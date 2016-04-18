@@ -453,7 +453,13 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool IsTrigger() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER) != 0; }
         bool IsGuard() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_GUARD) != 0; }
         bool CanWalk() const { return (GetCreatureTemplate()->InhabitType & INHABIT_GROUND) != 0; }
-        bool CanSwim() const { return (GetCreatureTemplate()->InhabitType & INHABIT_WATER) != 0 || IsPet(); }
+        bool CanSwim() const
+        {
+            Unit const* owner = GetCharmerOrOwner();
+            if (owner && owner->GetTypeId() == TYPEID_PLAYER)
+                return true;
+            return (GetCreatureTemplate()->InhabitType & INHABIT_WATER) != 0;
+        }
         bool CanFly()  const override { return (GetCreatureTemplate()->InhabitType & INHABIT_AIR) != 0; }
 
         void SetReactState(ReactStates st) { m_reactState = st; }
@@ -617,6 +623,14 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
                 m_combatPulseTime = delay;
         }
 
+        uint32 GetMasterCallDelay() const { return m_masterCallDelay; }
+        void SetMasterCallDelay(uint32 delay) // (secs) interval at which the creature will going at owner for free him from roots
+        {
+            m_masterCallDelay = delay;
+            if (m_masterCallTime == 0 || m_masterCallTime > delay)
+                m_masterCallTime = delay;
+        }
+
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
         ObjectGuid::LowType lootingGroupLowGUID;                         // used to find group which is looting corpse
 
@@ -706,6 +720,8 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         uint32 m_boundaryCheckTime;                         // (msecs) remaining time for next evade boundary check
         uint32 m_combatPulseTime;                           // (msecs) remaining time for next zone-in-combat pulse
         uint32 m_combatPulseDelay;                          // (secs) how often the creature puts the entire zone in combat (only works in dungeons)
+        uint32 m_masterCallTime;                            
+        uint32 m_masterCallDelay;
 
         ReactStates m_reactState;                           // for AI, not charmInfo
         void RegenerateMana();

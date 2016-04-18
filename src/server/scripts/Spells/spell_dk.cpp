@@ -23,6 +23,7 @@
 
 #include "Player.h"
 #include "PlayerAI.h"
+#include "CreatureAI.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
@@ -65,7 +66,8 @@ enum DeathKnightSpells
     SPELL_DK_UNHOLY_PRESENCE_TRIGGERED          = 49772,
     SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1   = 49189,
     SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284,
-    SPELL_DK_GHOUL_THRASH                       = 47480
+    SPELL_DK_GHOUL_THRASH                       = 47480,
+    SPELL_DK_DANCING_RUNE_WEAPON                = 49028
 };
 
 enum DeathKnightSpellIcons
@@ -1453,16 +1455,24 @@ class spell_dk_scourge_strike : public SpellScriptLoader
             spell_dk_scourge_strike_SpellScript()
             {
                 multiplier = 1.0f;
+                damageDone = 0;
             }
 
         private:
             float multiplier;
+            int32 damageDone;
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_DK_SCOURGE_STRIKE_TRIGGERED))
                     return false;
                 return true;
+            }
+
+            void HandleBeforeHit()
+            {
+                // Save calculated damage before hit, so we can do shadow damage even if absorbed
+                damageDone = GetHitDamage();
             }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1482,7 +1492,7 @@ class spell_dk_scourge_strike : public SpellScriptLoader
                 Unit* caster = GetCaster();
                 if (Unit* unitTarget = GetHitUnit())
                 {
-                    int32 bp = GetHitDamage() * multiplier;
+                    int32 bp = damageDone * multiplier;
 
                     if (AuraEffect* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_DK_BLACK_ICE_R1, EFFECT_0))
                         AddPct(bp, aurEff->GetAmount());
@@ -1493,6 +1503,7 @@ class spell_dk_scourge_strike : public SpellScriptLoader
 
             void Register() override
             {
+                BeforeHit += SpellHitFn(spell_dk_scourge_strike_SpellScript::HandleBeforeHit);
                 OnEffectHitTarget += SpellEffectFn(spell_dk_scourge_strike_SpellScript::HandleDummy, EFFECT_2, SPELL_EFFECT_DUMMY);
                 AfterHit += SpellHitFn(spell_dk_scourge_strike_SpellScript::HandleAfterHit);
             }
@@ -2004,6 +2015,82 @@ public:
     }
 };
 
+enum DancingRuneWeapon
+{
+    NPC_DANCING_RUNE_WEAPON     = 27893,
+    DATA_INITIAL_TARGET_GUID    = 1,
+    SPELL_DK_BLOOD_STRIKE       = 45902,
+    SPELL_DK_ICY_TOUCH          = 45477,
+    SPELL_DK_PLAGUE_STRIKE      = 45462
+};
+
+// 49028 - SPELL_DK_DANCING_RUNE_WEAPON
+class spell_dk_dancing_rune_weapon : public SpellScriptLoader
+{
+    public:
+        spell_dk_dancing_rune_weapon() : SpellScriptLoader("spell_dk_dancing_rune_weapon") { }
+
+        class spell_dk_dancing_rune_weapon_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dk_dancing_rune_weapon_AuraScript);
+
+            void HandleTarget(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                Unit* caster = GetCaster();
+                if (!caster)
+                    return;
+
+                std::list<Creature*> runeWeapons;
+                caster->GetAllMinionsByEntry(runeWeapons, NPC_DANCING_RUNE_WEAPON);
+                for (Creature* temp : runeWeapons)
+                    temp->AI()->SetGUID(GetTarget()->GetGUID(), DATA_INITIAL_TARGET_GUID);
+            }
+
+            bool CheckProc(ProcEventInfo& eventInfo)
+            {
+                if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
+                    if (procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_STRIKE)) ||
+                        procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_ICY_TOUCH)) ||
+                        procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_PLAGUE_STRIKE)))
+                        return true;
+
+                return false;
+            }
+
+            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            {
+                PreventDefaultAction();
+
+                SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+                if (!procSpell)
+                    return;
+
+                Unit* runeWeapon = nullptr;
+                for (auto itr = GetTarget()->m_Controlled.begin(); itr != GetTarget()->m_Controlled.end() && !runeWeapon; itr++)
+                    if ((*itr)->GetEntry() == NPC_DANCING_RUNE_WEAPON)
+                        runeWeapon = *itr;
+
+                if (!runeWeapon)
+                    return;
+
+                uint32 procDamage = eventInfo.GetDamageInfo()->GetDamage() / 2;
+                runeWeapon->CastCustomSpell(procSpell->Id, SPELLVALUE_BASE_POINT0, int32(procDamage), runeWeapon->GetVictim(), false, nullptr, aurEff, runeWeapon->GetGUID());
+            }
+
+            void Register() override
+            {
+                AfterEffectApply += AuraEffectApplyFn(spell_dk_dancing_rune_weapon_AuraScript::HandleTarget, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                DoCheckProc += AuraCheckProcFn(spell_dk_dancing_rune_weapon_AuraScript::CheckProc);
+                OnEffectProc += AuraEffectProcFn(spell_dk_dancing_rune_weapon_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_dk_dancing_rune_weapon_AuraScript();
+        }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -2037,4 +2124,5 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_raise_ally_initial();
     new spell_dk_raise_ally();
     new spell_dk_ghoul_thrash();
+    new spell_dk_dancing_rune_weapon();
 }

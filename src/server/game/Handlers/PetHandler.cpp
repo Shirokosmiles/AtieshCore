@@ -167,11 +167,15 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     charmInfo->SetIsFollowing(false);
                     charmInfo->SetIsReturning(false);
                     charmInfo->SaveStayPosition();
+                    if (pet->ToPet())
+                        pet->ToPet()->ClearCastWhenWillAvailable();
                     break;
                 case COMMAND_FOLLOW:                        //spellid=1792  //FOLLOW
                     pet->AttackStop();
                     pet->InterruptNonMeleeSpells(false);
                     pet->GetMotionMaster()->MoveFollow(_player, PET_FOLLOW_DIST, pet->GetFollowAngle());
+                    if (pet->ToPet())
+                        pet->ToPet()->ClearCastWhenWillAvailable();
                     charmInfo->SetCommandState(COMMAND_FOLLOW);
 
                     charmInfo->SetIsCommandAttack(false);
@@ -271,6 +275,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
             {
                 case REACT_PASSIVE:                         //passive
                     pet->AttackStop();
+                    if (pet->ToPet())
+                        pet->ToPet()->ClearCastWhenWillAvailable();
                     // no break;
                 case REACT_DEFENSIVE:                       //recovery
                 case REACT_AGGRESSIVE:                      //activete
@@ -295,6 +301,9 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 TC_LOG_ERROR("network", "WORLD: unknown PET spell id %i", spellid);
                 return;
             }
+
+            if (!unit_target)
+                return;
 
             for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             {
@@ -370,6 +379,138 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 }
 
                 spell->prepare(&(spell->m_targets));
+            }
+            else if (pet->ToPet() && (result == SPELL_FAILED_LINE_OF_SIGHT || SPELL_FAILED_OUT_OF_RANGE))
+            {
+                unit_target = spell->m_targets.GetUnitTarget();
+                bool haspositiveeffect = false;
+
+                // search positive effects for spell
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                {
+                    if (spellInfo->_IsPositiveEffect(i, true))
+                    {
+                        haspositiveeffect = true;
+                        break;
+                    }                        
+                }
+
+                if (pet->isPossessed() || pet->IsVehicle()) /// @todo: confirm this check
+                    Spell::SendCastResult(GetPlayer(), spellInfo, 0, result);
+                else if (GetPlayer()->IsFriendlyTo(unit_target) && !haspositiveeffect)
+                    spell->SendPetCastResult(SPELL_FAILED_TARGET_FRIENDLY);
+                else
+                    spell->SendPetCastResult(SPELL_FAILED_DONT_REPORT);                
+
+                if (!pet->GetSpellHistory()->HasCooldown(spellid))
+                    pet->GetSpellHistory()->ResetCooldown(spellid, true);
+
+                spell->finish(false);
+                delete spell;
+
+                // Can't attack if owner is pacified
+                if (_player->HasAuraType(SPELL_AURA_MOD_PACIFY))
+                {
+                    //pet->SendPetCastFail(spellid, SPELL_FAILED_PACIFIED);
+                    /// @todo Send proper error message to client
+                    return;
+                }
+
+                bool tempspellIsPositive = false;
+
+                if (!GetPlayer()->IsFriendlyTo(unit_target))
+                {                    
+                    // only place where pet can be player
+                    Unit* TargetUnit = ObjectAccessor::GetUnit(*_player, guid2);
+                    if (!TargetUnit)
+                        return;
+
+                    if (Unit* owner = pet->GetOwner())
+                        if (!owner->IsValidAttackTarget(TargetUnit))
+                            return;
+
+                    pet->ClearUnitState(UNIT_STATE_FOLLOW);
+                    // This is true if pet has no target or has target but targets differs.
+                    if (pet->GetVictim() != TargetUnit || (pet->GetVictim() == TargetUnit && !pet->GetCharmInfo()->IsCommandAttack()))
+                    {
+                        if (pet->GetVictim())
+                            pet->AttackStop();
+
+                        if (pet->GetTypeId() != TYPEID_PLAYER && pet->ToCreature()->IsAIEnabled)
+                        {
+                            charmInfo->SetIsCommandAttack(true);
+                            charmInfo->SetIsAtStay(false);
+                            charmInfo->SetIsFollowing(false);
+                            charmInfo->SetIsCommandFollow(false);
+                            charmInfo->SetIsReturning(false);
+
+                            pet->ToCreature()->AI()->AttackStart(TargetUnit);
+
+                            //10% chance to play special pet attack talk, else growl
+                            if (pet->IsPet() && ((Pet*)pet)->getPetType() == SUMMON_PET && pet != TargetUnit && urand(0, 100) < 10)
+                                pet->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
+                            else
+                            {
+                                // 90% chance for pet and 100% chance for charmed creature
+                                pet->SendPetAIReaction(guid1);
+                            }
+                        }
+                        else                                // charmed player
+                        {
+                            if (pet->GetVictim() && pet->GetVictim() != TargetUnit)
+                                pet->AttackStop();
+
+                            charmInfo->SetIsCommandAttack(true);
+                            charmInfo->SetIsAtStay(false);
+                            charmInfo->SetIsFollowing(false);
+                            charmInfo->SetIsCommandFollow(false);
+                            charmInfo->SetIsReturning(false);
+
+                            pet->Attack(TargetUnit, true);
+                            pet->SendPetAIReaction(guid1);
+                        }
+
+                        pet->ToPet()->CastWhenWillAvailable(spellid, unit_target, NULL, tempspellIsPositive);
+                    }
+                }
+                else if (haspositiveeffect)
+                {
+                    bool tempspellIsPositive = true;
+                    pet->ClearUnitState(UNIT_STATE_FOLLOW);
+                    // This is true if pet has no target or has target but targets differs.
+                    Unit* victim = pet->GetVictim();
+                    if (victim)
+                    {
+                        pet->AttackStop();
+                    }
+                    else
+                        victim = NULL;                        
+
+                    if (pet->GetTypeId() != TYPEID_PLAYER && pet->ToCreature()->IsAIEnabled)
+                    {
+                        pet->StopMoving();
+                        pet->GetMotionMaster()->Clear();
+
+                        charmInfo->SetIsCommandAttack(false);
+                        charmInfo->SetIsAtStay(false);
+                        charmInfo->SetIsFollowing(false);
+                        charmInfo->SetIsCommandFollow(false);
+                        charmInfo->SetIsReturning(false);
+
+                        pet->GetMotionMaster()->MoveChase(unit_target);
+
+                        //10% chance to play special pet attack talk, else growl
+                        if (pet->IsPet() && ((Pet*)pet)->getPetType() == SUMMON_PET && pet != unit_target && urand(0, 100) < 10)
+                            pet->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
+                        else
+                        {
+                            // 90% chance for pet and 100% chance for charmed creature
+                            pet->SendPetAIReaction(guid1);
+                        }
+
+                        pet->ToPet()->CastWhenWillAvailable(spellid, unit_target, victim, tempspellIsPositive);
+                    }
+                }
             }
             else
             {

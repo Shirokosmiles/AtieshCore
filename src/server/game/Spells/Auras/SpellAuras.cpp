@@ -1330,6 +1330,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (target->HasAura(58039)) // Glyph of Blurred Speed
                         target->CastSpell(target, 61922, true); // Sprint (waterwalk)
                 break;
+            case SPELLFAMILY_WARLOCK:
+                if (!caster)
+                    break;
+                if (GetSpellInfo()->SpellIconID == 3317 && GetSpellInfo()->SpellVisual[0] == 11247) // Shadowflame
+                    if (caster->HasAura(63310)) // Glyph of Shadowflame
+                        caster->CastSpell(target, 63311, true);
+                break;
             case SPELLFAMILY_DEATHKNIGHT:
                 if (!caster)
                     break;

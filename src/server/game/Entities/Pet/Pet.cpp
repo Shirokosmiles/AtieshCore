@@ -31,13 +31,14 @@
 #include "Util.h"
 #include "Group.h"
 #include "WorldSession.h"
+#include "CreatureAI.h"
 
 #define PET_XP_FACTOR 0.05f
 
 Pet::Pet(Player* owner, PetType type) :
     Guardian(NULL, owner, true), m_usedTalentCount(0), m_removed(false),
     m_happinessTimer(7500), m_petType(type), m_duration(0), m_auraRaidUpdateMask(0), m_loading(false),
-    m_declinedname(NULL)
+    m_declinedname(NULL), tempspellTarget(NULL), tempoldTarget(NULL), tempspellIsPositive(false), tempspell(0)
 {
     ASSERT(GetOwner());
 
@@ -618,6 +619,93 @@ void Pet::Update(uint32 diff)
                         default:
                             m_focusRegenTimer = 0;
                             break;
+                    }
+                }
+            }
+
+            if (tempspell != 0)
+            {
+                if (tempspellTarget && tempspellTarget->IsAlive())
+                {
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tempspell);
+                    float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
+
+                    if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)
+                    {
+                        if (tempspellTarget && !GetSpellHistory()->HasGlobalCooldown(spellInfo) && !GetSpellHistory()->HasCooldown(tempspell))
+                        {
+                            StopMoving();
+                            GetMotionMaster()->Clear(false);
+                            GetMotionMaster()->MoveIdle();
+
+                            GetCharmInfo()->SetIsCommandAttack(false);
+                            GetCharmInfo()->SetIsAtStay(true);
+                            GetCharmInfo()->SetIsCommandFollow(false);
+                            GetCharmInfo()->SetIsFollowing(false);
+                            GetCharmInfo()->SetIsReturning(false);
+                            GetCharmInfo()->SaveStayPosition();
+
+                            CastSpell(tempspellTarget, tempspell, true);
+
+                            if (tempspellIsPositive)
+                            {
+                                if (tempoldTarget && tempoldTarget->IsAlive())
+                                {
+                                    GetCharmInfo()->SetIsCommandAttack(true);
+                                    GetCharmInfo()->SetIsAtStay(false);
+                                    GetCharmInfo()->SetIsFollowing(false);
+                                    GetCharmInfo()->SetIsCommandFollow(false);
+                                    GetCharmInfo()->SetIsReturning(false);
+
+                                    ToCreature()->AI()->AttackStart(tempoldTarget);
+                                }
+                                else
+                                {
+                                    GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+                                    GetCharmInfo()->SetIsCommandAttack(false);
+                                    GetCharmInfo()->SetIsAtStay(false);
+                                    GetCharmInfo()->SetIsReturning(true);
+                                    GetCharmInfo()->SetIsCommandFollow(true);
+                                    GetCharmInfo()->SetIsFollowing(false);
+                                    GetMotionMaster()->MoveFollow(GetCharmerOrOwner(), PET_FOLLOW_DIST, GetFollowAngle());
+                                }
+                            }
+
+                            ClearCastWhenWillAvailable();
+                        }
+                    }
+                }
+                else
+                {
+                    ClearCastWhenWillAvailable();
+
+                    if (GetCharmerOrOwner()->GetVictim() && GetCharmerOrOwner()->GetVictim()->IsAlive())
+                    {
+                        StopMoving();
+                        GetMotionMaster()->Clear(false);
+                        GetMotionMaster()->MoveIdle();
+
+                        GetCharmInfo()->SetIsCommandAttack(true);
+                        GetCharmInfo()->SetIsAtStay(false);
+                        GetCharmInfo()->SetIsFollowing(false);
+                        GetCharmInfo()->SetIsCommandFollow(false);
+                        GetCharmInfo()->SetIsReturning(false);
+
+                        ToCreature()->AI()->AttackStart(GetCharmerOrOwner()->GetVictim());
+                    }
+                    else
+                    {
+                        StopMoving();
+                        GetMotionMaster()->Clear(false);
+                        GetMotionMaster()->MoveIdle();
+
+                        GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+                        GetCharmInfo()->SetIsCommandAttack(false);
+                        GetCharmInfo()->SetIsAtStay(false);
+                        GetCharmInfo()->SetIsReturning(true);
+                        GetCharmInfo()->SetIsCommandFollow(true);
+                        GetCharmInfo()->SetIsFollowing(false);
+                        GetMotionMaster()->MoveFollow(GetCharmerOrOwner(), PET_FOLLOW_DIST, GetFollowAngle());
                     }
                 }
             }
@@ -1919,6 +2007,30 @@ void Pet::CastPetAura(PetAura const* aura)
     }
     else
         CastSpell(this, auraId, true);
+}
+
+void Pet::CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, Unit* oldTarget, bool spellIsPositive)
+{
+    if (!spellid)
+        return;
+
+    if (!spellTarget)
+        return;
+
+    tempspellTarget = spellTarget;
+    tempspell = spellid;
+    tempspellIsPositive = spellIsPositive;
+
+    if (oldTarget)
+        tempoldTarget = oldTarget;
+}
+
+void Pet::ClearCastWhenWillAvailable()
+{
+    tempspellIsPositive = false;
+    tempspell = 0;
+    tempspellTarget = NULL;
+    tempoldTarget = NULL;
 }
 
 bool Pet::IsPetAura(Aura const* aura)

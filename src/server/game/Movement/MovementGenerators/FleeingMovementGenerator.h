@@ -20,26 +20,23 @@
 #define TRINITY_FLEEINGMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
+#include "Timer.h"
 
 template<class T>
 class FleeingMovementGenerator : public MovementGeneratorMedium< T, FleeingMovementGenerator<T> >
 {
-    public:
-        FleeingMovementGenerator(ObjectGuid fright) : i_frightGUID(fright), i_nextCheckTime(0) { }
+public:
+    explicit FleeingMovementGenerator(ObjectGuid fright) : i_frightGUID(fright), i_nextMoveTime(0) { }
 
-        void DoInitialize(T*);
-        void DoFinalize(T*);
-        void DoReset(T*);
-        bool DoUpdate(T*, uint32);
+    void DoInitialize(T*);
+    void DoFinalize(T*);
+    void DoReset(T*);
+    bool DoUpdate(T*, uint32);
 
-        MovementGeneratorType GetMovementGeneratorType() const override { return FLEEING_MOTION_TYPE; }
-
-    private:
-        void _setTargetLocation(T*);
-        void _getPoint(T*, float &x, float &y, float &z);
-
-        ObjectGuid i_frightGUID;
-        TimeTracker i_nextCheckTime;
+    MovementGeneratorType GetMovementGeneratorType() const override { return FLEEING_MOTION_TYPE; }
+private:
+    ObjectGuid i_frightGUID;
+    TimeTracker i_nextMoveTime;
 };
 
 class TimedFleeingMovementGenerator : public FleeingMovementGenerator<Creature>

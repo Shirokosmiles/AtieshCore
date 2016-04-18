@@ -37,8 +37,17 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
 
     if (!unit->IsAlive() || unit->IsStopped())
         return;
+    else if (unit->ToCreature())
+    {
+        if (Unit* victim = unit->GetVictim())
+        {
+            unit->InterruptSpell(CURRENT_MELEE_SPELL);
+            unit->SendMeleeAttackStop(victim);
+        }
+    }
 
     unit->StopMoving();
+    unit->DisableSpline();
     unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
 }
 
@@ -51,6 +60,7 @@ void ConfusedMovementGenerator<T>::DoReset(T* unit)
         return;
 
     unit->StopMoving();
+    unit->DisableSpline();
     unit->AddUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
 }
 
@@ -74,6 +84,9 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
         i_nextMoveTime.Update(diff);
         if (i_nextMoveTime.Passed())
         {
+            unit->StopMoving();
+            unit->DisableSpline();
+
             // start moving
             unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
 
@@ -83,19 +96,28 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
             pos.Relocate(i_x, i_y, i_z);
             unit->MovePositionToFirstCollision(pos, dest, 0.0f);
 
-            PathGenerator path(unit);
-            path.SetPathLengthLimit(30.0f);
-            bool result = path.CalculatePath(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-            if (!result || (path.GetPathType() & PATHFIND_NOPATH))
-            {
-                i_nextMoveTime.Reset(100);
-                return true;
-            }
+            unit->UpdateSpeed(MOVE_WALK);
 
             Movement::MoveSplineInit init(unit);
-            init.MovebyPath(path.GetPath());
+            init.MoveTo(pos.m_positionX, pos.m_positionY, pos.m_positionZ, true, false);
             init.SetWalk(true);
             init.Launch();
+
+            Movement::Location loc = unit->movespline->ComputePosition();
+
+            if (unit->movespline->onTransport)
+            {
+                Position& pos = unit->m_movementInfo.transport.pos;
+                pos.m_positionX = loc.x;
+                pos.m_positionY = loc.y;
+                pos.m_positionZ = loc.z;
+                pos.SetOrientation(loc.orientation);
+
+                if (TransportBase* transport = unit->GetDirectTransport())
+                    transport->CalculatePassengerPosition(loc.x, loc.y, loc.z, &loc.orientation);
+            }
+
+            unit->UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
         }
     }
 
@@ -108,6 +130,7 @@ void ConfusedMovementGenerator<Player>::DoFinalize(Player* unit)
     unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
     unit->ClearUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
     unit->StopMoving();
+    unit->DisableSpline();
 }
 
 template<>

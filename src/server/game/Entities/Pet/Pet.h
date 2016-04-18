@@ -107,6 +107,9 @@ class TC_GAME_API Pet : public Guardian
         void CastPetAura(PetAura const* aura);
         bool IsPetAura(Aura const* aura);
 
+        void CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, Unit* oldTarget, bool spellIsPositive = false);
+        void ClearCastWhenWillAvailable();
+
         void _LoadSpellCooldowns();
         void _LoadAuras(uint32 timediff);
         void _SaveAuras(SQLTransaction& trans);
@@ -155,6 +158,11 @@ class TC_GAME_API Pet : public Guardian
         uint32  m_focusRegenTimer;
 
         DeclinedName *m_declinedname;
+
+        Unit*   tempspellTarget;
+        Unit*   tempoldTarget;
+        bool    tempspellIsPositive;
+        uint32  tempspell;
 
     private:
         void SaveToDB(uint32, uint8, uint32) override                // override of Creature::SaveToDB     - must not be called

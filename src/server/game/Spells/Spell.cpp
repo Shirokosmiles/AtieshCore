@@ -1286,20 +1286,213 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             dest = SpellDestination(x, y, liquidLevel, m_caster->GetOrientation());
             break;
         }
+        case TARGET_DEST_CASTER_FRONT_LEAP:
+        {
+            float distance = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
+            Map* map = m_caster->GetMap();
+            uint32 mapid = m_caster->GetMapId();
+            uint32 phasemask = m_caster->GetPhaseMask();
+            float destx, desty, destz, ground;
+       
+            Position pos;
+            Position lastpos;
+            pos = m_caster->GetPosition();
+            destx = pos.GetPositionX() + distance * cos(pos.GetOrientation());
+            desty = pos.GetPositionY() + distance * sin(pos.GetOrientation());
+
+            ground = map->GetHeight(phasemask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+
+            if (!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || (pos.GetPositionZ() - ground < 25.0f))
+            {
+                float tstX, tstY, tstZ, prevX, prevY, prevZ;
+                float tstZ1, tstZ2, tstZ3, destz1, destz2, destz3, srange, srange1, srange2, srange3;
+                float maxtravelDistZ = 2.65f;
+                float overdistance = 0.0f;
+                float totalpath = 0.0f;
+                float beforewaterz = 0.0f;
+                const float  step = 2.0f;
+                const uint8 numChecks = ceil(fabs(distance / step));
+                const float DELTA_X = (destx - pos.GetPositionX()) / numChecks;
+                const float DELTA_Y = (desty - pos.GetPositionY()) / numChecks;
+                int j = 1;
+                for (; j < (numChecks + 1); j++)
+                {
+                    prevX = pos.GetPositionX() + (float(j - 1)*DELTA_X);
+                    prevY = pos.GetPositionY() + (float(j - 1)*DELTA_Y);
+                    tstX = pos.GetPositionX() + (float(j)*DELTA_X);
+                    tstY = pos.GetPositionY() + (float(j)*DELTA_Y);
+
+                    if (j < 2)
+                    {
+                        prevZ = pos.GetPositionZ();
+                    }
+                    else
+                    {
+                        prevZ = tstZ;
+                    }
+
+                    tstZ = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true);
+                    ground = tstZ;
+
+                    if (!map->IsInWater(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()))
+                    {
+                        if (map->IsInWater(tstX, tstY, tstZ))
+                        {
+                            if (!(beforewaterz != 0.0f))
+                                beforewaterz = prevZ;
+                            tstZ = beforewaterz;                            
+                            srange = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX));
+                            //TC_LOG_ERROR("server", "(start was from land) step in water , number of cycle = %i , distance of step = %f, total path = %f, Z = %f", j, srange, totalpath, tstZ);
+                        }
+                    }
+                    else if (map->IsInWater(tstX, tstY, tstZ))
+                    {
+                        prevZ = pos.GetPositionZ();
+                        tstZ = pos.GetPositionZ();
+                        srange = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX));
+                        //TC_LOG_ERROR("server", "(start in water) step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                    }
+
+                    if (!map->IsInWater(tstX, tstY, tstZ) && tstZ != beforewaterz)  // second safety check z for blink way if on the ground
+                    {
+                        // highest available point
+                        tstZ1 = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true, 25.0f);
+                        // upper or floor
+                        tstZ2 = map->GetHeight(phasemask, tstX, tstY, prevZ, true, 25.0f);
+                        //lower than floor
+                        tstZ3 = map->GetHeight(phasemask, tstX, tstY, prevZ - maxtravelDistZ / 2, true, 25.0f);
+
+                        //distance of rays, will select the shortest in 3D
+                        srange1 = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX) + (tstZ1 - prevZ)*(tstZ1 - prevZ));
+                        //TC_LOG_ERROR("server", "step = %i, distance of ray1 = %f", j, srange1);
+                        srange2 = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX) + (tstZ2 - prevZ)*(tstZ2 - prevZ));
+                        //TC_LOG_ERROR("server", "step = %i, distance of ray2 = %f", j, srange2);
+                        srange3 = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX) + (tstZ3 - prevZ)*(tstZ3 - prevZ));
+                        //TC_LOG_ERROR("server", "step = %i, distance of ray3 = %f", j, srange3);
+
+                        if (srange1 < srange2)
+                            tstZ = tstZ1;
+                        else if (srange3 < srange2)
+                            tstZ = tstZ3;
+                        else
+                            tstZ = tstZ2;                        
+                        
+                        srange = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX) + (tstZ - prevZ)*(tstZ - prevZ));
+                        //TC_LOG_ERROR("server", "step on ground, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                    }
+
+                    destx = tstX;
+                    desty = tstY;
+                    destz = tstZ;
+                                        
+                    totalpath += srange;                                            
+
+                    if (totalpath > distance)
+                    {
+                        overdistance = totalpath - distance;
+                        //TC_LOG_ERROR("server", "total path > than distance in 3D , need to move back a bit for save distance, total path = %f, overdistance = %f", totalpath, overdistance);
+                    }
+
+                    bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(mapid, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
+                    // check dynamic collision
+                    bool dcol = m_caster->GetMap()->getObjectHitPos(phasemask, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
+
+                    // collision occured
+                    if (col || dcol || (overdistance > 0.0f && !map->IsInWater(tstX, tstY, ground)) || (fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
+                    {
+                        if ((overdistance > 0.0f) && (overdistance < step))
+                        {
+                            destx = prevX + overdistance * cos(pos.GetOrientation());
+                            desty = prevY + overdistance * sin(pos.GetOrientation());
+                            //TC_LOG_ERROR("server", "(collision) collision occured 1");
+                        }
+                        else
+                        {
+                            // move back a bit
+                            destx = tstX - (0.6 * cos(pos.GetOrientation()));
+                            desty = tstY - (0.6 * sin(pos.GetOrientation()));
+                            //TC_LOG_ERROR("server", "(collision) collision occured 2");
+                        }
+
+                        // highest available point
+                        destz1 = map->GetHeight(phasemask, destx, desty, prevZ + maxtravelDistZ, true, 25.0f);
+                        // upper or floor
+                        destz2 = map->GetHeight(phasemask, destx, desty, prevZ, true, 25.0f);
+                        //lower than floor
+                        destz3 = map->GetHeight(phasemask, destx, desty, prevZ - maxtravelDistZ / 2, true, 25.0f);
+
+                        //distance of rays, will select the shortest in 3D
+                        srange1 = sqrt((desty - prevY)*(desty - prevY) + (destx - prevX)*(destx - prevX) + (destz1 - prevZ)*(destz1 - prevZ));
+                        srange2 = sqrt((desty - prevY)*(desty - prevY) + (destx - prevX)*(destx - prevX) + (destz2 - prevZ)*(destz2 - prevZ));
+                        srange3 = sqrt((desty - prevY)*(desty - prevY) + (destx - prevX)*(destx - prevX) + (destz3 - prevZ)*(destz3 - prevZ));
+
+                        if (srange1 < srange2)
+                            destz = destz1;
+                        else if (srange3 < srange2)
+                            destz = destz3;
+                        else
+                            destz = destz2;
+
+                        //TC_LOG_ERROR("server", "(collision) destZ rewrited in prevZ");                         
+
+                        break;
+                    }
+                    // we have correct destz now
+                }
+                //}
+
+                lastpos.Relocate(destx, desty, destz + 0.5f, pos.GetOrientation());
+                dest = SpellDestination(lastpos);
+            }
+            else
+            {
+                float z = pos.GetPositionZ();
+                bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(mapid, pos.GetPositionX(), pos.GetPositionY(), z + 0.5f, destx, desty, z + 0.5f, destx, desty, z, -0.5f);
+                // check dynamic collision
+                bool dcol = m_caster->GetMap()->getObjectHitPos(phasemask, pos.GetPositionX(), pos.GetPositionY(), z + 0.5f, destx, desty, z + 0.5f, destx, desty, z, -0.5f);
+
+                // collision occured
+                if (col || dcol)
+                {
+                    // move back a bit
+                    destx = destx - (0.6 * cos(pos.GetOrientation()));
+                    desty = desty - (0.6 * sin(pos.GetOrientation()));
+                }
+                                
+                lastpos.Relocate(destx, desty, z, pos.GetOrientation());
+                dest = SpellDestination(lastpos);
+                //float range = sqrt((desty - pos.GetPositionY())*(desty - pos.GetPositionY()) + (destx - pos.GetPositionX())*(destx - pos.GetPositionX()));
+                //TC_LOG_ERROR("server", "Blink number 2, in falling but at a hight, distance of blink = %f", range);
+            }
+
+            break;
+        }
         default:
         {
-            float dist;
+            float dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
             float angle = targetType.CalcDirectionAngle();
             float objSize = m_caster->GetObjectSize();
-            if (targetType.GetTarget() == TARGET_DEST_CASTER_SUMMON)
-                dist = PET_FOLLOW_DIST;
-            else
-                dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
 
             if (dist < objSize)
                 dist = objSize;
-            else if (targetType.GetTarget() == TARGET_DEST_CASTER_RANDOM)
-                dist = objSize + (dist - objSize) * float(rand_norm());
+
+            switch (targetType.GetTarget())
+            {
+                case TARGET_DEST_CASTER_SUMMON:
+                    dist = PET_FOLLOW_DIST;
+                    break;
+                case TARGET_DEST_CASTER_RANDOM:
+                    dist = objSize + (dist - objSize) * float(rand_norm());
+                    break;
+                case TARGET_DEST_CASTER_FRONT_LEFT:
+                case TARGET_DEST_CASTER_BACK_LEFT:
+                case TARGET_DEST_CASTER_FRONT_RIGHT:
+                case TARGET_DEST_CASTER_BACK_RIGHT:
+                    dist = dist + objSize;
+                    break;
+                default:
+                    break;                                            
+            }
 
             Position pos = dest._position;
             m_caster->MovePositionToFirstCollision(pos, dist, angle);
@@ -2961,7 +3154,7 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
 
     // don't allow channeled spells / spells with cast time to be cast while moving
     // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
-    if ((m_spellInfo->IsChanneled() || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT)
+    if (((m_spellInfo->IsChanneled() && !m_spellInfo->HasAttribute(SPELL_ATTR5_CAN_CHANNEL_WHILE_MOVING)) || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT)
     {
         SendCastResult(SPELL_FAILED_MOVING);
         finish(false);
@@ -3309,6 +3502,10 @@ void Spell::handle_immediate()
             m_caster->AddInterruptMask(m_spellInfo->ChannelInterruptFlags);
             SendChannelStart(duration);
         }
+
+        // interrupt movement at channeled spells for creature case
+        if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->isMoving() && !m_spellInfo->HasAttribute(SPELL_ATTR5_CAN_CHANNEL_WHILE_MOVING))
+            m_caster->StopMoving();
     }
 
     PrepareTargetProcessing();
@@ -4876,7 +5073,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (DynamicObject* dynObj = m_caster->GetDynObject(m_triggeredByAuraSpell->Id))
                         losTarget = dynObj;
 
-                if (!m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, NULL, SPELL_DISABLE_LOS) && !target->IsWithinLOSInMap(losTarget))
+                if (!m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, NULL, SPELL_DISABLE_LOS) && !target->IsWithinLOSInMap(losTarget) && !(m_spellInfo->HasAttribute(SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC) && m_spellInfo->HasAttribute(SPELL_ATTR5_UNK26)))
                     return SPELL_FAILED_LINE_OF_SIGHT;
             }
         }
@@ -4888,7 +5085,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         float x, y, z;
         m_targets.GetDstPos()->GetPosition(x, y, z);
 
-        if (!m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, NULL, SPELL_DISABLE_LOS) && !m_caster->IsWithinLOS(x, y, z))
+        if (!m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, NULL, SPELL_DISABLE_LOS) && !m_caster->IsWithinLOS(x, y, z) && !(m_spellInfo->HasAttribute(SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC) && m_spellInfo->HasAttribute(SPELL_ATTR5_UNK26)))
             return SPELL_FAILED_LINE_OF_SIGHT;
     }
 

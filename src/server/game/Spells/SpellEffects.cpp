@@ -3661,6 +3661,16 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     m_caster->CastSpell(unitTarget, 22682, true);
                     return;
                 }
+                // Decimate
+                case 28374:
+                case 54426:
+                    if (unitTarget)
+                    {
+                        int32 decimateDamage = int32(unitTarget->GetHealth()) - int32(unitTarget->CountPctFromMaxHealth(5));
+                        if (decimateDamage > 0)
+                            m_caster->CastCustomSpell(28375, SPELLVALUE_BASE_POINT0, decimateDamage, unitTarget);
+                    }
+                    return;
                 // Mirren's Drinking Hat
                 case 29830:
                 {
@@ -4583,7 +4593,6 @@ void Spell::EffectLeap(SpellEffIndex /*effIndex*/)
         return;
 
     Position pos = destTarget->GetPosition();
-    pos = unitTarget->GetFirstCollisionPosition(unitTarget->GetDistance(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()), 0.0f);
     unitTarget->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), unitTarget == m_caster);
 }
 
@@ -5586,7 +5595,11 @@ void Spell::EffectTitanGrip(SpellEffIndex /*effIndex*/)
         return;
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
         m_caster->ToPlayer()->SetCanTitanGrip(true);
+        if (m_caster->ToPlayer()->HasTwoHandWeaponInOneHand() && !m_caster->ToPlayer()->HasAura(49152))
+            m_caster->ToPlayer()->CastSpell(m_caster, 49152, true);
+    }
 }
 
 void Spell::EffectRedirectThreat(SpellEffIndex /*effIndex*/)

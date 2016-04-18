@@ -42,43 +42,16 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool up
     if (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsFocusing(nullptr, true))
         return;
 
-    float x, y, z;
+    float x, y, z;    
 
     if (updateDestination || !i_path)
     {
         if (!i_offset)
-        {
-            // to nearest contact position
             i_target->GetContactPoint(owner, x, y, z);
-        }
+        else if (owner->GetTypeId() == TYPEID_UNIT && owner->HasUnitState(UNIT_STATE_FOLLOW))
+            i_target->GetClosePoint(x, y, z, CONTACT_DISTANCE, i_offset, i_angle);
         else
-        {
-            float dist;
-            float size;
-
-            // Pets need special handling.
-            // We need to subtract GetObjectSize() because it gets added back further down the chain
-            //  and that makes pets too far away. Subtracting it allows pets to properly
-            //  be (GetCombatReach() + i_offset) away.
-            // Only applies when i_target is pet's owner otherwise pets and mobs end up
-            //   doing a "dance" while fighting
-            if (owner->IsPet() && i_target->GetTypeId() == TYPEID_PLAYER)
-            {
-                dist = i_target->GetCombatReach();
-                size = i_target->GetCombatReach() - i_target->GetObjectSize();
-            }
-            else
-            {
-                dist = i_offset + 1.0f;
-                size = owner->GetObjectSize();
-            }
-
-            if (i_target->IsWithinDistInMap(owner, dist))
-                return;
-
-            // to at i_offset distance from target and i_angle from target facing
-            i_target->GetClosePoint(x, y, z, size, i_offset, i_angle);
-        }
+            i_target->GetClosePoint(x, y, z, owner->GetObjectSize(), i_offset, i_angle);
     }
     else
     {
@@ -89,14 +62,20 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool up
         z = end.z;
     }
 
+    float dest = i_target->GetDistance(owner);
+
+    Position pos;
+    pos.Relocate(x, y, z);
+    owner->MovePositionToFirstCollision(pos, dest, 0.0f);
+
     if (!i_path)
         i_path = new PathGenerator(owner);
 
     // allow pets to use shortcut if no path found when following their master
-    bool forceDest = (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsPet()
-        && owner->HasUnitState(UNIT_STATE_FOLLOW));
+    bool forceDest = owner->GetTypeId() == TYPEID_UNIT && owner->HasUnitTypeMask(UNIT_MASK_MINION) && owner->ToCreature()->IsPet() &&
+        owner->HasUnitState(UNIT_STATE_FOLLOW) && i_target->IsWithinLOSInMap(owner);
 
-    bool result = i_path->CalculatePath(x, y, z, forceDest);
+    bool result = i_path->CalculatePath(pos.m_positionX, pos.m_positionY, pos.m_positionZ, forceDest);
     if (!result || (i_path->GetPathType() & PATHFIND_NOPATH))
     {
         // Cant reach target
@@ -111,7 +90,8 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool up
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());
-    init.SetWalk(((D*)this)->EnableWalking());
+    init.SetWalk(static_cast<D*>(this)->EnableWalking(owner));
+    static_cast<D*>(this)->_updateSpeed(owner);
     // Using the same condition for facing target as the one that is used for SetInFront on movement end
     // - applies to ChaseMovementGenerator mostly
     if (i_angle == 0.f)
@@ -155,8 +135,11 @@ bool TargetedMovementGeneratorMedium<T, D>::DoUpdate(T* owner, uint32 time_diff)
     if (i_recheckDistance.Passed())
     {
         i_recheckDistance.Reset(100);
-        //More distance let have better performance, less distance let have more sensitive reaction at target move.
+
         float allowed_dist = owner->GetCombatReach() + sWorld->getRate(RATE_TARGET_POS_RECALCULATION_RANGE);
+        if (owner->GetTypeId() == TYPEID_UNIT && owner->HasUnitState(UNIT_STATE_FOLLOW))
+            allowed_dist = owner->GetMeleeReach();
+
         G3D::Vector3 dest = owner->movespline->FinalDestination();
         if (owner->movespline->onTransport)
             if (TransportBase* transport = owner->GetDirectTransport())
@@ -169,7 +152,7 @@ bool TargetedMovementGeneratorMedium<T, D>::DoUpdate(T* owner, uint32 time_diff)
             targetMoved = !i_target->IsWithinDist2d(dest.x, dest.y, allowed_dist);
 
         // then, if the target is in range, check also Line of Sight.
-        if (!targetMoved)
+        if (!targetMoved && owner->movespline->Finalized())
             targetMoved = !i_target->IsWithinLOSInMap(owner);
     }
 
@@ -240,13 +223,13 @@ void ChaseMovementGenerator<Creature>::MovementInform(Creature* unit)
 
 //-----------------------------------------------//
 template<>
-bool FollowMovementGenerator<Creature>::EnableWalking() const
+bool FollowMovementGenerator<Creature>::EnableWalking(Creature* owner) const
 {
-    return i_target.isValid() && i_target->IsWalking();
+    return i_target.isValid() && i_target->IsWalking() && i_target->IsWithinMeleeRange(owner);
 }
 
 template<>
-bool FollowMovementGenerator<Player>::EnableWalking() const
+bool FollowMovementGenerator<Player>::EnableWalking(Player* /*owner*/) const
 {
     return false;
 }
@@ -262,12 +245,26 @@ void FollowMovementGenerator<Creature>::_updateSpeed(Creature* owner)
 {
     // pet only sync speed with owner
     /// Make sure we are not in the process of a map change (IsInWorld)
-    if (!owner->IsPet() || !owner->IsInWorld() || !i_target.isValid() || i_target->GetGUID() != owner->GetOwnerGUID())
+    if (!owner->HasUnitTypeMask(UNIT_MASK_MINION) || !owner->IsInWorld() || !i_target.isValid() ||
+        i_target->GetGUID() != owner->GetOwnerGUID())
         return;
 
     owner->UpdateSpeed(MOVE_RUN);
     owner->UpdateSpeed(MOVE_WALK);
     owner->UpdateSpeed(MOVE_SWIM);
+}
+
+template<>
+void FollowMovementGenerator<Player>::_reachTarget(Player* /*owner*/)
+{
+    // nothing to do for Player
+}
+
+template<>
+void FollowMovementGenerator<Creature>::_reachTarget(Creature* owner)
+{
+    if (i_target->IsWithinMeleeRange(owner))
+        owner->SetFacingTo(i_target->GetOrientation());
 }
 
 template<>

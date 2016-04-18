@@ -2193,7 +2193,7 @@ void WorldObject::GetNearPoint2D(float &x, float &y, float distance2d, float abs
 void WorldObject::GetNearPoint(WorldObject const* /*searcher*/, float &x, float &y, float &z, float searcher_size, float distance2d, float absAngle) const
 {
     GetNearPoint2D(x, y, distance2d+searcher_size, absAngle);
-    z = GetPositionZ();
+    z = GetPositionZ() + 0.5f;
     // Should "searcher" be used instead of "this" when updating z coordinate ?
     UpdateAllowedPositionZ(x, y, z);
 
@@ -2339,7 +2339,7 @@ float NormalizeZforCollision(WorldObject* obj, float x, float y, float z)
 void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float angle)
 {
     angle += GetOrientation();
-    float destx, desty, destz;
+    float destx, desty, destz, tdestz;
     destx = pos.m_positionX + dist * std::cos(angle);
     desty = pos.m_positionY + dist * std::sin(angle);
 
@@ -2360,6 +2360,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         destx -= CONTACT_DISTANCE * std::cos(angle);
         desty -= CONTACT_DISTANCE * std::sin(angle);
         dist = std::sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
+        tdestz = destz;
     }
 
     // check dynamic collision
@@ -2371,6 +2372,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         destx -= CONTACT_DISTANCE * std::cos(angle);
         desty -= CONTACT_DISTANCE * std::sin(angle);
         dist = std::sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
+        tdestz = destz;
     }
 
     float step = dist / 10.0f;
@@ -2391,6 +2393,10 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
             break;
         }
     }
+
+    // sometimes in algorithm with using "dist" destz can be lower then z of collision, for example in elwyn with collision in trees.
+    if (tdestz && tdestz > destz)
+        pos.Relocate(destx, desty, tdestz + 0.5f);
 
     Trinity::NormalizeMapCoord(pos.m_positionX);
     Trinity::NormalizeMapCoord(pos.m_positionY);

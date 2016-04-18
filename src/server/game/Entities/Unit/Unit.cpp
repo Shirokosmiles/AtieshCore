@@ -1422,6 +1422,12 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     if (GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->CastItemCombatSpell(victim, damageInfo->attackType, damageInfo->procVictim, damageInfo->procEx);
 
+    for (Unit* unit : m_Controlled)
+    {
+        if (unit->IsAIEnabled && unit->GetAI())
+            unit->GetAI()->OwnerMeleeDamageDealt(this, damageInfo);
+    }
+
     // Do effect if any damage done to target
     if (damageInfo->damage)
     {
@@ -6325,8 +6331,25 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             {
                 case 56800: // Glyph of Backstab
                 {
-                    triggered_spell_id = 63975;
-                    break;
+                    if (!target)
+                        return false;
+
+                    if (AuraEffect const* AurEff = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x00100000, 0x0, 0x0, GetGUID()))
+                    {
+                        uint32 CountMin = AurEff->GetBase()->GetMaxDuration();
+                        
+                        uint32 CountMax = AurEff->GetSpellInfo()->GetMaxDuration();
+                        
+                        CountMax += 3 * triggerAmount * IN_MILLISECONDS;      // Glyph of Backstab              -> +6 seconds
+                        
+                        if (CountMin < CountMax)
+                        {
+                            AurEff->GetBase()->SetDuration(AurEff->GetBase()->GetDuration() + triggerAmount * IN_MILLISECONDS);
+                            AurEff->GetBase()->SetMaxDuration(CountMin + triggerAmount * IN_MILLISECONDS);
+                            return true;
+                        }
+                    }
+                    return false;
                 }
                 case 32748: // Deadly Throw Interrupt
                 {
@@ -7223,31 +7246,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 triggered_spell_id = 50163;
                 target = this;
                 break;
-            }
-            // Dancing Rune Weapon
-            if (dummySpell->Id == 49028)
-            {
-                // 1 dummy aura for dismiss rune blade
-                if (effIndex != 1)
-                    return false;
-
-                Unit* pPet = NULL;
-                for (ControlList::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr) // Find Rune Weapon
-                    if ((*itr)->GetEntry() == 27893)
-                    {
-                        pPet = *itr;
-                        break;
-                    }
-
-                if (pPet && pPet->GetVictim() && damage && procSpell)
-                {
-                    uint32 procDmg = damage / 2;
-                    pPet->SendSpellNonMeleeDamageLog(pPet->GetVictim(), procSpell->Id, procDmg, procSpell->GetSchoolMask(), 0, 0, false, 0, false);
-                    pPet->DealDamage(pPet->GetVictim(), procDmg, NULL, SPELL_DIRECT_DAMAGE, procSpell->GetSchoolMask(), procSpell, true);
-                    break;
-                }
-                else
-                    return false;
             }
             // Mark of Blood
             if (dummySpell->Id == 49005)
@@ -11868,7 +11866,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
                 creature->GetFormation()->MemberAttackStart(creature, enemy);
         }
 
-        if (IsPet())
+        if (creature->HasUnitTypeMask(UNIT_MASK_MINION))
         {
             UpdateSpeed(MOVE_RUN);
             UpdateSpeed(MOVE_SWIM);
@@ -13027,6 +13025,8 @@ void Unit::ModSpellDurationTime(SpellInfo const* spellInfo, int32 & duration, Sp
         duration = int32(float(duration) * GetFloatValue(UNIT_MOD_CAST_SPEED));
     else if (spellInfo->HasAttribute(SPELL_ATTR0_REQ_AMMO) && !spellInfo->HasAttribute(SPELL_ATTR2_AUTOREPEAT_FLAG))
         duration = int32(float(duration) * m_modAttackSpeedPct[RANGED_ATTACK]);
+    else if (spellInfo->SpellVisual[0] == 3881 && HasAura(67556)) // cooking with Chef Hat.
+        duration = 500;
 }
 
 DiminishingLevels Unit::GetDiminishing(DiminishingGroup group)
@@ -14245,7 +14245,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
             continue;
         ProcTriggeredData triggerData(itr->second->GetBase());
         // Defensive procs are active on absorbs (so absorption effects are not a hindrance)
-        bool active = damage || (procExtra & PROC_EX_BLOCK && isVictim);
+        bool active = damage || (procExtra & PROC_EX_BLOCK && isVictim) || (procSpell ? procSpell->HasAttribute(SPELL_ATTR6_TRIGGER_ALWAYS) : false);
         if (isVictim)
             procExtra &= ~PROC_EX_INTERNAL_REQ_FAMILY;
 

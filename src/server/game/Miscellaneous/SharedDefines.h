@@ -456,7 +456,7 @@ enum SpellAttr4
 
 enum SpellAttr5
 {
-    SPELL_ATTR5_UNK0                             = 0x00000001, //  0
+    SPELL_ATTR5_CAN_CHANNEL_WHILE_MOVING         = 0x00000001, //  0 don't interrupt channeling spells when moving
     SPELL_ATTR5_NO_REAGENT_WHILE_PREP            = 0x00000002, //  1 not need reagents if UNIT_FLAG_PREPARATION
     SPELL_ATTR5_UNK2                             = 0x00000004, //  2
     SPELL_ATTR5_USABLE_WHILE_STUNNED             = 0x00000008, //  3 usable while stunned
@@ -515,7 +515,7 @@ enum SpellAttr6
     SPELL_ATTR6_ONLY_VISIBLE_TO_CASTER           = 0x00100000, // 20 Auras with this attribute are only visible to their caster (or pet's owner)
     SPELL_ATTR6_CLIENT_UI_TARGET_EFFECTS         = 0x00200000, // 21 it's only client-side attribute
     SPELL_ATTR6_UNK22                            = 0x00400000, // 22 only 72054
-    SPELL_ATTR6_UNK23                            = 0x00800000, // 23
+    SPELL_ATTR6_TRIGGER_ALWAYS                   = 0x00800000, // 23 Spells with this attribute will always trigger procs
     SPELL_ATTR6_CAN_TARGET_UNTARGETABLE          = 0x01000000, // 24
     SPELL_ATTR6_UNK25                            = 0x02000000, // 25 Exorcism, Flash of Light
     SPELL_ATTR6_UNK26                            = 0x04000000, // 26 related to player castable positive buff
