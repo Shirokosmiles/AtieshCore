@@ -1,19 +1,9 @@
-# ![logo](http://www.trinitycore.org/f/public/style_images/1_trinitycore.png) TrinityCore
-
-[![Issue Stats](http://www.issuestats.com/github/TrinityCore/TrinityCore/badge/issue)](http://www.issuestats.com/github/TrinityCore/TrinityCore) [![Issue Stats](http://www.issuestats.com/github/TrinityCore/TrinityCore/badge/pr)](http://www.issuestats.com/github/TrinityCore/TrinityCore) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=1310)](https://www.bountysource.com/trackers/1310-trinity-core?utm_source=1310&utm_medium=shield&utm_campaign=TRACKER_BADGE)
-
-## Build Status
-
-6.x | 3.3.5
-:------------: | :------------:
-[![6.x Build Status](https://travis-ci.org/TrinityCore/TrinityCore.svg?branch=6.x)](https://travis-ci.org/TrinityCore/TrinityCore) | [![3.3.5 Build Status](https://travis-ci.org/TrinityCore/TrinityCore.svg?branch=3.3.5)](https://travis-ci.org/TrinityCore/TrinityCore)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/435/badge.svg)](https://scan.coverity.com/projects/435) | [![Coverity Scan Build Status](https://scan.coverity.com/projects/4656/badge.svg)](https://scan.coverity.com/projects/4656)
+# ![logo](https://gitlab.com/uploads/project/avatar/1086968/logo.png?raw=true) 
 
 ## Introduction
+RustEmu-Core is a *MMORPG* Framework based mostly in C++.
 
-TrinityCore is a *MMORPG* Framework based mostly in C++.
-
-It is derived from *MaNGOS*, the *Massive Network Game Object Server*, and is
+It is derived from *TrinityCore* and *MaNGOS*, the *Massive Network Game Object Server*, and is
 based on the code of that project with extensive changes over time to optimize,
 improve and cleanup the codebase at the same time as improving the in-game
 mechanics and functionality.
