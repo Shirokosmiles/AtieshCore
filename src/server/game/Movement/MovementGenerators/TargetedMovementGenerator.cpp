@@ -47,7 +47,12 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool up
     if (updateDestination || !i_path)
     {
         if (!i_offset)
+        {
+            if (i_target->IsWithinDistInMap(owner, CONTACT_DISTANCE))
+                return;
+
             i_target->GetContactPoint(owner, x, y, z);
+        }
         else if (owner->GetTypeId() == TYPEID_UNIT && owner->HasUnitState(UNIT_STATE_FOLLOW))
             i_target->GetClosePoint(x, y, z, CONTACT_DISTANCE, i_offset, i_angle);
         else
