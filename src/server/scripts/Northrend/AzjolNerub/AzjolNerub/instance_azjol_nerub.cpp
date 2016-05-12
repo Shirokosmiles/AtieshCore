@@ -31,16 +31,23 @@ DoorData const doorData[] =
 ObjectData const creatureData[] =
 {
     { NPC_KRIKTHIR,        DATA_KRIKTHIR_THE_GATEWATCHER },
+    { NPC_HADRONOX,        DATA_HADRONOX                 },
+    { NPC_ANUBARAK,        DATA_ANUBARAK                 },
     { NPC_WATCHER_NARJIL,  DATA_WATCHER_GASHRA           },
     { NPC_WATCHER_GASHRA,  DATA_WATCHER_SILTHIK          },
     { NPC_WATCHER_SILTHIK, DATA_WATCHER_NARJIL           },
     { 0,                   0                             } // END
 };
 
+BossBoundaryData const boundaries = 
+{
+    { DATA_ANUBARAK, new CircleBoundary(Position(550.6178f, 253.5917f), 26.0f) }
+};
+
 class instance_azjol_nerub : public InstanceMapScript
 {
     public:
-        instance_azjol_nerub() : InstanceMapScript(AzjolNerubScriptName, 601) { }
+        instance_azjol_nerub() : InstanceMapScript("instance_azjol_nerub", 601) { }
 
         struct instance_azjol_nerub_InstanceScript : public InstanceScript
         {
@@ -48,8 +55,19 @@ class instance_azjol_nerub : public InstanceMapScript
             {
                 SetHeaders(DataHeader);
                 SetBossNumber(EncounterCount);
+                LoadBossBoundaries(boundaries);
                 LoadDoorData(doorData);
                 LoadObjectData(creatureData, nullptr);
+            }
+
+            void OnUnitDeath(Unit* who) override
+            {
+                InstanceScript::OnUnitDeath(who);
+                Creature* creature = who->ToCreature();
+                if (!creature || creature->IsCritter())
+                    return;
+                if (Creature* gatewatcher = GetCreature(DATA_KRIKTHIR_THE_GATEWATCHER))
+                    gatewatcher->AI()->DoAction(-ACTION_GATEWATCHER_GREET);
             }
         };
 
