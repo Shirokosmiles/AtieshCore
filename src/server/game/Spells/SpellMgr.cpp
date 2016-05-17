@@ -3050,6 +3050,7 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 52438: // Summon Skittering Swarmer (Force Cast)
             case 52449: // Summon Skittering Infector (Force Cast)
             case 53609: // Summon Anub'ar Assassin (Force Cast)
+            case 53457: // Summon Impale Trigger (AoE)
                 spellInfo->MaxAffectedTargets = 1;
                 break;
             case 36384: // Skartax Purple Beam

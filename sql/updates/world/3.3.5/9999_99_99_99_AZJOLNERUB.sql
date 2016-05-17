@@ -1,5 +1,10 @@
 SET @CGUID = 500000; -- creature GUIDs (14 creatures)
 
+SET @IMMUNEMASK = (1|2|4|16|32|64|128|256|512|2048|4096|8192|65536|131072|524288|4194304|8388608|67108864|536870912);
+-- Correct immunity mask (all bosses)
+UPDATE `creature_template` SET `mechanic_immune_mask` = @IMMUNEMASK WHERE `entry` IN (28684);
+UPDATE `creature_template` SET `mechanic_immune_mask` = (@IMMUNEMASK|33554432) WHERE `entry` IN (28921,29120);
+
 -- ------------------------- --
 -- Krik'thir the Gatewatcher --
 -- ------------------------- --
