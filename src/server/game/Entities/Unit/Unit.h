@@ -1533,6 +1533,7 @@ class TC_GAME_API Unit : public WorldObject
         bool isFeared()  const { return HasAuraType(SPELL_AURA_MOD_FEAR); }
         bool isInRoots() const { return HasAuraType(SPELL_AURA_MOD_ROOT); }
         bool IsPolymorphed() const;
+        bool IsDazed() const;
 
         bool isFrozen() const;
 

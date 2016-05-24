@@ -577,20 +577,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 // Steady Shot
                 else if (m_spellInfo->SpellFamilyFlags[1] & 0x1)
                 {
-                    bool found = false;
-                    // check dazed affect
-                    Unit::AuraEffectList const& decSpeedList = unitTarget->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
-                    for (Unit::AuraEffectList::const_iterator iter = decSpeedList.begin(); iter != decSpeedList.end(); ++iter)
-                    {
-                        if ((*iter)->GetSpellInfo()->SpellIconID == 15 && (*iter)->GetSpellInfo()->Dispel == 0)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-
                     /// @todo should this be put on taken but not done?
-                    if (found)
+                    if (unitTarget->IsDazed())
                         damage += m_spellInfo->Effects[EFFECT_1].CalcValue();
 
                     if (Player* caster = m_caster->ToPlayer())

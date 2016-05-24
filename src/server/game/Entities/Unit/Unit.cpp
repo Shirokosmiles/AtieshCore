@@ -14287,6 +14287,23 @@ bool Unit::IsPolymorphed() const
     return spellInfo->GetSpellSpecific() == SPELL_SPECIFIC_MAGE_POLYMORPH;
 }
 
+bool Unit::IsDazed() const
+{
+    bool found = false;
+    // check dazed affect
+    Unit::AuraEffectList const& decSpeedList = GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
+    for (Unit::AuraEffectList::const_iterator iter = decSpeedList.begin(); iter != decSpeedList.end(); ++iter)
+    {
+        if ((*iter)->GetSpellInfo()->SpellIconID == 15 && (*iter)->GetSpellInfo()->Dispel == 0)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    return found;
+}
+
 void Unit::SetDisplayId(uint32 modelId)
 {
     SetUInt32Value(UNIT_FIELD_DISPLAYID, modelId);
