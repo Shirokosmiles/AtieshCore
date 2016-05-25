@@ -14289,19 +14289,13 @@ bool Unit::IsPolymorphed() const
 
 bool Unit::IsDazed() const
 {
-    bool found = false;
-    // check dazed affect
     Unit::AuraEffectList const& decSpeedList = GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
-    for (Unit::AuraEffectList::const_iterator iter = decSpeedList.begin(); iter != decSpeedList.end(); ++iter)
+    Unit::AuraEffectList::const_iterator itr = std::find_if(decSpeedList.begin(), decSpeedList.end(), [](AuraEffect* auraEffect)
     {
-        if ((*iter)->GetSpellInfo()->SpellIconID == 15 && (*iter)->GetSpellInfo()->Dispel == 0)
-        {
-            found = true;
-            break;
-        }
-    }
+        return auraEffect->GetSpellInfo()->SpellIconID == 15 && auraEffect->GetSpellInfo()->Dispel == 0;
+    });
 
-    return found;
+    return itr != decSpeedList.end();
 }
 
 void Unit::SetDisplayId(uint32 modelId)
