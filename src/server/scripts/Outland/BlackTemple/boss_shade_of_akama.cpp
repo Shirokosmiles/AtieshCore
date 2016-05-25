@@ -135,16 +135,59 @@ enum Events
     EVENT_RAIN_OF_FIRE               = 22,
     EVENT_LIGHTNING_BOLT             = 23,
     // Ashtongue Spiritbinder
-    EVENT_SPIRIT_HEAL                = 24
+    EVENT_SPIRIT_HEAL                = 24,
+    // spawn of event npc
+    EVENT_START_FIGHT                = 25,
+    EVENT_END_FIGHT                  = 26,
+    EVENT_AFTER_BATTLE               = 27,
+    EVENT_FIRST_END_WAVE             = 28,
+    EVENT_SECOND_END_WAVE            = 29,
+    EVENT_3_END_WAVE                 = 30,
+    EVENT_3_END_WAVE_MOVE_1          = 31,
+    EVENT_3_END_WAVE_MOVE_2          = 32,
+    EVENT_3_END_WAVE_MOVE_3          = 33,
+    EVENT_END_EMOTE                  = 34
 };
 
-G3D::Vector3 const ShadeWP = { 512.4877f, 400.7993f, 112.7837f };
-
-G3D::Vector3 const AkamaWP[] =
+enum PhaseNpcAkama
 {
-    { 517.4877f, 400.7993f, 112.7837f },
-    { 468.4435f, 401.1062f, 118.5379f }
+    PHASE_NPC_AKAMA_NULL = 0,
+    PHASE_CHANNEL = 1,
+    PHASE_FIGHT_WITH_SHADE = 2,
+    PHASE_WALK_AND_MINIOS = 3
 };
+
+Position const SummonPositions[9] =
+{
+    { 487.8522f, 429.9765f, 112.7839f, 4.0f }, // 1
+    { 482.5728f, 431.5027f, 112.7839f, 4.3f }, // 2
+    { 486.9953f, 431.8665f, 112.7839f, 3.9f }, // 3
+
+    { 509.4674f, 401.0299f, 112.7839f, 3.1f }, // 4
+    { 508.5506f, 405.7852f, 112.7839f, 3.1f }, // 5
+    { 508.3435f, 396.7022f, 112.7839f, 3.0f }, // 6
+
+    { 493.2539f, 372.1406f, 112.7839f, 2.3f }, // 7
+    { 494.4277f, 375.8009f, 112.7839f, 2.24f }, // 8
+    { 488.7583f, 369.7834f, 112.7838f, 2.1f }, // 9
+};
+
+Position const SummonWP[9] =
+{
+    { 476.5457f, 417.7671f, 115.5209f }, // 1
+    { 472.4048f, 420.4574f, 116.2645f }, // 2
+    { 476.5458f, 415.2565f, 115.5131f }, // 3
+
+    { 486.0755f, 401.2258f, 112.7839f }, // 4
+    { 485.2746f, 406.8502f, 112.7839f }, // 5
+    { 484.6188f, 396.9120f, 112.7839f }, // 6
+
+    { 482.2252f, 382.8841f, 112.7838f }, // 7
+    { 482.8166f, 388.1901f, 112.7838f }, // 8
+    { 477.4723f, 382.1891f, 114.4382f }, // 9
+};
+
+Position const ShadeWP = { 512.4877f, 400.7993f, 112.7837f };
 
 // ########################################################
 // Shade of Akama
@@ -169,6 +212,8 @@ public:
             akamaReached = false;
             HasKilledAkama = false;
             HasKilledAkamaAndReseting = false;
+            DeadShade = false;
+            DeadShadeNoRepeat = false;
         }
 
         void Reset() override
@@ -206,6 +251,12 @@ public:
             }
             else
                 ScriptedAI::AttackStart(who);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            DeadShade = true;
+            instance->SetBossState(DATA_SHADE_OF_AKAMA, DONE);
         }
 
         void DoAction(int32 actionId) override
@@ -310,8 +361,17 @@ public:
                             break;
                         }
                         case EVENT_START_ATTACK_AKAMA:
-                            me->GetMotionMaster()->MovePoint(0, ShadeWP.x, ShadeWP.y, ShadeWP.z, false);
-                            events.ScheduleEvent(EVENT_START_ATTACK_AKAMA, 1000);
+                            if (!akamaReached)
+                            {
+                                me->GetMotionMaster()->MovePoint(0, ShadeWP, false);
+                                events.ScheduleEvent(EVENT_START_ATTACK_AKAMA, 1000);
+                            }
+                            else
+                            {
+                                me->StopMoving();
+                                me->GetMotionMaster()->Clear(true);
+                            }
+
                             break;
                         case EVENT_ADD_THREAT:
                             DoCast(SPELL_THREAT);
@@ -358,15 +418,15 @@ public:
                     {
                         if (me->IsWithinDist(Akama, 2.0f, false))
                         {
-                            akamaReached = true;
-                            me->GetMotionMaster()->Clear(true);
-                            me->GetMotionMaster()->MoveIdle();
-                            me->SetWalk(false);
+                            akamaReached = true;                            
 
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
                             events.CancelEvent(EVENT_START_ATTACK_AKAMA);
                             events.ScheduleEvent(EVENT_ADD_THREAT, 100);
+
+                            me->StopMoving();
+                            me->GetMotionMaster()->Clear(true);
 
                             for (GuidList::const_iterator itr = Spawners.begin(); itr != Spawners.end(); ++itr)
                                 if (Creature* Spawner = ObjectAccessor::GetCreature(*me, *itr))
@@ -380,12 +440,14 @@ public:
         }
 
         public:
-            bool HasKilledAkama;
+            bool HasKilledAkama;    
+            bool akamaReached;
+            bool DeadShade;
+            bool DeadShadeNoRepeat;
         private:
             GuidList Channelers;
             GuidList Spawners;
-            bool akamaReached;
-            bool combatStarted;
+            bool combatStarted;                      
             bool HasKilledAkamaAndReseting;
     };
 
@@ -417,7 +479,11 @@ public:
             StartChannel = false;
             StartCombat = false;
             HasYelledOnce = false;
-            ShadeHasDied = false;
+
+            Phase = PHASE_NPC_AKAMA_NULL;
+
+            for (ObjectGuid summon : summons)
+                summon = ObjectGuid::Empty;
         }
 
         void Reset() override
@@ -452,71 +518,242 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterPhase(PhaseNpcAkama NextPhase)
         {
-            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 2000);
-            events.ScheduleEvent(EVENT_DESTRUCTIVE_POISON, 5000);
+            switch (NextPhase)
+            {
+                case PHASE_CHANNEL:
+                    events.ScheduleEvent(EVENT_SHADE_START, 500);                  
+                    break;
+                case PHASE_FIGHT_WITH_SHADE:
+                    me->InterruptNonMeleeSpells(0);                    
+                    me->ClearUnitState(UNIT_STATE_ROOT);
+                    me->ClearUnitState(UNIT_STATE_STUNNED);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+
+                    if (Creature* Shade = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_AKAMA_SHADE)))
+                        if (Shade->IsAlive())
+                            ScriptedAI::AttackStart(Shade);    
+
+                    events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 2000);
+                    events.ScheduleEvent(EVENT_DESTRUCTIVE_POISON, 5000);
+                    break;
+                case PHASE_WALK_AND_MINIOS:                                        
+                    me->setFaction(FACTION_FRIENDLY); 
+                    me->StopMoving();
+                    me->GetMotionMaster()->Clear(true);                    
+                    events.ScheduleEvent(EVENT_FIRST_END_WAVE, 500);
+                    break;
+                default:
+                    break;
+            }
+            Phase = NextPhase;
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (StartChannel)
+            events.Update(diff);                          
+
+            if (Phase == PHASE_CHANNEL)
             {
-                events.Update(diff);
+                if (Creature* Shade = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SHADE_OF_AKAMA)))
+                    if (Shade->IsAlive())
+                        if (ENSURE_AI(boss_shade_of_akama::boss_shade_of_akamaAI, Shade->AI())->akamaReached == true)
+                        {
+                            events.ScheduleEvent(EVENT_START_FIGHT, 500);
+                        }
 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
                     {
-                        case EVENT_SHADE_START:
-                            instance->SetBossState(DATA_SHADE_OF_AKAMA, IN_PROGRESS);
-                            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                            me->RemoveAura(SPELL_STEALTH);
-                            me->SetWalk(true);
-                            me->GetMotionMaster()->MovePoint(0, AkamaWP[0].x, AkamaWP[0].y, AkamaWP[0].z, false);
-                            events.ScheduleEvent(EVENT_SHADE_CHANNEL, 10000);
-                            break;
-                        case EVENT_SHADE_CHANNEL:
-                            me->AddUnitState(UNIT_STATE_ROOT);
-                            me->SetFacingTo(3.118662f);
-                            DoCast(me, SPELL_AKAMA_SOUL_CHANNEL);
-                            me->setFaction(FACTION_COMBAT);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-                            events.ScheduleEvent(EVENT_FIXATE, 5000);
-                            break;
-                        case EVENT_FIXATE:
-                            DoCast(SPELL_FIXATE);
-                            StartChannel = false;
-                            break;
-                        default:
-                            break;
+                    case EVENT_SHADE_START:
+                        instance->SetBossState(DATA_SHADE_OF_AKAMA, IN_PROGRESS);
+                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveAura(SPELL_STEALTH);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetWalk(true);
+                        me->GetMotionMaster()->MovePoint(0, 517.4877f, 400.7993f, 112.7837f, false);
+                        me->SetPosition(517.4877f, 400.7993f, 112.7837f, me->GetOrientation());
+                        events.ScheduleEvent(EVENT_SHADE_CHANNEL, 10000);
+                        break;
+                    case EVENT_SHADE_CHANNEL:
+                        me->AddUnitState(UNIT_STATE_ROOT);
+                        me->SetFacingTo(3.118662f);
+                        DoCast(me, SPELL_AKAMA_SOUL_CHANNEL);
+                        me->setFaction(FACTION_COMBAT);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        events.ScheduleEvent(EVENT_FIXATE, 5000);
+                        break;
+                    case EVENT_FIXATE:
+                        DoCast(SPELL_FIXATE);
+                        StartChannel = false;                        
+                        break;
+                    case EVENT_START_FIGHT:
+                        EnterPhase(PHASE_FIGHT_WITH_SHADE);
+                        break;
+                    default:
+                        break;
                     }
                 }
             }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            while (uint32 eventId = events.ExecuteEvent())
+            else if (Phase == PHASE_FIGHT_WITH_SHADE)
             {
-                switch (eventId)
+                if (Creature* Shade = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SHADE_OF_AKAMA)))
+                    if (!Shade->IsAlive())
+                        if (ENSURE_AI(boss_shade_of_akama::boss_shade_of_akamaAI, Shade->AI())->DeadShade == true && ENSURE_AI(boss_shade_of_akama::boss_shade_of_akamaAI, Shade->AI())->DeadShadeNoRepeat == false)
+                        {
+                            events.ScheduleEvent(EVENT_END_FIGHT, 500);
+                            ENSURE_AI(boss_shade_of_akama::boss_shade_of_akamaAI, Shade->AI())->DeadShadeNoRepeat = true; // only for 1 time for execute event
+                        }
+
+                while (uint32 eventId = events.ExecuteEvent())
                 {
+                    switch (eventId)
+                    {
                     case EVENT_CHAIN_LIGHTNING:
-                        DoCastVictim(SPELL_CHAIN_LIGHTNING);
+                        DoCast(SPELL_CHAIN_LIGHTNING);
                         events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, urand(10000, 15000));
                         break;
                     case EVENT_DESTRUCTIVE_POISON:
                         DoCast(me, SPELL_DESTRUCTIVE_POISON);
                         events.ScheduleEvent(EVENT_DESTRUCTIVE_POISON, urand(4000, 5000));
                         break;
+                    case EVENT_END_FIGHT:
+                        events.CancelEvent(EVENT_CHAIN_LIGHTNING);
+                        events.CancelEvent(EVENT_DESTRUCTIVE_POISON);
+                        me->InterruptNonMeleeSpells(0);
+                        me->RemoveMovementImpairingAuras();
+                        me->AttackStop();
+                        me->SetWalk(false);
+                        me->GetMotionMaster()->MovePoint(0, 468.4435f, 401.1062f, 118.5379f, true);
+                        events.ScheduleEvent(EVENT_AFTER_BATTLE, 7000);
+                        break;
+                    case EVENT_AFTER_BATTLE:
+                        me->SetFacingTo(0.1f);
+                        EnterPhase(PHASE_WALK_AND_MINIOS);                        
+                        break;
                     default:
                         break;
+                    }
+                }
+
+                DoMeleeAttackIfReady();
+            }
+            else if (Phase == PHASE_WALK_AND_MINIOS)
+            {
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {                    
+                    case EVENT_FIRST_END_WAVE:                        
+                        SummonEndWave(0);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                        Talk(SAY_BROKEN_FREE_0);
+                        events.ScheduleEvent(EVENT_3_END_WAVE_MOVE_1, 500);
+                        break;
+                    case EVENT_SECOND_END_WAVE:
+                        SummonEndWave(1);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                        Talk(SAY_BROKEN_FREE_1);
+                        events.ScheduleEvent(EVENT_3_END_WAVE_MOVE_2, 500);
+                        break;
+                    case EVENT_3_END_WAVE:
+                        SummonEndWave(2);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                        Talk(SAY_BROKEN_FREE_2);
+                        events.ScheduleEvent(EVENT_3_END_WAVE_MOVE_3, 500);
+                        break;
+                    case EVENT_3_END_WAVE_MOVE_1:
+                        for (uint8 i = 0; i < 3; ++i)
+                        {
+                            Creature* summon = ObjectAccessor::GetCreature(*me, summons[i]);
+                            if (!summon)
+                                continue;
+
+                            summon->AttackStop();
+                            summon->SetWalk(true);
+                            summon->GetMotionMaster()->MovePoint(0, SummonWP[i]);
+                        }
+
+                        events.ScheduleEvent(EVENT_SECOND_END_WAVE, urand(5000, 9000));
+                        break;
+                    case EVENT_3_END_WAVE_MOVE_2:
+                        for (uint8 i = 0; i < 3; ++i)
+                        {
+                            Creature* summon = ObjectAccessor::GetCreature(*me, summons[i + 3]);
+                            if (!summon)
+                                continue;
+
+                            summon->AttackStop();
+                            summon->SetWalk(true);
+                            summon->GetMotionMaster()->MovePoint(0, SummonWP[i + 3]);
+                        }
+
+                        events.ScheduleEvent(EVENT_3_END_WAVE, urand(5000, 9000));
+                        break;
+                    case EVENT_3_END_WAVE_MOVE_3:
+                        for (uint8 i = 0; i < 3; ++i)
+                        {
+                            Creature* summon = ObjectAccessor::GetCreature(*me, summons[i + 6]);
+                            if (!summon)
+                                continue;
+
+                            summon->AttackStop();
+                            summon->SetWalk(true);
+                            summon->GetMotionMaster()->MovePoint(0, SummonWP[i + 6]);
+                        }
+
+                        events.ScheduleEvent(EVENT_END_EMOTE, 8000);
+                        break;
+                    case EVENT_END_EMOTE:
+                        for (ObjectGuid summonGuid : summons)
+                        {
+                            Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
+                            if (!summon)
+                                continue;
+
+                            summon->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        }
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                        break;
+                    default:
+                        break;
+                    }
                 }
             }
+        }
+        
+        void SummonEndWave(uint8 num)
+        {
+            if (num > 2)
+                return;
 
-            DoMeleeAttackIfReady();
+            uint32 summonEntries[3] = { NPC_ASHTONGUE_SORCERER, NPC_ASHTONGUE_DEFENDER, NPC_ASHTONGUE_ELEMENTALIST };
+            if (num == 1)
+            {
+                summonEntries[0] = NPC_ASHTONGUE_ROGUE;
+                summonEntries[1] = NPC_ASHTONGUE_SPIRITBINDER;
+            }
+            else if (num == 2)
+            {
+                summonEntries[0] = NPC_ASHTONGUE_BROKEN;
+                summonEntries[1] = NPC_ASHTONGUE_SPIRITBINDER;
+                summonEntries[2] = NPC_ASHTONGUE_DEFENDER;
+            }
+
+            for (uint8 i = 0; i < 3; ++i)
+            {
+                TempSummon* summ = me->SummonCreature(summonEntries[i], SummonPositions[i + num * 3], TEMPSUMMON_DEAD_DESPAWN);
+                if (!summ)
+                    continue;
+
+                summons[i + num * 3] = summ->GetGUID();
+                summ->setFaction(FACTION_FRIENDLY);
+                summ->StopMoving();
+                summ->GetMotionMaster()->Clear(true);
+            }
         }
 
         void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
@@ -525,18 +762,18 @@ public:
             {
                 player->CLOSE_GOSSIP_MENU();
                 StartChannel = true;
-                events.ScheduleEvent(EVENT_SHADE_START, 500);
+                EnterPhase(PHASE_CHANNEL);         
             }
         }
 
         private:
+            ObjectGuid summons[9];
             InstanceScript* instance;
             EventMap events;
-            bool StartChannel;
-            bool ShadeHasDied;
+            PhaseNpcAkama Phase;
+            bool StartChannel;            
             bool StartCombat;
             bool HasYelledOnce;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -749,6 +986,7 @@ public:
         {
             startedBanishing = false;
             switchToCombat = false;
+            resetevents = false;
         }
 
         void Reset() override
@@ -758,7 +996,7 @@ public:
                 if (Creature* Shade = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SHADE_OF_AKAMA)))
                 {
                     if (Shade->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
-                        me->GetMotionMaster()->MovePoint(0, Shade->GetPositionX(), Shade->GetPositionY(), Shade->GetPositionZ(), false);
+                        me->GetMotionMaster()->MovePoint(0, Shade->GetPositionX(), Shade->GetPositionY(), Shade->GetPositionZ(), true);
                     else
                     {
                         if (Unit* target = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_AKAMA_SHADE)))
@@ -788,6 +1026,15 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (me->getFaction() == FACTION_FRIENDLY && resetevents)
+                return;
+            else if (me->getFaction() == FACTION_FRIENDLY)
+            {
+                events.Reset();
+                resetevents = true;
+                return;
+            }
+
             events.Update(diff);
 
             while (uint32 eventId = events.ExecuteEvent())
@@ -825,7 +1072,7 @@ public:
                 {
                     me->StopMoving();
                     me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MovePoint(1, me->GetPositionX() + frand (-8.0f, 8.0f), me->GetPositionY() + frand (-8.0f, 8.0f), me->GetPositionZ(), false);
+                    me->GetMotionMaster()->MovePoint(1, me->GetPositionX() + frand (-8.0f, 8.0f), me->GetPositionY() + frand (-8.0f, 8.0f), me->GetPositionZ(), true);
                     events.ScheduleEvent(EVENT_SORCERER_CHANNEL, 1500);
                     startedBanishing = true;
                 }
@@ -839,6 +1086,7 @@ public:
             EventMap events;
             bool startedBanishing;
             bool switchToCombat;
+            bool resetevents;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -861,10 +1109,17 @@ public:
         npc_ashtongue_defenderAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            resetevents = false;
         }
 
         void Reset() override
         {
+            Initialize();
             if (Unit* target = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_AKAMA_SHADE)))
                 AttackStart(target);
         }
@@ -884,6 +1139,15 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (me->getFaction() == FACTION_FRIENDLY && resetevents)
+                return;
+            else if (me->getFaction() == FACTION_FRIENDLY)
+            {
+                events.Reset();
+                resetevents = true;
+                return;
+            }
+
             if (!UpdateVictim())
                 return;
 
@@ -920,6 +1184,7 @@ public:
         private:
             InstanceScript* instance;
             EventMap events;
+            bool resetevents;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -944,8 +1209,14 @@ public:
             instance = creature->GetInstanceScript();
         }
 
+        void Initialize()
+        {
+            resetevents = false;
+        }
+
         void Reset() override
         {
+            Initialize();
             if (Unit* target = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_AKAMA_SHADE)))
                 AttackStart(target);
         }
@@ -963,6 +1234,15 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (me->getFaction() == FACTION_FRIENDLY && resetevents)
+                return;
+            else if (me->getFaction() == FACTION_FRIENDLY)
+            {
+                events.Reset();
+                resetevents = true;
+                return;
+            }
+
             if (!UpdateVictim())
                 return;
 
@@ -991,6 +1271,7 @@ public:
         private:
             InstanceScript* instance;
             EventMap events;
+            bool resetevents;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1015,8 +1296,14 @@ public:
             instance = creature->GetInstanceScript();
         }
 
+        void Initialize()
+        {
+            resetevents = false;
+        }
+
         void Reset() override
         {
+            Initialize();
             if (Unit* target = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_AKAMA_SHADE)))
                 AttackStart(target);
         }
@@ -1034,6 +1321,15 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (me->getFaction() == FACTION_FRIENDLY && resetevents)
+                return;
+            else if (me->getFaction() == FACTION_FRIENDLY)
+            {
+                events.Reset();
+                resetevents = true;
+                return;
+            }
+
             if (!UpdateVictim())
                 return;
 
@@ -1062,6 +1358,7 @@ public:
         private:
             InstanceScript* instance;
             EventMap events;
+            bool resetevents;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1091,6 +1388,7 @@ public:
         {
             spiritMend = false;
             chainHeal = false;
+            resetevents = false;
         }
 
         void Reset() override
@@ -1113,6 +1411,15 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (me->getFaction() == FACTION_FRIENDLY && resetevents)
+                return;
+            else if (me->getFaction() == FACTION_FRIENDLY)
+            {
+                events.Reset();
+                resetevents = true;
+                return;
+            }
+
             events.Update(diff);
 
             while (uint32 eventId = events.ExecuteEvent())
@@ -1157,6 +1464,7 @@ public:
             EventMap events;
             bool spiritMend;
             bool chainHeal;
+            bool resetevents;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
