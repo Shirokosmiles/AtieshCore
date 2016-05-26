@@ -605,7 +605,7 @@ void Creature::Update(uint32 diff)
                         GetCharmInfo()->SetIsReturning(false);
                         SendMeleeAttackStart(pettarget);
                         GetMotionMaster()->MoveChase(pettarget);
-                        UpdateSpeed(MOVE_RUN, false);
+                        UpdateSpeed(MOVE_RUN);
                     }
                     else
                         GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, GetFollowAngle());

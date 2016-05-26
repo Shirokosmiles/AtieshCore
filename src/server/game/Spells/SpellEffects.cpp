@@ -579,7 +579,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 {
                     /// @todo should this be put on taken but not done?
                     if (unitTarget->IsDazed())
-                        damage += m_spellInfo->Effects[EFFECT_1].CalcValue();
+                        m_damage += m_spellInfo->Effects[EFFECT_1].CalcValue();
 
                     if (Player* caster = m_caster->ToPlayer())
                     {
@@ -590,10 +590,12 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             float dmg_min = weaponTemplate->Damage[0].DamageMin;
                             float dmg_max = weaponTemplate->Damage[0].DamageMax;
                             if (dmg_max == 0.0f && dmg_min > dmg_max)
-                                damage += int32(dmg_min);
+                                m_damage += int32(dmg_min);
                             else
-                                damage += irand(int32(dmg_min), int32(dmg_max));
-                            damage += int32(caster->GetAmmoDPS() * weaponTemplate->Delay * 0.001f);
+                                m_damage += irand(int32(dmg_min), int32(dmg_max));
+                            m_damage += int32(caster->GetAmmoDPS() * weaponTemplate->Delay * 0.001f);
+							float RAP = caster->GetTotalAttackPowerValue(RANGED_ATTACK);
+							m_damage += RAP * 0.1f;
                         }
                     }
                 }
