@@ -3988,6 +3988,8 @@ bool Player::ResetTalents(bool no_cost)
     CharacterDatabase.CommitTransaction(trans);
 
     SetFreeTalentPoints(talentPointsForLevel);
+    // check some item equip limitations (in result lost CanTitanGrip at talent reset, for example)
+    AutoUnequipOffhandIfNeed();
 
     if (!no_cost)
     {
