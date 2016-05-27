@@ -1665,6 +1665,9 @@ ListenRange.Yell = 300
 
 Creature.MovingStopTimeForPlayer = 180000
 
+MonsterSight = 50
+GuarderSight = 50
+
 #
 ###################################################################################################
 

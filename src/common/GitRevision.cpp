@@ -41,18 +41,18 @@ char const* GitRevision::GetFullDatabase()
     return _FULL_DATABASE;
 }
 
-#define _PACKAGENAME "TrinityCore"
+#define _PACKAGENAME "RE Core"
 
 char const* GitRevision::GetFullVersion()
 {
 #if PLATFORM == PLATFORM_WINDOWS
 # ifdef _WIN64
-    return _PACKAGENAME " rev. " VER_PRODUCTVERSION_STR " (Win64, " _BUILD_DIRECTIVE ")";
+    return _PACKAGENAME " rev: " VER_PRODUCTVERSION_STR " (Win64, " _BUILD_DIRECTIVE ")";
 # else
-    return _PACKAGENAME " rev. " VER_PRODUCTVERSION_STR " (Win32, " _BUILD_DIRECTIVE ")";
+    return _PACKAGENAME " rev: " VER_PRODUCTVERSION_STR " (Win32, " _BUILD_DIRECTIVE ")";
 # endif
 #else
-    return _PACKAGENAME " rev. " VER_PRODUCTVERSION_STR " (Unix, " _BUILD_DIRECTIVE ")";
+    return _PACKAGENAME " rev: " VER_PRODUCTVERSION_STR " (Unix, " _BUILD_DIRECTIVE ")";
 #endif
 }
 

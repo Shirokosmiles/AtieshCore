@@ -11,7 +11,7 @@
  #define VER_COMPANYNAME_STR        "healthstone"
  #define VER_LEGALCOPYRIGHT_STR     "(c)2015 - 2016 RustEmu-Core"
  #define VER_FILEVERSION            0,0,0
- #define VER_FILEVERSION_STR        "@rev_hash@ @rev_date@ (@rev_branch@ branch)"
+ #define VER_FILEVERSION_STR        "[@rev_hash@] @rev_date@ (@rev_branch@ branch)"
  #define VER_PRODUCTVERSION         VER_FILEVERSION
  #define VER_PRODUCTVERSION_STR     VER_FILEVERSION_STR
 #endif // __REVISION_DATA_H__
