@@ -4247,27 +4247,27 @@ class spell_gen_clear_debuffs : public SpellScriptLoader
 class spell_gen_shadowmeld : public SpellScriptLoader
 {
 public:
-	spell_gen_shadowmeld() : SpellScriptLoader("spell_gen_shadowmeld") { }
+    spell_gen_shadowmeld() : SpellScriptLoader("spell_gen_shadowmeld") { }
 
-	class spell_gen_shadowmeld_SpellScript : public SpellScript
-	{
-		PrepareSpellScript(spell_gen_shadowmeld_SpellScript);
+    class spell_gen_shadowmeld_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_shadowmeld_SpellScript);
 
-		void HandleDummy(SpellEffIndex /*effIndex*/)
-		{
-			GetCaster()->CombatStop(true);
-		}
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            GetCaster()->CombatStop(true);
+        }
 
-		void Register() override
-		{
-			OnEffectHit += SpellEffectFn(spell_gen_shadowmeld_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-		}
-	};
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_gen_shadowmeld_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+        }
+    };
 
-	SpellScript* GetSpellScript() const override
-	{
-		return new spell_gen_shadowmeld_SpellScript();
-	}
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gen_shadowmeld_SpellScript();
+    }
 };
 
 void AddSC_generic_spell_scripts()
@@ -4358,5 +4358,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_mixology_bonus();
     new spell_gen_landmine_knockback_achievement();
     new spell_gen_clear_debuffs();
-	new spell_gen_shadowmeld();
+    new spell_gen_shadowmeld();
 }
