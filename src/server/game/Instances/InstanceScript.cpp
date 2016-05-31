@@ -288,34 +288,34 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
 {
     if (id < bosses.size())
     {
-        BossInfo* bossInfo = &bosses[id];
-        if (bossInfo->state == TO_BE_DECIDED) // loading
+        BossInfo& bossInfo = bosses[id];
+        if (bossInfo.state == TO_BE_DECIDED) // loading
         {
-            bossInfo->state = state;
+            bossInfo.state = state;
             //TC_LOG_ERROR("misc", "Inialize boss %u state as %u.", id, (uint32)state);
             return false;
         }
         else
         {
-            if (bossInfo->state == state)
+            if (bossInfo.state == state)
                 return false;
 
             if (state == DONE)
-                for (GuidSet::iterator i = bossInfo->minion.begin(); i != bossInfo->minion.end(); ++i)
+                for (GuidSet::iterator i = bossInfo.minion.begin(); i != bossInfo.minion.end(); ++i)
                     if (Creature* minion = instance->GetCreature(*i))
                         if (minion->isWorldBoss() && minion->IsAlive())
                             return false;
 
-            bossInfo->state = state;
+            bossInfo.state = state;
             SaveToDB();
         }
 
         for (uint32 type = 0; type < MAX_DOOR_TYPES; ++type)
-            for (GuidSet::iterator i = bossInfo->door[type].begin(); i != bossInfo->door[type].end(); ++i)
+            for (GuidSet::iterator i = bossInfo.door[type].begin(); i != bossInfo.door[type].end(); ++i)
                 if (GameObject* door = instance->GetGameObject(*i))
                     UpdateDoorState(door);
 
-        for (GuidSet::iterator i = bossInfo->minion.begin(); i != bossInfo->minion.end(); ++i)
+        for (GuidSet::iterator i = bossInfo.minion.begin(); i != bossInfo.minion.end(); ++i)
             if (Creature* minion = instance->GetCreature(*i))
                 UpdateMinionState(minion, state);
 

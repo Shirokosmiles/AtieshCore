@@ -25,14 +25,15 @@ uint32 const EncounterCount = 3;
 enum DataTypes
 {
     // Encounter States/Boss GUIDs
-    DATA_KRIKTHIR_THE_GATEWATCHER   = 0,
+    DATA_KRIKTHIR   = 0,
     DATA_HADRONOX                   = 1,
     DATA_ANUBARAK                   = 2,
 
     // Additional Data
     DATA_WATCHER_NARJIL,
     DATA_WATCHER_GASHRA,
-    DATA_WATCHER_SILTHIK
+    DATA_WATCHER_SILTHIK,
+    DATA_ANUBARAK_WALL
 };
 
 enum CreatureIds

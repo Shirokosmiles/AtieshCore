@@ -70,7 +70,8 @@ enum Events
     EVENT_DARTER,
     EVENT_ASSASSIN,
     EVENT_GUARDIAN,
-    EVENT_VENOMANCER
+    EVENT_VENOMANCER,
+    EVENT_CLOSE_DOOR
 };
 
 enum Actions
@@ -125,10 +126,15 @@ public:
         void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
+
+            if (GameObject* door = instance->GetGameObject(DATA_ANUBARAK_WALL))
+                door->SetGoState(GO_STATE_ACTIVE); // open door for now
+
             Talk(SAY_AGGRO);
             instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_GOTTA_GO_START_EVENT);
 
             events.SetPhase(PHASE_EMERGE);
+            events.ScheduleEvent(EVENT_CLOSE_DOOR, Seconds(5));
             events.ScheduleEvent(EVENT_POUND, randtime(Seconds(2), Seconds(4)), 0, PHASE_EMERGE);
             events.ScheduleEvent(EVENT_LEECHING_SWARM, randtime(Seconds(5), Seconds(7)), 0, PHASE_EMERGE);
             events.ScheduleEvent(EVENT_CARRION_BEETLES, randtime(Seconds(14), Seconds(17)), 0, PHASE_EMERGE);
@@ -172,6 +178,10 @@ public:
             {
                 switch (eventId)
                 {
+                    case EVENT_CLOSE_DOOR:
+                        if (GameObject* door = instance->GetGameObject(DATA_ANUBARAK_WALL))
+                            door->SetGoState(GO_STATE_READY);
+                        break;
                     case EVENT_POUND:
                         DoCastVictim(SPELL_POUND);
                         events.Repeat(randtime(Seconds(26), Seconds(32)));

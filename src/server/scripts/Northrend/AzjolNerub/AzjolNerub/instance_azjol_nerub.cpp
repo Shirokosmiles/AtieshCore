@@ -21,7 +21,7 @@
 
 DoorData const doorData[] =
 {
-    { GO_KRIKTHIR_DOOR,     DATA_KRIKTHIR_THE_GATEWATCHER,  DOOR_TYPE_PASSAGE },
+    { GO_KRIKTHIR_DOOR,     DATA_KRIKTHIR,  DOOR_TYPE_PASSAGE },
     { GO_ANUBARAK_DOOR_1,   DATA_ANUBARAK,                  DOOR_TYPE_ROOM },
     { GO_ANUBARAK_DOOR_2,   DATA_ANUBARAK,                  DOOR_TYPE_ROOM },
     { GO_ANUBARAK_DOOR_3,   DATA_ANUBARAK,                  DOOR_TYPE_ROOM },
@@ -30,7 +30,7 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_KRIKTHIR,        DATA_KRIKTHIR_THE_GATEWATCHER },
+    { NPC_KRIKTHIR,        DATA_KRIKTHIR },
     { NPC_HADRONOX,        DATA_HADRONOX                 },
     { NPC_ANUBARAK,        DATA_ANUBARAK                 },
     { NPC_WATCHER_NARJIL,  DATA_WATCHER_GASHRA           },
@@ -39,8 +39,16 @@ ObjectData const creatureData[] =
     { 0,                   0                             } // END
 };
 
+ObjectData const gameobjectData[] =
+{
+    { GO_ANUBARAK_DOOR_3, DATA_ANUBARAK_WALL },
+    { 0,                  0                  } // END
+};
+
 BossBoundaryData const boundaries = 
 {
+    { DATA_KRIKTHIR, new RectangleBoundary(400.0f, 580.0f, 623.5f, 810.0f) },
+    { DATA_HADRONOX, new ZRangeBoundary(666.0f, 776.0f) },
     { DATA_ANUBARAK, new CircleBoundary(Position(550.6178f, 253.5917f), 26.0f) }
 };
 
@@ -57,7 +65,7 @@ class instance_azjol_nerub : public InstanceMapScript
                 SetBossNumber(EncounterCount);
                 LoadBossBoundaries(boundaries);
                 LoadDoorData(doorData);
-                LoadObjectData(creatureData, nullptr);
+                LoadObjectData(creatureData, gameobjectData);
             }
 
             void OnUnitDeath(Unit* who) override
@@ -66,7 +74,7 @@ class instance_azjol_nerub : public InstanceMapScript
                 Creature* creature = who->ToCreature();
                 if (!creature || creature->IsCritter())
                     return;
-                if (Creature* gatewatcher = GetCreature(DATA_KRIKTHIR_THE_GATEWATCHER))
+                if (Creature* gatewatcher = GetCreature(DATA_KRIKTHIR))
                     gatewatcher->AI()->DoAction(-ACTION_GATEWATCHER_GREET);
             }
         };

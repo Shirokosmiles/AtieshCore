@@ -126,11 +126,11 @@ class boss_krik_thir : public CreatureScript
 
         struct boss_krik_thirAI : public BossAI
         {
-            boss_krik_thirAI(Creature* creature) : BossAI(creature, DATA_KRIKTHIR_THE_GATEWATCHER), _hadGreet(false), _hadFrenzy(false), _petsInCombat(false) { }
+            boss_krik_thirAI(Creature* creature) : BossAI(creature, DATA_KRIKTHIR), _hadGreet(false), _hadFrenzy(false), _petsInCombat(false) { }
 
             void SummonAdds()
             {
-                if (instance->GetBossState(DATA_KRIKTHIR_THE_GATEWATCHER) == DONE)
+                if (instance->GetBossState(DATA_KRIKTHIR) == DONE)
                     return;
                 for (uint8 i = 1; i <= 3; ++i)
                 {
@@ -411,7 +411,7 @@ class npc_watcher_gashra : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                Creature* krikthir = _instance->GetCreature(DATA_KRIKTHIR_THE_GATEWATCHER);
+                Creature* krikthir = _instance->GetCreature(DATA_KRIKTHIR);
                 if (krikthir && krikthir->IsAlive())
                     krikthir->AI()->DoAction(ACTION_GASHRA_DIED);
             }
@@ -488,7 +488,7 @@ class npc_watcher_narjil : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                Creature* krikthir = _instance->GetCreature(DATA_KRIKTHIR_THE_GATEWATCHER);
+                Creature* krikthir = _instance->GetCreature(DATA_KRIKTHIR);
                 if (krikthir && krikthir->IsAlive())
                     krikthir->AI()->DoAction(ACTION_NARJIL_DIED);
             }
@@ -565,7 +565,7 @@ class npc_watcher_silthik : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                Creature* krikthir = _instance->GetCreature(DATA_KRIKTHIR_THE_GATEWATCHER);
+                Creature* krikthir = _instance->GetCreature(DATA_KRIKTHIR);
                 if (krikthir && krikthir->IsAlive())
                     krikthir->AI()->DoAction(ACTION_SILTHIK_DIED);
             }
@@ -807,7 +807,7 @@ class npc_skittering_swarmer : public CreatureScript
             void InitializeAI() override
             {
                 ScriptedAI::InitializeAI();
-                if (Creature* gatewatcher = me->GetInstanceScript()->GetCreature(DATA_KRIKTHIR_THE_GATEWATCHER))
+                if (Creature* gatewatcher = me->GetInstanceScript()->GetCreature(DATA_KRIKTHIR))
                     gatewatcher->AI()->JustSummoned(me);
             }
         };
@@ -830,7 +830,7 @@ class npc_skittering_infector : public CreatureScript
             void InitializeAI() override
             {
                 ScriptedAI::InitializeAI();
-                if (Creature* gatewatcher = me->GetInstanceScript()->GetCreature(DATA_KRIKTHIR_THE_GATEWATCHER))
+                if (Creature* gatewatcher = me->GetInstanceScript()->GetCreature(DATA_KRIKTHIR))
                     gatewatcher->AI()->JustSummoned(me);
             }
 
