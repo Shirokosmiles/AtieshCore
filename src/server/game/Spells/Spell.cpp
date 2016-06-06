@@ -1324,6 +1324,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 float overdistance = 0.0f;
                 float totalpath = 0.0f;
                 float beforewaterz = 0.0f;
+                bool wcol = false;
                 const float  step = 2.0f;
                 const uint8 numChecks = ceil(fabs(distance / step));
                 const float DELTA_X = (destx - pos.GetPositionX()) / numChecks;
@@ -1364,10 +1365,17 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         prevZ = pos.GetPositionZ();
                         tstZ = pos.GetPositionZ();
                         srange = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX));
-                        //TC_LOG_ERROR("server", "(start in water) step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
+                        //TC_LOG_ERROR("server", "(start in water) step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);                        
+
+                        bool wcol = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(mapid, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
+                        //if (wcol)
+                        //    TC_LOG_ERROR("server", "(start in water) step in water with collide and use standart check (for continue way after possible collide), number of cycle = %i ", j);
+
+                        if (j == numChecks && fabs(tstZ - ground) < 2.0f)
+                            tstZ = ground + 0.5f;                        
                     }
 
-                    if (!map->IsInWater(tstX, tstY, tstZ) && tstZ != beforewaterz)  // second safety check z for blink way if on the ground
+                    if ((!map->IsInWater(tstX, tstY, tstZ) && tstZ != beforewaterz) || wcol)  // second safety check z for blink way if on the ground
                     {
                         // highest available point
                         tstZ1 = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true, 25.0f);
