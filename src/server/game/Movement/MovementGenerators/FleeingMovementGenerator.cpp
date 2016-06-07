@@ -66,12 +66,17 @@ template<class T>
 bool FleeingMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 {
     if (!unit || !unit->IsAlive())
-        return false;
+        return false;    
 
     if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
     {
         unit->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
         return true;
+    }
+
+    if (unit->HasUnitState(UNIT_STATE_CASTING) && !unit->CanMoveDuringChannel())
+    {
+        unit->CastStop();
     }
 
     if (i_nextMoveTime.Passed())
