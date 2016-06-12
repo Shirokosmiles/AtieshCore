@@ -40,6 +40,12 @@ void FleeingMovementGenerator<T>::DoInitialize(T* unit)
     unit->AddUnitState(UNIT_FLAG_FLEEING);
     unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);    
 
+    if (unit->HasUnitState(UNIT_STATE_CASTING) && !unit->CanMoveDuringChannel())
+    {
+        unit->CastStop();
+        return;
+    }
+
     if (!unit->IsAlive() || unit->IsStopped())
         return;
     else if (unit->ToCreature())
@@ -72,11 +78,6 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
     {
         unit->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
         return true;
-    }
-
-    if (unit->HasUnitState(UNIT_STATE_CASTING) && !unit->CanMoveDuringChannel())
-    {
-        unit->CastStop();
     }
 
     if (i_nextMoveTime.Passed())
