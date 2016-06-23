@@ -68,43 +68,420 @@ bool Player::SendRealNameQuery()
 
 void Player::SetFakeRaceAndMorph()
 {
-    if (getClass() == CLASS_DRUID)
+    uint8 random;
+    switch (getClass())
     {
-        if (GetCFSTeam() == ALLIANCE)
+        case CLASS_DRUID:
         {
-            m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
-            m_FakeRace = RACE_TAUREN;
-        }
-        else if (getGender() == GENDER_MALE) // HORDE PLAYER, ONLY HAVE MALE NELF ID
-        {
-            m_FakeMorph = FAKE_M_NELF;
-            m_FakeRace = RACE_NIGHTELF;
-        }
-        else
-            m_FakeRace = GetCFSTeam() == ALLIANCE ? RACE_BLOODELF : RACE_HUMAN;
-    }
-    else if (getClass() == CLASS_SHAMAN && GetCFSTeam() == HORDE && getGender() == GENDER_FEMALE)
-    {
-        m_FakeMorph = FAKE_F_DRAENEI; // Female Draenei
-        m_FakeRace = RACE_DRAENEI;
-    }
-    else
-    {
-        m_FakeRace = GetCFSTeam() == ALLIANCE ? RACE_BLOODELF : RACE_HUMAN;
+            if (GetCFSTeam() == ALLIANCE)
+            {
+                m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+                m_FakeRace = RACE_TAUREN;
+            }
+            else
+            {
+                m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                m_FakeRace = RACE_NIGHTELF;
+            }
 
-        if (GetCFSTeam() == HORDE)
-        {
-            if (getGender() == GENDER_MALE)
-                m_FakeMorph = 19723;
-            else
-                m_FakeMorph = 19724;
+            break;
         }
-        else
+        case CLASS_SHAMAN:
         {
-            if (getGender() == GENDER_MALE)
-                m_FakeMorph = 20578;
+            if (GetCFSTeam() == ALLIANCE)
+            {
+                random = urand(0, 100);         // RACE_TROLL, RACE_ORC, RACE_TAUREN
+                if (random > 40 && random < 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                    m_FakeRace = RACE_ORC;
+                }
+                else if (random > 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+                    m_FakeRace = RACE_TAUREN;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                    m_FakeRace = RACE_TROLL;
+                }
+            }
             else
-                m_FakeMorph = 20579;
+            {
+                m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                m_FakeRace = RACE_DRAENEI;
+            }
+
+            break;
+        }
+        case CLASS_MAGE:
+        {
+            random = urand(0, 100);
+            if (GetCFSTeam() == ALLIANCE) // UNDEAD, BLOODELF, TROLL
+            {                
+                if (random > 40 && random < 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                    m_FakeRace = RACE_UNDEAD_PLAYER;
+                }
+                else if (random > 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                    m_FakeRace = RACE_BLOODELF;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                    m_FakeRace = RACE_TROLL;
+                }
+            }
+            else // HUMAN, GNOME, DRAENEI
+            {
+                if (random > 40 && random < 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                    m_FakeRace = RACE_HUMAN;
+                }
+                else if (random > 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                    m_FakeRace = RACE_GNOME;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                    m_FakeRace = RACE_DRAENEI;
+                }
+            }
+
+            break;
+        }
+        case CLASS_WARLOCK:
+        {
+            random = urand(0, 100);
+            if (GetCFSTeam() == ALLIANCE) // UNDEAD, BLOODELF, ORC
+            {
+                if (random > 40 && random < 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                    m_FakeRace = RACE_UNDEAD_PLAYER;
+                }
+                else if (random > 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                    m_FakeRace = RACE_BLOODELF;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                    m_FakeRace = RACE_ORC;
+                }
+            }
+            else // HUMAN, GNOME
+            {
+                if (random > 50)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                    m_FakeRace = RACE_HUMAN;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                    m_FakeRace = RACE_GNOME;
+                }
+            }
+
+            break;
+        }
+        case CLASS_ROGUE:
+        {
+            random = urand(0, 100);
+            if (GetCFSTeam() == ALLIANCE) // UNDEAD, BLOODELF, ORC, TROLL
+            {
+                if (random > 50 && random < 75)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                    m_FakeRace = RACE_UNDEAD_PLAYER;
+                }
+                else if (random >= 75)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                    m_FakeRace = RACE_BLOODELF;
+                }
+                else if (random > 25 && random <= 50)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                    m_FakeRace = RACE_ORC;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                    m_FakeRace = RACE_TROLL;
+                }
+            }
+            else // HUMAN, DWARF, GNOME, NELF
+            {
+                if (random > 50 && random < 75)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                    m_FakeRace = RACE_NIGHTELF;
+                }
+                else if (random >= 75)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                    m_FakeRace = RACE_GNOME;
+                }
+                else if (random > 25 && random <= 50)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                    m_FakeRace = RACE_HUMAN;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
+                    m_FakeRace = RACE_DWARF;
+                }
+            }
+
+            break;
+        }
+        case CLASS_PALADIN:
+        {
+            random = urand(0, 100);
+            if (GetCFSTeam() == ALLIANCE) // BLOODELF
+            {
+                m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                m_FakeRace = RACE_BLOODELF;
+            }
+            else // HUMAN, DWARF, DRENEI
+            {
+                if (random > 40 && random < 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                    m_FakeRace = RACE_HUMAN;
+                }
+                else if (random > 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
+                    m_FakeRace = RACE_DWARF;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                    m_FakeRace = RACE_DRAENEI;
+                }
+            }
+
+            break;
+        }
+        case CLASS_PRIEST:
+        {
+            random = urand(0, 100);
+            if (GetCFSTeam() == ALLIANCE) // UNDEAD, BLOODELF, TROLL
+            {
+                if (random > 40 && random < 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                    m_FakeRace = RACE_UNDEAD_PLAYER;
+                }
+                else if (random > 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                    m_FakeRace = RACE_BLOODELF;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                    m_FakeRace = RACE_TROLL;
+                }
+            }
+            else // HUMAN, DWARF, DRENEI, NELF
+            {
+                if (random > 50 && random < 75)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                    m_FakeRace = RACE_NIGHTELF;
+                }
+                else if (random >= 75)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                    m_FakeRace = RACE_GNOME;
+                }
+                else if (random > 25 && random <= 50)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                    m_FakeRace = RACE_HUMAN;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                    m_FakeRace = RACE_DRAENEI;
+                }
+            }
+
+            break;
+        }
+        case CLASS_HUNTER:
+        {
+            random = urand(0, 100);
+            if (GetCFSTeam() == ALLIANCE) // ORC, TAUREN, BLOODELF, TROLL
+            {
+                if (random > 50 && random < 75)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+                    m_FakeRace = RACE_TAUREN;
+                }
+                else if (random >= 75)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                    m_FakeRace = RACE_BLOODELF;
+                }
+                else if (random > 25 && random <= 50)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                    m_FakeRace = RACE_ORC;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                    m_FakeRace = RACE_TROLL;
+                }
+            }
+            else // DWARF, DRENEI, NELF
+            {
+                if (random > 40 && random < 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                    m_FakeRace = RACE_NIGHTELF;
+                }
+                else if (random > 70)
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
+                    m_FakeRace = RACE_DWARF;
+                }
+                else
+                {
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                    m_FakeRace = RACE_DRAENEI;
+                }
+            }
+
+            break;
+        }
+        case CLASS_WARRIOR:
+        {
+            if (GetCFSTeam() == ALLIANCE)
+            {
+                random = urand(1, 4);
+                switch (random)
+                {
+                    case 1:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                        m_FakeRace = RACE_ORC;
+                        break;
+                    case 2:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                        m_FakeRace = RACE_UNDEAD_PLAYER;
+                        break;
+                    case 3:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+                        m_FakeRace = RACE_TAUREN;
+                        break;
+                    case 4:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                        m_FakeRace = RACE_TROLL;
+                        break;                    
+                }
+            }
+            else
+            {
+                random = urand(1, 5);
+                switch (random)
+                {
+                    case 1:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                        m_FakeRace = RACE_HUMAN;
+                        break;
+                    case 2:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
+                        m_FakeRace = RACE_DWARF;
+                        break;
+                    case 3:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                        m_FakeRace = RACE_NIGHTELF;
+                        break;
+                    case 4:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                        m_FakeRace = RACE_GNOME;
+                        break;
+                    case 5:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                        m_FakeRace = RACE_DRAENEI;
+                        break;
+                }
+            }
+
+            break;
+        }
+        case CLASS_DEATH_KNIGHT:
+        {
+            if (GetCFSTeam() == ALLIANCE)
+            {
+                random = urand(1, 5);
+                switch (random)
+                {
+                    case 1:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                        m_FakeRace = RACE_ORC;
+                        break;
+                    case 2:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                        m_FakeRace = RACE_UNDEAD_PLAYER;
+                        break;
+                    case 3:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+                        m_FakeRace = RACE_TAUREN;
+                        break;
+                    case 4:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                        m_FakeRace = RACE_TROLL;
+                        break;
+                    case 5:
+                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                        m_FakeRace = RACE_BLOODELF;
+                        break;
+                }
+            }
+            else
+            {
+                random = urand(1, 5);
+                switch (random)
+                {
+                case 1:
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                    m_FakeRace = RACE_HUMAN;
+                    break;
+                case 2:
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
+                    m_FakeRace = RACE_DWARF;
+                    break;
+                case 3:
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                    m_FakeRace = RACE_NIGHTELF;
+                    break;
+                case 4:
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                    m_FakeRace = RACE_GNOME;
+                    break;
+                case 5:
+                    m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                    m_FakeRace = RACE_DRAENEI;
+                    break;
+                }
+            }
+
+            break;
         }
     }
 }
