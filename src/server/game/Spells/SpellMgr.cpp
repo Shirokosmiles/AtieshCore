@@ -2935,6 +2935,11 @@ void SpellMgr::LoadSpellInfoCorrections()
 
         switch (spellInfo->Id)
         {
+            case 674: // Shaman Dual Wield has skill
+                spellInfo->Effects[1].Effect = SPELL_EFFECT_SKILL;
+                spellInfo->Effects[1].BasePoints = 1;
+                spellInfo->Effects[1].MiscValue = 118; // Dual Wield skill
+                break;
             case 63026: // Force Cast (HACK: Target shouldn't be changed)
             case 63137: // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
                 spellInfo->Effects[0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DB);
