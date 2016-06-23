@@ -6637,23 +6637,23 @@ void Player::RewardReputation(Unit* victim, float rate)
     uint32 repfaction1 = Rep->RepFaction1;
     uint32 repfaction2 = Rep->RepFaction2;
     
-        if (!IsPlayingNative())
-         {
+    if (!IsPlayingNative())
+    {
         if (GetCFSTeam() == ALLIANCE)
-             {
+        {
             if (repfaction1 == 729)
-                 repfaction1 = 730;
+                repfaction1 = 730;
             if (repfaction2 == 729)
-                 repfaction2 = 730;
-            }
-        else
-             {
-            if (repfaction1 == 730)
-                 repfaction1 = 729;
-            if (repfaction2 == 730)
-                 repfaction2 = 729;
-            }
+                repfaction2 = 730;
         }
+        else
+        {
+        if (repfaction1 == 730)
+            repfaction1 = 729;
+        if (repfaction2 == 730)
+            repfaction2 = 729;
+        }
+    }
 
     uint32 ChampioningFaction = 0;
 

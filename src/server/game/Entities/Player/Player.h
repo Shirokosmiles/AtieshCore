@@ -1045,7 +1045,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void DoForgetPlayersInBG(Battleground* pBattleGround);                                          // void DoForgetPlayersInBG(Battleground* bg);
         uint8 getCFSRace() const { return m_RealRace; }
         void SetCFSRace() { m_RealRace = GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_RACE); }; // SHOULD ONLY BE CALLED ON LOGIN
-        void SetFakeRace(); // SHOULD ONLY BE CALLED ON LOGIN
         void SetFakeRaceAndMorph(); // SHOULD ONLY BE CALLED ON LOGIN
         uint32 GetFakeMorph() { return m_FakeMorph; };
         uint8 getFRace() const { return m_FakeRace; }
@@ -1053,7 +1052,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool ShouldForgetBGPlayers() { return m_ForgetBGPlayers; }
         void SetForgetInListPlayers(bool value) { m_ForgetInListPlayers = value; }
         bool ShouldForgetInListPlayers() { return m_ForgetInListPlayers; }
-        bool SendBattleGroundChat(uint32 msgtype, std::string message);
+        void SendBattleGroundChat(uint32 msgtype, std::string message);
         void MorphFit(bool value);
         bool IsPlayingNative() const { return GetTeam() == m_team; }
         uint32 GetCFSTeam() const { return m_team; }

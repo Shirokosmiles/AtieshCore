@@ -109,15 +109,15 @@ void Player::SetFakeRaceAndMorph()
     }
 }
 
-bool Player::SendBattleGroundChat(uint32 msgtype, std::string message)
+void Player::SendBattleGroundChat(uint32 msgtype, std::string message)
 {
     // Select distance to broadcast to.
     float distance = msgtype == CHAT_MSG_SAY ? sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY) : sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL);
-
+    uint32 language;
     if (Battleground* pBattleGround = GetBattleground())
     {
         if (pBattleGround->isArena()) // Only fake chat in BG's. CFBG should not interfere with arenas.
-            return false;
+            return;
 
         for (Battleground::BattlegroundPlayerMap::const_iterator itr = pBattleGround->GetPlayers().begin(); itr != pBattleGround->GetPlayers().end(); ++itr)
         {
@@ -127,26 +127,27 @@ bool Player::SendBattleGroundChat(uint32 msgtype, std::string message)
                 {
                     WorldPacket data(SMSG_MESSAGECHAT, 200);
 
-                    if (GetTeam() == pPlayer->GetTeam())
+                    if (GetTeam() == pPlayer->GetTeam()) 
                     {
-                        WorldPacket data;
-						BuildPlayerChat(&data, msgtype, message, LANG_UNIVERSAL);
-                        pPlayer->GetSession()->SendPacket(&data);
+                        if (pPlayer->IsPlayingNative())
+                            language = pPlayer->GetTeam() == ALLIANCE ? LANG_COMMON : LANG_ORCISH;
+                        else
+                            language = pPlayer->GetTeam() == ALLIANCE ? LANG_ORCISH : LANG_COMMON;
                     }
                     else if (msgtype != CHAT_MSG_EMOTE)
                     {
-                        WorldPacket data;
-						BuildPlayerChat(&data, msgtype, message, pPlayer->GetTeam() == ALLIANCE ? LANG_ORCISH : LANG_COMMON);
-                        pPlayer->GetSession()->SendPacket(&data);
+                        if (pPlayer->IsPlayingNative())
+                            language = pPlayer->GetTeam() == ALLIANCE ? LANG_ORCISH : LANG_COMMON;
+                        else
+                            language = pPlayer->GetTeam() == ALLIANCE ? LANG_COMMON : LANG_ORCISH;
                     }
+
+                    BuildPlayerChat(&data, msgtype, message, language);
                     pPlayer->GetSession()->SendPacket(&data);
                 }
             }
         }
-        return true;
     }
-    else
-        return false;
 }
 
 void Player::MorphFit(bool value)
