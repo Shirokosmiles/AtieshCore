@@ -700,7 +700,7 @@ void Battleground::RewardReputationToTeam(uint32 a_faction_id, uint32 h_faction_
                     uint32 repGain = Reputation;
                     AddPct(repGain, player->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
                     AddPct(repGain, player->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, player->GetCFSTeam() == ALLIANCE ? a_faction_id : h_faction_id));
-                    player->GetReputationMgr().ModifyReputation(player->GetCFSTeam() == ALLIANCE ? a_factionEntry : h_factionEntry, Reputation);
+                    player->GetReputationMgr().ModifyReputation(player->GetCFSTeam() == ALLIANCE ? a_factionEntry : h_factionEntry, repGain);
                 }
         }
     }
