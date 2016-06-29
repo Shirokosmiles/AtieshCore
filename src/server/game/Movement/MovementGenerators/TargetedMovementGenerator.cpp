@@ -97,12 +97,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool up
         z = end.z;
     }
 
-    float dest = i_target->GetDistance(owner);
-
-    Position pos;
-    pos.Relocate(x, y, z);
-    owner->MovePositionToFirstCollision(pos, dest, 0.0f);
-
     if (!i_path)
         i_path = new PathGenerator(owner);
 
@@ -110,7 +104,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool up
     bool forceDest = owner->GetTypeId() == TYPEID_UNIT && owner->HasUnitTypeMask(UNIT_MASK_MINION) && owner->ToCreature()->IsPet() &&
         owner->HasUnitState(UNIT_STATE_FOLLOW) && i_target->IsWithinLOSInMap(owner);
 
-    bool result = i_path->CalculatePath(pos.m_positionX, pos.m_positionY, pos.m_positionZ, forceDest);
+    bool result = i_path->CalculatePath(x, y, z, forceDest);
     if (!result || (i_path->GetPathType() & PATHFIND_NOPATH))
     {
         // can't reach target
@@ -191,8 +185,16 @@ bool TargetedMovementGeneratorMedium<T, D>::DoUpdate(T* owner, uint32 time_diff)
             targetMoved = !i_target->IsWithinDist2d(dest.x, dest.y, allowed_dist);
 
         // then, if the target is in range, check also Line of Sight.
-        if (!targetMoved && owner->movespline->Finalized())
-            targetMoved = !i_target->IsWithinLOSInMap(owner);
+        if (!targetMoved)
+        {
+            if (owner->IsPet() && owner->InArenaMap())
+            {
+                if (owner->movespline->Finalized())
+                    targetMoved = !i_target->IsWithinLOSInMap(owner);
+            }
+            else
+                targetMoved = !i_target->IsWithinLOSInMap(owner);
+        }
     }
 
     if (i_recalculateTravel || targetMoved)

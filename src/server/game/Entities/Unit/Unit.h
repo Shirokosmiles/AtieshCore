@@ -1339,6 +1339,8 @@ class TC_GAME_API Unit : public WorldObject
         uint8 getLevelForTarget(WorldObject const* /*target*/) const override { return getLevel(); }
         void SetLevel(uint8 lvl);
 
+        bool InArenaMap();
+
         uint8 getRace(bool forceoriginal = false) const;
         uint8 getCFSRace() { return getRace(true); }
 

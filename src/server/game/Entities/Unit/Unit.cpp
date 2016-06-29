@@ -12982,6 +12982,26 @@ bool Unit::CanFreeMove() const
         UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) && GetOwnerGUID().IsEmpty();
 }
 
+bool Unit::InArenaMap()
+{
+    if (Player* player = ToPlayer())
+    {
+        if (player->InArena())
+            return true;
+    }
+    else if (Pet* pet = ToCreature()->ToPet())
+    {
+        if (pet->isControlled())
+        {
+            Unit* owner = GetOwner();
+            if (owner->ToPlayer()->InArena())
+                return true;
+        }
+    }
+
+    return false;
+}
+
 void Unit::SetLevel(uint8 lvl)
 {
     SetUInt32Value(UNIT_FIELD_LEVEL, lvl);

@@ -4255,7 +4255,21 @@ public:
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            GetCaster()->CombatStop(true);
+            if (Unit* target = GetCaster())
+            {
+                target->CombatStop(true);
+
+                target->getHostileRefManager().UpdateVisibility();
+
+                Unit::AttackerSet const& attackers = target->getAttackers();
+                for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
+                {
+                    if (!(*itr)->CanSeeOrDetect(target))
+                        (*(itr++))->AttackStop();
+                    else
+                        ++itr;
+                }
+            }
         }
 
         void Register() override
