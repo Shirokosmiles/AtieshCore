@@ -593,7 +593,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         damage += int32(caster->GetAmmoDPS() * caster->GetAttackTime(RANGED_ATTACK) * 0.001f);
 
                         float RAP = caster->GetTotalAttackPowerValue(RANGED_ATTACK);
-                        m_damage += RAP * 0.1f;
+                        m_damage += int32(RAP * 0.1f);
                     }
                 }
                 break;
