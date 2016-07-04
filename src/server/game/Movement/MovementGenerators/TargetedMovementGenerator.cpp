@@ -169,9 +169,13 @@ bool TargetedMovementGeneratorMedium<T, D>::DoUpdate(T* owner, uint32 time_diff)
     {
         i_recheckDistance.Reset(100);
 
-        float allowed_dist = owner->GetCombatReach() + sWorld->getRate(RATE_TARGET_POS_RECALCULATION_RANGE);
+        //More distance let have better performance, less distance let have more sensitive reaction at target move.
+        float allowed_dist = 0.0f;
+
         if (owner->IsPet() && (owner->GetCharmerOrOwnerGUID() == i_target->GetGUID()))
-            allowed_dist = owner->GetMeleeReach();
+            allowed_dist = 1.0f; // pet following owner
+        else
+            allowed_dist = owner->GetCombatReach() + sWorld->getRate(RATE_TARGET_POS_RECALCULATION_RANGE);
 
         G3D::Vector3 dest = owner->movespline->FinalDestination();
         if (owner->movespline->onTransport)
