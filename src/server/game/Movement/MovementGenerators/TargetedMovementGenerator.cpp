@@ -191,7 +191,7 @@ bool TargetedMovementGeneratorMedium<T, D>::DoUpdate(T* owner, uint32 time_diff)
         // then, if the target is in range, check also Line of Sight.
         if (!targetMoved)
         {
-            if (owner->IsPet() && owner->InArenaMap())
+            if (owner->IsPet() && owner->GetCharmerOrOwner()->ToPlayer() && owner->GetCharmerOrOwner()->ToPlayer()->InArena())
             {
                 if (owner->movespline->Finalized())
                     targetMoved = !i_target->IsWithinLOSInMap(owner);
