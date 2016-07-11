@@ -22,6 +22,7 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "Player.h"
+#include "VMapFactory.h"
 
 template<class T>
 void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
@@ -91,10 +92,31 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
             pos.Relocate(i_x, i_y, i_z);
             unit->MovePositionToFirstCollision(pos, dest, 0.0f);
 
+            // additional vmap checking, related with not full algorythm in MovePositionToFirstCollision
+            bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(unit->GetMapId(), unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 0.5f, pos.m_positionX, pos.m_positionY, pos.m_positionZ + 0.5f, pos.m_positionX, pos.m_positionY, pos.m_positionZ, -0.5f);
+            // collision occured
+            if (col)
+            {
+                // move back a bit
+                pos.m_positionX -= CONTACT_DISTANCE * std::cos(unit->GetOrientation());
+                pos.m_positionY -= CONTACT_DISTANCE * std::sin(unit->GetOrientation());
+                if (Map* map = unit->GetMap())
+                    pos.m_positionZ = map->GetHeight(unit->GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + 2.8f, true);
+            }
+
+            PathGenerator path(unit);
+            path.SetPathLengthLimit(30.0f);
+            bool result = path.CalculatePath(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+            if (!result || (path.GetPathType() & PATHFIND_NOPATH))
+            {
+                i_nextMoveTime.Reset(100);
+                return true;
+            }
+
             unit->UpdateSpeed(MOVE_WALK);
 
             Movement::MoveSplineInit init(unit);
-            init.MoveTo(pos.m_positionX, pos.m_positionY, pos.m_positionZ, true, false);
+            init.MovebyPath(path.GetPath());
             init.SetWalk(true);
             init.Launch();
 
@@ -102,11 +124,11 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 
             if (unit->movespline->onTransport)
             {
-                Position& pos = unit->m_movementInfo.transport.pos;
-                pos.m_positionX = loc.x;
-                pos.m_positionY = loc.y;
-                pos.m_positionZ = loc.z;
-                pos.SetOrientation(loc.orientation);
+                Position& tpos = unit->m_movementInfo.transport.pos;
+                tpos.m_positionX = loc.x;
+                tpos.m_positionY = loc.y;
+                tpos.m_positionZ = loc.z;
+                tpos.SetOrientation(loc.orientation);
 
                 if (TransportBase* transport = unit->GetDirectTransport())
                     transport->CalculatePassengerPosition(loc.x, loc.y, loc.z, &loc.orientation);

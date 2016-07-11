@@ -2370,6 +2370,8 @@ float NormalizeZforCollision(WorldObject* obj, float x, float y, float z)
 
 void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float angle)
 {
+    Map* map = GetMap();
+    uint32 phasemask = GetPhaseMask();
     angle += GetOrientation();
     float destx, desty, destz, tdestz;
     destx = pos.m_positionX + dist * std::cos(angle);
@@ -2392,7 +2394,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         destx -= CONTACT_DISTANCE * std::cos(angle);
         desty -= CONTACT_DISTANCE * std::sin(angle);
         dist = std::sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
-        tdestz = destz;
+        tdestz = map->GetHeight(phasemask, destx, desty, destz + 2.8f, true);
     }
 
     // check dynamic collision
@@ -2404,7 +2406,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         destx -= CONTACT_DISTANCE * std::cos(angle);
         desty -= CONTACT_DISTANCE * std::sin(angle);
         dist = std::sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
-        tdestz = destz;
+        tdestz = map->GetHeight(phasemask, destx, desty, destz + 2.8f, true);
     }
 
     float step = dist / 10.0f;
