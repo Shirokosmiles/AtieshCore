@@ -1035,7 +1035,11 @@ void Spell::CalculateJumpSpeeds(uint8 i, float dist, float & speedXY, float & sp
         speedZ = float(m_spellInfo->Effects[i].MiscValueB)/10;
     else
         speedZ = 10.0f;
-    speedXY = dist * 10.0f / speedZ;
+
+    speedXY = dist * speedZ / 10.0f;
+
+    if (speedXY < speedZ)
+        speedXY = speedZ;
 }
 
 void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)

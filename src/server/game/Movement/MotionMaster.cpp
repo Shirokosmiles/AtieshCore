@@ -397,7 +397,7 @@ void MotionMaster::MoveJump(float x, float y, float z, float o, float speedXY, f
         return;
 
     float moveTimeHalf = speedZ / Movement::gravity;
-    float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -speedZ);
+    float max_height = (_owner->GetExactDist2d(x, y) * moveTimeHalf) / 10.0f;
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(x, y, z, false);
