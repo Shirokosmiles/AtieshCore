@@ -248,6 +248,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
     }
 
+    Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
+    bool senderinbattleground = sender->InBattleground() && !sender->IsGameMaster();
+    bool receiverinbattleground = receiver->InBattleground() && !receiver->IsGameMaster();
+
     switch (type)
     {
         case CHAT_MSG_SAY:
@@ -266,7 +270,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
             if (type == CHAT_MSG_SAY)
             {
-                if (sender->InBattleground() && !sender->IsGameMaster())
+                if (senderinbattleground)
                     sender->SendBattleGroundChat(type, msg);
                 else
                     sender->Say(msg, Language(lang));
@@ -283,8 +287,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 SendPlayerNotFoundNotice(to);
                 break;
             }
-
-            Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
+            
             if (!receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
             {
                 SendPlayerNotFoundNotice(to);
@@ -313,6 +316,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             if (receiver->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) ||
                 (HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID())))
                 sender->AddWhisperWhiteList(receiver->GetGUID());
+
+            if (senderinbattleground && receiverinbattleground && (receiver->GetTeam() == sender->GetTeam()))
+                lang = LANG_UNIVERSAL;
 
             GetPlayer()->Whisper(msg, Language(lang), receiver);
         } break;
