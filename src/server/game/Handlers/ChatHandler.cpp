@@ -47,6 +47,18 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     recvData >> type;
     recvData >> lang;
 
+    if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && lang != LANG_ADDON)
+    {
+        switch (type)
+        {
+            case CHAT_MSG_BATTLEGROUND:
+            case CHAT_MSG_BATTLEGROUND_LEADER:
+                lang = LANG_UNIVERSAL;
+            default:
+                break;
+        }
+    }
+
     if (type >= MAX_CHAT_MSG_TYPE)
     {
         TC_LOG_ERROR("network", "CHAT: Wrong message type received: %u", type);
@@ -252,10 +264,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
-            if (sender->InBattleground() && !sender->IsGameMaster())
-                sender->SendBattleGroundChat(type, msg);
-            else if (type == CHAT_MSG_SAY)
-                sender->Say(msg, Language(lang));
+            if (type == CHAT_MSG_SAY)
+            {
+                if (sender->InBattleground() && !sender->IsGameMaster())
+                    sender->SendBattleGroundChat(type, msg);
+                else
+                    sender->Say(msg, Language(lang));
+            }
             else if (type == CHAT_MSG_EMOTE)
                 sender->TextEmote(msg);
             else if (type == CHAT_MSG_YELL)
