@@ -45,19 +45,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     uint32 lang;
 
     recvData >> type;
-    recvData >> lang;
-
-    if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && lang != LANG_ADDON)
-    {
-        switch (type)
-        {
-            case CHAT_MSG_BATTLEGROUND:
-            case CHAT_MSG_BATTLEGROUND_LEADER:
-                lang = LANG_UNIVERSAL;
-            default:
-                break;
-        }
-    }
+    recvData >> lang;    
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
@@ -66,7 +54,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (lang == LANG_UNIVERSAL && type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
+    if (lang == LANG_UNIVERSAL && type != CHAT_MSG_AFK && type != CHAT_MSG_WHISPER && type != CHAT_MSG_BATTLEGROUND && type != CHAT_MSG_BATTLEGROUND_LEADER && type != CHAT_MSG_DND)
     {
         TC_LOG_ERROR("network", "CMSG_MESSAGECHAT: Possible hacking-attempt: %s tried to send a message in universal language", GetPlayerInfo().c_str());
         SendNotification(LANG_UNKNOWN_LANGUAGE);
@@ -247,10 +235,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             }
         }
     }
-
-    Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
-    bool senderinbattleground = sender->InBattleground() && !sender->IsGameMaster();
-    bool receiverinbattleground = receiver->InBattleground() && !receiver->IsGameMaster();
+    
+    bool senderinbattleground = sender->InBattleground();   
 
     switch (type)
     {
@@ -270,7 +256,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
             if (type == CHAT_MSG_SAY)
             {
-                if (senderinbattleground)
+                if (senderinbattleground && !sender->IsGameMaster())
                     sender->SendBattleGroundChat(type, msg);
                 else
                     sender->Say(msg, Language(lang));
@@ -288,21 +274,33 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 break;
             }
             
+            Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
+            bool receiverinbattleground = receiver->InBattleground();
+
             if (!receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
             {
-                SendPlayerNotFoundNotice(to);
-                return;
+                if (receiver && receiverinbattleground && senderinbattleground && receiver->GetTeam() == sender->GetTeam())
+                    lang = LANG_UNIVERSAL;
+                else
+                {
+                    SendPlayerNotFoundNotice(to);
+                    return;
+                }
             }
+
             if (!sender->IsGameMaster() && sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) && !receiver->IsInWhisperWhiteList(sender->GetGUID()))
             {
                 SendNotification(GetTrinityString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
                 return;
             }
 
-            if (GetPlayer()->GetTeam() != receiver->GetTeam() && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT) && !receiver->IsInWhisperWhiteList(sender->GetGUID()))
+            if (GetPlayer()->GetTeam() != receiver->GetTeam() && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT) /* && !receiver->IsInWhisperWhiteList(sender->GetGUID()) */)
             {
-                SendWrongFactionNotice();
-                return;
+                if (!receiver->IsGameMaster() && !sender->IsGameMaster() && sender->GetCFSTeam() != receiver->GetCFSTeam())
+                {
+                    SendWrongFactionNotice();
+                    return;
+                }
             }
 
             if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
@@ -317,7 +315,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 (HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID())))
                 sender->AddWhisperWhiteList(receiver->GetGUID());
 
-            if (senderinbattleground && receiverinbattleground && (receiver->GetTeam() == sender->GetTeam()))
+            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && receiverinbattleground && senderinbattleground && receiver->GetTeam() == sender->GetTeam())
                 lang = LANG_UNIVERSAL;
 
             GetPlayer()->Whisper(msg, Language(lang), receiver);
@@ -421,6 +419,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             if (!group || !group->isBGGroup())
                 return;
 
+            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && lang != LANG_ADDON)
+                lang = LANG_UNIVERSAL;
+
             sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
             WorldPacket data;
@@ -433,6 +434,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             Group* group = GetPlayer()->GetGroup();
             if (!group || !group->isBGGroup() || !group->IsLeader(GetPlayer()->GetGUID()))
                 return;
+
+            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && lang != LANG_ADDON)
+                lang = LANG_UNIVERSAL;
 
             sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
