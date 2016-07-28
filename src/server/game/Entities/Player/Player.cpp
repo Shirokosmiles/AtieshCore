@@ -4230,7 +4230,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
     // close player ticket if any
     GmTicket* ticket = sTicketMgr->GetTicketByPlayer(playerguid);
     if (ticket)
-        ticket->SetClosedBy(playerguid);
+        sTicketMgr->CloseTicket(ticket->GetId(), playerguid);
 
     // remove from arena teams
     LeaveAllArenaTeams(playerguid);
@@ -14946,15 +14946,23 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     uint32 quest_id = quest->GetQuestId();
 
     for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
-        if (quest->RequiredItemId[i])
-            DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true);
-
+    {
+        if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
+        {
+            if (quest->RequiredItemCount[i] > 0 && (itemTemplate->Bonding == BIND_QUEST_ITEM || itemTemplate->Bonding == BIND_QUEST_ITEM1))
+                DestroyItemCount(quest->RequiredItemId[i], 9999, true, true);
+            else 
+                DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true, true);
+        }
+    }
     for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
     {
-        if (quest->ItemDrop[i])
+        if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
         {
-            uint32 count = quest->ItemDropQuantity[i];
-            DestroyItemCount(quest->ItemDrop[i], count ? count : 9999, true);
+            if (quest->ItemDropQuantity[i] > 0 && (itemTemplate->Bonding == BIND_QUEST_ITEM || itemTemplate->Bonding == BIND_QUEST_ITEM1))
+                DestroyItemCount(quest->ItemDrop[i], 9999, true, true);
+            else
+                DestroyItemCount(quest->ItemDrop[i], quest->ItemDropQuantity[i], true, true);
         }
     }
 
@@ -15167,12 +15175,12 @@ void Player::FailQuest(uint32 questId)
         for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
                 if (quest->RequiredItemCount[i] > 0 && (itemTemplate->Bonding == BIND_QUEST_ITEM || itemTemplate->Bonding == BIND_QUEST_ITEM1))
-                    DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true, true);
+                    DestroyItemCount(quest->RequiredItemId[i], 9999, true, true);
 
         for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
                 if (quest->ItemDropQuantity[i] > 0 && (itemTemplate->Bonding == BIND_QUEST_ITEM || itemTemplate->Bonding == BIND_QUEST_ITEM1))
-                    DestroyItemCount(quest->ItemDrop[i], quest->ItemDropQuantity[i], true, true);
+                    DestroyItemCount(quest->ItemDrop[i], 9999, true, true);
     }
 }
 
@@ -15184,12 +15192,12 @@ void Player::AbandonQuest(uint32 questId)
         for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
                 if (quest->RequiredItemCount[i] > 0 && (itemTemplate->Bonding == BIND_QUEST_ITEM || itemTemplate->Bonding == BIND_QUEST_ITEM1))
-                    DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true, true);
+                    DestroyItemCount(quest->RequiredItemId[i], 9999, true, true);
 
         for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
                 if (quest->ItemDropQuantity[i] > 0 && (itemTemplate->Bonding == BIND_QUEST_ITEM || itemTemplate->Bonding == BIND_QUEST_ITEM1))
-                    DestroyItemCount(quest->ItemDrop[i], quest->ItemDropQuantity[i], true, true);
+                    DestroyItemCount(quest->ItemDrop[i], 9999, true, true);
     }
 }
 
