@@ -1,21 +1,22 @@
 /**
- @file Cylinder.h
+ @file G3D/Cylinder.h
   
  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
   
  @created 2003-02-07
- @edited  2005-09-26
+ @edited  2014-07-26
 
- Copyright 2000-2005, Morgan McGuire.
+ Copyright 2000-2015, Morgan McGuire.
  All rights reserved.
  */
 
-#ifndef G3D_Cylinder_H
-#define G3D_Cylinder_H
+#ifndef G3D_Cylinder_h
+#define G3D_Cylinder_h
 
 #include "G3D/platform.h"
 #include "G3D/g3dmath.h"
 #include "G3D/Vector3.h"
+#include "G3D/Random.h"
 
 namespace G3D {
 
@@ -37,8 +38,16 @@ public:
     Cylinder();
     Cylinder(class BinaryInput& b);
     Cylinder(const Vector3& _p1, const Vector3& _p2, float _r);
+    Cylinder(const Any& a);
+
+    Any toAny() const;
+
     void serialize(class BinaryOutput& b) const;
     void deserialize(class BinaryInput& b);
+
+    size_t hashCode() const;
+
+    bool operator==(const Cylinder& other) const;
     
     /** The line down the center of the Cylinder */
     Line axis() const;
@@ -81,10 +90,10 @@ public:
     void getBounds(AABox& out) const;
 
     /** Random world space point with outward facing normal. */
-    void getRandomSurfacePoint(Vector3& P, Vector3& N) const;
+    void getRandomSurfacePoint(Vector3& P, Vector3& N, Random& rnd = Random::common()) const;
 
     /** Point selected uniformly at random over the volume. */
-    Vector3 randomInteriorPoint() const;
+    Vector3 randomInteriorPoint(Random& rnd = Random::common()) const;
 };
 
 } // namespace

@@ -6,18 +6,19 @@
   \maintainer Morgan McGuire, http://graphics.cs.williams.edu
   
   \created 2001-06-02
-  \edited  2011-11-30
+  \edited  2016-06-01
 
-  Copyright 2000-2012, Morgan McGuire.
+  Copyright 2000-2016, Morgan McGuire.
   All rights reserved.
 */
 
 #ifndef G3D_Vector2_h
 #define G3D_Vector2_h
 
-#include <string>
-
 #include "G3D/platform.h"
+#include <cmath>
+#include "G3D/G3DString.h"
+#include "G3D/DoNotInitialize.h"
 #include "G3D/g3dmath.h"
 #include "G3D/Table.h"
 #include "G3D/HashTrait.h"
@@ -49,9 +50,14 @@ public:
     float x;
     float y;
 
+	/** For use with default output arguments. The value is always undefined. */
+	static Vector2 ignore;
+
     /** \param any Must either Vector2(#, #) or Vector2 {x = #, y = #}*/
     Vector2(const Any& any);
     
+    Vector2(DoNotInitialize /*dni*/) {}
+
     /** Converts the Vector2 to an Any. */
     Any toAny() const;
 
@@ -190,6 +196,14 @@ public:
 
     /** Component-wise maximum */
     Vector2 max(const Vector2& v) const;
+    
+    Vector2 floor() const {
+        return Vector2(std::floor(x), std::floor(y));
+    }
+
+    Vector2 ceil() const {
+        return Vector2(std::ceil(x), std::ceil(y));
+    }
 
     /** Component-wise argmax(abs(), v.abs()).
 
@@ -225,7 +239,7 @@ public:
     /** Largest representable vector */
     static const Vector2& maxFinite();
 
-    std::string toString() const;
+    String toString() const;
 
     // 2-char swizzles
 
@@ -265,6 +279,13 @@ public:
     Vector4 yyyy() const;
 
 };
+
+
+/** Preserves sign while squaring magnitude */
+inline Vector2 squareMagnitude(const Vector2& x) {
+    return x.directionOrZero() * x.squaredLength();
+}
+
 
 inline Vector2 operator*(double s, const Vector2& v) {
     return v * (float)s;
@@ -492,6 +513,7 @@ inline bool Vector2::isUnit() const {
 typedef Vector2 Point2;
 void serialize(const Vector2& v, class BinaryOutput& b);
 void deserialize(Vector2& v, class BinaryInput& b);
+
 
 } // namespace G3D
 

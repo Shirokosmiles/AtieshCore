@@ -18,7 +18,7 @@
 namespace G3D {
 
 class Plane;
-
+class Any;
 /**
  An infinite 3D line.
  */
@@ -39,6 +39,10 @@ public:
     inline Line() {}
 
     Line(class BinaryInput& b);
+
+    Line(const Any& a);
+
+    Any toAny() const;
 
     void serialize(class BinaryOutput& b) const;
 

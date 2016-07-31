@@ -34,7 +34,32 @@ namespace G3D {
     static bool iswspace(int ch) { return (ch==' ' || ch=='\t' || ch=='\n' || ch=='\r'); }
 #endif
 
-void parseCommaSeparated(const std::string s, Array<std::string>& array, bool stripQuotes) {
+bool __cdecl alphabeticalIgnoringCaseG3DLastLessThan(const String& _a, const String& _b) {
+    const String& a = toLower(_a);
+    const String& b = toLower(_b);
+
+    if (beginsWith(a, "g3d")) {
+        if (beginsWith(b, "g3d")) {
+            return (a < b);
+        } else {
+            return false;
+        }
+    } else if (beginsWith(b, "g3d")) {
+        return true;
+    } else if (beginsWith(a, "mcg")) {
+        if (beginsWith(b, "mcg")) {
+            return (a < b);
+        } else {
+            return false;
+        }
+    } else if (beginsWith(b, "mcg")) {
+        return true;
+    } else {
+        return (a < b);
+    }
+}
+
+void parseCommaSeparated(const String s, Array<String>& array, bool stripQuotes) {
     array.fastClear();
     if (s == "") {
         return;
@@ -63,7 +88,7 @@ void parseCommaSeparated(const std::string s, Array<std::string>& array, bool st
 
     if (stripQuotes) {
         for (int i = 0; i < array.length(); ++i) {
-            std::string& t = array[i];
+            String& t = array[i];
             size_t L = t.length();
             if ((L > 1) && (t[0] == quote) && (t[L - 1] == quote)) {
                 if ((L > 6)  && (t[1] == quote) && (t[2] == quote) && (t[L - 3] == quote) && (t[L - 2] == quote)) {
@@ -79,8 +104,8 @@ void parseCommaSeparated(const std::string s, Array<std::string>& array, bool st
 }
 
 bool beginsWith(
-    const std::string& test,
-    const std::string& pattern) {
+    const String& test,
+    const String& pattern) {
 
     if (test.size() >= pattern.size()) {
         for (int i = 0; i < (int)pattern.size(); ++i) {
@@ -94,16 +119,16 @@ bool beginsWith(
     }
 }
 
-std::string replace(const std::string& s, const std::string& pattern, const std::string& replacement) {
+String replace(const String& s, const String& pattern, const String& replacement) {
     if (pattern.length() == 0) {
         return s;
     }
-	std::string temp = "";
+	String temp = "";
     size_t lastindex = 0;
     size_t nextindex = 0;
     do {
         nextindex = s.find(pattern, lastindex);
-        if (nextindex == std::string::npos) {
+        if (nextindex == String::npos) {
             break;
         }
         temp += s.substr(lastindex, nextindex - lastindex) + replacement;
@@ -112,7 +137,7 @@ std::string replace(const std::string& s, const std::string& pattern, const std:
     return temp + (lastindex < s.length() ? s.substr(lastindex) : "");
 }
 
-bool isValidIdentifier(const std::string& s) {
+bool isValidIdentifier(const String& s) {
     if (s.length() > 0 && (isLetter(s[0]) || s[0] == '_')) {   
         for (size_t i = 1; i < s.length() ; ++i) {
             if (!( isLetter(s[i]) || (s[i] == '_') || isDigit(s[i]) )) {
@@ -124,9 +149,26 @@ bool isValidIdentifier(const std::string& s) {
     return false;
 }
 
+String makeValidIndentifierWithUnderscores(const String& s) {
+    
+    String valid = s;
+    if (!isValidIdentifier(s)) {
+        //begin with underscore if invalid first character
+        if (!(isLetter(s[0]) || s[0] == '_')) {
+            valid = '_' + s;
+        }
+        for (size_t i = 1; i < valid.length(); ++i) {
+            if (! ((valid[i] == '_') || isLetter(valid[i]) || isDigit(valid[i]))) {
+                valid[i] = '_';
+            }
+        }
+    }
+    return valid;
+}
+
 bool endsWith(
-    const std::string& test,
-    const std::string& pattern) {
+    const String& test,
+    const String& pattern) {
 
     if (test.size() >= pattern.size()) {
         size_t te = test.size() - 1;
@@ -143,11 +185,11 @@ bool endsWith(
 }
 
 
-std::string wordWrap(
-    const std::string&      input,
+String wordWrap(
+    const String&      input,
     int                     numCols) {
 
-    std::string output;
+    String output;
     size_t      c = 0;
     int         len;
 
@@ -198,62 +240,62 @@ std::string wordWrap(
 
 
 int stringCompare(
-    const std::string&      s1,
-    const std::string&      s2) {
+    const String&      s1,
+    const String&      s2) {
 
     return stringPtrCompare(&s1, &s2);
 }
 
 
 int stringPtrCompare(
-    const std::string*      s1,
-    const std::string*      s2) {
+    const String*      s1,
+    const String*      s2) {
 
     return s1->compare(*s2);
 }
 
 
-std::string toUpper(const std::string& x) {
-    std::string result = x;
+String toUpper(const String& x) {
+    String result = x;
     std::transform(result.begin(), result.end(), result.begin(), toupper);
     return result;
 }
 
 
-std::string toLower(const std::string& x) {
-    std::string result = x;
+String toLower(const String& x) {
+    String result = x;
     std::transform(result.begin(), result.end(), result.begin(), tolower);
     return result;
 }
 
 
-Array<std::string> stringSplit(
-    const std::string&          x,
+Array<String> stringSplit(
+    const String&          x,
     char                        splitChar) {
 
-    Array<std::string> out;
+    Array<String> out;
     
     // Pointers to the beginning and end of the substring
     const char* start = x.c_str();
     const char* stop = start;
     
     while ((stop = strchr(start, splitChar))) {
-        out.append(std::string(start, stop - start));
+        out.append(String(start, stop - start));
         start = stop + 1;
     }
 
     // Append the last one
-    out.append(std::string(start));
+    out.append(String(start));
     
     return out;
 }
 
 
-std::string stringJoin(
-    const Array<std::string>&   a,
+String stringJoin(
+    const Array<String>&   a,
     char                        joinChar) {
 
-    std::string out;
+    String out;
 
     for (int i = 0; i < (int)a.size() - 1; ++i) {
         out += a[i] + joinChar;
@@ -267,11 +309,11 @@ std::string stringJoin(
 }
 
 
-std::string stringJoin(
-    const Array<std::string>&   a,
-    const std::string&          joinStr) {
+String stringJoin(
+    const Array<String>&   a,
+    const String&          joinStr) {
 
-    std::string out;
+    String out;
 
     for (int i = 0; i < (int)a.size() - 1; ++i) {
         out += a[i] + joinStr;
@@ -285,7 +327,7 @@ std::string stringJoin(
 }
 
 
-std::string trimWhitespace(const std::string& s) {
+String trimWhitespace(const String& s) {
 
     if (s.length() == 0) {
         return s;
@@ -306,6 +348,79 @@ std::string trimWhitespace(const std::string& s) {
     return s.substr(left, right - left + 1);
 }
 
+
+namespace _internal {
+    /** Helper function to prefixTree. Finds all strings 
+        within the given interval which share an indented 
+        prefix with the item at index start, continuing the 
+        tree traversal with the smallest greatest common 
+        prefix of these strings.
+        \param list alphabetically sorted list of strings
+        \param tree depth first tree traversal, providing functions enterChild(n) and goToParent() 
+        \param start beginning of interval, inclusive
+        \param end end of interval, exclusive
+        \param indent starting index of string being considered */
+void buildPrefixTree(const Array<String>& list, DepthFirstTreeBuilder<String>& tree, const size_t start, const size_t end, const size_t indent) {      
+    debugAssertM((int)end <= (int)list.length(), "Index out of bounds.");
+    debugAssertM(start <= end + 1, "The interval cannot have the inclusive start index more than one past the exclusive end index");
+    
+    if (start >= end) {
+        // reached end of recursion
+        return;
+    } 
+    
+    if (start == (end - 1)) {
+        // if start == (end - 1), then entry is a leaf
+        tree.enterChild(list[int(start)].substr(indent));
+        tree.goToParent();
+    } else {
+        // else, find elements at top of list that share a prefix
+        // start < end <  list.length(), therefore start and start + 1 are valid indices 
+        // t, leastGCP, and prefix will change upon each iteration
+        size_t t = start;
+        String leastGCP = greatestCommonPrefix(list[start].substr(indent), list[start + 1].substr(indent));
+        String prefix = leastGCP;
+    
+        while ((! prefix.empty()) && (t < (end - 1))) {
+            // when considering children, we must keep track of indent index of where
+            // the child starts in the string
+            // for example, when considering the children of "G3D Demo" and "G3D Scene",
+            // the indent will be 4 since the parent is "G3D " and the children are "Demo" and "Scene"
+            prefix = greatestCommonPrefix(list[t].substr(indent), list[t + 1].substr(indent)); 
+            if (! prefix.empty()) {
+                ++t;
+                if (prefix.length() < leastGCP.length()) {
+                  leastGCP = prefix; 
+                }
+            }
+        } // while
+        
+        if (leastGCP.empty()) {
+            // if leastGCP is "", then list[start] is a leaf
+            buildPrefixTree(list, tree, start, t + 1,   indent);
+            buildPrefixTree(list, tree, t + 1, end, indent);
+        
+        } else { 
+            // t represents last index of list that shared a common prefix
+            // otherwise, leastGCP is a child and _prefixTree can be recursively called
+            // if t < end, then there are siblings to be added as well
+            tree.enterChild(leastGCP);
+            buildPrefixTree(list, tree, start, t + 1, indent + leastGCP.length());
+            tree.goToParent();
+
+            if (t < end - 1) {
+                buildPrefixTree(list, tree, t + 1, end, indent); 
+            } // t < end
+        } // leastGCP is empty
+    } // start < end
+}
+
+} // _internal
+
+
+void buildPrefixTree(const Array<String>& list, DepthFirstTreeBuilder<String>& tree) {
+     _internal::buildPrefixTree(list, tree, 0, list.length(), 0);
+}
 
 }; // namespace
 

@@ -6,7 +6,7 @@
  \maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
  \created 2001-06-02
- \edited  2011-02-07
+ \edited  2014-07-07
  */
 
 #ifndef G3D_Sphere_h
@@ -15,6 +15,7 @@
 #include "G3D/platform.h"
 #include "G3D/Vector3.h"
 #include "G3D/Array.h"
+#include "G3D/Random.h"
 
 namespace G3D {
 
@@ -65,6 +66,10 @@ public:
         return !((center == other.center) && (radius == other.radius));
     }
 
+    size_t hashCode() const {
+        return (size_t)(radius*100.0f) ^ center.hashCode();
+    }
+
     /**
      Returns true if point is less than or equal to radius away from
      the center.
@@ -104,12 +109,11 @@ public:
     /**
      Conservative culling test that does not produce a mask for children.
      */
-    bool culledBy(
-                  const Array<Plane>&        plane,
+    bool culledBy(const Array<Plane>&        plane,
                   int32&                    cullingPlaneIndex = dummy,
                   const uint32              testMask          = 0xFFFFFFFF) const;
 
-    virtual std::string toString() const;
+    virtual String toString() const;
 
     float volume() const;
 
@@ -118,12 +122,12 @@ public:
     /**
      Uniformly distributed on the surface.
      */
-    Point3 randomSurfacePoint() const;
+    Point3 randomSurfacePoint(Random& rnd = Random::common()) const;
 
     /**
      Uniformly distributed on the interior (includes surface)
      */
-    Point3 randomInteriorPoint() const;
+    Point3 randomInteriorPoint(Random& rnd = Random::common()) const;
 
     void getBounds(class AABox& out) const;
 

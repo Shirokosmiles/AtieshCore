@@ -6,14 +6,15 @@
   \maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
   \created 2001-10-23
-  \edited  2013-01-05
+  \edited  2016-07-09
+
+  G3D Innovation Engine
+  Copyright 2000-2016, Morgan McGuire.
+  All rights reserved.
 */
-#ifndef G3D_ReferenceCount_h
-#define G3D_ReferenceCount_h
+#pragma once
 
 #include "G3D/platform.h"
-#include "G3D/debug.h"
-#include "G3D/AtomicInt32.h"
 
 #define USE_SHARED_PTR
 
@@ -25,10 +26,6 @@ class ReferenceCountedObject : public enable_shared_from_this<ReferenceCountedOb
 public:
     virtual ~ReferenceCountedObject() {};
 };
-
-} // namespace
-
-namespace G3D {
 
 template<class T>
 bool isNull(const ReferenceCountedPointer<T>& ptr) {
@@ -42,15 +39,13 @@ bool notNull(const ReferenceCountedPointer<T>& ptr) {
 
 template<class T>
 bool isNull(const T* ptr) {
-    return ptr == NULL;
+    return ptr == nullptr;
 }
 
 template<class T>
 bool notNull(const T* ptr) {
-    return ptr != NULL;
+    return ptr != nullptr;
 }
 
 } // namespace
-
-#endif
 

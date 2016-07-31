@@ -4,9 +4,9 @@
  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
  @created 2009-03-31
- @edited  2009-03-31
+ @edited  2015-06-01
 
- Copyright 2000-2009, Morgan McGuire.
+ Copyright 2000-2015, Morgan McGuire.
  All rights reserved.
  */
 #ifndef G3D_PrecomputedRandom_h
@@ -75,34 +75,36 @@ public:
     PrecomputedRandom(int dataSize, uint32 seed = 0xF018A4D2);
 
     ~PrecomputedRandom();
+    
+    virtual void reset(uint32 seed = 0xF018A4D2, bool threadsafe = true) override;
 
     /** Each bit is random.  Subclasses can choose to override just 
        this method and the other methods will all work automatically. */
-    virtual uint32 bits();
+    virtual uint32 bits() override;
 
     // integer is inherited
 
     /** Uniform random float on the range [min, max] */
-    virtual float uniform(float low, float high);
+    virtual float uniform(float low, float high) override;
 
     /** Uniform random float on the range [0, 1] */
-    virtual float uniform();
+    virtual float uniform() override;
 
     // gaussian is inherited
 
     /** Returns 3D unit vectors distributed according to 
         a cosine distribution about the z axis. */
-    virtual void cosHemi(float& x, float& y, float& z);
+    virtual void cosHemi(float& x, float& y, float& z) override;
 
     /** Returns 3D unit vectors distributed according to a cosine
         power distribution (\f$ \mbox{cos}^k \theta \f$) about
         the z-axis. */
-    virtual void cosPowHemi(const float k, float& x, float& y, float& z);
+    virtual void cosPowHemi(const float k, float& x, float& y, float& z) override;
 
     // hemi is inherited
 
     /** Returns 3D unit vectors uniformly distributed on the sphere */
-    virtual void sphere(float& x, float& y, float& z);
+    virtual void sphere(float& x, float& y, float& z) override;
 };
 
 }

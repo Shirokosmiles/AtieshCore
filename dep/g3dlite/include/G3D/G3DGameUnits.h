@@ -6,20 +6,17 @@
  @edited  2012-02-19
  */
 
-#ifndef G3D_GAMEUNITS_H
-#define G3D_GAMEUNITS_H
+#ifndef G3D_G3DGameUnits_h
+#define G3D_G3DGameUnits_h
 
 #include "G3D/platform.h"
 
 namespace G3D {
 
-/** \deprecated use SimTime */
-typedef double GameTime;
-
 /**
- Time, in seconds.
+ Time, in seconds in a simulation. Relatively low precision compared to RealTime.
  */
-typedef double SimTime;
+typedef float SimTime;
 
 /**
  Actual wall clock time in seconds (Unix time).

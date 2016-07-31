@@ -307,7 +307,9 @@ INT_PTR CALLBACK PromptDlgProc(HWND hDlg, UINT msg,
     case WM_INITDIALOG:
       {
         PromptParams *params = (PromptParams*)lParam;
-        ::SetWindowTextA(::GetDlgItem(hDlg, IDC_MESSAGE), params->message);
+        HWND item = ::GetDlgItem(hDlg, IDC_MESSAGE);
+
+        ::SetWindowTextA(item, params->message);
 
         ::SetFocus(::GetDlgItem(hDlg, IDC_BUTTON0));
 
@@ -425,11 +427,11 @@ static int guiPrompt(
     *pNew = '\0';
 
     PromptParams params;
-    params.message  = newStr;;
+    params.message  = newStr;
     params.title    = windowTitle;
 
     HMODULE module = GetModuleHandle(0);
-    int ret = (int)DialogBoxIndirectParam(module, dialogTemplate, NULL, (DLGPROC) PromptDlgProc, (DWORD)&params);
+    int ret = (int)DialogBoxIndirectParam(module, dialogTemplate, NULL, (DLGPROC)PromptDlgProc, (LPARAM)&params);
 
     free(newStr);
 
@@ -548,14 +550,15 @@ static int guiPrompt
 }
 
 #endif
-
 #endif /* G3DFIX: exclude GUI prompt code */
+
 int prompt(
     const char*      windowTitle,
     const char*      prompt, 
     const char**     choice,
     int              numChoices,
     bool             useGui) {
+
 #if 0 /* G3DFIX: exclude GUI prompt code */
     #ifdef G3D_WINDOWS
         if (useGui) {
@@ -580,8 +583,8 @@ int prompt(
 
 
 void msgBox(
-    const std::string& message,
-    const std::string& title) {
+    const String& message,
+    const String& title) {
 
     const char *choice[] = {"Ok"};
     prompt(title.c_str(), message.c_str(), choice, 1, true); 

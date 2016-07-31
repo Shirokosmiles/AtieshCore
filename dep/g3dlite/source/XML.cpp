@@ -5,9 +5,9 @@
  \maintainer Morgan McGuire
   
  \created 2010-02-11
- \edited  2010-02-24
+ \edited  2016-01-28
 
- Copyright 2000-2012, Morgan McGuire.
+ Copyright 2000-2015, Morgan McGuire.
  All rights reserved.
  */
 
@@ -33,7 +33,7 @@ bool XML::boolean() const {
 }
 
 
-void XML::load(const std::string& filename) {
+void XML::load(const String& filename) {
     TextInput::Settings s;
     s.cppBlockComments = false;
     s.cppLineComments = false;
@@ -44,25 +44,25 @@ void XML::load(const std::string& filename) {
 }
 
 
-void XML::save(const std::string& filename) const {
-    std::string s;
-    unparse(s);
+void XML::save(const String& filename, bool collapseEmptyTags) const {
+    String s;
+    unparse(s, collapseEmptyTags);
     writeWholeFile(filename, s);
 }
 
     
-void XML::unparse(std::string &s) const {
+void XML::unparse(String &s, bool collapseEmptyTags) const {
     TextOutput::Settings set;
     set.wordWrap = TextOutput::Settings::WRAP_WITHOUT_BREAKING;
     TextOutput t(set);
 
-    serialize(t);
+    serialize(t, collapseEmptyTags);
 
     t.commitString(s);
 }
 
 
-void XML::serialize(TextOutput& t) const {
+void XML::serialize(TextOutput& t, bool collapseEmptyTags) const {
     if (m_type == VALUE) {
         // Raw string; no quotes
         t.writeSymbol(m_value);
@@ -71,31 +71,36 @@ void XML::serialize(TextOutput& t) const {
         for (AttributeTable::Iterator it = m_attribute.begin(); it.isValid(); ++it) {
             t.printf(" %s=\"%s\"", it->key.c_str(), it->value.m_value.c_str());
         }
-        t.printf(">");
-        t.writeNewline();
-        t.pushIndent();
-        for (int i = 0; i < m_child.size(); ++i) {
-            m_child[i].serialize(t);
-            if (m_child[i].m_type == VALUE) {
-                // Only tags know to append a newline
-                t.writeNewline();
+        if (collapseEmptyTags && m_child.size() == 0) {
+            t.printf("/>");
+            t.writeNewline();
+        } else {
+            t.printf(">");
+            t.writeNewline();
+            t.pushIndent();
+            for (int i = 0; i < m_child.size(); ++i) {
+                m_child[i].serialize(t, collapseEmptyTags);
+                if (m_child[i].m_type == VALUE) {
+                    // Only tags know to append a newline
+                    t.writeNewline();
+                }
             }
+            t.popIndent();
+            t.printf("</%s>", m_name.c_str());
+            t.writeNewline();
         }
-        t.popIndent();
-        t.printf("</%s>", m_name.c_str());
-        t.writeNewline();
     }
 }
 
 
-void XML::parse(const std::string& s) {
+void XML::parse(const String& s) {
     TextInput t(TextInput::FROM_STRING, s);
     deserialize(t);
 }
 
 
 /** True if the next token begins the close tag */
-static bool atClose(TextInput& t, const std::string name) {
+static bool atClose(TextInput& t, const String name) {
     if ((t.peek().type() == Token::SYMBOL) && (t.peek().string() == "<")) {
         // Need to keep looking ahead
         Token p0 = t.read();
@@ -105,7 +110,7 @@ static bool atClose(TextInput& t, const std::string name) {
             // tag error.
             Token p1 = t.read();
             Token p2 = t.peek();
-            std::string s = p2.string();
+            String s = p2.string();
             debugAssertM(beginsWith(name, s), "Mismatched close tag");
 
             // Put the tokens back
@@ -191,9 +196,9 @@ void XML::deserialize(TextInput& t) {
                 done = true;
             } else {
                 // Attribute pair
-                std::string k = n.string();
+                String k = n.string();
                 t.readSymbol("=");
-                std::string v = t.read().string();
+                String v = t.read().string();
                 m_attribute.set(k, v);
 
                 // Advance to next

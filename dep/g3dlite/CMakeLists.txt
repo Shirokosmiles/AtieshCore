@@ -25,9 +25,13 @@ set(g3dlib_STAT_SRCS
   source/FileSystem.cpp
   source/fileutils.cpp
   source/format.cpp
+  source/Frustum.cpp
+  source/G3DAllocator.cpp
   source/g3dfnmatch.cpp
   source/g3dmath.cpp
+  source/G3DString.cpp
   source/GThread.cpp
+  source/initG3D.cpp
   source/Line.cpp
   source/LineSegment.cpp
   source/Log.cpp
@@ -46,6 +50,7 @@ set(g3dlib_STAT_SRCS
   source/System.cpp
   source/TextInput.cpp
   source/TextOutput.cpp
+  source/ThreadSet.cpp
   source/Triangle.cpp
   source/uint128.cpp
   source/UprightFrame.cpp
