@@ -241,8 +241,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     switch (type)
     {
         case CHAT_MSG_SAY:
-        case CHAT_MSG_EMOTE:
-        case CHAT_MSG_YELL:
         {
             // Prevent cheating
             if (!sender->IsAlive())
@@ -254,16 +252,43 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
-            if (type == CHAT_MSG_SAY)
+            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground && !sender->IsGameMaster())
+                sender->SendBattleGroundChat(type, msg);
+            else
+                sender->Say(msg, Language(lang));
+        }
+        case CHAT_MSG_EMOTE:
+        {
+            // Prevent cheating
+            if (!sender->IsAlive())
+                return;
+
+            if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_EMOTE_LEVEL_REQ))
             {
-                if (senderinbattleground && !sender->IsGameMaster())
-                    sender->SendBattleGroundChat(type, msg);
-                else
-                    sender->Say(msg, Language(lang));
+                SendNotification(GetTrinityString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_EMOTE_LEVEL_REQ));
+                return;
             }
-            else if (type == CHAT_MSG_EMOTE)
+
+            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground && !sender->IsGameMaster())
+                sender->SendBattleGroundChat(type, msg);
+            else
                 sender->TextEmote(msg);
-            else if (type == CHAT_MSG_YELL)
+        }
+        case CHAT_MSG_YELL:
+        {
+            // Prevent cheating
+            if (!sender->IsAlive())
+                return;
+
+            if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_YELL_LEVEL_REQ))
+            {
+                SendNotification(GetTrinityString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_YELL_LEVEL_REQ));
+                return;
+            }
+
+            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground && !sender->IsGameMaster())
+                sender->SendBattleGroundChat(type, msg);
+            else
                 sender->Yell(msg, Language(lang));
         } break;
         case CHAT_MSG_WHISPER:
