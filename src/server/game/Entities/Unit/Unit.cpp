@@ -14464,6 +14464,37 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
     return Trinity::Containers::SelectRandomContainerElement(targets);
 }
 
+Unit* Unit::SelectNearbyNoTotemTarget(Unit* exclude, float dist) const
+{
+    std::list<Unit*> targets;
+    Trinity::AnyUnfriendlyNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
+    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    VisitNearbyObject(dist, searcher);
+
+    // remove current target
+    if (GetVictim())
+        targets.remove(GetVictim());
+
+    if (exclude)
+        targets.remove(exclude);
+
+    // remove not LoS targets
+    for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+    {
+        if (!IsWithinLOSInMap(*tIter) || (*tIter)->IsTotem() || (*tIter)->IsSpiritService() || (*tIter)->IsCritter())
+            targets.erase(tIter++);
+        else
+            ++tIter;
+    }
+
+    // no appropriate targets
+    if (targets.empty())
+        return NULL;
+
+    // select random
+    return Trinity::Containers::SelectRandomContainerElement(targets);
+}
+
 void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply)
 {
     float remainingTimePct = (float)m_attackTimer[att] / (GetAttackTime(att) * m_modAttackSpeedPct[att]);

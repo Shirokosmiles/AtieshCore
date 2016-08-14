@@ -2356,6 +2356,56 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             delete targets;
             break;
         }
+        case SMART_ACTION_SET_COMBAT_DISTANCE:
+        {
+            ObjectList* targets = GetTargets(e, unit);
+            if (!targets)
+                break;
+
+            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+                if (IsCreature(*itr))
+                    (*itr)->ToCreature()->m_CombatDistance = e.action.combatDistance.dist;
+
+            delete targets;
+            break;
+        }
+        case SMART_ACTION_SET_CASTER_COMBAT_DIST:
+        {
+            if (e.action.casterDistance.reset)
+                RestoreCasterMaxDist();
+            else
+                SetCasterActualDist(e.action.casterDistance.dist);
+
+            if (me->GetVictim() && me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), GetCasterActualDist());
+            break;
+        }
+        case SMART_ACTION_ADD_THREAT:
+        {
+            ObjectList* targets = GetTargets(e, unit);
+            if (!targets)
+                break;
+
+            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+                if (IsUnit(*itr))
+                    me->AddThreat((*itr)->ToUnit(), (float)e.action.threatPCT.threatINC - (float)e.action.threatPCT.threatDEC);
+
+            delete targets;
+            break;
+        }
+        case SMART_ACTION_LOAD_EQUIPMENT:
+        {
+            ObjectList* targets = GetTargets(e, unit);
+            if (!targets)
+                break;
+
+            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+                if (IsCreature(*itr))
+                    (*itr)->ToCreature()->LoadEquipment(e.action.loadEquipment.id, e.action.loadEquipment.force);
+
+            delete targets;
+            break;
+        }
         default:
             TC_LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry %d SourceType %u, Event %u, Unhandled Action type %u", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;

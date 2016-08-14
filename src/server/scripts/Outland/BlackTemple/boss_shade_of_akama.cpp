@@ -237,6 +237,8 @@ public:
                     spawner->AI()->DoAction(ACTION_DESPAWN_ALL_SPAWNS);
 
             _DespawnAtEvade();
+
+            instance->SetBossState(DATA_SHADE_OF_AKAMA, FAIL);
         }
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override

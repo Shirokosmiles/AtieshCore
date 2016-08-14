@@ -134,6 +134,7 @@ public:
             events.ScheduleEvent(EVENT_PRISMATIC_SHIELD, 1000);
             events.ScheduleEvent(EVENT_BERSERK, 600000);
             Talk(SAY_AGGRO);
+            instance->SetBossState(DATA_MOTHER_SHAHRAZ, IN_PROGRESS);
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -145,6 +146,16 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
+            instance->SetBossState(DATA_MOTHER_SHAHRAZ, DONE);
+        }
+
+        void EnterEvadeMode(EvadeReason /*why*/) override
+        {
+            _Reset();
+
+            instance->SetBossState(DATA_MOTHER_SHAHRAZ, FAIL);
+
+            _DespawnAtEvade();
         }
 
         void TeleportPlayers()

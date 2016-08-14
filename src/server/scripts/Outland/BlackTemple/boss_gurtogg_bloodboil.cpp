@@ -120,6 +120,16 @@ public:
         {
             Talk(SAY_AGGRO);
             _EnterCombat();
+            instance->SetBossState(DATA_GURTOGG_BLOODBOIL, IN_PROGRESS);
+        }
+
+        void EnterEvadeMode(EvadeReason /*why*/) override
+        {
+            _Reset();
+
+            instance->SetBossState(DATA_GURTOGG_BLOODBOIL, FAIL);
+
+            _DespawnAtEvade();
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -131,6 +141,7 @@ public:
         {
             Talk(SAY_DEATH);
             _JustDied();
+            instance->SetBossState(DATA_GURTOGG_BLOODBOIL, DONE);
         }
 
         void RevertThreatOnTarget(ObjectGuid guid)

@@ -65,9 +65,12 @@ enum SMART_EVENT_PHASE
     SMART_EVENT_PHASE_7       = 7,
     SMART_EVENT_PHASE_8       = 8,
     SMART_EVENT_PHASE_9       = 9,
-    SMART_EVENT_PHASE_MAX     = 10,
+    SMART_EVENT_PHASE_10      = 10,
+    SMART_EVENT_PHASE_11      = 11,
+	SMART_EVENT_PHASE_12      = 12,
+    SMART_EVENT_PHASE_MAX     = 13,
 
-    SMART_EVENT_PHASE_COUNT   = 9
+    SMART_EVENT_PHASE_COUNT   = 12
 };
 
 enum SMART_EVENT_PHASE_BITS
@@ -82,7 +85,10 @@ enum SMART_EVENT_PHASE_BITS
     SMART_EVENT_PHASE_7_BIT        = 64,
     SMART_EVENT_PHASE_8_BIT        = 128,
     SMART_EVENT_PHASE_9_BIT        = 256,
-    SMART_EVENT_PHASE_ALL          = SMART_EVENT_PHASE_1_BIT + SMART_EVENT_PHASE_2_BIT + SMART_EVENT_PHASE_3_BIT + SMART_EVENT_PHASE_4_BIT + SMART_EVENT_PHASE_5_BIT + SMART_EVENT_PHASE_6_BIT + SMART_EVENT_PHASE_7_BIT + SMART_EVENT_PHASE_8_BIT + SMART_EVENT_PHASE_9_BIT
+    SMART_EVENT_PHASE_10_BIT       = 512,
+    SMART_EVENT_PHASE_11_BIT       = 1024,
+    SMART_EVENT_PHASE_12_BIT       = 2048,
+    SMART_EVENT_PHASE_ALL          = SMART_EVENT_PHASE_1_BIT + SMART_EVENT_PHASE_2_BIT + SMART_EVENT_PHASE_3_BIT + SMART_EVENT_PHASE_4_BIT + SMART_EVENT_PHASE_5_BIT + SMART_EVENT_PHASE_6_BIT + SMART_EVENT_PHASE_7_BIT + SMART_EVENT_PHASE_8_BIT + SMART_EVENT_PHASE_9_BIT + SMART_EVENT_PHASE_10_BIT + SMART_EVENT_PHASE_11_BIT + SMART_EVENT_PHASE_12_BIT
 };
 
 const uint32 SmartPhaseMask[SMART_EVENT_PHASE_COUNT][2] =
@@ -95,7 +101,10 @@ const uint32 SmartPhaseMask[SMART_EVENT_PHASE_COUNT][2] =
     {SMART_EVENT_PHASE_6, SMART_EVENT_PHASE_6_BIT },
     {SMART_EVENT_PHASE_7, SMART_EVENT_PHASE_7_BIT },
     {SMART_EVENT_PHASE_8, SMART_EVENT_PHASE_8_BIT },
-    {SMART_EVENT_PHASE_9, SMART_EVENT_PHASE_9_BIT }
+    {SMART_EVENT_PHASE_9, SMART_EVENT_PHASE_9_BIT },
+    {SMART_EVENT_PHASE_10, SMART_EVENT_PHASE_10_BIT },
+    {SMART_EVENT_PHASE_11, SMART_EVENT_PHASE_11_BIT },
+    {SMART_EVENT_PHASE_12, SMART_EVENT_PHASE_12_BIT }
 };
 
 enum SMART_EVENT
@@ -552,7 +561,43 @@ enum SMART_ACTION
     SMART_ACTION_RANDOM_SOUND                       = 115,    // soundId1, soundId2, soundId3, soundId4, soundId5, onlySelf
     SMART_ACTION_SET_CORPSE_DELAY                   = 116,    // timer
 
-    SMART_ACTION_END                                = 117
+    // RESERVED										= 117,
+    // RESERVED										= 118,
+	// RESERVED										= 119,
+	// RESERVED										= 120,
+	// RESERVED										= 121,
+	// RESERVED										= 122,
+	// RESERVED										= 123,
+	// RESERVED										= 124,
+	// RESERVED										= 125,
+	// RESERVED										= 126,
+	// RESERVED										= 127,
+	// RESERVED										= 128,
+	// RESERVED										= 129,
+	//SMART_ACTION_MOVE_TO_POS_TARGET					= 130,    // pointId
+	//SMART_ACTION_SET_GO_STATE						= 131,    // state
+	//SMART_ACTION_EXIT_VEHICLE						= 132,    // none
+	//SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS			= 133,    // flags
+	SMART_ACTION_SET_COMBAT_DISTANCE				= 134,    // combatDistance
+	SMART_ACTION_SET_CASTER_COMBAT_DIST				= 135,    // followDistance, resetToMax
+	//SMART_ACTION_SET_SIGHT_DIST						= 136,    // sightDistance
+	//SMART_ACTION_FLEE								= 137,    // fleeTime
+	SMART_ACTION_ADD_THREAT							= 138,    // +threat, -threat
+	SMART_ACTION_LOAD_EQUIPMENT						= 139,    // id
+	//SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT			= 140,    // id min range, id max range
+	//SMART_ACTION_SET_HOVER							= 141,    // 0/1
+	//SMART_ACTION_ADD_IMMUNITY						= 142,    // type, id, value
+	//SMART_ACTION_REMOVE_IMMUNITY					= 143,    // type, id, value
+	//SMART_ACTION_FALL								= 144,    // 
+	//SMART_ACTION_SET_EVENT_FLAG_RESET				= 145,    // 0/1
+	//SMART_ACTION_REMOVE_ALL_GAMEOBJECTS				= 146,
+	//SMART_ACTION_STOP_MOTION						= 147,	  // stopMoving, movementExpired
+	//SMART_ACTION_NO_ENVIRONMENT_UPDATE				= 148,
+	//SMART_ACTION_ZONE_UNDER_ATTACK					= 149,
+	//SMART_ACTION_LOAD_GRID							= 150,
+
+    // From SunWell Core SMART_ACTIONs
+    SMART_ACTION_END                                = 151
 };
 
 struct SmartAction
@@ -1029,6 +1074,23 @@ struct SmartAction
             uint32 wp5;
             uint32 wp6;
         } closestWaypointFromList;
+
+        struct
+        {
+            uint32 dist;
+        } combatDistance;
+
+        struct
+        {
+            uint32 dist;
+            uint32 reset;
+        } casterDistance;
+
+        struct
+        {
+            uint32 id;
+            uint32 force;
+        } loadEquipment;
 
         struct
         {

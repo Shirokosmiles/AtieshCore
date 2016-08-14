@@ -204,6 +204,7 @@ public:
             Phase = 1;
             Counter = 0;
             Timer = 0;
+            instance->SetBossState(DATA_RELIQUARY_OF_SOULS, IN_PROGRESS);
         }
 
         bool SummonSoul()
@@ -670,6 +671,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(ANGER_SAY_DEATH);
+            _instance->SetBossState(DATA_RELIQUARY_OF_SOULS, DONE);
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -719,6 +721,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        InstanceScript* _instance;
     };
 };
 

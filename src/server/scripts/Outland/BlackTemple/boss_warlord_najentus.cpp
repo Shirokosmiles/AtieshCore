@@ -85,6 +85,7 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
+            instance->SetBossState(DATA_HIGH_WARLORD_NAJENTUS, DONE);
         }
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
@@ -104,6 +105,12 @@ public:
             events.ScheduleEvent(EVENT_BERSERK, 480000, GCD_CAST);
             events.ScheduleEvent(EVENT_YELL, 45000 + (rand32() % 76) * 1000, GCD_YELL);
             ResetTimer();
+            instance->SetBossState(DATA_HIGH_WARLORD_NAJENTUS, IN_PROGRESS);
+        }
+
+        void EnterEvadeMode(EvadeReason /*why*/) override 
+        {
+            instance->SetBossState(DATA_HIGH_WARLORD_NAJENTUS, FAIL);
         }
 
         bool RemoveImpalingSpine()

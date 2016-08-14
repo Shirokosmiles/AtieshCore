@@ -55,20 +55,44 @@ enum CreatureIds
 {
     NPC_HIGH_WARLORD_NAJENTUS       = 22887,
     NPC_SUPREMUS                    = 22898,
+
     NPC_SHADE_OF_AKAMA              = 22841,
-    NPC_AKAMA_SHADE                 = 23191, // This is the Akama that starts the Shade of Akama encounter.
-    NPC_AKAMA                       = 23089, // This is the Akama that starts the Illidan encounter.
-
-    NPC_GATHIOS_THE_SHATTERER       = 22949,
-    NPC_HIGH_NETHERMANCER_ZEREVOR   = 22950,
-    NPC_LADY_MALANDE                = 22951,
-    NPC_VERAS_DARKSHADOW            = 22952,
-    NPC_ILLIDARI_COUNCIL            = 23426,
-    NPC_BLOOD_ELF_COUNCIL_VOICE     = 23499,
-
+    NPC_AKAMA_SHADE                 = 23191,
+	NPC_STORM_FURY					= 22848,
+	NPC_TERON_GOREFIEND				= 22871,
+	NPC_VENGEFUL_SPIRIT				= 23109,
+	NPC_SHADOWY_CONSTRUCT			= 23111,
+	NPC_ANGERED_SOUL_FRAGMENT		= 23398,
+	NPC_HUNGERING_SOUL_FRAGMENT		= 23401,
+	NPC_SUFFERING_SOUL_FRAGMENT		= 23399,
+	NPC_RELIQUARY_OF_THE_LOST		= 22856,
+	NPC_ENSLAVED_SOUL				= 23469,
+	NPC_GATHIOS_THE_SHATTERER		= 22949,
+	NPC_HIGH_NETHERMANCER_ZEREVOR	= 22950,
+	NPC_LADY_MALANDE				= 22951,
+	NPC_VERAS_DARKSHADOW			= 22952,
+	NPC_ILLIDARI_COUNCIL			= 23426,
+    NPC_AKAMA                       = 23089,
     NPC_ILLIDAN_STORMRAGE           = 22917,
+	NPC_PARASITIC_SHADOWFIEND		= 23498,
+	NPC_BLADE_OF_AZZINOTH			= 22996,
+	NPC_FLAME_OF_AZZINOTH			= 22997,
+
+	NPC_DRAGON_TURTLE				= 22885,
 
     NPC_SUPREMUS_VOLCANO            = 23085
+};
+
+enum MiscIds
+{
+	SPELL_CHEST_PAINS				= 41356,
+	SPELL_WYVERN_STING				= 24336,
+	SPELL_SHADOW_INFERNO_DAMAGE		= 39646,
+	SPELL_CHAOTIC_CHARGE			= 41033,
+	SPELL_DEMENTIA1					= 41406,
+	SPELL_DEMENTIA2					= 41409,
+
+	FACTION_ASHTONGUE				= 1820
 };
 
 enum GameObjectIds
@@ -87,6 +111,21 @@ enum GameObjectIds
     GO_ILLIDAN_GATE                 = 185905,
     GO_ILLIDAN_DOOR_R               = 186261,
     GO_ILLIDAN_DOOR_L               = 186262
+};
+
+class PlayerOrPetCheck
+{
+public:
+    bool operator()(WorldObject* object) const
+    {
+        if (object->GetTypeId() == TYPEID_PLAYER)
+            return false;
+
+        if (Creature* creature = object->ToCreature())
+            return !creature->IsPet();
+
+        return true;
+    }
 };
 
 template<class AI>

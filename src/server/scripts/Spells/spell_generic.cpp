@@ -2219,6 +2219,44 @@ class spell_gen_mounted_charge: public SpellScriptLoader
         }
 };
 
+class spell_gen_select_target_count : public SpellScriptLoader
+{
+public:
+    spell_gen_select_target_count(const char* name, Targets effTarget, uint8 count) : SpellScriptLoader(name), _effTarget(effTarget), _count(count) { }
+
+    class spell_gen_select_target_count_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_select_target_count_SpellScript);
+
+    public:
+        spell_gen_select_target_count_SpellScript(Targets effTarget, uint8 count) : _effTarget(effTarget), _count(count) { }
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove(GetCaster());
+            Trinity::Containers::RandomResizeList(targets, _count);
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_select_target_count_SpellScript::FilterTargets, EFFECT_ALL, _effTarget);
+        }
+
+    private:
+        Targets _effTarget;
+        uint8 _count;
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_select_target_count_SpellScript(_effTarget, _count);
+    }
+
+private:
+    Targets _effTarget;
+    uint8 _count;
+};
+
 enum Netherbloom
 {
     SPELL_NETHERBLOOM_POLLEN_1      = 28703
@@ -4307,6 +4345,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_clone_weapon_aura();
     new spell_gen_count_pct_from_max_hp("spell_gen_default_count_pct_from_max_hp");
     new spell_gen_count_pct_from_max_hp("spell_gen_50pct_count_pct_from_max_hp", 50);
+    new spell_gen_count_pct_from_max_hp("spell_gen_100pct_count_pct_from_max_hp", 100);
     new spell_gen_create_lance();
     new spell_gen_creature_permanent_feign_death();
     new spell_gen_dalaran_disguise("spell_gen_sunreaver_disguise");
@@ -4338,6 +4377,12 @@ void AddSC_generic_spell_scripts()
     new spell_gen_mount("spell_celestial_steed", 0, SPELL_CELESTIAL_STEED_60, SPELL_CELESTIAL_STEED_100, SPELL_CELESTIAL_STEED_150, SPELL_CELESTIAL_STEED_280, SPELL_CELESTIAL_STEED_310);
     new spell_gen_mount("spell_x53_touring_rocket", 0, 0, 0, SPELL_X53_TOURING_ROCKET_150, SPELL_X53_TOURING_ROCKET_280, SPELL_X53_TOURING_ROCKET_310);
     new spell_gen_mounted_charge();
+    new spell_gen_select_target_count("spell_gen_select_target_count_15_1", TARGET_UNIT_SRC_AREA_ENEMY, 1);
+    //new spell_gen_select_target_count("spell_gen_select_target_count_15_2", TARGET_UNIT_SRC_AREA_ENEMY, 2); will use in Gundrak
+    //new spell_gen_select_target_count("spell_gen_select_target_count_15_5", TARGET_UNIT_SRC_AREA_ENEMY, 5); will use in Gundrak
+    new spell_gen_select_target_count("spell_gen_select_target_count_7_1", TARGET_UNIT_SRC_AREA_ENTRY, 1);
+    new spell_gen_select_target_count("spell_gen_select_target_count_24_1", TARGET_UNIT_CONE_ENEMY_24, 1);
+    //new spell_gen_select_target_count("spell_gen_select_target_count_30_1", TARGET_UNIT_SRC_AREA_ALLY, 1); will use in Gundrak
     new spell_gen_netherbloom();
     new spell_gen_nightmare_vine();
     new spell_gen_obsidian_armor();

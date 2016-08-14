@@ -107,6 +107,17 @@ public:
             ChangePhase();
             events.ScheduleEvent(EVENT_BERSERK, 900000, GCD_CAST);
             events.ScheduleEvent(EVENT_FLAME, 20000, GCD_CAST);
+            instance->SetBossState(DATA_SUPREMUS, IN_PROGRESS);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            instance->SetBossState(DATA_SUPREMUS, DONE);
+        }
+
+        void EnterEvadeMode(EvadeReason /*why*/) override
+        {
+            instance->SetBossState(DATA_SUPREMUS, FAIL);
         }
 
         void ChangePhase()

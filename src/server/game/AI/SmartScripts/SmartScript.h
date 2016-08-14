@@ -238,6 +238,11 @@ class TC_GAME_API SmartScript
         typedef std::unordered_map<uint32, uint32> CounterMap;
         CounterMap mCounterList;
 
+        void SetCasterActualDist(float dist) { smartCasterActualDist = dist; }
+        void RestoreCasterMaxDist() { smartCasterActualDist = smartCasterMaxDist; }
+        float GetCasterActualDist() const { return smartCasterActualDist; }
+        float GetCasterMaxDist() const { return smartCasterMaxDist; }
+
     private:
         void IncPhase(int32 p = 1)
         {
@@ -278,6 +283,9 @@ class TC_GAME_API SmartScript
         uint32 mLastTextID;
         uint32 mTalkerEntry;
         bool mUseTextTimer;
+
+        uint32 smartCasterActualDist;
+        uint32 smartCasterMaxDist;
 
         SMARTAI_TEMPLATE mTemplate;
         void InstallEvents();
