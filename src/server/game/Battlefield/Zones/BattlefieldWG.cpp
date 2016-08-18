@@ -51,8 +51,6 @@ BfWGCoordGY const WGGraveYard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
     { { 5140.790f, 2179.120f, 390.950f, 1.972220f }, 1332, BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE, TEAM_ALLIANCE },
 };
 
-uint32 const VehNumWorldState[]        = { 3680, 3490 };
-uint32 const MaxVehNumWorldState[]     = { 3681, 3491 };
 uint32 const ClockWorldState[]         = { 3781, 4354 };
 uint32 const WintergraspFaction[]      = { 1732, 1735, 35 };
 
