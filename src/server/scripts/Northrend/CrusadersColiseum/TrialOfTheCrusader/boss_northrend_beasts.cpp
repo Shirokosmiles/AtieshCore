@@ -822,7 +822,7 @@ struct boss_jormungarAI : public BossAI
         // if the worm was mobile before submerging, make him stationary now
         if (WasMobile)
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_REMOVE_CLIENT_CONTROL);
+            me->SetControlled(true, UNIT_STATE_ROOT);
             SetCombatMovement(false);
             me->SetDisplayId(ModelStationary);
             me->CastSpell(me, SPELL_GROUND_VISUAL_1, true);
@@ -834,7 +834,7 @@ struct boss_jormungarAI : public BossAI
         }
         else
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_REMOVE_CLIENT_CONTROL);
+            me->SetControlled(false, UNIT_STATE_ROOT);
             SetCombatMovement(true);
             me->GetMotionMaster()->MoveChase(me->GetVictim());
             me->SetDisplayId(ModelMobile);
@@ -1199,7 +1199,7 @@ public:
                     me->SetTarget(_trampleTargetGUID);
                     _trampleCast = false;
                     SetCombatMovement(false);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
+                    me->SetControlled(true, UNIT_STATE_ROOT);
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveIdle();
                     events.ScheduleEvent(EVENT_TRAMPLE, 4 * IN_MILLISECONDS);
@@ -1283,7 +1283,7 @@ public:
                     Talk(EMOTE_TRAMPLE_FAIL);
                 }
                 _movementStarted = false;
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_REMOVE_CLIENT_CONTROL);
+                me->SetControlled(false, UNIT_STATE_ROOT);
                 SetCombatMovement(true);
                 me->GetMotionMaster()->MovementExpired();
                 me->GetMotionMaster()->Clear();
