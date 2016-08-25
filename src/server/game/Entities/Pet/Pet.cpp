@@ -38,7 +38,7 @@
 Pet::Pet(Player* owner, PetType type) :
     Guardian(NULL, owner, true), m_usedTalentCount(0), m_removed(false),
     m_happinessTimer(7500), m_petType(type), m_duration(0), m_auraRaidUpdateMask(0), m_loading(false),
-    m_declinedname(NULL), tempspellTarget(NULL), tempoldTarget(NULL), tempspellIsPositive(false), tempspell(0)
+    m_declinedname(NULL), tempspellTarget(nullptr), tempoldTarget(nullptr), tempspellIsPositive(false), tempspell(0)
 {
     ASSERT(GetOwner());
 
@@ -2031,8 +2031,8 @@ void Pet::ClearCastWhenWillAvailable()
 {
     tempspellIsPositive = false;
     tempspell = 0;
-    tempspellTarget = NULL;
-    tempoldTarget = NULL;
+    tempspellTarget = nullptr;
+    tempoldTarget = nullptr;
 }
 
 bool Pet::IsPetAura(Aura const* aura)

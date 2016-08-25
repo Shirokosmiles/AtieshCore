@@ -289,7 +289,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
         case ACT_PASSIVE:                                   // 0x01
         case ACT_ENABLED:                                   // 0xC1    spell
         {
-            Unit* unit_target = NULL;
+            Unit* unit_target = nullptr;
 
             if (guid2)
                 unit_target = ObjectAccessor::GetUnit(*_player, guid2);
@@ -470,7 +470,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             pet->SendPetAIReaction(guid1);
                         }
 
-                        pet->ToPet()->CastWhenWillAvailable(spellid, unit_target, NULL, tempspellIsPositive);
+                        pet->ToPet()->CastWhenWillAvailable(spellid, unit_target, nullptr, tempspellIsPositive);
                     }
                 }
                 else if (haspositiveeffect)
@@ -484,7 +484,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         pet->AttackStop();
                     }
                     else
-                        victim = NULL;                        
+                        victim = nullptr;
 
                     if (pet->GetTypeId() != TYPEID_PLAYER && pet->ToCreature()->IsAIEnabled)
                     {
