@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "utgarde_pinnacle.h"
 #include "GridNotifiers.h"
@@ -76,7 +77,7 @@ enum Emotes
 
 enum Data
 {
-    
+
     DATA_LOVE_TO_SKADI                   = 0,
     FIRST_WAVE_MAX_WARRIORS              = 10,
     FIRST_WAVE_SIZE                      = 13,
@@ -108,18 +109,6 @@ enum CombatPhase
 {
     PHASE_FLYING                         = 0,
     PHASE_GROUND
-};
-
-std::list<uint32> SummonSpellsList =
-{
-    SPELL_SUMMON_YMIRJAR_WARRIOR_E,
-    SPELL_SUMMON_YMIRJAR_HARPOONER_W,
-    SPELL_SUMMON_YMIRJAR_WARRIOR_W,
-    SPELL_SUMMON_YMIRJAR_HARPOONER_E,
-    SPELL_SUMMON_YMIRJAR_WARRIOR_W,
-    SPELL_SUMMON_YMIRJAR_WITCH_DOCTOR_E,
-    SPELL_SUMMON_YMIRJAR_WARRIOR_E,
-    SPELL_SUMMON_YMIRJAR_WITCH_DOCTOR_W
 };
 
 Position const BreachPoint = { 0.0f, 0.0f, 0.0f, 2.670354f };
@@ -215,7 +204,7 @@ public:
                 crea->GetMotionMaster()->MovePoint(POINT_0, FirstWaveLocations[11]);
             if (Creature* crea = me->SummonCreature(NPC_YMIRJAR_HARPOONER, SpawnLoc, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                 crea->GetMotionMaster()->MovePoint(POINT_0, FirstWaveLocations[12]);
-            
+
             firstWaveSummoned = true;
         }
 
@@ -330,7 +319,7 @@ public:
         uint8 loveSkadi;
         bool firstWaveSummoned;
     };
-    
+
     CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_skadiAI>(creature);
@@ -377,7 +366,7 @@ public:
             me->setActive(true);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            me->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
+            me->SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
 
             _scheduler.Schedule(Seconds(2), [this](TaskContext /*context*/)
             {
@@ -502,7 +491,7 @@ struct npc_skadi_trashAI : public ScriptedAI
         if (Creature* skadi = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SKADI_THE_RUTHLESS)))
             skadi->AI()->JustSummoned(me);
     }
-    
+
     void MovementInform(uint32 type, uint32 pointId) override
     {
         if (type != POINT_MOTION_TYPE)
@@ -721,6 +710,36 @@ public:
     }
 };
 
+class spell_freezing_cloud_damage : public SpellScriptLoader
+{
+    public:
+        spell_freezing_cloud_damage() : SpellScriptLoader("spell_freezing_cloud_damage") { }
+
+        class spell_freezing_cloud_damage_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_freezing_cloud_damage_AuraScript);
+
+            bool CanBeAppliedOn(Unit* target)
+            {
+                if (Aura* aur = target->GetAura(GetId()))
+                    if (aur->GetOwner() != GetOwner())
+                        return false;
+
+                return true;
+            }
+
+            void Register() override
+            {
+                DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_freezing_cloud_damage_AuraScript::CanBeAppliedOn);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_freezing_cloud_damage_AuraScript();
+        }
+};
+
 class spell_skadi_reset_check : public SpellScriptLoader
 {
     public:
@@ -738,10 +757,10 @@ class spell_skadi_reset_check : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                if (_targetCount || !GetHitUnit())
+                if (_targetCount)
                     return;
 
-                Creature* target = GetHitCreature()->ToCreature();
+                Creature* target = GetHitCreature();
                 if (!target)
                     return;
 
@@ -874,6 +893,18 @@ class spell_summon_gauntlet_mobs_periodic : public SpellScriptLoader
                     CastTheNextTwoSpells();
                 }
             }
+        private:
+            std::deque<uint32> SummonSpellsList =
+            {
+                SPELL_SUMMON_YMIRJAR_WARRIOR_E,
+                SPELL_SUMMON_YMIRJAR_HARPOONER_W,
+                SPELL_SUMMON_YMIRJAR_WARRIOR_W,
+                SPELL_SUMMON_YMIRJAR_HARPOONER_E,
+                SPELL_SUMMON_YMIRJAR_WARRIOR_W,
+                SPELL_SUMMON_YMIRJAR_WITCH_DOCTOR_E,
+                SPELL_SUMMON_YMIRJAR_WARRIOR_E,
+                SPELL_SUMMON_YMIRJAR_WITCH_DOCTOR_W
+            };
 
             void Register() override
             {
@@ -935,6 +966,7 @@ void AddSC_boss_skadi()
     new npc_ymirjar_harpooner();
     new spell_freezing_cloud_area_left();
     new spell_freezing_cloud_area_right();
+    new spell_freezing_cloud_damage();
     new spell_skadi_reset_check();
     new spell_skadi_launch_harpoon();
     new spell_skadi_poisoned_spear();
