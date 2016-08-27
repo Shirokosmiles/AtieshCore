@@ -21,43 +21,42 @@
 
 enum Spells
 {
-    SPELL_EMERGE                                = 53500,
-    SPELL_SUBMERGE                              = 53421,
-    SPELL_IMPALE_AURA                           = 53456, // periodically triggers 53457
-    SPELL_IMPALE_VISUAL                         = 53455,
-    SPELL_IMPALE_DAMAGE                         = 53454,
-    SPELL_LEECHING_SWARM                        = 53467,
-    SPELL_POUND                                 = 59433,
-    SPELL_POUND_DAMAGE                          = 59432,
-    SPELL_CARRION_BEETLES                       = 53520,
-    SPELL_CARRION_BEETLE                        = 53521,
+    SPELL_EMERGE                = 53500,
+    SPELL_SUBMERGE              = 53421,
+    SPELL_IMPALE_AURA           = 53456,
+    SPELL_IMPALE_VISUAL         = 53455,
+    SPELL_IMPALE_DAMAGE         = 53454,
+    SPELL_LEECHING_SWARM        = 53467,
+    SPELL_POUND                 = 59433,
+    SPELL_POUND_DAMAGE          = 59432,
+    SPELL_CARRION_BEETLES       = 53520,
+    SPELL_CARRION_BEETLE        = 53521,
 
-    SPELL_SUMMON_DARTER                         = 53599,
-    SPELL_SUMMON_ASSASSIN                       = 53609,
-    SPELL_SUMMON_GUARDIAN                       = 53614,
-    SPELL_SUMMON_VENOMANCER                     = 53615,
+    SPELL_SUMMON_DARTER         = 53599,
+    SPELL_SUMMON_ASSASSIN       = 53609,
+    SPELL_SUMMON_GUARDIAN       = 53614,
+    SPELL_SUMMON_VENOMANCER     = 53615,
 
-    SPELL_DART                                  = 59349,
-    SPELL_BACKSTAB                              = 52540,
-    SPELL_ASSASSIN_VISUAL                       = 53611,
-    SPELL_SUNDER_ARMOR                          = 53618,
-    SPELL_POISON_BOLT                           = 53617
+    SPELL_DART                  = 59349,
+    SPELL_BACKSTAB              = 52540,
+    SPELL_ASSASSIN_VISUAL       = 53611,
+    SPELL_SUNDER_ARMOR          = 53618,
+    SPELL_POISON_BOLT           = 53617
 };
 
 enum Creatures
 {
-    NPC_WORLD_TRIGGER                           = 22515,
+    NPC_WORLD_TRIGGER           = 22515,
 };
 
-// not in db
 enum Yells
 {
-    SAY_AGGRO                                     = 0,
-    SAY_SLAY                                      = 1,
-    SAY_DEATH                                     = 2,
-    SAY_LOCUST                                    = 3,
-    SAY_SUBMERGE                                  = 4,
-    SAY_INTRO                                     = 5
+    SAY_AGGRO       = 0,
+    SAY_SLAY        = 1,
+    SAY_DEATH       = 2,
+    SAY_LOCUST      = 3,
+    SAY_SUBMERGE    = 4,
+    SAY_INTRO       = 5
 };
 
 enum Events
@@ -82,7 +81,7 @@ enum Actions
 
 enum Misc
 {
-    ACHIEV_GOTTA_GO_START_EVENT                      = 20381,
+    ACHIEV_GOTTA_GO_START_EVENT = 20381,
 };
 
 enum Phases
@@ -93,8 +92,7 @@ enum Phases
 
 enum GUIDTypes
 {
-    GUID_TYPE_SMALL_PET = 0,
-    GUID_TYPE_LARGE_PET,
+    GUID_TYPE_PET = 0,
     GUID_TYPE_IMPALE
 };
 
@@ -111,8 +109,6 @@ public:
     struct boss_anub_arakAI : public BossAI
     {
         boss_anub_arakAI(Creature* creature) : BossAI(creature, DATA_ANUBARAK), _nextSubmerge(0), _petCount(0), _assassinCount(0), _guardianCount(0), _venomancerCount(0) { }
-
-        void Initialize() { }
 
         void Reset() override
         {
@@ -187,6 +183,7 @@ public:
                         events.Repeat(randtime(Seconds(26), Seconds(32)));
                         break;
                     case EVENT_LEECHING_SWARM:
+                        Talk(SAY_LOCUST);
                         DoCastAOE(SPELL_LEECHING_SWARM);
                         events.Repeat(randtime(Seconds(25), Seconds(28)));
                         break;
@@ -199,6 +196,7 @@ public:
                             DoCast(impaleTarget, SPELL_IMPALE_DAMAGE, true);
                         break;
                     case EVENT_SUBMERGE:
+                        Talk(SAY_SUBMERGE);
                         DoCastSelf(SPELL_SUBMERGE);
                         break;
                     case EVENT_DARTER:
@@ -221,8 +219,13 @@ public:
                         {
                             trigger->CastSpell(trigger, SPELL_SUMMON_ASSASSIN, true);
                             trigger->CastSpell(trigger, SPELL_SUMMON_ASSASSIN, true);
-                            if (_assassinCount -= 2)
+                            if (_assassinCount > 2)
+                                _assassinCount -= 2;
+                            else
+                            {
+                                _assassinCount = 0;
                                 events.Repeat(Seconds(20));
+                            }
                         }
                         else // something went wrong
                             EnterEvadeMode(EVADE_REASON_OTHER);
@@ -232,8 +235,13 @@ public:
                         {
                             trigger->CastSpell(trigger, SPELL_SUMMON_GUARDIAN, true);
                             trigger->CastSpell(trigger, SPELL_SUMMON_GUARDIAN, true);
-                            if (_guardianCount -= 2)
+                            if (_guardianCount > 2)
+                                _guardianCount -= 2;
+                            else
+                            {
+                                _guardianCount = 0;
                                 events.Repeat(Seconds(20));
+                            }
                         }
                         else
                             EnterEvadeMode(EVADE_REASON_OTHER);
@@ -243,8 +251,13 @@ public:
                         {
                             trigger->CastSpell(trigger, SPELL_SUMMON_VENOMANCER, true);
                             trigger->CastSpell(trigger, SPELL_SUMMON_VENOMANCER, true);
-                            if (_venomancerCount -= 2)
+                            if (_venomancerCount > 2)
+                                _venomancerCount -= 2;
+                            else
+                            {
+                                _venomancerCount = 0;
                                 events.Repeat(Seconds(20));
+                            }
                         }
                         else
                             EnterEvadeMode(EVADE_REASON_OTHER);
@@ -274,10 +287,7 @@ public:
         {
             switch (type)
             {
-                case GUID_TYPE_LARGE_PET:
-                    ++_petCount;
-                    // intentional missing break
-                case GUID_TYPE_SMALL_PET:
+                case GUID_TYPE_PET:
                 {
                     if (Creature* creature = ObjectAccessor::GetCreature(*me, guid))
                         JustSummoned(creature);
@@ -305,6 +315,7 @@ public:
                     if (!--_petCount) // last pet died, emerge
                     {
                         me->RemoveAurasDueToSpell(SPELL_SUBMERGE);
+                        me->RemoveAurasDueToSpell(SPELL_IMPALE_AURA);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                         DoCastSelf(SPELL_EMERGE);
                         events.SetPhase(PHASE_EMERGE);
@@ -360,6 +371,7 @@ public:
                         events.ScheduleEvent(EVENT_DARTER, Seconds(0), 0, PHASE_SUBMERGE);
                         break;
                 }
+                _petCount = _guardianCount + _venomancerCount;
                 if (_assassinCount)
                     events.ScheduleEvent(EVENT_ASSASSIN, Seconds(0), 0, PHASE_SUBMERGE);
                 if (_guardianCount)
@@ -395,7 +407,7 @@ class npc_anubarak_pet_template : public ScriptedAI
         {
             ScriptedAI::InitializeAI();
             if (Creature* anubarak = _instance->GetCreature(DATA_ANUBARAK))
-                anubarak->AI()->SetGUID(me->GetGUID(), _isLarge ? GUID_TYPE_LARGE_PET : GUID_TYPE_SMALL_PET);
+                anubarak->AI()->SetGUID(me->GetGUID(), GUID_TYPE_PET);
             else
                 me->DespawnOrUnsummon();
         }
@@ -473,7 +485,6 @@ class npc_anubarak_anub_ar_assassin : public CreatureScript
             {
                 npc_anubarak_pet_template::InitializeAI();
                 CreatureBoundary const* boundary = _instance->GetBossBoundary(DATA_ANUBARAK);
-                npc_anubarak_pet_template::InitializeAI();
                 if (Creature* anubarak = _instance->GetCreature(DATA_ANUBARAK))
                 {
                     Position jumpTo;
@@ -492,7 +503,8 @@ class npc_anubarak_anub_ar_assassin : public CreatureScript
 
                 if (diff >= _backstabTimer)
                 {
-                    DoCastVictim(SPELL_BACKSTAB);
+                    if (me->GetVictim() && me->GetVictim()->isInBack(me))
+                        DoCastVictim(SPELL_BACKSTAB);
                     _backstabTimer = 6 * IN_MILLISECONDS;
                 }
                 else
@@ -604,7 +616,7 @@ class npc_anubarak_impale_target : public CreatureScript
                 if (Creature* anubarak = me->GetInstanceScript()->GetCreature(DATA_ANUBARAK))
                 {
                     DoCastSelf(SPELL_IMPALE_VISUAL);
-                    me->DespawnOrUnsummon(7 * IN_MILLISECONDS);
+                    me->DespawnOrUnsummon(Seconds(6));
                     anubarak->AI()->SetGUID(me->GetGUID(), GUID_TYPE_IMPALE);
                 }
                 else

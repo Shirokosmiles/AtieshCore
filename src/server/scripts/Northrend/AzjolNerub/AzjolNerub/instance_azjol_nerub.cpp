@@ -72,7 +72,7 @@ class instance_azjol_nerub : public InstanceMapScript
             {
                 InstanceScript::OnUnitDeath(who);
                 Creature* creature = who->ToCreature();
-                if (!creature || creature->IsCritter())
+                if (!creature || creature->IsCritter() || creature->IsControlledByPlayer())
                     return;
                 if (Creature* gatewatcher = GetCreature(DATA_KRIKTHIR))
                     gatewatcher->AI()->DoAction(-ACTION_GATEWATCHER_GREET);

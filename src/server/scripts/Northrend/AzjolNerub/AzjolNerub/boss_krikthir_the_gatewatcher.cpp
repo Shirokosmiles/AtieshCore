@@ -58,40 +58,40 @@ enum Events
 enum Spells
 {
     // Krik'thir the Gatewatcher
-    SPELL_SUBBOSS_AGGRO_TRIGGER                 = 52343,
-    SPELL_SWARM                                 = 52440,
-    SPELL_MIND_FLAY                             = 52586,
-    SPELL_CURSE_OF_FATIGUE                      = 52592,
-    SPELL_FRENZY                                = 28747,
+    SPELL_SUBBOSS_AGGRO_TRIGGER     = 52343,
+    SPELL_SWARM                     = 52440,
+    SPELL_MIND_FLAY                 = 52586,
+    SPELL_CURSE_OF_FATIGUE          = 52592,
+    SPELL_FRENZY                    = 28747,
 
     // Watchers - Shared
-    SPELL_WEB_WRAP                              = 52086,
-    SPELL_WEB_WRAP_WRAPPED                      = 52087,
-    SPELL_INFECTED_BITE                         = 52469,
+    SPELL_WEB_WRAP                  = 52086,
+    SPELL_WEB_WRAP_WRAPPED          = 52087,
+    SPELL_INFECTED_BITE             = 52469,
 
     // Watcher Gashra
-    SPELL_ENRAGE                                = 52470,
+    SPELL_ENRAGE                    = 52470,
     // Watcher Narjil
-    SPELL_BLINDING_WEBS                         = 52524,
+    SPELL_BLINDING_WEBS             = 52524,
     // Watcher Silthik
-    SPELL_POISON_SPRAY                          = 52493,
+    SPELL_POISON_SPRAY              = 52493,
 
     // Anub'ar Warrior
-    SPELL_CLEAVE                                = 49806,
-    SPELL_STRIKE                                = 52532,
+    SPELL_CLEAVE                    = 49806,
+    SPELL_STRIKE                    = 52532,
 
     // Anub'ar Skirmisher
-    SPELL_CHARGE                                = 52538,
-    SPELL_BACKSTAB                              = 52540,
-    SPELL_FIXTATE_TRIGGER                       = 52536,
-    SPELL_FIXTATE_TRIGGERED                     = 52537,
+    SPELL_CHARGE                    = 52538,
+    SPELL_BACKSTAB                  = 52540,
+    SPELL_FIXTATE_TRIGGER           = 52536,
+    SPELL_FIXTATE_TRIGGERED         = 52537,
 
     // Anub'ar Shadowcaster
-    SPELL_SHADOW_BOLT                           = 52534,
-    SPELL_SHADOW_NOVA                           = 52535,
+    SPELL_SHADOW_BOLT               = 52534,
+    SPELL_SHADOW_NOVA               = 52535,
 
     // Skittering Infector
-    SPELL_ACID_SPLASH                           = 52446
+    SPELL_ACID_SPLASH               = 52446
 };
 
 enum Data
@@ -104,21 +104,21 @@ enum Actions
     ACTION_GASHRA_DIED,
     ACTION_NARJIL_DIED,
     ACTION_SILTHIK_DIED,
+    ACTION_WATCHER_ENGAGED,
     ACTION_PET_ENGAGED,
     ACTION_PET_EVADE
 };
 
 enum Yells
 {
-    SAY_AGGRO                                     = 0,
-    SAY_SLAY                                      = 1,
-    SAY_DEATH                                     = 2,
-    SAY_SWARM                                     = 3,
-    SAY_PREFIGHT                                  = 4,
-    SAY_SEND_GROUP                                = 5
+    SAY_AGGRO       = 0,
+    SAY_SLAY        = 1,
+    SAY_DEATH       = 2,
+    SAY_SWARM       = 3,
+    SAY_PREFIGHT    = 4,
+    SAY_SEND_GROUP  = 5
 };
 
-static const float AGGRO_DISTANCE = 25.0f; // distance where mobs switch to aggressive
 class boss_krik_thir : public CreatureScript
 {
     public:
@@ -126,12 +126,13 @@ class boss_krik_thir : public CreatureScript
 
         struct boss_krik_thirAI : public BossAI
         {
-            boss_krik_thirAI(Creature* creature) : BossAI(creature, DATA_KRIKTHIR), _hadGreet(false), _hadFrenzy(false), _petsInCombat(false) { }
+            boss_krik_thirAI(Creature* creature) : BossAI(creature, DATA_KRIKTHIR), _hadGreet(false), _hadFrenzy(false), _petsInCombat(false), _watchersActive(0) { }
 
             void SummonAdds()
             {
                 if (instance->GetBossState(DATA_KRIKTHIR) == DONE)
                     return;
+
                 for (uint8 i = 1; i <= 3; ++i)
                 {
                     std::list<TempSummon*> summons;
@@ -146,6 +147,7 @@ class boss_krik_thir : public CreatureScript
                 BossAI::Reset();
                 _hadFrenzy = false;
                 _petsInCombat = false;
+                _watchersActive = 0;
                 me->SetReactState(REACT_PASSIVE);
             }
 
@@ -195,7 +197,7 @@ class boss_krik_thir : public CreatureScript
                     return;
                 }
 
-                if (me->CanStartAttack(who, false) && me->GetDistance2d(who) <= AGGRO_DISTANCE)
+                if (me->CanStartAttack(who, false) && me->IsWithinDistInMap(who, me->GetAttackDistance(who) + me->m_CombatDistance))
                     EnterCombat(who);
             }
 
@@ -219,7 +221,16 @@ class boss_krik_thir : public CreatureScript
                     case ACTION_GASHRA_DIED:
                     case ACTION_NARJIL_DIED:
                     case ACTION_SILTHIK_DIED:
-                        events.RescheduleEvent(EVENT_SEND_GROUP, Seconds(5));
+                        if (!_watchersActive) // something is wrong
+                        {
+                            EnterEvadeMode(EVADE_REASON_OTHER);
+                            return;
+                        }
+                        if (!--_watchersActive) // if there are no watchers currently in combat...
+                            events.RescheduleEvent(EVENT_SEND_GROUP, Seconds(5)); // ...send the next watcher after the targets sooner
+                        break;
+                    case ACTION_WATCHER_ENGAGED:
+                        ++_watchersActive;
                         break;
                     case ACTION_PET_ENGAGED:
                         if (_petsInCombat || me->IsInCombat())
@@ -296,6 +307,7 @@ class boss_krik_thir : public CreatureScript
                 bool _hadGreet;
                 bool _hadFrenzy;
                 bool _petsInCombat;
+                uint8 _watchersActive;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
@@ -306,11 +318,19 @@ class boss_krik_thir : public CreatureScript
 
 struct npc_gatewatcher_petAI : public ScriptedAI
 {
-    npc_gatewatcher_petAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()), _petGroup(0) { }
+    npc_gatewatcher_petAI(Creature* creature, bool isWatcher) : ScriptedAI(creature), _instance(creature->GetInstanceScript()), _petGroup(0), _isWatcher(isWatcher) { }
 
-    virtual void _EnterCombat(Unit* /*who*/) = 0;
+    virtual void _EnterCombat() = 0;
     void EnterCombat(Unit* who) override
     {
+        if (_isWatcher)
+        {
+            _isWatcher = false;
+            if (TempSummon* meSummon = me->ToTempSummon())
+                if (Creature* summoner = meSummon->GetSummonerCreatureBase())
+                    summoner->AI()->DoAction(ACTION_WATCHER_ENGAGED);
+        }
+
         if (me->HasReactState(REACT_PASSIVE))
         {
             std::list<Creature*> others;
@@ -321,14 +341,12 @@ struct npc_gatewatcher_petAI : public ScriptedAI
                     other->SetReactState(REACT_AGGRESSIVE);
                     other->AI()->AttackStart(who);
                 }
-            me->SetReactState(REACT_AGGRESSIVE);
-            AttackStart(who);
 
             if (TempSummon* meSummon = me->ToTempSummon())
                 if (Creature* summoner = meSummon->GetSummonerCreatureBase())
                     summoner->AI()->DoAction(ACTION_PET_ENGAGED);
         }
-        _EnterCombat(who);
+        _EnterCombat();
         ScriptedAI::EnterCombat(who);
     }
 
@@ -356,7 +374,7 @@ struct npc_gatewatcher_petAI : public ScriptedAI
             return;
         }
 
-        if (me->CanStartAttack(who, false) && me->GetDistance2d(who) <= AGGRO_DISTANCE)
+        if (me->CanStartAttack(who, false) && me->IsWithinDistInMap(who, me->GetAttackDistance(who) + me->m_CombatDistance))
             EnterCombat(who);
     }
 
@@ -382,6 +400,7 @@ struct npc_gatewatcher_petAI : public ScriptedAI
     EventMap _events;
     InstanceScript* _instance;
     uint32 _petGroup;
+    bool _isWatcher;
 };
 
 class npc_watcher_gashra : public CreatureScript
@@ -391,7 +410,7 @@ class npc_watcher_gashra : public CreatureScript
 
         struct npc_watcher_gashraAI : public npc_gatewatcher_petAI
         {
-            npc_watcher_gashraAI(Creature* creature) : npc_gatewatcher_petAI(creature)
+            npc_watcher_gashraAI(Creature* creature) : npc_gatewatcher_petAI(creature, true)
             {
                 _instance = creature->GetInstanceScript();
                 me->SetReactState(REACT_PASSIVE);
@@ -402,7 +421,7 @@ class npc_watcher_gashra : public CreatureScript
                 _events.Reset();
             }
 
-            void _EnterCombat(Unit* /*who*/) override
+            void _EnterCombat() override
             {
                 _events.ScheduleEvent(EVENT_ENRAGE, randtime(Seconds(3), Seconds(5)));
                 _events.ScheduleEvent(EVENT_WEB_WRAP, randtime(Seconds(16), Seconds(19)));
@@ -469,7 +488,7 @@ class npc_watcher_narjil : public CreatureScript
 
         struct npc_watcher_narjilAI : public npc_gatewatcher_petAI
         {
-            npc_watcher_narjilAI(Creature* creature) : npc_gatewatcher_petAI(creature)
+            npc_watcher_narjilAI(Creature* creature) : npc_gatewatcher_petAI(creature, true)
             {
                 _instance = creature->GetInstanceScript();
             }
@@ -479,7 +498,7 @@ class npc_watcher_narjil : public CreatureScript
                 _events.Reset();
             }
 
-            void _EnterCombat(Unit* /*who*/) override
+            void _EnterCombat() override
             {
                 _events.ScheduleEvent(EVENT_BLINDING_WEBS, randtime(Seconds(13), Seconds(18)));
                 _events.ScheduleEvent(EVENT_WEB_WRAP, randtime(Seconds(3), Seconds(5)));
@@ -546,7 +565,7 @@ class npc_watcher_silthik : public CreatureScript
 
         struct npc_watcher_silthikAI : public npc_gatewatcher_petAI
         {
-            npc_watcher_silthikAI(Creature* creature) : npc_gatewatcher_petAI(creature)
+            npc_watcher_silthikAI(Creature* creature) : npc_gatewatcher_petAI(creature, true)
             {
                 _instance = creature->GetInstanceScript();
             }
@@ -556,7 +575,7 @@ class npc_watcher_silthik : public CreatureScript
                 _events.Reset();
             }
 
-            void _EnterCombat(Unit* /*who*/) override
+            void _EnterCombat() override
             {
                 _events.ScheduleEvent(EVENT_POISON_SPRAY, randtime(Seconds(16), Seconds(19)));
                 _events.ScheduleEvent(EVENT_WEB_WRAP, randtime(Seconds(7), Seconds(11)));
@@ -623,14 +642,14 @@ class npc_anub_ar_warrior : public CreatureScript
 
         struct npc_anub_ar_warriorAI : public npc_gatewatcher_petAI
         {
-            npc_anub_ar_warriorAI(Creature* creature) : npc_gatewatcher_petAI(creature) { }
+            npc_anub_ar_warriorAI(Creature* creature) : npc_gatewatcher_petAI(creature, false) { }
 
             void Reset() override
             {
                 _events.Reset();
             }
 
-            void _EnterCombat(Unit* /*who*/) override
+            void _EnterCombat() override
             {
                 _events.ScheduleEvent(EVENT_CLEAVE, randtime(Seconds(7), Seconds(9)));
                 _events.ScheduleEvent(EVENT_STRIKE, randtime(Seconds(5), Seconds(10)));
@@ -680,14 +699,14 @@ class npc_anub_ar_skirmisher : public CreatureScript
 
         struct npc_anub_ar_skirmisherAI : public npc_gatewatcher_petAI
         {
-            npc_anub_ar_skirmisherAI(Creature* creature) : npc_gatewatcher_petAI(creature) { }
+            npc_anub_ar_skirmisherAI(Creature* creature) : npc_gatewatcher_petAI(creature, false) { }
 
             void Reset() override
             {
                 _events.Reset();
             }
 
-            void _EnterCombat(Unit* /*who*/) override
+            void _EnterCombat() override
             {
                 _events.ScheduleEvent(EVENT_ANUBAR_CHARGE, randtime(Seconds(6), Seconds(8)));
                 _events.ScheduleEvent(EVENT_BACKSTAB, randtime(Seconds(7), Seconds(9)));
@@ -713,7 +732,8 @@ class npc_anub_ar_skirmisher : public CreatureScript
                             _events.Repeat(randtime(Seconds(20), Seconds(25)));
                             break;
                         case EVENT_BACKSTAB:
-                            DoCastVictim(SPELL_BACKSTAB);
+                            if (me->GetVictim() && me->GetVictim()->isInBack(me))
+                                DoCastVictim(SPELL_BACKSTAB);
                             _events.Repeat(randtime(Seconds(10), Seconds(13)));
                             break;
                         default:
@@ -744,14 +764,14 @@ class npc_anub_ar_shadowcaster : public CreatureScript
 
         struct npc_anub_ar_shadowcasterAI : public npc_gatewatcher_petAI
         {
-            npc_anub_ar_shadowcasterAI(Creature* creature) : npc_gatewatcher_petAI(creature) { }
+            npc_anub_ar_shadowcasterAI(Creature* creature) : npc_gatewatcher_petAI(creature, false) { }
 
             void Reset() override
             {
                 _events.Reset();
             }
 
-            void _EnterCombat(Unit* /*who*/) override
+            void _EnterCombat() override
             {
                 _events.ScheduleEvent(EVENT_SHADOW_BOLT, Seconds(4));
                 _events.ScheduleEvent(EVENT_SHADOW_NOVA, randtime(Seconds(10), Seconds(14)));
@@ -808,7 +828,11 @@ class npc_skittering_swarmer : public CreatureScript
             {
                 ScriptedAI::InitializeAI();
                 if (Creature* gatewatcher = me->GetInstanceScript()->GetCreature(DATA_KRIKTHIR))
+                {
+                    if (Unit* target = gatewatcher->getAttackerForHelper())
+                        AttackStart(target);
                     gatewatcher->AI()->JustSummoned(me);
+                }
             }
         };
 
@@ -831,7 +855,11 @@ class npc_skittering_infector : public CreatureScript
             {
                 ScriptedAI::InitializeAI();
                 if (Creature* gatewatcher = me->GetInstanceScript()->GetCreature(DATA_KRIKTHIR))
+                {
+                    if (Unit* target = gatewatcher->getAttackerForHelper())
+                        AttackStart(target);
                     gatewatcher->AI()->JustSummoned(me);
+                }
             }
 
             void JustDied(Unit* killer) override

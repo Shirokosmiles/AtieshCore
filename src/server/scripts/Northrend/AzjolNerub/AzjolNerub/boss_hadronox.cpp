@@ -107,13 +107,14 @@ enum Actions
 enum Data
 {
     DATA_CRUSHER_PACK_ID = 1,
+    DATA_HADRONOX_ENTERED_COMBAT,
     DATA_HADRONOX_WEBBED_DOORS
 };
 
 enum Creatures
 {
-    NPC_CRUSHER = 28922,
-    NPC_WORLDTRIGGER_LARGE = 23472
+    NPC_CRUSHER             = 28922,
+    NPC_WORLDTRIGGER_LARGE  = 23472
 };
 
 enum Talk
@@ -135,7 +136,7 @@ enum Movements
 };
 
 static const uint8 NUM_STEPS = 4;
-Position hadronoxStep[NUM_STEPS] =
+static const Position hadronoxStep[NUM_STEPS] =
 {
     { 515.5848f, 544.2007f, 673.6272f },
     { 562.191f , 514.068f , 696.4448f },
@@ -204,11 +205,10 @@ public:
 
         uint32 GetData(uint32 data) const override
         {
-            switch (data)
-            {
-                case DATA_HADRONOX_WEBBED_DOORS:
-                    return _doorsWebbed ? 1 : 0;
-            }
+            if (data == DATA_HADRONOX_ENTERED_COMBAT)
+                return _enteredCombat ? 1 : 0;
+            if (data == DATA_HADRONOX_WEBBED_DOORS)
+                return _doorsWebbed ? 1 : 0;
             return 0;
         }
 
@@ -227,13 +227,6 @@ public:
             events.ScheduleEvent(EVENT_WEB_GRAB, randtime(Seconds(13), Seconds(19)));
             events.ScheduleEvent(EVENT_PIERCE_ARMOR, randtime(Seconds(4), Seconds(7)));
             events.ScheduleEvent(EVENT_PLAYER_CHECK, Seconds(1));
-            
-            if (!instance->CheckRequiredBosses(DATA_HADRONOX))
-            {
-                EnterEvadeMode(EVADE_REASON_SEQUENCE_BREAK);
-                return;
-            }
-            instance->SetBossState(DATA_HADRONOX, IN_PROGRESS);
             me->setActive(true);
         }
 
@@ -244,6 +237,7 @@ public:
                 case ACTION_CRUSHER_ENGAGED:
                     if (_enteredCombat)
                         break;
+                    instance->SetBossState(DATA_HADRONOX, IN_PROGRESS);
                     _enteredCombat = true;
                     SummonCrusherPack(SUMMON_GROUP_CRUSHER_2);
                     SummonCrusherPack(SUMMON_GROUP_CRUSHER_3);
@@ -338,6 +332,11 @@ public:
                             _lastPlayerCombatState = !_lastPlayerCombatState;
                             if (_lastPlayerCombatState) // we are now in combat with players
                             {
+                                if (!instance->CheckRequiredBosses(DATA_HADRONOX))
+                                {
+                                    EnterEvadeMode(EVADE_REASON_SEQUENCE_BREAK);
+                                    return;
+                                }
                                 // cancel current point movement if engaged by players
                                 if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
                                 {
@@ -377,7 +376,7 @@ public:
         
         private:
             bool _enteredCombat; // has a player entered combat with the first crusher pack? (talk and spawn two more packs)
-            bool _doorsWebbed;   // obvious - have we reached the top and webbed the doors shut (trigger for hadronox denied achievement)
+            bool _doorsWebbed;   // obvious - have we reached the top and webbed the doors shut? (trigger for hadronox denied achievement)
             bool _lastPlayerCombatState; // was there a player in our threat list the last time we checked (we check every second)
             uint8 _step;
             std::list<ObjectGuid> _anubar;
@@ -416,13 +415,53 @@ struct npc_hadronox_crusherPackAI : public ScriptedAI
             hadronox->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
     }
 
+    uint32 GetData(uint32 data) const override
+    {
+        if (data == DATA_CRUSHER_PACK_ID)
+            return _myPack;
+        return 0;
+    }
+
     void SetData(uint32 data, uint32 value) override
     {
         if (data == DATA_CRUSHER_PACK_ID)
+        {
             _myPack = SummonGroups(value);
+            me->SetReactState(_myPack ? REACT_PASSIVE : REACT_AGGRESSIVE);
+        }
     }
 
+    void EnterCombat(Unit* who) override
+    {
+        if (me->HasReactState(REACT_PASSIVE))
+        {
+            std::list<Creature*> others;
+            me->GetCreatureListWithEntryInGrid(others, 0, 40.0f);
+            for (Creature* other : others)
+                if (other->AI()->GetData(DATA_CRUSHER_PACK_ID) == _myPack)
+                {
+                    other->SetReactState(REACT_AGGRESSIVE);
+                    other->AI()->AttackStart(who);
+                }
+        }
+        _EnterCombat();
+        ScriptedAI::EnterCombat(who);
+    }
+
+    virtual void _EnterCombat() = 0;
     virtual void DoEvent(uint32 /*eventId*/) = 0;
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!me->HasReactState(REACT_PASSIVE))
+        {
+            ScriptedAI::MoveInLineOfSight(who);
+            return;
+        }
+
+        if (me->CanStartAttack(who, false) && me->IsWithinDistInMap(who, me->GetAttackDistance(who) + me->m_CombatDistance))
+            EnterCombat(who);
+    }
 
     void UpdateAI(uint32 diff) override
     {
@@ -460,17 +499,21 @@ class npc_anub_ar_crusher : public CreatureScript
         {
             npc_anub_ar_crusherAI(Creature* creature) : npc_hadronox_crusherPackAI(creature, crusherWaypoints), _hadFrenzy(false) { }
 
-            void EnterCombat(Unit* who) override
+            void _EnterCombat() override
             {
+                _events.ScheduleEvent(EVENT_SMASH, randtime(Seconds(8), Seconds(12)));
+
                 if (_myPack != SUMMON_GROUP_CRUSHER_1)
                     return;
 
-                Talk(CRUSHER_SAY_AGGRO);
                 if (Creature* hadronox = _instance->GetCreature(DATA_HADRONOX))
+                {
+                    if (hadronox->AI()->GetData(DATA_HADRONOX_ENTERED_COMBAT))
+                        return;
                     hadronox->AI()->DoAction(ACTION_CRUSHER_ENGAGED);
-                
-                _events.ScheduleEvent(EVENT_SMASH, randtime(Seconds(8), Seconds(12)));
-                ScriptedAI::EnterCombat(who);
+                }
+
+                Talk(CRUSHER_SAY_AGGRO);
             }
 
             void DamageTaken(Unit* /*source*/, uint32& damage) override
@@ -540,7 +583,7 @@ class npc_anub_ar_crusher_champion : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* /*who*/) override
+            void _EnterCombat() override
             {
                 _events.ScheduleEvent(EVENT_REND, randtime(Seconds(4), Seconds(8)));
                 _events.ScheduleEvent(EVENT_PUMMEL, randtime(Seconds(15), Seconds(19)));
@@ -583,7 +626,7 @@ class npc_anub_ar_crusher_crypt_fiend : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* /*who*/) override
+            void _EnterCombat() override
             {
                 _events.ScheduleEvent(EVENT_CRUSHING_WEBS, randtime(Seconds(4), Seconds(8)));
                 _events.ScheduleEvent(EVENT_INFECTED_WOUND, randtime(Seconds(15), Seconds(19)));
@@ -626,7 +669,7 @@ class npc_anub_ar_crusher_necromancer : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* /*who*/) override
+            void _EnterCombat() override
             {
                 _events.ScheduleEvent(EVENT_SHADOW_BOLT, randtime(Seconds(2), Seconds(4)));
                 _events.ScheduleEvent(EVENT_ANIMATE_BONES, randtime(Seconds(37), Seconds(45)));
@@ -712,6 +755,7 @@ struct npc_hadronox_foeAI : public ScriptedAI
                         me->GetMotionMaster()->MovePoint(MOVE_DOWNSTAIRS_2, downstairsMoves2[_mySpawn]);
                         break;
                     }
+                    // intentional missing break
                 case MOVE_HADRONOX:
                 case MOVE_HADRONOX_REAL:
                 {
@@ -998,6 +1042,9 @@ class spell_hadronox_leeching_poison : public SpellScriptLoader
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEATH)
+                return;
+
+            if (GetTarget()->IsGuardian())
                 return;
 
             if (Unit* caster = GetCaster())
