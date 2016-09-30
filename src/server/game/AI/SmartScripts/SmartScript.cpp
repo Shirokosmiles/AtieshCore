@@ -2436,9 +2436,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!targets)
                 break;
 
+            bool forceload = false;
+
             for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                 if (IsCreature(*itr))
-                    (*itr)->ToCreature()->LoadEquipment(e.action.loadEquipment.id, e.action.loadEquipment.force);
+                {
+                    if (e.action.loadEquipment.force != NULL)
+                        forceload = true;
+
+                    (*itr)->ToCreature()->LoadEquipment(e.action.loadEquipment.id, forceload);
+                }
 
             delete targets;
             break;
