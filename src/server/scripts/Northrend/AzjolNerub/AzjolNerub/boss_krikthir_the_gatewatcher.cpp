@@ -412,7 +412,6 @@ class npc_watcher_gashra : public CreatureScript
         {
             npc_watcher_gashraAI(Creature* creature) : npc_gatewatcher_petAI(creature, true)
             {
-                _instance = creature->GetInstanceScript();
                 me->SetReactState(REACT_PASSIVE);
             }
 
@@ -472,7 +471,6 @@ class npc_watcher_gashra : public CreatureScript
 
             private:
                 EventMap _events;
-                InstanceScript* _instance;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
@@ -490,7 +488,6 @@ class npc_watcher_narjil : public CreatureScript
         {
             npc_watcher_narjilAI(Creature* creature) : npc_gatewatcher_petAI(creature, true)
             {
-                _instance = creature->GetInstanceScript();
             }
 
             void Reset() override
@@ -549,7 +546,6 @@ class npc_watcher_narjil : public CreatureScript
 
             private:
                 EventMap _events;
-                InstanceScript* _instance;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
@@ -567,7 +563,6 @@ class npc_watcher_silthik : public CreatureScript
         {
             npc_watcher_silthikAI(Creature* creature) : npc_gatewatcher_petAI(creature, true)
             {
-                _instance = creature->GetInstanceScript();
             }
 
             void Reset() override
@@ -626,7 +621,6 @@ class npc_watcher_silthik : public CreatureScript
 
             private:
                 EventMap _events;
-                InstanceScript* _instance;
         };
 
         CreatureAI* GetAI(Creature* creature) const override

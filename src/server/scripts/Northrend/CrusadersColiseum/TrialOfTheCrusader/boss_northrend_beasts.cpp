@@ -341,6 +341,7 @@ public:
                             break;
                         }
                     }
+
                     events.ScheduleEvent(EVENT_THROW, urand(15 * IN_MILLISECONDS, 30 * IN_MILLISECONDS));
                     return;
                 default:
@@ -751,44 +752,45 @@ struct boss_jormungarAI : public BossAI
         {
             switch (eventId)
             {
-            case EVENT_EMERGE:
-                Emerge();
-                return;
-            case EVENT_SUBMERGE:
-                Submerge();
-                return;
-            case EVENT_BITE:
-                DoCastVictim(BiteSpell);
-                events.ScheduleEvent(EVENT_BITE, urand(15 * IN_MILLISECONDS, 30 * IN_MILLISECONDS), 0, PHASE_MOBILE);
-                return;
-            case EVENT_SPEW:
-                DoCastAOE(SpewSpell);
-                events.ScheduleEvent(EVENT_SPEW, urand(15 * IN_MILLISECONDS, 30 * IN_MILLISECONDS), 0, PHASE_MOBILE);
-                return;
-            case EVENT_SLIME_POOL:
-                DoCast(me, SUMMON_SLIME_POOL);
-                events.ScheduleEvent(EVENT_SLIME_POOL, 30 * IN_MILLISECONDS, 0, PHASE_MOBILE);
-                return;
-            case EVENT_SUMMON_ACIDMAW:
-                if (Creature* acidmaw = me->SummonCreature(NPC_ACIDMAW, ToCCommonLoc[9].GetPositionX(), ToCCommonLoc[9].GetPositionY(), ToCCommonLoc[9].GetPositionZ(), 5, TEMPSUMMON_MANUAL_DESPAWN))
-                {
-                    acidmaw->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
-                    acidmaw->SetReactState(REACT_AGGRESSIVE);
-                    acidmaw->SetInCombatWithZone();
-                    me->RemoveAurasDueToSpell(SPELL_SUBMERGE);
-                }
-                return;
-            case EVENT_SPRAY:
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                    DoCast(target, SpraySpell);
-                events.ScheduleEvent(EVENT_SPRAY, urand(15 * IN_MILLISECONDS, 30 * IN_MILLISECONDS), 0, PHASE_STATIONARY);
-                return;
-            case EVENT_SWEEP:
-                DoCastAOE(SPELL_SWEEP);
-                events.ScheduleEvent(EVENT_SWEEP, urand(15 * IN_MILLISECONDS, 30 * IN_MILLISECONDS), 0, PHASE_STATIONARY);
-                return;
-            default:
-                return;
+                case EVENT_EMERGE:
+                    Emerge();
+                    return;
+                case EVENT_SUBMERGE:
+                    Submerge();
+                    return;
+                case EVENT_BITE:
+                    DoCastVictim(BiteSpell);
+                    events.ScheduleEvent(EVENT_BITE, urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS), 0, PHASE_MOBILE);
+                    return;
+                case EVENT_SPEW:
+                    DoCastAOE(SpewSpell);
+                    events.ScheduleEvent(EVENT_SPEW, urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS), 0, PHASE_MOBILE);
+                    return;
+                case EVENT_SLIME_POOL:
+                    DoCast(me, SUMMON_SLIME_POOL);
+                    events.ScheduleEvent(EVENT_SLIME_POOL, 30*IN_MILLISECONDS, 0, PHASE_MOBILE);
+                    return;
+                case EVENT_SUMMON_ACIDMAW:
+                    if (Creature* acidmaw = me->SummonCreature(NPC_ACIDMAW, ToCCommonLoc[9].GetPositionX(), ToCCommonLoc[9].GetPositionY(), ToCCommonLoc[9].GetPositionZ(), 5, TEMPSUMMON_MANUAL_DESPAWN))
+                    {
+                        acidmaw->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                        acidmaw->SetReactState(REACT_AGGRESSIVE);
+                        acidmaw->SetInCombatWithZone();
+                        acidmaw->CastSpell(acidmaw, SPELL_EMERGE);
+                        acidmaw->CastSpell(acidmaw, SPELL_GROUND_VISUAL_1, true);
+                    }
+                    return;
+                case EVENT_SPRAY:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(target, SpraySpell);
+                    events.ScheduleEvent(EVENT_SPRAY, urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS), 0, PHASE_STATIONARY);
+                    return;
+                case EVENT_SWEEP:
+                    DoCastAOE(SPELL_SWEEP);
+                    events.ScheduleEvent(EVENT_SWEEP, urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS), 0, PHASE_STATIONARY);
+                    return;
+                default:
+                    return;
             }
         }
         if (events.IsInPhase(PHASE_MOBILE))
