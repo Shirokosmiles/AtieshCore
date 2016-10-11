@@ -234,7 +234,7 @@ class npc_dancing_rune_weapon : public CreatureScript
                     damageInfo->damage /= 2;
                     me->DealDamage(target, damageInfo->damage, nullptr, DIRECT_DAMAGE, SpellSchoolMask(damageInfo->damageSchoolMask));
                     me->SendAttackStateUpdate(damageInfo);
-                    me->ProcDamageAndSpell(damageInfo->target, damageInfo->procAttacker, damageInfo->procVictim, damageInfo->procEx, damageInfo->damage, damageInfo->attackType);
+                    //me->ProcDamageAndSpell(damageInfo->target, damageInfo->procAttacker, damageInfo->procVictim, damageInfo->procEx, damageInfo->damage, damageInfo->attackType);
                 }
             }
 
