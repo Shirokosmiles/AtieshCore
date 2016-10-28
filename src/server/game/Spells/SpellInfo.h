@@ -498,8 +498,10 @@ class TC_GAME_API SpellInfo
     private:
         // loading helpers
         void _InitializeExplicitTargetMask();
+    public:
         bool _IsPositiveEffect(uint8 effIndex, bool deep) const;
         bool _IsPositiveSpell() const;
+    private:
         static bool _IsPositiveTarget(uint32 targetA, uint32 targetB);
         void _LoadSpellSpecific();
         void _LoadAuraState();
