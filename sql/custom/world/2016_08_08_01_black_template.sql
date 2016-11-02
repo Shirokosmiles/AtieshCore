@@ -362,7 +362,6 @@ INSERT INTO smart_scripts VALUES (22879, 0, 0, 0, 0, 0, 100, 0, 2000, 10000, 300
 INSERT INTO smart_scripts VALUES (22879, 0, 1, 0, 0, 0, 100, 0, 0, 6000, 10000, 15000, 11, 41047, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Shadowmoon Reaver - In Combat - Cast Shadow Resonance');
 
 -- SPELL Spell Absorption (41034)
-REPLACE INTO spell_proc_event VALUES (41034, 0, 0, 0, 0, 0, 0, 1024, 0, 0, 0);
 DELETE FROM spell_script_names WHERE spell_id=41034;
 INSERT INTO spell_script_names VALUES(41034, 'spell_black_temple_spell_absorption');
 
@@ -593,9 +592,6 @@ INSERT INTO smart_scripts VALUES (22964, 0, 1, 0, 0, 0, 100, 0, 0, 2000, 10000, 
 INSERT INTO smart_scripts VALUES (22964, 0, 2, 0, 0, 0, 100, 0, 0, 20000, 30000, 40000, 11, 41381, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Sister of Pleasure - In Combat - Cast Shell of Life');
 INSERT INTO smart_scripts VALUES (22964, 0, 3, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 41363, 0, 0, 0, 0, 0, 19, 22956, 30, 0, 0, 0, 0, 0, 'Sister of Pleasure - In Combat - Cast Shared Bonds');
 
--- SPELL Shell of Life (41381)
-REPLACE INTO spell_proc_event VALUES (41381, 0, 0, 0, 0, 0, 0, 256, 0, 0, 0);
-
 -- Enslaved Servant (22965)
 UPDATE creature_template SET AIName='SmartAI', ScriptName='' WHERE entry=22965;
 DELETE FROM smart_scripts WHERE entryorguid=22965 AND source_type=0;
@@ -663,9 +659,6 @@ UPDATE creature_template SET AIName='SmartAI', ScriptName='' WHERE entry=23403;
 DELETE FROM smart_scripts WHERE entryorguid=23403 AND source_type=0;
 INSERT INTO smart_scripts VALUES (23403, 0, 0, 0, 0, 0, 100, 0, 0, 10000, 15000, 25000, 11, 3609, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Illidari Assassin - In Combat - Cast Paralyzing Poison');
 INSERT INTO smart_scripts VALUES (23403, 0, 1, 0, 0, 0, 100, 0, 6000, 15000, 19000, 25000, 11, 39667, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Illidari Assassin - In Combat - Cast Vanish');
-
--- SPELL Riposte (41393)
-REPLACE INTO spell_proc_event VALUES (41393, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0);
 
 -- Illidari Archon (22964)
 UPDATE creature_template SET AIName='SmartAI', ScriptName='' WHERE entry=22964;
@@ -746,9 +739,6 @@ UPDATE creature_template SET flags_extra=130, AIName='NullCreatureAI', ScriptNam
 -- SPELL Judgement (41467)
 DELETE FROM spell_script_names WHERE spell_id=41467;
 INSERT INTO spell_script_names VALUES(41467, 'spell_illidari_council_judgement');
-
--- SPELL Seal of Command (41469)
-REPLACE INTO spell_proc_event VALUES (41469, 0, 0, 0, 0, 0, 0, 0, 0, 33, 0);
 
 -- SPELL Circle of Healing (41455)
 DELETE FROM conditions WHERE SourceTypeOrReferenceId=13 AND SourceEntry=41455;
