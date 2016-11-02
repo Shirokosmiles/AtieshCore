@@ -359,14 +359,15 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
 
-    uint32 mstime = GameTime::GetGameTimeMS();
-    /*----------------------*/
-    if (m_clientTimeDelay == 0)
-        m_clientTimeDelay = mstime - movementInfo.time;
-
     /* process position-change */
     WorldPacket data(opcode, recvData.size());
-    movementInfo.time = movementInfo.time + m_clientTimeDelay + MOVEMENT_PACKET_TIME_DELAY;
+    int64 movementTime = (int64) movementInfo.time + plrMover->m_timeSyncClockDelta; // time of the event on the server clock.
+    if (movementTime < 0)
+    {
+        TC_LOG_WARN("network", "Computed movement time should not have a negative value. Movement time on client cloak: %u. Clock delta: %d", movementInfo.time, plrMover->m_timeSyncClockDelta);
+        movementTime = 0;
+    }
+    movementInfo.time = (uint32) movementTime;
 
     movementInfo.guid = mover->GetGUID();
     WriteMovementInfo(&data, &movementInfo);
