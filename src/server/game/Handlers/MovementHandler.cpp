@@ -362,7 +362,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     int64 movementTime = (int64) movementInfo.time + plrMover->m_timeSyncClockDelta; // time of the event on the server clock.
     if (movementTime < 0)
     {
-        TC_LOG_WARN("network", "Computed movement time should not have a negative value. Movement time on client cloak: %u. Clock delta: %ld", movementInfo.time, plrMover->m_timeSyncClockDelta);
+        TC_LOG_WARN("network", "Computed movement time should not have a negative value. Movement time on client clock: %u. Clock delta: %ld", movementInfo.time, plrMover->m_timeSyncClockDelta);
         movementTime = 0;
     }
     movementInfo.time = (uint32) movementTime;

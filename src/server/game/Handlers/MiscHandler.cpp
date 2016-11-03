@@ -1278,8 +1278,8 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
     /*
     clockDelta = serverTime - clientTime
     where
-    serverTime: time that was displayed on the cloak of the SERVER at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
-    clientTime:  time that was displayed on the cloak of the CLIENT at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
+    serverTime: time that was displayed on the clock of the SERVER at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
+    clientTime:  time that was displayed on the clock of the CLIENT at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
     Once clockDelta has been computed, we can compute the time on server clock of an event when we know the time of the event on the client clock,
     using this relation:
     serverTime = clockDelta + clientTime
