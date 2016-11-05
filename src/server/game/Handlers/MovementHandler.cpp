@@ -360,10 +360,10 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     /* process position-change */
     WorldPacket data(opcode, recvData.size());
     int64 movementTime = (int64) movementInfo.time + plrMover->m_timeSyncClockDelta; // time of the event on the server clock.
-    if (movementTime < 0)
+    if (movementTime < 0 || movementTime > 0xFFFFFFFF)
     {
-        TC_LOG_WARN("network", "Computed movement time should not have a negative value. Movement time on client clock: %u. Clock delta: %ld", movementInfo.time, plrMover->m_timeSyncClockDelta);
-        movementTime = 0;
+        TC_LOG_WARN("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
+        movementTime = getMSTime();
     }
     movementInfo.time = (uint32) movementTime;
 
