@@ -1261,8 +1261,8 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
 
     TC_LOG_DEBUG("network", "CMSG_TIME_SYNC_RESP");
 
-    uint32 counter, clientTicks;
-    recvData >> counter >> clientTicks;
+    uint32 counter, clientTimestamp;
+    recvData >> counter >> clientTimestamp;
 
     if (counter != _player->m_timeSyncCounter - 1)
     {
@@ -1284,7 +1284,7 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
     using this relation:
     serverTime = clockDelta + clientTime
     */
-    _player->m_timeSyncClockDelta = (_player->m_timeSyncServer + lagDelay) - clientTicks; // in order to prevent an underflow caused by the subtraction, using int64 instead of int32
+    _player->m_timeSyncClockDelta = (int64) (_player->m_timeSyncServer + lagDelay) - (int64) clientTimestamp;
 }
 
 void WorldSession::HandleResetInstancesOpcode(WorldPacket& /*recvData*/)
