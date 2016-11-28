@@ -17,7 +17,7 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMa
 
 -- Target Trigger should walk in ground, not fly
 UPDATE `creature_template` SET `InhabitType`=1 WHERE `entry`=17474;
--- dded Taunt Immunity in Magtheridon.
+-- Added Taunt Immunity in Magtheridon.
 UPDATE `creature_template` SET `spell2`=0, `spell3`=0, `spell4`=0, `flags_extra` = `flags_extra` |256 WHERE `entry`=17257;
 
 -- Delete addon aura from Magtheridon
