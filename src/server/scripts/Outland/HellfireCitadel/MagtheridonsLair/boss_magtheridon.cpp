@@ -170,16 +170,15 @@ class boss_magtheridon : public CreatureScript
 
             void DoAction(int32 action) override
             {
-                if (action == ACTION_START_CHANNELERS_EVENT)
-                    if (events.IsInPhase(PHASE_BANISH))
-                    {
-                        events.SetPhase(PHASE_1);
-                        Talk(EMOTE_WEAKEN, me);
-                        summons.DoZoneInCombat(NPC_HELLFIRE_CHANNELLER);
-                        events.ScheduleEvent(EVENT_START_FIGHT, Minutes(2));
-                        events.ScheduleEvent(EVENT_NEARLY_EMOTE, Seconds(60));
-                        instance->SetBossState(DATA_MAGTHERIDON, IN_PROGRESS);
-                    }
+                if (action == ACTION_START_CHANNELERS_EVENT && events.IsInPhase(PHASE_BANISH))
+                {
+                    events.SetPhase(PHASE_1);
+                    Talk(EMOTE_WEAKEN, me);
+                    summons.DoZoneInCombat(NPC_HELLFIRE_CHANNELLER);
+                    events.ScheduleEvent(EVENT_START_FIGHT, Minutes(2));
+                    events.ScheduleEvent(EVENT_NEARLY_EMOTE, Seconds(60));
+                    instance->SetBossState(DATA_MAGTHERIDON, IN_PROGRESS);
+                }
             }
 
             void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -218,6 +217,9 @@ class boss_magtheridon : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
+                if (!events.IsInPhase(PHASE_COLLAPSE) && !UpdateVictim())
+                    return;
+
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
@@ -290,13 +292,8 @@ class boss_magtheridon : public CreatureScript
                         return;
                 }
 
-                if (!events.IsInPhase(PHASE_COLLAPSE))
-                {
-                    if (!UpdateVictim())
-                        return;
+                DoMeleeAttackIfReady();
 
-                    DoMeleeAttackIfReady();
-                }
             }
 
         private:
@@ -457,7 +454,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return  new npc_magtheridon_roomAI(creature);
+        return new npc_magtheridon_roomAI(creature);
     }
 };
 

@@ -82,7 +82,7 @@ class instance_magtheridons_lair : public InstanceMapScript
                 InstanceScript::OnGameObjectCreate(go);
 
                 if (go->GetEntry() == GO_MANTICRON_CUBE)
-                    cubesGUID.insert(go->GetGUID());
+                    cubesGUID.push_back(go->GetGUID());
             }
 
             void SetData(uint32 data, uint32 value) override
@@ -114,7 +114,7 @@ class instance_magtheridons_lair : public InstanceMapScript
             }
 
         protected:
-            GuidSet cubesGUID;
+            GuidVector cubesGUID;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override
