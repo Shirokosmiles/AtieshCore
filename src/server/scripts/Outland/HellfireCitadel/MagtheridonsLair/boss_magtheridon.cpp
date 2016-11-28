@@ -285,6 +285,7 @@ class boss_magtheridon : public CreatureScript
                             break;
                         case EVENT_TAUNT:
                             Talk(SAY_TAUNT);
+                            events.Repeat(Minutes(4), Minutes(5));
                             break;
                         default:
                             break;

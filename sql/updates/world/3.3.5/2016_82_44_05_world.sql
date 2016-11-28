@@ -50,10 +50,10 @@ DELETE FROM `creature` WHERE `id`=17256 AND `map`=544;
 DELETE FROM `linked_respawn` WHERE `guid` IN(90982,90981,90980,90979,90978);
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=17257; -- Magtheridon
 INSERT INTO `creature_summon_groups` (`summonerId`,`summonerType`,`groupId`,`entry`,`position_x`,`position_y`,`position_z`,`orientation`,`summonType`,`summonTime`) VALUES
-(17257,0,1,17256,-31.7645,-35.8374,0.714268,1.37881 ,6,6000), -- Hellfire Channelers
-(17257,0,1,17256,10.3369,-19.7942,0.714241,2.53073  ,6,6000),
-(17257,0,1,17256,10.4777,23.9914,0.714224,3.66519 ,6,6000),
-(17257,0,1,17256,-31.9479,40.2201,0.714251,4.93928  ,6,6000),
+(17257,0,1,17256,-31.7645,-35.8374,0.714268,1.37881,6,6000), -- Hellfire Channelers
+(17257,0,1,17256,10.3369,-19.7942,0.714241,2.53073,6,6000),
+(17257,0,1,17256,10.4777,23.9914,0.714224,3.66519,6,6000),
+(17257,0,1,17256,-31.9479,40.2201,0.714251,4.93928,6,6000),
 (17257,0,1,17256,-55.6891,2.17024,0.71428,0.05236,6,6000);
 
 DELETE FROM `spell_script_names` WHERE `ScriptName` IN('spell_magtheridon_blaze_target','spell_magtheridon_shadow_grasp','spell_magtheridon_shadow_grasp_visual');
