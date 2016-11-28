@@ -128,8 +128,7 @@ class boss_magtheridon : public CreatureScript
             {
                 _Reset();
                 DoCastSelf(SPELL_SHADOW_CAGE_C);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
                 me->SummonCreatureGroup(SUMMON_GROUP_CHANNELERS);
                 events.SetPhase(PHASE_BANISH);
                 _channelersCount = 5;
@@ -248,8 +247,7 @@ class boss_magtheridon : public CreatureScript
                             break;
                         case EVENT_RELEASED:
                             Talk(SAY_AGRO);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
                             me->SetInCombatWithZone();
                             instance->SetData(DATA_MANTICRON_CUBE, ACTION_ENABLE);
                             events.ScheduleEvent(EVENT_CLEAVE, Seconds(10));
