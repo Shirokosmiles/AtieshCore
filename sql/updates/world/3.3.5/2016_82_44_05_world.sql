@@ -45,7 +45,7 @@ DELETE FROM `spell_linked_spell` WHERE `spell_trigger`=30658;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
 (30658, 30571, 0, 'Quake Trigger Quake Knockback');
 
--- Making a summon group for Magtheridon
+-- Making a summon group for Magtheridon.
 DELETE FROM `creature` WHERE `id`=17256 AND `map`=544;
 DELETE FROM `linked_respawn` WHERE `guid` IN(90982,90981,90980,90979,90978);
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=17257; -- Magtheridon
@@ -77,15 +77,14 @@ INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`pr
 (17257,0,4,'How long do you believe your pathetic sorcery can hold me?',14,0,100,0,0,10251,17343,0,'Magtheridon - Taunt05'),
 (17257,0,5,'My blood will be the end of you!',14,0,100,0,0,10252,17344,0,'Magtheridon - Taunt06'),
 (17257,1,0,'I... am... unleashed!',14,0,100,15,0,10253,17346,0,'Magtheridon - Free'),
-(17257,2,0,'Thank you for releasing me, now die!',14,0,100,0,0,10254,0,0,'Magtheridon - Agro'),
-(17257,3,0,'Did you think me weak? Soft? Who is the weak one now?',14,0,100,0,0,10255,17349,0,'Magtheridon - Slay'),
-(17257,4,0,'Not again! Not again...',14,0,100,0,0,10256,17348,0,'Magtheridon - Banished'),
-(17257,5,0,'I will not be taken so easily! Let the walls of this prison tremble... and fall!',14,0,100,0,0,10257,17336,0,'Magtheridon - Collapse'),
-(17257,6,0,'The Legion will consume you all!',14,0,100,0,0,10258,17347,0,'Magtheridon - Death'),
-(17257,7,0,'%s\'s bonds begin to weaken!',16,0,100,0,0,0,13689,0,'Magtheridon - Weaken'),
-(17257,8,0,'%s is nearly free of his bonds!',16,0,100,0,0,0,13690,0,'Magtheridon - Nearly free'),
-(17257,9,0,'%s breaks free!',16,0,100,0,0,0,13691,0,'Magtheridon - Breaks free'),
-(17257,10,0,'%s begins to cast Blast Nova!',41,0,100,0,0,0,18739,0,'Magtheridon - Blast Nova');
+(17257,2,0,'Did you think me weak? Soft? Who is the weak one now?',14,0,100,0,0,10255,17349,0,'Magtheridon - Slay'),
+(17257,3,0,'Not again! Not again...',14,0,100,0,0,10256,17348,0,'Magtheridon - Banished'),
+(17257,4,0,'I will not be taken so easily! Let the walls of this prison tremble... and fall!',14,0,100,0,0,10257,17336,0,'Magtheridon - Collapse'),
+(17257,5,0,'The Legion will consume you all!',14,0,100,0,0,10258,17347,0,'Magtheridon - Death'),
+(17257,6,0,'%s\'s bonds begin to weaken!',16,0,100,0,0,0,13689,0,'Magtheridon - Weaken'),
+(17257,7,0,'%s is nearly free of his bonds!',16,0,100,0,0,0,13690,0,'Magtheridon - Nearly free'),
+(17257,8,0,'%s breaks free!',16,0,100,0,0,0,13691,0,'Magtheridon - Breaks free'),
+(17257,9,0,'%s begins to cast Blast Nova!',41,0,100,0,0,0,18739,0,'Magtheridon - Blast Nova');
 
 -- Channel Visual Group
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN(-90985,-90986,-90987);

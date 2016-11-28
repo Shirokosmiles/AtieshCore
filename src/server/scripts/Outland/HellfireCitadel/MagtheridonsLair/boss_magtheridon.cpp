@@ -28,15 +28,14 @@ enum Yells
 {
     SAY_TAUNT           = 0,
     SAY_FREE            = 1,
-    SAY_AGRO            = 2,
-    SAY_SLAY            = 3,
-    SAY_BANISHED        = 4,
-    SAY_COLLAPSE        = 5,
-    SAY_DEATH           = 6,
-    EMOTE_WEAKEN        = 7,
-    EMOTE_NEARLY_FREE   = 8,
-    EMOTE_BREAKS_FREE   = 9,
-    EMOTE_BLAST_NOVA    = 10
+    SAY_SLAY            = 2,
+    SAY_BANISHED        = 3,
+    SAY_COLLAPSE        = 4,
+    SAY_DEATH           = 5,
+    EMOTE_WEAKEN        = 6,
+    EMOTE_NEARLY_FREE   = 7,
+    EMOTE_BREAKS_FREE   = 8,
+    EMOTE_BLAST_NOVA    = 9
 };
 
 enum Spells
@@ -248,7 +247,6 @@ class boss_magtheridon : public CreatureScript
                             CombatStart();
                             break;
                         case EVENT_RELEASED:
-                            Talk(SAY_AGRO);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
                             me->SetInCombatWithZone();
                             instance->SetData(DATA_MANTICRON_CUBE, ACTION_ENABLE);
