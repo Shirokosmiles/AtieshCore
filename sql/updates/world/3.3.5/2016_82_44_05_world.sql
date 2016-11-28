@@ -17,8 +17,8 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMa
 
 -- Target Trigger should walk in ground, not fly
 UPDATE `creature_template` SET `InhabitType`=1 WHERE `entry`=17474;
--- Remove UNIT_FLAG_NOT_SELECTABLE and UNIT_FLAG_IMMUNE_TO_PC of Magtheridon and added Taunt Immunity
-UPDATE `creature_template` SET `unit_flags` = `unit_flags` &~33554688, `spell2`=0, `spell3`=0, `spell4`=0, `flags_extra` = `flags_extra` |256 WHERE `entry`=17257;
+-- dded Taunt Immunity in Magtheridon.
+UPDATE `creature_template` SET `spell2`=0, `spell3`=0, `spell4`=0, `flags_extra` = `flags_extra` |256 WHERE `entry`=17257;
 
 -- Delete addon aura from Magtheridon
 DELETE FROM `creature_addon` WHERE `guid`=91254;
@@ -26,7 +26,7 @@ DELETE FROM `creature_addon` WHERE `guid`=91254;
 -- Added missing Fire Blast aura in Burning Abyssal creature
 DELETE FROM `creature_template_addon` WHERE `entry`=17454;
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES
-(17454, 0, 0, 0, 0, 0, 30516);
+(17454, 0, 0, 0, 1, 0, 30516);
 -- Removed script from Burning Abyssal creature
 UPDATE `creature_template` SET `ScriptName`='' WHERE `entry`=17454;
 
@@ -46,7 +46,8 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 (30658, 30571, 0, 'Quake Trigger Quake Knockback');
 
 -- Making a summon group for Magtheridon
-DELETE FROM `creature` WHERE `id`=17256;
+DELETE FROM `creature` WHERE `id`=17256 AND `map`=544;
+DELETE FROM `linked_respawn` WHERE `guid` IN(90982,90981,90980,90979,90978);
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=17257; -- Magtheridon
 INSERT INTO `creature_summon_groups` (`summonerId`,`summonerType`,`groupId`,`entry`,`position_x`,`position_y`,`position_z`,`orientation`,`summonType`,`summonTime`) VALUES
 (17257,0,1,17256,-31.7645,-35.8374,0.714268,1.37881 ,6,6000), -- Hellfire Channelers
@@ -70,23 +71,68 @@ UPDATE `spell_dbc` SET `AttributesEx3`=262400, `EffectImplicitTargetA1`=53, `Eff
 DELETE FROM `creature_text` WHERE `entry`=17257;
 INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES
 (17257,0,0,'Wretched, meddling insects! Release me, and perhaps I will grant you a merciful death!',14,0,100,0,0,10247,17339,0,'Magtheridon - Taunt01'),
-(17257,1,0,'Vermin! Leeches! Take my blood and choke on it!',14,0,100,0,0,10248,17340,0,'Magtheridon - Taunt02'),
-(17257,2,0,'Illidan is an arrogant fool! I will crush him and reclaim Outland as my own!',14,0,100,0,0,10249,17341,0,'Magtheridon - Taunt03'),
-(17257,3,0,'Away, you mindless parasites! My blood is my own!',14,0,100,0,0,10250,17342,0,'Magtheridon - Taunt04'),
-(17257,4,0,'How long do you believe your pathetic sorcery can hold me?',14,0,100,0,0,10251,17343,0,'Magtheridon - Taunt05'),
-(17257,5,0,'My blood will be the end of you!',14,0,100,0,0,10252,17344,0,'Magtheridon - Taunt06'),
-(17257,6,0,'I... am... unleashed!',14,0,100,0,0,10253,17346,0,'Magtheridon - Free'),
-(17257,7,0,'Thank you for releasing me, now die!',14,0,100,0,0,10254,0,0,'Magtheridon - Agro'),
-(17257,8,0,'Did you think me weak? Soft? Who is the weak one now?',14,0,100,0,0,10255,17349,0,'Magtheridon - Slay'),
-(17257,9,0,'Not again! Not again...',14,0,100,0,0,10256,17348,0,'Magtheridon - Banished'),
-(17257,10,0,'I will not be taken so easily! Let the walls of this prison tremble... and fall!',14,0,100,0,0,10257,17336,0,'Magtheridon - Collapse'),
-(17257,11,0,'The Legion will consume you all!',14,0,100,0,0,10258,17347,0,'Magtheridon - Death'),
-(17257,12,0,'%s\'s bonds begin to weaken!',16,0,100,0,0,0,13689,0,'Magtheridon - Weaken'),
-(17257,13,0,'%s is nearly free of his bonds!',16,0,100,0,0,0,13690,0,'Magtheridon - Nearly free'),
-(17257,14,0,'%s breaks free!',16,0,100,0,0,0,13691,0,'Magtheridon - Breaks free'),
-(17257,15,0,'%s begins to cast Blast Nova!',16,0,100,0,0,0,18739,0,'Magtheridon - Blast Nova');
+(17257,0,1,'Vermin! Leeches! Take my blood and choke on it!',14,0,100,0,0,10248,17340,0,'Magtheridon - Taunt02'),
+(17257,0,2,'Illidan is an arrogant fool! I will crush him and reclaim Outland as my own!',14,0,100,0,0,10249,17341,0,'Magtheridon - Taunt03'),
+(17257,0,3,'Away, you mindless parasites! My blood is my own!',14,0,100,0,0,10250,17342,0,'Magtheridon - Taunt04'),
+(17257,0,4,'How long do you believe your pathetic sorcery can hold me?',14,0,100,0,0,10251,17343,0,'Magtheridon - Taunt05'),
+(17257,0,5,'My blood will be the end of you!',14,0,100,0,0,10252,17344,0,'Magtheridon - Taunt06'),
+(17257,1,0,'I... am... unleashed!',14,0,100,15,0,10253,17346,0,'Magtheridon - Free'),
+(17257,2,0,'Thank you for releasing me, now die!',14,0,100,0,0,10254,0,0,'Magtheridon - Agro'),
+(17257,3,0,'Did you think me weak? Soft? Who is the weak one now?',14,0,100,0,0,10255,17349,0,'Magtheridon - Slay'),
+(17257,4,0,'Not again! Not again...',14,0,100,0,0,10256,17348,0,'Magtheridon - Banished'),
+(17257,5,0,'I will not be taken so easily! Let the walls of this prison tremble... and fall!',14,0,100,0,0,10257,17336,0,'Magtheridon - Collapse'),
+(17257,6,0,'The Legion will consume you all!',14,0,100,0,0,10258,17347,0,'Magtheridon - Death'),
+(17257,7,0,'%s\'s bonds begin to weaken!',16,0,100,0,0,0,13689,0,'Magtheridon - Weaken'),
+(17257,8,0,'%s is nearly free of his bonds!',16,0,100,0,0,0,13690,0,'Magtheridon - Nearly free'),
+(17257,9,0,'%s breaks free!',16,0,100,0,0,0,13691,0,'Magtheridon - Breaks free'),
+(17257,10,0,'%s begins to cast Blast Nova!',41,0,100,0,0,0,18739,0,'Magtheridon - Blast Nova');
 
--- Missing smart script for Hellfire Warder
-DELETE FROM `smart_scripts` WHERE `entryorguid`=18829 AND `source_type`=0 AND `id`=6;
+-- Channel Visual Group
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN(-90985,-90986,-90987);
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(18829,0,6,0,1,0,100,1,1000,1000,0,0,11,33827,0,0,0,0,0,19,15384,20,0,0,0,0,0,"Hellfire Warder - Ooc no repeat - Cast Hellfire Warder Channel Visual");
+(-90986,0,0,0,0,0,75,2,4800,4800,18400,27400,11,39175,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Bolt Volley\''),
+(-90986,0,1,0,0,0,70,2,9000,9000,14500,21500,11,34437,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Death Coil\''),
+(-90986,0,2,0,0,0,75,2,3000,3000,17000,18000,11,34435,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Rain of Fire\''),
+(-90986,0,3,0,0,0,75,2,4100,4100,20000,23500,11,34436,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Burst\''),
+(-90986,0,4,0,0,0,60,2,1400,1400,7000,9000,11,34439,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Unstable Affliction\''),
+(-90986,0,5,0,0,0,75,2,57700,57700,50000,50000,11,34441,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Word: Pain\''),
+(-90986,0,6,0,1,0,100,1,1000,1000,0,0,11,33827,0,0,0,0,0,19,15384,20,0,0,0,0,0,'Hellfire Warder - Ooc no repeat - Cast Hellfire Warder Channel Visual'),
+(-90987,0,0,0,0,0,75,2,4800,4800,18400,27400,11,39175,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Bolt Volley\''),
+(-90987,0,1,0,0,0,70,2,9000,9000,14500,21500,11,34437,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Death Coil\''),
+(-90987,0,2,0,0,0,75,2,3000,3000,17000,18000,11,34435,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Rain of Fire\''),
+(-90987,0,3,0,0,0,75,2,4100,4100,20000,23500,11,34436,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Burst\''),
+(-90987,0,4,0,0,0,60,2,1400,1400,7000,9000,11,34439,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Unstable Affliction\''),
+(-90987,0,5,0,0,0,75,2,57700,57700,50000,50000,11,34441,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Word: Pain\''),
+(-90987,0,6,0,1,0,100,1,1000,1000,0,0,11,33827,0,0,0,0,0,19,15384,20,0,0,0,0,0,'Hellfire Warder - Ooc no repeat - Cast Hellfire Warder Channel Visual'),
+(-90985,0,0,0,0,0,75,2,4800,4800,18400,27400,11,39175,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Bolt Volley\''),
+(-90985,0,1,0,0,0,70,2,9000,9000,14500,21500,11,34437,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Death Coil\''),
+(-90985,0,2,0,0,0,75,2,3000,3000,17000,18000,11,34435,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Rain of Fire\''),
+(-90985,0,3,0,0,0,75,2,4100,4100,20000,23500,11,34436,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Burst\''),
+(-90985,0,4,0,0,0,60,2,1400,1400,7000,9000,11,34439,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Unstable Affliction\''),
+(-90985,0,5,0,0,0,75,2,57700,57700,50000,50000,11,34441,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Word: Pain\''),
+(-90985,0,6,0,1,0,100,1,1000,1000,0,0,11,33827,0,0,0,0,0,19,15384,20,0,0,0,0,0,'Hellfire Warder - Ooc no repeat - Cast Hellfire Warder Channel Visual');
+
+-- Green Beam group
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN(-91247,-91248,-91249);
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(-91248,0,0,0,0,0,75,2,4800,4800,18400,27400,11,39175,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Bolt Volley\''),
+(-91248,0,1,0,0,0,70,2,9000,9000,14500,21500,11,34437,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Death Coil\''),
+(-91248,0,2,0,0,0,75,2,3000,3000,17000,18000,11,34435,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Rain of Fire\''),
+(-91248,0,3,0,0,0,75,2,4100,4100,20000,23500,11,34436,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Burst\''),
+(-91248,0,4,0,0,0,60,2,1400,1400,7000,9000,11,34439,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Unstable Affliction\''),
+(-91248,0,5,0,0,0,75,2,57700,57700,50000,50000,11,34441,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Word: Pain\''),
+(-91248,0,6,0,1,0,100,1,1000,1000,0,0,11,33346,0,0,0,0,0,19,15384,20,0,0,0,0,0,'Hellfire Warder - Ooc no repeat - Cast Green Beam'),
+(-91247,0,0,0,0,0,75,2,4800,4800,18400,27400,11,39175,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Bolt Volley\''),
+(-91247,0,1,0,0,0,70,2,9000,9000,14500,21500,11,34437,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Death Coil\''),
+(-91247,0,2,0,0,0,75,2,3000,3000,17000,18000,11,34435,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Rain of Fire\''),
+(-91247,0,3,0,0,0,75,2,4100,4100,20000,23500,11,34436,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Burst\''),
+(-91247,0,4,0,0,0,60,2,1400,1400,7000,9000,11,34439,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Unstable Affliction\''),
+(-91247,0,5,0,0,0,75,2,57700,57700,50000,50000,11,34441,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Word: Pain\''),
+(-91247,0,6,0,1,0,100,1,1000,1000,0,0,11,33346,0,0,0,0,0,19,15384,20,0,0,0,0,0,'Hellfire Warder - Ooc no repeat - Cast Green Beam'),
+(-91249,0,0,0,0,0,75,2,4800,4800,18400,27400,11,39175,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Bolt Volley\''),
+(-91249,0,1,0,0,0,70,2,9000,9000,14500,21500,11,34437,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Death Coil\''),
+(-91249,0,2,0,0,0,75,2,3000,3000,17000,18000,11,34435,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Rain of Fire\''),
+(-91249,0,3,0,0,0,75,2,4100,4100,20000,23500,11,34436,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Burst\''),
+(-91249,0,4,0,0,0,60,2,1400,1400,7000,9000,11,34439,0,0,0,0,0,5,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Unstable Affliction\''),
+(-91249,0,5,0,0,0,75,2,57700,57700,50000,50000,11,34441,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Word: Pain\''),
+(-91249,0,6,0,1,0,100,1,1000,1000,0,0,11,33346,0,0,0,0,0,19,15384,20,0,0,0,0,0,'Hellfire Warder - Ooc no repeat - Cast Green Beam');

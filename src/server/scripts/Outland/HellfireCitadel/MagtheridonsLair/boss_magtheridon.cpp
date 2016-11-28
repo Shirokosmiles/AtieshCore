@@ -26,16 +26,17 @@
 
 enum Yells
 {
-    SAY_FREE            = 6,
-    SAY_AGRO            = 7,
-    SAY_SLAY            = 8,
-    SAY_BANISHED        = 9,
-    SAY_COLLAPSE        = 10,
-    SAY_DEATH           = 11,
-    EMOTE_WEAKEN        = 12,
-    EMOTE_NEARLY_FREE   = 13,
-    EMOTE_BREAKS_FREE   = 14,
-    EMOTE_BLAST_NOVA    = 15
+    SAY_TAUNT           = 0,
+    SAY_FREE            = 1,
+    SAY_AGRO            = 2,
+    SAY_SLAY            = 3,
+    SAY_BANISHED        = 4,
+    SAY_COLLAPSE        = 5,
+    SAY_DEATH           = 6,
+    EMOTE_WEAKEN        = 7,
+    EMOTE_NEARLY_FREE   = 8,
+    EMOTE_BREAKS_FREE   = 9,
+    EMOTE_BLAST_NOVA    = 10
 };
 
 enum Spells
@@ -91,6 +92,7 @@ enum Events
     EVENT_DEDRIS_KNOCKDOWN,
     EVENT_DEDRIS,
     EVENT_NEARLY_EMOTE,
+    EVENT_TAUNT,
     //Hellfire Channelers events
     EVENT_SHADOWBOLT,
     EVENT_FEAR,
@@ -104,7 +106,6 @@ enum Phases
     PHASE_BANISH = 1,
     PHASE_1,
     PHASE_2,
-    PHASE_COLLAPSE,
     PHASE_3
 };
 
@@ -128,10 +129,10 @@ class boss_magtheridon : public CreatureScript
             {
                 _Reset();
                 DoCastSelf(SPELL_SHADOW_CAGE_C);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
                 me->SummonCreatureGroup(SUMMON_GROUP_CHANNELERS);
                 events.SetPhase(PHASE_BANISH);
                 _channelersCount = 5;
+                events.ScheduleEvent(EVENT_TAUNT, Minutes(4), Minutes(5));
             }
 
             void CombatStart()
@@ -139,10 +140,10 @@ class boss_magtheridon : public CreatureScript
                 events.SetPhase(PHASE_2);
                 events.CancelEvent(EVENT_START_FIGHT);
                 events.CancelEvent(EVENT_NEARLY_EMOTE);
-                events.ScheduleEvent(EVENT_RELEASED, Seconds(5));
+                events.CancelEvent(EVENT_TAUNT);
+                events.ScheduleEvent(EVENT_RELEASED, Seconds(6));
                 Talk(EMOTE_BREAKS_FREE, me);
                 Talk(SAY_FREE);
-                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                 me->RemoveAurasDueToSpell(SPELL_SHADOW_CAGE_C);
             }
 
@@ -178,6 +179,7 @@ class boss_magtheridon : public CreatureScript
                     events.ScheduleEvent(EVENT_START_FIGHT, Minutes(2));
                     events.ScheduleEvent(EVENT_NEARLY_EMOTE, Seconds(60));
                     instance->SetBossState(DATA_MAGTHERIDON, IN_PROGRESS);
+                    instance->SetData(DATA_CALL_WARDERS, ACTION_ENABLE);
                 }
             }
 
@@ -189,9 +191,9 @@ class boss_magtheridon : public CreatureScript
 
             void DamageTaken(Unit* /*who*/, uint32& damage) override
             {
-                if (me->HealthBelowPctDamaged(30, damage) && !(events.IsInPhase(PHASE_3) || events.IsInPhase(PHASE_COLLAPSE)))
+                if (me->HealthBelowPctDamaged(30, damage) && !events.IsInPhase(PHASE_3))
                 {
-                    events.SetPhase(PHASE_COLLAPSE);
+                    events.SetPhase(PHASE_3);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
@@ -217,8 +219,6 @@ class boss_magtheridon : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (!events.IsInPhase(PHASE_COLLAPSE) && !UpdateVictim())
-                    return;
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -267,7 +267,6 @@ class boss_magtheridon : public CreatureScript
                             {
                                 trigger->CastSpell(trigger, SPELL_DEBRIS_KNOCKDOWN, true);
                                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                                events.SetPhase(PHASE_3);
                                 me->SetReactState(REACT_AGGRESSIVE);
                                 events.ScheduleEvent(EVENT_DEDRIS, Seconds(20));
                             }
@@ -284,6 +283,9 @@ class boss_magtheridon : public CreatureScript
                             DoCast(SPELL_BLAST_NOVA);
                             events.Repeat(Seconds(55));
                             break;
+                        case EVENT_TAUNT:
+                            Talk(SAY_TAUNT);
+                            break;
                         default:
                             break;
                     }
@@ -291,6 +293,9 @@ class boss_magtheridon : public CreatureScript
                     if (me->HasUnitState(UNIT_STATE_CASTING))
                         return;
                 }
+
+                if (!UpdateVictim())
+                    return;
 
                 DoMeleeAttackIfReady();
 

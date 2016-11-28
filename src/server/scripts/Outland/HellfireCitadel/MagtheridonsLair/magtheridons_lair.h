@@ -35,7 +35,8 @@ enum DataTypes
     DATA_MAGTHERIDON_COLUMN_5 = 8,
     DATA_MANTICRON_CUBE       = 9,
     DATA_COLLAPSE             = 10,
-    DATA_COLLAPSE_2           = 11
+    DATA_COLLAPSE_2           = 11,
+    DATA_CALL_WARDERS         = 12
 };
 
 enum Actions
@@ -53,7 +54,8 @@ enum CreatureIds
     NPC_WORLD_TRIGGER        = 21252,
     NPC_HELFIRE_RAID_TRIGGER = 17376,
     NPC_OLDWORLD_TRIGGER     = 15384,
-    NPC_MAGTHERIDON_ROOM     = 17516
+    NPC_MAGTHERIDON_ROOM     = 17516,
+    NPC_HELLFIRE_WARDER      = 18829
 };
 
 enum GameObjectIds

@@ -82,7 +82,15 @@ class instance_magtheridons_lair : public InstanceMapScript
                 InstanceScript::OnGameObjectCreate(go);
 
                 if (go->GetEntry() == GO_MANTICRON_CUBE)
-                    cubesGUID.push_back(go->GetGUID());
+                    cubesGUIDS.push_back(go->GetGUID());
+            }
+
+            void OnCreatureCreate(Creature* creature) override
+            {
+                InstanceScript::OnCreatureCreate(creature);
+
+                if (creature->GetEntry() == NPC_HELLFIRE_WARDER)
+                    warderGUIDS.push_back(creature->GetGUID());
             }
 
             void SetData(uint32 data, uint32 value) override
@@ -90,7 +98,7 @@ class instance_magtheridons_lair : public InstanceMapScript
                 switch (data)
                 {
                     case DATA_MANTICRON_CUBE:
-                        for (ObjectGuid gobGUID : cubesGUID)
+                        for (ObjectGuid gobGUID : cubesGUIDS)
                             if (GameObject* go = instance->GetGameObject(gobGUID))
                             {
                                 if (value == ACTION_ENABLE)
@@ -108,13 +116,20 @@ class instance_magtheridons_lair : public InstanceMapScript
                             if (GameObject* go = GetGameObject(data))
                                 go->SetGoState(value == ACTION_ENABLE ? GO_STATE_ACTIVE : GO_STATE_READY);
                         break;
+                    case DATA_CALL_WARDERS:
+                        for (ObjectGuid warderGuid : warderGUIDS)
+                            if (Creature* warder = instance->GetCreature(warderGuid))
+                                if (warder->IsAlive())
+                                    warder->SetInCombatWithZone();
+                        break;
                     default:
                         break;
                 }
             }
 
         protected:
-            GuidVector cubesGUID;
+            GuidVector cubesGUIDS;
+            GuidVector warderGUIDS;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override
