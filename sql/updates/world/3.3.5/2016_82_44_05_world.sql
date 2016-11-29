@@ -1,6 +1,6 @@
 -- Add Missing Spawns of Target Trigger. Recycled guids of Hellfire Channelers. But need 2 more clean guids
 -- DEVELOPER THAT WILL MERGE IT, PLEASE CHANGE 865901 AND 865902 FOR A CURRENT CLEAN GUID AND DELETE THIS COMMENT
-DELETE FROM `creature` WHERE `id` IN(17256,15435) AND `map`=544;
+DELETE FROM `creature` WHERE `id` IN(17256,17474) AND `map`=544;
 DELETE FROM `linked_respawn` WHERE `guid` IN(90982,90981,90980,90979,90978); -- Delete Linked respawn from channelers
 INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`,`VerifiedBuild`) VALUES
 (865901,17474,544,0,0,1,1,15435,0,11.2283,2.97198,-0.320875,1.14748,7200,15,0,3965,0,1,0,0,0,0),
@@ -85,10 +85,10 @@ INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`pr
 (17257,8,0,'%s breaks free!',16,0,100,0,0,0,13691,0,'Magtheridon - Breaks free'),
 (17257,9,0,'%s begins to cast Blast Nova!',41,0,100,0,0,0,18739,0,'Magtheridon - Blast Nova');
 
-UPDATE `smart_scripts` SET `event_chance`=100 WHERE `entryorguid`=18829;
+UPDATE `smart_scripts` SET `event_chance`=100 WHERE `entryorguid`=18829 AND `source_type`=0;
 
 -- Channel Visual Group
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN(-90985,-90986,-90987);
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN(-90985,-90986,-90987) AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (-90986,0,0,0,0,0,100,2,4800,4800,18400,27400,11,39175,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Bolt Volley\''),
 (-90986,0,1,0,0,0,100,2,9000,9000,14500,21500,11,34437,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Death Coil\''),
@@ -113,7 +113,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (-90985,0,6,0,1,0,100,1,1000,1000,0,0,11,33827,0,0,0,0,0,19,15384,20,0,0,0,0,0,'Hellfire Warder - Ooc no repeat - Cast Hellfire Warder Channel Visual');
 
 -- Green Beam group
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN(-91247,-91248,-91249);
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN(-91247,-91248,-91249) AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (-91248,0,0,0,0,0,100,2,4800,4800,18400,27400,11,39175,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Shadow Bolt Volley\''),
 (-91248,0,1,0,0,0,100,2,9000,9000,14500,21500,11,34437,0,0,0,0,0,2,0,0,0,0,0,0,0,'Hellfire Warder - In Combat - Cast \'Death Coil\''),
