@@ -47,7 +47,7 @@ enum Spells
     SPELL_CAMERA_SHAKE          = 36455,
     SPELL_BERSERK               = 27680,
     SPELL_QUAKE                 = 30657,
-    SPELL_DEDRIS_SERVERSIDE     = 30630,
+    SPELL_DEBRIS_SERVERSIDE     = 30630,
 
     //Player or Manticron Cube
     SPELL_SHADOW_CAGE           = 30168,
@@ -88,14 +88,14 @@ enum Events
     EVENT_START_FIGHT,
     EVENT_RELEASED,
     EVENT_COLLAPSE,
-    EVENT_DEDRIS_KNOCKDOWN,
-    EVENT_DEDRIS,
+    EVENT_DEBRIS_KNOCKDOWN,
+    EVENT_DEBRIS,
     EVENT_NEARLY_EMOTE,
     EVENT_TAUNT,
     //Hellfire Channelers events
     EVENT_SHADOWBOLT,
     EVENT_FEAR,
-    EVENT_CHECKFRIEND,
+    EVENT_CHECK_FRIEND,
     EVENT_DARK_MENDING,
     EVENT_ABYSSAL
 };
@@ -139,7 +139,6 @@ class boss_magtheridon : public CreatureScript
                 events.SetPhase(PHASE_2);
                 events.CancelEvent(EVENT_START_FIGHT);
                 events.CancelEvent(EVENT_NEARLY_EMOTE);
-                events.CancelEvent(EVENT_TAUNT);
                 events.ScheduleEvent(EVENT_RELEASED, Seconds(6));
                 Talk(EMOTE_BREAKS_FREE, me);
                 Talk(SAY_FREE);
@@ -229,7 +228,7 @@ class boss_magtheridon : public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_BERSERK:
-                            DoCast(SPELL_BERSERK);
+                            DoCastSelf(SPELL_BERSERK);
                             break;
                         case EVENT_CLEAVE:
                             DoCastVictim(SPELL_CLEAVE);
@@ -255,22 +254,23 @@ class boss_magtheridon : public CreatureScript
                             events.ScheduleEvent(EVENT_BLAZE, Seconds(20));
                             events.ScheduleEvent(EVENT_QUAKE, Seconds(35));
                             events.ScheduleEvent(EVENT_BERSERK, Minutes(20));
+                            events.CancelEvent(EVENT_TAUNT);
                             break;
                         case EVENT_COLLAPSE:
                             instance->SetData(DATA_COLLAPSE_2, ACTION_ENABLE);
-                            events.ScheduleEvent(EVENT_DEDRIS_KNOCKDOWN, Seconds(4));
+                            events.ScheduleEvent(EVENT_DEBRIS_KNOCKDOWN, Seconds(4));
                             break;
-                        case EVENT_DEDRIS_KNOCKDOWN:
+                        case EVENT_DEBRIS_KNOCKDOWN:
                             if (Creature* trigger = instance->GetCreature(DATA_WORLD_TRIGGER))
                             {
                                 trigger->CastSpell(trigger, SPELL_DEBRIS_KNOCKDOWN, true);
                                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                                 me->SetReactState(REACT_AGGRESSIVE);
-                                events.ScheduleEvent(EVENT_DEDRIS, Seconds(20));
+                                events.ScheduleEvent(EVENT_DEBRIS, Seconds(20));
                             }
                             break;
-                        case EVENT_DEDRIS:
-                            DoCast(SPELL_DEDRIS_SERVERSIDE);
+                        case EVENT_DEBRIS:
+                            DoCastAOE(SPELL_DEBRIS_SERVERSIDE);
                             events.Repeat(Seconds(20));
                             break;
                         case EVENT_NEARLY_EMOTE:
@@ -278,7 +278,7 @@ class boss_magtheridon : public CreatureScript
                             break;
                         case EVENT_BLAST_NOVA:
                             Talk(EMOTE_BLAST_NOVA, me);
-                            DoCast(SPELL_BLAST_NOVA);
+                            DoCastAOE(SPELL_BLAST_NOVA);
                             events.Repeat(Seconds(55));
                             break;
                         case EVENT_TAUNT:
@@ -326,7 +326,7 @@ class npc_hellfire_channeler : public CreatureScript
             void Reset() override
             {
                 _events.Reset();
-                DoCast(SPELL_SHADOW_GRASP_C);
+                DoCastSelf(SPELL_SHADOW_GRASP_C);
                 me->SetReactState(REACT_DEFENSIVE);
             }
 
@@ -338,7 +338,7 @@ class npc_hellfire_channeler : public CreatureScript
                     magtheridon->AI()->DoAction(ACTION_START_CHANNELERS_EVENT);
 
                 _events.ScheduleEvent(EVENT_SHADOWBOLT, Seconds(20));
-                _events.ScheduleEvent(EVENT_CHECKFRIEND, Seconds(1));
+                _events.ScheduleEvent(EVENT_CHECK_FRIEND, Seconds(1));
                 _events.ScheduleEvent(EVENT_ABYSSAL, Seconds(30));
                 _events.ScheduleEvent(EVENT_FEAR, Seconds(15), Seconds(20));
 
@@ -387,7 +387,7 @@ class npc_hellfire_channeler : public CreatureScript
                                 DoCast(target, SPELL_FEAR);
                             _events.Repeat(Seconds(25), Seconds(40));
                             break;
-                        case EVENT_CHECKFRIEND:
+                        case EVENT_CHECK_FRIEND:
                             if (_canCastDarkMending)
                             {
                                 if (Unit* target = DoSelectBelowHpPctFriendlyWithEntry(NPC_HELLFIRE_CHANNELLER, 30.0f, 51, false))
@@ -443,7 +443,7 @@ public:
 
             _scheduler.Schedule(Seconds(5), [this](TaskContext /*context*/)
             {
-                DoCast(SPELL_DEBRIS_DAMAGE);
+                DoCastAOE(SPELL_DEBRIS_DAMAGE);
             });
         }
 
