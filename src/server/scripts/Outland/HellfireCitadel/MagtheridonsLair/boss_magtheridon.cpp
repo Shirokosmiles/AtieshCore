@@ -193,7 +193,6 @@ class boss_magtheridon : public CreatureScript
                 if (me->HealthBelowPctDamaged(30, damage) && !events.IsInPhase(PHASE_3))
                 {
                     events.SetPhase(PHASE_3);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     Talk(SAY_COLLAPSE);
@@ -264,7 +263,6 @@ class boss_magtheridon : public CreatureScript
                             if (Creature* trigger = instance->GetCreature(DATA_WORLD_TRIGGER))
                             {
                                 trigger->CastSpell(trigger, SPELL_DEBRIS_KNOCKDOWN, true);
-                                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                                 me->SetReactState(REACT_AGGRESSIVE);
                                 events.ScheduleEvent(EVENT_DEBRIS, Seconds(20));
                             }
