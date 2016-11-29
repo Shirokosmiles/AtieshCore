@@ -1,6 +1,7 @@
 -- Add Missing Spawns of Target Trigger. Recycled guids of Hellfire Channelers. But need 2 more clean guids
 -- DEVELOPER THAT WILL MERGE IT, PLEASE CHANGE 865901 AND 865902 FOR A CURRENT CLEAN GUID AND DELETE THIS COMMENT
-DELETE FROM `creature` WHERE `guid` IN(865901,865902,138106,138107,138108,138109,138110,90978,90979,90980,90981,90982);
+DELETE FROM `creature` WHERE `id` IN(17256,15435) AND `map`=544;
+DELETE FROM `linked_respawn` WHERE `guid` IN(90982,90981,90980,90979,90978); -- Delete Linked respawn from channelers
 INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`,`VerifiedBuild`) VALUES
 (865901,17474,544,0,0,1,1,15435,0,11.2283,2.97198,-0.320875,1.14748,7200,15,0,3965,0,1,0,0,0,0),
 (865902,17474,544,0,0,1,1,15435,0,10.2283,1.97198,-0.320875,1.41097,7200,15,0,3965,0,1,0,0,0,0),
@@ -46,8 +47,6 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 (30658, 30571, 0, 'Quake Trigger Quake Knockback');
 
 -- Making a summon group for Magtheridon.
-DELETE FROM `creature` WHERE `id`=17256 AND `map`=544;
-DELETE FROM `linked_respawn` WHERE `guid` IN(90982,90981,90980,90979,90978);
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=17257; -- Magtheridon
 INSERT INTO `creature_summon_groups` (`summonerId`,`summonerType`,`groupId`,`entry`,`position_x`,`position_y`,`position_z`,`orientation`,`summonType`,`summonTime`) VALUES
 (17257,0,1,17256,-31.7645,-35.8374,0.714268,1.37881,6,6000), -- Hellfire Channelers
