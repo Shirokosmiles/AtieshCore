@@ -176,6 +176,7 @@ class boss_magtheridon : public CreatureScript
                     summons.DoZoneInCombat(NPC_HELLFIRE_CHANNELLER);
                     events.ScheduleEvent(EVENT_START_FIGHT, Minutes(2));
                     events.ScheduleEvent(EVENT_NEARLY_EMOTE, Seconds(60));
+                    events.CancelEvent(EVENT_TAUNT);
                     instance->SetBossState(DATA_MAGTHERIDON, IN_PROGRESS);
                     instance->SetData(DATA_CALL_WARDERS, ACTION_ENABLE);
                 }
@@ -254,7 +255,6 @@ class boss_magtheridon : public CreatureScript
                             events.ScheduleEvent(EVENT_BLAZE, Seconds(20));
                             events.ScheduleEvent(EVENT_QUAKE, Seconds(35));
                             events.ScheduleEvent(EVENT_BERSERK, Minutes(20));
-                            events.CancelEvent(EVENT_TAUNT);
                             break;
                         case EVENT_COLLAPSE:
                             instance->SetData(DATA_COLLAPSE_2, ACTION_ENABLE);
