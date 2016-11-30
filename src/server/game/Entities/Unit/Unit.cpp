@@ -11338,8 +11338,8 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
 Unit* Unit::SelectNearbyNoTotemTarget(Unit* exclude, float dist) const
 {
     std::list<Unit*> targets;
-    Trinity::NearestUnfriendlyNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
-    Trinity::UnitListSearcher<Trinity::NearestUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    Trinity::NearestAttackableNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
+    Trinity::UnitListSearcher<Trinity::NearestAttackableNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
     VisitNearbyObject(dist, searcher);
 
     // remove current target
