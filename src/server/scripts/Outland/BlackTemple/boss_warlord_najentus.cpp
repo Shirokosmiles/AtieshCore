@@ -85,7 +85,6 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
-            instance->SetBossState(DATA_HIGH_WARLORD_NAJENTUS, DONE);
         }
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
@@ -105,12 +104,6 @@ public:
             events.ScheduleEvent(EVENT_BERSERK, 480000, GCD_CAST);
             events.ScheduleEvent(EVENT_YELL, 45000 + (rand32() % 76) * 1000, GCD_YELL);
             ResetTimer();
-            instance->SetBossState(DATA_HIGH_WARLORD_NAJENTUS, IN_PROGRESS);
-        }
-
-        void EnterEvadeMode(EvadeReason /*why*/) override 
-        {
-            instance->SetBossState(DATA_HIGH_WARLORD_NAJENTUS, FAIL);
         }
 
         bool RemoveImpalingSpine()
@@ -157,7 +150,7 @@ public:
                         DoCast(target, SPELL_IMPALING_SPINE, true);
                         SpineTargetGUID = target->GetGUID();
                         //must let target summon, otherwise you cannot click the spine
-                        target->SummonGameObject(GO_NAJENTUS_SPINE, *target, G3D::Quat(), 30);
+                        target->SummonGameObject(GO_NAJENTUS_SPINE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation(), 0, 0, 0, 0, 30);
                         Talk(SAY_NEEDLE);
                         events.DelayEvents(1500, GCD_CAST);
                         events.DelayEvents(15000, GCD_YELL);

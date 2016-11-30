@@ -37,6 +37,15 @@ void FleeingMovementGenerator<T>::DoInitialize(T* unit)
 
     i_nextMoveTime.Reset(50);
 
+    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+        return;
+
+    if (owner->IsMovementPreventedByCasting())
+    {
+        owner->CastStop();
+        return;
+    }
+
     unit->AddUnitState(UNIT_FLAG_FLEEING);
     unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);    
 

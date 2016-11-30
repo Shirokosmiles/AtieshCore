@@ -64,11 +64,12 @@ public:
         return GetInstanceAI<boss_gurtogg_bloodboilAI>(creature);
     }
 
-    struct boss_gurtogg_bloodboilAI : public BossAI
+    struct boss_gurtogg_bloodboilAI : public ScriptedAI
     {
-        boss_gurtogg_bloodboilAI(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL)
+        boss_gurtogg_bloodboilAI(Creature* creature) : ScriptedAI(creature)
         {
             Initialize();
+            instance = creature->GetInstanceScript();
         }
 
         void Initialize()
@@ -90,6 +91,8 @@ public:
             Phase1 = true;
         }
 
+        InstanceScript* instance;
+
         ObjectGuid TargetGUID;
 
         float TargetThreat;
@@ -109,7 +112,8 @@ public:
 
         void Reset() override
         {
-            _Reset();
+            instance->SetBossState(DATA_GURTOGG_BLOODBOIL, NOT_STARTED);
+
             Initialize();
 
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
@@ -118,18 +122,9 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
+            DoZoneInCombat();
             Talk(SAY_AGGRO);
-            _EnterCombat();
             instance->SetBossState(DATA_GURTOGG_BLOODBOIL, IN_PROGRESS);
-        }
-
-        void EnterEvadeMode(EvadeReason /*why*/) override
-        {
-            _Reset();
-
-            instance->SetBossState(DATA_GURTOGG_BLOODBOIL, FAIL);
-
-            _DespawnAtEvade();
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -139,9 +134,9 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            Talk(SAY_DEATH);
-            _JustDied();
             instance->SetBossState(DATA_GURTOGG_BLOODBOIL, DONE);
+
+            Talk(SAY_DEATH);
         }
 
         void RevertThreatOnTarget(ObjectGuid guid)
@@ -266,7 +261,7 @@ public:
                 }
                 else                                           // Encounter is a loop pretty much. Phase 1 -> Phase 2 -> Phase 1 -> Phase 2 till death or enrage
                 {
-                    if (TargetGUID)
+                    if (!TargetGUID.IsEmpty())
                         RevertThreatOnTarget(TargetGUID);
                     TargetGUID.Clear();
                     Phase1 = true;
