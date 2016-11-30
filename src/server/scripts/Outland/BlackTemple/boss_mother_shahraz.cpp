@@ -134,7 +134,6 @@ public:
             events.ScheduleEvent(EVENT_PRISMATIC_SHIELD, 1000);
             events.ScheduleEvent(EVENT_BERSERK, 600000);
             Talk(SAY_AGGRO);
-            instance->SetBossState(DATA_MOTHER_SHAHRAZ, IN_PROGRESS);
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -146,21 +145,11 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
-            instance->SetBossState(DATA_MOTHER_SHAHRAZ, DONE);
-        }
-
-        void EnterEvadeMode(EvadeReason /*why*/) override
-        {
-            _Reset();
-
-            instance->SetBossState(DATA_MOTHER_SHAHRAZ, FAIL);
-
-            _DespawnAtEvade();
         }
 
         void TeleportPlayers()
         {
-            uint32 random = urand(0, 6);
+            uint32 random = urand(0, 7);
             float X = TeleportPoint[random].x;
             float Y = TeleportPoint[random].y;
             float Z = TeleportPoint[random].z;
@@ -221,7 +210,7 @@ public:
                     break;
                 case EVENT_PRISMATIC_SHIELD:
                     // Random Prismatic Shield every 15 seconds.
-                    DoCast(me, PrismaticAuras[urand(0, 5)]);
+                    DoCast(me, PrismaticAuras[urand(0, 6)]);
                     events.ScheduleEvent(EVENT_PRISMATIC_SHIELD, 15000);
                     break;
                 case EVENT_FATAL_ATTRACTION:
@@ -238,7 +227,7 @@ public:
                     {
                         for (uint8 i = 0; i < 3; ++i)
                         {
-                            if (TargetGUID[i])
+                            if (!TargetGUID[i].IsEmpty())
                             {
                                 if (Unit* unit = ObjectAccessor::GetUnit(*me, TargetGUID[i]))
                                     unit->CastSpell(unit, SPELL_ATTRACTION, true);
