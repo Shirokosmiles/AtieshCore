@@ -135,12 +135,11 @@ public:
         return GetInstanceAI<boss_reliquary_of_soulsAI>(creature);
     }
 
-    struct boss_reliquary_of_soulsAI : public ScriptedAI
+    struct boss_reliquary_of_soulsAI : public BossAI
     {
-        boss_reliquary_of_soulsAI(Creature* creature) : ScriptedAI(creature)
+        boss_reliquary_of_soulsAI(Creature* creature) : BossAI(creature, DATA_RELIQUARY_OF_SOULS)
         {
             Initialize();
-            instance = creature->GetInstanceScript();
             Counter = 0;
             Timer = 0;
             SoulCount = 0;
@@ -151,8 +150,6 @@ public:
         {
             Phase = 0;
         }
-
-        InstanceScript* instance;
 
         ObjectGuid EssenceGUID;
 
@@ -165,9 +162,9 @@ public:
 
         void Reset() override
         {
-            instance->SetBossState(DATA_RELIQUARY_OF_SOULS, NOT_STARTED);
+            _Reset();
 
-            if (!EssenceGUID.IsEmpty())
+            if (EssenceGUID)
             {
                 if (Creature* essence = ObjectAccessor::GetCreature(*me, EssenceGUID))
                     essence->DespawnOrUnsummon();
@@ -202,8 +199,7 @@ public:
         void EnterCombat(Unit* who) override
         {
             me->AddThreat(who, 10000.0f);
-            DoZoneInCombat();
-            instance->SetBossState(DATA_RELIQUARY_OF_SOULS, IN_PROGRESS);
+            _EnterCombat();
 
             Phase = 1;
             Counter = 0;
@@ -246,11 +242,6 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetBossState(DATA_RELIQUARY_OF_SOULS, DONE);
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!Phase)
@@ -263,7 +254,7 @@ public:
             }
 
             Creature* Essence = NULL;
-            if (!EssenceGUID.IsEmpty())
+            if (EssenceGUID)
             {
                 Essence = ObjectAccessor::GetCreature(*me, EssenceGUID);
                 if (!Essence)
@@ -382,7 +373,7 @@ public:
 
 void npc_enslaved_soul::npc_enslaved_soulAI::JustDied(Unit* /*killer*/)
 {
-    if (!ReliquaryGUID.IsEmpty())
+    if (ReliquaryGUID)
         if (Creature* Reliquary = (ObjectAccessor::GetCreature((*me), ReliquaryGUID)))
             ++(ENSURE_AI(boss_reliquary_of_souls::boss_reliquary_of_soulsAI, Reliquary->AI())->SoulDeathCount);
 
@@ -572,8 +563,8 @@ public:
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
-                for (SpellEffectInfo const* effect : spell->GetEffectsForDifficulty(me->GetMap()->GetDifficultyID()))
-                    if (effect->Effect == SPELL_EFFECT_INTERRUPT_CAST)
+                for (uint8 i = 0; i < 3; ++i)
+                    if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
                         if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_SOUL_SHOCK
                             || me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_DEADEN)
                             me->InterruptSpell(CURRENT_GENERIC_SPELL, false);

@@ -149,7 +149,7 @@ public:
 
         void TeleportPlayers()
         {
-            uint32 random = urand(0, 7);
+            uint32 random = urand(0, 6);
             float X = TeleportPoint[random].x;
             float Y = TeleportPoint[random].y;
             float Z = TeleportPoint[random].z;
@@ -210,7 +210,7 @@ public:
                     break;
                 case EVENT_PRISMATIC_SHIELD:
                     // Random Prismatic Shield every 15 seconds.
-                    DoCast(me, PrismaticAuras[urand(0, 6)]);
+                    DoCast(me, PrismaticAuras[urand(0, 5)]);
                     events.ScheduleEvent(EVENT_PRISMATIC_SHIELD, 15000);
                     break;
                 case EVENT_FATAL_ATTRACTION:
@@ -227,7 +227,7 @@ public:
                     {
                         for (uint8 i = 0; i < 3; ++i)
                         {
-                            if (!TargetGUID[i].IsEmpty())
+                            if (TargetGUID[i])
                             {
                                 if (Unit* unit = ObjectAccessor::GetUnit(*me, TargetGUID[i]))
                                     unit->CastSpell(unit, SPELL_ATTRACTION, true);
