@@ -49,9 +49,10 @@ void FleeingMovementGenerator<T>::DoInitialize(T* unit)
     unit->AddUnitState(UNIT_FLAG_FLEEING);
     unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);    
 
-    if (!unit->IsAlive() || unit->IsStopped())
+    if (!unit->IsAlive())
         return;
-    else if (unit->ToCreature())
+
+    if (unit->ToCreature())
     {
         if (Unit* victim = unit->GetVictim())
         {
@@ -62,6 +63,15 @@ void FleeingMovementGenerator<T>::DoInitialize(T* unit)
         
     unit->StopMoving();
     unit->DisableSpline();
+
+    // send to clients the order to immobilize the unit and make it face a random direction.
+    Movement::MoveSplineInit init(unit);
+    init.MoveTo(unit->GetPosition(), false, false);
+    init.SetFacing(frand(0.0f, 2 * (float)M_PI));
+    init.SetWalk(true);
+    init.Launch();
+
+    unit->ClearUnitState(UNIT_STATE_MOVING);
     unit->AddUnitState(UNIT_STATE_FLEEING_MOVE);
 }
 
