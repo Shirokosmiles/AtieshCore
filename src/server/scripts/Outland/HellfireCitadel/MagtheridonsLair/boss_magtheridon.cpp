@@ -217,7 +217,6 @@ class boss_magtheridon : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
@@ -295,7 +294,6 @@ class boss_magtheridon : public CreatureScript
                     return;
 
                 DoMeleeAttackIfReady();
-
             }
 
         private:

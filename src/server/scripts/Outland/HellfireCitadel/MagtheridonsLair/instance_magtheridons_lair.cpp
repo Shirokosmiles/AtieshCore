@@ -99,22 +99,22 @@ class instance_magtheridons_lair : public InstanceMapScript
                 {
                     case DATA_MANTICRON_CUBE:
                         for (ObjectGuid gobGUID : cubesGUIDS)
-                            if (GameObject* go = instance->GetGameObject(gobGUID))
+                            if (GameObject* cube = instance->GetGameObject(gobGUID))
                             {
                                 if (value == ACTION_ENABLE)
-                                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                    cube->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                                 else
-                                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                    cube->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                             }
                         break;
                     case DATA_COLLAPSE:
-                        if (GameObject* go = GetGameObject(DATA_MAGTHERIDON_HALL))
-                            go->SetGoState(value == ACTION_ENABLE ? GO_STATE_ACTIVE : GO_STATE_READY);
+                        if (GameObject* hall = GetGameObject(DATA_MAGTHERIDON_HALL))
+                            HandleGameObject(ObjectGuid::Empty, value == ACTION_ENABLE ? true : false, hall);
                         break;
                     case DATA_COLLAPSE_2:
                         for (DataTypes data : collapseObjectDatas)
                             if (GameObject* go = GetGameObject(data))
-                                go->SetGoState(value == ACTION_ENABLE ? GO_STATE_ACTIVE : GO_STATE_READY);
+                                HandleGameObject(ObjectGuid::Empty, value == ACTION_ENABLE ? true : false, go);
                         break;
                     case DATA_CALL_WARDERS:
                         for (ObjectGuid warderGuid : warderGUIDS)
