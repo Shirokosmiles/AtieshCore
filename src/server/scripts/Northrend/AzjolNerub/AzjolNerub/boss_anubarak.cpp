@@ -148,7 +148,7 @@ public:
                 return;
             }
             _guardianTrigger = (*summoned.begin())->GetGUID();
-            
+
             if (Creature* trigger = DoSummon(NPC_WORLD_TRIGGER, me->GetPosition(), 0u, TEMPSUMMON_MANUAL_DESPAWN))
                 _assassinTrigger = trigger->GetGUID();
             else
@@ -356,7 +356,7 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                 me->RemoveAurasDueToSpell(SPELL_LEECHING_SWARM);
                 DoCastSelf(SPELL_IMPALE_AURA, true);
-                
+
                 events.SetPhase(PHASE_SUBMERGE);
                 switch (_nextSubmerge)
                 {
