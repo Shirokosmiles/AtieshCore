@@ -60,16 +60,16 @@ void FleeingMovementGenerator<T>::DoInitialize(T* unit)
             unit->SendMeleeAttackStop(victim);
         }        
     }
-        
-    unit->StopMoving();
-    unit->DisableSpline();
-
+    
     // send to clients the order to immobilize the unit and make it face a random direction.
     Movement::MoveSplineInit init(unit);
     init.MoveTo(unit->GetPosition(), false, false);
     init.SetFacing(frand(0.0f, 2 * (float)M_PI));
     init.SetWalk(true);
     init.Launch();
+
+    unit->StopMoving();
+    unit->DisableSpline();    
 
     unit->ClearUnitState(UNIT_STATE_MOVING);
     unit->AddUnitState(UNIT_STATE_FLEEING_MOVE);
