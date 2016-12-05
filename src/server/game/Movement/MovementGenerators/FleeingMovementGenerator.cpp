@@ -65,7 +65,6 @@ void FleeingMovementGenerator<T>::DoInitialize(T* unit)
     Movement::MoveSplineInit init(unit);
     init.MoveTo(unit->GetPosition(), false, false);
     init.SetFacing(frand(0.0f, 2 * (float)M_PI));
-    init.SetWalk(true);
     init.Launch();
 
     unit->StopMoving();
