@@ -64,7 +64,7 @@ void FleeingMovementGenerator<T>::DoInitialize(T* unit)
     // send to clients the order to immobilize the unit and make it face a random direction.
     Movement::MoveSplineInit init(unit);
     init.MoveTo(unit->GetPosition(), false, false);
-    init.SetFacing(frand(0.0f, 2 * (float)M_PI));
+    init.SetFacing(frand(0.0f, 2 * static_cast<float>(M_PI)));
     init.Launch();
 
     unit->StopMoving();
