@@ -40,7 +40,7 @@ enum Yells
 
 enum Spells
 {
-    //Magtheridon
+    // Magtheridon
     SPELL_BLAST_NOVA            = 30616,
     SPELL_CLEAVE                = 30619,
     SPELL_BLAZE_TARGET          = 30541,
@@ -49,15 +49,15 @@ enum Spells
     SPELL_QUAKE                 = 30657,
     SPELL_DEBRIS_SERVERSIDE     = 30630,
 
-    //Player or Manticron Cube
+    // Player or Manticron Cube
     SPELL_SHADOW_CAGE           = 30168,
     SPELL_SHADOW_GRASP          = 30410,
     SPELL_MIND_EXHAUSTION       = 44032,
 
-    //Hellfire Raid Trigger
+    // Hellfire Raid Trigger
     SPELL_SHADOW_GRASP_VISUAL   = 30166,
 
-    //HellFire Channeler
+    // HellFire Channeler
     SPELL_SHADOW_CAGE_C         = 30205,
     SPELL_SHADOW_GRASP_C        = 30207,
     SPELL_SHADOW_BOLT_VOLLEY    = 30510,
@@ -66,20 +66,20 @@ enum Spells
     SPELL_SOUL_TRANSFER         = 30531,
     SPELL_FEAR                  = 30530,
 
-    //WorldTrigger
+    // WorldTrigger
     SPELL_DEBRIS_KNOCKDOWN      = 36449,
 
     // Magtheridon Room
     SPELL_DEBRIS_VISUAL         = 30632,
     SPELL_DEBRIS_DAMAGE         = 30631,
 
-    //Target Trigger
+    // Target Trigger
     SPELL_BLAZE                 = 30542
 };
 
 enum Events
 {
-    //Magtheridon
+    // Magtheridon
     EVENT_BERSERK = 1,
     EVENT_CLEAVE,
     EVENT_BLAZE,
@@ -92,7 +92,7 @@ enum Events
     EVENT_DEBRIS,
     EVENT_NEARLY_EMOTE,
     EVENT_TAUNT,
-    //Hellfire Channelers events
+    // Hellfire Channelers events
     EVENT_SHADOWBOLT,
     EVENT_FEAR,
     EVENT_CHECK_FRIEND,
