@@ -141,7 +141,10 @@ public:
 
     struct boss_reliquary_of_soulsAI : public BossAI
     {
-        boss_reliquary_of_soulsAI(Creature* creature) : BossAI(creature, DATA_RELIQUARY_OF_SOULS), _inCombat(false) { }
+        boss_reliquary_of_soulsAI(Creature* creature) : BossAI(creature, DATA_RELIQUARY_OF_SOULS), _inCombat(false)
+        {
+            creature->m_SightDistance = 70.0f;
+        }
 
         void Reset() override
         {
@@ -153,7 +156,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!_inCombat && who->GetTypeId() == TYPEID_PLAYER && !who->ToPlayer()->IsGameMaster() && me->GetDistance2d(who) <= 70.0f)
+            if (!_inCombat && who->GetTypeId() == TYPEID_PLAYER && !who->ToPlayer()->IsGameMaster() && CanAIAttack(who))
             {
                 _inCombat = true;
                 DoZoneInCombat();
@@ -305,7 +308,7 @@ public:
 
     struct boss_essence_of_sufferingAI : public BossAI
     {
-        boss_essence_of_sufferingAI(Creature* creature) : BossAI(creature, DATA_ESSENCE_OF_SUFFERING)
+        boss_essence_of_sufferingAI(Creature* creature) : BossAI(creature, DATA_ESSENCE_OF_SUFFERING), _dead(false)
         {
             SetBoundary(instance->GetBossBoundary(DATA_RELIQUARY_OF_SOULS));
         }
@@ -314,6 +317,7 @@ public:
         {
             DoCastAOE(SPELL_AURA_OF_SUFFERING, true);
             events.Reset();
+            _dead = false;
         }
 
         void MovementInform(uint32 motionType, uint32 pointId) override
@@ -336,11 +340,14 @@ public:
             if (damage >= me->GetHealth())
             {
                 damage = 0;
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                Talk(SUFF_SAY_RECAP);
-                me->AttackStop();
-                me->SetReactState(REACT_PASSIVE);
-                me->GetMotionMaster()->MovePoint(RELIQUARY_DESPAWN_WAYPOINT, DespawnPoint);
+                if (!_dead)
+                {
+                    _dead = true;
+                    Talk(SUFF_SAY_RECAP);
+                    me->AttackStop();
+                    me->SetReactState(REACT_PASSIVE);
+                    me->GetMotionMaster()->MovePoint(RELIQUARY_DESPAWN_WAYPOINT, DespawnPoint);
+                }
             }
         }
 
@@ -400,6 +407,8 @@ public:
 
             DoMeleeAttackIfReady();
         }
+    private:
+        bool _dead;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -415,7 +424,7 @@ public:
 
     struct boss_essence_of_desireAI : public BossAI
     {
-        boss_essence_of_desireAI(Creature* creature) : BossAI(creature, DATA_ESSENCE_OF_DESIRE)
+        boss_essence_of_desireAI(Creature* creature) : BossAI(creature, DATA_ESSENCE_OF_DESIRE), _dead(false)
         {
             SetBoundary(instance->GetBossBoundary(DATA_RELIQUARY_OF_SOULS));
         }
@@ -424,6 +433,7 @@ public:
         {
             DoCastSelf(SPELL_AURA_OF_DESIRE, true);
             events.Reset();
+            _dead = false;
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -458,11 +468,14 @@ public:
             if (damage >= me->GetHealth())
             {
                 damage = 0;
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                Talk(DESI_SAY_RECAP);
-                me->AttackStop();
-                me->SetReactState(REACT_PASSIVE);
-                me->GetMotionMaster()->MovePoint(RELIQUARY_DESPAWN_WAYPOINT, DespawnPoint);
+                if (!_dead)
+                {
+                    _dead = true;
+                    Talk(DESI_SAY_RECAP);
+                    me->AttackStop();
+                    me->SetReactState(REACT_PASSIVE);
+                    me->GetMotionMaster()->MovePoint(RELIQUARY_DESPAWN_WAYPOINT, DespawnPoint);
+                }
             }
         }
 
@@ -515,6 +528,8 @@ public:
 
             DoMeleeAttackIfReady();
         }
+    private:
+        bool _dead;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -798,7 +813,7 @@ class spell_reliquary_of_souls_spite : public SpellScriptLoader
                     caster->CastSpell(GetTarget(), SPELL_SPITE_DAMAGE, true);
             }
 
-            void Register()
+            void Register() override
             {
                 AfterEffectRemove += AuraEffectRemoveFn(spell_reliquary_of_souls_spite_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DAMAGE_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
             }
