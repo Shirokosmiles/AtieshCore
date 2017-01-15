@@ -1093,6 +1093,15 @@ MaxRecruitAFriendBonusDistance = 100
 MailDeliveryDelay = 3600
 
 #
+#
+# Mail External 
+#
+#    
+
+External.Mail.Enable = 0
+External.Mail.Interval = 1
+
+#
 #    SkillChance.Prospecting
 #        Description: Allow skill increase from prospecting.
 #        Default:     0 - (Disabled)

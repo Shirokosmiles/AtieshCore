@@ -177,6 +177,7 @@ enum WorldBoolConfigs
     CONFIG_HOTSWAP_INSTALL_ENABLED,
     CONFIG_HOTSWAP_PREFIX_CORRECTION_ENABLED,
     CONFIG_PREVENT_RENAME_CUSTOMIZATION,
+    CONFIG_EXTERNAL_MAIL_ENABLE,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -376,6 +377,7 @@ enum WorldIntConfigs
     CONFIG_AUCTION_GETALL_DELAY,
     CONFIG_AUCTION_SEARCH_DELAY,
     CONFIG_TALENTS_INSPECTING,
+    CONFIG_EXTERNAL_MAIL_INTERVAL,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -812,6 +814,7 @@ class TC_GAME_API World
         time_t m_startTime;
         time_t m_gameTime;
         IntervalTimer m_timers[WUPDATE_COUNT];
+        IntervalTimer extmail_timer;
         time_t mail_timer;
         time_t mail_timer_expires;
         uint32 m_updateTime, m_updateTimeSum;
