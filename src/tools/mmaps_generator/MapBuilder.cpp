@@ -63,15 +63,14 @@ namespace MMAP
         m_skipBattlegrounds  (skipBattlegrounds),
         m_maxWalkableAngle   (maxWalkableAngle),
         m_bigBaseUnit        (bigBaseUnit),
+        m_totalTiles         (0u),
+        m_totalTilesProcessed(0u),
         m_rcContext          (NULL),
         _cancelationToken    (false)
     {
         m_terrainBuilder = new TerrainBuilder(skipLiquid);
 
         m_rcContext = new rcContext(false);
-
-        m_totalTiles = 0;
-        m_totalTilesBuilt = 0;
 
         discoverTiles();
     }
@@ -156,28 +155,7 @@ namespace MMAP
         }
         printf("found %u.\n\n", count);
 
-        // DEBUG code, this does the same as L115 through L147 above
-
-        // I'm counting tiles of every map with some portion of code taken
-        // from lines inside of buildMap() and buildNavMesh() wich are the real 
-        // process of building tile files, and buildng navmesh, first of all 
-        // this methods get how many tiles has each mapId in order to process data
-
-        // Surprisingly m_totalTiles matches how many tiles are found at L147
-
-        printf("\n\n Comienza la parte de codigo para saber el total de tiles\n\n");
-        std::set<uint32>* tiles;
-
-        for (TileList::iterator it = m_tiles.begin(); it != m_tiles.end(); ++it)
-        {
-            uint32 mapId = it->m_mapId;
-            tiles = getTileList(mapId);
-
-            m_totalTiles += tiles->size();
-            printf("Tiles para el mapa %u en total %zu.\n\n", mapId, tiles->size());
-        }
-
-        printf("Tiles en total %u.\n\n", m_totalTiles);
+        m_totalTiles.store(count, std::memory_order_relaxed);
     }
 
     /**************************************************************************/
@@ -412,7 +390,8 @@ namespace MMAP
             // add all tiles within bounds to tile list.
             for (uint32 i = minX; i <= maxX; ++i)
                 for (uint32 j = minY; j <= maxY; ++j)
-                    tiles->insert(StaticMapTree::packTileID(i, j));
+                    if (tiles->insert(StaticMapTree::packTileID(i, j)).second)
+                        ++m_totalTiles;
         }
 
         if (!tiles->empty())
@@ -423,6 +402,7 @@ namespace MMAP
             if (!navMesh)
             {
                 printf("[Map %03i] Failed creating navmesh!\n", mapID);
+                m_totalTilesProcessed += tiles->size();
                 return;
             }
 
@@ -435,6 +415,7 @@ namespace MMAP
                 // unpack tile coords
                 StaticMapTree::unpackTileID((*it), tileX, tileY);
 
+                ++m_totalTilesProcessed;
                 if (shouldSkipTile(mapID, tileX, tileY))
                     continue;
 
@@ -450,7 +431,7 @@ namespace MMAP
     /**************************************************************************/
     void MapBuilder::buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh)
     {
-        printf("%u%% [Map %03i] Building tile [%02u,%02u]\n", percentageDone(m_totalTiles, m_totalTilesBuilt), mapID, tileX, tileY);
+        printf("%u%% [Map %03i] Building tile [%02u,%02u]\n", percentageDone(m_totalTiles, m_totalTilesProcessed), mapID, tileX, tileY);
 
         MeshData meshData;
 
@@ -484,10 +465,6 @@ namespace MMAP
 
         // build navmesh tile
         buildMoveMapTile(mapID, tileX, tileY, meshData, bmin, bmax, navMesh);
-
-        // increment tiles done for percentageDone
-        m_totalTilesBuilt++;
-        printf("m_totalTilesBuilt = %u\n", m_totalTilesBuilt);
     }
 
     /**************************************************************************/
@@ -1053,4 +1030,5 @@ namespace MMAP
 
         return 0;
     }
+
 }
