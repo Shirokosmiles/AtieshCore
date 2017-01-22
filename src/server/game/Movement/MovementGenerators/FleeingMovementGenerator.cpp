@@ -50,7 +50,7 @@ void FleeingMovementGenerator<T>::DoInitialize(T* unit)
     unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);    
 
     if (!unit->IsAlive())
-        return;
+		return;
 
     if (unit->ToCreature())
     {
@@ -145,6 +145,15 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
             }
 
             Position pos = unit->GetFirstCollisionPosition(dist, angle);
+			// Add LOS check for target point
+			Position mypos = unit->GetPosition();
+
+			VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(unit->GetMapId(),
+				mypos.m_positionX,
+				mypos.m_positionY,
+				mypos.m_positionZ + 2.0f,
+				pos.m_positionX, pos.m_positionY, pos.m_positionZ + 2.0f,
+				VMAP::ModelIgnoreFlags::Nothing);
 
             unit->UpdateSpeed(MOVE_WALK);
             unit->UpdateSpeed(MOVE_RUN);
