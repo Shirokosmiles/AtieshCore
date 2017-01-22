@@ -2323,7 +2323,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
     float destx, desty, destz, tdestz;
     destx = pos.m_positionX + dist * std::cos(angle);
     desty = pos.m_positionY + dist * std::sin(angle);
-
+	bool needtorecheck = false;
     // Prevent invalid coordinates here, position is unchanged
     if (!Trinity::IsValidMapCoord(destx, desty))
     {
@@ -2342,6 +2342,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         desty -= CONTACT_DISTANCE * std::sin(angle);
         dist = std::sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
         tdestz = map->GetHeight(phasemask, destx, desty, destz + 2.8f, true);
+		needtorecheck = true;
     }
 
     // check dynamic collision
@@ -2354,6 +2355,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         desty -= CONTACT_DISTANCE * std::sin(angle);
         dist = std::sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
         tdestz = map->GetHeight(phasemask, destx, desty, destz + 2.8f, true);
+		needtorecheck = true;
     }
 
     float step = dist / 10.0f;
@@ -2376,7 +2378,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
     }
 
     // sometimes in algorithm with using "dist" destz can be lower then z of collision, for example in elwyn with collision in trees.
-    if (tdestz && tdestz > destz)
+    if (needtorecheck && tdestz > destz)
         pos.Relocate(destx, desty, tdestz + 0.5f);
 
     Trinity::NormalizeMapCoord(pos.m_positionX);
