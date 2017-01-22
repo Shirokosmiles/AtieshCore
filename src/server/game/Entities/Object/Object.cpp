@@ -2342,7 +2342,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         desty -= CONTACT_DISTANCE * std::sin(angle);
         dist = std::sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
         tdestz = map->GetHeight(phasemask, destx, desty, destz + 2.8f, true);
-		needtorecheck = true;
+        needtorecheck = true;
     }
 
     // check dynamic collision
@@ -2355,7 +2355,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         desty -= CONTACT_DISTANCE * std::sin(angle);
         dist = std::sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
         tdestz = map->GetHeight(phasemask, destx, desty, destz + 2.8f, true);
-		needtorecheck = true;
+        needtorecheck = true;
     }
 
     float step = dist / 10.0f;
