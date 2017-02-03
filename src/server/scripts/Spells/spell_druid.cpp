@@ -1700,6 +1700,34 @@ class spell_dru_tiger_s_fury : public SpellScriptLoader
         }
 };
 
+// 49376 - Feral Charge Cat
+class spell_dru_charge_cat : public SpellScriptLoader
+{
+public:
+    spell_dru_charge_cat() : SpellScriptLoader("spell_dru_charge_cat") { }
+
+    class spell_dru_charge_cat_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_charge_cat_SpellScript);
+
+        void OnHit()
+        {
+            if (Unit* target = GetHitUnit())
+                GetCaster()->Attack(target, true);
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_dru_charge_cat_SpellScript::OnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_dru_charge_cat_SpellScript();
+    }
+};
+
 // -61391 - Typhoon
 class spell_dru_typhoon : public SpellScriptLoader
 {
@@ -2307,6 +2335,7 @@ void AddSC_druid_spell_scripts()
     new spell_dru_survival_instincts();
     new spell_dru_swift_flight_passive();
     new spell_dru_tiger_s_fury();
+    new spell_dru_charge_cat();
     new spell_dru_typhoon();
     new spell_dru_t3_2p_bonus();
     new spell_dru_t3_6p_bonus();
