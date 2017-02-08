@@ -3525,6 +3525,11 @@ void BattlegroundMap::RemoveAllPlayers()
                     player->TeleportTo(player->GetBattlegroundEntryPoint());
 }
 
+Player* Map::GetPlayer(ObjectGuid const& guid)
+{
+    return ObjectAccessor::GetPlayer(this, guid);
+}
+
 Corpse* Map::GetCorpse(ObjectGuid const& guid)
 {
     return _objectsStore.Find<Corpse>(guid);

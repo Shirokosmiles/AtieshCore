@@ -138,6 +138,7 @@ void WorldSession::HandlePetStopAttack(WorldPacket &recvData)
         return;
 
     pet->AttackStop();
+    pet->ClearInPetCombat();
 }
 
 void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spellid, uint16 flag, ObjectGuid guid2)
@@ -173,6 +174,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 case COMMAND_FOLLOW:                        //spellid=1792  //FOLLOW
                     pet->AttackStop();
                     pet->InterruptNonMeleeSpells(false);
+                    pet->ClearInPetCombat();
                     pet->GetMotionMaster()->MoveFollow(_player, PET_FOLLOW_DIST, pet->GetFollowAngle());
                     if (pet->ToPet())
                         pet->ToPet()->ClearCastWhenWillAvailable();
@@ -231,9 +233,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         }
                         else                                // charmed player
                         {
-                            if (pet->GetVictim() && pet->GetVictim() != TargetUnit)
-                                pet->AttackStop();
-
                             charmInfo->SetIsCommandAttack(true);
                             charmInfo->SetIsAtStay(false);
                             charmInfo->SetIsFollowing(false);
@@ -275,6 +274,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
             {
                 case REACT_PASSIVE:                         //passive
                     pet->AttackStop();
+                    pet->ClearInPetCombat();
                     if (pet->ToPet())
                         pet->ToPet()->ClearCastWhenWillAvailable();
                     // no break;
@@ -370,8 +370,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     // This is true if pet has no target or has target but targets differs.
                     if (pet->GetVictim() != unit_target)
                     {
-                        if (pet->GetVictim())
-                            pet->AttackStop();
                         pet->GetMotionMaster()->Clear();
                         if (pet->ToCreature()->IsAIEnabled)
                             pet->ToCreature()->AI()->AttackStart(unit_target);
@@ -840,7 +838,7 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
     if (!_player->GetGuardianPet() && !_player->GetCharm())
         return;
 
-    if (ObjectAccessor::FindPlayer(guid))
+    if (guid.IsPlayer())
         return;
 
     Creature* pet=ObjectAccessor::GetCreatureOrPetOrVehicle(*_player, guid);
