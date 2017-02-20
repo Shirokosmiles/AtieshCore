@@ -574,7 +574,6 @@ enum SMART_ACTION
     SMART_ACTION_SET_CORPSE_DELAY                   = 116,    // timer
     SMART_ACTION_DISABLE_EVADE                      = 117,    // 0/1 (1 = disabled, 0 = enabled)
     SMART_ACTION_GO_SET_GO_STATE                    = 118,    // state
-
     SMART_ACTION_SET_CAN_FLY                        = 119,    // 0/1
     SMART_ACTION_REMOVE_AURAS_BY_TYPE               = 120,    // type
     SMART_ACTION_SET_SIGHT_DIST                     = 121,    // sightDistance
@@ -585,7 +584,7 @@ enum SMART_ACTION
     SMART_ACTION_REMOVE_ALL_GAMEOBJECTS             = 126,
     SMART_ACTION_STOP_MOTION                        = 127,	  // stopMoving, movementExpired
 
-    SMART_ACTION_END                                = 128,
+    //SMART_ACTION_END                                = 128,
 	// RESERVED										= 129,
 	//SMART_ACTION_MOVE_TO_POS_TARGET					= 130,    // pointId
 	//SMART_ACTION_SET_GO_STATE						= 131,    // state
@@ -595,8 +594,8 @@ enum SMART_ACTION
 	SMART_ACTION_SET_CASTER_COMBAT_DIST				= 135,    // followDistance, resetToMax
 	//SMART_ACTION_SET_SIGHT_DIST						= 136,    // sightDistance
 	//SMART_ACTION_FLEE								= 137,    // fleeTime
-	SMART_ACTION_ADD_THREAT							= 138,    // +threat, -threat
-	SMART_ACTION_LOAD_EQUIPMENT						= 139,    // id
+	//SMART_ACTION_ADD_THREAT							= 138,    // +threat, -threat
+	//SMART_ACTION_LOAD_EQUIPMENT						= 139,    // id
 	//SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT			= 140,    // id min range, id max range
 	//SMART_ACTION_SET_HOVER							= 141,    // 0/1
 	//SMART_ACTION_ADD_IMMUNITY						= 142,    // type, id, value
@@ -1129,12 +1128,6 @@ struct SmartAction
             uint32 dist;
             uint32 reset;
         } casterDistance;
-
-        struct
-        {
-            uint32 id;
-            uint32 force;
-        } loadEquipment;
 
         struct
         {

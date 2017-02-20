@@ -1294,8 +1294,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_CORPSE_DELAY:
         case SMART_ACTION_SET_COMBAT_DISTANCE:
         case SMART_ACTION_SET_CASTER_COMBAT_DIST:
-        case SMART_ACTION_ADD_THREAT:
-        case SMART_ACTION_LOAD_EQUIPMENT:
         case SMART_ACTION_DISABLE_EVADE:
         case SMART_ACTION_SET_SIGHT_DIST:
         case SMART_ACTION_FLEE:

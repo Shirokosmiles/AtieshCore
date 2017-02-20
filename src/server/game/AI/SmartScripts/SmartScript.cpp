@@ -2519,39 +2519,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 me->GetMotionMaster()->MoveChase(me->GetVictim(), GetCasterActualDist());
             break;
         }
-        case SMART_ACTION_ADD_THREAT:
-        {
-            ObjectList* targets = GetTargets(e, unit);
-            if (!targets)
-                break;
-
-            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
-                if (IsUnit(*itr))
-                    me->AddThreat((*itr)->ToUnit(), (float)e.action.threatPCT.threatINC - (float)e.action.threatPCT.threatDEC);
-
-            delete targets;
-            break;
-        }
-        case SMART_ACTION_LOAD_EQUIPMENT:
-        {
-            ObjectList* targets = GetTargets(e, unit);
-            if (!targets)
-                break;
-
-            bool forceload = false;
-
-            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
-                if (IsCreature(*itr))
-                {
-                    if (e.action.loadEquipment.force != NULL)
-                        forceload = true;
-
-                    (*itr)->ToCreature()->LoadEquipment(e.action.loadEquipment.id, forceload);
-                }
-
-            delete targets;
-            break;
-        }
         case SMART_ACTION_DISABLE_EVADE:
         {
             if (!IsSmart())
