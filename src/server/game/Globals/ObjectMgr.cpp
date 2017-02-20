@@ -2825,6 +2825,9 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.FlagsCu &= ~ITEM_FLAGS_CU_DURATION_REAL_TIME;
         }
 
+        // Load cached data
+        itemTemplate._LoadTotalAP();
+
         ++count;
     }
     while (result->NextRow());
@@ -5462,6 +5465,14 @@ void ObjectMgr::LoadInstanceEncounters()
                     continue;
                 }
                 const_cast<CreatureTemplate*>(creatureInfo)->flags_extra |= CREATURE_FLAG_EXTRA_DUNGEON_BOSS;
+                for (uint8 diff = 1; diff < MAX_DIFFICULTY; ++diff)
+                {
+                    if (uint32 diffEntry = creatureInfo->DifficultyEntry[diff - 1])
+                    {
+                        if (CreatureTemplate const* diffInfo = GetCreatureTemplate(diffEntry))
+                            const_cast<CreatureTemplate*>(diffInfo)->flags_extra |= CREATURE_FLAG_EXTRA_DUNGEON_BOSS;
+                    }
+                }
                 break;
             }
             case ENCOUNTER_CREDIT_CAST_SPELL:
