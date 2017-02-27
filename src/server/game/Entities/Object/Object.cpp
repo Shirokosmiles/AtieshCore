@@ -331,7 +331,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     if (flags & UPDATEFLAG_LIVING)
     {
         ASSERT(unit);
-        unit->BuildMovementPacket(data);
+        unit->GetMovementInfo().WriteContentIntoPacket(data);
 
         *data << unit->GetSpeed(MOVE_WALK)
               << unit->GetSpeed(MOVE_RUN)
@@ -344,7 +344,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
               << unit->GetSpeed(MOVE_PITCH_RATE);
 
         // 0x08000000
-        if (unit->m_movementInfo.GetMovementFlags() & MOVEMENTFLAG_SPLINE_ENABLED)
+        if (unit->GetMovementInfo().GetMovementFlags() & MOVEMENTFLAG_SPLINE_ENABLED)
             Movement::PacketBuilder::WriteCreate(*unit->movespline, *data);
     }
     else
@@ -974,7 +974,7 @@ bool Object::PrintIndexError(uint32 index, bool set) const
     return false;
 }
 
-void MovementInfo::OutDebug()
+void MovementInfo::OutDebug() const
 {
     TC_LOG_DEBUG("misc", "MOVEMENT INFO");
     TC_LOG_DEBUG("misc", "%s", guid.ToString().c_str());
@@ -1002,6 +1002,86 @@ void MovementInfo::OutDebug()
 
     if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
         TC_LOG_DEBUG("misc", "splineElevation: %f", splineElevation);
+}
+
+void MovementInfo::WriteContentIntoPacket(ByteBuffer * data, bool includeGuid /* = false*/) const
+{
+    if (includeGuid)
+        *data << guid.WriteAsPacked();
+    *data << flags;
+    *data << flags2;
+    *data << time;
+    *data << pos.GetPositionX(); // not using PositionXYZOStream because I need the method to be const
+    *data << pos.GetPositionY();
+    *data << pos.GetPositionZ();
+    *data << pos.GetOrientation();
+
+    if (HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+    {
+        *data << transport.guid.WriteAsPacked();
+        *data << transport.pos.GetPositionX();
+        *data << transport.pos.GetPositionY();
+        *data << transport.pos.GetPositionZ();
+        *data << transport.pos.GetOrientation();
+        *data << transport.time;
+        *data << transport.seat;
+
+        if (HasExtraMovementFlag(MOVEMENTFLAG2_INTERPOLATED_MOVEMENT))
+            *data << transport.time2;
+    }
+
+    if (HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || HasExtraMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
+        *data << pitch;
+
+    *data << fallTime;
+
+    if (HasMovementFlag(MOVEMENTFLAG_FALLING))
+    {
+        *data << jump.zspeed;
+        *data << jump.cosAngle;
+        *data << jump.sinAngle;
+        *data << jump.xyspeed;
+    }
+
+    if (HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
+        *data << splineElevation;
+}
+
+void MovementInfo::FillContentFromPacket(ByteBuffer * data, bool includeGuid /* = false*/)
+{
+    if (includeGuid)
+        *data >> guid.ReadAsPacked();
+    *data >> flags;
+    *data >> flags2;
+    *data >> time;
+    *data >> pos.PositionXYZOStream();
+
+    if (HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+    {
+        *data >> transport.guid.ReadAsPacked();
+        *data >> transport.pos.PositionXYZOStream();
+        *data >> transport.time;
+        *data >> transport.seat;
+
+        if (HasExtraMovementFlag(MOVEMENTFLAG2_INTERPOLATED_MOVEMENT))
+            *data >> transport.time2;
+    }
+
+    if (HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (HasExtraMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING)))
+        *data >> pitch;
+
+    *data >> fallTime;
+
+    if (HasMovementFlag(MOVEMENTFLAG_FALLING))
+    {
+        *data >> jump.zspeed;
+        *data >> jump.cosAngle;
+        *data >> jump.sinAngle;
+        *data >> jump.xyspeed;
+    }
+
+    if (HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
+        *data >> splineElevation;
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(), LastUsedScriptID(0),
@@ -1261,7 +1341,7 @@ Position WorldObject::GetHitSpherePointFor(Position const& dest) const
 {
     G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ());
     G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
-    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * GetObjectSize();
+    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(GetPosition()), GetObjectSize());
 
     return Position(contactPoint.x, contactPoint.y, contactPoint.z, GetAngle(contactPoint.x, contactPoint.y));
 }
@@ -1767,8 +1847,7 @@ void Object::ForceValuesUpdateAtIndex(uint32 i)
 void Unit::BuildHeartBeatMsg(WorldPacket* data) const
 {
     data->Initialize(MSG_MOVE_HEARTBEAT, 32);
-    *data << GetPackGUID();
-    BuildMovementPacket(data);
+    GetMovementInfo().WriteContentIntoPacket(data, true);
 }
 
 void WorldObject::SendMessageToSet(WorldPacket const* data, bool self)
@@ -2574,6 +2653,69 @@ ObjectGuid WorldObject::GetTransGUID() const
     if (GetTransport())
         return GetTransport()->GetGUID();
     return ObjectGuid::Empty;
+}
+
+void WorldObject::SetTransport(Transport* transport)
+{
+    if (transport)
+    {
+        m_movementInfo.transport.guid = transport->GetGUID();
+        // could it be possible to initialize the rest of the transport data (seat, time, offset) here?
+        AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+    }
+    else // if(!m_vehicle) ?
+    {
+        m_movementInfo.transport.Reset();
+        RemoveUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+    }
+
+    m_transport = transport;
+}
+
+MovementInfo WorldObject::GetMovementInfo() const
+{
+    MovementInfo mInfo;
+    mInfo.guid = GetGUID();
+    mInfo.SetMovementFlags(GetUnitMovementFlags());
+    mInfo.SetExtraMovementFlags(GetExtraUnitMovementFlags());
+    mInfo.time = m_movementInfo.time; // @todo: one (or more) field should be created for this! lastPositionUpdateByPlayer & lastPositionUpdateByServer or just lastPositionUpdate + lastPositionUpdateByPlayer on the side.
+    mInfo.pos.Relocate
+    (
+        GetPositionX(),
+        GetPositionY(),
+        ToUnit() != NULL ? ToUnit()->GetPositionZMinusOffset() : GetPositionZ(),
+        GetOrientation()
+    );
+
+    if (GetUnitMovementFlags() & MOVEMENTFLAG_ONTRANSPORT)
+    {
+        mInfo.transport.guid = GetTransGUID();
+        mInfo.transport.pos.Relocate(GetTransOffsetX(), GetTransOffsetY(), GetTransOffsetZ(), GetTransOffsetO());
+        mInfo.transport.time = GetTransTime();
+        mInfo.transport.seat = GetTransSeat();
+
+        if (GetExtraUnitMovementFlags() & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
+            mInfo.transport.time2 = m_movementInfo.transport.time2;
+    }
+
+    if ((GetUnitMovementFlags() & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING))
+        || (m_movementInfo.flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
+        mInfo.pitch = m_movementInfo.pitch;
+
+    mInfo.SetFallTime(m_movementInfo.fallTime);
+
+    if (GetUnitMovementFlags() & MOVEMENTFLAG_FALLING)
+    {
+        mInfo.jump.zspeed = m_movementInfo.jump.zspeed;
+        mInfo.jump.sinAngle = m_movementInfo.jump.sinAngle;
+        mInfo.jump.cosAngle = m_movementInfo.jump.cosAngle;
+        mInfo.jump.xyspeed = m_movementInfo.jump.xyspeed;
+    }
+
+    if (GetUnitMovementFlags() & MOVEMENTFLAG_SPLINE_ELEVATION)
+        mInfo.splineElevation = m_movementInfo.splineElevation;
+
+    return mInfo;
 }
 
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>&, uint32, float) const;

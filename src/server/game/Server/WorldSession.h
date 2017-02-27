@@ -283,9 +283,6 @@ class TC_GAME_API WorldSession
         void ReadAddonsInfo(ByteBuffer& data);
         void SendAddonsInfo();
 
-        void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
-        void WriteMovementInfo(WorldPacket* data, MovementInfo* mi);
-
         void SendPacket(WorldPacket const* packet);
         void SendNotification(const char *format, ...) ATTR_PRINTF(2, 3);
         void SendNotification(uint32 string_id, ...);
@@ -438,6 +435,8 @@ class TC_GAME_API WorldSession
         uint32 GetLatency() const { return m_latency; }
         void SetLatency(uint32 latency) { m_latency = latency; }
         void ResetClientTimeDelay() { m_clientTimeDelay = 0; }
+        void SetClientTimeDelay(uint32 delay) { m_clientTimeDelay = delay; }
+        uint32 GetClientTimeDelay() const { return m_clientTimeDelay; }
 
         std::atomic<int32> m_timeOutTime;
 
@@ -523,6 +522,7 @@ class TC_GAME_API WorldSession
 
         void HandleMoveTeleportAck(WorldPacket& recvPacket);
         void HandleForceSpeedChangeAck(WorldPacket& recvData);
+        void HandleCollisionHeightChangeAck(WorldPacket& recvData);
 
         void HandlePingOpcode(WorldPacket& recvPacket);
         void HandleRepopRequestOpcode(WorldPacket& recvPacket);

@@ -67,7 +67,7 @@ void FleeingMovementGenerator<T>::DoInitialize(T* unit)
     init.SetFacing(frand(0.0f, 2 * static_cast<float>(M_PI)));
     init.Launch();
 
-    unit->StopMoving();
+    unit->StopMoving(true);
     unit->DisableSpline();    
 
     unit->ClearUnitState(UNIT_STATE_MOVING);
@@ -106,7 +106,7 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
         i_nextMoveTime.Update(diff);
         if (i_nextMoveTime.Passed())
         {
-            unit->StopMoving();
+            unit->StopMoving(true);
             unit->DisableSpline();
 
             // start moving
@@ -166,7 +166,7 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 
             if (unit->movespline->onTransport)
             {
-                Position& pos = unit->m_movementInfo.transport.pos;
+                Position pos = unit->GetMovementInfo().transport.pos;
                 pos.m_positionX = loc.x;
                 pos.m_positionY = loc.y;
                 pos.m_positionZ = loc.z;
@@ -188,7 +188,7 @@ void FleeingMovementGenerator<Player>::DoFinalize(Player* unit)
 {
     unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
     unit->ClearUnitState(UNIT_STATE_FLEEING | UNIT_STATE_FLEEING_MOVE);
-    unit->StopMoving();
+    unit->StopMoving(true);
     unit->DisableSpline();
 }
 

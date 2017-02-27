@@ -35,6 +35,7 @@
 #include "Log.h"
 #include "LootMgr.h"
 #include "MoveSpline.h"
+#include "MovementPacketSender.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
@@ -2807,9 +2808,7 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     if (!movespline->Initialized())
         return true;
 
-    WorldPacket data(disable ? SMSG_SPLINE_MOVE_GRAVITY_DISABLE : SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, false);
+    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_DISABLE_GRAVITY, disable);
     return true;
 }
 
@@ -2835,7 +2834,7 @@ bool Creature::SetCanFly(bool enable, bool /*packetOnly = false */)
     if (!movespline->Initialized())
         return true;
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_FLYING : SMSG_SPLINE_MOVE_UNSET_FLYING, 9);
+    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_FLYING : SMSG_SPLINE_MOVE_UNSET_FLYING, 9); //CAN_FLY & FLYING are different. I'm pretty sure this is wrong
     data << GetPackGUID();
     SendMessageToSet(&data, false);
     return true;
@@ -2849,9 +2848,7 @@ bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)
     if (!movespline->Initialized())
         return true;
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
+    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_WATERWALKING, enable);
     return true;
 }
 
@@ -2863,9 +2860,7 @@ bool Creature::SetFeatherFall(bool enable, bool packetOnly /* = false */)
     if (!movespline->Initialized())
         return true;
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_FEATHER_FALL : SMSG_SPLINE_MOVE_NORMAL_FALL);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
+    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_FALLING_SLOW, enable);
     return true;
 }
 
@@ -2884,9 +2879,7 @@ bool Creature::SetHover(bool enable, bool packetOnly /*= false*/)
         return true;
 
     //! Not always a packet is sent
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_HOVER : SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, false);
+    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_HOVER, enable);
     return true;
 }
 

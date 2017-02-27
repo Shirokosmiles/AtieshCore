@@ -20,18 +20,18 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
+#include "Language.h"
 #include "Log.h"
 #include "Corpse.h"
 #include "Player.h"
 #include "MapManager.h"
+#include "MovementPacketSender.h"
 #include "Transport.h"
 #include "Battleground.h"
 #include "WaypointMovementGenerator.h"
 #include "InstanceSaveMgr.h"
 #include "ObjectMgr.h"
 #include "Vehicle.h"
-
-#define MOVEMENT_PACKET_TIME_DELAY 0
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvData*/)
 {
@@ -250,15 +250,51 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
     GetPlayer()->ProcessDelayedOperations();
 }
 
+/*
+Handles:
+MSG_MOVE_START_FORWARD
+MSG_MOVE_START_BACKWARD
+MSG_MOVE_STOP
+MSG_MOVE_START_STRAFE_LEFT
+MSG_MOVE_START_STRAFE_RIGHT
+MSG_MOVE_STOP_STRAFE
+MSG_MOVE_JUMP
+MSG_MOVE_START_TURN_LEFT
+MSG_MOVE_START_TURN_RIGHT
+MSG_MOVE_STOP_TURN
+
+MSG_MOVE_START_PITCH_UP
+MSG_MOVE_START_PITCH_DOWN
+MSG_MOVE_STOP_PITCH
+MSG_MOVE_SET_RUN_MODE
+MSG_MOVE_SET_WALK_MODE
+MSG_MOVE_FALL_LAND
+MSG_MOVE_START_SWIM
+MSG_MOVE_STOP_SWIM
+MSG_MOVE_SET_FACING
+MSG_MOVE_SET_PITCH
+
+MSG_MOVE_HEARTBEAT
+CMSG_MOVE_FALL_RESET (?)
+CMSG_MOVE_SET_FLY (?)
+MSG_MOVE_START_ASCEND
+MSG_MOVE_STOP_ASCEND
+CMSG_MOVE_CHNG_TRANSPORT (?)
+MSG_MOVE_START_DESCEND
+*/
+
 void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 {
     uint16 opcode = recvData.GetOpcode();
-
-    Unit* mover = _player->m_unitMovedByMe;
+    Unit* mover = _player->GetUnitBeingMoved();
+    Player* plrMover = mover->ToPlayer();
 
     ASSERT(mover != NULL);                      // there must always be a mover
 
-    Player* plrMover = mover->ToPlayer();
+    /* extract packet */
+    MovementInfo movementInfo;
+    movementInfo.FillContentFromPacket(&recvData, true);
+    recvData.rfinish();                         // prevent warnings spam
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (plrMover && plrMover->IsBeingTeleported())
@@ -267,29 +303,18 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         return;
     }
 
-    /* extract packet */
-    ObjectGuid guid;
-
-    recvData >> guid.ReadAsPacked();
-
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recvData, &movementInfo);
-
-    recvData.rfinish();                         // prevent warnings spam
-
     // prevent tampered movement data
-    if (guid != mover->GetGUID())
+    if (movementInfo.guid != mover->GetGUID())
         return;
 
     if (!movementInfo.pos.IsPositionValid())
-    {
-        recvData.rfinish();                     // prevent warnings spam
         return;
-    }
+
+    /* validate (and correct if necessary) new movement packet */
+    mover->ValidateNewMovementInfo(&movementInfo);
 
     /* handle special cases */
-    if (movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+    if (movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT)) // @todo: move this stuff. CMSG_MOVE_CHNG_TRANSPORT should be handled elsewhere than here.
     {
         // We were teleported, skip packets that were broadcast before teleport
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
@@ -308,10 +333,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
         if (!Trinity::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
             movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
-        {
-            recvData.rfinish();                 // prevent warnings spam
             return;
-        }
 
         // if we boarded a transport, add us to it
         if (plrMover)
@@ -354,20 +376,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
 
-    uint32 mstime = getMSTime();
-    /*----------------------*/
-    if (m_clientTimeDelay == 0)
-        m_clientTimeDelay = mstime - movementInfo.time;
-
     /* process position-change */
+    mover->UpdateMovementInfo(movementInfo);
+
     WorldPacket data(opcode, recvData.size());
-    movementInfo.time = movementInfo.time + m_clientTimeDelay + MOVEMENT_PACKET_TIME_DELAY;
-
-    movementInfo.guid = mover->GetGUID();
-    WriteMovementInfo(&data, &movementInfo);
+    mover->GetMovementInfo().WriteContentIntoPacket(&data, true);
     mover->SendMessageToSet(&data, _player);
-
-    mover->m_movementInfo = movementInfo;
 
     // Some vehicles allow the passenger to turn by himself
     if (Vehicle* vehicle = mover->GetVehicle())
@@ -386,7 +400,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         return;
     }
 
-    mover->UpdatePosition(movementInfo.pos);
+    mover->UpdatePosition(movementInfo.pos); // unsure if this can be safely deleted since it is also called in "mover->UpdateMovementInfo(movementInfo)" but the above if blocks may influence the unit's orintation
 
     if (plrMover)                                            // nothing is charmed, or player charmed
     {
@@ -419,78 +433,143 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 {
+    Unit* mover = _player->GetUnitBeingMoved();
+    ASSERT(mover);
+
     /* extract packet */
     ObjectGuid guid;
-    uint32 unk1;
-    float  newspeed;
-
     recvData >> guid.ReadAsPacked();
 
     // now can skip not our packet
-    if (_player->GetGUID() != guid)
+    if (mover->GetGUID() != guid)
     {
         recvData.rfinish();                   // prevent warnings spam
         return;
     }
 
-    // continue parse packet
-
-    recvData >> unk1;                                      // counter or moveEvent
-
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recvData, &movementInfo);
-
-    recvData >> newspeed;
-    /*----------------*/
-
-    // client ACK send one packet for mounted/run case and need skip all except last from its
-    // in other cases anti-cheat check can be fail in false case
     UnitMoveType move_type;
-    UnitMoveType force_move_type;
-
-    static char const* move_type_name[MAX_MOVE_TYPE] = {  "Walk", "Run", "RunBack", "Swim", "SwimBack", "TurnRate", "Flight", "FlightBack", "PitchRate" };
-
     switch (recvData.GetOpcode())
     {
-        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:          move_type = MOVE_WALK;          force_move_type = MOVE_WALK;        break;
-        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:           move_type = MOVE_RUN;           force_move_type = MOVE_RUN;         break;
-        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:      move_type = MOVE_RUN_BACK;      force_move_type = MOVE_RUN_BACK;    break;
-        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:          move_type = MOVE_SWIM;          force_move_type = MOVE_SWIM;        break;
-        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:     move_type = MOVE_SWIM_BACK;     force_move_type = MOVE_SWIM_BACK;   break;
-        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:           move_type = MOVE_TURN_RATE;     force_move_type = MOVE_TURN_RATE;   break;
-        case CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK:        move_type = MOVE_FLIGHT;        force_move_type = MOVE_FLIGHT;      break;
-        case CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLIGHT_BACK;   force_move_type = MOVE_FLIGHT_BACK; break;
-        case CMSG_FORCE_PITCH_RATE_CHANGE_ACK:          move_type = MOVE_PITCH_RATE;    force_move_type = MOVE_PITCH_RATE;  break;
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:          move_type = MOVE_WALK;          break;
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:           move_type = MOVE_RUN;           break;
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:      move_type = MOVE_RUN_BACK;      break;
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:          move_type = MOVE_SWIM;          break;
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:     move_type = MOVE_SWIM_BACK;     break;
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:           move_type = MOVE_TURN_RATE;     break;
+        case CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK:        move_type = MOVE_FLIGHT;        break;
+        case CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLIGHT_BACK;   break;
+        case CMSG_FORCE_PITCH_RATE_CHANGE_ACK:          move_type = MOVE_PITCH_RATE;    break;
         default:
             TC_LOG_ERROR("network", "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", recvData.GetOpcode());
             return;
     }
 
-    // skip all forced speed changes except last and unexpected
-    // in run/mounted case used one ACK and it must be skipped.m_forced_speed_changes[MOVE_RUN} store both.
-    if (_player->m_forced_speed_changes[force_move_type] > 0)
+    uint32 movementCounter;
+    float  speedReceived;
+    MovementInfo movementInfo;
+    movementInfo.guid = guid;
+
+    recvData >> movementCounter;
+    movementInfo.FillContentFromPacket(&recvData);
+    recvData >> speedReceived;
+    //TC_LOG_ERROR("custom", "PRE-VALIDATION received speed ack. movement counter: %u. new speed rate: %f", movementCounter, speedReceived);
+
+    // verify that indeed the client is replying with the changes that were send to him
+    if (!mover->HasPendingMovementChange())
     {
-        --_player->m_forced_speed_changes[force_move_type];
-        if (_player->m_forced_speed_changes[force_move_type] > 0)
+        TC_LOG_INFO("cheat", "WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u kicked because no movement change ack was expected from this player",
+            _player->GetName().c_str(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+    }
+
+    PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
+    float speedSent = pendingChange.newValue;
+    MovementChangeType changeType = pendingChange.movementChangeType;
+    UnitMoveType moveTypeSent;
+    switch (changeType)
+    {
+        case SPEED_CHANGE_WALK:                 moveTypeSent = MOVE_WALK; break;
+        case SPEED_CHANGE_RUN:                  moveTypeSent = MOVE_RUN; break;
+        case SPEED_CHANGE_RUN_BACK:             moveTypeSent = MOVE_RUN_BACK; break;
+        case SPEED_CHANGE_SWIM:                 moveTypeSent = MOVE_SWIM; break;
+        case SPEED_CHANGE_SWIM_BACK:            moveTypeSent = MOVE_SWIM_BACK; break;
+        case RATE_CHANGE_TURN:                  moveTypeSent = MOVE_TURN_RATE; break;
+        case SPEED_CHANGE_FLIGHT_SPEED:         moveTypeSent = MOVE_FLIGHT; break;
+        case SPEED_CHANGE_FLIGHT_BACK_SPEED:    moveTypeSent = MOVE_FLIGHT_BACK; break;
+        case RATE_CHANGE_PITCH:                 moveTypeSent = MOVE_PITCH_RATE; break;
+        default:
+            TC_LOG_INFO("cheat", "WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u kicked for incorrect data returned in an ack",
+                _player->GetName().c_str(), _player->GetSession()->GetAccountId());
+            _player->GetSession()->KickPlayer();
             return;
     }
 
-    if (!_player->GetTransport() && std::fabs(_player->GetSpeed(move_type) - newspeed) > 0.01f)
+    if (pendingChange.movementCounter != movementCounter || std::fabs(speedSent - speedReceived) > 0.01f || moveTypeSent != move_type)
     {
-        if (_player->GetSpeed(move_type) > newspeed)         // must be greater - just correct
-        {
-            TC_LOG_ERROR("network", "%sSpeedChange player %s is NOT correct (must be %f instead %f), force set to correct value",
-                move_type_name[move_type], _player->GetName().c_str(), _player->GetSpeed(move_type), newspeed);
-            _player->SetSpeedRate(move_type, _player->GetSpeedRate(move_type));
-        }
-        else                                                // must be lesser - cheating
-        {
-            TC_LOG_DEBUG("misc", "Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
-                _player->GetName().c_str(), _player->GetSession()->GetAccountId(), _player->GetSpeed(move_type), newspeed);
-            _player->GetSession()->KickPlayer();
-        }
+        TC_LOG_INFO("cheat", "WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u kicked for incorrect data returned in an ack",
+            _player->GetName().c_str(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
     }
+
+    /* the client data has been verified. let's do the actual change now */
+    float newSpeedRate = speedSent / (mover->IsControlledByPlayer() ? playerBaseMoveSpeed[move_type] : baseMoveSpeed[move_type]); // is it sure that IsControlledByPlayer() should be used?
+    //TC_LOG_ERROR("custom", "POST-VALIDATION received speed ack. movement counter: %u. new speed rate: %f", movementCounter, speedReceived);
+    mover->UpdateMovementInfo(movementInfo);
+    mover->SetSpeedRateReal(move_type, newSpeedRate);
+    MovementPacketSender::SendSpeedChangeToObservers(mover, move_type, speedSent);
+    
+}
+
+void WorldSession::HandleCollisionHeightChangeAck(WorldPacket &recvData)
+{
+    Unit* mover = _player->GetUnitBeingMoved();
+    ASSERT(mover);
+    
+    /* extract packet */
+    ObjectGuid guid;
+    uint32 movementCounter;
+    MovementInfo movementInfo;
+    float  heightReceived;
+    
+    recvData >> guid.ReadAsPacked();
+    movementInfo.guid = guid;
+    recvData >> movementCounter;
+    movementInfo.FillContentFromPacket(&recvData, false);
+    recvData >> heightReceived;
+    //TC_LOG_ERROR("custom", "PRE-VALIDATION received height ack. movement counter: %u. new speed rate: %f", movementCounter, heightReceived);
+    
+    // now can skip not our packet
+    if (mover->GetGUID() != movementInfo.guid) // @todo: potential hack attempt. use disciplinary measure?
+        return;
+    
+    // verify that indeed the client is replying with the changes that were send to him
+    if (!mover->HasPendingMovementChange())
+    {
+        TC_LOG_INFO("cheat", "WorldSession::HandleCollisionHeightChangeAck: Player %s from account id %u kicked because no movement change ack was expected from this player",
+            _player->GetName().c_str(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+    }
+
+    PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
+    float heightSent = pendingChange.newValue;
+    MovementChangeType changeType = pendingChange.movementChangeType;
+        
+    if (pendingChange.movementCounter != movementCounter || changeType != SET_COLLISION_HGT || std::fabs(heightSent - heightReceived) > 0.01f)
+    {
+        TC_LOG_INFO("cheat", "WorldSession::HandleCollisionHeightChangeAck: Player %s from account id %u kicked for incorrect data returned in an ack",
+            _player->GetName().c_str(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+    }
+        
+    /* the client data has been verified. let's do the actual change now */
+    //TC_LOG_ERROR("custom", "POST-VALIDATION received height ack. movement counter: %u. new speed rate: %f", movementCounter, heightReceived);
+    mover->UpdateMovementInfo(movementInfo);
+    mover->SetCollisionHeightReal(heightSent);
+    MovementPacketSender::SendHeightChangeToObservers(mover, heightSent);
 }
 
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
@@ -508,15 +587,8 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
 void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
-
-    ObjectGuid old_mover_guid;
-    recvData >> old_mover_guid.ReadAsPacked();
-
     MovementInfo mi;
-    ReadMovementInfo(recvData, &mi);
-
-    mi.guid = old_mover_guid;
-
+    mi.FillContentFromPacket(&recvData, true);
     _player->m_movementInfo = mi;
 }
 
@@ -530,32 +602,55 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "CMSG_MOVE_KNOCK_BACK_ACK");
+    Unit* mover = _player->GetUnitBeingMoved();
+    ASSERT(mover);
 
+    /* extract packet */
     ObjectGuid guid;
-    recvData >> guid.ReadAsPacked();
+    uint32 movementCounter;
+    MovementInfo movementInfo;
 
-    if (_player->m_unitMovedByMe->GetGUID() != guid)
+    recvData >> guid.ReadAsPacked();
+    movementInfo.guid = guid;
+    recvData >> movementCounter;
+    movementInfo.FillContentFromPacket(&recvData, false);
+    //TC_LOG_ERROR("custom", "PRE-VALIDATION received knockback ack. movement counter: %u. vcos: %f, vsin: %f, speedXY: %f, speedZ: %f", movementCounter, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.zspeed);
+
+    // now can skip not our packet
+    if (mover->GetGUID() != movementInfo.guid) // @todo: potential hack attempt. use disciplinary measure?
         return;
 
-    recvData.read_skip<uint32>();                          // unk
+    // verify that indeed the client is replying with the changes that were send to him
+    if (!mover->HasPendingMovementChange())
+    {
+        TC_LOG_INFO("cheat", "WorldSession::HandleMoveKnockBackAck: Player %s from account id %u kicked because no movement change ack was expected from this player",
+            _player->GetName().c_str(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+    }
 
-    MovementInfo movementInfo;
-    ReadMovementInfo(recvData, &movementInfo);
+    PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
+    if (pendingChange.movementCounter != movementCounter || pendingChange.movementChangeType != KNOCK_BACK
+        || std::fabs(pendingChange.knockbackInfo.speedXY - movementInfo.jump.xyspeed) > 0.01f
+        || std::fabs(pendingChange.knockbackInfo.speedZ - movementInfo.jump.zspeed) > 0.01f
+        || std::fabs(pendingChange.knockbackInfo.vcos - movementInfo.jump.cosAngle) > 0.01f
+        || std::fabs(pendingChange.knockbackInfo.vsin - movementInfo.jump.sinAngle) > 0.01f)
+    {
+        TC_LOG_ERROR("custom", "RECEIVED: movement counter: %u. vcos: %f, vsin: %f, speedXY: %f, speedZ: %f", movementCounter, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.zspeed);
+        TC_LOG_ERROR("custom", "SENT: movement counter: %u. vcos: %f, vsin: %f, speedXY: %f, speedZ: %f", pendingChange.movementCounter, pendingChange.knockbackInfo.vcos, pendingChange.knockbackInfo.vsin, pendingChange.knockbackInfo.speedXY, pendingChange.knockbackInfo.speedZ);
 
-    _player->m_movementInfo = movementInfo;
 
-    WorldPacket data(MSG_MOVE_KNOCK_BACK, 66);
-    data << guid.WriteAsPacked();
-    _player->BuildMovementPacket(&data);
+        TC_LOG_INFO("cheat", "WorldSession::HandleMoveKnockBackAck: Player %s from account id %u kicked for incorrect data returned in an ack",
+            _player->GetName().c_str(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+        
+    }
 
-    // knockback specific info
-    data << movementInfo.jump.sinAngle;
-    data << movementInfo.jump.cosAngle;
-    data << movementInfo.jump.xyspeed;
-    data << movementInfo.jump.zspeed;
-
-    _player->SendMessageToSet(&data, false);
+    /* the client data has been verified. let's do the actual change now */
+    //TC_LOG_ERROR("custom", "POST-VALIDATION received knockback ack. movement counter: %u. vcos: %f, vsin: %f, speedXY: %f, speedZ: %f", movementCounter, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.zspeed);
+    mover->UpdateMovementInfo(movementInfo);
+    MovementPacketSender::SendKnockBackToObservers(mover, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.zspeed);
 }
 
 void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
@@ -568,7 +663,7 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
     recvData.read_skip<uint32>();                           // unk
 
     MovementInfo movementInfo;
-    ReadMovementInfo(recvData, &movementInfo);
+    movementInfo.FillContentFromPacket(&recvData);
 
     recvData.read_skip<uint32>();                           // unk2
 }
@@ -583,9 +678,134 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
     recvData.read_skip<uint32>();                           // unk
 
     MovementInfo movementInfo;
-    ReadMovementInfo(recvData, &movementInfo);
+    movementInfo.FillContentFromPacket(&recvData);
 
     recvData.read_skip<uint32>();                           // unk2
+}
+
+void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recvData)
+{
+    // fly mode on/off
+    TC_LOG_DEBUG("network", "WORLD: CMSG_MOVE_SET_CAN_FLY_ACK");
+
+    ObjectGuid guid;                                            // guid - unused
+    recvData >> guid.ReadAsPacked();
+
+    recvData.read_skip<uint32>();                          // unk
+
+    MovementInfo movementInfo;
+    movementInfo.guid = guid;
+    movementInfo.FillContentFromPacket(&recvData);
+
+    recvData.read_skip<float>();                           // unk2
+
+    _player->m_unitMovedByMe->SetUnitMovementFlags(movementInfo.GetMovementFlags());
+}
+
+void WorldSession::HandleFeatherFallAck(WorldPacket& recvData)
+{
+    TC_LOG_DEBUG("network", "WORLD: CMSG_MOVE_FEATHER_FALL_ACK");
+
+    // no used
+    recvData.rfinish();                       // prevent warnings spam
+}
+
+void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
+{
+    // no used
+    recvData.rfinish();                       // prevent warnings spam
+                                              /*
+                                              uint64 guid;
+                                              recvData >> guid;
+                                              // now can skip not our packet
+                                              if (_player->GetGUID() != guid)
+                                              {
+                                              recvData.rfinish();                   // prevent warnings spam
+                                              return;
+                                              }
+                                              TC_LOG_DEBUG("network", "WORLD: CMSG_FORCE_MOVE_UNROOT_ACK");
+                                              recvData.read_skip<uint32>();                          // unk
+                                              MovementInfo movementInfo;
+                                              movementInfo.guid = guid;
+                                              movementInfo.FillContentFromPacket(&recvData);
+                                              recvData.read_skip<float>();                           // unk2
+                                              */
+}
+
+void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
+{
+    // no used
+    recvData.rfinish();                       // prevent warnings spam
+                                              /*
+                                              uint64 guid;
+                                              recvData >> guid;
+                                              // now can skip not our packet
+                                              if (_player->GetGUID() != guid)
+                                              {
+                                              recvData.rfinish();                   // prevent warnings spam
+                                              return;
+                                              }
+                                              TC_LOG_DEBUG("network", "WORLD: CMSG_FORCE_MOVE_ROOT_ACK");
+                                              recvData.read_skip<uint32>();                          // unk
+                                              MovementInfo movementInfo;
+                                              movementInfo.FillContentFromPacket(&recvData);
+                                              */
+}
+
+void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
+{
+    /*  WorldSession::Update(getMSTime());*/
+    TC_LOG_DEBUG("network", "WORLD: Received CMSG_MOVE_TIME_SKIPPED");
+
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
+    recvData.read_skip<uint32>();
+    /*
+    uint64 guid;
+    uint32 time_skipped;
+    recvData >> guid;
+    recvData >> time_skipped;
+    TC_LOG_DEBUG("network", "WORLD: CMSG_MOVE_TIME_SKIPPED");
+    //// @todo
+    must be need use in Trinity
+    We substract server Lags to move time (AntiLags)
+    for exmaple
+    GetPlayer()->ModifyLastMoveTime(-int32(time_skipped));
+    */
+}
+
+void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recvData)
+{
+    uint32 time;
+    uint32 mapid;
+    float PositionX;
+    float PositionY;
+    float PositionZ;
+    float Orientation;
+
+    recvData >> time;                                      // time in m.sec.
+    recvData >> mapid;
+    recvData >> PositionX;
+    recvData >> PositionY;
+    recvData >> PositionZ;
+    recvData >> Orientation;                               // o (3.141593 = 180 degrees)
+
+    TC_LOG_DEBUG("network", "WORLD: Received CMSG_WORLD_TELEPORT");
+
+    if (GetPlayer()->IsInFlight())
+    {
+        TC_LOG_DEBUG("network", "Player '%s' (GUID: %u) in flight, ignore worldport command.",
+            GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().GetCounter());
+        return;
+    }
+
+    TC_LOG_DEBUG("network", "CMSG_WORLD_TELEPORT: Player = %s, Time = %u, map = %u, x = %f, y = %f, z = %f, o = %f",
+        GetPlayer()->GetName().c_str(), time, mapid, PositionX, PositionY, PositionZ, Orientation);
+
+    if (HasPermission(rbac::RBAC_PERM_OPCODE_WORLD_TELEPORT))
+        GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
+    else
+        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
 }
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)

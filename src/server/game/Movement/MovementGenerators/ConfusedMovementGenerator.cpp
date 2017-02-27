@@ -59,10 +59,10 @@ void ConfusedMovementGenerator<T>::DoReset(T* unit)
 {
     i_nextMoveTime.Reset(0);
 
-    if (!unit->IsAlive() || unit->IsStopped())
+    if (!unit->IsAlive() || !unit->isMoving())
         return;
 
-    unit->StopMoving();
+    unit->StopMoving(true);
     unit->DisableSpline();
     unit->AddUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
 }
@@ -131,7 +131,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 
             if (unit->movespline->onTransport)
             {
-                Position& tpos = unit->m_movementInfo.transport.pos;
+                Position tpos = unit->GetMovementInfo().transport.pos;
                 tpos.m_positionX = loc.x;
                 tpos.m_positionY = loc.y;
                 tpos.m_positionZ = loc.z;
@@ -153,7 +153,7 @@ void ConfusedMovementGenerator<Player>::DoFinalize(Player* unit)
 {
     unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
     unit->ClearUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
-    unit->StopMoving();
+    unit->StopMoving(true);
     unit->DisableSpline();
 }
 
