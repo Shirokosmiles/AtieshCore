@@ -34,6 +34,9 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
     if (!unit->IsAlive())
         return;
 
+    if (unit->IsMovementPreventedByCasting())
+        unit->CastStop();
+
     if (unit->ToCreature())
     {
         if (Unit* victim = unit->GetVictim())
@@ -50,8 +53,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
     init.SetWalk(true);
     init.Launch();
 
-    unit->ClearUnitState(UNIT_STATE_MOVING);
-    unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
+    unit->StopMoving(true);
 }
 
 template<class T>
@@ -59,11 +61,11 @@ void ConfusedMovementGenerator<T>::DoReset(T* unit)
 {
     i_nextMoveTime.Reset(0);
 
-    if (!unit->IsAlive() || !unit->isMoving())
+    if (!unit->IsAlive())
         return;
 
     unit->StopMoving(true);
-    unit->AddUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
+    unit->AddUnitState(UNIT_STATE_CONFUSED);
 }
 
 template<class T>
@@ -74,11 +76,11 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 
     if (i_nextMoveTime.Passed())
     {
-        // currently moving, update location
-        unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
-
         if (unit->movespline->Finalized())
+        {
+            unit->ClearUnitState(UNIT_STATE_CONFUSED_MOVE);
             i_nextMoveTime.Reset(urand(800, 1500));
+        }
     }
     else
     {
@@ -124,7 +126,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
             init.MovebyPath(path.GetPath());
             init.SetWalk(true);
             init.Launch();
-
+            unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
             Movement::Location loc = unit->movespline->ComputePosition();
 
             if (unit->movespline->onTransport)

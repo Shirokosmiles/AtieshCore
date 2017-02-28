@@ -43,9 +43,7 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T* owner)
         owner->StopMoving(true);
         i_nextCheckTime.Reset(100);
         return;
-    }
-
-    owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
+    }    
 
     float x, y, z;
     _getPoint(owner, x, y, z);
@@ -74,10 +72,13 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T* owner)
         return;
     }
 
+    owner->UpdateSpeed(MOVE_RUN);
+
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(path.GetPath());
     init.SetWalk(false);
     int32 traveltime = init.Launch();
+    owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
     i_nextCheckTime.Reset(traveltime + urand(800, 1500));    
 
     Movement::Location loc = owner->movespline->ComputePosition();
