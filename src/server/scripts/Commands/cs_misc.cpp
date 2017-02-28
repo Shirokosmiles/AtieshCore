@@ -1295,6 +1295,7 @@ public:
         if (!playerTarget->HasPermissionToAddItem())
         {
             // Prepare a log in DB
+            ObjectGuid sel_guid = playerTarget->GetGUID();
             PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_ITEM_ADD);
             stmt->setUInt32(0, player->GetGUID());
             stmt->setString(1, player->GetName());
@@ -1305,7 +1306,7 @@ public:
             char position[96];
             sprintf(position, "X: %f Y: %f Z: %f Map: %u", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId());
             stmt->setString(6, position); char target[96];
-            sprintf(target, "%s: %s (GUID: %u)", playerTarget->GetName(), playerTarget ? playerTarget->GetName().c_str() : "", playerTarget->GetGUID());
+            sprintf(target, "%s: %s (GUID: %u)", sel_guid.GetTypeName(), (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "", sel_guid.GetCounter());
             stmt->setString(7, target);
             stmt->setInt32(8, int32(realm.Id.Realm));
             LoginDatabase.Execute(stmt);
