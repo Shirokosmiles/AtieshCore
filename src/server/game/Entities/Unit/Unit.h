@@ -2350,8 +2350,6 @@ class TC_GAME_API Unit : public WorldObject
 
         bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
         bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
-
-    public:
         void DisableSpline();
 
     private:

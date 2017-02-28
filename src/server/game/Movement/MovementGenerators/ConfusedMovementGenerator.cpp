@@ -63,7 +63,6 @@ void ConfusedMovementGenerator<T>::DoReset(T* unit)
         return;
 
     unit->StopMoving(true);
-    unit->DisableSpline();
     unit->AddUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
 }
 
@@ -87,8 +86,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
         i_nextMoveTime.Update(diff);
         if (i_nextMoveTime.Passed())
         {
-            unit->StopMoving();
-            unit->DisableSpline();
+            unit->StopMoving(true);
 
             // start moving
             unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
@@ -151,10 +149,9 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 template<>
 void ConfusedMovementGenerator<Player>::DoFinalize(Player* unit)
 {
-    unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
-    unit->ClearUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
     unit->StopMoving(true);
-    unit->DisableSpline();
+    unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
+    unit->ClearUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);    
 }
 
 template<>
