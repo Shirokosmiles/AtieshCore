@@ -1291,21 +1291,25 @@ public:
         if (noSpaceForCount > 0)
             handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemId, noSpaceForCount);
 
-        // Prepare a log in DB
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_ITEM_ADD);
-        stmt->setUInt32(0, player->GetGUID());
-        stmt->setString(1, player->GetName());
-        stmt->setUInt32(2, handler->GetSession()->GetAccountId());
-        stmt->setUInt32(3, item->GetEntry());
-        stmt->setUInt32(4, item->GetGUID());
-        stmt->setUInt32(5, count);
-        char position[96];
-        sprintf(position, "X: %f Y: %f Z: %f Map: %u", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId());
-        stmt->setString(6, position); char target[96];
-        sprintf(target, "%s: %s (GUID: %u)", playerTarget->GetName(), playerTarget ? playerTarget->GetName().c_str() : "", playerTarget->GetGUID());
-        stmt->setString(7, target);
-        stmt->setInt32(8, int32(realm.Id.Realm));
-        LoginDatabase.Execute(stmt);
+        // if Target haven't permission to add item (just player) - need to go log for him in DB
+        if (!playerTarget->HasPermissionToAddItem())
+        {
+            // Prepare a log in DB
+            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_ITEM_ADD);
+            stmt->setUInt32(0, player->GetGUID());
+            stmt->setString(1, player->GetName());
+            stmt->setUInt32(2, handler->GetSession()->GetAccountId());
+            stmt->setUInt32(3, item->GetEntry());
+            stmt->setUInt32(4, item->GetGUID());
+            stmt->setUInt32(5, count);
+            char position[96];
+            sprintf(position, "X: %f Y: %f Z: %f Map: %u", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId());
+            stmt->setString(6, position); char target[96];
+            sprintf(target, "%s: %s (GUID: %u)", playerTarget->GetName(), playerTarget ? playerTarget->GetName().c_str() : "", playerTarget->GetGUID());
+            stmt->setString(7, target);
+            stmt->setInt32(8, int32(realm.Id.Realm));
+            LoginDatabase.Execute(stmt);
+        }
 
         return true;
     }

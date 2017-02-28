@@ -2610,6 +2610,11 @@ bool Player::CanBeGameMaster() const
     return GetSession()->HasPermission(rbac::RBAC_PERM_COMMAND_GM);
 }
 
+bool Player::HasPermissionToAddItem() const
+{
+    return GetSession()->HasPermission(rbac::RBAC_PERM_COMMAND_ADDITEM);
+}
+
 void Player::SetGMVisible(bool on)
 {
     if (on)
