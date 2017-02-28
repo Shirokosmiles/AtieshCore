@@ -322,6 +322,21 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                     areaId, areaName.c_str(), zoneName.c_str(),
                     (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
                     guid.ToString().c_str());
+
+                // Database Logging
+                ObjectGuid sel_guid = player->GetTarget();
+                PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_LOG);
+                stmt->setString(0, player->GetName());
+                stmt->setUInt32(1, m_session->GetAccountId());
+                stmt->setString(2, fullcmd.c_str());
+                char position[96];
+                sprintf(position, "X: %f Y: %f Z: %f Map: %u", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId());
+                stmt->setString(3, position);
+                char selection[96];
+                sprintf(selection, "%s: %s (GUID: %u)", sel_guid.GetTypeName(), (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "", sel_guid.GetCounter());
+                stmt->setString(4, selection);
+                stmt->setInt32(5, int32(realm.Id.Realm));
+                LoginDatabase.Execute(stmt);
             }
         }
         // some commands have custom error messages. Don't send the default one in these cases.
