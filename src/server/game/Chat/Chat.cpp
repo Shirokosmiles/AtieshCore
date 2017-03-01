@@ -326,16 +326,16 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                 // Database Logging
                 ObjectGuid sel_guid = player->GetTarget();
                 PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_LOG);
-                stmt->setString(2, player->GetName());
-                stmt->setUInt32(3, m_session->GetAccountId());
-                stmt->setString(4, fullcmd.c_str());
+                stmt->setString(0, player->GetName());
+                stmt->setUInt32(1, m_session->GetAccountId());
+                stmt->setString(2, fullcmd.c_str());
                 char position[96];
                 sprintf(position, "X: %f Y: %f Z: %f Map: %u", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId());
-                stmt->setString(5, position);
+                stmt->setString(3, position);
                 char selection[96];
                 sprintf(selection, "%s: %s (GUID: %u)", sel_guid.GetTypeName(), (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "", sel_guid.GetCounter());
-                stmt->setString(6, selection);
-                stmt->setInt32(7, int32(realm.Id.Realm));
+                stmt->setString(4, selection);
+                stmt->setInt32(5, int32(realm.Id.Realm));
                 LoginDatabase.Execute(stmt);
             }
         }

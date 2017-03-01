@@ -1297,18 +1297,18 @@ public:
             // Prepare a log in DB
             ObjectGuid sel_guid = playerTarget->GetGUID();
             PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_ITEM_ADD);
-            stmt->setUInt32(2, player->GetGUID());
-            stmt->setString(3, player->GetName());
-            stmt->setUInt32(4, handler->GetSession()->GetAccountId());
-            stmt->setUInt32(5, item->GetEntry());
-            stmt->setUInt32(6, item->GetGUID());
-            stmt->setUInt32(7, count);
+            stmt->setUInt32(0, player->GetGUID());
+            stmt->setString(1, player->GetName());
+            stmt->setUInt32(2, handler->GetSession()->GetAccountId());
+            stmt->setUInt32(3, item->GetEntry());
+            stmt->setUInt32(4, item->GetGUID());
+            stmt->setUInt32(5, count);
             char position[96];
             sprintf(position, "X: %f Y: %f Z: %f Map: %u", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId());
-            stmt->setString(8, position); char target[96];
+            stmt->setString(6, position); char target[96];
             sprintf(target, "%s: %s (GUID: %u)", sel_guid.GetTypeName(), (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "", sel_guid.GetCounter());
-            stmt->setString(9, target);
-            stmt->setInt32(10, int32(realm.Id.Realm));
+            stmt->setString(7, target);
+            stmt->setInt32(8, int32(realm.Id.Realm));
             LoginDatabase.Execute(stmt);
         }
 
