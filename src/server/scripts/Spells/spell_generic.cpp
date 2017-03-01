@@ -2212,7 +2212,7 @@ public:
 private:
     Targets _effTarget;
     uint8 _count;
-}
+};
 
 {
     SPELL_FALL_DOWN = 6869
