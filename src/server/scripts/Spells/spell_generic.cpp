@@ -2212,6 +2212,46 @@ public:
 private:
     Targets _effTarget;
     uint8 _count;
+}
+
+{
+    SPELL_FALL_DOWN = 6869
+};
+
+// 6870 Moss Covered Feet
+// 31399 Moss Covered Feet
+class spell_gen_moss_covered_feet : public SpellScriptLoader
+{
+    public:
+        spell_gen_moss_covered_feet() : SpellScriptLoader("spell_gen_moss_covered_feet") { }
+
+        class spell_gen_moss_covered_feet_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_gen_moss_covered_feet_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_FALL_DOWN))
+                    return false;
+                return true;
+            }
+
+            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            {
+                PreventDefaultAction();
+                eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_FALL_DOWN, true, nullptr, aurEff);
+            }
+
+            void Register() override
+            {
+                OnEffectProc += AuraEffectProcFn(spell_gen_moss_covered_feet_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_gen_moss_covered_feet_AuraScript();
+        }
 };
 
 enum Netherbloom
@@ -4586,6 +4626,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_select_target_count("spell_gen_select_target_count_7_1", TARGET_UNIT_SRC_AREA_ENTRY, 1);
     new spell_gen_select_target_count("spell_gen_select_target_count_24_1", TARGET_UNIT_CONE_ENEMY_24, 1);
     //new spell_gen_select_target_count("spell_gen_select_target_count_30_1", TARGET_UNIT_SRC_AREA_ALLY, 1); will use in Gundrak
+    new spell_gen_moss_covered_feet();
     new spell_gen_netherbloom();
     new spell_gen_nightmare_vine();
     new spell_gen_obsidian_armor();
