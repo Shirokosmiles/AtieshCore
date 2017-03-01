@@ -2214,6 +2214,7 @@ private:
     uint8 _count;
 };
 
+enum MossCoveredFeet
 {
     SPELL_FALL_DOWN = 6869
 };
