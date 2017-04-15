@@ -24,6 +24,8 @@
 extern Position const ObservationRingKeepersPos[4];
 extern Position const YSKeepersPos[4];
 extern Position const AlgalonLandPos;
+extern CreatureBoundary const ThorimInArenaBoundaries;
+extern CreatureBoundary const ThorimOutOfArenaBoundaries;
 
 enum UlduarBosses
 {
@@ -309,7 +311,7 @@ enum UlduarGameObjects
     GO_GIFT_OF_THE_OBSERVER_25              = 194822,
 };
 
-enum EventIds
+enum UUEventIds
 {
     EVENT_TOWER_OF_STORM_DESTROYED      = 21031,
     EVENT_TOWER_OF_FROST_DESTROYED      = 21032,
@@ -422,7 +424,7 @@ enum UlduarData
     DATA_HODIR_YS,
     DATA_THORIM_YS,
     DATA_MIMIRON_YS,
-    DATA_ILLUSION,
+    DATA_ILLUSION, // = 38 used by conditions
     DATA_DRIVE_ME_CRAZY,
     DATA_KEEPERS_COUNT,
 
@@ -466,13 +468,13 @@ enum UlduarAchievementData
     // FL Achievement boolean
     DATA_UNBROKEN               = 29052906, // 2905, 2906 are achievement IDs,
     MAX_HERALD_ARMOR_ITEMLEVEL  = 226,
-    MAX_HERALD_WEAPON_ITEMLEVEL = 232
+    MAX_HERALD_WEAPON_ITEMLEVEL = 232    
 };
 
 enum UlduarSharedSpells
 {
     SPELL_LUMBERJACKED_CREDIT = 65296,
-    SPELL_TELEPORT_KEEPER_VISUAL = 62940 // used by keepers
+    SPELL_TELEPORT_KEEPER_VISUAL = 62940  // used by keepers
 };
 
 enum UlduarEvents
@@ -499,19 +501,19 @@ AI* GetUlduarAI(T* obj)
 
 class KeeperDespawnEvent : public BasicEvent
 {
-    public:
-        KeeperDespawnEvent(Creature* owner, uint32 despawnTimerOffset = 500) : _owner(owner), _despawnTimer(despawnTimerOffset) { }
-
-        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
-        {
-            _owner->CastSpell(_owner, SPELL_TELEPORT_KEEPER_VISUAL);
-            _owner->DespawnOrUnsummon(1000 + _despawnTimer);
-            return true;
-        }
-
-    private:
-        Creature* _owner;
-        uint32 _despawnTimer;
+public:
+    KeeperDespawnEvent(Creature* owner, uint32 despawnTimerOffset = 500) : _owner(owner), _despawnTimer(despawnTimerOffset) { }
+        
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    {
+        _owner->CastSpell(_owner, SPELL_TELEPORT_KEEPER_VISUAL);
+        _owner->DespawnOrUnsummon(1000 + _despawnTimer);
+        return true;
+    }
+        
+private:
+    Creature* _owner;
+    uint32 _despawnTimer;
 };
 
 class PlayerOrPetCheck

@@ -1204,7 +1204,7 @@ void GameObject::UseDoorOrButton(uint32 time_to_restore, bool alternative /* = f
     SwitchDoorOrButton(true, alternative);
     SetLootState(GO_ACTIVATED, user);
 
-    m_cooldownTime = GameTime::GetGameTimeMS() + time_to_restore;
+    m_cooldownTime = time_to_restore ? (GameTime::GetGameTimeMS() + time_to_restore) : 0;
 }
 
 void GameObject::SetGoArtKit(uint8 kit)
@@ -1952,6 +1952,15 @@ void GameObject::EventInform(uint32 eventId, WorldObject* invoker /*= nullptr*/)
     if (BattlegroundMap* bgMap = GetMap()->ToBattlegroundMap())
         if (bgMap->GetBG())
             bgMap->GetBG()->ProcessEvent(this, eventId, invoker);
+}
+
+uint32 GameObject::GetScriptId() const
+{
+    if (GameObjectData const* gameObjectData = GetGOData())
+        if (uint32 scriptId = gameObjectData->ScriptId)
+            return scriptId;
+
+    return GetGOInfo()->ScriptId;
 }
 
 // overwrite WorldObject function for proper name localization

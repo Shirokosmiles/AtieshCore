@@ -635,7 +635,7 @@ class boss_flame_leviathan_seat : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return GetInstanceAI<boss_flame_leviathan_seatAI>(creature);
+            return GetUlduarAI<boss_flame_leviathan_seatAI>(creature);
         }
 };
 
@@ -691,7 +691,7 @@ class boss_flame_leviathan_defense_cannon : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_flame_leviathan_defense_cannonAI(creature);
+            return GetUlduarAI<boss_flame_leviathan_defense_cannonAI>(creature);
         }
 };
 
@@ -720,7 +720,7 @@ class boss_flame_leviathan_defense_turret : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_flame_leviathan_defense_turretAI(creature);
+            return GetUlduarAI<boss_flame_leviathan_defense_turretAI>(creature);
         }
 };
 
@@ -757,7 +757,7 @@ class boss_flame_leviathan_overload_device : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_flame_leviathan_overload_deviceAI(creature);
+            return GetUlduarAI<boss_flame_leviathan_overload_deviceAI>(creature);
         }
 };
 
@@ -788,7 +788,7 @@ class boss_flame_leviathan_safety_container : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_flame_leviathan_safety_containerAI(creature);
+            return GetUlduarAI<boss_flame_leviathan_safety_containerAI>(creature);
         }
 };
 
@@ -857,7 +857,7 @@ class npc_mechanolift : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_mechanoliftAI(creature);
+            return GetUlduarAI<npc_mechanoliftAI>(creature);
         }
 };
 
@@ -891,7 +891,7 @@ class npc_pool_of_tar : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_pool_of_tarAI(creature);
+            return GetUlduarAI<npc_pool_of_tarAI>(creature);
         }
 };
 
@@ -926,7 +926,7 @@ class npc_colossus : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return GetInstanceAI<npc_colossusAI>(creature);
+            return GetUlduarAI<npc_colossusAI>(creature);
         }
 };
 
@@ -964,7 +964,7 @@ class npc_thorims_hammer : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_thorims_hammerAI(creature);
+            return GetUlduarAI<npc_thorims_hammerAI>(creature);
         }
 };
 
@@ -972,11 +972,6 @@ class npc_mimirons_inferno : public CreatureScript
 {
 public:
     npc_mimirons_inferno() : CreatureScript("npc_mimirons_inferno") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_mimirons_infernoAI(creature);
-    }
 
     struct npc_mimirons_infernoAI : public npc_escortAI
     {
@@ -1030,6 +1025,10 @@ public:
         }
     };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetUlduarAI<npc_mimirons_infernoAI>(creature);
+    }
 };
 
 class npc_hodirs_fury : public CreatureScript
@@ -1066,7 +1065,7 @@ class npc_hodirs_fury : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_hodirs_furyAI(creature);
+            return GetUlduarAI<npc_hodirs_furyAI>(creature);
         }
 };
 
@@ -1115,7 +1114,7 @@ class npc_freyas_ward : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_freyas_wardAI(creature);
+            return GetUlduarAI<npc_freyas_wardAI>(creature);
         }
 };
 
@@ -1163,7 +1162,7 @@ class npc_freya_ward_summon : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_freya_ward_summonAI(creature);
+            return GetUlduarAI<npc_freya_ward_summonAI>(creature);
         }
 };
 
@@ -1246,7 +1245,7 @@ class npc_lorekeeper : public CreatureScript
                     player->PlayerTalkClass->SendCloseGossip();
                     _instance->instance->LoadGrid(364, -16); // make sure leviathan is loaded
 
-                    if (Creature* leviathan = _instance->instance->GetCreature(_instance->GetGuidData(BOSS_LEVIATHAN)))
+                    if (Creature* leviathan = _instance->GetCreature(BOSS_LEVIATHAN))
                     {
                         leviathan->AI()->DoAction(ACTION_START_HARD_MODE);
                         me->SetVisible(false);
@@ -1270,7 +1269,7 @@ class npc_lorekeeper : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_lorekeeperAI(creature);
+            return GetUlduarAI<npc_lorekeeperAI>(creature);
         }
 };
 

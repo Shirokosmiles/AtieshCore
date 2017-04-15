@@ -504,19 +504,16 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
         case SPEED_CHANGE_FLIGHT_BACK_SPEED:    moveTypeSent = MOVE_FLIGHT_BACK; break;
         case RATE_CHANGE_PITCH:                 moveTypeSent = MOVE_PITCH_RATE; break;
         default:
-            TC_LOG_INFO("cheat", "WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u kicked for incorrect data returned in an ack",
-                _player->GetName().c_str(), _player->GetSession()->GetAccountId());
-            _player->GetSession()->KickPlayer();
             return;
     }
 
-    if (pendingChange.movementCounter != movementCounter || std::fabs(speedSent - speedReceived) > 0.01f || moveTypeSent != move_type)
+    /* if (pendingChange.movementCounter != movementCounter || std::fabs(speedSent - speedReceived) > 0.01f || moveTypeSent != move_type)
     {
         TC_LOG_INFO("cheat", "WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u kicked for incorrect data returned in an ack",
             _player->GetName().c_str(), _player->GetSession()->GetAccountId());
         _player->GetSession()->KickPlayer();
         return;
-    }
+    } */
 
     /* the client data has been verified. let's do the actual change now */
     float newSpeedRate = speedSent / (mover->IsControlledByPlayer() ? playerBaseMoveSpeed[move_type] : baseMoveSpeed[move_type]); // is it sure that IsControlledByPlayer() should be used?
@@ -562,13 +559,13 @@ void WorldSession::HandleCollisionHeightChangeAck(WorldPacket &recvData)
     float heightSent = pendingChange.newValue;
     MovementChangeType changeType = pendingChange.movementChangeType;
         
-    if (pendingChange.movementCounter != movementCounter || changeType != SET_COLLISION_HGT || std::fabs(heightSent - heightReceived) > 0.01f)
+    /* if (pendingChange.movementCounter != movementCounter || changeType != SET_COLLISION_HGT || std::fabs(heightSent - heightReceived) > 0.01f)
     {
         TC_LOG_INFO("cheat", "WorldSession::HandleCollisionHeightChangeAck: Player %s from account id %u kicked for incorrect data returned in an ack",
             _player->GetName().c_str(), _player->GetSession()->GetAccountId());
         _player->GetSession()->KickPlayer();
         return;
-    }
+    } */
         
     /* the client data has been verified. let's do the actual change now */
     //TC_LOG_ERROR("custom", "POST-VALIDATION received height ack. movement counter: %u. new speed rate: %f", movementCounter, heightReceived);

@@ -37,7 +37,7 @@ void MovementPacketSender::SendHeightChangeToMover(Unit* unit, float newHeight)
 
     unit->PushPendingMovementChange(pendingChange);
 
-    TC_LOG_ERROR("entities.unit", "MovementPacketSender::SendHeightChangeToMover called. new height: %f", newHeight);
+    //TC_LOG_ERROR("entities.unit", "MovementPacketSender::SendHeightChangeToMover called. new height: %f", newHeight);
 
     WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, unit->GetPackGUID().size() + 4 + 4);
     data << unit->GetPackGUID();
@@ -55,7 +55,7 @@ void MovementPacketSender::SendHeightChangeToObservers(Unit* unit, float newHeig
         return;
     }
 
-    TC_LOG_ERROR("entities.unit", "MovementPacketSender::SendHeightChangeToObservers called. new height: %f", newHeight);
+    //TC_LOG_ERROR("entities.unit", "MovementPacketSender::SendHeightChangeToObservers called. new height: %f", newHeight);
 
     WorldPacket data(MSG_MOVE_SET_COLLISION_HGT, 8 + 30 + 4);
     unit->GetMovementInfo().WriteContentIntoPacket(&data, true);

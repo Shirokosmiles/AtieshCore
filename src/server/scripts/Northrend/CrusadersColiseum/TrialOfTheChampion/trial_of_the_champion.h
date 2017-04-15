@@ -69,7 +69,7 @@ float const allianceOrientation = 3.114f; // Facing towards horde spectators
 float const gateOrientation = 1.582f; // Facing towards main gate
 float const centerOrientation = 4.714f; // Facing towards the center of arena
 
-enum DataTypes
+enum TCData64
 {
     // Encounter States/Boss GUIDs
     DATA_GRAND_CHAMPIONS            = 0,
@@ -116,7 +116,7 @@ enum DataTypes
     DATA_BLACK_KNIGHT_VEHICLE
 };
 
-enum Creatures
+enum TCCreatureIds
 {
     // Horde Champions
     NPC_MOKRA                                       = 35572,
@@ -171,7 +171,7 @@ enum Creatures
     NPC_SPECTATOR_GNOME                             = 34910
 };
 
-enum GameObjects
+enum TCGameObjects
 {
     GO_MAIN_GATE                                    = 195647,
 
@@ -185,7 +185,7 @@ enum GameObjects
     GO_CONFESSOR_S_CACHE_H                          = 195324
 };
 
-enum Vehicles
+enum TCVehicles
 {
     // Grand Champions Alliance Vehicles
     VEHICLE_MARSHAL_JACOB_ALERIUS_MOUNT             = 35637,

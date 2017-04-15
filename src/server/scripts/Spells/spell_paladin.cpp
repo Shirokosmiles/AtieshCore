@@ -132,7 +132,8 @@ enum PaladinSpells
 
 enum PaladinSpellIcons
 {
-    PALADIN_ICON_ID_RETRIBUTION_AURA             = 555
+    PALADIN_ICON_ID_RETRIBUTION_AURA             = 555,
+    PALADIN_ICON_ID_HAMMER_OF_THE_RIGHTEOUS      = 3023
 };
 
 // 31850 - Ardent Defender
@@ -1591,10 +1592,11 @@ class spell_pal_judgement_of_wisdom_mana : public SpellScriptLoader
             {
                 PreventDefaultAction();
 
-                Unit* caster = eventInfo.GetProcTarget();
-                int32 amount = CalculatePct(static_cast<int32>(caster->GetCreateMana()), aurEff->GetAmount());
+                SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA);
 
-                caster->CastCustomSpell(SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true, nullptr, aurEff, GetCasterGUID());
+                Unit* caster = eventInfo.GetProcTarget();
+                int32 const amount = CalculatePct(static_cast<int32>(caster->GetCreateMana()), spellInfo->Effects[EFFECT_0].CalcValue());
+                caster->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, amount, (Unit*)nullptr, true, nullptr, aurEff, GetCasterGUID());
             }
 
             void Register() override
@@ -2105,7 +2107,12 @@ class spell_pal_seal_of_vengeance : public SpellScriptLoader
                 PreventDefaultAction();
 
                 if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_MELEE_AUTO_ATTACK))
-                    return;
+                {
+                    // Patch 3.2.0 Notes: Only auto-attacks and Hammer of the Righteous can place the debuff on the paladin's current target(s).
+                    SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+                    if (!spellInfo || spellInfo->SpellIconID != PALADIN_ICON_ID_HAMMER_OF_THE_RIGHTEOUS)
+                        return;
+                }
 
                 // don't cast triggered, spell already has SPELL_ATTR4_CAN_CAST_WHILE_CASTING attr
                 eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), DoTSpell, TRIGGERED_DONT_RESET_PERIODIC_TIMER, nullptr, aurEff);

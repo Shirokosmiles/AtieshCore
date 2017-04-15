@@ -28,6 +28,20 @@ namespace Movement
 {
     UnitMoveType SelectSpeedType(uint32 moveFlags)
     {
+        if (moveFlags & MOVEMENTFLAG_STRAFE_LEFT)
+        {
+            if (moveFlags & MOVEMENTFLAG_WALKING)
+                return MOVE_WALK;
+            else
+                return MOVE_RUN;
+        }
+        if (moveFlags & MOVEMENTFLAG_STRAFE_RIGHT)
+        {
+            if (moveFlags & MOVEMENTFLAG_WALKING)
+                return MOVE_WALK;
+            else
+                return MOVE_RUN;
+        }
         if (moveFlags & MOVEMENTFLAG_FLYING)
         {
             if (moveFlags & MOVEMENTFLAG_BACKWARD /*&& speed_obj.flight >= speed_obj.flight_back*/)
@@ -65,7 +79,7 @@ namespace Movement
         // there is a big chance that current position is unknown if current state is not finalized, need compute it
         // this also allows CalculatePath spline position and update map position in much greater intervals
         // Don't compute for transport movement if the unit is in a motion between two transports
-        if (!move_spline.Finalized() && move_spline.onTransport == transport)
+        if (move_spline.Initialized() && !move_spline.Finalized() && move_spline.onTransport == transport)
             real_position = move_spline.ComputePosition();
         else
         {
@@ -91,6 +105,8 @@ namespace Movement
         move_spline.onTransport = transport;
 
         uint32 moveFlags = unit->GetMovementInfo().GetMovementFlags();
+        if (!args.HasRun)
+            moveFlags = MOVEMENTFLAG_NONE;
         moveFlags |= (MOVEMENTFLAG_SPLINE_ENABLED|MOVEMENTFLAG_FORWARD);
 
         if (moveFlags & MOVEMENTFLAG_ROOT)
@@ -102,7 +118,16 @@ namespace Movement
             moveFlags &= ~MOVEMENTFLAG_WALKING;
 
         if (!args.HasVelocity)
-            args.velocity = unit->GetSpeed(SelectSpeedType(moveFlags));
+        {
+            if (!args.HasRun)
+                args.velocity = unit->GetSpeed(SelectSpeedType(moveFlags));
+            else
+            {
+                float speed = unit->GetSpeed(MOVE_RUN);                
+                args.velocity = speed;
+                //TC_LOG_ERROR("server", "MoveSplineInit::args.HasRun::args.velocity speed = %f", speed);
+            }
+        }
 
         if (!args.Validate(unit))
             return 0;
@@ -130,12 +155,12 @@ namespace Movement
         MoveSpline& move_spline = *unit->movespline;
 
         // No need to stop if we are not moving
-        if (move_spline.Finalized())
+        if (!unit->isMoving())
             return;
 
         bool transport = unit->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && unit->GetTransGUID();
         Location loc;
-        if (move_spline.onTransport == transport)
+        if (move_spline.Initialized() && !move_spline.Finalized() && move_spline.onTransport == transport)
             loc = move_spline.ComputePosition();
         else
         {
