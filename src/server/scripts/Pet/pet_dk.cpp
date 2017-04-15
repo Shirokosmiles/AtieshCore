@@ -82,6 +82,25 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                     }
             }
 
+            void UpdateAI(uint32 diff) override
+            {
+                CasterAI::UpdateAI(diff);
+                Unit* owner = me->GetOwner();
+                if (!owner)
+                    return;
+
+                Unit* target = me->GetVictim();
+                if (!target)
+                    return;
+
+                Unit* targetdk = owner->GetVictim();
+                if (!targetdk)
+                    return;
+
+                if (targetdk != target)
+                    me->Attack(targetdk, false);
+            }
+
             void JustDied(Unit* /*killer*/) override
             {
                 // Stop Feeding Gargoyle when it dies
@@ -113,12 +132,12 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 me->SetSpeedRate(MOVE_RUN, 0.75f);
                 float x = me->GetPositionX() + 20 * std::cos(me->GetOrientation());
                 float y = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
-                float z = me->GetPositionZ() + 40;
+                float z = source->GetPositionZ() + 2.5f;
                 me->GetMotionMaster()->Clear(false);
                 me->GetMotionMaster()->MovePoint(0, x, y, z);
 
                 // Despawn as soon as possible
-                me->DespawnOrUnsummon(Seconds(4));
+                me->DespawnOrUnsummon(Seconds(5));
             }
         };
 

@@ -3010,6 +3010,60 @@ class spell_dk_dancing_rune_weapon : public SpellScriptLoader
         }
 };
 
+class spell_dk_summon_gargoyle : public SpellScriptLoader
+{
+public:
+    spell_dk_summon_gargoyle() : SpellScriptLoader("spell_dk_summon_gargoyle") { }
+
+    class spell_dk_summon_gargoyle_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_summon_gargoyle_SpellScript);
+
+        bool Load() override
+        {
+            offset.m_positionX = frand(-5.0f, 5.0f);
+            offset.m_positionY = frand(-5.0f, 5.0f);
+            offset.m_positionZ = 40.0f;
+            return true;
+        }
+
+        void HandleHitTarget(SpellEffIndex /*effIndex*/)
+        {
+            WorldLocation summonPos = *GetExplTargetDest();
+            summonPos.RelocateOffset(offset);
+            SetExplTargetDest(summonPos);
+            GetHitDest()->RelocateOffset(offset);
+        }
+
+        void HandleLaunchTarget(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* target = GetExplTargetUnit())
+            {
+                if (!GetCaster()->isInFront(target, 2.5f) && GetCaster()->IsWithinMeleeRange(target))
+                {
+                    float o = GetCaster()->GetOrientation();
+                    offset.m_positionX = (7 * cos(o)) + target->GetCombatReach();
+                    offset.m_positionY = (7 * sin(o)) + target->GetCombatReach();
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_dk_summon_gargoyle_SpellScript::HandleHitTarget, EFFECT_0, SPELL_EFFECT_SUMMON);
+            OnEffectLaunchTarget += SpellEffectFn(spell_dk_summon_gargoyle_SpellScript::HandleLaunchTarget, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+        }
+
+    private:
+        Position offset;
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_summon_gargoyle_SpellScript();
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_acclimation();
@@ -3063,4 +3117,5 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_raise_ally();
     new spell_dk_ghoul_thrash();
     new spell_dk_dancing_rune_weapon();
+    new spell_dk_summon_gargoyle();
 }
