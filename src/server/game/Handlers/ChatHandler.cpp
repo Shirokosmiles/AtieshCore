@@ -303,7 +303,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             if (!normalizePlayerName(to))
             {
                 SendPlayerNotFoundNotice(to);
-                break;
+                return;
             }
             
             Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
