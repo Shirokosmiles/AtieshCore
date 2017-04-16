@@ -380,7 +380,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
             }
             else if (pet->ToPet() && (result == SPELL_FAILED_LINE_OF_SIGHT || SPELL_FAILED_OUT_OF_RANGE))
             {
-                unit_target = spell->m_targets.GetUnitTarget();
                 bool haspositiveeffect = false;
 
                 // search positive effects for spell
@@ -395,7 +394,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                 if (pet->isPossessed() || pet->IsVehicle()) /// @todo: confirm this check
                     Spell::SendCastResult(GetPlayer(), spellInfo, 0, result);
-                else if (GetPlayer()->IsFriendlyTo(unit_target) && !haspositiveeffect)
+                else if (unit_target && GetPlayer()->IsFriendlyTo(unit_target) && !haspositiveeffect)
                     spell->SendPetCastResult(SPELL_FAILED_TARGET_FRIENDLY);
                 else
                     spell->SendPetCastResult(SPELL_FAILED_DONT_REPORT);                
