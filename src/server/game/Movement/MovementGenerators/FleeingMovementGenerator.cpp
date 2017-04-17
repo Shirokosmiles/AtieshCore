@@ -152,7 +152,7 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
 
     if (owner->movespline->onTransport)
     {
-        Position pos = owner->GetMovementInfo().transport.pos;
+        Position& pos = owner->m_movementInfo.transport.pos;
         pos.m_positionX = loc.x;
         pos.m_positionY = loc.y;
         pos.m_positionZ = loc.z;

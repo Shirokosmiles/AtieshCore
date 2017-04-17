@@ -240,7 +240,7 @@ public:
             }
         }
 
-        void CastGravityLapseFly()
+        void CastGravityLapseFly()                              // Use Fly Packet hack for now as players can't cast "fly" spells unless in map 530. Has to be done a while after they get knocked into the air...
         {
             ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
             ThreatContainer::StorageType::const_iterator i = threatlist.begin();
@@ -251,7 +251,11 @@ public:
                 {
                     // Also needs an exception in spell system.
                     unit->CastSpell(unit, SPELL_GRAVITY_LAPSE_FLY, true, 0, 0, me->GetGUID());
-                    unit->SetCanFly(true);
+                    // Use packet hack
+                    WorldPacket data(SMSG_MOVE_SET_CAN_FLY, 12);
+                    data << unit->GetPackGUID();
+                    data << uint32(0);
+                    unit->SendMessageToSet(&data, true);
                 }
             }
         }
@@ -268,7 +272,10 @@ public:
                     unit->RemoveAurasDueToSpell(SPELL_GRAVITY_LAPSE_FLY);
                     unit->RemoveAurasDueToSpell(SPELL_GRAVITY_LAPSE_DOT);
 
-                    unit->SetCanFly(false);
+                    WorldPacket data(SMSG_MOVE_UNSET_CAN_FLY, 12);
+                    data << unit->GetPackGUID();
+                    data << uint32(0);
+                    unit->SendMessageToSet(&data, true);
                 }
             }
         }

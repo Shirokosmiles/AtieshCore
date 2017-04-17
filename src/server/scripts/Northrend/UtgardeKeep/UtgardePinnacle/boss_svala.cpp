@@ -325,7 +325,7 @@ class boss_svala : public CreatureScript
                             pos.m_positionY = me->GetHomePosition().GetPositionY();
                             pos.m_positionZ = 90.6065f;
                             me->GetMotionMaster()->MoveLand(0, pos);
-                            me->SetDisableGravity(false);
+                            me->SetDisableGravity(false, true);
                             me->SetHover(true);
                             events.ScheduleEvent(EVENT_INTRO_DESPAWN_ARTHAS, 3 * IN_MILLISECONDS, 0, INTRO);
                             break;

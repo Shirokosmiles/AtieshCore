@@ -34,10 +34,15 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recvData)
         return;
     }
 
-    MovementInfo mi;
-    mi.FillContentFromPacket(&recvData, true);
+    ObjectGuid guid;
 
-    _player->UpdateMovementInfo(mi);
+    recvData >> guid.ReadAsPacked();
+
+    MovementInfo mi;
+    mi.guid = guid;
+    ReadMovementInfo(recvData, &mi);
+
+    _player->m_movementInfo = mi;
 
     _player->ExitVehicle();
 }
@@ -72,9 +77,12 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recvData)
             break;
         case CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE:
         {
+            ObjectGuid guid;        // current vehicle guid
+            recvData >> guid.ReadAsPacked();
+
             MovementInfo movementInfo;
-            movementInfo.FillContentFromPacket(&recvData, true);
-            vehicle_base->UpdateMovementInfo(movementInfo);
+            ReadMovementInfo(recvData, &movementInfo);
+            vehicle_base->m_movementInfo = movementInfo;
 
             ObjectGuid accessory;        //  accessory guid
             recvData >> accessory.ReadAsPacked();
@@ -82,7 +90,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recvData)
             int8 seatId;
             recvData >> seatId;
 
-            if (vehicle_base->GetGUID() != movementInfo.guid)
+            if (vehicle_base->GetGUID() != guid)
                 return;
 
             if (!accessory)

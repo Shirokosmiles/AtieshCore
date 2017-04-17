@@ -365,6 +365,14 @@ struct EnchantDuration
 typedef std::list<EnchantDuration> EnchantDurationList;
 typedef std::list<Item*> ItemDurationList;
 
+enum PlayerMovementType
+{
+    MOVE_ROOT       = 1,
+    MOVE_UNROOT     = 2,
+    MOVE_WATER_WALK = 3,
+    MOVE_LAND_WALK  = 4
+};
+
 enum DrunkenState
 {
     DRUNKEN_SOBER   = 0,
@@ -1826,6 +1834,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool own_team_only);
         void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) override;
 
+        void SendTeleportAckPacket();
+
         Corpse* GetCorpse() const;
         void SpawnCorpseBones(bool triggerSave = true);
         Corpse* CreateCorpse();
@@ -1851,6 +1861,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void UpdateMirrorTimers();
         void StopMirrorTimers();
         bool IsMirrorTimerActive(MirrorTimerType type) const;
+
+        void SetMovement(PlayerMovementType pType);
 
         bool CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone) const;
 
@@ -2292,7 +2304,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool IsInWhisperWhiteList(ObjectGuid guid);
         void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
-        bool SetDisableGravity(bool apply, bool packetOnly /* = false */) override;
+        bool SetDisableGravity(bool disable, bool packetOnly /* = false */) override;
         bool SetCanFly(bool apply, bool packetOnly = false) override;
         bool SetWaterWalking(bool apply, bool packetOnly = false) override;
         bool SetFeatherFall(bool apply, bool packetOnly = false) override;
@@ -2301,7 +2313,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
 
         //! Return collision height sent to client
-        float ComputeCollisionHeight(bool mounted) const;
+        float GetCollisionHeight(bool mounted) const;
 
         std::string GetMapAreaAndZoneString() const;
         std::string GetCoordsMapAreaAndZoneString() const;

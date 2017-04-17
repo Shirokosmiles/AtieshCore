@@ -595,50 +595,6 @@ enum UnitMoveType
 TC_GAME_API extern float baseMoveSpeed[MAX_MOVE_TYPE];
 TC_GAME_API extern float playerBaseMoveSpeed[MAX_MOVE_TYPE];
 
-#define MOVEMENT_PACKET_TIME_DELAY 0
-
-enum MovementChangeType
-{
-    ROOT,
-    WATER_WALK,
-    SET_HOVER,
-    SET_CAN_FLY,
-    SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY,
-    FEATHER_FALL,
-    GRAVITY_DISABLE,
-
-    SPEED_CHANGE_WALK,
-    SPEED_CHANGE_RUN,
-    SPEED_CHANGE_RUN_BACK,
-    SPEED_CHANGE_SWIM,
-    SPEED_CHANGE_SWIM_BACK,
-    RATE_CHANGE_TURN,
-    SPEED_CHANGE_FLIGHT_SPEED,
-    SPEED_CHANGE_FLIGHT_BACK_SPEED,
-    RATE_CHANGE_PITCH,
-
-    SET_COLLISION_HGT,
-    TELEPORT,
-    KNOCK_BACK
-};
-
-struct PlayerMovementPendingChange
-{
-    uint32 movementCounter;
-    MovementChangeType movementChangeType;
-
-    float newValue; // used if speed or height change
-    bool apply; // used if movement flag change
-    Position pos; // used if teleport
-    struct KnockbackInfo
-    {
-        float vcos; 
-        float vsin; 
-        float speedXY;
-        float speedZ;
-    } knockbackInfo; // used if knockback
-};
-
 enum CombatRating
 {
     CR_WEAPON_SKILL             = 0,
@@ -831,23 +787,23 @@ enum MovementFlags
 
 enum MovementFlags2
 {
-    MOVEMENTFLAG2_NONE                                  = 0x00000000,
-    MOVEMENTFLAG2_NO_STRAFE                             = 0x00000001,
-    MOVEMENTFLAG2_NO_JUMPING                            = 0x00000002,
-    MOVEMENTFLAG2_UNK3                                  = 0x00000004,   // Overrides various clientside checks
-    MOVEMENTFLAG2_FULL_SPEED_TURNING                    = 0x00000008,
-    MOVEMENTFLAG2_FULL_SPEED_PITCHING                   = 0x00000010,
-    MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING                 = 0x00000020,
-    MOVEMENTFLAG2_UNK7                                  = 0x00000040,
-    MOVEMENTFLAG2_UNK8                                  = 0x00000080,
-    MOVEMENTFLAG2_UNK9                                  = 0x00000100,
-    MOVEMENTFLAG2_UNK10                                 = 0x00000200,
-    MOVEMENTFLAG2_INTERPOLATED_MOVEMENT                 = 0x00000400,
-    MOVEMENTFLAG2_INTERPOLATED_TURNING                  = 0x00000800,
-    MOVEMENTFLAG2_INTERPOLATED_PITCHING                 = 0x00001000,
-    MOVEMENTFLAG2_UNK14                                 = 0x00002000,
-    MOVEMENTFLAG2_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY   = 0x00004000,
-    MOVEMENTFLAG2_UNK16                                 = 0x00008000
+    MOVEMENTFLAG2_NONE                     = 0x00000000,
+    MOVEMENTFLAG2_NO_STRAFE                = 0x00000001,
+    MOVEMENTFLAG2_NO_JUMPING               = 0x00000002,
+    MOVEMENTFLAG2_UNK3                     = 0x00000004,        // Overrides various clientside checks
+    MOVEMENTFLAG2_FULL_SPEED_TURNING       = 0x00000008,
+    MOVEMENTFLAG2_FULL_SPEED_PITCHING      = 0x00000010,
+    MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING    = 0x00000020,
+    MOVEMENTFLAG2_UNK7                     = 0x00000040,
+    MOVEMENTFLAG2_UNK8                     = 0x00000080,
+    MOVEMENTFLAG2_UNK9                     = 0x00000100,
+    MOVEMENTFLAG2_UNK10                    = 0x00000200,
+    MOVEMENTFLAG2_INTERPOLATED_MOVEMENT    = 0x00000400,
+    MOVEMENTFLAG2_INTERPOLATED_TURNING     = 0x00000800,
+    MOVEMENTFLAG2_INTERPOLATED_PITCHING    = 0x00001000,
+    MOVEMENTFLAG2_UNK14                    = 0x00002000,
+    MOVEMENTFLAG2_UNK15                    = 0x00004000,
+    MOVEMENTFLAG2_UNK16                    = 0x00008000
 };
 
 enum UnitTypeMask
@@ -1699,9 +1655,6 @@ class TC_GAME_API Unit : public WorldObject
         virtual bool SetWaterWalking(bool enable, bool packetOnly = false);
         virtual bool SetFeatherFall(bool enable, bool packetOnly = false);
         virtual bool SetHover(bool enable, bool packetOnly = false);
-        bool SetCollisionHeight(float newValue);
-        void SetCollisionHeightReal(float newValue) { collisionHeight = newValue; }
-        float GetCollisionHeight() const { return collisionHeight; }
 
         void SetInFront(WorldObject const* target);
         void SetFacingTo(float ori, bool force = false);
@@ -1785,8 +1738,6 @@ class TC_GAME_API Unit : public WorldObject
         Player* GetPlayerMovingMe() const { return m_playerMovingMe; }
         // only set for direct client control (possess effects, vehicles and similar)
         Player* m_playerMovingMe;
-        // reflects direct client control (possess effects, vehicles and similar)
-        bool IsMovedByPlayer() const { return m_playerMovingMe != NULL; }
         SharedVisionList const& GetSharedVisionList() { return m_sharedVision; }
         void AddPlayerToVision(Player* player);
         void RemovePlayerFromVision(Player* player);
@@ -2146,7 +2097,6 @@ class TC_GAME_API Unit : public WorldObject
         float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
         void SetSpeed(UnitMoveType mtype, float newValue);
         void SetSpeedRate(UnitMoveType mtype, float rate);
-        void SetSpeedRateReal(UnitMoveType mtype, float rate);
 
         float ApplyEffectModifiers(SpellInfo const* spellProto, uint8 effect_index, float value) const;
         int32 CalculateSpellDamage(Unit const* target, SpellInfo const* spellProto, uint8 effect_index, int32 const* basePoints = NULL) const;
@@ -2162,7 +2112,20 @@ class TC_GAME_API Unit : public WorldObject
         MotionMaster* GetMotionMaster() { return i_motionMaster; }
         const MotionMaster* GetMotionMaster() const { return i_motionMaster; }
 
-        void StopMoving(bool force = false);
+        bool IsStopped() const { return !(HasUnitState(UNIT_STATE_MOVING)); }
+        void StopMoving();
+
+        void AddUnitMovementFlag(uint32 f) { m_movementInfo.flags |= f; }
+        void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.flags &= ~f; }
+        bool HasUnitMovementFlag(uint32 f) const { return (m_movementInfo.flags & f) == f; }
+        uint32 GetUnitMovementFlags() const { return m_movementInfo.flags; }
+        void SetUnitMovementFlags(uint32 f) { m_movementInfo.flags = f; }
+
+        void AddExtraUnitMovementFlag(uint16 f) { m_movementInfo.flags2 |= f; }
+        void RemoveExtraUnitMovementFlag(uint16 f) { m_movementInfo.flags2 &= ~f; }
+        uint16 HasExtraUnitMovementFlag(uint16 f) const { return m_movementInfo.flags2 & f; }
+        uint16 GetExtraUnitMovementFlags() const { return m_movementInfo.flags2; }
+        void SetExtraUnitMovementFlags(uint16 f) { m_movementInfo.flags2 = f; }
 
         float GetPositionZMinusOffset() const;
 
@@ -2234,26 +2197,13 @@ class TC_GAME_API Unit : public WorldObject
         void _ExitVehicle(Position const* exitPosition = NULL);
         void _EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* aurApp = NULL);
 
-        // should only be used by packet handlers to validate and apply incoming MovementInfos from clients. Do not use internally to modify m_movementInfo
-        void UpdateMovementInfo(MovementInfo movementInfo);
-        void ValidateNewMovementInfo(MovementInfo* mi);
+        void BuildMovementPacket(ByteBuffer *data) const;
 
         bool isMoving() const   { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING); }
         bool isTurning() const  { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_TURNING); }
         virtual bool CanFly() const = 0;
         bool IsFlying() const   { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); }
         bool IsFalling() const;
-
-        uint32 GetMovementCounterAndInc() { return m_movementCounter++; }
-        uint32 GetMovementCounter() const { return m_movementCounter; }
-        void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }
-        void SetLastMoveServerTimestamp(uint32 timestamp) { lastMoveServerTimestamp = timestamp; }
-        uint32 GetLastMoveClientTimestamp() const { return lastMoveClientTimestamp; }
-        uint32 GetLastMoveServerTimestamp() const { return lastMoveServerTimestamp; }
-        
-        PlayerMovementPendingChange PopPendingMovementChange();
-        void PushPendingMovementChange(PlayerMovementPendingChange newChange);
-        bool HasPendingMovementChange() const { return !pendingMovementChanges.empty(); }
 
         void RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker);
 
@@ -2349,7 +2299,6 @@ class TC_GAME_API Unit : public WorldObject
         VisibleAuraMap m_visibleAuras;
 
         float m_speed_rate[MAX_MOVE_TYPE];
-        float collisionHeight; // @todo: initialize this value using dbc data at unit creation
 
         CharmInfo* m_charmInfo;
         SharedVisionList m_sharedVision;
@@ -2388,18 +2337,6 @@ class TC_GAME_API Unit : public WorldObject
         void SetConfused(bool apply);
         void SetStunned(bool apply);
         void SetRooted(bool apply);
-
-        /* Player Movement fields START*/
-        // Timestamp on client clock of the moment the most recently processed movement packet was SENT by the client
-        uint32 lastMoveClientTimestamp;
-        
-        // Timestamp on server clock of the moment the most recently processed movement packet was RECEIVED from the client
-        uint32 lastMoveServerTimestamp;
-        
-        // when a player controls this unit, and when change is made to this unit which requires an ack from the client to be acted (change of speed for example), this movementCounter is incremented
-        uint32 m_movementCounter;
-        std::queue<PlayerMovementPendingChange> pendingMovementChanges;
-        /* Player Movement fields END*/
 
         uint32 m_rootTimes;
 

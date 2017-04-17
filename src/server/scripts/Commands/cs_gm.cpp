@@ -99,17 +99,19 @@ public:
         if (!target)
             target = handler->GetSession()->GetPlayer();
 
-        bool apply;
+        WorldPacket data(12);
         if (strncmp(args, "on", 3) == 0)
-            apply = true;
+            data.SetOpcode(SMSG_MOVE_SET_CAN_FLY);
         else if (strncmp(args, "off", 4) == 0)
-            apply = false;
+            data.SetOpcode(SMSG_MOVE_UNSET_CAN_FLY);
         else
         {
             handler->SendSysMessage(LANG_USE_BOL);
             return false;
         }
-        target->SetCanFly(apply);
+        data << target->GetPackGUID();
+        data << uint32(0);                                      // unknown
+        target->SendMessageToSet(&data, true);
         handler->PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, handler->GetNameLink(target).c_str(), args);
         return true;
     }

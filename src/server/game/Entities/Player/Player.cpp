@@ -56,7 +56,6 @@
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "MapManager.h"
-#include "MovementPacketSender.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -1828,6 +1827,15 @@ uint8 Player::GetChatTag() const
     return tag;
 }
 
+void Player::SendTeleportAckPacket()
+{
+    WorldPacket data(MSG_MOVE_TELEPORT_ACK, 41);
+    data << GetPackGUID();
+    data << uint32(0);                                     // this value increments every time
+    BuildMovementPacket(&data);
+    GetSession()->SendPacket(&data);
+}
+
 bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options)
 {
     if (!MapManager::IsValidMapCoord(mapid, x, y, z, orientation))
@@ -1935,7 +1943,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             if (HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
                 z += GetFloatValue(UNIT_FIELD_HOVERHEIGHT);
             Relocate(x, y, z, orientation);
-            MovementPacketSender::SendTeleportAckPacket(this);
+            SendTeleportAckPacket();
             SendTeleportPacket(oldPos); // this automatically relocates to oldPos in order to broadcast the packet in the right place
         }
     }
@@ -4645,6 +4653,24 @@ void Player::DeleteOldCharacters(uint32 keepDays)
     }
 }
 
+void Player::SetMovement(PlayerMovementType pType)
+{
+    WorldPacket data;
+    switch (pType)
+    {
+        case MOVE_ROOT:       data.Initialize(SMSG_FORCE_MOVE_ROOT,   GetPackGUID().size()+4); break;
+        case MOVE_UNROOT:     data.Initialize(SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size()+4); break;
+        case MOVE_WATER_WALK: data.Initialize(SMSG_MOVE_WATER_WALK,   GetPackGUID().size()+4); break;
+        case MOVE_LAND_WALK:  data.Initialize(SMSG_MOVE_LAND_WALK,    GetPackGUID().size()+4); break;
+        default:
+            TC_LOG_ERROR("entities.player", "Player::SetMovement: Unsupported move type (%d), data not sent to client.", pType);
+            return;
+    }
+    data << GetPackGUID();
+    data << uint32(0);
+    GetSession()->SendPacket(&data);
+}
+
 /* Preconditions:
   - a resurrectable corpse must not be loaded for the player (only bones)
   - the player must be in world
@@ -4682,9 +4708,9 @@ void Player::BuildPlayerRepop()
     // convert player body to ghost
     SetHealth(1);
 
-    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_WATERWALKING, true);
+    SetMovement(MOVE_WATER_WALK);
     if (!GetSession()->isLogingOut())
-        MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_ROOT, false);
+        SetMovement(MOVE_UNROOT);
 
     // BG - remove insignia related
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
@@ -4730,8 +4756,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     setDeathState(ALIVE);
 
-    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_WATERWALKING, false);
-    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_ROOT, false);
+    SetMovement(MOVE_LAND_WALK);
+    SetMovement(MOVE_UNROOT);
 
     m_deathTimer = 0;
 
@@ -4799,7 +4825,7 @@ void Player::KillPlayer()
     if (IsFlying() && !GetTransport())
         GetMotionMaster()->MoveFall();
 
-    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_ROOT, true);
+    SetMovement(MOVE_ROOT);
 
     StopMirrorTimers();                                     //disable timers(bars)
 
@@ -22724,11 +22750,16 @@ void Player::SendInitialPacketsAfterAddToMap()
     }
 
     if (HasAuraType(SPELL_AURA_MOD_STUN))
-        MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_ROOT, true);
+        SetMovement(MOVE_ROOT);
 
     // manual send package (have code in HandleEffect(this, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT, true); that must not be re-applied.
     if (HasAuraType(SPELL_AURA_MOD_ROOT))
-        MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_ROOT, true);
+    {
+        WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
+        data2 << GetPackGUID();
+        data2 << (uint32)2;
+        SendMessageToSet(&data2, true);
+    }
 
     SendAurasForTarget(this);
     SendEnchantmentDurations();                             // must be after add to map
@@ -23945,7 +23976,6 @@ void Player::SetClientControl(Unit* target, bool allowMove)
 
 void Player::SetMover(Unit* target)
 {
-    // todo: any way to make this method function in an atomic step?
     m_unitMovedByMe->m_playerMovingMe = nullptr;
     m_unitMovedByMe = target;
     m_unitMovedByMe->m_playerMovingMe = this;
@@ -26457,7 +26487,15 @@ bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/)
     if (!packetOnly && !Unit::SetDisableGravity(disable))
         return false;
 
-    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_DISABLE_GRAVITY, disable);
+    WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
+    data << GetPackGUID();
+    data << uint32(0);          //! movement counter
+    SendDirectMessage(&data);
+
+    data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
+    data << GetPackGUID();
+    BuildMovementPacket(&data);
+    SendMessageToSet(&data, false);
     return true;
 }
 
@@ -26469,7 +26507,15 @@ bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
     if (!apply)
         SetFallInformation(0, GetPositionZ());
 
-    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_CAN_FLY, apply);
+    WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
+    data << GetPackGUID();
+    data << uint32(0);          //! movement counter
+    SendDirectMessage(&data);
+
+    data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
+    data << GetPackGUID();
+    BuildMovementPacket(&data);
+    SendMessageToSet(&data, false);
     return true;
 }
 
@@ -26478,7 +26524,15 @@ bool Player::SetHover(bool apply, bool packetOnly /*= false*/)
     if (!packetOnly && !Unit::SetHover(apply))
         return false;
 
-    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_HOVER, apply);
+    WorldPacket data(apply ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 12);
+    data << GetPackGUID();
+    data << uint32(0);          //! movement counter
+    SendDirectMessage(&data);
+
+    data.Initialize(MSG_MOVE_HOVER, 64);
+    data << GetPackGUID();
+    BuildMovementPacket(&data);
+    SendMessageToSet(&data, false);
     return true;
 }
 
@@ -26487,7 +26541,15 @@ bool Player::SetWaterWalking(bool apply, bool packetOnly /*= false*/)
     if (!packetOnly && !Unit::SetWaterWalking(apply))
         return false;
 
-    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_WATERWALKING, apply);
+    WorldPacket data(apply ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
+    data << GetPackGUID();
+    data << uint32(0);          //! movement counter
+    SendDirectMessage(&data);
+
+    data.Initialize(MSG_MOVE_WATER_WALK, 64);
+    data << GetPackGUID();
+    BuildMovementPacket(&data);
+    SendMessageToSet(&data, false);
     return true;
 }
 
@@ -26496,21 +26558,29 @@ bool Player::SetFeatherFall(bool apply, bool packetOnly /*= false*/)
     if (!packetOnly && !Unit::SetFeatherFall(apply))
         return false;
 
-    MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_FALLING_SLOW, apply);
+    WorldPacket data(apply ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
+    data << GetPackGUID();
+    data << uint32(0);          //! movement counter
+    SendDirectMessage(&data);
+
+    data.Initialize(MSG_MOVE_FEATHER_FALL, 64);
+    data << GetPackGUID();
+    BuildMovementPacket(&data);
+    SendMessageToSet(&data, false);
     return true;
 }
 
-float Player::ComputeCollisionHeight(bool mounted) const
+float Player::GetCollisionHeight(bool mounted) const
 {
     if (mounted)
     {
         CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID));
         if (!mountDisplayInfo)
-            return ComputeCollisionHeight(false);
+            return GetCollisionHeight(false);
 
         CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId);
         if (!mountModelData)
-            return ComputeCollisionHeight(false);
+            return GetCollisionHeight(false);
 
         CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId());
         ASSERT(displayInfo);

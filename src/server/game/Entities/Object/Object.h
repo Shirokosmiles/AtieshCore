@@ -313,17 +313,12 @@ struct MovementInfo
     bool HasMovementFlag(uint32 flag) const { return (flags & flag) != 0; }
 
     uint16 GetExtraMovementFlags() const { return flags2; }
-    void SetExtraMovementFlags(uint16 flag) { flags2 = flag; }
     void AddExtraMovementFlag(uint16 flag) { flags2 |= flag; }
-    void RemoveExtraMovementFlag(uint16 flag) { flags2 &= ~flag; }
     bool HasExtraMovementFlag(uint16 flag) const { return (flags2 & flag) != 0; }
 
     void SetFallTime(uint32 time) { fallTime = time; }
 
-    void OutDebug() const;
-
-    void WriteContentIntoPacket(ByteBuffer* data, bool includeGuid = false) const;
-    void FillContentFromPacket(ByteBuffer* data, bool includeGuid = false);
+    void OutDebug();
 };
 
 #define MAPID_INVALID 0xFFFFFFFF
@@ -605,20 +600,6 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         uint32  LastUsedScriptID;
 
-        void SetFallTime(uint32 time) { m_movementInfo.SetFallTime(time); }
-        
-        void AddUnitMovementFlag(uint32 f) { m_movementInfo.flags |= f; }
-        void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.flags &= ~f; }
-        bool HasUnitMovementFlag(uint32 f) const { return (m_movementInfo.flags & f) == f; }
-        uint32 GetUnitMovementFlags() const { return m_movementInfo.flags; }
-        void SetUnitMovementFlags(uint32 f) { m_movementInfo.flags = f; }
-        
-        void AddExtraUnitMovementFlag(uint16 f) { m_movementInfo.flags2 |= f; }
-        void RemoveExtraUnitMovementFlag(uint16 f) { m_movementInfo.flags2 &= ~f; }
-        uint16 HasExtraUnitMovementFlag(uint16 f) const { return m_movementInfo.flags2 & f; }
-        uint16 GetExtraUnitMovementFlags() const { return m_movementInfo.flags2; }
-        void SetExtraUnitMovementFlags(uint16 f) { m_movementInfo.flags2 = f; }
-
         // Transports
         Transport* GetTransport() const { return m_transport; }
         float GetTransOffsetX() const { return m_movementInfo.transport.pos.GetPositionX(); }
@@ -628,27 +609,20 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         uint32 GetTransTime()   const { return m_movementInfo.transport.time; }
         int8 GetTransSeat()     const { return m_movementInfo.transport.seat; }
         virtual ObjectGuid GetTransGUID() const;
-        void SetTransport(Transport* t);
-        void SetTransOffset(float x, float y, float z, float o = 0.0f) { m_movementInfo.transport.pos.Relocate(x, y, z, o); }
-        void SetTransTime(uint32 time) { m_movementInfo.transport.time = time; }
-        void SetTransSeat(int8 seat) { m_movementInfo.transport.seat = seat; }
-        void SetTransGUID(ObjectGuid guid) { m_movementInfo.transport.guid = guid; }
+        void SetTransport(Transport* t) { m_transport = t; }
+
+        MovementInfo m_movementInfo;
 
         virtual float GetStationaryX() const { return GetPositionX(); }
         virtual float GetStationaryY() const { return GetPositionY(); }
         virtual float GetStationaryZ() const { return GetPositionZ(); }
         virtual float GetStationaryO() const { return GetOrientation(); }
 
-        // Return the current positional/physical state of the object
-        MovementInfo GetMovementInfo() const;
-
     protected:
         std::string m_name;
         bool m_isActive;
         const bool m_isWorldObject;
         ZoneScript* m_zoneScript;
-
-        MovementInfo m_movementInfo;
 
         // transports
         Transport* m_transport;

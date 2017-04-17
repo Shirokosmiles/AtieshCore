@@ -39,7 +39,6 @@
 #include "Log.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
-#include "MovementPacketSender.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -286,11 +285,6 @@ Unit::Unit(bool isWorldObject) :
 
     m_extraAttacks = 0;
     m_canDualWield = false;
-
-    m_movementCounter = 0;
-    
-    lastMoveClientTimestamp = 0;
-    lastMoveServerTimestamp = 0;
 
     m_rootTimes = 0;
 
@@ -8568,8 +8562,11 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
             if (charm->GetTypeId() == TYPEID_UNIT)
                 charm->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
-        float newCollisionHeight = player->ComputeCollisionHeight(true);
-        SetCollisionHeight(newCollisionHeight);
+        WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
+        data << GetPackGUID();
+        data << uint32(sWorld->GetGameTime());   // Packet counter
+        data << player->GetCollisionHeight(true);
+        player->GetSession()->SendPacket(&data);
     }
 
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOUNT);
@@ -8585,8 +8582,11 @@ void Unit::Dismount()
 
     if (Player* thisPlayer = ToPlayer())
     {
-        float newCollisionHeight = thisPlayer->ComputeCollisionHeight(false);
-        SetCollisionHeight(newCollisionHeight);
+        WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
+        data << GetPackGUID();
+        data << uint32(sWorld->GetGameTime());   // Packet counter
+        data << thisPlayer->GetCollisionHeight(false);
+        thisPlayer->GetSession()->SendPacket(&data);
     }
 
     WorldPacket data(SMSG_DISMOUNT, 8);
@@ -9355,23 +9355,64 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate)
     if (m_speed_rate[mtype] == rate)
         return;
 
-    if (IsMovedByPlayer())
-        MovementPacketSender::SendSpeedChangeToMover(this, mtype, rate);
-    else
-    {
-        SetSpeedRateReal(mtype, rate);
-        MovementPacketSender::SendSpeedChangeToAll(this, mtype, rate);
-    }
-}
-
-void Unit::SetSpeedRateReal(UnitMoveType mtype, float rate)
-{
-    if (!IsInCombat() && ToPlayer())
-        if (Pet* pet = ToPlayer()->GetPet())
-            pet->SetSpeedRate(mtype, rate);
-
     m_speed_rate[mtype] = rate;
+
     PropagateSpeedChange();
+
+    // Spline packets are for units controlled by AI. "Force speed change" (wrongly named opcodes) and "move set speed" packets are for units controlled by a player.
+    static Opcodes const moveTypeToOpcode[MAX_MOVE_TYPE][3] =
+    {
+        {SMSG_SPLINE_SET_WALK_SPEED,        SMSG_FORCE_WALK_SPEED_CHANGE,           MSG_MOVE_SET_WALK_SPEED         },
+        {SMSG_SPLINE_SET_RUN_SPEED,         SMSG_FORCE_RUN_SPEED_CHANGE,            MSG_MOVE_SET_RUN_SPEED          },
+        {SMSG_SPLINE_SET_RUN_BACK_SPEED,    SMSG_FORCE_RUN_BACK_SPEED_CHANGE,       MSG_MOVE_SET_RUN_BACK_SPEED     },
+        {SMSG_SPLINE_SET_SWIM_SPEED,        SMSG_FORCE_SWIM_SPEED_CHANGE,           MSG_MOVE_SET_SWIM_SPEED         },
+        {SMSG_SPLINE_SET_SWIM_BACK_SPEED,   SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,      MSG_MOVE_SET_SWIM_BACK_SPEED    },
+        {SMSG_SPLINE_SET_TURN_RATE,         SMSG_FORCE_TURN_RATE_CHANGE,            MSG_MOVE_SET_TURN_RATE          },
+        {SMSG_SPLINE_SET_FLIGHT_SPEED,      SMSG_FORCE_FLIGHT_SPEED_CHANGE,         MSG_MOVE_SET_FLIGHT_SPEED       },
+        {SMSG_SPLINE_SET_FLIGHT_BACK_SPEED, SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE,    MSG_MOVE_SET_FLIGHT_BACK_SPEED  },
+        {SMSG_SPLINE_SET_PITCH_RATE,        SMSG_FORCE_PITCH_RATE_CHANGE,           MSG_MOVE_SET_PITCH_RATE         },
+    };
+
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
+        // and do it only for real sent packets and use run for run/mounted as client expected
+        ++ToPlayer()->m_forced_speed_changes[mtype];
+
+        if (!IsInCombat())
+            if (Pet* pet = ToPlayer()->GetPet())
+                pet->SetSpeedRate(mtype, m_speed_rate[mtype]);
+    }
+
+    if (Player* playerMover = GetPlayerBeingMoved()) // unit controlled by a player.
+    {
+        // Send notification to self. this packet is only sent to one client (the client of the player concerned by the change).
+        WorldPacket self;
+        self.Initialize(moveTypeToOpcode[mtype][1], mtype != MOVE_RUN ? 8 + 4 + 4 : 8 + 4 + 1 + 4);
+        self << GetPackGUID();
+        self << (uint32)0;                                  // Movement counter. Unimplemented at the moment! NUM_PMOVE_EVTS = 0x39Z.
+        if (mtype == MOVE_RUN)
+            self << uint8(1);                               // unknown byte added in 2.1.0
+        self << float(GetSpeed(mtype));
+        playerMover->GetSession()->SendPacket(&self);
+
+        // Send notification to other players. sent to every clients (if in range) except one: the client of the player concerned by the change.
+        WorldPacket data;
+        data.Initialize(moveTypeToOpcode[mtype][2], 8 + 30 + 4);
+        data << GetPackGUID();
+        BuildMovementPacket(&data);
+        data << float(GetSpeed(mtype));
+        playerMover->SendMessageToSet(&data, false);
+    }
+    else // unit controlled by AI.
+    {
+        // send notification to every clients.
+        WorldPacket data;
+        data.Initialize(moveTypeToOpcode[mtype][0], 8 + 4);
+        data << GetPackGUID();
+        data << float(GetSpeed(mtype));
+        SendMessageToSet(&data, false);
+    }
 }
 
 bool Unit::IsGhouled() const
@@ -12346,7 +12387,10 @@ void Unit::SetStunned(bool apply)
         if (GetTypeId() == TYPEID_PLAYER)
             SetStandState(UNIT_STAND_STATE_STAND);
 
-        MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_ROOT, true);
+        WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8);
+        data << GetPackGUID();
+        data << uint32(0);
+        SendMessageToSet(&data, true);
 
         CastStop();
     }
@@ -12362,7 +12406,10 @@ void Unit::SetStunned(bool apply)
 
         if (!HasUnitState(UNIT_STATE_ROOT))         // prevent moving if it also has root effect
         {
-            MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_ROOT, false);
+            WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 8+4);
+            data << GetPackGUID();
+            data << uint32(0);
+            SendMessageToSet(&data, true);
 
             RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
@@ -12373,19 +12420,48 @@ void Unit::SetRooted(bool apply)
 {
     if (apply)
     {
+        if (m_rootTimes > 0) // blizzard internal check?
+            m_rootTimes++;
+
         // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
         // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
         // setting MOVEMENTFLAG_ROOT
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
         StopMoving();
-        MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_ROOT, true);
+
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            WorldPacket data(SMSG_FORCE_MOVE_ROOT, 10);
+            data << GetPackGUID();
+            data << m_rootTimes;
+            SendMessageToSet(&data, true);
+        }
+        else
+        {
+            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
+            data << GetPackGUID();
+            SendMessageToSet(&data, true);
+        }
     }
     else
     {
         if (!HasUnitState(UNIT_STATE_STUNNED))      // prevent moving if it also has stun effect
         {
-            MovementPacketSender::SendMovementFlagChange(this, MOVEMENTFLAG_ROOT, false);
+            if (GetTypeId() == TYPEID_PLAYER)
+            {
+                WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 10);
+                data << GetPackGUID();
+                data << ++m_rootTimes;
+                SendMessageToSet(&data, true);
+            }
+            else
+            {
+                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
+                data << GetPackGUID();
+                SendMessageToSet(&data, true);
+            }
+
             RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
     }
@@ -13146,18 +13222,39 @@ void Unit::UpdateObjectVisibility(bool forced)
 
 void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
 {
-    if (IsMovedByPlayer())
+    Player* player = ToPlayer();
+    if (!player)
+    {
+        if (Unit* charmer = GetCharmer())
+        {
+            player = charmer->ToPlayer();
+            if (player && player->m_unitMovedByMe != this)
+                player = NULL;
+        }
+    }
+
+    if (!player)
+    {
+        GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ);
+    }
+    else
     {
         float vcos, vsin;
         GetSinCos(x, y, vsin, vcos);
-        TC_LOG_ERROR("custom", "Unit::KnockbackFrom called");
-        MovementPacketSender::SendKnockBackToMover(this, vcos, vsin, speedXY, -speedZ); // !! notice the - sign in front of speedZ !!
 
-        if (HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY))
-            SetCanFly(true, true);
+        WorldPacket data(SMSG_MOVE_KNOCK_BACK, (8 + 4 + 4 + 4 + 4 + 4));
+        data << GetPackGUID();
+        data << uint32(0);                                      // counter
+        data << float(vcos);                                    // x direction
+        data << float(vsin);                                    // y direction
+        data << float(speedXY);                                 // Horizontal speed
+        data << float(-speedZ);                                 // Z Movement speed (vertical)
+
+        player->GetSession()->SendPacket(&data);
+
+        if (player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || player->HasAuraType(SPELL_AURA_FLY))
+            player->SetCanFly(true, true);
     }
-    else
-        GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ);
 }
 
 float Unit::GetCombatRatingReduction(CombatRating cr) const
@@ -13490,17 +13587,23 @@ uint32 Unit::GetModelForTotem(PlayerTotemType totemType)
 void Unit::JumpTo(float speedXY, float speedZ, bool forward)
 {
     float angle = forward ? 0 : float(M_PI);
-    if (IsMovedByPlayer())
-    {
-        float vcos = std::cos(angle + GetOrientation());
-        float vsin = std::sin(angle + GetOrientation());
-
-        TC_LOG_ERROR("custom", "Unit::JumpTo called");
-        MovementPacketSender::SendKnockBackToMover(this, vcos, vsin, speedXY, -speedZ); // !! notice the - sign in front of speedZ !!
-        
-    }
-    else
+    if (GetTypeId() == TYPEID_UNIT)
         GetMotionMaster()->MoveJumpTo(angle, speedXY, speedZ);
+    else
+    {
+        float vcos = std::cos(angle+GetOrientation());
+        float vsin = std::sin(angle+GetOrientation());
+
+        WorldPacket data(SMSG_MOVE_KNOCK_BACK, (8+4+4+4+4+4));
+        data << GetPackGUID();
+        data << uint32(0);                                      // Sequence
+        data << float(vcos);                                    // x direction
+        data << float(vsin);                                    // y direction
+        data << float(speedXY);                                 // Horizontal speed
+        data << float(-speedZ);                                 // Z Movement speed (vertical)
+
+        ToPlayer()->GetSession()->SendPacket(&data);
+    }
 }
 
 void Unit::JumpTo(WorldObject* obj, float speedZ, bool withOrientation)
@@ -13750,6 +13853,58 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 }
 
+void Unit::BuildMovementPacket(ByteBuffer *data) const
+{
+    *data << uint32(GetUnitMovementFlags());            // movement flags
+    *data << uint16(GetExtraUnitMovementFlags());       // 2.3.0
+    *data << uint32(getMSTime());                       // time / counter
+    *data << GetPositionX();
+    *data << GetPositionY();
+    *data << GetPositionZMinusOffset();
+    *data << GetOrientation();
+
+    // 0x00000200
+    if (GetUnitMovementFlags() & MOVEMENTFLAG_ONTRANSPORT)
+    {
+        if (m_vehicle)
+            *data << m_vehicle->GetBase()->GetPackGUID();
+        else if (GetTransport())
+            *data << GetTransport()->GetPackGUID();
+        else
+            *data << (uint8)0;
+
+        *data << float (GetTransOffsetX());
+        *data << float (GetTransOffsetY());
+        *data << float (GetTransOffsetZ());
+        *data << float (GetTransOffsetO());
+        *data << uint32(GetTransTime());
+        *data << uint8 (GetTransSeat());
+
+        if (GetExtraUnitMovementFlags() & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
+            *data << uint32(m_movementInfo.transport.time2);
+    }
+
+    // 0x02200000
+    if ((GetUnitMovementFlags() & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING))
+        || (m_movementInfo.flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
+        *data << (float)m_movementInfo.pitch;
+
+    *data << (uint32)m_movementInfo.fallTime;
+
+    // 0x00001000
+    if (GetUnitMovementFlags() & MOVEMENTFLAG_FALLING)
+    {
+        *data << (float)m_movementInfo.jump.zspeed;
+        *data << (float)m_movementInfo.jump.sinAngle;
+        *data << (float)m_movementInfo.jump.cosAngle;
+        *data << (float)m_movementInfo.jump.xyspeed;
+    }
+
+    // 0x04000000
+    if (GetUnitMovementFlags() & MOVEMENTFLAG_SPLINE_ELEVATION)
+        *data << (float)m_movementInfo.splineElevation;
+}
+
 bool Unit::IsFalling() const
 {
     return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR) || movespline->isFalling();
@@ -13777,11 +13932,14 @@ void Unit::SendTeleportPacket(Position const& pos)
     if (GetTypeId() == TYPEID_UNIT)
         Relocate(&pos);
 
-    MovementPacketSender::SendTeleportPacket(this);
+    WorldPacket data2(MSG_MOVE_TELEPORT, 38);
+    data2 << GetPackGUID();
+    BuildMovementPacket(&data2);
     if (GetTypeId() == TYPEID_UNIT)
         Relocate(&oldPos);
     if (GetTypeId() == TYPEID_PLAYER)
         Relocate(&pos);
+    SendMessageToSet(&data2, false);
 }
 
 bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool teleport)
@@ -13903,21 +14061,6 @@ void Unit::SendRemoveFromThreatListOpcode(HostileReference* pHostileReference)
     data << GetPackGUID();
     data << pHostileReference->getUnitGuid().WriteAsPacked();
     SendMessageToSet(&data, false);
-}
-
-PlayerMovementPendingChange Unit::PopPendingMovementChange()
-{
-    //TC_LOG_ERROR("custom", "PopPendingMovementChange called. queue size. BEFORE: %lu", pendingMovementChanges.size());
-    PlayerMovementPendingChange result = pendingMovementChanges.front();
-    pendingMovementChanges.pop();
-    //TC_LOG_ERROR("custom", "PopPendingMovementChange called. queue size. AFTER: %lu", pendingMovementChanges.size());
-    return result;
-}
-
-void Unit::PushPendingMovementChange(PlayerMovementPendingChange newChange)
-{
-    //TC_LOG_ERROR("custom", "pushed new pending change. queue size before: %lu type: %d. movementCounter %u", pendingMovementChanges.size(), newChange.movementChangeType, newChange.movementCounter);
-    pendingMovementChanges.push(newChange);
 }
 
 void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
@@ -14268,23 +14411,6 @@ bool Unit::SetHover(bool enable, bool /*packetOnly = false*/)
     return true;
 }
 
-bool Unit::SetCollisionHeight(float newValue)
-{
-    // Update only on change
-    if (GetCollisionHeight() == newValue)
-        return false;
-    
-    if (IsMovedByPlayer())
-        MovementPacketSender::SendHeightChangeToMover(this, newValue);
-    else
-    {
-        // no need to send this information to the clients since it only affects pathfinding, which is server side only.
-        SetCollisionHeightReal(newValue);
-    }
-    
-    return true; // change method return type to void?
-}
-
 void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
 {
     if (!target)
@@ -14594,111 +14720,4 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);
-}
-
-void Unit::ValidateNewMovementInfo(MovementInfo* mi)
- {
-    //! Anti-cheat checks.
-        //! Might be subject to latency, so just remove improper flags.
-    #ifdef TRINITY_DEBUG
-        #define REMOVE_VIOLATING_FLAGS(check, maskToRemove) \
-     { \
-         if (check) \
-         { \
-             TC_LOG_DEBUG("entities.unit", "WorldSession::ReadMovementInfo: Violation of MovementFlags found (%s). " \
-                 "MovementFlags: %u, MovementFlags2: %u for player GUID: %u. Mask %u will be removed.", \
-                 STRINGIZE(check), mi->GetMovementFlags(), mi->GetExtraMovementFlags(), GetPlayerMovingMe()->GetGUID().GetCounter(), maskToRemove); \
-             mi->RemoveMovementFlag((maskToRemove)); \
-         } \
-     }
-    #else
-    #define REMOVE_VIOLATING_FLAGS(check, maskToRemove) \
-                    if (check) \
-                        mi->RemoveMovementFlag((maskToRemove));
-    #endif
-        
-    if (!GetVehicleBase() || !(GetVehicle()->GetVehicleInfo()->m_flags & VEHICLE_FLAG_FIXED_POSITION))
-        REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_ROOT), MOVEMENTFLAG_ROOT);
-    
-        /*! This must be a packet spoofing attempt. MOVEMENTFLAG_ROOT sent from the client is not valid
-                in conjunction with any of the moving movement flags such as MOVEMENTFLAG_FORWARD.
-                It will freeze clients that receive this player's movement info.
-                */
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_ROOT) && mi->HasMovementFlag(MOVEMENTFLAG_MASK_MOVING),
-        MOVEMENTFLAG_MASK_MOVING);
-    
-        //! Cannot hover without SPELL_AURA_HOVER
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_HOVER) && !HasAuraType(SPELL_AURA_HOVER),
-        MOVEMENTFLAG_HOVER);
-    
-        //! Cannot ascend and descend at the same time
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_ASCENDING) && mi->HasMovementFlag(MOVEMENTFLAG_DESCENDING),
-        MOVEMENTFLAG_ASCENDING | MOVEMENTFLAG_DESCENDING);
-    
-        //! Cannot move left and right at the same time
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_LEFT) && mi->HasMovementFlag(MOVEMENTFLAG_RIGHT),
-        MOVEMENTFLAG_LEFT | MOVEMENTFLAG_RIGHT);
-    
-        //! Cannot strafe left and right at the same time
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT) && mi->HasMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT),
-        MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
-    
-        //! Cannot pitch up and down at the same time
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_PITCH_UP) && mi->HasMovementFlag(MOVEMENTFLAG_PITCH_DOWN),
-        MOVEMENTFLAG_PITCH_UP | MOVEMENTFLAG_PITCH_DOWN);
-    
-        //! Cannot move forwards and backwards at the same time
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FORWARD) && mi->HasMovementFlag(MOVEMENTFLAG_BACKWARD),
-        MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD);
-    
-        //! Cannot walk on water without SPELL_AURA_WATER_WALK except for ghosts
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_WATERWALKING) &&
-        !HasAuraType(SPELL_AURA_WATER_WALK) &&
-        !HasAuraType(SPELL_AURA_GHOST),
-        MOVEMENTFLAG_WATERWALKING);
-    
-        //! Cannot feather fall without SPELL_AURA_FEATHER_FALL
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FALLING_SLOW) && !HasAuraType(SPELL_AURA_FEATHER_FALL),
-        MOVEMENTFLAG_FALLING_SLOW);
-    
-        /*! Cannot fly if no fly auras present. Exception is being a GM.
-                Note that we check for account level instead of Player::IsGameMaster() because in some
-                situations it may be feasable to use .gm fly on as a GM without having .gm on,
-                e.g. aerial combat.
-                */
-        
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY) && GetPlayerMovingMe() && GetPlayerMovingMe()->GetSession()->GetSecurity() == SEC_PLAYER &&
-        !HasAuraType(SPELL_AURA_FLY) &&
-        !HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED),
-        MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY);
-    
-        //! Cannot fly and fall at the same time
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY) && mi->HasMovementFlag(MOVEMENTFLAG_FALLING),
-        MOVEMENTFLAG_FALLING);
-    
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED) &&
-        (!movespline->Initialized() || movespline->Finalized()), MOVEMENTFLAG_SPLINE_ENABLED);
-    
-    #undef REMOVE_VIOLATING_FLAGS
-}
-
-void Unit::UpdateMovementInfo(MovementInfo movementInfo)
- {
-    if (!IsMovedByPlayer())
-    {
-        TC_LOG_ERROR("entities.unit", "Unit::UpdateMovementInfo call on a unit not moved by a player. This should not happen.");
-        return;
-    }
-    
-    SetLastMoveClientTimestamp(movementInfo.time); // unused for now. will be needed for speed cheat detection
-    SetLastMoveServerTimestamp(getMSTime()); // unused for now. will probably needed for stuff, you know
-    
-    WorldSession* playerSession = GetPlayerMovingMe()->GetSession();
-    if (playerSession->GetClientTimeDelay() == 0)
-        playerSession->SetClientTimeDelay(getMSTime() - movementInfo.time);
-    
-    movementInfo.time = movementInfo.time + playerSession->GetClientTimeDelay() + MOVEMENT_PACKET_TIME_DELAY;
-    
-    UpdatePosition(movementInfo.pos);
-    m_movementInfo = movementInfo;
 }
