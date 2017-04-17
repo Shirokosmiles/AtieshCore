@@ -303,42 +303,37 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             if (!normalizePlayerName(to))
             {
                 SendPlayerNotFoundNotice(to);
-                return;
+                break;
             }
             
             Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
-            if (!receiver)
+            bool receiverinbattleground = receiver && receiver->InBattleground();
+            bool cantalk = receiverinbattleground && senderinbattleground && receiver->GetTeam() == sender->GetTeam();
+            if (!receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
             {
-                SendPlayerNotFoundNotice(to);
-                return;
-            }
-
-            bool receiverinbattleground = receiver->InBattleground();
-
-            if (receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
-            {
-                if (receiver && receiverinbattleground && senderinbattleground && receiver->GetTeam() == sender->GetTeam())
+                if (receiver && cantalk)
                     lang = LANG_UNIVERSAL;
                 else
                 {
                     SendPlayerNotFoundNotice(to);
                     return;
                 }
-            }
+            }            
 
             if (!sender->IsGameMaster() && sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) && !receiver->IsInWhisperWhiteList(sender->GetGUID()))
             {
-                SendNotification(GetTrinityString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
-                return;
-            }
-
-            if (GetPlayer()->GetTeam() != receiver->GetTeam() && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT) /* && !receiver->IsInWhisperWhiteList(sender->GetGUID()) */)
-            {
-                if (!receiver->IsGameMaster() && !sender->IsGameMaster() && sender->GetCFSTeam() != receiver->GetCFSTeam())
+                if (!cantalk)
                 {
-                    SendWrongFactionNotice();
+                    SendNotification(GetTrinityString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
                     return;
                 }
+            }
+
+            bool onefaction = sender->GetCFSTeam() != receiver->GetCFSTeam();
+            if (!sender->IsGameMaster() && sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) && !receiver->IsInWhisperWhiteList(sender->GetGUID()) && !onefaction)
+            {
+                SendNotification(GetTrinityString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
+                return;
             }
 
             if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
