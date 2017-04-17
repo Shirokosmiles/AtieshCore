@@ -113,7 +113,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
 
         if (owner->movespline->onTransport)
         {
-            Position& tpos = unit->m_movementInfo.transport.pos;
+            Position& tpos = owner->m_movementInfo.transport.pos;
             tpos.m_positionX = loc.x;
             tpos.m_positionY = loc.y;
             tpos.m_positionZ = loc.z;
