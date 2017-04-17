@@ -329,7 +329,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
             }
 
-            bool onefaction = sender->GetCFSTeam() != receiver->GetCFSTeam();
+            bool onefaction = sender->GetCFSTeam() == receiver->GetCFSTeam();
             if (!sender->IsGameMaster() && sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) && !receiver->IsInWhisperWhiteList(sender->GetGUID()) && !onefaction)
             {
                 SendNotification(GetTrinityString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
