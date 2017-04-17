@@ -360,18 +360,19 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (plrMover)
         sAnticheatMgr->StartHackDetection(plrMover, movementInfo, opcode);
 
-    if (!plrMover)
-        return;
-
     /* process position-change */
     WorldPacket data(opcode, recvData.size());
-    int64 movementTime = (int64) movementInfo.time + plrMover->m_timeSyncClockDelta; // time of the event on the server clock.
-    if (movementTime < 0 || movementTime > 0xFFFFFFFF)
-    {
-        TC_LOG_WARN("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
-        movementTime = getMSTime();
+
+    if (plrMover)
+    {        
+        int64 movementTime = (int64)movementInfo.time + plrMover->m_timeSyncClockDelta; // time of the event on the server clock.
+        if (movementTime < 0 || movementTime > 0xFFFFFFFF)
+        {
+            TC_LOG_WARN("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
+            movementTime = getMSTime();
+        }
+        movementInfo.time = (uint32)movementTime;
     }
-    movementInfo.time = (uint32) movementTime;
 
     movementInfo.guid = mover->GetGUID();
     WriteMovementInfo(&data, &movementInfo);
