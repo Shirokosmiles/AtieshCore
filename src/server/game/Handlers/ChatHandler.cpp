@@ -311,7 +311,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             bool cantalk = receiverinbattleground && senderinbattleground && receiver->GetTeam() == sender->GetTeam();
             if (!receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
             {
-                if (receiver && cantalk)
+                if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && receiver && cantalk)
                     lang = LANG_UNIVERSAL;
                 else
                 {
@@ -347,9 +347,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             if (receiver->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) ||
                 (HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID())))
                 sender->AddWhisperWhiteList(receiver->GetGUID());
-
-            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && receiverinbattleground && senderinbattleground && receiver->GetTeam() == sender->GetTeam())
-                lang = LANG_UNIVERSAL;
 
             GetPlayer()->Whisper(msg, Language(lang), receiver);
             break;
