@@ -307,9 +307,15 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             }
             
             Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
+            if (!receiver)
+            {
+                SendPlayerNotFoundNotice(to);
+                return;
+            }
+
             bool receiverinbattleground = receiver->InBattleground();
 
-            if (!receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
+            if (receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
             {
                 if (receiver && receiverinbattleground && senderinbattleground && receiver->GetTeam() == sender->GetTeam())
                     lang = LANG_UNIVERSAL;
