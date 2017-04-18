@@ -188,8 +188,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 Unit* owner = me->GetOwner();
                 if (!owner || owner != source)
                     return;
-
-                _events.Reset();
+                
                 // Stop Fighting
                 me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
 
@@ -210,6 +209,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
 
                 // Despawn as soon as possible
                 me->DespawnOrUnsummon(Seconds(4));
+                _events.Reset();
             }
             
         private:
