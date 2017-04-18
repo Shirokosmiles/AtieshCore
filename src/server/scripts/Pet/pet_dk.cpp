@@ -57,9 +57,9 @@ enum DeathKnightSpells
 
 enum GargoyleState
 {    
-    EVENT_MOVE_AT_TARGET    = 0,
-    EVENT_START_COMBAT      = 1,
-    EVENT_COMBAT_UPD        = 2
+    EVENT_MOVE_AT_TARGET    = 1,
+    EVENT_START_COMBAT      = 2,
+    EVENT_COMBAT_UPD        = 3
 };
 
 class npc_pet_dk_ebon_gargoyle : public CreatureScript
@@ -69,17 +69,29 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
 
         struct npc_pet_dk_ebon_gargoyleAI : CasterAI
         {
-            npc_pet_dk_ebon_gargoyleAI(Creature* creature) : CasterAI(creature) { }
-
-            void InitializeAI() override
+            npc_pet_dk_ebon_gargoyleAI(Creature* creature) : CasterAI(creature) 
             {
-                CasterAI::InitializeAI();
+                Initialize();
+            }
+
+            void Initialize()
+            {                
                 ownerGuid = me->GetOwnerGUID();
                 if (!ownerGuid)
                     return;
 
-                _events.Reset();
-                _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 1 * IN_MILLISECONDS);                
+                me->SetReactState(REACT_PASSIVE);
+                me->CombatStop(true);
+                me->StopMoving(true);
+                me->GetMotionMaster()->Clear(false);
+                me->SetCanFly(true);
+
+                _events.Reset();                                
+            }
+
+            void IsSummonedBy(Unit* summoner) override
+            {
+                _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 100);
             }
 
             void UpdateAI(uint32 diff) override
@@ -103,7 +115,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                                 {
                                     victim = (*iter);
                                     break;
-                                }
+                                }                            
 
                             if (!victim)
                                 return;
@@ -111,13 +123,14 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                             float o = victim->GetOrientation();
                             float x = victim->GetPositionX() + (7 * cos(o)) + victim->GetCombatReach();
                             float y = victim->GetPositionY() + (7 * sin(o)) + victim->GetCombatReach();
-                            float z = victim->GetPositionZ() + 2.5f;
+                            float z = victim->GetPositionZ() + 4.5f;
+
+                            me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
+                            me->SetSpeedRate(MOVE_RUN, 1.0f);
 
                             // Fly at target
-                            me->SetCanFly(true);
-
                             Movement::MoveSplineInit init(me);
-                            init.MoveTo(x, y, z, false, true);
+                            init.MoveTo(x, y, z);
                             init.SetFly();
                             int32 traveltime = init.Launch();
                             _events.ScheduleEvent(EVENT_START_COMBAT, traveltime);
@@ -125,16 +138,12 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                         }
                         case EVENT_START_COMBAT:
                         {
-                            if (me->movespline->Finalized())
-                            {
-                                // Start combat
-                                me->Attack(victim, false);
-                                me->SetCanFly(false);
-                                _events.ScheduleEvent(EVENT_COMBAT_UPD, 1 * IN_MILLISECONDS);
-                                break;
-                            }
-                            else
-                                events.Repeat(Seconds(1));                            
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            // Start combat
+                            me->Attack(victim, false);
+                            me->SetCanFly(false);
+                            _events.ScheduleEvent(EVENT_COMBAT_UPD, 100);
+
                             break;
                         }
                         case EVENT_COMBAT_UPD:
@@ -145,7 +154,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
 
                             if (Unit* targetdk = owner->GetVictim())
                             {
-                                if (!victim) // target should always
+                                if (!victim && owner->IsInCombatWith(targetdk)) // target should always
                                     me->Attack(targetdk, false);
 
                                 if (targetdk != victim)
@@ -154,7 +163,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                                     me->Attack(victim, false);
                                 }
                             }
-                            events.Repeat(Seconds(1));
+                            events.Repeat(Milliseconds(200));
                             break;
                         }
                         default:
