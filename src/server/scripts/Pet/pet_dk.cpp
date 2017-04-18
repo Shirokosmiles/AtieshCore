@@ -59,7 +59,8 @@ enum GargoyleState
 {    
     EVENT_MOVE_AT_TARGET    = 1,
     EVENT_START_COMBAT      = 2,
-    EVENT_COMBAT_UPD        = 3
+    EVENT_COMBAT_UPD        = 3,
+    EVENT_COMBAT_OUT        = 4
 };
 
 class npc_pet_dk_ebon_gargoyle : public CreatureScript
@@ -85,6 +86,8 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 me->StopMoving(true);
                 me->GetMotionMaster()->Clear(false);
                 me->SetCanFly(true);
+
+                me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
 
                 _events.Reset();                                
             }
@@ -125,6 +128,8 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                             float y = victim->GetPositionY() + (7 * sin(o)) + victim->GetCombatReach();
                             float z = victim->GetPositionZ() + 4.5f;
 
+                            me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, false);
+
                             me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
                             me->SetSpeedRate(MOVE_RUN, 1.0f);
 
@@ -163,7 +168,33 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                                     me->Attack(victim, false);
                                 }
                             }
-                            events.Repeat(Milliseconds(200));
+                            _events.ScheduleEvent(EVENT_COMBAT_UPD, 100);
+                            break;
+                        }
+                        case EVENT_COMBAT_OUT:
+                        {
+                            me->CombatStop(true);
+                            // Stop Fighting
+                            me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
+
+                            // Sanctuary
+                            me->CastSpell(me, SPELL_DK_SANCTUARY, true);
+                            me->SetReactState(REACT_PASSIVE);
+                            
+                            //! HACK: Creature's can't have MOVEMENTFLAG_FLYING
+                            // Fly Away
+                            me->SetCanFly(true);
+                            me->SetSpeedRate(MOVE_FLIGHT, 0.75f);
+                            me->SetSpeedRate(MOVE_RUN, 0.75f);
+                            float newx = me->GetPositionX() + 20 * std::cos(me->GetOrientation());
+                            float newy = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
+                            float newz = me->GetPositionZ() + 40.0f;
+                            me->GetMotionMaster()->Clear(false);
+                            me->GetMotionMaster()->MovePoint(0, newx, newy, newz);
+
+                            // Despawn as soon as possible
+                            me->DespawnOrUnsummon(Seconds(4));
+                            _events.Reset();
                             break;
                         }
                         default:
@@ -188,28 +219,8 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 Unit* owner = me->GetOwner();
                 if (!owner || owner != source)
                     return;
-                
-                // Stop Fighting
-                me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
-
-                // Sanctuary
-                me->CastSpell(me, SPELL_DK_SANCTUARY, true);
-                me->SetReactState(REACT_PASSIVE);
-
-                //! HACK: Creature's can't have MOVEMENTFLAG_FLYING
-                // Fly Away
-                me->SetCanFly(true);
-                me->SetSpeedRate(MOVE_FLIGHT, 0.75f);
-                me->SetSpeedRate(MOVE_RUN, 0.75f);
-                float x = me->GetPositionX() + 20 * std::cos(me->GetOrientation());
-                float y = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
-                float z = me->GetPositionZ() + 40.0f;
-                me->GetMotionMaster()->Clear(false);
-                me->GetMotionMaster()->MovePoint(0, x, y, z);
-
-                // Despawn as soon as possible
-                me->DespawnOrUnsummon(Seconds(4));
-                _events.Reset();
+                _events.CancelEvent(EVENT_COMBAT_UPD);
+                _events.ScheduleEvent(EVENT_COMBAT_OUT, 100);                
             }
             
         private:
