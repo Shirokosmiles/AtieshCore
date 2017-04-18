@@ -3023,7 +3023,7 @@ public:
         {
             offset.m_positionX = frand(-5.0f, 5.0f);
             offset.m_positionY = frand(-5.0f, 5.0f);
-            offset.m_positionZ = 40.0f;
+            offset.m_positionZ = 20.0f;
             return true;
         }
 
@@ -3032,7 +3032,7 @@ public:
             WorldLocation summonPos = *GetExplTargetDest();
             summonPos.RelocateOffset(offset);
             SetExplTargetDest(summonPos);
-            GetHitDest()->RelocateOffset(offset);
+            GetHitDest()->Relocate(summonPos);
         }
 
         void HandleLaunchTarget(SpellEffIndex /*effIndex*/)

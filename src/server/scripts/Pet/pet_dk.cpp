@@ -27,6 +27,8 @@
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "MoveSpline.h"
+#include "MoveSplineInit.h"
 
 enum DeathKnightSpells
 {
@@ -53,6 +55,13 @@ enum DeathKnightSpells
     SPELL_DISMISS_RUNEBLADE         = 50707 // Right now despawn is done by its duration
 };
 
+enum GargoyleState
+{    
+    EVENT_MOVE_AT_TARGET    = 0,
+    EVENT_START_COMBAT      = 1,
+    EVENT_COMBAT_UPD        = 2
+};
+
 class npc_pet_dk_ebon_gargoyle : public CreatureScript
 {
     public:
@@ -65,40 +74,93 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
             void InitializeAI() override
             {
                 CasterAI::InitializeAI();
-                ObjectGuid ownerGuid = me->GetOwnerGUID();
+                ownerGuid = me->GetOwnerGUID();
                 if (!ownerGuid)
                     return;
 
-                // Find victim of Summon Gargoyle spell
-                std::list<Unit*> targets;
-                Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
-                Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-                me->VisitNearbyObject(30.0f, searcher);
-                for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                    if ((*iter)->HasAura(SPELL_DK_SUMMON_GARGOYLE_1, ownerGuid))
-                    {
-                        me->Attack((*iter), false);
-                        break;
-                    }
+                _events.Reset();
+                _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 1 * IN_MILLISECONDS);                
             }
 
             void UpdateAI(uint32 diff) override
             {
                 CasterAI::UpdateAI(diff);
-                Unit* owner = me->GetOwner();
-                if (!owner)
-                    return;
+                _events.Update(diff);
 
-                Unit* target = me->GetVictim();
-                if (!target)
-                    return;
+                while (uint32 _eventId = _events.ExecuteEvent())
+                {
+                    switch (_eventId)
+                    {
+                        case EVENT_MOVE_AT_TARGET:
+                        {
+                            // Find victim of Summon Gargoyle spell
+                            std::list<Unit*> targets;
+                            Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
+                            Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+                            me->VisitNearbyObject(30.0f, searcher);
+                            for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                                if ((*iter)->HasAura(SPELL_DK_SUMMON_GARGOYLE_1, ownerGuid))
+                                {
+                                    victim = (*iter);
+                                    break;
+                                }
 
-                Unit* targetdk = owner->GetVictim();
-                if (!targetdk)
-                    return;
+                            if (!victim)
+                                return;
 
-                if (targetdk != target)
-                    me->Attack(targetdk, false);
+                            float o = victim->GetOrientation();
+                            float x = victim->GetPositionX() + (7 * cos(o)) + victim->GetCombatReach();
+                            float y = victim->GetPositionY() + (7 * sin(o)) + victim->GetCombatReach();
+                            float z = victim->GetPositionZ() + 2.5f;
+
+                            // Fly at target
+                            me->SetCanFly(true);
+
+                            Movement::MoveSplineInit init(me);
+                            init.MoveTo(x, y, z, false, true);
+                            init.SetFly();
+                            int32 traveltime = init.Launch();
+                            _events.ScheduleEvent(EVENT_START_COMBAT, traveltime);
+                            break;
+                        }
+                        case EVENT_START_COMBAT:
+                        {
+                            if (me->movespline->Finalized())
+                            {
+                                // Start combat
+                                me->Attack(victim, false);
+                                me->SetCanFly(false);
+                                _events.ScheduleEvent(EVENT_COMBAT_UPD, 1 * IN_MILLISECONDS);
+                                break;
+                            }
+                            else
+                                events.Repeat(Seconds(1));                            
+                            break;
+                        }
+                        case EVENT_COMBAT_UPD:
+                        {
+                            Unit* owner = me->GetOwner();
+                            if (!owner)
+                                return;
+
+                            if (Unit* targetdk = owner->GetVictim())
+                            {
+                                if (!victim) // target should always
+                                    me->Attack(targetdk, false);
+
+                                if (targetdk != victim)
+                                {
+                                    victim = targetdk;
+                                    me->Attack(victim, false);
+                                }
+                            }
+                            events.Repeat(Seconds(1));
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }                
             }
 
             void JustDied(Unit* /*killer*/) override
@@ -118,6 +180,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 if (!owner || owner != source)
                     return;
 
+                _events.Reset();
                 // Stop Fighting
                 me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
 
@@ -132,13 +195,18 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 me->SetSpeedRate(MOVE_RUN, 0.75f);
                 float x = me->GetPositionX() + 20 * std::cos(me->GetOrientation());
                 float y = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
-                float z = source->GetPositionZ() + 2.5f;
+                float z = me->GetPositionZ() + 40.0f;
                 me->GetMotionMaster()->Clear(false);
                 me->GetMotionMaster()->MovePoint(0, x, y, z);
 
                 // Despawn as soon as possible
-                me->DespawnOrUnsummon(Seconds(5));
+                me->DespawnOrUnsummon(Seconds(4));
             }
+            
+        private:
+            Unit* victim;
+            ObjectGuid ownerGuid;
+            EventMap _events;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
