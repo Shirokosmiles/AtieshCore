@@ -2635,7 +2635,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         uint32 m_timeSyncCounter;
         uint32 m_timeSyncTimer;
-        int64 m_timeSyncClockDelta;
+        uint32 m_timeSyncClient;
         uint32 m_timeSyncServer;
 
         InstanceTimeMap _instanceResetTimes;

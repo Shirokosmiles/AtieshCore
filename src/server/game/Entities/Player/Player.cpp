@@ -520,7 +520,7 @@ Player::Player(WorldSession* session): Unit(true)
 
     m_timeSyncCounter = 0;
     m_timeSyncTimer = 0;
-    m_timeSyncClockDelta = 0;
+    m_timeSyncClient = 0;
     m_timeSyncServer = 0;
 
     for (uint8 i = 0; i < MAX_POWERS; ++i)
@@ -26166,7 +26166,7 @@ void Player::ResetTimeSync()
 {
     m_timeSyncCounter = 0;
     m_timeSyncTimer = 0;
-    m_timeSyncClockDelta = 0;
+    m_timeSyncClient = 0;
     m_timeSyncServer = GameTime::GetGameTimeMS();
 }
 

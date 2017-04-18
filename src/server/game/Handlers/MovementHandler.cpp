@@ -33,6 +33,8 @@
 #include "Vehicle.h"
 #include "GameTime.h"
 
+#define MOVEMENT_PACKET_TIME_DELAY 0
+
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvData*/)
 {
     TC_LOG_DEBUG("network", "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
@@ -360,19 +362,14 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (plrMover)
         sAnticheatMgr->StartHackDetection(plrMover, movementInfo, opcode);
 
+    uint32 mstime = GameTime::GetGameTimeMS();
+    /*----------------------*/
+    if (m_clientTimeDelay == 0)
+        m_clientTimeDelay = mstime - movementInfo.time;
+
     /* process position-change */
     WorldPacket data(opcode, recvData.size());
-
-    if (plrMover)
-    {        
-        int64 movementTime = (int64)movementInfo.time + plrMover->m_timeSyncClockDelta; // time of the event on the server clock.
-        if (movementTime < 0 || movementTime > 0xFFFFFFFF)
-        {
-            TC_LOG_WARN("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
-            movementTime = getMSTime();
-        }
-        movementInfo.time = (uint32)movementTime;
-    }
+    movementInfo.time = movementInfo.time + m_clientTimeDelay + MOVEMENT_PACKET_TIME_DELAY;
 
     movementInfo.guid = mover->GetGUID();
     WriteMovementInfo(&data, &movementInfo);

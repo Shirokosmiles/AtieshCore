@@ -1261,30 +1261,20 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
 
     TC_LOG_DEBUG("network", "CMSG_TIME_SYNC_RESP");
 
-    uint32 counter, clientTimestamp;
-    recvData >> counter >> clientTimestamp;
+    uint32 counter, clientTicks;
+    recvData >> counter >> clientTicks;
 
     if (counter != _player->m_timeSyncCounter - 1)
-    {
         TC_LOG_DEBUG("network", "Wrong time sync counter from player %s (cheater?)", _player->GetName().c_str());
-        // todo: send a new one?
-        return;
-    }
 
-    // time it took for the request to travel to the client, for the client to process it and reply and for response to travel back to the server.
-    uint32 roundTripDuration = getMSTimeDiff(_player->m_timeSyncServer, getMSTime());
-    uint32 lagDelay = roundTripDuration / 2; // we assume that the request processing time equals 0.
+    TC_LOG_DEBUG("network", "Time sync received: counter %u, client ticks %u, time since last sync %u", counter, clientTicks, clientTicks - _player->m_timeSyncClient);
 
-    /*
-    clockDelta = serverTime - clientTime
-    where
-    serverTime: time that was displayed on the clock of the SERVER at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
-    clientTime:  time that was displayed on the clock of the CLIENT at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
-    Once clockDelta has been computed, we can compute the time on server clock of an event when we know the time of the event on the client clock,
-    using this relation:
-    serverTime = clockDelta + clientTime
-    */
-    _player->m_timeSyncClockDelta = (int64) (_player->m_timeSyncServer + lagDelay) - (int64) clientTimestamp;
+    uint32 ourTicks = clientTicks + (GameTime::GetGameTimeMS() - _player->m_timeSyncServer);
+
+    // diff should be small
+    TC_LOG_DEBUG("network", "Our ticks: %u, diff %u, latency %u", ourTicks, ourTicks - clientTicks, GetLatency());
+
+    _player->m_timeSyncClient = clientTicks;
 }
 
 void WorldSession::HandleResetInstancesOpcode(WorldPacket& /*recvData*/)
