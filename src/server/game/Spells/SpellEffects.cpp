@@ -4778,7 +4778,10 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
         return;
 
     float speedxy = m_spellInfo->Effects[effIndex].MiscValue / 10.f;
-    float speedz = damage/ 10.f;
+    float modificator = sqrt(damage);
+    if (modificator > 10.0f)
+        modificator = 10.0f;
+    float speedz = damage / modificator;
 
     //1891: Disengage
     //4022: Rolling Throw
