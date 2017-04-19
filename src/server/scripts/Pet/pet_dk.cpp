@@ -120,8 +120,14 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                                     break;
                                 }                            
 
-                            if (!victim)
-                                return;
+                            if (!victim || !victim->IsAlive())
+                            {
+                                Unit* targetdk = me->GetOwner()->GetVictim();
+                                if (targetdk && targetdk->IsInCombatWith(me->GetOwner()))
+                                    victim = targetdk;
+                                else
+                                    victim = me->GetOwner();
+                            }
 
                             float o = victim->GetOrientation();
                             float x = victim->GetPositionX() + (7 * cos(o)) + victim->GetCombatReach();
@@ -145,7 +151,8 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                         {
                             me->SetReactState(REACT_AGGRESSIVE);
                             // Start combat
-                            me->Attack(victim, false);
+                            if (victim != me->GetOwner())
+                                me->Attack(victim, false);
                             me->SetCanFly(false);
                             _events.ScheduleEvent(EVENT_COMBAT_UPD, 100);
 
@@ -159,10 +166,10 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
 
                             if (Unit* targetdk = owner->GetVictim())
                             {
-                                if (!victim && owner->IsInCombatWith(targetdk)) // target should always
+                                if ((!victim || !victim->IsAlive()) && targetdk->IsAlive() && owner->IsInCombatWith(targetdk)) // target should always
                                     me->Attack(targetdk, false);
 
-                                if (targetdk != victim)
+                                if (targetdk != victim && targetdk->IsAlive() && owner->IsInCombatWith(targetdk))
                                 {
                                     victim = targetdk;
                                     me->Attack(victim, false);
