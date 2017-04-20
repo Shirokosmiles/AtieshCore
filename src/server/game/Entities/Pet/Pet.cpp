@@ -1093,12 +1093,30 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 {
                     if (!pInfo)
                     {
-                        SetCreateMana(28 + 10*petlevel);
-                        SetCreateHealth(28 + 30*petlevel);
+                        SetCreateMana(28 + 10 * petlevel);
+                        SetCreateHealth(GetOwner()->GetMaxHealth() / 2);
                     }
-                    SetBonusDamage(int32(GetOwner()->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f));
+
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+
+                    float ownerAP = GetOwner()->GetTotalAttackPowerValue(BASE_ATTACK);
+                    float sp = ownerAP * 0.47f;
+                    float gap = ownerAP * 0.33f;
+                    float bonus = 0.0f;
+                    if (Player *owner = GetOwner()->ToPlayer()) // get 100% of owning player's haste
+                        bonus = owner->GetRatingBonusValue(CR_HASTE_MELEE);
+
+                    float dkarmor = GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_BASE_RESISTANCE);
+                    float armor = dkarmor + dkarmor * 0.25f;
+
+                    bonus += GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) +
+                        GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
+                    ApplyCastTimePercentMod(bonus, true);
+
+                    SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, gap);
+                    SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
+                    SetBonusDamage(int32(sp));
                     break;
                 }
                 case 28017: // Bloodworms
