@@ -3361,7 +3361,24 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
 
     // these spells must not be downscaled, thus marking them negative (see GetAuraRankForLevel)
     if (HasAttribute(SPELL_ATTR2_UNK3))
-        return false;
+    {
+        bool positive = false;
+        switch (Id)
+        {
+            case 54646: // Focus Magic
+            case 19752: //Divine Intervention
+            case 60229: //Greatness
+            case 60233: //Greatness
+            case 60234: //Greatness
+                positive = true;
+                break;
+            default:
+                break;
+        }
+
+        if (!positive)
+            return false;
+    }        
 
     switch (SpellFamilyName)
     {
