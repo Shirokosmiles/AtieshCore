@@ -1094,29 +1094,33 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     if (!pInfo)
                     {
                         SetCreateMana(28 + 10 * petlevel);
-                        SetCreateHealth(GetOwner()->GetMaxHealth() / 2);
+                        SetCreateHealth(28 + 30 * petlevel);
                     }
 
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
 
-                    float ownerAP = GetOwner()->GetTotalAttackPowerValue(BASE_ATTACK);
-                    float sp = ownerAP * 0.47f;
-                    float gap = ownerAP * 0.33f;
-                    float bonus = 0.0f;
-                    if (Player *owner = GetOwner()->ToPlayer()) // get 100% of owning player's haste
-                        bonus = owner->GetRatingBonusValue(CR_HASTE_MELEE);
+                    if (GetOwner())
+                    {
+                        float ownerAP = GetOwner()->GetTotalAttackPowerValue(BASE_ATTACK);
+                        float sp = ownerAP * 0.47f;
+                        float gap = ownerAP * 0.33f;
+                        float dkarmor = GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_BASE_RESISTANCE);
+                        float armor = dkarmor + dkarmor * 0.25f;
 
-                    float dkarmor = GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_BASE_RESISTANCE);
-                    float armor = dkarmor + dkarmor * 0.25f;
+                        SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, gap);
+                        SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
+                        SetBonusDamage(int32(sp));
 
-                    bonus += GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) +
-                        GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
-                    ApplyCastTimePercentMod(bonus, true);
-
-                    SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, gap);
-                    SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
-                    SetBonusDamage(int32(sp));
+                        if (Player *owner = GetOwner()->ToPlayer()) // get 100% of owning player's haste
+                        {
+                            float bonus = owner->GetRatingBonusValue(CR_HASTE_MELEE) +
+                                GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) +
+                                GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
+                            SetCreateHealth(uint32(owner->GetMaxHealth() * 0.5)); // hp must be 0.5x of DK hp
+                            ApplyCastTimePercentMod(bonus, true);
+                        }
+                    }
                     break;
                 }
                 case 28017: // Bloodworms
