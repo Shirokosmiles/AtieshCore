@@ -59,8 +59,7 @@ enum GargoyleState
 {    
     EVENT_MOVE_AT_TARGET    = 1,
     EVENT_START_COMBAT      = 2,
-    EVENT_COMBAT_UPD        = 3,
-    EVENT_COMBAT_OUT        = 4
+    EVENT_COMBAT_OUT        = 3
 };
 
 class npc_pet_dk_ebon_gargoyle : public CreatureScript
@@ -112,97 +111,83 @@ public:
             {
                 switch (_eventId)
                 {
-                case EVENT_MOVE_AT_TARGET:
-                {
-                    // Find victim of Summon Gargoyle spell
-                    std::list<Unit*> targets;
-                    Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
-                    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-                    me->VisitNearbyObject(30.0f, searcher);
-                    for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                        if ((*iter)->HasAura(SPELL_DK_SUMMON_GARGOYLE_1, ownerGuid))
+                    case EVENT_MOVE_AT_TARGET:
+                    {
+                        // Find victim of Summon Gargoyle spell
+                        std::list<Unit*> targets;
+                        Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
+                        Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+                        me->VisitNearbyObject(30.0f, searcher);
+                        for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                            if ((*iter)->HasAura(SPELL_DK_SUMMON_GARGOYLE_1, ownerGuid))
+                            {
+                                victim = (*iter)->GetGUID();
+                                break;
+                            }
+
+                        Unit* target = ObjectAccessor::GetUnit(*me, victim);
+
+                        if (!target)
                         {
-                            victim = (*iter);
+                            _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 400);
                             break;
                         }
 
-                    if (!victim)
-                    {
-                        _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 400);
-                        return;
+                        float o = target->GetOrientation();
+                        float x = target->GetPositionX() + (7 * cos(o)) + target->GetCombatReach();
+                        float y = target->GetPositionY() + (7 * sin(o)) + target->GetCombatReach();
+                        float z = target->GetPositionZ() + 4.5f;
+
+                        me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, false);
+
+                        me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
+                        me->SetSpeedRate(MOVE_RUN, 1.0f);
+
+                        // Fly at target
+                        Movement::MoveSplineInit init(me);
+                        init.MoveTo(x, y, z);
+                        init.SetFly();
+                        int32 traveltime = init.Launch();
+                        _events.ScheduleEvent(EVENT_START_COMBAT, traveltime);
+                        break;
                     }
-
-                    float o = victim->GetOrientation();
-                    float x = victim->GetPositionX() + (7 * cos(o)) + victim->GetCombatReach();
-                    float y = victim->GetPositionY() + (7 * sin(o)) + victim->GetCombatReach();
-                    float z = victim->GetPositionZ() + 4.5f;
-
-                    me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, false);
-
-                    me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
-                    me->SetSpeedRate(MOVE_RUN, 1.0f);
-
-                    // Fly at target
-                    Movement::MoveSplineInit init(me);
-                    init.MoveTo(x, y, z);
-                    init.SetFly();
-                    int32 traveltime = init.Launch();
-                    _events.ScheduleEvent(EVENT_START_COMBAT, traveltime);
-                    break;
-                }
-                case EVENT_START_COMBAT:
-                {
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    // Start combat
-                    me->Attack(victim, false);
-                    me->SetCanFly(false);
-                    _events.ScheduleEvent(EVENT_COMBAT_UPD, 100);
-
-                    break;
-                }
-                case EVENT_COMBAT_UPD:
-                {
-                    /* Unit* owner = me->GetOwner();
-                    if (!owner || !owner->IsAlive())
-                    return;
-
-                    if (Unit* targetdk = owner->GetVictim())
+                    case EVENT_START_COMBAT:
                     {
-                    if ((!victim || !victim->IsAlive()) && targetdk->IsAlive() && owner->IsInCombatWith(targetdk)) // target should always
-                    me->Attack(targetdk, false);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        // Start combat
+                        if (Unit* target = ObjectAccessor::GetUnit(*me, victim))
+                            me->Attack(target, false);
+                        me->SetCanFly(false);
+                        break;
                     }
-                    */
-                    _events.ScheduleEvent(EVENT_COMBAT_UPD, 100);
-                    break;
-                }
-                case EVENT_COMBAT_OUT:
-                {
-                    me->CombatStop(true);
-                    // Stop Fighting
-                    me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
+                    case EVENT_COMBAT_OUT:
+                    {
+                        me->CombatStop(true);
+                        // Stop Fighting
+                        me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
 
-                    // Sanctuary
-                    me->CastSpell(me, SPELL_DK_SANCTUARY, true);
-                    me->SetReactState(REACT_PASSIVE);
+                        // Sanctuary
+                        me->CastSpell(me, SPELL_DK_SANCTUARY, true);
+                        me->SetReactState(REACT_PASSIVE);
 
-                    //! HACK: Creature's can't have MOVEMENTFLAG_FLYING
-                    // Fly Away
-                    me->SetCanFly(true);
-                    me->SetSpeedRate(MOVE_FLIGHT, 0.75f);
-                    me->SetSpeedRate(MOVE_RUN, 0.75f);
-                    float newx = me->GetPositionX() + 20 * std::cos(me->GetOrientation());
-                    float newy = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
-                    float newz = me->GetPositionZ() + 40.0f;
-                    me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MovePoint(0, newx, newy, newz);
+                        //! HACK: Creature's can't have MOVEMENTFLAG_FLYING
+                        // Fly Away
+                        me->SetCanFly(true);
+                        me->SetSpeedRate(MOVE_FLIGHT, 0.75f);
+                        me->SetSpeedRate(MOVE_RUN, 0.75f);
+                        float newx = me->GetPositionX() + 20 * std::cos(me->GetOrientation());
+                        float newy = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
+                        float newz = me->GetPositionZ() + 40.0f;
+                        me->GetMotionMaster()->Clear(false);
+                        me->GetMotionMaster()->MovePoint(0, newx, newy, newz);
 
-                    // Despawn as soon as possible
-                    me->DespawnOrUnsummon(Seconds(4));
-                    _events.Reset();
-                    break;
-                }
-                default:
-                    break;
+                        // Despawn as soon as possible
+                        me->DespawnOrUnsummon(Seconds(4));
+                        _events.Reset();
+                        break;
+                    }
+                    default:
+                        break;
                 }
             }
         }
@@ -225,12 +210,11 @@ public:
             Unit* owner = me->GetOwner();
             if (!owner || owner != source)
                 return;
-            _events.CancelEvent(EVENT_COMBAT_UPD);
             _events.ScheduleEvent(EVENT_COMBAT_OUT, 100);
         }
 
     private:
-        Unit* victim;
+        ObjectGuid victim;
         ObjectGuid ownerGuid;
         EventMap _events;
     };
