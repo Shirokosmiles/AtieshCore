@@ -5022,7 +5022,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
             if (m_triggeredByAuraSpell)
                 return SPELL_FAILED_DONT_REPORT;
             else
-                return SPELL_FAILED_NOT_READY;
+                return m_spellInfo->Id == 15473 ? SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW : SPELL_FAILED_NOT_READY; // !Hack, returning not ready bugs shadowform client
         }
     }
 
