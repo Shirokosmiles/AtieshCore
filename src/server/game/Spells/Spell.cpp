@@ -1275,6 +1275,22 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     dest = SpellDestination(*target);
             }
             break;
+        case TARGET_DEST_TARGET_BACK:
+        {
+            if (Unit* target = m_caster->GetVictim())
+            {
+                Position pos = target->GetPosition();
+                float vcos, vsin;
+                m_caster->GetSinCos(pos.m_positionX, pos.m_positionY, vsin, vcos);
+
+                pos.m_positionX += 0.05f * vcos;
+                pos.m_positionY += 0.05f * vsin;
+                target->UpdateAllowedPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+
+                dest = SpellDestination(pos.m_positionX, pos.m_positionY, pos.m_positionZ, target->GetOrientation());
+            }
+            break;
+        }
         case TARGET_DEST_CASTER_FISHING:
         {
             float minDist = m_spellInfo->GetMinRange(true);
