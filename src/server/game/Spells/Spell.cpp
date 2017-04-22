@@ -5960,6 +5960,9 @@ SpellCastResult Spell::CheckCasterAuras(uint32* param1) const
     if (m_spellInfo->HasAttribute(SPELL_ATTR6_IGNORE_CASTER_AURAS))
         return SPELL_CAST_OK;
 
+    if (m_spellInfo->HasAttribute(SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY) && m_caster->HasAura(33786))
+        return SPELL_FAILED_STUNNED;
+
     // these attributes only show the spell as usable on the client when it has related aura applied
     // still they need to be checked against certain mechanics
 
