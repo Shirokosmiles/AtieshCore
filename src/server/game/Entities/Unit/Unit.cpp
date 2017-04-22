@@ -2763,7 +2763,12 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spellInfo, boo
 
 uint32 Unit::GetShieldBlockValue(uint32 soft_cap, uint32 hard_cap) const
 {
+
     uint32 value = GetShieldBlockValue();
+    float pctMod = GetShieldBlockValuePctMod();
+    soft_cap *= pctMod;
+    hard_cap *= pctMod;
+
     if (value >= hard_cap)
     {
         value = (soft_cap + hard_cap) / 2;

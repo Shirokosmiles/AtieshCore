@@ -523,6 +523,11 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool SetFeatherFall(bool enable, bool packetOnly = false) override;
         bool SetHover(bool enable, bool packetOnly = false) override;
 
+        float GetShieldBlockValuePctMod() const
+        {
+            return 1.0f;
+        }
+        
         uint32 GetShieldBlockValue() const override;
 
         SpellSchoolMask GetMeleeDamageSchoolMask() const override { return m_meleeDamageSchoolMask; }
