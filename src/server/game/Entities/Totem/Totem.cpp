@@ -154,6 +154,10 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Uni
     /// @todo possibly all negative auras immune?
     if (GetEntry() == 5925)
         return false;
+    
+    // Devouring plague with trigger
+    if (spellInfo->Id == 48300)
+        return false;
 
     switch (spellInfo->Effects[index].ApplyAuraName)
     {
