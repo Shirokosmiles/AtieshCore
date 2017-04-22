@@ -3220,6 +3220,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Death and Decay
     ApplySpellFix({ 52212 }, [](SpellInfo* spellInfo)
     {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
         spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
     });
 
@@ -3984,6 +3985,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(1); // 10 seconds
     });
 
+    // Putrice-pre event leap spell 
+    ApplySpellFix({ 70485 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS);
+    });
+
     ApplySpellFix({
         71412, // Green Ooze Summon (Professor Putricide)
         71415  // Orange Ooze Summon (Professor Putricide)
@@ -4246,6 +4253,22 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
     });
 
+    ApplySpellFix({ 62124 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes &= ~SPELL_ATTR0_ABILITY;
+        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+        spellInfo->SchoolMask = SPELL_SCHOOL_MASK_HOLY;
+    });
+
+    ApplySpellFix({ 56222 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes &= ~SPELL_ATTR0_ABILITY;
+        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+        spellInfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
+    });
+
     // Jump
     ApplySpellFix({ 71809 }, [](SpellInfo* spellInfo)
     {
@@ -4379,6 +4402,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
     });
+
+    ApplySpellFix({ 52610 }, [](SpellInfo* spellInfo) // Savage Roar
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NOT_BREAK_STEALTH;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+    });
+
     // ENDOF ISLE OF CONQUEST SPELLS
 
     ApplySpellFix({
