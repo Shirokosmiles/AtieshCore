@@ -1099,6 +1099,8 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
         return;
     }
 
+    unitTarget->UpdatePosition(x, y, z, orientation);
+
     // post effects for TARGET_DEST_DB
     switch (m_spellInfo->Id)
     {

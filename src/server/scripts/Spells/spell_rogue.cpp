@@ -415,8 +415,6 @@ class spell_rog_killing_spree : public SpellScriptLoader
                     {
                         GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_TELEPORT, true);
                         GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG, true);
-                        pos = GetTarget()->GetPosition();
-                        GetTarget()->UpdatePosition(pos);
                         break;
                     }
                     else
