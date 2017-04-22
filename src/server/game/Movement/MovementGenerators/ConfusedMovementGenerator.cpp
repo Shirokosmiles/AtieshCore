@@ -55,10 +55,15 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
     if (!owner || !owner->IsAlive())
         return false;
 
+    if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED))
+        return true;
+
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
     {
         _interrupt = true;
-        owner->StopMoving(true);
+        // remove old flag of movement
+        owner->ClearUnitState(UNIT_STATE_CONFUSED_MOVE);
+        owner->StopMoving(true);        
         return true;
     }
     else
@@ -105,7 +110,6 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
         init.SetWalk(true);
         int32 traveltime = init.Launch();
         _timer.Reset(traveltime + urand(800, 1500));
-
         owner->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
 
         // update position for server and others units/players

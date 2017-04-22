@@ -1040,13 +1040,8 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     //49375: Feral Charge - Cat
     if (m_spellInfo->Id == 49376)
     {
-        speedXY = float(m_spellInfo->Effects[effIndex].MiscValueB) * 0.1f;
-        speedZ = float(m_spellInfo->Effects[effIndex].MiscValue);
-        if (speedZ < dist)
-        {
-            speedZ += sqrt(dist);
-            speedXY += dist * 0.1f;
-        }
+        speedXY = float(m_spellInfo->Effects[effIndex].MiscValueB) * 0.1f + sqrt(dist);
+        speedZ = float(m_spellInfo->Effects[effIndex].MiscValue) + dist * 0.2f;
     }
     else
         CalculateJumpSpeeds(effIndex, dist, speedXY, speedZ);

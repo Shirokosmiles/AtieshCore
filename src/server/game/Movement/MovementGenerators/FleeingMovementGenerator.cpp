@@ -81,6 +81,12 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
     if (!owner || !owner->IsAlive())
         return false;
 
+    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+    {
+        owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
+        return true;
+    }
+
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
     {
         _interrupt = true;
@@ -117,7 +123,8 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
         return;
     }
 
-    owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
+    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+        return;
 
     Position destination = owner->GetPosition();
     GetPoint(owner, destination);
@@ -146,7 +153,7 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     init.SetRun(true);
     int32 traveltime = init.Launch();
     _timer.Reset(traveltime + urand(800, 1500));
-
+    owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
     // update position
     Movement::Location loc = owner->movespline->ComputePosition();
 

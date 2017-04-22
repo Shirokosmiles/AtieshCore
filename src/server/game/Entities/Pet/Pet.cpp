@@ -1107,7 +1107,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         float gap = ownerAP * 0.33f;
                         float dkarmor = GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_BASE_RESISTANCE);
                         float armor = dkarmor + dkarmor * 0.25f;
-
+                        float health = float(GetOwner()->GetMaxHealth()) / 2.0f;
+                        SetMaxHealth(uint32(health));// hp must be 0.5x of DK hp
                         SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, gap);
                         SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
                         SetBonusDamage(int32(sp));
@@ -1117,7 +1118,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             float bonus = owner->GetRatingBonusValue(CR_HASTE_MELEE) +
                                 GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) +
                                 GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
-                            SetCreateHealth(uint32(owner->GetMaxHealth() * 0.5)); // hp must be 0.5x of DK hp
+                            
                             ApplyCastTimePercentMod(bonus, true);
                         }
                     }
