@@ -2752,10 +2752,13 @@ void SpellInfo::_LoadImmunityInfo()
             {
                 switch (Id)
                 {
-                    case 34471: // The Beast Within
-                    case 19574: // Bestial Wrath
                     case 42292: // PvP trinket
                     case 59752: // Every Man for Himself
+                        mechanicImmunityMask |= IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
+                        immuneInfo.AuraTypeImmune.insert(SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED);
+                        break;
+                    case 34471: // The Beast Within
+                    case 19574: // Bestial Wrath
                     case 53490: // Bullheaded
                         mechanicImmunityMask |= IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
                         break;
@@ -3471,6 +3474,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                 case SPELL_AURA_MOD_STEALTH:
                     return true;
                 case SPELL_AURA_CHANNEL_DEATH_ITEM:
+                case SPELL_AURA_EMPATHY:
                     return false;
             }
         }
