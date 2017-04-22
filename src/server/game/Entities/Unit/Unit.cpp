@@ -511,7 +511,7 @@ void Unit::UpdateSplinePosition()
     if (!movespline->Initialized())
         return;
 
-    static uint32 const positionUpdateDelay = 200;
+    static uint32 const positionUpdateDelay = 400;
 
     m_movesplineTimer.Reset(positionUpdateDelay);
     Movement::Location loc = movespline->ComputePosition();
