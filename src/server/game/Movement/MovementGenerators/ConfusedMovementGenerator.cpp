@@ -55,8 +55,19 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
     if (!owner || !owner->IsAlive())
         return false;
 
-    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED))
+    if (!owner->HasUnitState(UNIT_STATE_CONFUSED))
+    {
+        owner->StopMoving(true);
+        owner->ClearUnitState(UNIT_STATE_CONFUSED_MOVE);
         return true;
+    }
+
+    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED))
+    {
+        owner->StopMoving(true);
+        owner->ClearUnitState(UNIT_STATE_CONFUSED_MOVE);
+        return true;
+    }
 
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
     {

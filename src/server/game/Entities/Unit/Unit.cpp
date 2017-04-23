@@ -12298,16 +12298,21 @@ void Unit::SetControlled(bool apply, UnitState state)
         switch (state)
         {
             case UNIT_STATE_STUNNED:
+                UpdateSplinePosition();
                 SetStunned(true);
                 CastStop();
                 break;
             case UNIT_STATE_ROOT:
                 if (!HasUnitState(UNIT_STATE_STUNNED))
+                {
+                    UpdateSplinePosition();
                     SetRooted(true);
+                }
                 break;
             case UNIT_STATE_CONFUSED:
                 if (!HasUnitState(UNIT_STATE_STUNNED))
                 {
+                    UpdateSplinePosition();
                     ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
                     SendMeleeAttackStop();
                     // SendAutoRepeatCancel ?
@@ -12318,6 +12323,7 @@ void Unit::SetControlled(bool apply, UnitState state)
             case UNIT_STATE_FLEEING:
                 if (!HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_CONFUSED))
                 {
+                    UpdateSplinePosition();
                     ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
                     SendMeleeAttackStop();
                     // SendAutoRepeatCancel ?
@@ -12336,25 +12342,25 @@ void Unit::SetControlled(bool apply, UnitState state)
             case UNIT_STATE_STUNNED:
                 if (HasAuraType(SPELL_AURA_MOD_STUN))
                     return;
-
+                UpdateSplinePosition();
                 SetStunned(false);
                 break;
             case UNIT_STATE_ROOT:
                 if (HasAuraType(SPELL_AURA_MOD_ROOT) || GetVehicle())
                     return;
-
+                UpdateSplinePosition();
                 SetRooted(false);
                 break;
             case UNIT_STATE_CONFUSED:
                 if (HasAuraType(SPELL_AURA_MOD_CONFUSE))
                     return;
-
+                UpdateSplinePosition();
                 SetConfused(false);
                 break;
             case UNIT_STATE_FLEEING:
                 if (HasAuraType(SPELL_AURA_MOD_FEAR))
                     return;
-
+                UpdateSplinePosition();
                 SetFeared(false);
                 break;
             default:
@@ -12365,16 +12371,28 @@ void Unit::SetControlled(bool apply, UnitState state)
 
         // Unit States might have been already cleared but auras still present. I need to check with HasAuraType
         if (HasAuraType(SPELL_AURA_MOD_STUN))
+        {
+            UpdateSplinePosition();
             SetStunned(true);
+        }
         else
         {
             if (HasAuraType(SPELL_AURA_MOD_ROOT))
+            {
+                UpdateSplinePosition();
                 SetRooted(true);
+            }
 
             if (HasAuraType(SPELL_AURA_MOD_CONFUSE))
+            {
+                UpdateSplinePosition();
                 SetConfused(true);
+            }
             else if (HasAuraType(SPELL_AURA_MOD_FEAR))
+            {
+                UpdateSplinePosition();
                 SetFeared(true);
+            }
         }
     }
 }
@@ -12480,9 +12498,9 @@ void Unit::SetFeared(bool apply)
 {
     if (apply)
     {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         StopMoving(true);
         GetMotionMaster()->MovementExpired();
+        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         Position pos = GetPosition();
         UpdatePosition(pos);
         SetTarget(ObjectGuid::Empty);
@@ -12517,6 +12535,7 @@ void Unit::SetConfused(bool apply)
     {
         SetTarget(ObjectGuid::Empty);
         StopMoving(true);
+        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         GetMotionMaster()->MovementExpired();
         GetMotionMaster()->MoveConfused();
     }
