@@ -1090,7 +1090,11 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
     TC_LOG_DEBUG("spells", "Spell::EffectTeleportUnits - teleport unit to %u %f %f %f %f\n", mapid, x, y, z, orientation);
 
     if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    {
         unitTarget->ToPlayer()->TeleportTo(mapid, x, y, z, orientation, unitTarget == m_caster ? TELE_TO_SPELL | TELE_TO_NOT_LEAVE_COMBAT : 0);
+        if (mapid == unitTarget->GetMapId())
+            unitTarget->UpdatePosition(x, y, z, orientation);
+    }
     else if (mapid == unitTarget->GetMapId())
         unitTarget->NearTeleportTo(x, y, z, orientation, unitTarget == m_caster);
     else
@@ -1098,7 +1102,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
         TC_LOG_ERROR("spells", "Spell::EffectTeleportUnits - spellId %u attempted to teleport creature to a different map.", m_spellInfo->Id);
         return;
     }
-    
+
     // post effects for TARGET_DEST_DB
     switch (m_spellInfo->Id)
     {
