@@ -1098,9 +1098,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
         TC_LOG_ERROR("spells", "Spell::EffectTeleportUnits - spellId %u attempted to teleport creature to a different map.", m_spellInfo->Id);
         return;
     }
-
-    unitTarget->UpdatePosition(x, y, z, orientation);
-
+    
     // post effects for TARGET_DEST_DB
     switch (m_spellInfo->Id)
     {
