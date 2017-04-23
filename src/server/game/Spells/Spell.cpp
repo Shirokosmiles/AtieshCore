@@ -5980,7 +5980,7 @@ SpellCastResult Spell::CheckCasterAuras(uint32* param1) const
         return SPELL_CAST_OK;
 
     // hack, but nessesary for stop cast under by cyclone
-    if (m_spellInfo->Id != (59752 || 42292) && m_spellInfo->HasAttribute(SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY) && m_caster->HasAura(33786))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY) && m_caster->HasAura(33786) && m_spellInfo->Id != 59752 && m_spellInfo->Id != 42292)
         return SPELL_FAILED_STUNNED;
 
     // these attributes only show the spell as usable on the client when it has related aura applied
