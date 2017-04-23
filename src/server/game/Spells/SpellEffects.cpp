@@ -1037,10 +1037,10 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
 
     float speedXY, speedZ;
     float dist = m_caster->GetExactDist2d(destTarget);
-    //49375: Feral Charge - Cat
+    //49376: Feral Charge - Cat
     if (m_spellInfo->Id == 49376)
     {
-        speedXY = float(m_spellInfo->Effects[effIndex].MiscValueB) * 0.1f + sqrt(dist);
+        speedXY = (float(m_spellInfo->Effects[effIndex].MiscValueB) * 0.1f + sqrt(dist)) * 2.0f;
         speedZ = float(m_spellInfo->Effects[effIndex].MiscValue) + dist * 0.2f;
     }
     else
