@@ -1092,7 +1092,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
     if (unitTarget->GetTypeId() == TYPEID_PLAYER)
     {
         unitTarget->ToPlayer()->TeleportTo(mapid, x, y, z, orientation, unitTarget == m_caster ? TELE_TO_SPELL | TELE_TO_NOT_LEAVE_COMBAT : 0);
-        if (mapid == unitTarget->GetMapId())
+        if (m_spellInfo->Id == 57840 && mapid == unitTarget->GetMapId())
             unitTarget->UpdatePosition(x, y, z, orientation);
     }
     else if (mapid == unitTarget->GetMapId())
