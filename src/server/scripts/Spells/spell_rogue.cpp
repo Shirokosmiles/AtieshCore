@@ -161,6 +161,8 @@ class spell_rog_cheat_death : public SpellScriptLoader
                 // hp lower than 10% - absorb everything
                 else
                     absorbAmount = dmgInfo.GetDamage();
+
+                target->CastSpell(target, 45182); // cheat death aura
             }
 
             void Register() override

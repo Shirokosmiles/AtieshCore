@@ -1197,7 +1197,12 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
     }
 
     // Script Hook For CalculateSpellDamageTaken -- Allow scripts to change the Damage post class mitigation calculations
-    sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);
+    sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);   
+
+    if (damageInfo->target->UnderCheatDeath())
+    {
+        damage -= CalculatePct(damage, 90);
+    }
 
     // Calculate absorb resist
     if (damage < 0)
@@ -1417,7 +1422,12 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
     ApplyResilience(victim, NULL, &resilienceReduction, (damageInfo->hitOutCome == MELEE_HIT_CRIT), CR_CRIT_TAKEN_MELEE);
     resilienceReduction = damageInfo->damage - resilienceReduction;
     damageInfo->damage      -= resilienceReduction;
-    damageInfo->cleanDamage += resilienceReduction;
+    damageInfo->cleanDamage += resilienceReduction;    
+
+    if (damageInfo->target->UnderCheatDeath())
+    {
+        damageInfo->damage -= CalculatePct(damageInfo->damage, 90);
+    }
 
     // Calculate absorb resist
     if (int32(damageInfo->damage) > 0)

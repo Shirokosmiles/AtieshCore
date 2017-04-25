@@ -1673,6 +1673,7 @@ class TC_GAME_API Unit : public WorldObject
         bool isDying() const { return (m_deathState == JUST_DIED); }
         bool isDead() const { return (m_deathState == DEAD || m_deathState == CORPSE); }
         bool IsGhouled() const;
+        bool UnderCheatDeath() const { return HasAura(45182 /*Cheat Death aura -90% dmg*/); }
         DeathState getDeathState() const { return m_deathState; }
         virtual void setDeathState(DeathState s);           // overwrited in Creature/Player/Pet
 
