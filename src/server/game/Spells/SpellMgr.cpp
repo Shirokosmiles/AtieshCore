@@ -4419,6 +4419,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
     });
 
+    ApplySpellFix({ 47496 }, [](SpellInfo* spellInfo) // Corpse explosion Correct fix 
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_FIXED_DAMAGE;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_RESISTANCES;
+    });
+
     ApplySpellFix({
         // Proc attribute correction
         // Remove procflags from test/debug/deprecated spells to avoid DB Errors

@@ -99,10 +99,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!me->IsAlive())
-            {
-                _events.Reset();
                 return;
-            }
 
             CasterAI::UpdateAI(diff);
             _events.Update(diff);
@@ -197,8 +194,6 @@ public:
             // Stop Feeding Gargoyle when it dies
             if (Unit* owner = me->GetOwner())
                 owner->RemoveAurasDueToSpell(SPELL_DK_SUMMON_GARGOYLE_2);
-
-            _events.Reset();
         }
 
         // Fly away when dismissed
@@ -210,7 +205,7 @@ public:
             Unit* owner = me->GetOwner();
             if (!owner || owner != source)
                 return;
-            _events.ScheduleEvent(EVENT_COMBAT_OUT, 100);
+            _events.ScheduleEvent(EVENT_COMBAT_OUT, 0);
         }
 
     private:

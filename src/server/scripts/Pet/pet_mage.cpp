@@ -35,7 +35,12 @@ enum MageSpells
     SPELL_MAGE_CLONE_ME                 = 45204,
     SPELL_MAGE_MASTERS_THREAT_LIST      = 58838,
     SPELL_MAGE_FROST_BOLT               = 59638,
-    SPELL_MAGE_FIRE_BLAST               = 59637
+    SPELL_MAGE_FIRE_BLAST               = 59637,
+
+    SPELL_FROSTSHIELD                   = 43008,
+    SPELL_FIRESHIELD                    = 43046,
+    SPELL_ICEBLOCK                      = 65802,
+    SPELL_NOVA                          = 42917
 };
 
 enum MirrorImageTimers
@@ -217,6 +222,12 @@ class npc_pet_mage_mirror_image : public CreatureScript
                         Init();
                 }
 
+                Unit* pVictim = me->GetVictim();
+                if (pVictim && pVictim->IsWithinDist2d(me->GetPositionX(), me->GetPositionY(), 4.0f)) // icering for mirror image
+                {
+                    events.ScheduleEvent(SPELL_NOVA, 0);
+                }
+
                 if (uint32 spellId = events.ExecuteEvent())
                 {
                     if (spellId == SPELL_MAGE_FROST_BOLT)
@@ -229,7 +240,31 @@ class npc_pet_mage_mirror_image : public CreatureScript
                         DoCastVictim(spellId);
                         events.ScheduleEvent(SPELL_MAGE_FIRE_BLAST, TIMER_MIRROR_IMAGE_FIRE_BLAST);
                     }
+                    else if (spellId == SPELL_NOVA) // root target and move from target
+                    {
+                        DoCastVictim(SPELL_NOVA, false);
+                        me->ClearUnitState(UNIT_STATE_FOLLOW);
+                        me->GetMotionMaster()->Clear(true);
+                        me->GetMotionMaster()->MoveRandom(6.0f);
+                        events.ScheduleEvent(42917 + 1, 3 * IN_MILLISECONDS);
+                    }
+                    else if (spellId == SPELL_NOVA +1) // root target and move from target
+                    {
+                        me->AddUnitState(UNIT_STATE_FOLLOW);
+                        me->GetMotionMaster()->Clear(true);
+                        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+                        Init();
+                    }
                 }
+
+                // prepare shields
+                if (owner && (owner->HasAura(168) || owner->HasAura(7300) || owner->HasAura(7301)) && !me->HasAura(SPELL_FROSTSHIELD))
+                    DoCastSelf(SPELL_FROSTSHIELD, false);
+                else if (owner && (owner->HasAura(543) || owner->HasAura(8457) || owner->HasAura(10223) || owner->HasAura(10225) || owner->HasAura(27128)) && !me->HasAura(SPELL_FIRESHIELD))
+                    DoCastSelf(SPELL_FIRESHIELD, false);
+
+                if (me->GetHealthPct() <= 30.0f)
+                    DoCastSelf(SPELL_ICEBLOCK, false);
             }
 
             // Do not reload Creature templates on evade mode enter - prevent visual lost
