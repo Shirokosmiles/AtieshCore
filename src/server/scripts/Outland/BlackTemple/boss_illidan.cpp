@@ -519,6 +519,7 @@ public:
                     events.ScheduleEvent(EVENT_SHADOW_BLAST, Seconds(1), group);
                     events.ScheduleEvent(EVENT_FLAME_BURST, Seconds(6), group);
                     events.ScheduleEvent(EVENT_SHADOW_DEMON, Seconds(18), Seconds(30), group);
+                    break;
                 case GROUP_PHASE_4:
                     ScheduleEvents(GROUP_PHASE_3, group);
                     events.ScheduleEvent(EVENT_FRENZY, Seconds(40), group);
@@ -2321,7 +2322,6 @@ class spell_illidan_find_target : public SpellScriptLoader
                 if (Creature* caster = GetCaster()->ToCreature())
                 {
                     caster->CastSpell(target, SPELL_PARALYZE, true);
-                    caster->ClearUnitState(UNIT_STATE_CASTING);
                     caster->AI()->SetGUID(target->GetGUID(), 0);
                 }
             }
