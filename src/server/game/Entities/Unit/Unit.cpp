@@ -12517,6 +12517,8 @@ void Unit::SetFeared(bool apply)
     {
         if (IsAlive())
         {
+            StopMoving(true);
+            RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
             if (GetMotionMaster()->GetCurrentMovementGeneratorType() == FLEEING_MOTION_TYPE)
                 GetMotionMaster()->MovementExpired();
             if (GetVictim())
