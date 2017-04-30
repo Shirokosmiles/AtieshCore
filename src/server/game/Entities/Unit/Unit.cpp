@@ -12455,7 +12455,7 @@ void Unit::SetRooted(bool apply)
         // setting MOVEMENTFLAG_ROOT
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
-        StopMoving();
+        StopMoving(true);
 
         if (GetTypeId() == TYPEID_PLAYER)
         {
