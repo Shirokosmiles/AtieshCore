@@ -2322,11 +2322,14 @@ class TC_GAME_API Unit : public WorldObject
         bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
         void DisableSpline();
 
+    public:
+        void UpdateSplinePosition();
+
     private:
 
         void UpdateSplineMovement(uint32 t_diff);
-        void UpdateSplinePosition();
-
+    
+        private:
         // player or player's pet
         float GetCombatRatingReduction(CombatRating cr) const;
         uint32 GetCombatRatingDamageReduction(CombatRating cr, float rate, float cap, uint32 damage) const;

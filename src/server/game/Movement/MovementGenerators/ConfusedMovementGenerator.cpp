@@ -57,8 +57,15 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
 
     if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED))
     {
-        owner->ClearUnitState(UNIT_STATE_CONFUSED_MOVE);
-        return true;
+        if (owner->HasUnitState(UNIT_STATE_CONFUSED_MOVE))
+        {
+            owner->UpdateSplinePosition();
+            owner->ClearUnitState(UNIT_STATE_CONFUSED_MOVE);            
+            owner->StopMoving(true);            
+            return true;
+        }
+        else
+            return true;
     }
 
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
@@ -116,21 +123,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
         owner->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
 
         // update position for server and others units/players
-        Movement::Location loc = owner->movespline->ComputePosition();
-
-        if (owner->movespline->onTransport)
-        {
-            Position& tpos = owner->m_movementInfo.transport.pos;
-            tpos.m_positionX = loc.x;
-            tpos.m_positionY = loc.y;
-            tpos.m_positionZ = loc.z;
-            tpos.SetOrientation(loc.orientation);
-
-            if (TransportBase* transport = owner->GetDirectTransport())
-                transport->CalculatePassengerPosition(loc.x, loc.y, loc.z, &loc.orientation);
-        }
-
-        owner->UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
+        owner->UpdateSplinePosition();
     }
 
     return true;

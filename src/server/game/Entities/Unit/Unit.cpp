@@ -12407,6 +12407,7 @@ void Unit::SetStunned(bool apply)
         // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
         // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
         // setting MOVEMENTFLAG_ROOT
+        UpdateSplinePosition();
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
         StopMoving(true);
@@ -12453,9 +12454,11 @@ void Unit::SetRooted(bool apply)
         // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
         // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
         // setting MOVEMENTFLAG_ROOT
+        UpdateSplinePosition();
+        StopMoving(true);
+        GetMotionMaster()->MovementExpired();
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
-        StopMoving(true);
 
         if (GetTypeId() == TYPEID_PLAYER)
         {
@@ -12498,11 +12501,10 @@ void Unit::SetFeared(bool apply)
 {
     if (apply)
     {
+        UpdateSplinePosition();
         StopMoving(true);
         GetMotionMaster()->MovementExpired();
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
-        Position pos = GetPosition();
-        UpdatePosition(pos);
         SetTarget(ObjectGuid::Empty);
 
         Unit* caster = NULL;
@@ -12517,6 +12519,7 @@ void Unit::SetFeared(bool apply)
     {
         if (IsAlive())
         {
+            UpdateSplinePosition();
             StopMoving(true);
             RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
             if (GetMotionMaster()->GetCurrentMovementGeneratorType() == FLEEING_MOTION_TYPE)
@@ -12536,6 +12539,7 @@ void Unit::SetConfused(bool apply)
     if (apply)
     {
         SetTarget(ObjectGuid::Empty);
+        UpdateSplinePosition();
         StopMoving(true);
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         GetMotionMaster()->MovementExpired();
@@ -12545,6 +12549,8 @@ void Unit::SetConfused(bool apply)
     {
         if (IsAlive())
         {
+            UpdateSplinePosition();
+            StopMoving(true);
             if (GetMotionMaster()->GetCurrentMovementGeneratorType() == CONFUSED_MOTION_TYPE)
                 GetMotionMaster()->MovementExpired();
             if (GetVictim())

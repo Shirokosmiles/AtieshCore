@@ -83,8 +83,15 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
 
     if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
     {
-        owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
-        return true;
+        if (owner->HasUnitState(UNIT_STATE_FLEEING_MOVE))
+        {
+            owner->UpdateSplinePosition();
+            owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);            
+            owner->StopMoving(true);            
+            return true;
+        }
+        else
+            return true;
     }
 
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
@@ -155,20 +162,7 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     _timer.Reset(traveltime + urand(800, 1500));
     owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
     // update position
-    Movement::Location loc = owner->movespline->ComputePosition();
-
-    if (owner->movespline->onTransport)
-    {
-        Position& pos = owner->m_movementInfo.transport.pos;
-        pos.m_positionX = loc.x;
-        pos.m_positionY = loc.y;
-        pos.m_positionZ = loc.z;
-        pos.SetOrientation(loc.orientation);
-
-        if (TransportBase* transport = owner->GetDirectTransport())
-            transport->CalculatePassengerPosition(loc.x, loc.y, loc.z, &loc.orientation);
-    }
-    owner->UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
+    owner->UpdateSplinePosition();
 }
 
 template<class T>
