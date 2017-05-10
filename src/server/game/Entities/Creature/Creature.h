@@ -687,9 +687,6 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         }
         bool CanNotReachTarget() const { return m_cannotReachTarget; }
 
-        void SetPosition(float x, float y, float z, float o);
-        void SetPosition(const Position &pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
-
         void SetHomePosition(float x, float y, float z, float o) { m_homePosition.Relocate(x, y, z, o); }
         void SetHomePosition(const Position &pos) { m_homePosition.Relocate(pos); }
         void GetHomePosition(float& x, float& y, float& z, float& ori) const { m_homePosition.GetPosition(x, y, z, ori); }
@@ -735,6 +732,8 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         void FocusTarget(Spell const* focusSpell, WorldObject const* target);
         bool IsFocusing(Spell const* focusSpell = nullptr, bool withDelay = false) override;
         void ReleaseFocus(Spell const* focusSpell = nullptr, bool withDelay = true);
+
+        bool IsMovementPreventedByCasting() const override;
 
         // Part of Evade mechanics
         time_t GetLastDamagedTime() const { return _lastDamagedTime; }

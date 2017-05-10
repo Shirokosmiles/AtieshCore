@@ -860,7 +860,7 @@ public:
                         events.ScheduleEvent(EVENT_FLY_TO_RANDOM_PILLAR, Seconds(2), GROUP_PHASE_ALL);
                         break;
                     case EVENT_CHANGE_ORIENTATION:
-                        me->SetFacingTo(_orientation, true);
+                        me->SetFacingTo(_orientation);
                         break;
                     case EVENT_FLY:
                         ChangeOrientation(3.137039f);
@@ -877,7 +877,7 @@ public:
                     case EVENT_FACE_MIDDLE:
                     {
                         float angle = me->GetAngle(IllidanMiddlePoint);
-                        me->SetFacingTo(angle, true);
+                        me->SetFacingTo(angle);
                         break;
                     }
                     case EVENT_EYE_BLAST:
@@ -1055,7 +1055,7 @@ public:
             _isTeleportToMinions = false;
         }
 
-        void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             if (gossipListId == GOSSIP_START_INTRO)
             {
@@ -1074,6 +1074,7 @@ public:
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 CloseGossipMenuFor(player);
             }
+            return false;
         }
 
         bool CanAIAttack(Unit const* who) const override
@@ -1294,7 +1295,7 @@ public:
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                         break;
                     case EVENT_CHANGE_ORIENTATION:
-                        me->SetFacingTo(_orientation, true);
+                        me->SetFacingTo(_orientation);
                         break;
                     case EVENT_HEALING_POTION:
                         if (me->HealthBelowPct(20))
