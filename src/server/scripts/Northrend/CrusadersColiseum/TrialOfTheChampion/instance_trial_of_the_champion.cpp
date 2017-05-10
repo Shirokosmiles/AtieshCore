@@ -216,7 +216,7 @@ public:
                     {
                         if (Creature* pBoss = instance->GetCreature(uiArgentChampionGUID))
                         {
-                            pBoss->setFaction(16);
+                            pBoss->SetFaction(16);
                             pBoss->SetHomePosition(747.02f, 637.65f, 411.57f, centerOrientation);
                             pBoss->GetMotionMaster()->MovePoint(1, pBoss->GetHomePosition());
                         }

@@ -571,7 +571,7 @@ class boss_thorim : public CreatureScript
                 me->InterruptNonMeleeSpells(true);
                 me->RemoveAllAttackers();
                 me->AttackStop();
-                me->setFaction(FACTION_FRIENDLY);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_RENAME);
 
                 if (Creature* controller = instance->GetCreature(DATA_THORIM_CONTROLLER))
