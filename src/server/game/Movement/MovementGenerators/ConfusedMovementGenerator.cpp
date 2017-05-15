@@ -36,8 +36,10 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* owner)
     if (!owner || !owner->IsAlive())
         return;
 
+    owner->ClearUnitState(UNIT_STATE_MOVING);
     owner->AddUnitState(UNIT_STATE_CONFUSED);
     owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
+    owner->SetFacingTo(frand(0.0f, 2 * static_cast<float>(M_PI)), true);
 
     _timer.Reset(0);
     owner->GetPosition(_reference.x, _reference.y, _reference.z);
@@ -59,9 +61,8 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
     {
         if (owner->HasUnitState(UNIT_STATE_CONFUSED_MOVE))
         {
-            owner->UpdateSplinePosition();
-            owner->ClearUnitState(UNIT_STATE_CONFUSED_MOVE);            
-            owner->StopMoving(true);            
+            owner->StopMoving();
+            owner->ClearUnitState(UNIT_STATE_CONFUSED_MOVE);
             return true;
         }
         else
@@ -72,9 +73,11 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
     {
         _interrupt = true;
         // remove old flag of movement
-        owner->ClearUnitState(UNIT_STATE_CONFUSED_MOVE);
-        owner->StopMoving(true);        
-        return true;
+        if (owner->HasUnitState(UNIT_STATE_CONFUSED_MOVE))
+        {
+            owner->StopMoving();
+            owner->ClearUnitState(UNIT_STATE_CONFUSED_MOVE);
+        }
     }
     else
         _interrupt = false;
@@ -137,7 +140,7 @@ void ConfusedMovementGenerator<Player>::DoFinalize(Player* unit)
 {
     unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
     unit->ClearUnitState(UNIT_STATE_CONFUSED);
-    unit->StopMoving(true);
+    unit->StopMoving();
 }
 
 template<>

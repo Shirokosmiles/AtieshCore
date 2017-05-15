@@ -41,6 +41,7 @@ void FleeingMovementGenerator<T>::DoInitialize(T* owner)
     if (!owner)
         return;
 
+    owner->ClearUnitState(UNIT_STATE_MOVING);
     owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
     owner->AddUnitState(UNIT_STATE_FLEEING);
 
@@ -85,9 +86,8 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
     {
         if (owner->HasUnitState(UNIT_STATE_FLEEING_MOVE))
         {
-            owner->UpdateSplinePosition();
-            owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);            
-            owner->StopMoving(true);            
+            owner->StopMoving();
+            owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
             return true;
         }
         else
@@ -98,9 +98,11 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
     {
         _interrupt = true;
         // remove old flag of movement
-        owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
-        owner->StopMoving(true);
-        return true;
+        if (owner->HasUnitState(UNIT_STATE_FLEEING_MOVE))
+        {
+            owner->StopMoving();
+            owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
+        }
     }
     else
         _interrupt = false;
@@ -126,7 +128,7 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
     {
         _interrupt = true;
-        owner->StopMoving(true);
+        owner->StopMoving();
         return;
     }
 
@@ -157,9 +159,10 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(_path->GetPath());
-    init.SetRun(true);
+    init.SetWalk(false);
     int32 traveltime = init.Launch();
     _timer.Reset(traveltime + urand(800, 1500));
+
     owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
     // update position
     owner->UpdateSplinePosition();
@@ -201,6 +204,9 @@ void FleeingMovementGenerator<T>::GetPoint(T* owner, Position &position)
     }
 
     owner->MovePositionToFirstCollision(position, distance, angle);
+
+    if (owner->ToCreature() && owner->CanFly())
+        position.m_positionZ = owner->GetMap()->GetHeight(position.GetPositionX(), position.GetPositionY(), position.GetPositionZ() + 2.0f, true, 10.0f);
 }
 
 template FleeingMovementGenerator<Player>::~FleeingMovementGenerator();

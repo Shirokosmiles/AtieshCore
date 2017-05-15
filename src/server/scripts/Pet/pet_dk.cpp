@@ -82,7 +82,7 @@ public:
 
             me->SetReactState(REACT_PASSIVE);
             me->CombatStop(true);
-            me->StopMoving(true);
+            me->StopMoving();
             me->GetMotionMaster()->Clear(false);
             me->SetCanFly(true);
 
@@ -153,7 +153,10 @@ public:
                         me->SetReactState(REACT_AGGRESSIVE);
                         // Start combat
                         if (Unit* target = ObjectAccessor::GetUnit(*me, victim))
+                        {
                             me->Attack(target, false);
+                            me->GetMotionMaster()->MoveChase(target);
+                        }
                         me->SetCanFly(false);
                         break;
                     }

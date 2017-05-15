@@ -297,7 +297,7 @@ std::string SplineBase::ToString() const
     str << "mode: " << mode_str[mode()] << std::endl;
     str << "points count: " << count << std::endl;
     for (index_type i = 0; i < count; ++i)
-        str << "point " << i << " : " << points[i] << std::endl;
+        str << "point " << i << " : " << points[i].toString() << std::endl;
 
     return str.str();
 }

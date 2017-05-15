@@ -359,6 +359,7 @@ Unit::Unit(bool isWorldObject) :
     _oldFactionId = 0;
     _isWalkingBeforeCharm = false;
     _instantCast = false;
+    needtodismount = false;
 }
 
 ////////////////////////////////////////////////////////////
@@ -508,13 +509,10 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
 
 void Unit::UpdateSplinePosition()
 {
-    // this method could be called on players. players usually do not have a movespline initialized. the following condition is therefore needed.
-    if (!movespline->Initialized())
-        return;
-
     static uint32 const positionUpdateDelay = 400;
 
     m_movesplineTimer.Reset(positionUpdateDelay);
+
     Movement::Location loc = movespline->ComputePosition();
 
     if (movespline->onTransport)
@@ -8714,7 +8712,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         return;
 
     if (PvP)
-        m_CombatTimer = 5000;
+        m_CombatTimer = urand(5500, 6000);
 
     if (IsInCombat() || HasUnitState(UNIT_STATE_EVADE))
         return;
@@ -11406,20 +11404,19 @@ void Unit::SendPetAIReaction(ObjectGuid guid)
 
 ///----------End of Pet responses methods----------
 
-void Unit::StopMoving(bool force /* = false */)
+void Unit::StopMoving()
 {
     ClearUnitState(UNIT_STATE_MOVING);
 
     // not need send any packets if not in world or not moving
-    if (!force && (!IsInWorld() || !isMoving()))
+    if (!IsInWorld() || movespline->Finalized())
         return;
 
-    // Update position now since Stop does not start a new movement that can be updated later
-    if (!movespline->Finalized())
-        UpdateSplinePosition();
+    // Update position now since Stop does not start a new movement that can be updated later    
+    UpdateSplinePosition();
+
     Movement::MoveSplineInit init(this);
     init.Stop();
-    RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
 }
 
 void Unit::SendMovementFlagUpdate(bool self /* = false */)
@@ -12387,10 +12384,9 @@ void Unit::SetStunned(bool apply)
         // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
         // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
         // setting MOVEMENTFLAG_ROOT
-        UpdateSplinePosition();
-        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
+        StopMoving();
+        GetMotionMaster()->MovementExpired();
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
-        StopMoving(true);
 
         if (GetTypeId() == TYPEID_PLAYER)
             SetStandState(UNIT_STAND_STATE_STAND);
@@ -12414,7 +12410,7 @@ void Unit::SetStunned(bool apply)
 
         if (!HasUnitState(UNIT_STATE_ROOT))         // prevent moving if it also has root effect
         {
-            WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 8+4);
+            WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 8 + 4);
             data << GetPackGUID();
             data << uint32(0);
             SendMessageToSet(&data, true);
@@ -12434,10 +12430,8 @@ void Unit::SetRooted(bool apply)
         // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
         // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
         // setting MOVEMENTFLAG_ROOT
-        UpdateSplinePosition();
-        StopMoving(true);
+        StopMoving();
         GetMotionMaster()->MovementExpired();
-        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
 
         if (GetTypeId() == TYPEID_PLAYER)
@@ -12473,6 +12467,11 @@ void Unit::SetRooted(bool apply)
             }
 
             RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
+            if (needtodismount)
+            {
+                RemoveAurasByType(SPELL_AURA_MOUNTED);
+                needtodismount = false;
+            }
         }
     }
 }
@@ -12481,10 +12480,8 @@ void Unit::SetFeared(bool apply)
 {
     if (apply)
     {
-        UpdateSplinePosition();
-        StopMoving(true);
+        StopMoving();
         GetMotionMaster()->MovementExpired();
-        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         SetTarget(ObjectGuid::Empty);
 
         Unit* caster = NULL;
@@ -12499,9 +12496,7 @@ void Unit::SetFeared(bool apply)
     {
         if (IsAlive())
         {
-            UpdateSplinePosition();
-            StopMoving(true);
-            RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
+            StopMoving();
             if (GetMotionMaster()->GetCurrentMovementGeneratorType() == FLEEING_MOTION_TYPE)
                 GetMotionMaster()->MovementExpired();
             if (GetVictim())
@@ -12519,9 +12514,7 @@ void Unit::SetConfused(bool apply)
     if (apply)
     {
         SetTarget(ObjectGuid::Empty);
-        UpdateSplinePosition();
-        StopMoving(true);
-        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
+        StopMoving();
         GetMotionMaster()->MovementExpired();
         GetMotionMaster()->MoveConfused();
     }
@@ -12529,8 +12522,7 @@ void Unit::SetConfused(bool apply)
     {
         if (IsAlive())
         {
-            UpdateSplinePosition();
-            StopMoving(true);
+            StopMoving();
             if (GetMotionMaster()->GetCurrentMovementGeneratorType() == CONFUSED_MOTION_TYPE)
                 GetMotionMaster()->MovementExpired();
             if (GetVictim())
@@ -14318,7 +14310,7 @@ void Unit::SetInFront(WorldObject const* target)
 void Unit::SetFacingTo(float ori, bool force)
 {
     // do not face when already moving
-    if ((!force && isMoving()) || !movespline->Finalized())
+    if (!force && !IsStopped())
         return;
 
     Movement::MoveSplineInit init(this);
@@ -14332,7 +14324,7 @@ void Unit::SetFacingTo(float ori, bool force)
 void Unit::SetFacingToObject(WorldObject const* object, bool force)
 {
     // do not face when already moving
-    if ((!force && isMoving()) || !movespline->Finalized())
+    if (!force && !IsStopped())
         return;
 
     /// @todo figure out under what conditions creature will move towards object instead of facing it where it currently is.

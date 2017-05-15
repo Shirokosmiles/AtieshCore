@@ -2113,7 +2113,8 @@ class TC_GAME_API Unit : public WorldObject
         MotionMaster* GetMotionMaster() { return i_motionMaster; }
         const MotionMaster* GetMotionMaster() const { return i_motionMaster; }
 
-        void StopMoving(bool force = false);
+        bool IsStopped() const { return !(HasUnitState(UNIT_STATE_MOVING)); }
+        void StopMoving();
 
         void AddUnitMovementFlag(uint32 f) { m_movementInfo.flags |= f; }
         void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.flags &= ~f; }
@@ -2315,16 +2316,16 @@ class TC_GAME_API Unit : public WorldObject
 
         bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
         bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
-        void DisableSpline();
 
     public:
+        void DisableSpline();
         void UpdateSplinePosition();
+        void SetNeedToDismountAfterRoots() { needtodismount = true; }
 
     private:
 
         void UpdateSplineMovement(uint32 t_diff);
-    
-        private:
+
         // player or player's pet
         float GetCombatRatingReduction(CombatRating cr) const;
         uint32 GetCombatRatingDamageReduction(CombatRating cr, float rate, float cap, uint32 damage) const;
@@ -2356,6 +2357,7 @@ class TC_GAME_API Unit : public WorldObject
         bool m_cleanupDone; // lock made to not add stuff after cleanup before delete
         bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
         bool _instantCast;
+        bool needtodismount;
 
         uint32 _oldFactionId;           ///< faction before charm
         bool _isWalkingBeforeCharm;     ///< Are we walking before we were charmed?

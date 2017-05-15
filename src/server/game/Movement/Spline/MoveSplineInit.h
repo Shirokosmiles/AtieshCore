@@ -134,9 +134,6 @@ namespace Movement
          */
         void SetVelocity(float velocity);
 
-        /* Set GetSpeed = MOVE_RUN */
-        void SetRun(bool run);
-
         PointsArray& Path() { return args.path; }
 
         /* Disables transport coordinate transformations for cases where raw offsets are available
@@ -154,7 +151,6 @@ namespace Movement
     inline void MoveSplineInit::SetCyclic() { args.flags.cyclic = true; }
     inline void MoveSplineInit::SetFall() { args.flags.EnableFalling(); }
     inline void MoveSplineInit::SetVelocity(float vel) { args.velocity = vel; args.HasVelocity = true; }
-    inline void MoveSplineInit::SetRun(bool runbool) { args.HasRun = true; }
     inline void MoveSplineInit::SetOrientationInversed() { args.flags.orientationInversed = true;}
     inline void MoveSplineInit::SetTransportEnter() { args.flags.EnableTransportEnter(); }
     inline void MoveSplineInit::SetTransportExit() { args.flags.EnableTransportExit(); }

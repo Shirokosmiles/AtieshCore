@@ -31,16 +31,16 @@ void IdleMovementGenerator::Initialize(Unit* owner)
 
 void IdleMovementGenerator::Reset(Unit* owner)
 {
-    if (owner->isMoving())
-        owner->StopMoving(true);
+    if (!owner->IsStopped())
+        owner->StopMoving();
 }
 
 //----------------------------------------------------//
 
 void RotateMovementGenerator::Initialize(Unit* owner)
 {
-    if (owner->isMoving())
-        owner->StopMoving(true);
+    if (!owner->IsStopped())
+        owner->StopMoving();
 
     if (owner->GetVictim())
         owner->SetInFront(owner->GetVictim());
