@@ -12410,6 +12410,7 @@ void Unit::SetStunned(bool apply)
         // setting MOVEMENTFLAG_ROOT
         StopMoving();
         GetMotionMaster()->MovementExpired();
+        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
 
         if (GetTypeId() == TYPEID_PLAYER)
@@ -12456,6 +12457,7 @@ void Unit::SetRooted(bool apply)
         // setting MOVEMENTFLAG_ROOT
         StopMoving();
         GetMotionMaster()->MovementExpired();
+        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
 
         if (GetTypeId() == TYPEID_PLAYER)
