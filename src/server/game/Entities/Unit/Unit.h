@@ -1210,6 +1210,8 @@ struct TC_GAME_API CharmInfo
         void SetIsReturning(bool val);
         bool IsReturning();
         void SaveStayPosition();
+        void RemoveStayPosition();
+        bool HasStayPosition();
         void GetStayPosition(float &x, float &y, float &z);
 
     private:

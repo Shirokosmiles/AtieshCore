@@ -185,6 +185,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     charmInfo->SetIsReturning(true);
                     charmInfo->SetIsCommandFollow(true);
                     charmInfo->SetIsFollowing(false);
+                    charmInfo->RemoveStayPosition();
                     break;
                 case COMMAND_ATTACK:                        //spellid=1792  //ATTACK
                 {
