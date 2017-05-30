@@ -3792,9 +3792,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Blizzard (Thorim)
     ApplySpellFix({ 62576, 62602 }, [](SpellInfo* spellInfo)
     {
-        //@workaround: looks like TARGET_DEST_CASTER in effect 0 overrides
-        // TARGET_DEST_CASTER_LEFT in effect 1, this aura needs to spawn 13 yds to the left of the caster
-        // without this was spawning at caster's pos.
+        // DBC data is wrong for EFFECT_0, it's a different dynobject target than EFFECT_1
+        // Both effects should be shared by the same DynObject
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_LEFT);
     });
 
