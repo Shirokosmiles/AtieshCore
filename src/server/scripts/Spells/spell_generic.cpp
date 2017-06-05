@@ -2244,7 +2244,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove(GetCaster());
-            Trinity::Containers::RandomResizeList(targets, _count);
+            Trinity::Containers::RandomResize(targets, _count);
         }
 
         void Register()

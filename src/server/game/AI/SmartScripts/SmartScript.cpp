@@ -1931,15 +1931,11 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_SET_COMBAT_DISTANCE:
         {
-            ObjectList* targets = GetTargets(e, unit);
-            if (!targets)
-                break;
-
-            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
-                if (IsCreature(*itr))
-                    (*itr)->ToCreature()->m_CombatDistance = e.action.combatDistance.dist;
-
-            delete targets;
+			for (WorldObject* const target : targets)
+			{
+				if (IsCreature(target))
+					target->ToCreature()->m_CombatDistance = e.action.combatDistance.dist;
+			}
             break;
         }
         case SMART_ACTION_SET_CASTER_COMBAT_DIST:
