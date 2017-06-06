@@ -468,7 +468,7 @@ bool LoadRealmInfo()
 
     Field* fields = result->Fetch();
     realm.Name = fields[1].GetString();
-    boost::asio::ip::tcp::resolver::query externalAddressQuery(ip::tcp::v4(), fields[2].GetString(), "");
+    boost::asio::ip::tcp::resolver::query externalAddressQuery(boost::asio::ip::tcp::v4(), fields[2].GetString(), "");
 
     boost::system::error_code ec;
     boost::asio::ip::tcp::resolver::iterator endPoint = resolver.resolve(externalAddressQuery, ec);
@@ -480,7 +480,7 @@ bool LoadRealmInfo()
 
     realm.ExternalAddress = (*endPoint).endpoint().address();
 
-    boost::asio::ip::tcp::resolver::query localAddressQuery(ip::tcp::v4(), fields[3].GetString(), "");
+    boost::asio::ip::tcp::resolver::query localAddressQuery(boost::asio::ip::tcp::v4(), fields[3].GetString(), "");
     endPoint = resolver.resolve(localAddressQuery, ec);
     if (endPoint == end || ec)
     {
@@ -490,7 +490,7 @@ bool LoadRealmInfo()
 
     realm.LocalAddress = (*endPoint).endpoint().address();
 
-    boost::asio::ip::tcp::resolver::query localSubmaskQuery(ip::tcp::v4(), fields[4].GetString(), "");
+    boost::asio::ip::tcp::resolver::query localSubmaskQuery(boost::asio::ip::tcp::v4(), fields[4].GetString(), "");
     endPoint = resolver.resolve(localSubmaskQuery, ec);
     if (endPoint == end || ec)
     {
