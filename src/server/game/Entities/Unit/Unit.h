@@ -1592,7 +1592,6 @@ class TC_GAME_API Unit : public WorldObject
 
         virtual bool IsInWater() const;
         virtual bool IsUnderWater() const;
-        virtual void UpdateUnderwaterState(Map* m, float x, float y, float z);
         bool isInAccessiblePlaceFor(Creature const* c) const;
 
         void SendHealSpellLog(HealInfo& healInfo, bool critical = false);
@@ -1631,7 +1630,7 @@ class TC_GAME_API Unit : public WorldObject
 
         void NearTeleportTo(Position const& pos, bool casting = false);
         void NearTeleportTo(float x, float y, float z, float orientation, bool casting = false) { NearTeleportTo(Position(x, y, z, orientation), casting); }
-        void SendTeleportPacket(Position const& pos);
+        void SendTeleportPacket(Position const& pos, bool teleportingTransport = false);
         virtual bool UpdatePosition(float x, float y, float z, float ang, bool teleport = false);
         // returns true if unit's position really changed
         virtual bool UpdatePosition(const Position &pos, bool teleport = false);
@@ -2323,6 +2322,9 @@ class TC_GAME_API Unit : public WorldObject
         void DisableSpline();
         void UpdateSplinePosition();
         void SetNeedToDismountAfterRoots() { needtodismount = true; }
+
+        void ProcessPositionDataChanged(PositionFullTerrainStatus const& data) override;
+        virtual void ProcessTerrainStatusUpdate(ZLiquidStatus status, Optional<LiquidData> const& liquidData);
 
     private:
 
