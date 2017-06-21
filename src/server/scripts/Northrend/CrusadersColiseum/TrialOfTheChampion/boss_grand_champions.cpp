@@ -30,8 +30,13 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "Vehicle.h"
+
+#include "InstanceScript.h"
+#include "Map.h"
+#include "ObjectAccessor.h"
+#include "ScriptedEscortAI.h"
 #include "trial_of_the_champion.h"
+#include "Vehicle.h"
 
 enum Events
 {
@@ -1076,7 +1081,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetTrialOfChampionAI<generic_vehicleAI_toc5AI>(creature);
+        return GetTrialOfTheChampionAI<generic_vehicleAI_toc5AI>(creature);
     }
 };
 
@@ -1181,7 +1186,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetTrialOfChampionAI<boss_warrior_toc5AI>(creature);
+        return GetTrialOfTheChampionAI<boss_warrior_toc5AI>(creature);
     }
 };
 
@@ -1277,7 +1282,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetTrialOfChampionAI<boss_mage_toc5AI>(creature);
+        return GetTrialOfTheChampionAI<boss_mage_toc5AI>(creature);
     }
 };
 
@@ -1466,7 +1471,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetTrialOfChampionAI<boss_shaman_toc5AI>(creature);
+        return GetTrialOfTheChampionAI<boss_shaman_toc5AI>(creature);
     }
 };
 
@@ -1555,7 +1560,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetTrialOfChampionAI<boss_hunter_toc5AI>(creature);
+        return GetTrialOfTheChampionAI<boss_hunter_toc5AI>(creature);
     }
 };
 
@@ -1632,7 +1637,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetTrialOfChampionAI<boss_rogue_toc5AI>(creature);
+        return GetTrialOfTheChampionAI<boss_rogue_toc5AI>(creature);
     }
 };
 

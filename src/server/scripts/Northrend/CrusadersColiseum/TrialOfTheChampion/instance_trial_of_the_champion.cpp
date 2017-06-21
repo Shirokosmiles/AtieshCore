@@ -21,10 +21,15 @@ SDComment: missing fireworks when boss encounter is set to done
 SDCategory: Trial Of the Champion
 EndScriptData */
 
-#include "InstanceScript.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "Creature.h"
+#include "CreatureAI.h"
+#include "GameObject.h"
+#include "InstanceScript.h"
+#include "Log.h"
+#include "Map.h"
+#include "MotionMaster.h"
+#include "Player.h"
 #include "trial_of_the_champion.h"
 
 ObjectData const creatureData[] =
@@ -56,6 +61,11 @@ class instance_trial_of_the_champion : public InstanceMapScript
 {
 public:
     instance_trial_of_the_champion() : InstanceMapScript(ToCScriptName, 650) { }
+
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    {
+        return new instance_trial_of_the_champion_InstanceMapScript(map);
+    }
 
     struct instance_trial_of_the_champion_InstanceMapScript : public InstanceScript
     {
