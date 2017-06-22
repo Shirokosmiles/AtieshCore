@@ -11660,7 +11660,7 @@ Unit* Unit::SelectNearbyNoTotemTarget(Unit* exclude, float dist) const
     std::list<Unit*> targets;
     Trinity::NearestAttackableNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
     Trinity::UnitListSearcher<Trinity::NearestAttackableNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
-    VisitNearbyObject(dist, searcher);
+	Cell::VisitAllObjects(this, searcher, dist);
 
     // remove current target
     if (GetVictim())

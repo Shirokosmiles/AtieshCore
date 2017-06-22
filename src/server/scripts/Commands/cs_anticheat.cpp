@@ -17,6 +17,8 @@
 #include "ObjectMgr.h"
 #include "Chat.h"
 #include "AnticheatMgr.h"
+#include "World.h"
+#include "ObjectAccessor.h"
 
 class anticheat_commandscript : public CommandScript
 {

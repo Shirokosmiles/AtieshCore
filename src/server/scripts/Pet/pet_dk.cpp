@@ -29,6 +29,8 @@
 #include "GridNotifiersImpl.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "MotionMaster.h"
+#include "ObjectAccessor.h"
 
 enum DeathKnightSpells
 {
@@ -114,7 +116,7 @@ public:
                         std::list<Unit*> targets;
                         Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
                         Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-                        me->VisitNearbyObject(30.0f, searcher);
+						Cell::VisitAllObjects(me, searcher, 30.0f);
                         for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                             if ((*iter)->HasAura(SPELL_DK_SUMMON_GARGOYLE_1, ownerGuid))
                             {

@@ -2765,7 +2765,7 @@ bool Map::IsSwimmable(float x, float y, float z, float radius, LiquidData* data)
 {
     LiquidData liquid_status;
     LiquidData* liquid_ptr = data ? data : &liquid_status;
-    if (getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, liquid_ptr) & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER))
+    if (GetLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, liquid_ptr) & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER))
     {
     if (liquid_ptr->level - liquid_ptr->depth_level > radius)
         return true;

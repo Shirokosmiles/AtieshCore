@@ -23,6 +23,8 @@
 #include "PathGenerator.h"
 #include "Player.h"
 #include "Random.h"
+#include "VMapFactory.h"
+#include "Map.h"
 
 template<class T>
 ConfusedMovementGenerator<T>::~ConfusedMovementGenerator()

@@ -29,6 +29,8 @@ EndScriptData */
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "trial_of_the_champion.h"
+#include "MotionMaster.h"
+#include "ObjectAccessor.h"
 
 enum Yells
 {
@@ -592,10 +594,11 @@ class spell_black_knight_deaths_push : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_DEATH_RESPITE_DND) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_FEIGN_DEATH))
-                    return false;
-                return true;
+				return ValidateSpellInfo(
+				{
+					SPELL_DEATH_RESPITE_DND,
+					SPELL_FEIGN_DEATH
+				});
             }
 
             void HandleScript(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -630,12 +633,14 @@ class spell_black_knight_obliterate : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_BLOOD_PLAGUE) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_FROST_FEVER) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_BLOOD_PLAGUE_H) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_FROST_FEVER_H))
-                    return false;
-                return true;
+				return ValidateSpellInfo(
+				{
+					SPELL_BLOOD_PLAGUE,
+					SPELL_FROST_FEVER,
+					SPELL_BLOOD_PLAGUE_H,
+					SPELL_FROST_FEVER_H
+
+				});
             }
 
             void CalculateDamage()
@@ -712,9 +717,7 @@ class spell_black_knight_ghoul_explode : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_EXPLODE))
-                    return false;
-                return true;
+				return ValidateSpellInfo({ SPELL_EXPLODE });
             }
 
             void CastExplode(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

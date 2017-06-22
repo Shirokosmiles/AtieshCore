@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "WorldSession.h"
 #include "ArenaTeamMgr.h"
+#include "Battleground.h"
 #include "CalendarMgr.h"
 #include "CharacterCache.h"
 #include "Chat.h"
@@ -50,6 +50,7 @@
 #include "SocialMgr.h"
 #include "QueryHolder.h"
 #include "World.h"
+#include "WorldSession.h"
 
 class LoginQueryHolder : public SQLQueryHolder
 {

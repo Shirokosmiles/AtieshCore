@@ -33,9 +33,11 @@ EndScriptData */
 
 #include "InstanceScript.h"
 #include "Map.h"
+#include "MotionMaster.h"
 #include "ObjectAccessor.h"
 #include "ScriptedEscortAI.h"
 #include "trial_of_the_champion.h"
+#include "TemporarySummon.h"
 #include "Vehicle.h"
 
 enum Events
@@ -465,7 +467,7 @@ struct boss_grand_championAI : BossAI
 
                 Trinity::AllCreaturesOfEntryInRange check(me, newMountEntry, 100);
                 Trinity::CreatureListSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(me, tempList, check);
-                me->VisitNearbyGridObject(me->GetGridActivationRange(), searcher);
+				Cell::VisitGridObjects(me, searcher, me->GetGridActivationRange());
 
                 for (std::list<Creature*>::const_iterator itr = tempList.begin(); itr != tempList.end(); ++itr)
                 {
@@ -1704,9 +1706,7 @@ class spell_toc5_lightning_arrows : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_LIGHTNING_ARROWS_AURA))
-                    return false;
-                return true;
+				return ValidateSpellInfo({ SPELL_LIGHTNING_ARROWS_AURA });
             }
 
             void HandleScript(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

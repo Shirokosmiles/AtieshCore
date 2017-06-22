@@ -385,11 +385,6 @@ public:
         uint32 TeamInInstance;
         uint8 uiArgentSoldierDeaths;
     };
-
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
-    {
-        return new instance_trial_of_the_champion_InstanceMapScript(map);
-    }
 };
 
 void AddSC_instance_trial_of_the_champion()

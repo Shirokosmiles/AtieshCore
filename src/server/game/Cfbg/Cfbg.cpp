@@ -24,6 +24,9 @@
 #include "Chat.h"
 #include "BattlegroundQueue.h"
 #include "ObjectAccessor.h"
+#include "Random.h"
+#include "WorldSession.h"
+#include "World.h"
 
 /*####################################################################################
 ###############################CROSSFACTION BATTLEGROUNDS#############################

@@ -1021,7 +1021,7 @@ class npc_fountain_of_light : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return GetInstanceAI<npc_fountain_of_lightAI>(creature);
+            return GetTrialOfTheChampionAI<npc_fountain_of_lightAI>(creature);
         }
 };
 
@@ -1108,9 +1108,7 @@ class spell_paletress_reflective_shield : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_SHIELD_REFLECT))
-                    return false;
-                return true;
+				return ValidateSpellInfo({ SPELL_SHIELD_REFLECT });
             }
 
             void HandleScript(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
@@ -1145,10 +1143,11 @@ class spell_eadric_hammer_of_righteous : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_HAMMER_RIGHT_DUMMY) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_HAMMER_JUSTICE_STUN))
-                    return false;
-                return true;
+				return ValidateSpellInfo(
+				{
+					SPELL_HAMMER_RIGHT_DUMMY,
+					SPELL_HAMMER_JUSTICE_STUN
+				});
             }
 
             void HandleDamage()

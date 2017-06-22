@@ -30,6 +30,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "MoveSplineInit.h"
+#include "MotionMaster.h"
 
 enum HunterSpells
 {
