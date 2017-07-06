@@ -2875,6 +2875,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[1].MiscValue = 118; // Dual Wield skill
     });
 
+    // Spell Reflection
+    ApplySpellFix({ 57643 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->EquippedItemClass = -1;
+    });
+
     ApplySpellFix({
         63026, // Force Cast (HACK: Target shouldn't be changed)
         63137  // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
