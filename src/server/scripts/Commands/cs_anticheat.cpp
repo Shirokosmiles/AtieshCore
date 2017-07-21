@@ -19,6 +19,7 @@
 #include "AnticheatMgr.h"
 #include "World.h"
 #include "ObjectAccessor.h"
+#include "WorldSession.h"
 
 class anticheat_commandscript : public CommandScript
 {
