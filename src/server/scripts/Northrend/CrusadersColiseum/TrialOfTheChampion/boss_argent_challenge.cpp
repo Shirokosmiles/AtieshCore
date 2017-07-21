@@ -327,7 +327,7 @@ public:
                         break;
                     case EVENT_EADRIC_DONE:
                         me->RemoveAllAuras();
-                        me->DeleteThreatList();
+                        me->GetThreatManager().ClearAllThreat();
                         me->SetFullHealth();
                         me->RestoreFaction();
                         instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_EADRIC_ACH, 0, me);
@@ -530,7 +530,7 @@ public:
                         break;
                     case EVENT_PALETRESS_DONE:
                         me->RemoveAllAuras();
-                        me->DeleteThreatList();
+                        me->GetThreatManager().ClearAllThreat();
                         me->SetFullHealth();
                         me->RestoreFaction();
                         instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_PALETRESS_ACH, 0, me);

@@ -717,12 +717,12 @@ public:
                 {
                     if (player->GetVehicleBase())
                     {
-                        temp->AddThreat(player->GetVehicleBase(), 1.0f);
+                        temp->GetThreatManager().AddThreat(player->GetVehicleBase(), 1.0f, nullptr, true, true);
                         temp->AI()->AttackStart(player->GetVehicleBase());
                     }
                     else
                     {
-                        temp->AddThreat(player, 1.0f);
+                        temp->GetThreatManager().AddThreat(player, 1.0f, nullptr, true, true);
                         temp->AI()->AttackStart(player);
                     }
                     break;

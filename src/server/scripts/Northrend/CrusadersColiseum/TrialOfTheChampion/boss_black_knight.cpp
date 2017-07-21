@@ -223,8 +223,8 @@ public:
                         DoCastVictim(SPELL_CLAW);
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 50.0f, true))
                         {
-                            DoResetThreat();
-                            me->AddThreat(target, 10.0f);
+                            ResetThreatList();
+                            me->GetThreatManager().AddThreat(target, 10.0f, nullptr, true, true);
                             me->AI()->AttackStart(target);
                         }
                         events.ScheduleEvent(EVENT_CLAW, urand(12000, 15000));
