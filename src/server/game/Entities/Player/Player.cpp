@@ -499,6 +499,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     }
 
     SetMap(sMapMgr->CreateMap(info->mapId, this));
+    UpdatePositionData();
 
     uint8 powertype = cEntry->powerType;
 
@@ -17440,6 +17441,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
 
     SetMap(map);
     StoreRaidMapDifficulty();
+    UpdatePositionData();
 
     // now that map position is determined, check instance validity
     if (!CheckInstanceValidity(true) && !IsInstanceLoginGameMasterException())
@@ -26349,9 +26351,6 @@ bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/)
 
 bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
 {
-    if (!packetOnly && !Unit::SetCanFly(apply))
-        return false;
-
     if (!apply)
         SetFallInformation(0, GetPositionZ());
 
@@ -26360,11 +26359,16 @@ bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
     data << uint32(0);          //! movement counter
     SendDirectMessage(&data);
 
-    data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
+    if (packetOnly || Unit::SetCanFly(apply))
+    {
+        data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
+        data << GetPackGUID();
+        BuildMovementPacket(&data);
+        SendMessageToSet(&data, false);
+        return true;
+    }
+    else
+        return false;
 }
 
 bool Player::SetHover(bool apply, bool packetOnly /*= false*/)
