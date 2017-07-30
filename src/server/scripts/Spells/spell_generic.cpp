@@ -3440,43 +3440,32 @@ class spell_gen_clear_debuffs : public SpellScript
     }
 };
 
-class spell_gen_shadowmeld : public SpellScriptLoader
+class spell_gen_shadowmeld : public SpellScript
 {
-public:
-    spell_gen_shadowmeld() : SpellScriptLoader("spell_gen_shadowmeld") { }
+    PrepareSpellScript(spell_gen_shadowmeld);
 
-    class spell_gen_shadowmeld_SpellScript : public SpellScript
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_gen_shadowmeld_SpellScript);
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
+        if (Unit* target = GetCaster())
         {
-            if (Unit* target = GetCaster())
+            target->CombatStop(true);
+
+            target->getHostileRefManager().UpdateVisibility();
+
+            Unit::AttackerSet const& attackers = target->getAttackers();
+            for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
             {
-                target->CombatStop(true);
-
-                target->getHostileRefManager().UpdateVisibility();
-
-                Unit::AttackerSet const& attackers = target->getAttackers();
-                for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
-                {
-                    if (!(*itr)->CanSeeOrDetect(target))
-                        (*(itr++))->AttackStop();
-                    else
-                        ++itr;
-                }
+                if (!(*itr)->CanSeeOrDetect(target))
+                    (*(itr++))->AttackStop();
+                else
+                    ++itr;
             }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_gen_shadowmeld_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gen_shadowmeld_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_gen_shadowmeld::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -3623,5 +3612,6 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_gen_mixology_bonus);
     RegisterSpellScript(spell_gen_landmine_knockback_achievement);
     RegisterSpellScript(spell_gen_clear_debuffs);
+    RegisterSpellScript(spell_gen_shadowmeld);
     RegisterAuraScript(spell_gen_pony_mount_check);
 }
