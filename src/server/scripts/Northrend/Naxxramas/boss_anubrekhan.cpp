@@ -97,7 +97,7 @@ public:
 
         void InitializeAI() override
         {
-            if (!me->isDead())
+            if (!me->isDead() && instance->GetBossState(BOSS_ANUBREKHAN) != DONE)
             {
                 Reset();
                 SummonGuards();
