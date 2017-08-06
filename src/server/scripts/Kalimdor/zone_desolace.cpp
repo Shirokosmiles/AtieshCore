@@ -344,9 +344,9 @@ class npc_cork_gizelton : public CreatureScript
 public:
     npc_cork_gizelton() : CreatureScript("npc_cork_gizelton") { }
 
-    struct npc_cork_gizeltonAI : public npc_escortAI
+    struct npc_cork_gizeltonAI : public EscortAI
     {
-        npc_cork_gizeltonAI(Creature* creature) : npc_escortAI(creature)
+        npc_cork_gizeltonAI(Creature* creature) : EscortAI(creature)
         {
             memset(&summons, 0, sizeof(summons));
         }
@@ -506,7 +506,7 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void WaypointReached(uint32 waypointId) override
+        void WaypointReached(uint32 waypointId, uint32 /*pathId*/) override
         {
             RelocateSummons();
             switch (waypointId)
@@ -594,7 +594,7 @@ public:
                 DemonAmbush(2);
                 break;
             case 282:
-                SetNextWaypoint(1, false, true);
+                //Start(false, false, ObjectGuid::Empty, nullptr, false, true);
                 break;
             }
         }
