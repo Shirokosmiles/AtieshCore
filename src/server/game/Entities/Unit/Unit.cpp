@@ -3415,7 +3415,8 @@ void Unit::ProcessTerrainStatusUpdate(ZLiquidStatus status, Optional<LiquidData>
     {
         if (_lastLiquid && _lastLiquid->SpellId)
             RemoveAurasDueToSpell(_lastLiquid->SpellId);
-        if (curLiquid && curLiquid->SpellId)
+        Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (curLiquid && curLiquid->SpellId && (!player || !player->IsGameMaster()))
             CastSpell(this, curLiquid->SpellId, true);
         _lastLiquid = curLiquid;
     }
@@ -5908,9 +5909,8 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         creature->SendAIReaction(AI_REACTION_HOSTILE);
         creature->CallAssistance();
 
-        // Remove emote state and bytes - will be restored on creature reset
+        // Remove emote state - will be restored on creature reset
         SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-        SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_STAND);
     }
 
     // delay offhand weapon attack to next attack time

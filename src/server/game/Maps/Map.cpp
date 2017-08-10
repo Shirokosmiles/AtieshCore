@@ -3748,6 +3748,8 @@ void InstanceMap::CreateInstanceData(bool load)
             }
         }
     }
+    else
+        i_data->Create();
 }
 
 /*
