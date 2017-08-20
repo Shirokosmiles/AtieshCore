@@ -23610,8 +23610,14 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
             continue;
         }
 
-        // no alt item, remove aura, restart check
-        RemoveOwnedAura(itr);
+        // check on attr (dismanle on shield wall)
+        if (spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT) && spellInfo->HasAttribute(SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE) && !spellInfo->HasAttribute(SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY))
+        {
+            ++itr;
+            continue;
+        }
+            
+        RemoveOwnedAura(itr); // no alt item, remove aura, restart check            
     }
 
     // currently cast spells can be dependent from item
