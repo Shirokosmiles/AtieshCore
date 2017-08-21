@@ -2042,7 +2042,8 @@ void Aura::TriggerProcOnEvent(uint8 procEffectMask, AuraApplication* aurApp, Pro
     }
 
     // Remove aura if we've used last charge to proc
-    if (IsUsingCharges() && !GetCharges())
+    // HACH Dragon Breath should not break when living bomb explosive
+    if (IsUsingCharges() && !GetCharges() && GetId() != 42950)
         Remove();
 }
 
