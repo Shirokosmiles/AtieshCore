@@ -274,7 +274,7 @@ public:
                             pChampion->SetReactState(REACT_PASSIVE);
                             pChampion->SetHealth(1);
                             pChampion->CombatStop(true);
-                            pChampion->setRegeneratingHealth(false);
+                            pChampion->SetRegenerateHealth(false);
                             pChampion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                             pChampion->SetHomePosition(745.87f, 625.88f, 411.17f, pChampion->GetHomePosition().GetOrientation());
                             pChampion->GetMotionMaster()->MoveTargetedHome();

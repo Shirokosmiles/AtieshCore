@@ -600,7 +600,7 @@ public:
                 damage = 0;
                 events.Reset();
                 me->SetHealth(1);
-                me->setRegeneratingHealth(false);
+                me->SetRegenerateHealth(false);
                 me->RemoveAllAuras();
                 me->CombatStop(true);
                 me->SetReactState(REACT_PASSIVE);
