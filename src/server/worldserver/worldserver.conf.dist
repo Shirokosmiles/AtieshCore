@@ -376,10 +376,11 @@ DisconnectToleranceInterval = 0
 #
 #    mmap.enablePathFinding
 #        Description: Enable/Disable pathfinding using mmaps - recommended.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#                     
 
-mmap.enablePathFinding = 0
+mmap.enablePathFinding = 1
 
 #
 #    vmap.enableLOS
@@ -417,6 +418,15 @@ DetectPosCollision = 1
 #                     0 - (Disabled, may break some boss encounters)
 
 CheckGameObjectLoS = 1
+
+#
+#    CheckGameObjectLoS
+#        Description: Include M2 objects (trees etc.) in line of sight checks.
+#                     (only if vmaps are enabled)
+#        Default:     1 - (Enabled) - not blizzlike, but game looks really pretty
+#                     0 - (Disabled) - blizzlike, but you can cast throught trees...
+
+CheckM2ObjectLoS = 1
 
 #
 #    TargetPosRecalculateRange

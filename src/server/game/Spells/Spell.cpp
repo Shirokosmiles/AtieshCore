@@ -5254,7 +5254,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                     if (DynamicObject* dynObj = m_caster->GetDynObject(m_triggeredByAuraSpell->Id))
                         losTarget = dynObj;
 
-                if (!m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, nullptr, SPELL_DISABLE_LOS) && !target->IsWithinLOSInMap(losTarget, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::M2) && !m_spellInfo->HasAttribute(SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK) && !m_spellInfo->HasAttribute(SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC))
+                if (!m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, nullptr, SPELL_DISABLE_LOS) && !target->IsWithinLOSInMap(losTarget, LINEOFSIGHT_ALL_CHECKS, (sWorld->getBoolConfig(CONFIG_CHECK_M2_LOS) ? VMAP::ModelIgnoreFlags::Nothing : VMAP::ModelIgnoreFlags::M2)) && !m_spellInfo->HasAttribute(SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK) && !m_spellInfo->HasAttribute(SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC))
                     return SPELL_FAILED_LINE_OF_SIGHT;
             }
         }
@@ -5266,7 +5266,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
         float x, y, z;
         m_targets.GetDstPos()->GetPosition(x, y, z);
 
-        if (!m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, nullptr, SPELL_DISABLE_LOS) && !m_caster->IsWithinLOS(x, y, z, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::M2) && !m_spellInfo->HasAttribute(SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK) && !m_spellInfo->HasAttribute(SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC))
+        if (!m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, nullptr, SPELL_DISABLE_LOS) && !m_caster->IsWithinLOS(x, y, z, LINEOFSIGHT_ALL_CHECKS, (sWorld->getBoolConfig(CONFIG_CHECK_M2_LOS) ? VMAP::ModelIgnoreFlags::Nothing : VMAP::ModelIgnoreFlags::M2)) && !m_spellInfo->HasAttribute(SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK) && !m_spellInfo->HasAttribute(SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC))
             return SPELL_FAILED_LINE_OF_SIGHT;
     }
 
@@ -7178,7 +7178,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff, Position const* lo
         {
             if (!m_targets.GetCorpseTargetGUID())
             {
-                if (target->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::M2) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
+                if (target->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS, (sWorld->getBoolConfig(CONFIG_CHECK_M2_LOS) ? VMAP::ModelIgnoreFlags::Nothing : VMAP::ModelIgnoreFlags::M2)) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
                     return true;
 
                 return false;
@@ -7194,7 +7194,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff, Position const* lo
             if (!corpse->HasFlag(CORPSE_FIELD_FLAGS, CORPSE_FLAG_LOOTABLE))
                 return false;
 
-            if (!corpse->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::M2))
+            if (!corpse->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS, (sWorld->getBoolConfig(CONFIG_CHECK_M2_LOS) ? VMAP::ModelIgnoreFlags::Nothing : VMAP::ModelIgnoreFlags::M2)))
                 return false;
 
             break;
@@ -7202,7 +7202,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff, Position const* lo
         default:                                            // normal case
         {
             if (losPosition)
-                return target->IsWithinLOS(losPosition->GetPositionX(), losPosition->GetPositionY(), losPosition->GetPositionZ(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::M2);
+                return target->IsWithinLOS(losPosition->GetPositionX(), losPosition->GetPositionY(), losPosition->GetPositionZ(), LINEOFSIGHT_ALL_CHECKS, (sWorld->getBoolConfig(CONFIG_CHECK_M2_LOS) ? VMAP::ModelIgnoreFlags::Nothing : VMAP::ModelIgnoreFlags::M2));
             else
             {
                 // Get GO cast coordinates if original caster -> GO
@@ -7211,7 +7211,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff, Position const* lo
                     caster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
                 if (!caster)
                     caster = m_caster;
-                if (target != m_caster && !target->IsWithinLOSInMap(caster, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::M2))
+                if (target != m_caster && !target->IsWithinLOSInMap(caster, LINEOFSIGHT_ALL_CHECKS, (sWorld->getBoolConfig(CONFIG_CHECK_M2_LOS) ? VMAP::ModelIgnoreFlags::Nothing : VMAP::ModelIgnoreFlags::M2)))
                     return false;
             }
             break;

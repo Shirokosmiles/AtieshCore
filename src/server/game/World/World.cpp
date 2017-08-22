@@ -1473,6 +1473,9 @@ void World::LoadConfigSettings(bool reload)
     // Whether to use LoS from game objects
     m_bool_configs[CONFIG_CHECK_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("CheckGameObjectLoS", true);
 
+    // Whether to use LoS from M2 objects
+    m_bool_configs[CONFIG_CHECK_M2_LOS] = sConfigMgr->GetBoolDefault("CheckM2ObjectLoS", true);
+
     // call ScriptMgr if we're reloading the configuration
     if (reload)
         sScriptMgr->OnConfigLoad(reload);
