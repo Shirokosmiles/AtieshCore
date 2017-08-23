@@ -2092,7 +2092,6 @@ class TC_GAME_API Unit : public WorldObject
         void DisableSpline();
         void UpdateSplinePosition();
         void CheckPendingMovementAcks();
-        void SetNeedToDismountAfterRoots() { needtodismount = true; }
 
         void ProcessPositionDataChanged(PositionFullTerrainStatus const& data) override;
         virtual void ProcessTerrainStatusUpdate(ZLiquidStatus status, Optional<LiquidData> const& liquidData);
@@ -2144,7 +2143,6 @@ class TC_GAME_API Unit : public WorldObject
         bool m_cleanupDone; // lock made to not add stuff after cleanup before delete
         bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
         bool _instantCast;
-        bool needtodismount;
 
         uint32 _oldFactionId;           ///< faction before charm
         bool _isWalkingBeforeCharm;     ///< Are we walking before we were charmed?

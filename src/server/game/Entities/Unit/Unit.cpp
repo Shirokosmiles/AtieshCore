@@ -382,7 +382,6 @@ Unit::Unit(bool isWorldObject) :
     _oldFactionId = 0;
     _isWalkingBeforeCharm = false;
     _instantCast = false;
-    needtodismount = false;
 }
 
 ////////////////////////////////////////////////////////////
@@ -12514,12 +12513,6 @@ void Unit::SetRootedReal(bool apply)
     {
         RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
         RemoveUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
-
-        if (needtodismount)
-        {
-            RemoveAurasByType(SPELL_AURA_MOUNTED);
-            needtodismount = false;
-        }
     }
 }
 
