@@ -594,7 +594,7 @@ public:
                 DemonAmbush(2);
                 break;
             case 282:
-                //Start(false, false, ObjectGuid::Empty, nullptr, false, true);
+                Start(false, false, ObjectGuid::Empty, nullptr, false, false);
                 break;
             }
         }
