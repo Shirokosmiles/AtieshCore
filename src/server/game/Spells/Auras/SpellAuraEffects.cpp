@@ -1608,6 +1608,8 @@ void AuraEffect::HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool
         target->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST);
         target->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
         target->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
+        target->SetWaterWalking(true);
+        target->SetRooted(false);
     }
     else
     {
@@ -1617,6 +1619,7 @@ void AuraEffect::HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool
         target->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST);
         target->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
         target->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
+        target->SetWaterWalking(false);
     }
 }
 
@@ -2664,7 +2667,9 @@ void AuraEffect::HandleAuraAllowFlight(AuraApplication const* aurApp, uint8 mode
             return;
     }
 
-    if (target->SetCanFly(apply))
+    bool previousState = target->HasCanFly();
+    target->SetCanFly(apply);
+    if (previousState != apply)
         if (!apply && !target->IsLevitating())
             target->GetMotionMaster()->MoveFall();
 }
@@ -3066,7 +3071,9 @@ void AuraEffect::HandleAuraModIncreaseFlightSpeed(AuraApplication const* aurApp,
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
         if (mode & AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK && (apply || (!target->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !target->HasAuraType(SPELL_AURA_FLY))))
         {
-            if (target->SetCanFly(apply))
+            bool previousState = target->HasCanFly();
+            target->SetCanFly(apply);
+            if (previousState != apply)
                 if (!apply && !target->IsLevitating())
                     target->GetMotionMaster()->MoveFall();
         }

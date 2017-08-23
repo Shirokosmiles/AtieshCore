@@ -3187,40 +3187,6 @@ LevelReq.Auction = 1
 LevelReq.Mail = 1
 
 #
-#     Anticheat.Enable
-#        Description: Enables or disables the Anticheat System functionality
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-Anticheat.Enable = 1
-
-#     Anticheat.ReportsForIngameWarnings
-#        Description: How many reports the player must have to notify to GameMasters ingame when he generates a new report.
-#        Default:     70
-
-Anticheat.ReportsForIngameWarnings = 70
-
-#     Anticheat.DetectionsEnabled
-#        Description: It represents which detections are enabled.
-#
-#        SPEED_HACK_DETECTION            = 1
-#        FLY_HACK_DETECTION              = 2
-#        WALK_WATER_HACK_DETECTION       = 4
-#        JUMP_HACK_DETECTION             = 8
-#        TELEPORT_PLANE_HACK_DETECTION   = 16
-#        CLIMB_HACK_DETECTION            = 32
-#
-#        Default:     31
-
-Anticheat.DetectionsEnabled = 31
-
-#     Anticheat.MaxReportsForDailyReport
-#        Description: How many reports must the player have to make a report that it is in DB for a day (not only during the player's session).
-#        Default:     70
-
-Anticheat.MaxReportsForDailyReport = 70
-
-#
 #     PlayerDump.DisallowPaths
 #        Description: Disallow using paths in PlayerDump output files
 #        Default:     1
@@ -3970,6 +3936,23 @@ PacketSpoof.BanMode = 0
 #
 
 PacketSpoof.BanDuration = 86400
+
+#
+###################################################################################################
+
+###################################################################################################
+# MISC ANTI-CHEAT SETTINGS
+#
+# Settings to tweak various anti cheat measures.
+#
+#    AntiCheats.PendingMoveChangesTimeoutTime
+#        Description: Time each client has to acknowledge a movement change until they are kicked.
+#        Note:        A lower time will give cheaters less advantage when using a very specific
+#                     type of hack. However, the cost is that innocent but laggy players might
+#                     sometimes get kicked.
+#        Default:     5000 (5 seconds)
+
+AntiCheats.PendingMoveChangesTimeoutTime = 5000
 
 #
 ###################################################################################################

@@ -40,6 +40,8 @@
 #include "Log.h"
 #include "LootMgr.h"
 #include "MotionMaster.h"
+#include "MovementPacketSender.h"
+#include "MovementPackets.h"
 #include "MovementGenerator.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
@@ -48,21 +50,21 @@
 #include "Opcodes.h"
 #include "OutdoorPvP.h"
 #include "PassiveAI.h"
-#include "PetAI.h"
 #include "Pet.h"
+#include "PetAI.h"
 #include "Player.h"
 #include "PlayerAI.h"
 #include "QuestDef.h"
 #include "ReputationMgr.h"
+#include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
-#include "Spell.h"
-#include "SpellInfo.h"
 #include "SpellHistory.h"
+#include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
-#include "Transport.h"
 #include "Totem.h"
+#include "Transport.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
 #include "Vehicle.h"
@@ -301,6 +303,11 @@ Unit::Unit(bool isWorldObject) :
     m_extraAttacks = 0;
     m_canDualWield = false;
 
+    m_movementCounter = 0;
+    
+    lastMoveClientTimestamp = 0;
+    lastMoveServerTimestamp = 0;
+
     m_rootTimes = 0;
 
     m_state = 0;
@@ -354,6 +361,8 @@ Unit::Unit(bool isWorldObject) :
 
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
         m_speed_rate[i] = 1.0f;
+
+    collisionHeight = 0.0f;
 
     m_charmInfo = nullptr;
 
@@ -437,6 +446,8 @@ void Unit::Update(uint32 p_time)
     // Spells must be processed with event system BEFORE they go to _UpdateSpells.
     // Or else we may have some SPELL_STATE_FINISHED spells stalled in pointers, that is bad.
     m_Events.Update(p_time);
+
+    CheckPendingMovementAcks();
 
     if (!IsInWorld())
         return;
@@ -8611,11 +8622,8 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
             if (charm->GetTypeId() == TYPEID_UNIT)
                 charm->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
-        WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
-        data << GetPackGUID();
-        data << uint32(GameTime::GetGameTime());   // Packet counter
-        data << player->GetCollisionHeight(true);
-        player->SendDirectMessage(&data);
+        float newCollisionHeight = player->ComputeCollisionHeight(true);
+        SetCollisionHeight(newCollisionHeight);
     }
 
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOUNT);
@@ -8631,11 +8639,8 @@ void Unit::Dismount()
 
     if (Player* thisPlayer = ToPlayer())
     {
-        WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
-        data << GetPackGUID();
-        data << uint32(GameTime::GetGameTime());   // Packet counter
-        data << thisPlayer->GetCollisionHeight(false);
-        thisPlayer->SendDirectMessage(&data);
+        float newCollisionHeight = thisPlayer->ComputeCollisionHeight(false);
+        SetCollisionHeight(newCollisionHeight);
     }
 
     WorldPacket data(SMSG_DISMOUNT, 8);
@@ -9414,67 +9419,36 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate)
         rate = 0.0f;
 
     // Update speed only on change
-    if (m_speed_rate[mtype] == rate)
+    MovementChangeType changeType = MovementPacketSender::GetChangeTypeByMoveType(mtype);
+    if (m_speed_rate[mtype] == rate && !HasPendingMovementChange(changeType))
         return;
 
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendSpeedChangeToMover(this, mtype, rate);
+    else if (IsMovedByPlayer() && !IsInWorld()) // (1)
+        SetSpeedRateReal(mtype, rate);
+    else // <=> if(!IsMovedByPlayer())
+    {
+        SetSpeedRateReal(mtype, rate);
+        MovementPacketSender::SendSpeedChangeToAll(this, mtype, rate);
+    }
+
+    // explaination of (1):
+    // If the player is not in the world yet, it won't reply to the packets requiring an ack. And once the player is in the world, next time a movement
+    // packet which requires an ack is sent to the client (change of speed for example), the client is kicked from the
+    // server on the ground that it should have replied to the first packet first. That line is a hacky fix
+    // in the sense that it doesn't work like that in retail since buffs are applied only after the player has been
+    // initialized in the world. cf description of PR #18771
+}
+
+void Unit::SetSpeedRateReal(UnitMoveType mtype, float rate)
+{
+    if (!IsInCombat() && ToPlayer())
+        if (Pet* pet = ToPlayer()->GetPet())
+            pet->SetSpeedRate(mtype, rate);
+    
     m_speed_rate[mtype] = rate;
-
     PropagateSpeedChange();
-
-    // Spline packets are for units controlled by AI. "Force speed change" (wrongly named opcodes) and "move set speed" packets are for units controlled by a player.
-    static Opcodes const moveTypeToOpcode[MAX_MOVE_TYPE][3] =
-    {
-        {SMSG_SPLINE_SET_WALK_SPEED,        SMSG_FORCE_WALK_SPEED_CHANGE,           MSG_MOVE_SET_WALK_SPEED         },
-        {SMSG_SPLINE_SET_RUN_SPEED,         SMSG_FORCE_RUN_SPEED_CHANGE,            MSG_MOVE_SET_RUN_SPEED          },
-        {SMSG_SPLINE_SET_RUN_BACK_SPEED,    SMSG_FORCE_RUN_BACK_SPEED_CHANGE,       MSG_MOVE_SET_RUN_BACK_SPEED     },
-        {SMSG_SPLINE_SET_SWIM_SPEED,        SMSG_FORCE_SWIM_SPEED_CHANGE,           MSG_MOVE_SET_SWIM_SPEED         },
-        {SMSG_SPLINE_SET_SWIM_BACK_SPEED,   SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,      MSG_MOVE_SET_SWIM_BACK_SPEED    },
-        {SMSG_SPLINE_SET_TURN_RATE,         SMSG_FORCE_TURN_RATE_CHANGE,            MSG_MOVE_SET_TURN_RATE          },
-        {SMSG_SPLINE_SET_FLIGHT_SPEED,      SMSG_FORCE_FLIGHT_SPEED_CHANGE,         MSG_MOVE_SET_FLIGHT_SPEED       },
-        {SMSG_SPLINE_SET_FLIGHT_BACK_SPEED, SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE,    MSG_MOVE_SET_FLIGHT_BACK_SPEED  },
-        {SMSG_SPLINE_SET_PITCH_RATE,        SMSG_FORCE_PITCH_RATE_CHANGE,           MSG_MOVE_SET_PITCH_RATE         },
-    };
-
-    if (GetTypeId() == TYPEID_PLAYER)
-    {
-        // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
-        // and do it only for real sent packets and use run for run/mounted as client expected
-        ++ToPlayer()->m_forced_speed_changes[mtype];
-
-        if (!IsInCombat())
-            if (Pet* pet = ToPlayer()->GetPet())
-                pet->SetSpeedRate(mtype, m_speed_rate[mtype]);
-    }
-
-    if (Player* playerMover = GetPlayerBeingMoved()) // unit controlled by a player.
-    {
-        // Send notification to self. this packet is only sent to one client (the client of the player concerned by the change).
-        WorldPacket self;
-        self.Initialize(moveTypeToOpcode[mtype][1], mtype != MOVE_RUN ? 8 + 4 + 4 : 8 + 4 + 1 + 4);
-        self << GetPackGUID();
-        self << (uint32)0;                                  // Movement counter. Unimplemented at the moment! NUM_PMOVE_EVTS = 0x39Z.
-        if (mtype == MOVE_RUN)
-            self << uint8(1);                               // unknown byte added in 2.1.0
-        self << float(GetSpeed(mtype));
-        playerMover->SendDirectMessage(&self);
-
-        // Send notification to other players. sent to every clients (if in range) except one: the client of the player concerned by the change.
-        WorldPacket data;
-        data.Initialize(moveTypeToOpcode[mtype][2], 8 + 30 + 4);
-        data << GetPackGUID();
-        BuildMovementPacket(&data);
-        data << float(GetSpeed(mtype));
-        playerMover->SendMessageToSet(&data, false);
-    }
-    else // unit controlled by AI.
-    {
-        // send notification to every clients.
-        WorldPacket data;
-        data.Initialize(moveTypeToOpcode[mtype][0], 8 + 4);
-        data << GetPackGUID();
-        data << float(GetSpeed(mtype));
-        SendMessageToSet(&data, false);
-    }
 }
 
 bool Unit::IsGhouled() const
@@ -11439,7 +11413,7 @@ void Unit::PropagateSpeedChange()
     GetMotionMaster()->PropagateSpeedChange();
 }
 
-void Unit::StopMoving()
+void Unit::StopMoving()// @todo: in order to work well on players too, this method probably needs a bit of rework. Also, a fair bit of sniff digging  and analysis are needed in order to see the different ways that players are stopped by the server.
 {
     ClearUnitState(UNIT_STATE_MOVING);
 
@@ -11476,9 +11450,9 @@ void Unit::ResumeMovement(uint32 timer/* = 0*/, uint8 slot/* = 0*/)
 
 void Unit::SendMovementFlagUpdate(bool self /* = false */)
 {
-    WorldPacket data;
-    BuildHeartBeatMsg(&data);
-    SendMessageToSet(&data, self);
+    WorldPackets::Movement::MoveUpdate moveUpdate(MSG_MOVE_HEARTBEAT, 32);
+    moveUpdate.Status = GetMovementInfo();
+    SendMessageToSet(moveUpdate.Write(), self);
 }
 
 bool Unit::IsSitState() const
@@ -12484,21 +12458,12 @@ void Unit::SetStunned(bool apply)
         SetTarget(ObjectGuid::Empty);
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
-        // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
-        // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
-        // setting MOVEMENTFLAG_ROOT
-        StopMoving();
-        GetMotionMaster()->MovementExpired();
-        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
-        AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+        SetRooted(true);
+        StopMoving(); // todo: keep this?
+        //GetMotionMaster()->MovementExpired();
 
         if (GetTypeId() == TYPEID_PLAYER)
             SetStandState(UNIT_STAND_STATE_STAND);
-
-        WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8);
-        data << GetPackGUID();
-        data << uint32(0);
-        SendMessageToSet(&data, true);
 
         CastStop();
     }
@@ -12513,70 +12478,47 @@ void Unit::SetStunned(bool apply)
             RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
         if (!HasUnitState(UNIT_STATE_ROOT))         // prevent moving if it also has root effect
-        {
-            WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 8 + 4);
-            data << GetPackGUID();
-            data << uint32(0);
-            SendMessageToSet(&data, true);
-
-            RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
-        }
+            SetRooted(false);
     }
 }
 
 void Unit::SetRooted(bool apply)
 {
+    // do nothing if the unit is already in the required state
+    if ((HasUnitMovementFlag(MOVEMENTFLAG_ROOT) || HasUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT)) == apply && !HasPendingMovementChange(ROOT))
+        return;
+
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEMENTFLAG_ROOT, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetRootedReal(apply);
+    else
+    {
+        if (apply)
+            StopMoving(); // @todo: this method needs a rework. until then, should it be called only for NPC or also for player-controlled units?
+        SetRootedReal(apply);
+        MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEMENTFLAG_ROOT, apply);
+    }
+}
+
+void Unit::SetRootedReal(bool apply)
+{
     if (apply)
     {
-        if (m_rootTimes > 0) // blizzard internal check?
-            m_rootTimes++;
-
-        // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
-        // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
-        // setting MOVEMENTFLAG_ROOT
-        StopMoving();
-        GetMotionMaster()->MovementExpired();
-        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
-        AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
-
-        if (GetTypeId() == TYPEID_PLAYER)
-        {
-            WorldPacket data(SMSG_FORCE_MOVE_ROOT, 10);
-            data << GetPackGUID();
-            data << m_rootTimes;
-            SendMessageToSet(&data, true);
-        }
+        if (!HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
+            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
         else
-        {
-            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
-            data << GetPackGUID();
-            SendMessageToSet(&data, true);
-        }
+            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
     }
     else
     {
-        if (!HasUnitState(UNIT_STATE_STUNNED))      // prevent moving if it also has stun effect
-        {
-            if (GetTypeId() == TYPEID_PLAYER)
-            {
-                WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 10);
-                data << GetPackGUID();
-                data << ++m_rootTimes;
-                SendMessageToSet(&data, true);
-            }
-            else
-            {
-                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-                data << GetPackGUID();
-                SendMessageToSet(&data, true);
-            }
+        RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
+        RemoveUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
 
-            RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
-            if (needtodismount)
-            {
-                RemoveAurasByType(SPELL_AURA_MOUNTED);
-                needtodismount = false;
-            }
+        if (needtodismount)
+        {
+            RemoveAurasByType(SPELL_AURA_MOUNTED);
+            needtodismount = false;
         }
     }
 }
@@ -13342,37 +13284,20 @@ void Unit::UpdateObjectVisibility(bool forced)
 
 void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
 {
-    Player* player = ToPlayer();
-    if (!player)
-    {
-        if (Unit* charmer = GetCharmer())
-        {
-            player = charmer->ToPlayer();
-            if (player && player->m_unitMovedByMe != this)
-                player = nullptr;
-        }
-    }
-
-    if (!player)
-    {
-        GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ);
-    }
-    else
+    if (IsMovedByPlayer() && IsInWorld())
     {
         float vcos, vsin;
         GetSinCos(x, y, vsin, vcos);
-
-        WorldPacket data(SMSG_MOVE_KNOCK_BACK, (8 + 4 + 4 + 4 + 4 + 4));
-        data << GetPackGUID();
-        data << uint32(0);                                      // counter
-        data << TaggedPosition<Position::XY>(vcos, vsin);
-        data << float(speedXY);                                 // Horizontal speed
-        data << float(-speedZ);                                 // Z Movement speed (vertical)
-
-        player->SendDirectMessage(&data);
-
-        if (player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || player->HasAuraType(SPELL_AURA_FLY))
-            player->SetCanFly(true, true);
+        MovementPacketSender::SendKnockBackToMover(this, vcos, vsin, speedXY, -speedZ); // !! notice the - sign in front of speedZ !!
+        
+        if (HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY))
+            SetCanFly(true);
+    }
+    else if (IsMovedByPlayer() && !IsInWorld())
+        ; // do nothing? Using a Send****ToMover on a unit not yet initialized in the world creates issues.
+    else
+    {
+        GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ);
     }
 }
 
@@ -13706,21 +13631,16 @@ uint32 Unit::GetModelForTotem(PlayerTotemType totemType)
 void Unit::JumpTo(float speedXY, float speedZ, bool forward)
 {
     float angle = forward ? 0 : float(M_PI);
-    if (GetTypeId() == TYPEID_UNIT)
-        GetMotionMaster()->MoveJumpTo(angle, speedXY, speedZ);
+    if (IsMovedByPlayer())
+    {
+        float vcos = std::cos(angle + GetOrientation());
+        float vsin = std::sin(angle + GetOrientation());
+
+        MovementPacketSender::SendKnockBackToMover(this, vcos, vsin, speedXY, -speedZ); // !! notice the - sign in front of speedZ !!
+    }
     else
     {
-        float vcos = std::cos(angle+GetOrientation());
-        float vsin = std::sin(angle+GetOrientation());
-
-        WorldPacket data(SMSG_MOVE_KNOCK_BACK, (8+4+4+4+4+4));
-        data << GetPackGUID();
-        data << uint32(0);                                      // Sequence
-        data << TaggedPosition<Position::XY>(vcos, vsin);
-        data << float(speedXY);                                 // Horizontal speed
-        data << float(-speedZ);                                 // Z Movement speed (vertical)
-
-        ToPlayer()->SendDirectMessage(&data);
+        GetMotionMaster()->MoveJumpTo(angle, speedXY, speedZ);
     }
 }
 
@@ -13971,50 +13891,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 }
 
-void Unit::BuildMovementPacket(ByteBuffer *data) const
-{
-    Unit::BuildMovementPacket(Position(GetPositionX(), GetPositionY(), GetPositionZMinusOffset(), GetOrientation()), m_movementInfo.transport.pos, m_movementInfo, data);
-}
-
-void Unit::BuildMovementPacket(Position const& pos, Position const& transportPos, MovementInfo const& movementInfo, ByteBuffer* data)
-{
-    *data << uint32(movementInfo.GetMovementFlags());
-    *data << uint16(movementInfo.GetExtraMovementFlags());
-    *data << uint32(GameTime::GetGameTimeMS());         // time / counter
-    *data << TaggedPosition<Position::XYZO>(pos);
-
-    // 0x00000200
-    if (movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
-    {
-        *data << movementInfo.transport.guid.WriteAsPacked();
-        *data << TaggedPosition<Position::XYZO>(transportPos);
-        *data << uint32(movementInfo.transport.time);
-        *data << int8(movementInfo.transport.seat);
-
-        if (movementInfo.HasExtraMovementFlag(MOVEMENTFLAG2_INTERPOLATED_MOVEMENT))
-            *data << uint32(movementInfo.transport.time2);
-    }
-
-    // 0x02200000
-    if ((movementInfo.HasMovementFlag(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (movementInfo.HasExtraMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING)))
-        *data << float(movementInfo.pitch);
-
-    *data << uint32(movementInfo.fallTime);
-
-    // 0x00001000
-    if (movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING))
-    {
-        *data << float(movementInfo.jump.zspeed);
-        *data << float(movementInfo.jump.sinAngle);
-        *data << float(movementInfo.jump.cosAngle);
-        *data << float(movementInfo.jump.xyspeed);
-    }
-
-    // 0x04000000
-    if (movementInfo.HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
-        *data << float(movementInfo.splineElevation);
-}
-
 bool Unit::IsFalling() const
 {
     return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR) || movespline->isFalling();
@@ -14050,12 +13926,8 @@ void Unit::NearTeleportTo(Position const& pos, bool casting /*= false*/)
 
 void Unit::SendTeleportPacket(Position const& pos, bool teleportingTransport /*= false*/)
 {
-    // MSG_MOVE_TELEPORT is sent to nearby players to signal the teleport
-    // MSG_MOVE_TELEPORT_ACK is sent to self in order to trigger ACK and update the position server side
-
-    MovementInfo teleportMovementInfo = m_movementInfo;
-    teleportMovementInfo.pos.Relocate(pos);
-    Position transportPos = m_movementInfo.transport.pos;
+    MovementInfo movementInfo = GetMovementInfo();
+    movementInfo.pos.Relocate(pos);
     if (TransportBase* transportBase = GetDirectTransport())
     {
         // if its the transport that is teleported then we have old transport position here and cannot use it to calculate offsets
@@ -14065,29 +13937,16 @@ void Unit::SendTeleportPacket(Position const& pos, bool teleportingTransport /*=
             float x, y, z, o;
             pos.GetPosition(x, y, z, o);
             transportBase->CalculatePassengerOffset(x, y, z, &o);
-            transportPos.Relocate(x, y, z, o);
+            movementInfo.transport.pos.Relocate(x, y, z, o);
         }
     }
 
-    WorldPacket moveUpdateTeleport(MSG_MOVE_TELEPORT, 38);
-    moveUpdateTeleport << GetPackGUID();
-    Unit* broadcastSource = this;
-
-    if (Player* playerMover = GetPlayerBeingMoved())
-    {
-        WorldPacket moveTeleport(MSG_MOVE_TELEPORT_ACK, 41);
-        moveTeleport << GetPackGUID();
-        moveTeleport << uint32(0);                                     // this value increments every time
-        Unit::BuildMovementPacket(pos, transportPos, teleportMovementInfo, &moveTeleport);
-        playerMover->SendDirectMessage(&moveTeleport);
-
-        broadcastSource = playerMover;
-    }
-
-    Unit::BuildMovementPacket(pos, transportPos, teleportMovementInfo, &moveUpdateTeleport);
-
-    // Broadcast the packet to everyone except self.
-    broadcastSource->SendMessageToSet(&moveUpdateTeleport, false);
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendTeleportAckPacket(this, movementInfo);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        ; // do nothing. should never happen?
+    else
+        MovementPacketSender::SendTeleportPacket(this, movementInfo);
 }
 
 bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool teleport)
@@ -14208,6 +14067,27 @@ void Unit::SendRemoveFromThreatListOpcode(HostileReference* pHostileReference)
     data << GetPackGUID();
     data << pHostileReference->getUnitGuid().WriteAsPacked();
     SendMessageToSet(&data, false);
+}
+
+PlayerMovementPendingChange Unit::PopPendingMovementChange()
+{
+    PlayerMovementPendingChange result = m_pendingMovementChanges.front();
+    m_pendingMovementChanges.pop_front();
+    return result;
+}
+
+void Unit::PushPendingMovementChange(PlayerMovementPendingChange newChange)
+{
+    m_pendingMovementChanges.emplace_back(std::move(newChange));
+}
+
+bool Unit::HasPendingMovementChange(MovementChangeType changeType) const
+{
+    return std::find_if(m_pendingMovementChanges.begin(), m_pendingMovementChanges.end(),
+        [changeType](PlayerMovementPendingChange const& pendingChange)
+    {
+        return pendingChange.movementChangeType == changeType;
+    }) != m_pendingMovementChanges.end();
 }
 
 void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
@@ -14478,19 +14358,28 @@ bool Unit::SetWalk(bool enable)
     return true;
 }
 
-bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/)
+void Unit::SetDisableGravity(bool apply)
 {
-    if (disable == IsLevitating())
-        return false;
+    if (apply == HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && !HasPendingMovementChange(GRAVITY_DISABLE))
+        return;
 
-    if (disable)
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEMENTFLAG_DISABLE_GRAVITY, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetDisableGravityReal(apply);
+    else
     {
-        AddUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+        SetDisableGravityReal(apply);
+        MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEMENTFLAG_DISABLE_GRAVITY, apply);
     }
+}
+
+void Unit::SetDisableGravityReal(bool apply)
+{
+    if (apply)
+        AddUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
     else
         RemoveUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
-    return true;
 }
 
 bool Unit::SetSwim(bool enable)
@@ -14505,53 +14394,113 @@ bool Unit::SetSwim(bool enable)
     return true;
 }
 
-bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
+void Unit::SetCanFly(bool apply)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY))
-        return false;
+    if (apply == HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) && !HasPendingMovementChange(SET_CAN_FLY))
+        return;
 
-    if (enable)
-    {
-        AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY);
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
-    }
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEMENTFLAG_CAN_FLY, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetCanFlyReal(apply);
     else
-        RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_MASK_MOVING_FLY);
-    return true;
+    {
+        SetCanFlyReal(apply);
+        // nothing to send. there is no opcode to send this mFlag for server controlled units. This makes sense
+        // since the AI of these units is in the server. Clients don't care that a certain unit can fly.
+    }
 }
 
-bool Unit::SetWaterWalking(bool enable, bool /*packetOnly = false */)
+void Unit::SetCanFlyReal(bool apply)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING))
-        return false;
+    // @todo: keep this? from #16955 in Player::SetCanFly
+    //if (!apply)
+    //SetFallInformation(0, GetPositionZ());
+        
+    if (apply)
+        AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY);
+    else
+        RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING);
+}
 
-    if (enable)
+void Unit::SetWaterWalking(bool apply)
+{
+    if (apply == HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING) && !HasPendingMovementChange(WATER_WALK))
+        return;
+
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEMENTFLAG_WATERWALKING, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetWaterWalkingReal(apply);
+    else
+    {
+        SetWaterWalkingReal(apply);
+        MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEMENTFLAG_WATERWALKING, apply);
+    }    
+}
+
+void Unit::SetWaterWalkingReal(bool apply)
+{
+    if (apply)
         AddUnitMovementFlag(MOVEMENTFLAG_WATERWALKING);
     else
         RemoveUnitMovementFlag(MOVEMENTFLAG_WATERWALKING);
-    return true;
 }
 
-bool Unit::SetFeatherFall(bool enable, bool /*packetOnly = false */)
+void Unit::SetFeatherFall(bool apply)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW))
-        return false;
+    if (apply == HasUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW) && !HasPendingMovementChange(FEATHER_FALL))
+        return;
 
-    if (enable)
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEMENTFLAG_FALLING_SLOW, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetFeatherFallReal(apply);
+    else
+        {
+        SetFeatherFallReal(apply);
+        MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEMENTFLAG_FALLING_SLOW, apply);
+        }
+    
+}
+
+void Unit::SetFeatherFallReal(bool apply)
+{
+    if (apply)
         AddUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW);
     else
         RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW);
-    return true;
 }
 
-bool Unit::SetHover(bool enable, bool /*packetOnly = false*/)
+void Unit::SetHover(bool apply)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
-        return false;
+    if (apply == HasUnitMovementFlag(MOVEMENTFLAG_HOVER) && !HasPendingMovementChange(SET_HOVER))
+        return;
+    
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEMENTFLAG_HOVER, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetHoverReal(apply);
+    else
+    {
+        SetHoverReal(apply);
+        MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEMENTFLAG_HOVER, apply);
+    }    
+}
 
+void Unit::SetHoverReal(bool apply)
+{
     float hoverHeight = GetFloatValue(UNIT_FIELD_HOVERHEIGHT);
 
-    if (enable)
+    if (!IsMovedByPlayer())
+    {
+        if (apply)
+            SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+        else
+            RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+    }
+    
+    if (apply)
     {
         //! No need to check height on ascent
         AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
@@ -14568,7 +14517,51 @@ bool Unit::SetHover(bool enable, bool /*packetOnly = false*/)
             UpdateHeight(newZ);
         }
     }
-    return true;
+}
+
+void Unit::SetCanTransitionBetweenSwimAndFly(bool apply)
+{
+    // do nothing if the unit is already in the required state
+    if (HasExtraUnitMovementFlag(MOVEMENTFLAG2_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY) == apply && !HasPendingMovementChange(SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY))
+        return;
+    
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEMENTFLAG2_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetCanTransitionBetweenSwimAndFlyReal(apply);
+    else
+    {
+        // should not happen. this flag is only used on player-controlled units.
+    }
+}
+
+void Unit::SetCanTransitionBetweenSwimAndFlyReal(bool apply)
+{
+    if (apply)
+    {
+        AddExtraUnitMovementFlag(MOVEMENTFLAG2_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY);
+    }
+    else
+        RemoveExtraUnitMovementFlag(MOVEMENTFLAG2_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY);
+}
+
+bool Unit::SetCollisionHeight(float newValue)
+{
+    // Update only on change
+    if (GetCollisionHeight() == newValue && !HasPendingMovementChange(SET_COLLISION_HGT))
+        return false;
+    
+    if (IsMovedByPlayer() && IsInWorld())
+         MovementPacketSender::SendHeightChangeToMover(this, newValue);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetCollisionHeightReal(newValue);
+    else
+    {
+        // no need to send this information to the clients since it only affects pathfinding, which is server side only.
+        SetCollisionHeightReal(newValue);
+    }
+    
+    return true; // change method return type to void?
 }
 
 void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
@@ -14880,4 +14873,139 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);
+}
+
+void Unit::ValidateMovementInfo(MovementInfo* mi)
+{
+    //! Anti-cheat checks.
+#ifdef TRINITY_DEBUG
+#define CHECK_FOR_VIOLATING_FLAGS(check) \
+    { \
+        if (check) \
+        { \
+            TC_LOG_INFO("cheat", "Unit::ValidateMovementInfo: A violation has been detected (%s) for player GUID: %u. The player will be kicked." \
+                " Data from client: MovementFlags: %u, MovementFlags2: %u. Data in the server: MovementFlags: %u, MovementFlags2: %u.", \
+                STRINGIZE(check), GetPlayerMovingMe()->GetGUID().GetCounter(), \
+                            mi->GetMovementFlags(), mi->GetExtraMovementFlags(), \
+                            GetMovementInfo().GetMovementFlags(), GetMovementInfo().GetExtraMovementFlags()); \
+            GetPlayerMovingMe()->GetSession()->KickPlayer(); \
+            return; \
+        } \
+    }
+#else
+#define CHECK_FOR_VIOLATING_FLAGS(check) \
+                    if (check) \
+                    { \
+                        GetPlayerMovingMe()->GetSession()->KickPlayer(); \
+                        return; \
+                    } \
+
+#endif
+
+    /*! This must be a packet spoofing attempt. MOVEMENTFLAG_ROOT sent from the client is not valid
+    in conjunction with any of the moving movement flags such as MOVEMENTFLAG_FORWARD.
+    It will freeze clients that receive this player's movement info.
+    */
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_ROOT) && mi->HasMovementFlag(MOVEMENTFLAG_MASK_MOVING));
+
+    //! Cannot ascend and descend at the same time
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_ASCENDING) && mi->HasMovementFlag(MOVEMENTFLAG_DESCENDING));
+
+    //! Cannot move left and right at the same time
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_LEFT) && mi->HasMovementFlag(MOVEMENTFLAG_RIGHT));
+
+    //! Cannot strafe left and right at the same time
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT) && mi->HasMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT));
+
+    //! Cannot pitch up and down at the same time
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_PITCH_UP) && mi->HasMovementFlag(MOVEMENTFLAG_PITCH_DOWN));
+
+    //! Cannot move forwards and backwards at the same time
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FORWARD) && mi->HasMovementFlag(MOVEMENTFLAG_BACKWARD));
+
+    //! Cannot fly ('flying' flag) without the 'canFly' flag active
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FLYING) && !mi->HasMovementFlag(MOVEMENTFLAG_CAN_FLY));
+
+    ////! Check for synchronisation between client and server with those server-controlled flags:
+    // CanFly, Hover, Waterwalking, Root (or if necessary PendingRoot), DisableGravity, CanTransitionBetweenSwimAndFly and FeatherFall
+    MovementInfo oldMovementInfo = GetMovementInfo();
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_CAN_FLY) != oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY));
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_HOVER) != oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_HOVER));
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_WATERWALKING) != oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_WATERWALKING));
+    CHECK_FOR_VIOLATING_FLAGS((mi->HasMovementFlag(MOVEMENTFLAG_ROOT) || mi->HasMovementFlag(MOVEMENTFLAG_PENDING_ROOT)) != (oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT) || oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_PENDING_ROOT)));
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) != oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY));
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasExtraMovementFlag(MOVEMENTFLAG2_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY) != oldMovementInfo.HasExtraMovementFlag(MOVEMENTFLAG2_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY));
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FALLING_SLOW) != oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_SLOW));
+
+    // If a root is pending, the unit should be falling
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_PENDING_ROOT) && !mi->HasMovementFlag(MOVEMENTFLAG_FALLING));
+
+    // @todo: if the unit is falling, it should be away from the ground
+
+    // @todo: if a unit is away from the ground and doesn't have Flying or DisableGravity, it should be falling (unless hover)
+
+    //! Cannot fly and fall at the same time
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY) && mi->HasMovementFlag(MOVEMENTFLAG_FALLING));
+
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED) && (!movespline->Initialized() || movespline->Finalized()));
+
+#undef CHECK_FOR_VIOLATING_FLAGS
+}
+
+void Unit::UpdateMovementInfo(MovementInfo const& movementInfo)
+{
+    if (!IsMovedByPlayer())
+    {
+        TC_LOG_ERROR("entities.unit", "Unit::UpdateMovementInfo call on a unit not moved by a player. This should not happen.");
+        return;
+    }
+
+    SetLastMoveClientTimestamp(movementInfo.time); // unused for now. will be needed for speed cheat detection
+    SetLastMoveServerTimestamp(getMSTime()); // unused for now. will probably needed in the future
+
+    WorldSession* playerSession = GetPlayerMovingMe()->GetSession();
+    if (playerSession->GetClientTimeDelay() == 0)
+        playerSession->SetClientTimeDelay(getMSTime() - movementInfo.time);
+
+    UpdatePosition(movementInfo.pos);
+    m_movementInfo = movementInfo;
+    m_movementInfo.time = movementInfo.time + playerSession->GetClientTimeDelay() + MOVEMENT_PACKET_TIME_DELAY;
+}
+
+void Unit::CheckPendingMovementAcks()
+{
+    if (!HasPendingMovementChange())
+        return;
+
+    PlayerMovementPendingChange const& oldestChangeToAck = m_pendingMovementChanges.front();
+    if (GameTime::GetGameTimeMS() > oldestChangeToAck.time + sWorld->getIntConfig(CONFIG_PENDING_MOVE_CHANGES_TIMEOUT))
+    {
+        /*
+        when players are teleported from one corner of a map to an other (example: from Dragonblight to the entrance of Naxxramas, both in the same map: Northend),
+        is it done through what is called a 'near' teleport. A near teleport always involve teleporting a player from one point to an other in the same map, even if
+        the distance is huge. When that distance is big enough, a loading screen appears on the client side. During that time, the client loads the surrounding zone
+        of the new location (and everything it contains). The problem is that, as long as the client hasn't finished loading the new zone, it will NOT ack the near
+        teleport. So if the server sends a near teleport order at a certain time and the client takes 20s to load the new zone (let's imagine a very slow computer),
+        even with zero latency, the server will receive an ack from the client only after 20s.
+
+        For this reason and because the current implementation is simple (you dear reader, feel free to improve it if you can), we will just ignore checking for
+        near teleport acks (for now. @todo).
+        */
+        if (oldestChangeToAck.movementChangeType == TELEPORT)
+            return;
+
+        Player *controller = GetPlayerMovingMe();
+        if (controller)
+        {
+            TC_LOG_INFO("cheat", "Unit::CheckPendingMovementAcks: Player GUID: %u took too long to acknowledge a movement change. He was therefore kicked.", GetPlayerMovingMe()->GetGUID().GetCounter());
+            controller->GetSession()->KickPlayer();
+        }
+        //else
+        //ASSERT(false, "this shouldn't happen once transfer of move ownership is correctly implemented");
+    }
+}
+
+PlayerMovementPendingChange::PlayerMovementPendingChange()
+{
+    time = GameTime::GetGameTimeMS();
 }
