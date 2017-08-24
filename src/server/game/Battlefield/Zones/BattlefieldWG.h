@@ -20,6 +20,7 @@
 
 #include "Battlefield.h"
 #include "GameObjectData.h"
+#include "Map.h"
 
 class WintergraspCapturePoint;
 class WintergraspBuilding;
