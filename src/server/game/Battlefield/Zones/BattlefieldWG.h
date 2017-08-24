@@ -20,7 +20,6 @@
 
 #include "Battlefield.h"
 #include "GameObjectData.h"
-#include "Map.h"
 
 class WintergraspCapturePoint;
 class WintergraspBuilding;
@@ -374,14 +373,14 @@ struct WintergraspTowerInfo
 
 struct WintergraspObjectPositionData
 {
-    Position Position;
+    Position Positionic;
     uint32 HordeEntry;
     uint32 AllianceEntry;
 };
 
 struct WintergraspGameObjectData
 {
-    Position Position;
+    Position Positionic;
     QuaternionData Rotation;
     uint32 HordeEntry;
     uint32 AllianceEntry;
