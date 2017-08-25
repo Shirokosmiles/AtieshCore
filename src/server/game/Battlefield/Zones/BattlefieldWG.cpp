@@ -416,6 +416,10 @@ void BattlefieldWintergrasp::Update(uint32 diff)
 
 void BattlefieldWintergrasp::OnBattleStart()
 {
+    _tenacityTeam = TEAM_NEUTRAL;
+    _tenacityStack = 0;
+    _relicInteractible = false;
+
     if (GameObject* relic = GetRelic())
     {
         relic->SetFaction(WintergraspFaction[GetAttackerTeam()]);
@@ -457,6 +461,10 @@ void BattlefieldWintergrasp::OnBattleStart()
 
 void BattlefieldWintergrasp::OnBattleEnd(bool endByTimer)
 {
+    _tenacityTeam = TEAM_NEUTRAL;
+    _tenacityStack = 0;
+    _relicInteractible = false;
+
     if (GameObject* relic = GetRelic())
     {
         relic->SetFaction(WintergraspFaction[GetDefenderTeam()]);
@@ -812,10 +820,7 @@ void BattlefieldWintergrasp::OnGameObjectCreate(GameObject* gameObject)
                     gameObject->SetFaction(WintergraspFaction[GetAttackerTeam()]);
                 }
                 else
-                {
                     gameObject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
-                    gameObject->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_GAMEMASTER);
-                }
             }
             break;
         case GO_WINTERGRASP_KEEP_COLLISION_WALL:
