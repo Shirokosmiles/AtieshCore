@@ -435,9 +435,7 @@ void BattlefieldWintergrasp::OnBattleStart()
 
     // rebuild
     for (WintergraspBuilding* building : _buildingSet)
-    {
         building->Rebuild();
-    }
 
     SetData(DATA_WINTERGRASP_BROKEN_TOWER_ATTACK, 0);
     SetData(DATA_WINTERGRASP_BROKEN_TOWER_DEFENCE, 0);
@@ -1630,6 +1628,8 @@ void WintergraspBuilding::Initialize(GameObject* gameObject)
 
         UpdateTurretAttack(!_battlefield->IsWarTime());
     }
+
+    gameObject->SetFaction(WintergraspFaction[_teamControl]);
 }
 
 void WintergraspBuilding::Rebuild()
