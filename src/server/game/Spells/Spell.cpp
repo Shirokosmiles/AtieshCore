@@ -2769,7 +2769,19 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             return SPELL_MISS_EVADE;
 
         if (m_caster->_IsValidAttackTarget(unit, m_spellInfo))
+        {
             unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
+
+            // Target should evade spells under VFD
+            if (Player* playerTarget = unit->ToPlayer())
+            {
+                if (playerTarget->UnderVisibleVanish())
+                {
+                    if (!m_spellInfo->HasAttribute(SPELL_ATTR0_CU_AURA_CC))
+                        return SPELL_MISS_EVADE;
+                }
+            }
+        }
         else if (m_caster->IsFriendlyTo(unit))
         {
             // for delayed spells ignore negative spells (after duel end) for friendly targets

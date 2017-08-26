@@ -262,6 +262,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_isInWater = false;
     m_hostileReferenceCheckTimer = 0;
     m_drunkTimer = 0;
+    m_vanishTimer = 0;
     m_deathTimer = 0;
     m_deathExpireTime = 0;
     m_isRepopPending = false;
@@ -280,6 +281,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_Played_time[PLAYED_TIME_LEVEL] = 0;
     m_WeaponProficiency = 0;
     m_ArmorProficiency = 0;
+    m_visiblevanish = false;
     m_canParry = false;
     m_canBlock = false;
     m_canTitanGrip = false;
@@ -1262,6 +1264,17 @@ void Player::Update(uint32 p_time)
         }
         else
             m_zoneUpdateTimer -= p_time;
+    }
+
+    if (m_visiblevanish && m_vanishTimer > 0)
+    {
+        if (p_time >= m_vanishTimer)
+        {
+            m_visiblevanish = false;
+            m_vanishTimer = 0;
+        }
+        else
+            m_vanishTimer -= p_time;
     }
 
     if (m_timeSyncTimer > 0)
@@ -22205,6 +22218,15 @@ bool Player::CanAlwaysSee(WorldObject const* obj) const
     return false;
 }
 
+bool Player::CanSeeVFD(WorldObject const* obj) const
+{
+    if (Player const* seerPlayer = obj->ToPlayer())
+        if (seerPlayer->UnderVisibleVanish())
+            return true;
+
+    return false;
+}
+
 bool Player::IsAlwaysDetectableFor(WorldObject const* seer) const
 {
     if (Unit::IsAlwaysDetectableFor(seer))
@@ -23864,6 +23886,12 @@ void Player::UpdateAreaDependentAuras(uint32 newArea)
         if (itr->second->autocast && itr->second->IsFitToRequirements(this, m_zoneUpdateId, newArea))
             if (!HasAura(itr->second->spellId))
                 CastSpell(this, itr->second->spellId, true);
+}
+
+void Player::SetVanishTimer()
+{
+    m_vanishTimer = sWorld->getIntConfig(CONFIG_VANISH_VISION_TIMER);
+    m_visiblevanish = true;
 }
 
 uint32 Player::GetCorpseReclaimDelay(bool pvp) const

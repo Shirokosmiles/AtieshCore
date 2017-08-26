@@ -730,6 +730,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_float_configs[CONFIG_SIGHT_MONSTER] = sConfigMgr->GetFloatDefault("MonsterSight", 50.0f);
 
+    m_int_configs[CONFIG_VANISH_VISION_TIMER] = sConfigMgr->GetIntDefault("VanishVisionTimer", 500);
+
     if (reload)
     {
         uint32 val = sConfigMgr->GetIntDefault("GameType", 0);

@@ -1091,6 +1091,15 @@ bool SpellInfo::IsSelfCast() const
     return true;
 }
 
+bool SpellInfo::IsVanish() const
+{
+    return HasAttribute(SPELL_ATTR2_UNK1)
+        && HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT)
+        && HasAttribute(SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE)
+        && HasAttribute(SPELL_ATTR0_DISABLED_WHILE_ACTIVE)
+        && HasAttribute(SPELL_ATTR1_NOT_BREAK_STEALTH);
+}
+
 bool SpellInfo::IsPassive() const
 {
     return HasAttribute(SPELL_ATTR0_PASSIVE);

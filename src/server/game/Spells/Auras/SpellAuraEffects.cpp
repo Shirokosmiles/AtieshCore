@@ -1484,6 +1484,9 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
 
     Unit* target = aurApp->GetTarget();
     StealthType type = StealthType(GetMiscValue());
+    bool vanishspell = false;
+    if (GetSpellInfo()->IsVanish())
+        vanishspell = true;
 
     if (apply)
     {
@@ -1493,6 +1496,10 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
         target->SetStandFlags(UNIT_STAND_FLAGS_CREEP);
         if (target->GetTypeId() == TYPEID_PLAYER)
             target->SetByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_AURA_VISION, PLAYER_FIELD_BYTE2_STEALTH);
+
+        if (vanishspell)
+            if (target && target->ToPlayer())
+                target->ToPlayer()->SetVanishTimer();
     }
     else
     {

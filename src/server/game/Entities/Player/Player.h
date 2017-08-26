@@ -1790,6 +1790,11 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 GetDrunkValue() const { return GetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_INEBRIATION); }
         static DrunkenState GetDrunkenstateByValue(uint8 value);
 
+        // Vanish can be visible near 0.3-0.4 sec after using
+        uint32 GetVanishTimer() const { return m_vanishTimer; }
+        bool UnderVisibleVanish() const { return m_visiblevanish; }
+        void SetVanishTimer();
+
         uint32 GetDeathTimer() const { return m_deathTimer; }
         uint32 GetCorpseReclaimDelay(bool pvp) const;
         void UpdateCorpseReclaimDelay();
@@ -2344,11 +2349,14 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_zoneUpdateTimer;
         uint32 m_areaUpdateId;
 
+        uint32 m_vanishTimer;
+
         uint32 m_deathTimer;
         time_t m_deathExpireTime;
 
         uint32 m_WeaponProficiency;
         uint32 m_ArmorProficiency;
+        bool m_visiblevanish;
         bool m_canParry;
         bool m_canBlock;
         bool m_canTitanGrip;
@@ -2393,6 +2401,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         EquipmentSetContainer _equipmentSets;
 
         bool CanAlwaysSee(WorldObject const* obj) const override;
+        bool CanSeeVFD(WorldObject const* obj) const override;
 
         bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 

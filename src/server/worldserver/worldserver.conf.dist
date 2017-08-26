@@ -1276,6 +1276,14 @@ BirthdayTime = 1222964635
 
 CacheDataQueries = 1
 
+#   VanishVisionTimer
+#        Description: Vanish Fade Delay. 
+#        Default:     500 - (0.5 sec)
+#
+#
+
+VanishVisionTimer = 500
+
 #
 ###################################################################################################
 

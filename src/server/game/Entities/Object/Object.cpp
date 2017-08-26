@@ -1686,6 +1686,9 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj, bool checkAlert) co
     if (!obj->m_stealth.GetFlags())
         return true;
 
+    if (CanSeeVFD(obj))
+        return true;
+
     float distance = GetExactDist(obj);
     float combatReach = 0.0f;
 

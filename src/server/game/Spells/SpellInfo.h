@@ -434,6 +434,7 @@ class TC_GAME_API SpellInfo
         bool NeedsToBeTriggeredByCaster(SpellInfo const* triggeringSpell) const;
         bool IsSelfCast() const;
 
+        bool IsVanish() const; // 11327 || 11329 || 26888 vanish ranks
         bool IsPassive() const;
         bool IsAutocastable() const;
         bool IsStackableWithRanks() const;
