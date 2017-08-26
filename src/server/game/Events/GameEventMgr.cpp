@@ -945,7 +945,7 @@ void GameEventMgr::LoadHolidayDates()
     uint32 oldMSTime = getMSTime();
 
     //                                               0   1         2
-    QueryResult result = WorldDatabase.Query("SELECT id, date_id, UNIX_TIMESTAMP(date_value) FROM holiday_dates");
+    QueryResult result = WorldDatabase.Query("SELECT id, date_id, date_value FROM holiday_dates");
 
     if (!result)
     {
