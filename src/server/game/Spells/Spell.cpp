@@ -1488,10 +1488,12 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         //TC_LOG_ERROR("server", "total path > than distance in 3D , need to move back a bit for save distance, total path = %f, overdistance = %f", totalpath, overdistance);
                     }
 
+                    bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(mapid, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
+                    // check dynamic collision
                     bool dcol = m_caster->GetMap()->getObjectHitPos(phasemask, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
 
                     // collision occured
-                    if (dcol || (overdistance > 0.0f && !map->IsInWater(tstX, tstY, ground)) || (fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
+                    if (col || dcol || (overdistance > 0.0f && !map->IsInWater(tstX, tstY, ground)) || (fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
                     {
                         if ((overdistance > 0.0f) && (overdistance < step))
                         {
@@ -1542,11 +1544,12 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             else
             {
                 float z = pos.GetPositionZ();
+                bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(mapid, pos.GetPositionX(), pos.GetPositionY(), z + 0.5f, destx, desty, z + 0.5f, destx, desty, z, -0.5f);
                 // check dynamic collision
                 bool dcol = m_caster->GetMap()->getObjectHitPos(phasemask, pos.GetPositionX(), pos.GetPositionY(), z + 0.5f, destx, desty, z + 0.5f, destx, desty, z, -0.5f);
 
                 // collision occured
-                if (dcol)
+                if (col || dcol)
                 {
                     // move back a bit
                     destx = destx - (0.6 * cos(pos.GetOrientation()));
