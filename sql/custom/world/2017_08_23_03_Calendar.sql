@@ -1,3 +1,5 @@
+SET sql_mode = 'STRICT_TRANS_TABLES'; 
+
 DROP TABLE IF EXISTS holiday_dates;
 CREATE TABLE holiday_dates (
   id INT UNSIGNED NOT NULL,
@@ -7,6 +9,7 @@ CREATE TABLE holiday_dates (
 );
 
 DROP FUNCTION IF EXISTS packDate;
+
 CREATE FUNCTION packDate (yy TINYINT UNSIGNED, mm TINYINT UNSIGNED, dd TINYINT UNSIGNED)
 RETURNS INT UNSIGNED DETERMINISTIC
 RETURN (yy << 24) | ((mm - 1) << 20) | ((dd - 1) << 14);
@@ -176,8 +179,6 @@ INSERT INTO holiday_dates VALUES
 (376, 25, packDate(23, 04, 28));
 
 UPDATE holiday_dates SET date_value = date_value & ~0x3FFF; -- All holidays start at 00:00 in 3.3.5 + some unneeded bits
-
-DROP FUNCTION packDate;
 
 ALTER TABLE game_event ADD COLUMN holidayStage TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER holiday;
 
