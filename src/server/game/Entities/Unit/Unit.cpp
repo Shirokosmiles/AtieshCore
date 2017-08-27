@@ -14944,8 +14944,6 @@ void Unit::ValidateMovementInfo(MovementInfo* mi)
     CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY) && mi->HasMovementFlag(MOVEMENTFLAG_FALLING));
     
     //CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED) && (!movespline->Initialized() || movespline->Finalized()));
-    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED) &&
-        (!movespline->Initialized() || movespline->Finalized()), MOVEMENTFLAG_SPLINE_ENABLED);
 
 #undef CHECK_FOR_VIOLATING_FLAGS
 }
