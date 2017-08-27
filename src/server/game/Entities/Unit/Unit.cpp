@@ -12487,7 +12487,11 @@ void Unit::SetRooted(bool apply)
         return;
 
     if (IsMovedByPlayer() && IsInWorld())
+    {
+        if (apply)
+            StopMoving(); // @todo: this method needs a rework. until then, should it be called only for NPC or also for player-controlled units?
         MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEMENTFLAG_ROOT, apply);
+    }
     else if (IsMovedByPlayer() && !IsInWorld())
         SetRootedReal(apply);
     else
@@ -14938,8 +14942,10 @@ void Unit::ValidateMovementInfo(MovementInfo* mi)
 
     //! Cannot fly and fall at the same time
     CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY) && mi->HasMovementFlag(MOVEMENTFLAG_FALLING));
-
-    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED) && (!movespline->Initialized() || movespline->Finalized()));
+    
+    //CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED) && (!movespline->Initialized() || movespline->Finalized()));
+    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED) &&
+        (!movespline->Initialized() || movespline->Finalized()), MOVEMENTFLAG_SPLINE_ENABLED);
 
 #undef CHECK_FOR_VIOLATING_FLAGS
 }
