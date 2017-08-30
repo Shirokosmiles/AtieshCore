@@ -1458,6 +1458,7 @@ void WintergraspBuilding::Initialize(GameObject* gameObject)
 
     // GameObject associated to object
     _buildGUID = gameObject->GetGUID();
+    gameObject->SetFaction(WintergraspFaction[_teamControl]);
 
     _state = WintergraspGameObjectState(sWorld->getWorldState(_worldState));
     switch (_state)
@@ -1521,11 +1522,11 @@ void WintergraspBuilding::Initialize(GameObject* gameObject)
         {
             WintergraspGameObjectData const& gobData = AttackTowers[towerId - 4].GameObject[position];
             if (_gameObjectList[TEAM_HORDE][position].IsEmpty())
-                if (GameObject* goHorde = _battlefield->SpawnGameObject(gobData.HordeEntry, gobData.Positionic, gobData.Rotation))
+                if (GameObject* goHorde = _battlefield->SpawnGameObject(gobData.HordeEntry, gobData.Location, gobData.Rotation))
                     _gameObjectList[TEAM_HORDE][position] = goHorde->GetGUID();
 
             if (_gameObjectList[TEAM_ALLIANCE][position].IsEmpty())
-                if (GameObject* goAlliance = _battlefield->SpawnGameObject(gobData.AllianceEntry, gobData.Positionic, gobData.Rotation))
+                if (GameObject* goAlliance = _battlefield->SpawnGameObject(gobData.AllianceEntry, gobData.Location, gobData.Rotation))
                     _gameObjectList[TEAM_ALLIANCE][position] = goAlliance->GetGUID();
         }
 
@@ -1540,7 +1541,7 @@ void WintergraspBuilding::Initialize(GameObject* gameObject)
             WintergraspObjectPositionData const& creatureData = AttackTowers[towerId - 4].CreatureBottom[position];
             if (_creatureList[TEAM_HORDE][position].IsEmpty())
             {
-                if (Creature* creature = _battlefield->SpawnCreature(creatureData.HordeEntry, creatureData.Positionic))
+                if (Creature* creature = _battlefield->SpawnCreature(creatureData.HordeEntry, creatureData.Location))
                 {
                     _creatureList[TEAM_HORDE][position] = creature->GetGUID();
                     creature->SetRespawnTime(2 * MINUTE);
@@ -1549,7 +1550,7 @@ void WintergraspBuilding::Initialize(GameObject* gameObject)
 
             if (_creatureList[TEAM_ALLIANCE][position].IsEmpty())
             {
-                if (Creature* creature = _battlefield->SpawnCreature(creatureData.AllianceEntry, creatureData.Positionic))
+                if (Creature* creature = _battlefield->SpawnCreature(creatureData.AllianceEntry, creatureData.Location))
                 {
                     _creatureList[TEAM_ALLIANCE][position] = creature->GetGUID();
                     creature->SetRespawnTime(2 * MINUTE);
@@ -1633,8 +1634,6 @@ void WintergraspBuilding::Initialize(GameObject* gameObject)
 
         UpdateTurretAttack(!_battlefield->IsWarTime());
     }
-
-    gameObject->SetFaction(WintergraspFaction[_teamControl]);
 }
 
 void WintergraspBuilding::Rebuild()

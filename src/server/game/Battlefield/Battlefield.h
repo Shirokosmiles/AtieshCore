@@ -60,15 +60,15 @@ enum BattlefieldObjectiveStates
 
 enum BattlefieldSounds
 {
-    BATTLEFIELD_SOUND_HORDE_WINS    = 8454,
+    BATTLEFIELD_SOUND_HORDE_WINS = 8454,
     BATTLEFIELD_SOUND_ALLIANCE_WINS = 8455,
-    BATTLEFIELD_SOUND_START         = 3439
+    BATTLEFIELD_SOUND_START = 3439
 };
 
 enum BattlefieldTimers
 {
     BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL = 1000,
-    BATTLEFIELD_RESURRECT_ITERVAL         = 30000
+    BATTLEFIELD_RESURRECT_ITERVAL = 30000
 };
 
 enum BattlefieldSpells
@@ -177,9 +177,9 @@ class TC_GAME_API Battlefield : public ZoneScript
         BattlefieldCapturePointVector _capturePoints;
         BattlefieldGraveyardVector _graveyardList; // graveyard container
         GuidUnorderedSet _players[PVP_TEAMS_COUNT];
-        GuidUnorderedSet _playersInQueue[PVP_TEAMS_COUNT];
         GuidUnorderedSet _playersInWar[PVP_TEAMS_COUNT];
         GuidUnorderedSet _groups[PVP_TEAMS_COUNT]; // contains the two different raid groups
+        GuidDeque _playerQueue[PVP_TEAMS_COUNT];
         PlayerTimerMap _invitedPlayers[PVP_TEAMS_COUNT];
         PlayerTimerMap _playersToKick[PVP_TEAMS_COUNT];
         std::vector<uint32> _data;
