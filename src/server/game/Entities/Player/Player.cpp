@@ -1272,6 +1272,7 @@ void Player::Update(uint32 p_time)
         {
             m_visiblevanish = false;
             m_vanishTimer = 0;
+            UpdateObjectVisibility();
         }
         else
             m_vanishTimer -= p_time;
