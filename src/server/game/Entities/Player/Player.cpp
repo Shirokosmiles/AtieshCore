@@ -4559,6 +4559,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     SendDirectMessage(&data);
 
     // speed change, land walk
+    SetRooted(false);
 
     // remove death flag + set aura
     SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, 0);

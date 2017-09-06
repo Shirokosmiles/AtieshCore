@@ -390,6 +390,7 @@ public:
             me->Relocate(x, y, z + 0.94f);
             me->SetDisableGravity(true);
             me->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
+            // @todo: since Unit::BuildHeartBeatMsg has been deleted, replace this piece of what by something appropriate (me->Stop() ?)
             //WorldPacket data;                       //send update position to client
             //me->BuildHeartBeatMsg(&data);
             //me->SendMessageToSet(&data, true);
@@ -419,6 +420,7 @@ public:
                 me->SetFacingToObject(player);
                 Active = false;
 
+                // @todo: since Unit::BuildHeartBeatMsg has been deleted, replace this piece of what by something appropriate (me->Stop() ?)
                 //WorldPacket data;
                 //me->BuildHeartBeatMsg(&data);
                 //me->SendMessageToSet(&data, true);

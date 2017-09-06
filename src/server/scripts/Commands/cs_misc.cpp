@@ -653,7 +653,6 @@ public:
         if (target)
         {
             target->ResurrectPlayer(target->GetSession()->HasPermission(rbac::RBAC_PERM_RESURRECT_WITH_FULL_HPS) ? 1.0f : 0.5f);
-            target->SetRooted(false);
             target->SpawnCorpseBones();
             target->SaveToDB();
         }

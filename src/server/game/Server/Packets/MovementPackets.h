@@ -142,14 +142,14 @@ namespace WorldPackets
             void Read() override;
 
             ObjectGuid MoverGUID;
-            int32 AckIndex = 0;
+            uint32 AckIndex = 0;
             int32 MoveTime = 0;
         };
 
         struct MovementAck
         {
             MovementInfo Status;
-            int32 AckIndex = 0;
+            uint32 AckIndex = 0;
         };
 
         class MovementAckMessage final : public ClientPacket
