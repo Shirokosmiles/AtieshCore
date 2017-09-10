@@ -899,7 +899,7 @@ public:
     {
         npc_expedition_defenderAI(Creature* creature) : ScriptedAI(creature), _myPositionNumber(0), _instance(creature->GetInstanceScript())
         {
-            me->setRegeneratingHealth(false);
+            me->SetRegenerateHealth(false);
         }
 
         void Reset() override

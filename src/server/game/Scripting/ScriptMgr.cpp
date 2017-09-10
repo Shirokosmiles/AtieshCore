@@ -1799,6 +1799,15 @@ void ScriptMgr::OnAddPassenger(Transport* transport, Player* player)
     tmpscript->OnAddPassenger(transport, player);
 }
 
+void ScriptMgr::OnAddPassengerPet(Transport* transport, Creature* creature)
+{
+    ASSERT(transport);
+    ASSERT(creature);
+
+    GET_SCRIPT(TransportScript, transport->GetScriptId(), tmpscript);
+    tmpscript->OnAddPassengerPet(transport, creature);
+}
+
 void ScriptMgr::OnAddCreaturePassenger(Transport* transport, Creature* creature)
 {
     ASSERT(transport);
@@ -1815,6 +1824,15 @@ void ScriptMgr::OnRemovePassenger(Transport* transport, Player* player)
 
     GET_SCRIPT(TransportScript, transport->GetScriptId(), tmpscript);
     tmpscript->OnRemovePassenger(transport, player);
+}
+
+void ScriptMgr::OnRemovePassengerPet(Transport* transport, Creature* creature)
+{
+    ASSERT(transport);
+    ASSERT(creature);
+
+    GET_SCRIPT(TransportScript, transport->GetScriptId(), tmpscript);
+    tmpscript->OnRemovePassengerPet(transport, creature);
 }
 
 void ScriptMgr::OnTransportUpdate(Transport* transport, uint32 diff)

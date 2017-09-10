@@ -20,6 +20,7 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Common.h"
+#include "Creature.h"
 #include "DBCStores.h"
 #include "GameObjectAI.h"
 #include "Log.h"
@@ -259,6 +260,10 @@ void Transport::AddPassenger(WorldObject* passenger)
 
         if (Player* plr = passenger->ToPlayer())
             sScriptMgr->OnAddPassenger(this, plr);
+
+        if (Creature* crt = passenger->ToCreature())
+            if (crt->IsPet())
+                sScriptMgr->OnAddPassengerPet(this, crt);
     }
 }
 
@@ -290,6 +295,10 @@ void Transport::RemovePassenger(WorldObject* passenger)
             sScriptMgr->OnRemovePassenger(this, plr);
             plr->SetFallInformation(0, plr->GetPositionZ());
         }
+
+        if (Creature* crt = passenger->ToCreature())
+            if (crt->IsPet())
+                sScriptMgr->OnRemovePassengerPet(this, crt);
     }
 }
 

@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "VehicleDefines.h"
 #include "World.h"
+#include "Map.h"
 
 template<class T, typename D>
 TargetedMovementGenerator<T, D>::~TargetedMovementGenerator()
@@ -118,13 +119,13 @@ void TargetedMovementGenerator<T, D>::SetTargetLocation(T* owner, bool updateDes
         return;
     }
 
-    if (owner->GetTypeId() == TYPEID_UNIT && !GetTarget()->isInAccessiblePlaceFor(owner->ToCreature()))
+    if (owner->GetTypeId() == TYPEID_UNIT && !owner->GetCharmInfo()->IsOnTransport() && !GetTarget()->isInAccessiblePlaceFor(owner->ToCreature()))
     {
         owner->ToCreature()->SetCannotReachTarget(true);
         return;
     }
 
-    float x, y, z;
+    Position destination;
     if (updateDestination || !_path)
     {
         if (!_offset)
@@ -132,7 +133,7 @@ void TargetedMovementGenerator<T, D>::SetTargetLocation(T* owner, bool updateDes
             if (GetTarget()->IsWithinDistInMap(owner, CONTACT_DISTANCE))
                 return;
 
-            GetTarget()->GetContactPoint(owner, x, y, z);
+            GetTarget()->GetContactPoint(owner, destination.m_positionX, destination.m_positionY, destination.m_positionZ);
         }
         else
         {
@@ -148,25 +149,42 @@ void TargetedMovementGenerator<T, D>::SetTargetLocation(T* owner, bool updateDes
             if (GetTarget()->IsWithinDistInMap(owner, distance))
                 return;
 
-            GetTarget()->GetClosePoint(x, y, z, size, _offset, _angle);
+            GetTarget()->GetClosePoint(destination.m_positionX, destination.m_positionY, destination.m_positionZ, size, _offset, _angle);
         }
     }
     else
     {
         // the destination has not changed, we just need to refresh the path (usually speed change)
         G3D::Vector3 end = _path->GetEndPosition();
-        x = end.x;
-        y = end.y;
-        z = end.z;
+        destination.m_positionX = end.x;
+        destination.m_positionY = end.y;
+        destination.m_positionZ = end.z;
     }
 
     if (!_path)
         _path = new PathGenerator(owner);
+    
+    if (owner->GetTransport())
+    {
+        if (destination.GetPositionZ() < owner->GetOwner()->GetPositionZ())
+            destination.m_positionZ = owner->GetOwner()->GetPositionZ();
+
+        // check dynamic collision
+        bool dcol = owner->GetMap()->getObjectHitPos(owner->GetPhaseMask(), owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 0.5f, destination.m_positionX, destination.m_positionY, destination.m_positionZ + 0.5f, destination.m_positionX, destination.m_positionY, destination.m_positionZ, -0.5f);
+        // collision occured
+        if (dcol)
+        {
+            // move back a bit
+            destination.m_positionX -= CONTACT_DISTANCE * std::cos(owner->GetOrientation());
+            destination.m_positionY -= CONTACT_DISTANCE * std::sin(owner->GetOrientation());
+            if (Map* map = owner->GetMap())
+                destination.m_positionZ = map->GetHeight(owner->GetPhaseMask(), destination.m_positionX, destination.m_positionY, destination.m_positionZ + 2.8f, true);
+        }
+    }
 
     // allow pets to use shortcut if no path found when following their master
-    bool forceDest = (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsPet() && owner->HasUnitState(UNIT_STATE_FOLLOW));
-
-    bool result = _path->CalculatePath(x, y, z, forceDest);
+    bool forceDest = (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsPet() && owner->HasUnitState(UNIT_STATE_FOLLOW)) || (owner->ToCreature()->IsPet() && owner->GetTransport());
+    bool result = _path->CalculatePath(destination.GetPositionX(), destination.GetPositionY(), destination.GetPositionZ(), forceDest);
     if (!result || (_path->GetPathType() & PATHFIND_NOPATH))
     {
         // can't reach target
@@ -186,7 +204,10 @@ void TargetedMovementGenerator<T, D>::SetTargetLocation(T* owner, bool updateDes
         owner->ToCreature()->SetCannotReachTarget(false);
 
     Movement::MoveSplineInit init(owner);
-    init.MovebyPath(_path->GetPath());
+    if (owner->GetTransport())
+        init.MoveTo(destination.GetPositionX(), destination.GetPositionY(), destination.GetPositionZ(), false, forceDest);
+    else
+        init.MovebyPath(_path->GetPath());
     init.SetWalk(EnableWalking());
     // Using the same condition for facing target as the one that is used for SetInFront on movement end
     // - applies to ChaseMovementGenerator mostly

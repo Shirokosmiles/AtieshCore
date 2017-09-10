@@ -30,6 +30,7 @@
 #include "SpellAuras.h"
 #include "SpellHistory.h"
 #include "SpellMgr.h"
+#include "Transport.h"
 #include "Unit.h"
 #include "Util.h"
 #include "WorldPacket.h"
@@ -85,6 +86,11 @@ void Pet::AddToWorld()
         GetCharmInfo()->SetIsFollowing(false);
         GetCharmInfo()->SetIsReturning(false);
     }
+
+    Player* player = GetOwner();
+    Transport* transport = player->GetTransport();
+    if (player && transport)
+        transport->AddPassenger(this->ToCreature());
 }
 
 void Pet::RemoveFromWorld()
