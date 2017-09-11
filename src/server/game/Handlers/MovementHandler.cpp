@@ -386,7 +386,7 @@ void WorldSession::HandleMovementOpcode(Opcodes opcode, MovementInfo& movementIn
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
                 {
                     transport->AddPassenger(plrMover);
-                    if (petMover && crMover)
+                    if (petMover && crMover && !transport->isPassenger(crMover))
                         transport->AddPassenger(crMover);
                 }
             }
@@ -396,7 +396,7 @@ void WorldSession::HandleMovementOpcode(Opcodes opcode, MovementInfo& movementIn
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
                 {
                     transport->AddPassenger(plrMover);
-                    if (petMover && crMover)
+                    if (petMover && crMover && !transport->isPassenger(crMover))
                         transport->AddPassenger(crMover);
                 }
                 else
@@ -414,7 +414,7 @@ void WorldSession::HandleMovementOpcode(Opcodes opcode, MovementInfo& movementIn
     else if (plrMover && plrMover->GetTransport())                // if we were on a transport, leave
     {
         plrMover->GetTransport()->RemovePassenger(plrMover);
-        if (petMover && crMover)
+        if (petMover && crMover && crMover->GetTransport() && crMover->GetTransport()->isPassenger(crMover))
             crMover->GetTransport()->RemovePassenger(crMover);
         movementInfo.transport.Reset();
     }

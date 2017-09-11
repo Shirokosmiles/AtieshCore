@@ -172,13 +172,13 @@ void TargetedMovementGenerator<T, D>::SetTargetLocation(T* owner, bool updateDes
         // check dynamic collision
         bool dcol = owner->GetMap()->getObjectHitPos(owner->GetPhaseMask(), owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 0.5f, destination.m_positionX, destination.m_positionY, destination.m_positionZ + 0.5f, destination.m_positionX, destination.m_positionY, destination.m_positionZ, -0.5f);
         // collision occured
-        if (dcol)
+        if (dcol && (destination.m_positionZ < owner->GetOwner()->GetPositionZ()))
         {
             // move back a bit
             destination.m_positionX -= CONTACT_DISTANCE * std::cos(owner->GetOrientation());
             destination.m_positionY -= CONTACT_DISTANCE * std::sin(owner->GetOrientation());
             if (Map* map = owner->GetMap())
-                destination.m_positionZ = map->GetHeight(owner->GetPhaseMask(), destination.m_positionX, destination.m_positionY, destination.m_positionZ + 2.8f, true);
+                destination.m_positionZ = map->GetHeight(owner->GetPhaseMask(), destination.m_positionX, destination.m_positionY, owner->GetOwner()->GetPositionZ() + 2.8f, true);
         }
     }
 

@@ -580,8 +580,20 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
 
 void PathGenerator::NormalizePath()
 {
+    bool petontransport = _sourceUnit->IsPet() && _sourceUnit->GetTransport();
+
     for (uint32 i = 0; i < _pathPoints.size(); ++i)
+    {
         _sourceUnit->UpdateAllowedPositionZ(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
+
+        if (petontransport)
+        {
+            float distance = _sourceUnit->GetExactDist2d(_sourceUnit->GetOwner());
+            float checkz = _sourceUnit->GetMap()->GetHeight(_pathPoints[i].x, _pathPoints[i].y, (_sourceUnit->GetOwner()->GetPositionZ() + distance));
+            if (_pathPoints[i].z < checkz)
+                _pathPoints[i].z = checkz;
+        }
+    }
 }
 
 void PathGenerator::BuildShortcut()

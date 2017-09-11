@@ -90,7 +90,10 @@ void Pet::AddToWorld()
     Player* player = GetOwner();
     Transport* transport = player->GetTransport();
     if (player && transport)
-        transport->AddPassenger(this->ToCreature());
+    {
+        if (!transport->isPassenger(this->ToCreature()))
+            transport->AddPassenger(this->ToCreature());
+    }
 }
 
 void Pet::RemoveFromWorld()
@@ -98,6 +101,10 @@ void Pet::RemoveFromWorld()
     ///- Remove the pet from the accessor
     if (IsInWorld())
     {
+        Transport* transport = GetTransport();
+        if (transport && transport->isPassenger(this->ToCreature()))
+            transport->RemovePassenger(this->ToCreature());
+
         ///- Don't call the function for Creature, normal mobs + totems go in a different storage
         Unit::RemoveFromWorld();
         GetMap()->GetObjectsStore().Remove<Pet>(GetGUID());
@@ -254,9 +261,14 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     SynchronizeLevelWithOwner();
 
     // Set pet's position after setting level, its size depends on it
-    float px, py, pz;
-    owner->GetClosePoint(px, py, pz, GetCombatReach(), PET_FOLLOW_DIST, GetFollowAngle());
-    Relocate(px, py, pz, owner->GetOrientation());
+    float px, py, pz;    
+
+    if (owner->GetTransport())
+        owner->GetPosition(px, py, pz);
+    else
+        owner->GetClosePoint(px, py, pz, GetCombatReach(), PET_FOLLOW_DIST, GetFollowAngle());
+    
+    Relocate(px, py, pz + 1.0f, owner->GetOrientation());
     if (!IsPositionValid())
     {
         TC_LOG_ERROR("entities.pet", "Pet (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",

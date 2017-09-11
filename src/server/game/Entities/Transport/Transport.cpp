@@ -263,7 +263,20 @@ void Transport::AddPassenger(WorldObject* passenger)
 
         if (Creature* crt = passenger->ToCreature())
             if (crt->IsPet())
+            {
                 sScriptMgr->OnAddPassengerPet(this, crt);
+                if (Unit* owner = crt->GetOwner())
+                {
+                    float x, y, z, o;
+                    owner->GetMovementInfo().transport.pos.GetPosition(x, y, z, o);
+                    passenger->SetTransOffset(x, y, z, o);
+                    CalculatePassengerPosition(x, y, z, &o);
+                    crt->SetHomePosition(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
+                    crt->SetTransportHomePosition(x, y, z, o);
+
+                    crt->Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
+                }
+            }
     }
 }
 
@@ -298,8 +311,21 @@ void Transport::RemovePassenger(WorldObject* passenger)
 
         if (Creature* crt = passenger->ToCreature())
             if (crt->IsPet())
+            {
                 sScriptMgr->OnRemovePassengerPet(this, crt);
+                if (Unit* owner = crt->GetOwner())
+                    crt->Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
+            }
     }
+}
+
+bool Transport::isPassenger(WorldObject* passenger)
+{
+    for (PassengerSet::iterator itr = _passengers.begin(); itr != _passengers.end(); ++itr)
+        if (passenger == (*itr))
+            return true;
+
+    return false;
 }
 
 Creature* Transport::CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData const* data)

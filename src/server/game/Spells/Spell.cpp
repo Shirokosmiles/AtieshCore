@@ -1587,6 +1587,8 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     static float const DefaultTotemDistance = 3.0f;
                     if (!m_spellInfo->Effects[effIndex].HasRadius())
                         dist = DefaultTotemDistance;
+                    if (m_spellInfo->Id == 6495) // Sentry Totem has 100 basepoints (100 hp, but should be placed near caster)
+                        dist = 5.0f;
                     break;
                 }
                 default:
@@ -1597,6 +1599,13 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 dist = objSize;
 
             Position pos = dest._position;
+            if (Transport* transport = m_caster->GetTransport())
+            {
+                float casterZ = m_caster->GetPositionZ();
+                if (pos.m_positionZ < casterZ)
+                    pos.m_positionZ = m_caster->GetMap()->GetHeight(m_caster->GetPositionX(), m_caster->GetPositionY(), casterZ + 10.0f);
+            }
+
             m_caster->MovePositionToFirstCollision(pos, dist, angle);
 
             dest.Relocate(pos);
