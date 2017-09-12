@@ -339,12 +339,7 @@ void WorldSession::HandleMovementOpcode(Opcodes opcode, MovementInfo& movementIn
 {
     Unit* mover = _player->GetUnitBeingMoved();
     Player* plrMover = mover->ToPlayer();
-    Pet* petMover = nullptr;
-    Creature* crMover = nullptr;
-    if (plrMover->GetPet())
-        petMover = plrMover->GetPet();
-    if (petMover && petMover->ToCreature())
-        crMover = petMover->ToCreature();
+    Creature* crMover = mover->ToCreature();
 
     ASSERT(mover != nullptr);                      // there must always be a mover
 
@@ -386,7 +381,7 @@ void WorldSession::HandleMovementOpcode(Opcodes opcode, MovementInfo& movementIn
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
                 {
                     transport->AddPassenger(plrMover);
-                    if (petMover && crMover && !transport->isPassenger(crMover))
+                    if (crMover && !transport->isPassenger(crMover))
                         transport->AddPassenger(crMover);
                 }
             }
@@ -396,7 +391,7 @@ void WorldSession::HandleMovementOpcode(Opcodes opcode, MovementInfo& movementIn
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
                 {
                     transport->AddPassenger(plrMover);
-                    if (petMover && crMover && !transport->isPassenger(crMover))
+                    if (crMover && !transport->isPassenger(crMover))
                         transport->AddPassenger(crMover);
                 }
                 else
@@ -414,14 +409,14 @@ void WorldSession::HandleMovementOpcode(Opcodes opcode, MovementInfo& movementIn
     else if (plrMover && plrMover->GetTransport())                // if we were on a transport, leave
     {
         plrMover->GetTransport()->RemovePassenger(plrMover);
-        if (petMover && crMover && crMover->GetTransport() && crMover->GetTransport()->isPassenger(crMover))
+        if (crMover && crMover->GetTransport() && crMover->GetTransport()->isPassenger(crMover))
             crMover->GetTransport()->RemovePassenger(crMover);
         movementInfo.transport.Reset();
     }
 
     // So the PetAI will function properly
-    if (petMover)
-        petMover->GetCharmInfo()->SetIsOnTransport(plrMover->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT));
+    if (crMover && crMover->ToPet())
+        crMover->ToPet()->GetCharmInfo()->SetIsOnTransport(plrMover->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT));
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight())
