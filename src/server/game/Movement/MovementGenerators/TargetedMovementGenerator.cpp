@@ -119,7 +119,7 @@ void TargetedMovementGenerator<T, D>::SetTargetLocation(T* owner, bool updateDes
         return;
     }
 
-    if (owner->GetTypeId() == TYPEID_UNIT && !owner->GetCharmInfo()->IsOnTransport() && !GetTarget()->isInAccessiblePlaceFor(owner->ToCreature()))
+    if (owner->GetTypeId() == TYPEID_UNIT && !GetTarget()->isInAccessiblePlaceFor(owner->ToCreature()))
     {
         owner->ToCreature()->SetCannotReachTarget(true);
         return;
@@ -164,7 +164,7 @@ void TargetedMovementGenerator<T, D>::SetTargetLocation(T* owner, bool updateDes
     if (!_path)
         _path = new PathGenerator(owner);
     
-    if (owner->GetTransport())
+    if (owner->GetTransport() && owner->GetOwner())
     {
         if (destination.GetPositionZ() < owner->GetOwner()->GetPositionZ())
             destination.m_positionZ = owner->GetOwner()->GetPositionZ();

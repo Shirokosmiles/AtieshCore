@@ -286,9 +286,9 @@ void Creature::AddToWorld()
 
         if (IsTotem())
         {
-            Unit* owner = GetOwner();
-            Transport* transport = owner->GetTransport();
-            if (owner && transport)
+            Unit* unitplayer = GetOwner();
+            Transport* transport = unitplayer->GetTransport();
+            if (unitplayer && transport)
             {
                 if (!transport->isPassenger(this))
                     transport->AddPassenger(this);
@@ -303,12 +303,9 @@ void Creature::RemoveFromWorld()
     {
         if (IsTotem())
         {
-            if (Transport* transport = GetTransport())
-                if (transport)
-                {
-                    if (transport->isPassenger(this))
-                        transport->RemovePassenger(this);
-                }
+            Transport* transport = GetTransport();
+            if (transport && transport->isPassenger(this))
+                transport->RemovePassenger(this);
         }
 
         if (GetZoneScript())
