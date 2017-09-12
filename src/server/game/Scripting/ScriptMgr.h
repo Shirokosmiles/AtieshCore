@@ -581,7 +581,7 @@ class TC_GAME_API TransportScript : public ScriptObject, public UpdatableScript<
         virtual void OnAddPassenger(Transport* /*transport*/, Player* /*player*/) { }
 
         // Called when a creature pet boards the transport.
-        virtual void OnAddPassengerPet(Transport* /*transport*/, Creature* /*creature*/) { }
+        virtual void OnAddPassengerPetOrTotem(Transport* /*transport*/, Creature* /*creature*/) { }
 
         // Called when a creature boards the transport.
         virtual void OnAddCreaturePassenger(Transport* /*transport*/, Creature* /*creature*/) { }
@@ -976,7 +976,7 @@ class TC_GAME_API ScriptMgr
     public: /* TransportScript */
 
         void OnAddPassenger(Transport* transport, Player* player);
-        void OnAddPassengerPet(Transport* transport, Creature* creature);
+        void OnAddPassengerPetOrTotem(Transport* transport, Creature* creature);
         void OnAddCreaturePassenger(Transport* transport, Creature* creature);
         void OnRemovePassenger(Transport* transport, Player* player);
         void OnRemovePassengerPet(Transport* transport, Creature* creature);

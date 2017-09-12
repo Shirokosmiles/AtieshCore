@@ -261,10 +261,10 @@ void Transport::AddPassenger(WorldObject* passenger)
         if (Player* plr = passenger->ToPlayer())
             sScriptMgr->OnAddPassenger(this, plr);
 
-        if (Creature* crt = passenger->ToCreature())
+        if (Creature* crt = passenger->ToCreature()) // reg pet or totem on transport
+        {
             if (crt->IsPet())
             {
-                sScriptMgr->OnAddPassengerPet(this, crt);
                 if (Unit* owner = crt->GetOwner())
                 {
                     float x, y, z, o;
@@ -277,6 +277,20 @@ void Transport::AddPassenger(WorldObject* passenger)
                     crt->Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
                 }
             }
+            else if (crt->IsTotem())
+            {
+                float x, y, z, o;
+                passenger->GetPosition(x, y, z, o);
+                crt->SetHomePosition(x, y, z, o);
+
+                CalculatePassengerOffset(x, y, z, &o);
+                crt->SetTransOffset(x, y, z, o);
+                crt->SetTransportHomePosition(x, y, z, o);
+
+                crt->Relocate(crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation());
+            }
+            sScriptMgr->OnAddPassengerPetOrTotem(this, crt);
+        }
     }
 }
 

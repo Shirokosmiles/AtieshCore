@@ -586,12 +586,18 @@ void PathGenerator::NormalizePath()
     {
         _sourceUnit->UpdateAllowedPositionZ(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
 
-        if (petontransport)
+        if (petontransport && i != 0)
         {
-            float distance = _sourceUnit->GetExactDist2d(_sourceUnit->GetOwner());
-            float checkz = _sourceUnit->GetMap()->GetHeight(_pathPoints[i].x, _pathPoints[i].y, (_sourceUnit->GetOwner()->GetPositionZ() + distance));
-            if (_pathPoints[i].z < checkz)
-                _pathPoints[i].z = checkz;
+            // check dynamic collision for transport (TODO navmesh for transport map)
+            bool dcol = _sourceUnit->GetMap()->getObjectHitPos(_sourceUnit->GetPhaseMask(), _pathPoints[i-1].x, _pathPoints[i-1].y, _pathPoints[i-1].z + 0.5f, _pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z + 0.5f, _pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z, -0.5f);
+            // collision occured
+            if (dcol)
+            {
+                float distance = _sourceUnit->GetExactDist2dSq(_pathPoints[i].x, _pathPoints[i].y);
+                float checkz = _sourceUnit->GetMap()->GetHeight(_pathPoints[i].x, _pathPoints[i].y, (_pathPoints[i].z + distance));
+                if (_pathPoints[i].z < checkz)
+                    _pathPoints[i].z = checkz;
+            }
         }
     }
 }

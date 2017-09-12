@@ -1799,13 +1799,13 @@ void ScriptMgr::OnAddPassenger(Transport* transport, Player* player)
     tmpscript->OnAddPassenger(transport, player);
 }
 
-void ScriptMgr::OnAddPassengerPet(Transport* transport, Creature* creature)
+void ScriptMgr::OnAddPassengerPetOrTotem(Transport* transport, Creature* creature)
 {
     ASSERT(transport);
     ASSERT(creature);
 
     GET_SCRIPT(TransportScript, transport->GetScriptId(), tmpscript);
-    tmpscript->OnAddPassengerPet(transport, creature);
+    tmpscript->OnAddPassengerPetOrTotem(transport, creature);
 }
 
 void ScriptMgr::OnAddCreaturePassenger(Transport* transport, Creature* creature)

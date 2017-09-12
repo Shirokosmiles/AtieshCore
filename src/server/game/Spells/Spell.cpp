@@ -1602,11 +1602,22 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             if (Transport* transport = m_caster->GetTransport())
             {
                 float casterZ = m_caster->GetPositionZ();
-                if (pos.m_positionZ < casterZ)
-                    pos.m_positionZ = m_caster->GetMap()->GetHeight(m_caster->GetPositionX(), m_caster->GetPositionY(), casterZ + 10.0f);
-            }
+                pos.m_positionZ = m_caster->GetMap()->GetHeight(pos.m_positionX, pos.m_positionY, casterZ + 2 * dist);
+                // check dynamic collision
+                bool dcol = m_caster->GetMap()->getObjectHitPos(m_caster->GetPhaseMask(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ() + 0.5f, pos.m_positionX, pos.m_positionY, pos.m_positionZ + 0.5f, pos.m_positionX, pos.m_positionY, pos.m_positionZ, -0.5f);
 
-            m_caster->MovePositionToFirstCollision(pos, dist, angle);
+                // Collided with a gameobject
+                if (dcol)
+                {
+                    pos.m_positionX -= CONTACT_DISTANCE * std::cos(angle);
+                    pos.m_positionY -= CONTACT_DISTANCE * std::sin(angle);
+                    pos.m_positionZ = m_caster->GetMap()->GetHeight(m_caster->GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + dist);
+                    if (pos.m_positionZ < casterZ)
+                        pos.m_positionZ = casterZ + 1.0f;
+                }
+            }
+            else
+                m_caster->MovePositionToFirstCollision(pos, dist, angle);
 
             dest.Relocate(pos);
             break;
