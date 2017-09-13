@@ -593,7 +593,7 @@ void PathGenerator::NormalizePath()
             // collision occured
             if (dcol)
             {
-                float distance = _sourceUnit->GetExactDist2dSq(_pathPoints[i].x, _pathPoints[i].y);
+                float distance = _sourceUnit->GetExactDist2d(_pathPoints[i].x, _pathPoints[i].y);
                 float checkz = _sourceUnit->GetMap()->GetHeight(_pathPoints[i].x, _pathPoints[i].y, (_pathPoints[i].z + distance));
                 if (_pathPoints[i].z < checkz)
                     _pathPoints[i].z = checkz;

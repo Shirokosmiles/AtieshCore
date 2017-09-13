@@ -38,13 +38,30 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* owner)
     if (!owner || !owner->IsAlive())
         return;
 
-    owner->ClearUnitState(UNIT_STATE_MOVING);
+    //owner->ClearUnitState(UNIT_STATE_MOVING);
     owner->AddUnitState(UNIT_STATE_CONFUSED);
     owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
-    owner->SetFacingTo(frand(0.0f, 2 * static_cast<float>(M_PI)), true);
-
-    _timer.Reset(0);
+    owner->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
+    
     owner->GetPosition(_x, _y, _z);
+
+    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) || owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
+        _timer.Reset(200);
+    else
+    {
+        Position startdest;
+        owner->GetPosition(startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ);
+        owner->GetNearPoint(owner, startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ, 2.0f, 1.0f, owner->GetOrientation() * float(M_PI));
+
+        float distance = owner->GetExactDist2d(startdest.m_positionX, startdest.m_positionY);
+        owner->MovePositionToFirstCollision(startdest, distance, owner->GetOrientation() * float(M_PI));
+
+        Movement::MoveSplineInit init(owner);
+        init.MoveTo(startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ);
+        init.SetWalk(false);
+        int32 traveltime = init.Launch();
+        _timer.Reset(traveltime + urand(150, 250));
+    }
 }
 
 template<class T>
@@ -120,12 +137,13 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
             return true;
         }        
 
+        owner->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
+
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(_path->GetPath());
         init.SetWalk(true);
         int32 traveltime = init.Launch();
-        _timer.Reset(traveltime + urand(800, 1500));
-        owner->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
+        _timer.Reset(traveltime + urand(800, 1500));        
 
         // update position for server and others units/players
         owner->UpdateSplinePosition();

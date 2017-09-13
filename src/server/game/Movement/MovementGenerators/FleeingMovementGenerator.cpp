@@ -43,11 +43,28 @@ void FleeingMovementGenerator<T>::DoInitialize(T* owner)
     if (!owner)
         return;
 
-    owner->ClearUnitState(UNIT_STATE_MOVING);
+    //owner->ClearUnitState(UNIT_STATE_MOVING);
     owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
     owner->AddUnitState(UNIT_STATE_FLEEING);
+    owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
 
-    _timer.Reset(200);
+    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED) || owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
+        _timer.Reset(200);
+    else
+    {
+        Position startdest;
+        owner->GetPosition(startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ);
+        owner->GetNearPoint(owner, startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ, 2.0f, 1.0f, owner->GetOrientation() * float(M_PI));
+    
+        float distance = owner->GetExactDist2d(startdest.m_positionX, startdest.m_positionY);
+        owner->MovePositionToFirstCollision(startdest, distance, owner->GetOrientation() * float(M_PI));
+    
+        Movement::MoveSplineInit init(owner);
+        init.MoveTo(startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ);
+        init.SetWalk(false);
+        int32 traveltime = init.Launch();
+        _timer.Reset(traveltime + urand(150, 250));
+    }
 }
 
 template<class T>
@@ -159,13 +176,14 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
         return;
     }
 
+    owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
+
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(_path->GetPath());
     init.SetWalk(false);
     int32 traveltime = init.Launch();
     _timer.Reset(traveltime + urand(800, 1500));
-
-    owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
+    
     // update position
     owner->UpdateSplinePosition();
 }

@@ -12524,7 +12524,7 @@ void Unit::SetFeared(bool apply)
     if (apply)
     {
         StopMoving();
-        GetMotionMaster()->MovementExpired();
+        //GetMotionMaster()->MovementExpired();
         SetTarget(ObjectGuid::Empty);
 
         Unit* caster = nullptr;
@@ -12558,7 +12558,7 @@ void Unit::SetConfused(bool apply)
     {
         SetTarget(ObjectGuid::Empty);
         StopMoving();
-        GetMotionMaster()->MovementExpired();
+        //GetMotionMaster()->MovementExpired();
         GetMotionMaster()->MoveConfused();
     }
     else
