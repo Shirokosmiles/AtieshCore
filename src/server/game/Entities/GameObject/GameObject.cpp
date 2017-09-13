@@ -1732,7 +1732,7 @@ void GameObject::Use(Unit* user)
                     return;
             }
 
-            user->RemoveAurasByType(SPELL_AURA_MOUNTED);
+            //user->RemoveAurasByType(SPELL_AURA_MOUNTED); // if we will use portal from dalaran, ack packet can't be handlering while player adding in world
             spellId = info->spellcaster.spellId;
 
             AddUse();
