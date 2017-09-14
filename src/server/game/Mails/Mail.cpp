@@ -332,11 +332,18 @@ void WorldSession::SendExternalMails()
 
         if (itemId)
         {
-            TC_LOG_DEBUG("entities.player.character", "External Mail> Adding %u of item with id %u", itemCount, itemId);
-            if (Item* mailItem = Item::CreateItem(itemId, itemCount))
+            if (!sObjectMgr->GetItemTemplate(itemId))
             {
-                mailItem->SaveToDB(trans);
-                mail->AddItem(mailItem);
+                TC_LOG_ERROR("sql.sql", "External Mail> Item entry %u from `mail_external` doesn't exist in DB, skipped.", itemId);
+            }
+            else
+            {
+                TC_LOG_DEBUG("entities.player", "External Mail> Adding %u of item with id %u", itemCount, itemId);
+                if(Item* mailItem = Item::CreateItem(itemId, itemCount))
+                {
+                    mailItem->SaveToDB(trans);
+                    mail->AddItem(mailItem);
+                }
             }
         }
 
