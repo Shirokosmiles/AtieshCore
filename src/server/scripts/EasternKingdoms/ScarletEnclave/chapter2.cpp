@@ -215,6 +215,8 @@ public:
             waveTimer = 3000;
             valrothGUID.Clear();
             phasesum = false;
+            shouldbemount = false;
+            shouldrun = false;
         }
 
         void Reset() override
@@ -250,9 +252,11 @@ public:
                     break;
                 case 4:
                     SetRun(true);
+                    shouldrun = true;
                     break;
                 case 9:
                     me->Mount(MODEL_DEATH_KNIGHT_MOUNT);
+                    shouldbemount = true;
                     break;
                 case 10:
                     me->Dismount();
@@ -280,6 +284,12 @@ public:
                     AddEscortState(STATE_ESCORT_RETURNING);
                     if (phasesum)
                         ReturnToLastPoint();
+
+                    if (shouldrun)
+                        SetRun(true);
+
+                    if (shouldbemount)
+                        me->Mount(MODEL_DEATH_KNIGHT_MOUNT);
                 }
                 else
                 {
@@ -393,7 +403,8 @@ public:
         uint32 waveTimer;
         ObjectGuid valrothGUID;
         bool phasesum;
-
+        bool shouldbemount;
+        bool shouldrun;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
