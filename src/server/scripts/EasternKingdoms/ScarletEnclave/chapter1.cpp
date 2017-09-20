@@ -31,6 +31,8 @@
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 #include "Vehicle.h"
+#include "CellImpl.h"
+#include "GridNotifiersImpl.h"
 
 /*######
 ##Quest 12848
@@ -1023,9 +1025,16 @@ enum ScarletMinerCart
     SPELL_CART_CHECK        = 54173,
     SPELL_SUMMON_CART       = 52463,
     SPELL_SUMMON_MINER      = 52464,
-    SPELL_CART_DRAG         = 52465,
+    SPELL_CART_DRAG         = 52465
+};
 
-    NPC_MINER               = 28841
+enum MinerCartEntrys
+{
+    PLAYER_SPAWN_MINER_CART = 28817,
+    NORMAL_SPAWN_MINER_CART = 28821,
+
+    PLAYER_SPAWN_MINER      = 28841,
+    NORMAL_SPAWN_MINER      = 28822
 };
 
 class npc_scarlet_miner_cart : public CreatureScript
@@ -1042,7 +1051,7 @@ class npc_scarlet_miner_cart : public CreatureScript
 
             void JustSummoned(Creature* summon) override
             {
-                if (summon->GetEntry() == NPC_MINER)
+                if (summon->GetEntry() == PLAYER_SPAWN_MINER)
                 {
                     _minerGUID = summon->GetGUID();
                     summon->AI()->SetGUID(_playerGUID);
@@ -1051,22 +1060,8 @@ class npc_scarlet_miner_cart : public CreatureScript
 
             void SummonedCreatureDespawn(Creature* summon) override
             {
-                if (summon->GetEntry() == NPC_MINER)
+                if (summon->GetEntry() == PLAYER_SPAWN_MINER)
                     _minerGUID.Clear();
-            }
-
-            void DoAction(int32 /*param*/) override
-            {
-                if (Creature* miner = ObjectAccessor::GetCreature(*me, _minerGUID))
-                {
-                    me->SetWalk(false);
-
-                    // Not 100% correct, but movement is smooth. Sometimes miner walks faster
-                    // than normal, this speed is fast enough to keep up at those times.
-                    me->SetSpeedRate(MOVE_RUN, 1.25f);
-
-                    me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
-                }
             }
 
             void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
@@ -1099,10 +1094,25 @@ class npc_scarlet_miner_cart : public CreatureScript
 ## npc_scarlet_miner
 ####*/
 
+enum MinerEntrys
+{
+    P_SPAWN_MINER_CART = 28817,
+    N_SPAWN_MINER_CART = 28821,
+
+    P_SPAWN_MINER      = 28841,
+    N_SPAWN_MINER      = 28822
+};
+
 enum Says_SM
 {
     SAY_SCARLET_MINER_0         = 0,
     SAY_SCARLET_MINER_1         = 1
+};
+
+enum MinerState
+{    
+    EVENT_GET_CAR       = 1,
+    EVENT_START_WP      = 2
 };
 
 class npc_scarlet_miner : public CreatureScript
@@ -1120,18 +1130,20 @@ class npc_scarlet_miner : public CreatureScript
 
             void Initialize()
             {
-                carGUID.Clear();
                 IntroTimer = 0;
                 IntroPhase = 0;
+                _events.Reset();
+                _events.ScheduleEvent(EVENT_GET_CAR, 100);
             }
 
+            ObjectGuid carGUID;
             uint32 IntroTimer;
             uint32 IntroPhase;
-            ObjectGuid carGUID;
 
             void Reset() override
             {
-                Initialize();
+                carGUID.Clear();
+                Initialize();                
             }
 
             void IsSummonedBy(Unit* summoner) override
@@ -1141,7 +1153,10 @@ class npc_scarlet_miner : public CreatureScript
 
             void InitWaypoint()
             {
-                AddWaypoint(1, 2389.03f,     -5902.74f,     109.014f, 0.f, 5000);
+                if (me->GetEntry() == P_SPAWN_MINER)
+                    AddWaypoint(1, 2389.03f,     -5902.74f,     109.014f, 0.f, 5000);
+                else 
+                    AddWaypoint(1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 5000);
                 AddWaypoint(2, 2341.812012f, -5900.484863f, 102.619743f);
                 AddWaypoint(3, 2306.561279f, -5901.738281f, 91.792419f);
                 AddWaypoint(4, 2300.098389f, -5912.618652f, 86.014885f);
@@ -1172,24 +1187,31 @@ class npc_scarlet_miner : public CreatureScript
                 }
             }
 
-            void SetGUID(ObjectGuid guid, int32 /*id = 0*/) override
-            {
-                InitWaypoint();
-                Start(false, false, guid);
-                SetDespawnAtFar(false);
-            }
-
             void WaypointReached(uint32 waypointId, uint32 /*pathId*/) override
             {
                 switch (waypointId)
                 {
                     case 1:
-                        if (Unit* car = ObjectAccessor::GetCreature(*me, carGUID))
+                        if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
+                        {
                             me->SetFacingToObject(car);
-                        Talk(SAY_SCARLET_MINER_0);
-                        SetRun(true);
-                        IntroTimer = 4000;
-                        IntroPhase = 1;
+
+                            if (me->GetEntry() == P_SPAWN_MINER)
+                            {
+                                Talk(SAY_SCARLET_MINER_0);
+
+                                DoCast(car, SPELL_CART_DRAG);
+                                car->AI()->InitializeAI();
+                                car->SetWalk(false);
+                                car->SetSpeedRate(MOVE_RUN, 1.25f);
+
+                                car->GetMotionMaster()->MoveFollow(me, 1.0f, 0);
+                                IntroPhase = 1;
+                                IntroTimer = 0;
+                            }
+                        }
+
+                        SetRun(false);
                         break;
                     case 17:
                         if (Unit* car = ObjectAccessor::GetCreature(*me, carGUID))
@@ -1197,7 +1219,16 @@ class npc_scarlet_miner : public CreatureScript
                             me->SetFacingToObject(car);
                             car->RemoveAura(SPELL_CART_DRAG);
                         }
-                        Talk(SAY_SCARLET_MINER_1);
+
+                        if (me->GetEntry() == P_SPAWN_MINER)
+                            Talk(SAY_SCARLET_MINER_1);
+
+                        if (me->GetEntry() == N_SPAWN_MINER)
+                        {
+                            if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
+                                car->Respawn();
+                            me->Respawn();
+                        }
                         break;
                     default:
                         break;
@@ -1206,29 +1237,83 @@ class npc_scarlet_miner : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (IntroPhase)
+                if (!me || !me->IsAlive())
+                    return;
+
+                EscortAI::UpdateAI(diff);
+                _events.Update(diff);
+
+                while (uint32 _eventId = _events.ExecuteEvent())
+                {
+                    switch (_eventId)
+                    {
+                        case EVENT_GET_CAR:
+                        {
+                            IntroTimer = 2000;
+
+                            if (!carGUID && me->GetEntry() == P_SPAWN_MINER) // i think it's unnesesary, but let it be
+                            {
+                                Creature* car = me->FindNearestCreature(P_SPAWN_MINER_CART, 6.5f);
+                                if (car)
+                                {
+                                    carGUID = car->GetGUID();
+                                    IntroPhase = 1;
+                                    IntroTimer = 0;
+                                }
+                            }
+
+                            _events.ScheduleEvent(EVENT_START_WP, 0);
+                            break;
+                        }
+                        case EVENT_START_WP:
+                        {
+                            InitWaypoint();
+                            Start(false, false);
+                            SetDespawnAtFar(false);
+
+                            break;
+                        }
+                    default:
+                        break;
+                    }
+                }
+
+                if (!IntroPhase)
                 {
                     if (IntroTimer <= diff)
                     {
-                        if (IntroPhase == 1)
+                        Creature* car = me->FindNearestCreature(N_SPAWN_MINER_CART, 8.5f);
+                        if (car && !car->HasAura(SPELL_CART_DRAG))
                         {
-                            if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
+                            if (car && !car->HasAura(SPELL_CART_DRAG))
+                            {
+                                IntroPhase = 1;
+
                                 DoCast(car, SPELL_CART_DRAG);
-                            IntroTimer = 800;
-                            IntroPhase = 2;
-                        }
-                        else
-                        {
-                            if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
-                                car->AI()->DoAction(0);
-                            IntroPhase = 0;
+                                car->AI()->InitializeAI();
+                                car->SetWalk(false);
+
+                                // Not 100% correct, but movement is smooth. Sometimes miner walks faster
+                                // than normal, this speed is fast enough to keep up at those times.
+                                car->SetSpeedRate(MOVE_RUN, 1.25f);
+
+                                car->GetMotionMaster()->MoveFollow(me, 1.0f, 0);
+                                IntroPhase = 1;
+                                IntroTimer = 0;
+                            }
                         }
                     }
                     else
+                    {
                         IntroTimer -= diff;
-                }
-                EscortAI::UpdateAI(diff);
+                        if (IntroTimer <= 0)
+                            IntroTimer = 4000;
+                    }
+                }                   
             }
+
+            private:
+                EventMap _events;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
