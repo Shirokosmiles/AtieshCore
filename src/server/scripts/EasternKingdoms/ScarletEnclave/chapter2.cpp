@@ -214,6 +214,7 @@ public:
             wave = 0;
             waveTimer = 3000;
             valrothGUID.Clear();
+            phasesum = false;
         }
 
         void Reset() override
@@ -240,15 +241,12 @@ public:
                     break;
                 case 2:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    DoCast(me, SPELL_KOLTIRA_TRANSFORM);
                     me->LoadEquipment();
+                    DoCast(me, SPELL_KOLTIRA_TRANSFORM);
                     break;
                 case 3:
                     SetEscortPaused(true);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     Talk(SAY_BREAKOUT2);
-                    DoCast(me, SPELL_ANTI_MAGIC_ZONE);
                     break;
                 case 4:
                     SetRun(true);
@@ -259,6 +257,36 @@ public:
                 case 10:
                     me->Dismount();
                     break;
+            }
+        }
+
+        void EnterEvadeMode(EvadeReason /*why*/) override
+        {
+            Player* player = GetPlayerForEscort();
+            if (!player || !player->IsAlive() || !me->IsAlive())
+            {
+                if (HasEscortState(STATE_ESCORT_ESCORTING))
+                    RemoveEscortState(STATE_ESCORT_ESCORTING);
+                Reset();
+            }
+            else
+            {
+                me->GetThreatManager().ClearAllThreat();
+                me->CombatStop(true);
+                me->SetLootRecipient(nullptr);
+
+                if (HasEscortState(STATE_ESCORT_ESCORTING))
+                {
+                    AddEscortState(STATE_ESCORT_RETURNING);
+                    if (phasesum)
+                        ReturnToLastPoint();
+                }
+                else
+                {
+                    me->GetMotionMaster()->MoveTargetedHome();
+                    me->RemoveAllAuras();
+                    Reset();
+                }
             }
         }
 
@@ -308,6 +336,9 @@ public:
                             Talk(SAY_BREAKOUT6);
                             me->SummonCreature(NPC_HIGH_INQUISITOR_VALROTH, 1642.329f, -6045.818f, 127.583f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000);
                             waveTimer = 1000;
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            DoCast(me, SPELL_ANTI_MAGIC_ZONE);
                             break;
                         case 4:
                         {
@@ -327,9 +358,13 @@ public:
                         }
                         case 5:
                             Talk(SAY_BREAKOUT9);
+                            me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->RemoveAurasDueToSpell(SPELL_ANTI_MAGIC_ZONE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             waveTimer = 2500;
+                            if (HasEscortState(STATE_ESCORT_RETURNING))
+                                ReturnToLastPoint();
+                            phasesum = true;
                             break;
                         case 6:
                             Talk(SAY_BREAKOUT10);
@@ -357,6 +392,7 @@ public:
         uint8 wave;
         uint32 waveTimer;
         ObjectGuid valrothGUID;
+        bool phasesum;
 
     };
 
