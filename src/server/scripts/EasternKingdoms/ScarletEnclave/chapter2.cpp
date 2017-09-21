@@ -331,9 +331,15 @@ public:
                             Talk(SAY_BREAKOUT3);
                             SummonAcolyte(3);
                             waveTimer = 20000;
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            DoCast(me, SPELL_ANTI_MAGIC_ZONE);
                             break;
                         case 1:
                             Talk(SAY_BREAKOUT4);
+                            me->SetStandState(UNIT_STAND_STATE_STAND);
+                            me->RemoveAurasDueToSpell(SPELL_ANTI_MAGIC_ZONE);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             SummonAcolyte(3);
                             waveTimer = 20000;
                             break;

@@ -289,6 +289,12 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         }
         bool CanNotReachTarget() const { return m_cannotReachTarget; }
 
+        void SetCreatureAsCasterForExceptEvade(bool setcaster = false)
+        {
+            m_isCaster = setcaster;
+        }
+        bool isCreatureAsCasterForExceptEvade() const { return m_isCaster; } // will not calculate path at this target, HACK for except evade for some special NPC like ballista for DK zone
+
         void SetHomePosition(float x, float y, float z, float o) { m_homePosition.Relocate(x, y, z, o); }
         void SetHomePosition(Position const& pos) { m_homePosition.Relocate(pos); }
         void GetHomePosition(float& x, float& y, float& z, float& ori) const { m_homePosition.GetPosition(x, y, z, ori); }
@@ -393,6 +399,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool m_AlreadyCallAssistance;
         bool m_AlreadySearchedAssistance;
         bool m_cannotReachTarget;
+        bool m_isCaster;
         uint32 m_cannotReachTimer;
         bool m_AI_locked;
 

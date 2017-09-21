@@ -14926,7 +14926,7 @@ void Unit::ValidateMovementInfo(MovementInfo* mi)
     // CanFly, Hover, Waterwalking, Root (or if necessary PendingRoot), DisableGravity, CanTransitionBetweenSwimAndFly and FeatherFall
     MovementInfo oldMovementInfo = GetMovementInfo();
     CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_CAN_FLY) != oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY));
-    CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_HOVER) != oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_HOVER));
+    //CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_HOVER) != oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_HOVER));
     CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_WATERWALKING) != oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_WATERWALKING));
     CHECK_FOR_VIOLATING_FLAGS((mi->HasMovementFlag(MOVEMENTFLAG_ROOT) || mi->HasMovementFlag(MOVEMENTFLAG_PENDING_ROOT)) != (oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT) || oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_PENDING_ROOT)));
     CHECK_FOR_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) != oldMovementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY));
