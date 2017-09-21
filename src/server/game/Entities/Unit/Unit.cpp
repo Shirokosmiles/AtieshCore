@@ -281,7 +281,7 @@ bool DispelableAura::RollDispel() const
 
 Unit::Unit(bool isWorldObject) :
     WorldObject(isWorldObject), m_playerMovingMe(nullptr), m_lastSanctuaryTime(0),
-    IsAIEnabled(false), NeedChangeAI(false), LastCharmerGUID(),
+    IsAIEnabled(false), NeedChangeAI(false), LastCharmerGUID(), CharmerGUID_controller(), CharmerGUID_controlled(),
     m_ControlledByPlayer(false), movespline(new Movement::MoveSpline()),
     i_AI(nullptr), i_disabledAI(nullptr), m_AutoRepeatFirstCast(false), m_procDeep(0),
     m_removedAurasCount(0), i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_ThreatManager(this),
@@ -6202,6 +6202,44 @@ Player* Unit::GetAffectingPlayer() const
     return nullptr;
 }
 
+Unit* Unit::GetCharmerController() const
+{
+    if (CharmerGUID_controller)
+        return ObjectAccessor::GetUnit(*this, CharmerGUID_controller);
+
+    return nullptr;
+}
+
+Unit* Unit::GetCharmerControlledByThis() const
+{
+    if (CharmerGUID_controlled)
+        return ObjectAccessor::GetUnit(*this, CharmerGUID_controlled);
+
+    return nullptr;
+}
+
+void Unit::SetCharmerController(Unit* charmer)
+{
+    if (charmer)
+        CharmerGUID_controller = charmer->GetGUID();
+}
+
+void Unit::SetCharmerControlled(Unit* charmer)
+{
+    if (charmer)
+        CharmerGUID_controlled = charmer->GetGUID();
+}
+
+void Unit::RemoveCharmerController()
+{
+    CharmerGUID_controller = ObjectGuid::Empty;
+}
+
+void Unit::RemoveCharmerControlled()
+{
+    CharmerGUID_controlled = ObjectGuid::Empty;
+}
+
 Minion *Unit::GetFirstMinion() const
 {
     if (ObjectGuid pet_guid = GetMinionGUID())
@@ -9737,6 +9775,13 @@ Unit* Creature::SelectVictim()
         return nullptr;
     }
 
+    if (!target)
+    {
+        target = GetCharmerControlledByThis();
+        if (target)
+            return target;
+    }
+
     // enter in evade mode in other case
     AI()->EnterEvadeMode(CreatureAI::EVADE_REASON_NO_HOSTILES);
 
@@ -12654,6 +12699,8 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     // Set charmed
     charmer->SetCharm(this, true);
+    this->SetCharmerController(charmer);
+    charmer->SetCharmerControlled(this);
 
     if (GetTypeId() == TYPEID_UNIT)
     {
@@ -12769,6 +12816,10 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     CombatStop(); /// @todo CombatStop(true) may cause crash (interrupt spells)
     getHostileRefManager().deleteReferences();
     GetThreatManager().ClearAllThreat();
+
+    RemoveCharmerControlled();
+    if (charmer)
+        charmer->RemoveCharmerController();
 
     if (_oldFactionId)
     {

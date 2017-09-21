@@ -189,7 +189,7 @@ void TargetedMovementGenerator<T, D>::SetTargetLocation(T* owner, bool updateDes
     }
 
     // allow pets to use shortcut if no path found when following their master
-    bool forceDest = (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsPet() && owner->HasUnitState(UNIT_STATE_FOLLOW)) || (owner->ToCreature()->IsPet() && owner->GetTransport());
+    bool forceDest = (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature() && owner->ToCreature()->IsPet() && owner->HasUnitState(UNIT_STATE_FOLLOW)) || (owner->ToCreature() && owner->ToCreature()->IsPet() && owner->GetTransport());
     bool result = _path->CalculatePath(destination.GetPositionX(), destination.GetPositionY(), destination.GetPositionZ(), forceDest);
     if (!result || (_path->GetPathType() & PATHFIND_NOPATH))
     {
