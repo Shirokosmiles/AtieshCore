@@ -15019,6 +15019,48 @@ void Unit::UpdateMovementInfo(MovementInfo const& movementInfo)
     m_movementInfo.time = movementInfo.time + playerSession->GetClientTimeDelay() + MOVEMENT_PACKET_TIME_DELAY;
 }
 
+bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
+{
+    if (!IsMovedByPlayer())
+    {
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo call on a unit not moved by a player. This should not happen.");
+        return true;
+    }
+
+    float time = GetLastMoveClientTimestamp();
+    if (time)
+    {        
+        Position npos = movementInfo.pos;
+        float distance = GetExactDist2d(npos);
+        float movetime = movementInfo.time;
+        float delay = (getMSTime() - movementInfo.time) / 10000000000;
+        float difftime = ((movetime - time) + delay) / 1000;
+        float normaldistance = GetSpeed(MOVE_RUN) * difftime + 0.1f;
+
+        if (distance < normaldistance)
+            return true;
+
+        float x, y;
+        GetPosition(x, y);
+
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  SpeedHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+        TC_LOG_ERROR("server", "Unit::========================================================");
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  oldX = %f", x);
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  oldY = %f", y);
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  newX = %f", npos.GetPositionX());
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  newY = %f", npos.GetPositionY());
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  distance = %f", distance);
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  normal distance = %f", normaldistance);
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  movetime = %f", movetime);
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  difftime = %f", difftime);
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  ClientTimeDelay = %f", delay);
+    }
+    else
+        return true;
+
+    return false;
+}
+
 void Unit::CheckPendingMovementAcks()
 {
     if (!HasPendingMovementChange())

@@ -432,8 +432,15 @@ void WorldSession::HandleMovementOpcode(Opcodes opcode, MovementInfo& movementIn
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
 
+    /* start SpeedHack Detection */
+    if (plrMover && !mover->CheckMovementInfo(movementInfo))
+    {
+        plrMover->GetSession()->KickPlayer();
+        return;
+    }
+
     /* process position-change */
-    mover->UpdateMovementInfo(movementInfo);
+    mover->UpdateMovementInfo(movementInfo);    
 
     // as strange as it may be, retail servers actually use MSG_MOVE_START_SWIM_CHEAT & MSG_MOVE_STOP_SWIM_CHEAT to respectively set and unset the 'Flying' movement flag.
     // The only thing left to do is to move the handling of CMSG_MOVE_SET_FLY into a different handler
