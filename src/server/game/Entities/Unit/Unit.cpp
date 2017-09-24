@@ -15036,11 +15036,12 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         Position npos = movementInfo.pos;
         float distance = GetExactDist2d(npos);
         float movetime = movementInfo.time;
+        float ping = GetPlayerMovingMe()->GetSession()->GetLatency();
         float speed = GetSpeed(MOVE_RUN);
         if (IsFlying())
             speed = GetSpeed(MOVE_FLIGHT);
-        float delay = (getMSTime() - movementInfo.time) / 10000000000;
-        float difftime = ((movetime - time) + delay) / 1000;
+        float delay = (getMSTime() - movementInfo.time) / 10000000000 + (ping * 0.001f);
+        float difftime = (movetime - time) * 0.001f + delay;
         float normaldistance = speed * difftime + 0.1f;
 
         if (distance < normaldistance)
@@ -15048,7 +15049,7 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
 
         float x, y;
         GetPosition(x, y);
-        float ping = GetPlayerMovingMe()->GetSession()->GetLatency();
+        
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  SpeedHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
         TC_LOG_ERROR("server", "Unit::========================================================");
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  oldX = %f", x);
@@ -15060,7 +15061,7 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  movetime = %f", movetime);
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  difftime = %f", difftime);
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  ClientTimeDelay = %f", delay);
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  Ping = %u", ping);
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  Ping = %f", ping);
     }
     else
         return true;
