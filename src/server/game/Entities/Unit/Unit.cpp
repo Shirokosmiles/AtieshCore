@@ -15030,13 +15030,16 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
     float time = GetLastMoveClientTimestamp();
     if (time)
     {   
-        if (IsFalling())
+        if (IsFalling() || IsInFlight())
             return true;
 
         Position npos = movementInfo.pos;
         float distance = GetExactDist2d(npos);
         float movetime = movementInfo.time;
-        float ping = GetPlayerMovingMe()->GetSession()->GetLatency();
+        float realping = GetPlayerMovingMe()->GetSession()->GetLatency();
+        float ping = realping;
+        if (ping < 40.0f)
+            ping = 40.0f;
         float speed = GetSpeed(MOVE_RUN);
         if (IsFlying())
             speed = GetSpeed(MOVE_FLIGHT);
