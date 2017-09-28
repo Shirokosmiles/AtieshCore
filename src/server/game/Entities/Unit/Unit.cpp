@@ -12535,6 +12535,7 @@ void Unit::SetRooted(bool apply)
     {
         if (apply)
             StopMoving(); // @todo: this method needs a rework. until then, should it be called only for NPC or also for player-controlled units?
+        ToPlayer()->SetSkipOnePacketForASH(true);
         MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEMENTFLAG_ROOT, apply);
     }
     else if (IsMovedByPlayer() && !IsInWorld())
