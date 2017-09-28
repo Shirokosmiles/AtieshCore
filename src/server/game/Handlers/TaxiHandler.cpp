@@ -125,6 +125,7 @@ void WorldSession::SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathN
         GetPlayer()->Mount(mountDisplayId);
 
     GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path, pathNode);
+    GetPlayer()->SetSkipOnePacketForASH(true);
 }
 
 bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
