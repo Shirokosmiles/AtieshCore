@@ -13943,6 +13943,11 @@ bool Unit::IsFalling() const
     return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR) || movespline->isFalling();
 }
 
+bool Unit::IsFallingFar() const
+{
+    return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_FAR);
+}
+
 bool Unit::CanSwim() const
 {
     // Mirror client behavior, if this method returns false then client will not use swimming animation and for players will apply gravity as if there was no water
@@ -15030,7 +15035,21 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
     float time = GetLastMoveClientTimestamp();
     if (time)
     {   
-        if (IsFalling() || IsInFlight())
+        if (IsFallingFar() || IsInFlight())
+            return true;
+
+        if (GetPlayerMovingMe())
+        {
+            if (GetPlayerMovingMe()->IsSkipOnePacketForASH())
+            {
+                GetPlayerMovingMe()->SetSkipOnePacketForASH(false);
+                return true;
+            }
+        }
+        else
+            return true;
+
+        if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
             return true;
 
         Position npos = movementInfo.pos;
@@ -15038,8 +15057,8 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         float movetime = movementInfo.time;
         float realping = GetPlayerMovingMe()->GetSession()->GetLatency();
         float ping = realping;
-        if (ping < 40.0f)
-            ping = 40.0f;
+        if (ping < 60.0f)
+            ping = 60.0f;
         float speed = GetSpeed(MOVE_RUN);
         if (IsFlying())
             speed = GetSpeed(MOVE_FLIGHT);
@@ -15064,7 +15083,7 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  movetime = %f", movetime);
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  difftime = %f", difftime);
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  ClientTimeDelay = %f", delay);
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  Ping = %f", ping);
+        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  Ping = %f", realping);
     }
     else
         return true;

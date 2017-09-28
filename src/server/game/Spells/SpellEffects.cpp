@@ -4640,6 +4640,8 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         }
         else
             m_caster->GetMotionMaster()->MoveCharge(*m_preGeneratedPath, speed);
+
+        m_caster->AddUnitState(UNIT_STATE_CHARGING);
     }
 
     if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
@@ -4653,7 +4655,11 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
                 m_caster->Attack(victim, true);
             else
                 m_caster->Attack(unitTarget, true);
-        }            
+        }
+
+        m_caster->ClearUnitState(UNIT_STATE_CHARGING);
+        if (m_caster->ToPlayer())
+            m_caster->ToPlayer()->SetSkipOnePacketForASH(true);
     }
 }
 

@@ -1686,6 +1686,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetIsRepopPending(bool pending) { m_isRepopPending = pending; }
         bool IsRepopPending() const { return m_isRepopPending; }
 
+        // for antispeedhack for blink spell
+        void SetSkipOnePacketForASH(bool blinked) { m_skipOnePacketForASH = blinked; }
+        bool IsSkipOnePacketForASH() const { return m_skipOnePacketForASH; }
+
         void RemoveGhoul();
 
         void DurabilityLossAll(double percent, bool inventory);
@@ -2464,6 +2468,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         // Used to resurect a dead player into a ghost by 2 non consecutive steps
         bool m_isRepopPending;
+
+        // Used for skip 1 movement packet after charge or blink
+        bool m_skipOnePacketForASH;
 
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;
