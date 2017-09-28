@@ -1561,9 +1561,6 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 //float range = sqrt((desty - pos.GetPositionY())*(desty - pos.GetPositionY()) + (destx - pos.GetPositionX())*(destx - pos.GetPositionX()));
                 //TC_LOG_ERROR("server", "Blink number 2, in falling but at a hight, distance of blink = %f", range);
             }
-
-            if (m_caster->ToPlayer())
-                m_caster->ToPlayer()->SetSkipOnePacketForASH(true); // for except kick by antispeedhack
             break;
         }
         default:
