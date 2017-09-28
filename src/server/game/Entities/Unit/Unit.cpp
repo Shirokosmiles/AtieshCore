@@ -12580,6 +12580,8 @@ void Unit::SetFeared(bool apply)
         if (!caster)
             caster = getAttackerForHelper();
         GetMotionMaster()->MoveFleeing(caster, fearAuras.empty() ? sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY) : 0);             // caster == NULL processed in MoveFleeing
+        if (Player* player = ToPlayer())
+            player->SetSkipOnePacketForASH(true);
     }
     else
     {
@@ -12606,6 +12608,8 @@ void Unit::SetConfused(bool apply)
         StopMoving();
         //GetMotionMaster()->MovementExpired();
         GetMotionMaster()->MoveConfused();
+        if (Player* player = ToPlayer())
+            player->SetSkipOnePacketForASH(true);
     }
     else
     {
@@ -13340,6 +13344,8 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
         
         if (HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY))
             SetCanFly(true);
+
+        ToPlayer()->SetSkipOnePacketForASH(true);
     }
     else if (IsMovedByPlayer() && !IsInWorld())
         ; // do nothing? Using a Send****ToMover on a unit not yet initialized in the world creates issues.
@@ -15034,6 +15040,9 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         if (IsFalling() || IsInFlight())
             return true;
 
+        if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
+            return true;
+
         if (GetPlayerMovingMe())
         {
             if (GetPlayerMovingMe()->IsSkipOnePacketForASH())
@@ -15043,10 +15052,7 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
             }
         }
         else
-            return true;
-
-        if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
-            return true;
+            return true;        
 
         Position npos = movementInfo.pos;
         float distance = GetExactDist2d(npos);

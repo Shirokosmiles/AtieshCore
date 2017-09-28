@@ -4680,6 +4680,8 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
         }
 
         m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+        if (m_caster->ToPlayer())
+            m_caster->ToPlayer()->SetSkipOnePacketForASH(true);
     }
 }
 
