@@ -13944,11 +13944,6 @@ bool Unit::IsFalling() const
     return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR) || movespline->isFalling();
 }
 
-bool Unit::IsFallingFar() const
-{
-    return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_FAR);
-}
-
 bool Unit::CanSwim() const
 {
     // Mirror client behavior, if this method returns false then client will not use swimming animation and for players will apply gravity as if there was no water
@@ -15036,7 +15031,7 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
     float time = GetLastMoveClientTimestamp();
     if (time)
     {   
-        if (IsFallingFar() || IsInFlight())
+        if (IsFalling() || IsInFlight())
             return true;
 
         if (GetPlayerMovingMe())
