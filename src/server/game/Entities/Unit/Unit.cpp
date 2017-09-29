@@ -15041,6 +15041,9 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         if (IsFalling() || IsInFlight())
             return true;
 
+        if (GetTransport())
+            return true;
+
         if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
             return true;
 
