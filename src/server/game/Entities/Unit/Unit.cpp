@@ -15037,6 +15037,14 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
     float time = GetLastMoveClientTimestamp();
     if (time)
     {   
+        if (IsFlying() && !HasCanFly()) // kick flyhacks
+        {
+            TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+            TC_LOG_ERROR("server", "Unit::========================================================");
+            TC_LOG_ERROR("server", "Player IsFlying but CanFly is false");
+            return false;
+        }
+
         if (IsFlying() || IsFalling() || IsInFlight())
             return true;
 
@@ -15058,10 +15066,10 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
             return true;        
 
         Position npos = movementInfo.pos;
-        int32 rand = irand(0, 1);
+        int32 rand = irand(0, 1); // just not so often to call this
         if (rand)
         {
-            float z = GetMap()->GetHeight(npos); // SimpleFly
+            float z = GetMap()->GetHeight(npos); // smart flyhacks -> SimpleFly
             if (npos.GetPositionZ() - z >= 0.1f)
             {
                 TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
