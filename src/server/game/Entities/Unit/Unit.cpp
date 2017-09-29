@@ -15058,6 +15058,20 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
             return true;        
 
         Position npos = movementInfo.pos;
+        int32 rand = irand(0, 1);
+        if (rand)
+        {
+            float z = GetMap()->GetHeight(npos); // SimpleFly
+            if (npos.GetPositionZ() - z >= 0.1f)
+            {
+                TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+                TC_LOG_ERROR("server", "Unit::========================================================");
+                TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  normalZ = %f", z);
+                TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  playerZ = %f", npos.GetPositionZ());
+                return false;
+            }
+        }
+
         float distance = GetExactDist2d(npos);
         float movetime = movementInfo.time;
         float realping = GetPlayerMovingMe()->GetSession()->GetLatency();
@@ -15070,7 +15084,6 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         float delay = (getMSTime() - movementInfo.time) / 10000000000 + (ping * 0.001f);
         float difftime = (movetime - time) * 0.001f + delay;
         float normaldistance = speed * difftime + 0.1f;
-
         if (distance < normaldistance)
             return true;
 
