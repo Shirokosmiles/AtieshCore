@@ -15070,14 +15070,21 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         if (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && rand)
         {
             float z = GetMap()->GetHeight(npos); // smart flyhacks -> SimpleFly
-            if (npos.GetPositionZ() - z >= 0.1f)
+            if (npos.GetPositionZ() - z > 1.0f)
             {
-                TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-                TC_LOG_ERROR("server", "Unit::========================================================");
-                TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  normalZ = %f", z);
-                TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  playerZ = %f", npos.GetPositionZ());
-                return false;
+                if (!GetPlayerMovingMe()->HasFirstAlertForAntiCheat())
+                    GetPlayerMovingMe()->SetFirstAlert(true);
+                else
+                {
+                    TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+                    TC_LOG_ERROR("server", "Unit::========================================================");
+                    TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  normalZ = %f", z);
+                    TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  playerZ = %f", npos.GetPositionZ());
+                    return false;
+                }
             }
+            else if (GetPlayerMovingMe()->HasFirstAlertForAntiCheat())
+                GetPlayerMovingMe()->SetFirstAlert(false);
         }
 
         float distance = GetExactDist2d(npos);
@@ -15093,7 +15100,17 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         float difftime = (movetime - time) * 0.001f + delay;
         float normaldistance = speed * difftime + 0.1f;
         if (distance < normaldistance)
+        {
+            if (GetPlayerMovingMe()->HasFirstAlertForAntiCheat())
+                GetPlayerMovingMe()->SetFirstAlert(false);
+
             return true;
+        }
+        else if (!GetPlayerMovingMe()->HasFirstAlertForAntiCheat())
+        {
+            GetPlayerMovingMe()->SetFirstAlert(true);
+            return true;
+        }
 
         float x, y;
         GetPosition(x, y);

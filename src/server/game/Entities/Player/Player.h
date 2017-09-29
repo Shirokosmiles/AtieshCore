@@ -1690,6 +1690,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetSkipOnePacketForASH(bool blinked) { m_skipOnePacketForASH = blinked; }
         bool IsSkipOnePacketForASH() const { return m_skipOnePacketForASH; }
 
+        // for anticheat - it's nessesary because player can receive swimming flag not instant
+        void SetFirstAlert(bool alert) { m_checkFirstAllert = alert; }
+        bool HasFirstAlertForAntiCheat() const { return m_checkFirstAllert; }
+
         void RemoveGhoul();
 
         void DurabilityLossAll(double percent, bool inventory);
@@ -2471,6 +2475,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         // Used for skip 1 movement packet after charge or blink
         bool m_skipOnePacketForASH;
+
+        // Used for skip 1 alert for anticheat
+        bool m_checkFirstAllert;
 
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;
