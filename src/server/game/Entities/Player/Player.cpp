@@ -1717,6 +1717,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     // reset movement flags at teleport, because player will continue move with these flags after teleport
     SetUnitMovementFlags(GetUnitMovementFlags() & MOVEMENTFLAG_MASK_HAS_PLAYER_STATUS_OPCODE);
     DisableSpline();
+    SetSkipOnePacketForASH(true); // for except kick by antispeedhack
 
     if (Transport* transport = GetTransport())
     {
