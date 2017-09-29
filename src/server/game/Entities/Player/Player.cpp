@@ -267,7 +267,6 @@ Player::Player(WorldSession* session): Unit(true)
     m_deathExpireTime = 0;
     m_isRepopPending = false;
     m_skipOnePacketForASH = false;
-    m_checkFirstAllert = false;
 
     m_swingErrorMsg = 0;
 
