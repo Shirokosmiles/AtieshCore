@@ -15067,7 +15067,7 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
 
         Position npos = movementInfo.pos;
         int32 rand = irand(0, 1); // just not so often to call this
-        if (rand)
+        if (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && rand)
         {
             float z = GetMap()->GetHeight(npos); // smart flyhacks -> SimpleFly
             if (npos.GetPositionZ() - z >= 0.1f)
