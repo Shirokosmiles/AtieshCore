@@ -954,6 +954,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         PlayerSocial* GetSocial() { return m_social; }
         void RemoveSocial();
 
+        bool CheckOnFlyHack();
+
         PlayerTaxi m_taxi;
         void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getCFSRace(), getClass(), getLevel()); }
         bool ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc = nullptr, uint32 spellid = 0);
@@ -2354,6 +2356,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_areaUpdateId;
 
         uint32 m_vanishTimer;
+        uint32 m_flyhackTimer;
 
         uint32 m_deathTimer;
         time_t m_deathExpireTime;

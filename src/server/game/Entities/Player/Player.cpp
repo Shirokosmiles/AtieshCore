@@ -263,6 +263,9 @@ Player::Player(WorldSession* session): Unit(true)
     m_hostileReferenceCheckTimer = 0;
     m_drunkTimer = 0;
     m_vanishTimer = 0;
+    m_flyhackTimer = 0;
+    if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FLYHACK_ENABLED))
+        m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
     m_deathTimer = 0;
     m_deathExpireTime = 0;
     m_isRepopPending = false;
@@ -1277,6 +1280,18 @@ void Player::Update(uint32 p_time)
         }
         else
             m_vanishTimer -= p_time;
+    }
+
+    if (m_flyhackTimer > 0)
+    {
+        if (p_time >= m_flyhackTimer)
+        {
+            if (!CheckOnFlyHack())
+                GetSession()->KickPlayer();
+            m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
+        }
+        else
+            m_flyhackTimer -= p_time;
     }
 
     if (m_timeSyncTimer > 0)
@@ -26646,4 +26661,53 @@ void Player::RemoveSocial()
 {
     sSocialMgr->RemovePlayerSocial(GetGUID());
     m_social = nullptr;
+}
+
+bool Player::CheckOnFlyHack()
+{
+    if (Unit::IsFalling() || IsFalling())
+        return true;
+
+    if (IsFlying() || IsInFlight())
+        return true;
+
+    if (GetTransport())
+        return true;
+
+    if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
+        return true;
+
+    if (!GetPlayerMovingMe())
+        return true;
+
+    Position npos = GetPosition();
+    int32 rand = irand(0, 1); // just not so often to call this
+    if (rand == 1)
+    {
+        if (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+        {
+            float z = GetMap()->GetHeight(npos); // smart flyhacks -> SimpleFly
+            if (npos.GetPositionZ() - z > 1.0f)
+                if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), z))
+                {
+                    TC_LOG_ERROR("server", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+                    TC_LOG_ERROR("server", "Player::========================================================");
+                    TC_LOG_ERROR("server", "Player::CheckOnFlyHack :  normalZ = %f", z);
+                    TC_LOG_ERROR("server", "Player::CheckOnFlyHack :  playerZ = %f", npos.GetPositionZ());
+                    return false;
+                }
+        }
+        else
+        {
+            if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ()))
+            {
+                TC_LOG_ERROR("server", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+                TC_LOG_ERROR("server", "Player::========================================================");
+                TC_LOG_ERROR("server", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
+                return false;
+            }
+        }
+    }
+
+    return true;
 }

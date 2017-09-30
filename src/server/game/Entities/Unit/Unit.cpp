@@ -15034,6 +15034,9 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         return true;
     }
 
+    if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_SPEEDHACK_ENABLED))
+        return true;
+
     float time = GetLastMoveClientTimestamp();
     if (time)
     {   
@@ -15066,21 +15069,6 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
             return true;
 
         Position npos = movementInfo.pos;
-        int32 rand = irand(0, 1); // just not so often to call this
-        if (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && rand)
-        {
-            float z = GetMap()->GetHeight(npos); // smart flyhacks -> SimpleFly
-            if (npos.GetPositionZ() - z > 2.8f)
-                if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), z))
-                {
-                    TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-                    TC_LOG_ERROR("server", "Unit::========================================================");
-                    TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  normalZ = %f", z);
-                    TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  playerZ = %f", npos.GetPositionZ());
-                    return false;
-                }
-        }
-
         float distance = GetExactDist2d(npos);
         float movetime = movementInfo.time;
         float realping = GetPlayerMovingMe()->GetSession()->GetLatency();

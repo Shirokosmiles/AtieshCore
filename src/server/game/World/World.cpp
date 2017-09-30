@@ -1370,6 +1370,11 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WARDEN_CLIENT_FAIL_ACTION]    = sConfigMgr->GetIntDefault("Warden.ClientCheckFailAction", 0);
     m_int_configs[CONFIG_WARDEN_CLIENT_RESPONSE_DELAY] = sConfigMgr->GetIntDefault("Warden.ClientResponseDelay", 600);
 
+    // AntiCheat- anti FlyHack
+    m_bool_configs[CONFIG_ANTICHEAT_FLYHACK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FlyHack.Enabled", false);
+    m_bool_configs[CONFIG_ANTICHEAT_SPEEDHACK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Enabled", false);
+    m_int_configs[CONFIG_ANTICHEAT_FLYHACK_TIMER] = sConfigMgr->GetIntDefault("AntiCheats.FlyHackTimer", 1000);
+
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetIntDefault("DungeonFinder.OptionsMask", 1);
 

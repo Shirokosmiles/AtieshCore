@@ -3962,6 +3962,26 @@ PacketSpoof.BanDuration = 86400
 
 AntiCheats.PendingMoveChangesTimeoutTime = 5000
 
+#    AntiCheats.FlyHack
+#        Description: Enable AntiCheat.FlyHack
+#        Default:     0 - (Enabled)
+#                     1 - (Disabled)
+
+AntiCheats.FlyHack.Enabled = 1
+
+#    AntiCheats.FlyHack
+#        Description: Enable AntiCheat.SpeedHack
+#        Default:     0 - (Enabled)
+#                     1 - (Disabled)
+
+AntiCheats.SpeedHack.Enabled = 1
+
+#    AntiCheats.FlyHackTimer
+#        Description: Timer for AntiCheat FlyHack check
+#        Default:     1000 - 1 check in 1 second
+
+AntiCheats.FlyHackTimer = 1000
+
 #
 ###################################################################################################
 
