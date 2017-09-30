@@ -15071,13 +15071,14 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         {
             float z = GetMap()->GetHeight(npos); // smart flyhacks -> SimpleFly
             if (npos.GetPositionZ() - z > 2.8f)
-            {
-                TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-                TC_LOG_ERROR("server", "Unit::========================================================");
-                TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  normalZ = %f", z);
-                TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  playerZ = %f", npos.GetPositionZ());
-                return false;
-            }
+                if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), z))
+                {
+                    TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+                    TC_LOG_ERROR("server", "Unit::========================================================");
+                    TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  normalZ = %f", z);
+                    TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  playerZ = %f", npos.GetPositionZ());
+                    return false;
+                }
         }
 
         float distance = GetExactDist2d(npos);
