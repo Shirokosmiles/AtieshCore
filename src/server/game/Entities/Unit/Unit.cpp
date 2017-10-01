@@ -15048,7 +15048,7 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
             return false;
         }
 
-        if (IsFlying() || IsFalling() || IsInFlight())
+        if (IsFalling() || IsInFlight())
             return true;
 
         if (GetTransport())
