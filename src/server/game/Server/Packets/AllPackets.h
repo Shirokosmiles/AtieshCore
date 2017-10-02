@@ -19,9 +19,7 @@
 #define AllPackets_h__
 
 #include "BattlefieldPackets.h"
-#include "MovementPackets.h"
 #include "QueryPackets.h"
 #include "QuestPackets.h"
-#include "VehiclePackets.h"
 
 #endif // AllPackets_h__

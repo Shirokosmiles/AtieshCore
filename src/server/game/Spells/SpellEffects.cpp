@@ -4718,7 +4718,7 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
         if (m_targets.HasDst())
             destTarget->GetPosition(x, y);
         else
-            return; // log into warn a message for this case?
+            return;
     }
     else //if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_KNOCK_BACK)
     {
@@ -4742,7 +4742,11 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
         modificator = 10.0f;
     float speedz = damage / modificator;
 
-    unitTarget->JumpTo(speedxy, speedz, false);
+    //1891: Disengage
+    //4022: Rolling Throw
+    m_caster->JumpTo(speedxy, speedz, (m_spellInfo->SpellIconID != 1891 && m_spellInfo->SpellIconID != 4022));
+    if (m_spellInfo->SpellIconID == 4022)
+        unitTarget->JumpTo(speedxy, speedz);
 
     // changes fall time
     if (m_caster->GetTypeId() == TYPEID_PLAYER)

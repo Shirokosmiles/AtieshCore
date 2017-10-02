@@ -79,22 +79,6 @@ namespace WorldPackets
         class BattlefieldMgrQueueInviteResponse;
         class BattlefieldMgrExitRequest;
     }
-    namespace Movement
-    {
-        class ClientPlayerMovement;
-        class WorldPortResponse;
-        class MoveTeleportAck;
-        class MovementAckMessage;
-        class MovementToggleAckMessage;
-        class MovementSpeedAck;
-        class MoveKnockBackAck;
-        class SetActiveMover;
-        class MoveNotActiveMover;
-        class MoveSetCollisionHeightAck;
-        class MoveTimeSkipped;
-        class SummonResponse;
-        class MoveSplineDone;
-    }
 
     namespace Query
     {
@@ -107,15 +91,6 @@ namespace WorldPackets
     namespace Quest
     {
         class QueryQuestInfo;
-    }
-
-    namespace Vehicle
-    {
-        class MoveDismissVehicle;
-        class RequestVehiclePrevSeat;
-        class RequestVehicleNextSeat;
-        class MoveChangeVehicleSeats;
-        class RequestVehicleSwitchSeat;
     }
 }
 
@@ -310,6 +285,9 @@ class TC_GAME_API WorldSession
         void ReadAddonsInfo(ByteBuffer& data);
         void SendAddonsInfo();
 
+        void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
+        void WriteMovementInfo(WorldPacket* data, MovementInfo* mi);
+
         void SendPacket(WorldPacket const* packet);
         void SendNotification(const char *format, ...) ATTR_PRINTF(2, 3);
         void SendNotification(uint32 string_id, ...);
@@ -462,8 +440,6 @@ class TC_GAME_API WorldSession
         uint32 GetLatency() const { return m_latency; }
         void SetLatency(uint32 latency) { m_latency = latency; }
         void ResetClientTimeDelay() { m_clientTimeDelay = 0; }
-        void SetClientTimeDelay(uint32 delay) { m_clientTimeDelay = delay; }
-        uint32 GetClientTimeDelay() const { return m_clientTimeDelay; }
 
         std::atomic<int32> m_timeOutTime;
 
@@ -517,8 +493,8 @@ class TC_GAME_API WorldSession
         void HandlePlayedTime(WorldPacket& recvPacket);
 
         // new
-        void HandleMovementFlagChangeAck(WorldPackets::Movement::MovementAckMessage& movementAck);
-        void HandleMovementFlagChangeToggleAck(WorldPackets::Movement::MovementToggleAckMessage& movementAck);
+        void HandleMoveUnRootAck(WorldPacket& recvPacket);
+        void HandleMoveRootAck(WorldPacket& recvPacket);
         void HandleLookingForGroup(WorldPacket& recvPacket);
 
         // new inspect
@@ -526,6 +502,11 @@ class TC_GAME_API WorldSession
 
         // new party stats
         void HandleInspectHonorStatsOpcode(WorldPacket& recvPacket);
+
+        void HandleMoveWaterWalkAck(WorldPacket& recvPacket);
+        void HandleFeatherFallAck(WorldPacket& recvData);
+
+        void HandleMoveHoverAck(WorldPacket& recvData);
 
         void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
 
@@ -537,11 +518,10 @@ class TC_GAME_API WorldSession
         void HandleRepairItemOpcode(WorldPacket& recvPacket);
 
         // Knockback
-        void HandleMoveKnockBackAck(WorldPackets::Movement::MoveKnockBackAck& movementAck);
+        void HandleMoveKnockBackAck(WorldPacket& recvPacket);
 
-        void HandleMoveTeleportAck(WorldPackets::Movement::MoveTeleportAck& packet);
-        void HandleForceSpeedChangeAck(WorldPackets::Movement::MovementSpeedAck& packet);
-        void HandleCollisionHeightChangeAck(WorldPackets::Movement::MoveSetCollisionHeightAck& setCollisionHeightAck);
+        void HandleMoveTeleportAck(WorldPacket& recvPacket);
+        void HandleForceSpeedChangeAck(WorldPacket& recvData);
 
         void HandlePingOpcode(WorldPacket& recvPacket);
         void HandleRepopRequestOpcode(WorldPacket& recvPacket);
@@ -606,20 +586,16 @@ class TC_GAME_API WorldSession
 
         void HandleGameObjectQueryOpcode(WorldPackets::Query::QueryGameObject& query);
 
-        void HandleMoveWorldportAckOpcode(WorldPackets::Movement::WorldPortResponse& packet);
+        void HandleMoveWorldportAckOpcode(WorldPacket& recvPacket);
         void HandleMoveWorldportAck();                // for server-side calls
 
-        void HandleMovementOpcodes(WorldPackets::Movement::ClientPlayerMovement& packet);
-        void HandleMovementOpcode(Opcodes opcode, MovementInfo& movementInfo, std::size_t reserve = 200);
-        void HandleSetActiveMoverOpcode(WorldPackets::Movement::SetActiveMover& packet);
-        void HandleMoveNotActiveMover(WorldPackets::Movement::MoveNotActiveMover& moveNotActiveMover);
-        void HandleDismissControlledVehicle(WorldPackets::Vehicle::MoveDismissVehicle& moveDismissVehicle);
+        void HandleMovementOpcodes(WorldPacket& recvPacket);
+        void HandleSetActiveMoverOpcode(WorldPacket& recvData);
+        void HandleMoveNotActiveMover(WorldPacket& recvData);
+        void HandleDismissControlledVehicle(WorldPacket& recvData);
         void HandleRequestVehicleExit(WorldPacket& recvData);
-        void HandleRequestVehiclePrevSeat(WorldPackets::Vehicle::RequestVehiclePrevSeat& requestVehiclePrevSeat);
-        void HandleRequestVehicleNextSeat(WorldPackets::Vehicle::RequestVehicleNextSeat& requestVehicleNextSeat);
-        void HandleMoveChangeVehicleSeats(WorldPackets::Vehicle::MoveChangeVehicleSeats& moveChangeVehicleSeats);
-        void HandleRequestVehicleSwitchSeat(WorldPackets::Vehicle::RequestVehicleSwitchSeat& requestVehicleSwitchSeat);
-        void HandleMoveTimeSkippedOpcode(WorldPackets::Movement::MoveTimeSkipped& moveTimeSkipped);
+        void HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData);
+        void HandleMoveTimeSkippedOpcode(WorldPacket& recvData);
 
         void HandleRequestRaidInfoOpcode(WorldPacket& recvData);
 
@@ -683,7 +659,7 @@ class TC_GAME_API WorldSession
         void HandleTaxiQueryAvailableNodes(WorldPacket& recvPacket);
         void HandleActivateTaxiOpcode(WorldPacket& recvPacket);
         void HandleActivateTaxiExpressOpcode(WorldPacket& recvPacket);
-        void HandleMoveSplineDoneOpcode(WorldPackets::Movement::MoveSplineDone& moveSplineDone);
+        void HandleMoveSplineDoneOpcode(WorldPacket& recvPacket);
         void SendActivateTaxiReply(ActivateTaxiReply reply);
 
         void HandleTabardVendorActivateOpcode(WorldPacket& recvPacket);
@@ -808,7 +784,7 @@ class TC_GAME_API WorldSession
         void HandleCorpseQueryOpcode(WorldPacket& recvPacket);
         void HandleCorpseMapPositionQuery(WorldPacket& recvPacket);
         void HandleResurrectResponseOpcode(WorldPacket& recvPacket);
-        void HandleSummonResponseOpcode(WorldPackets::Movement::SummonResponse& packet);
+        void HandleSummonResponseOpcode(WorldPacket& recvData);
 
         void HandleJoinChannel(WorldPacket& recvPacket);
         void HandleLeaveChannel(WorldPacket& recvPacket);
@@ -888,6 +864,7 @@ class TC_GAME_API WorldSession
         void HandleFarSightOpcode(WorldPacket& recvData);
         void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
         void HandleSetRaidDifficultyOpcode(WorldPacket& recvData);
+        void HandleMoveSetCanFlyAckOpcode(WorldPacket& recvData);
         void HandleSetTitleOpcode(WorldPacket& recvData);
         void HandleRealmSplitOpcode(WorldPacket& recvData);
         void HandleTimeSyncResp(WorldPacket& recvData);

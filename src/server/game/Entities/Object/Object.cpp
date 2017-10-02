@@ -30,7 +30,6 @@
 #include "Map.h"
 #include "MovementInfo.h"
 #include "MovementPacketBuilder.h"
-#include "MovementPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
@@ -332,7 +331,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     if (flags & UPDATEFLAG_LIVING)
     {
         ASSERT(unit);
-        *data << unit->GetMovementInfo();
+        unit->BuildMovementPacket(data);
 
         *data << unit->GetSpeed(MOVE_WALK)
               << unit->GetSpeed(MOVE_RUN)
@@ -345,7 +344,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
               << unit->GetSpeed(MOVE_PITCH_RATE);
 
         // 0x08000000
-        if (unit->GetMovementInfo().GetMovementFlags() & MOVEMENTFLAG_SPLINE_ENABLED)
+        if (unit->m_movementInfo.GetMovementFlags() & MOVEMENTFLAG_SPLINE_ENABLED)
             Movement::PacketBuilder::WriteCreate(*unit->movespline, *data);
     }
     else
@@ -968,7 +967,7 @@ bool Object::PrintIndexError(uint32 index, bool set) const
     return false;
 }
 
-void MovementInfo::OutDebug() const
+void MovementInfo::OutDebug()
 {
     TC_LOG_DEBUG("misc", "MOVEMENT INFO");
     TC_LOG_DEBUG("misc", "%s", guid.ToString().c_str());
@@ -1756,6 +1755,13 @@ void Object::ForceValuesUpdateAtIndex(uint32 i)
 {
     _changesMask.SetBit(i);
     AddToObjectUpdateIfNeeded();
+}
+
+void Unit::BuildHeartBeatMsg(WorldPacket* data) const
+{
+    data->Initialize(MSG_MOVE_HEARTBEAT, 32);
+    *data << GetPackGUID();
+    BuildMovementPacket(data);
 }
 
 void WorldObject::SendMessageToSet(WorldPacket const* data, bool self)
@@ -2546,69 +2552,6 @@ float WorldObject::GetFloorZ() const
     if (!IsInWorld())
         return m_staticFloorZ;
     return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ()));
-}
-
-void WorldObject::SetTransport(Transport* transport)
-{
-    if (transport)
-    {
-        m_movementInfo.transport.guid = transport->GetGUID();
-        // could it be possible to initialize the rest of the transport data (seat, time, offset) here?
-        AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-    }
-    else // if(!m_vehicle) ?
-    {
-        m_movementInfo.transport.Reset();
-        RemoveUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-    }
-
-    m_transport = transport;
-}
-
-MovementInfo WorldObject::GetMovementInfo() const
-{
-    MovementInfo mInfo;
-    mInfo.guid = GetGUID();
-    mInfo.SetMovementFlags(GetUnitMovementFlags());
-    mInfo.SetExtraMovementFlags(GetExtraUnitMovementFlags());
-    mInfo.time = m_movementInfo.time;
-    mInfo.pos.Relocate
-    (
-        GetPositionX(),
-        GetPositionY(),
-        ToUnit() != NULL ? ToUnit()->GetPositionZMinusOffset() : GetPositionZ(),
-        GetOrientation()
-    );
-
-    if (GetUnitMovementFlags() & MOVEMENTFLAG_ONTRANSPORT)
-    {
-        mInfo.transport.guid = GetTransGUID();
-        mInfo.transport.pos.Relocate(GetTransOffsetX(), GetTransOffsetY(), GetTransOffsetZ(), GetTransOffsetO());
-        mInfo.transport.time = GetTransTime();
-        mInfo.transport.seat = GetTransSeat();
-
-        if (GetExtraUnitMovementFlags() & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
-            mInfo.transport.time2 = m_movementInfo.transport.time2;
-    }
-
-    if ((GetUnitMovementFlags() & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING))
-        || (m_movementInfo.flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        mInfo.pitch = m_movementInfo.pitch;
-
-    mInfo.SetFallTime(m_movementInfo.fallTime);
-
-    if (GetUnitMovementFlags() & MOVEMENTFLAG_FALLING)
-    {
-        mInfo.jump.zspeed = m_movementInfo.jump.zspeed;
-        mInfo.jump.sinAngle = m_movementInfo.jump.sinAngle;
-        mInfo.jump.cosAngle = m_movementInfo.jump.cosAngle;
-        mInfo.jump.xyspeed = m_movementInfo.jump.xyspeed;
-    }
-
-    if (GetUnitMovementFlags() & MOVEMENTFLAG_SPLINE_ELEVATION)
-        mInfo.splineElevation = m_movementInfo.splineElevation;
-
-    return mInfo;
 }
 
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>&, uint32, float) const;

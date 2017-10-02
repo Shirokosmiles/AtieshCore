@@ -25,7 +25,6 @@
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "Item.h"
-#include "MovementPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -55,12 +54,8 @@ void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlag
         recvPacket >> hasMovementData;
         if (hasMovementData)
         {
-            uint32 opcode;
-            MovementInfo movementInfo;
-            recvPacket >> opcode;
-            recvPacket >> movementInfo.guid.ReadAsPacked();
-            recvPacket >> movementInfo;
-            HandleMovementOpcode(Opcodes(opcode), movementInfo);
+            recvPacket.SetOpcode(recvPacket.read<uint32>());
+            HandleMovementOpcodes(recvPacket);
         }
     }
 }
@@ -447,6 +442,16 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
         if (Spell* curSpell = _player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
             if (curSpell->m_spellInfo->Id == spellId)
                 _player->InterruptSpell(CURRENT_CHANNELED_SPELL);
+        return;
+    }
+
+    // prevent dismount from fly mounts under roots ( will freeze for all observers )
+    if (_player->IsMounted() && spellInfo->HasAura(SPELL_AURA_MOUNTED) && _player->ToUnit()->isInRoots() && _player->IsFlying())
+    {
+        _player->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
+        _player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT);
+
+        _player->ToUnit()->SetNeedToDismountAfterRoots();
         return;
     }
 
