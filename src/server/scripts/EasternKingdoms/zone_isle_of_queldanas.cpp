@@ -19,7 +19,7 @@
 /* ScriptData
 SDName: Isle_of_Queldanas
 SD%Complete: 100
-SDComment: Quest support: 11541,24535,24563
+SDComment: Quest support: 11541,24535,24563,24553,24564
 SDCategory: Isle Of Quel'Danas
 EndScriptData */
 
@@ -28,6 +28,8 @@ npc_greengill_slave
 npc_thalorien_dawnseeker
 EndContentData */
 
+#include "GameObject.h"
+#include "GameObjectAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
@@ -222,7 +224,7 @@ public:
             return true;
         }
 
-        void Reset()
+        void Reset() override
         {
             if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayer))
                 player->SetPhaseMask(1, true);
@@ -389,7 +391,7 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_THALORIEN_DAWNSEEKER)
             {
@@ -423,9 +425,365 @@ public:
         ObjectGuid uiMorlen;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_thalorien_dawnseekerAI(creature);
+    }
+};
+
+enum SaysQueldelar
+{
+    SAY_QUELDELAR_1 = 11,  // Damas y Caballeros, les presento a $N, portador de Quel'Delar.
+    SAY_QUELDELAR_2 = 0,  // Is it true that this is Quel\'Delar?
+    SAY_QUELDELAR_3 = 1,  // We will see.
+    SAY_QUELDELAR_4 = 2,  // Look Lor\'themar! It is Quel\'Delar without a doubt.
+    SAY_QUELDELAR_5 = 3,  // So be it. You have my thanks, $N, for returning Quel\'Delar to its rightful owners
+    SAY_QUELDELAR_6 = 4,  // What means this treason?
+    SAY_QUELDELAR_7 = 5,  // Drop the weapon and surrender, traitor.
+    SAY_QUELDELAR_8 = 6,  // This is not my fault, Rommath. It is not a treason.
+    SAY_QUELDELAR_9 = 7,  // Remove your men. The stupidity of Lor\'themar himself caused his wounds. Quel\'Delar is not chosen, it chooses it\'s master.
+    SAY_QUELDELAR_10 = 8,  // Guards, return to your posts
+    SAY_QUELDELAR_11 = 9,  // You will have what you seek, $N. Take the sword and leave. And your Auric, be careful what you say in this sacred place.
+    SAY_QUELDELAR_12 = 10,  // Take the sword through this portal into Dalaran, $N. You have done what many quel\'dorei have dreamed for years. At last Quel\'Delar is restored.
+};
+
+enum QuelDelarEvents
+{
+    EVENT_QUEST_STEP_1 = 1,
+    EVENT_QUEST_STEP_2 = 2,
+    EVENT_QUEST_STEP_3 = 3,
+    EVENT_QUEST_STEP_4 = 4,
+    EVENT_QUEST_STEP_5 = 5,
+    EVENT_QUEST_STEP_6 = 6,
+    EVENT_QUEST_STEP_7 = 7,
+    EVENT_QUEST_STEP_8 = 8,
+    EVENT_QUEST_STEP_9 = 9,
+    EVENT_QUEST_STEP_10 = 10,
+    EVENT_QUEST_STEP_11 = 11,
+    EVENT_QUEST_STEP_12 = 12,
+    EVENT_QUEST_STEP_13 = 13,
+    EVENT_QUEST_STEP_14 = 14,
+    EVENT_QUEST_STEP_15 = 15,
+    EVENT_QUEST_STEP_16 = 16
+};
+
+enum QuelDelarActions
+{
+    ACTION_START_EVENT = 1
+};
+
+enum QuelDelarCreatures
+{
+    NPC_ROMMATH = 37763,
+    NPC_THERON = 37764,
+    NPC_AURIC = 37765,
+    NPC_QUEL_GUARD = 37781,
+    NPC_CASTER_BUNNY = 37746
+};
+
+enum QuelDelarGameobjects
+{
+    GO_QUEL_DANAR = 201794
+};
+
+enum QuelDelarMisc
+{
+    ITEM_TAINTED_QUELDANAR_1 = 49879,
+    ITEM_TAINTED_QUELDANAR_2 = 49889,
+    SPELL_WRATH_QUEL_DANAR = 70493,
+    SPELL_ICY_PRISON = 70540
+};
+
+/*######
+## npc_queldelar_sunwell_plateau
+######*/
+class item_tainted_queldelar : public ItemScript
+{
+public:
+    item_tainted_queldelar() : ItemScript("item_tainted_queldelar") { }
+    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/)
+    {
+        InstanceScript *instance = player->GetInstanceScript();
+        if (instance && player->FindNearestCreature(NPC_CASTER_BUNNY, 20.0f, true))
+        {
+
+            if (Creature *introducer = player->FindNearestCreature(NPC_CASTER_BUNNY, 20.0f, true))
+            {
+                introducer->Kill(player->FindNearestCreature(NPC_CASTER_BUNNY, 20.0f, true));
+            }
+            return true;
+        }
+
+        else
+            return false;
+    }
+};
+
+class npc_queldelar_sunwell_plateau : public CreatureScript
+{
+public:
+    npc_queldelar_sunwell_plateau() : CreatureScript("npc_queldelar_sunwell_plateau") { }
+
+    struct npc_queldelar_sunwell_plateauAI : public ScriptedAI
+    {
+        npc_queldelar_sunwell_plateauAI(Creature* creature) : ScriptedAI(creature) { }
+        int i = 0;
+        void MoveInLineOfSight(Unit * who) override
+        {
+            if (!who)
+                return;
+
+            if (who && me->IsWithinDistInMap(who, 150.0f) && me->FindNearestCreature(NPC_CASTER_BUNNY, 200.0f, false) && i == 0)
+            {
+                DoAction(ACTION_START_EVENT);
+                i = 1;
+                return;
+            }
+        }
+
+        void Reset() override
+        {
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            events.Reset();
+        }
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+            case ACTION_START_EVENT:
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                events.ScheduleEvent(EVENT_QUEST_STEP_1, 0);
+                break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            switch (events.ExecuteEvent())
+            {
+            case EVENT_QUEST_STEP_1:
+                me->Yell(SAY_QUELDELAR_1);
+                if (Creature* rommath = me->FindNearestCreature(NPC_ROMMATH, 100.0f, true))  // Rommath
+                    uiRommath = rommath->GetGUID();
+
+                if (Creature* theron = me->FindNearestCreature(NPC_THERON, 100.0f, true))    // Lor'Themar Theron
+                    uiTheron = theron->GetGUID();
+
+                if (Creature* auric = me->FindNearestCreature(NPC_AURIC, 100.0f, true))      // Auric
+                    uiAuric = auric->GetGUID();
+
+                if (GameObject* quelDelar = me->SummonGameObject(GO_QUEL_DANAR, 1683.99f, 620.231f, 29.3599f, 0.410932f, QuaternionData(), 0))
+                {
+                    uiQuelDelar = quelDelar->GetGUID();
+                    quelDelar->SetFlag(GAMEOBJECT_FLAGS, 5);
+                }
+
+                if (Player* player = me->SelectNearestPlayer(200.0f))
+                {
+                    player->DestroyItemCount(ITEM_TAINTED_QUELDANAR_1, 1, true);
+                    player->DestroyItemCount(ITEM_TAINTED_QUELDANAR_2, 1, true);
+                }
+                events.ScheduleEvent(EVENT_QUEST_STEP_2, 2 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_2:
+                if (Creature* guard = me->FindNearestCreature(NPC_QUEL_GUARD, 100.0f, true))
+                    guard->AI()->Talk(SAY_QUELDELAR_2);
+                events.ScheduleEvent(EVENT_QUEST_STEP_3, 1 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_3:
+                if (Creature* theron = ObjectAccessor::GetCreature(*me, uiTheron))
+                    theron->AI()->Talk(SAY_QUELDELAR_3);
+                events.ScheduleEvent(EVENT_QUEST_STEP_4, 4 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_4:
+                if (Creature* rommath = ObjectAccessor::GetCreature(*me, uiRommath))
+                    rommath->GetMotionMaster()->MovePoint(1, 1675.8f, 617.19f, 28.0504f);
+                if (Creature*auric = ObjectAccessor::GetCreature(*me, uiAuric))
+                    auric->GetMotionMaster()->MovePoint(1, 1681.77f, 612.084f, 28.4409f);
+                events.ScheduleEvent(EVENT_QUEST_STEP_5, 6 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_5:
+                if (Creature* rommath = ObjectAccessor::GetCreature(*me, uiRommath))
+                {
+                    rommath->SetOrientation(0.3308f);
+                    rommath->AI()->Talk(SAY_QUELDELAR_4);
+                }
+                if (Creature* auric = ObjectAccessor::GetCreature(*me, uiAuric))
+                    auric->SetOrientation(1.29057f);
+                if (Creature* theron = ObjectAccessor::GetCreature(*me, uiTheron))
+                    theron->GetMotionMaster()->MovePoint(1, 1677.07f, 613.122f, 28.0504f);
+                events.ScheduleEvent(EVENT_QUEST_STEP_6, 10 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_6:
+                if (Creature* theron = ObjectAccessor::GetCreature(*me, uiTheron))
+                {
+                    theron->AI()->Talk(SAY_QUELDELAR_5);
+                    theron->GetMotionMaster()->MovePoint(1, 1682.3f, 618.459f, 27.9581f);
+                }
+                events.ScheduleEvent(EVENT_QUEST_STEP_7, 4 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_7:
+                if (Creature* theron = ObjectAccessor::GetCreature(*me, uiTheron))
+                    theron->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                events.ScheduleEvent(EVENT_QUEST_STEP_8, 0.8 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_8:
+                if (Creature* theron = ObjectAccessor::GetCreature(*me, uiTheron))
+                    theron->CastSpell(theron, SPELL_WRATH_QUEL_DANAR, true);
+                events.ScheduleEvent(EVENT_QUEST_STEP_9, 1 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_9:
+                if (Creature* rommath = ObjectAccessor::GetCreature(*me, uiRommath))
+                {
+                    if (Player* player = me->SelectNearestPlayer(200.0f))
+                        rommath->AddAura(SPELL_ICY_PRISON, player);
+                    rommath->AI()->Talk(SAY_QUELDELAR_6);
+                }
+                if (Creature* guard = me->FindNearestCreature(NPC_QUEL_GUARD, 200.0f))
+                {
+                    guard->GetMotionMaster()->MovePoint(0, 1681.1f, 614.955f, 28.4983f);
+                    guard->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+                }
+                events.ScheduleEvent(EVENT_QUEST_STEP_10, 3 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_10:
+                if (Creature* guard = me->FindNearestCreature(NPC_QUEL_GUARD, 200.0f))
+                    guard->AI()->Talk(SAY_QUELDELAR_7);
+                events.ScheduleEvent(EVENT_QUEST_STEP_11, 2 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_11:
+                if (Creature* auric = ObjectAccessor::GetCreature(*me, uiAuric))
+                    auric->AI()->Talk(SAY_QUELDELAR_8);
+                events.ScheduleEvent(EVENT_QUEST_STEP_12, 6 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_12:
+                if (Creature* auric = ObjectAccessor::GetCreature(*me, uiAuric))
+                    auric->AI()->Talk(SAY_QUELDELAR_9);
+                events.ScheduleEvent(EVENT_QUEST_STEP_13, 5 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_13:
+                if (Creature* rommath = ObjectAccessor::GetCreature(*me, uiRommath))
+                    rommath->AI()->Talk(SAY_QUELDELAR_10);
+                events.ScheduleEvent(EVENT_QUEST_STEP_14, 2 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_14:
+                if (Creature* guard = me->FindNearestCreature(NPC_QUEL_GUARD, 200.0f))
+                {
+                    guard->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
+                    guard->GetMotionMaster()->MovePoint(0, guard->GetHomePosition());
+                }
+                if (Creature* rommath = ObjectAccessor::GetCreature(*me, uiRommath))
+                {
+                    rommath->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                    rommath->AI()->Talk(SAY_QUELDELAR_11);
+                }
+                events.ScheduleEvent(EVENT_QUEST_STEP_15, 7 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_15:
+                if (Creature* auric = ObjectAccessor::GetCreature(*me, uiAuric))
+                {
+                    auric->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                    auric->AI()->Talk(SAY_QUELDELAR_12);
+                    if (GameObject* quelDelar = me->FindNearestGameObject(GO_QUEL_DANAR, 100.0f))
+                        quelDelar->RemoveFlag(GAMEOBJECT_FLAGS, 5);
+                }
+                events.ScheduleEvent(EVENT_QUEST_STEP_16, 2 * IN_MILLISECONDS);
+                break;
+            case EVENT_QUEST_STEP_16:
+                if (Creature* auric = ObjectAccessor::GetCreature(*me, uiAuric))
+                    auric->GetMotionMaster()->MovePoint(0, auric->GetHomePosition());
+                if (Creature* rommath = ObjectAccessor::GetCreature(*me, uiRommath))
+                    rommath->GetMotionMaster()->MovePoint(0, rommath->GetHomePosition());
+                if (Creature* theron = ObjectAccessor::GetCreature(*me, uiTheron))
+                    theron->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+                break;
+            default:
+                break;
+            }
+        }
+    private:
+        EventMap events;
+        ObjectGuid uiRommath;
+        ObjectGuid uiTheron;
+        ObjectGuid uiAuric;
+        ObjectGuid uiQuelDelar;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_queldelar_sunwell_plateauAI(creature);
+    }
+};
+
+class npc_sunwell_warder : public CreatureScript
+{
+public:
+    npc_sunwell_warder() : CreatureScript("npc_sunwell_warder") { }
+
+    struct npc_sunwell_warderAI : public ScriptedAI
+    {
+        npc_sunwell_warderAI(Creature* creature) : ScriptedAI(creature) { }
+
+        bool GossipHello(Player* player) override
+        {
+            player->PrepareGossipMenu(me, 0);
+            if (player->HasItemCount(49879, 1) || player->HasItemCount(49889, 1))
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Take me to the Sunwell", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->SendPreparedGossip(me);
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*uiSender*/, uint32 gossipListId) override
+        {
+            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
+            player->PlayerTalkClass->ClearMenus();
+            switch (action)
+            {
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                CloseGossipMenuFor(player);
+                player->SetCanEnterInInstanceOrRaidCustom(true);
+                player->TeleportTo(580, 1728.5f, 709.219f, 71.1905f, 2.78676f);
+                player->SetPhaseMask(2, true);
+                break;
+            default:
+                return false; // nothing defined -> trinity core handling
+            }
+            return true; // no default handling -> prevent trinity core handling
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_sunwell_warderAI(creature);
+    }
+};
+
+class go_dalaran_portal_sunwell : public GameObjectScript
+{
+public:
+    go_dalaran_portal_sunwell() : GameObjectScript("go_dalaran_portal_sunwell") {}
+
+    struct go_dalaran_portal_sunwellAI : public GameObjectAI
+    {
+        go_dalaran_portal_sunwellAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipHello(Player* player) override
+        {
+            player->PrepareGossipMenu(me, 0);
+            player->SetCanEnterInInstanceOrRaidCustom(false);
+            player->TeleportTo(571, 5804.149902f, 624.770996f, 647.767029f, 1.640000f);
+            player->SetPhaseMask(1, true);
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_dalaran_portal_sunwellAI(go);
     }
 };
 
@@ -433,4 +791,8 @@ void AddSC_isle_of_queldanas()
 {
     new npc_greengill_slave();
     new npc_thalorien_dawnseeker();
+    new go_dalaran_portal_sunwell();
+    new npc_sunwell_warder();
+    new npc_queldelar_sunwell_plateau();
+    new item_tainted_queldelar();
 }

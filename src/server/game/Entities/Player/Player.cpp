@@ -210,6 +210,8 @@ Player::Player(WorldSession* session): Unit(true)
 
     m_needsZoneUpdate = false;
 
+    m_customAccessInZone = false;
+
     m_nextSave = sWorld->getIntConfig(CONFIG_INTERVAL_SAVE);
 
     memset(m_items, 0, sizeof(Item*)*PLAYER_SLOTS_COUNT);
@@ -19022,8 +19024,13 @@ bool Player::CheckInstanceValidity(bool /*isLogin*/)
 
     // raid instances require the player to be in a raid group to be valid
     if (map->IsRaid() && !sWorld->getBoolConfig(CONFIG_INSTANCE_IGNORE_RAID))
+    {
+        if (map->GetId() == 580 && CanEnterInInstanceOrRaidCustom())
+            return true;
+
         if (!GetGroup() || !GetGroup()->isRaidGroup())
             return false;
+    }
 
     if (Group* group = GetGroup())
     {

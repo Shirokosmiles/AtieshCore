@@ -985,6 +985,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         void InitStatsForLevel(bool reapplyMods = false);
 
+        bool CanEnterInInstanceOrRaidCustom() const { return m_customAccessInZone; }
+        void SetCanEnterInInstanceOrRaidCustom(bool access) { m_customAccessInZone = access; }
+
         // .cheat command related
         bool GetCommandStatus(uint32 command) const { return (_activeCheats & command) != 0; }
         void SetCommandStatusOn(uint32 command) { _activeCheats |= command; }
@@ -2417,6 +2420,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 m_fishingSteps;
 
         bool m_needsZoneUpdate;
+
+        //custom quests in instance or in raid zone by solo
+        bool m_customAccessInZone;
 
     private:
         // internal common parts for CanStore/StoreItem functions
