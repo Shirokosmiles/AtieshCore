@@ -367,6 +367,7 @@ Unit::Unit(bool isWorldObject) :
 
     m_cleanupDone = false;
     m_duringRemoveFromWorld = false;
+    needtodismount = false;
 
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
 
@@ -14982,7 +14983,7 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         if (ping < 60.0f)
             ping = 60.0f;
         float speed = GetSpeed(MOVE_RUN);
-        if (IsFlying())
+        if (IsFlying() || GetPlayerMovingMe()->CanFly())
             speed = GetSpeed(MOVE_FLIGHT);
         float delay = (getMSTime() - movementInfo.time) / 10000000000 + (ping * 0.001f);
         float difftime = (movetime - time) * 0.001f + delay;
