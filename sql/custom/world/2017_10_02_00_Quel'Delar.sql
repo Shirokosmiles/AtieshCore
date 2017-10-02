@@ -5,8 +5,8 @@ DELETE FROM `creature_template_addon` WHERE (`entry`=@ENTRY);
 INSERT INTO `creature_template_addon` (`entry`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`) VALUES 
 (@ENTRY, 0, 0, 0, 0, 0, '25824 31261');
 
-DELETE FROM `gossip_menu_option` WHERE `menu_id`= @ENTRY;
-INSERT INTO `gossip_menu_option` (`menu_id`,`id`,`option_icon`,`option_text`,`OptionBroadcastTextID`,`option_id`,`npc_option_npcflag`,`action_menu_id`,`action_poi_id`,`box_coded`,`box_money`,`box_text`,`BoxBroadcastTextID`) VALUES
+DELETE FROM `gossip_menu_option` WHERE `MenuID`= @ENTRY;
+INSERT INTO `gossip_menu_option` (`MenuID`,`OptionID`,`OptionIcon`,`OptionText`,`OptionBroadcastTextID`,`OptionType`,`OptionNpcFlag`,`ActionMenuID`,`ActionPoiID`,`BoxCoded`,`BoxMoney`,`BoxText`,`BoxBroadcastTextID`) VALUES
 (@ENTRY,0,0,'Examine the remains.',37149,1,1,0,0,0,0,'',0);
 
 UPDATE `creature_template` SET `ScriptName`="npc_thalorien_dawnseeker" WHERE `entry`=@ENTRY;
@@ -24,8 +24,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,3,0,0,0,100,0,1000,1000,8000,8000,11,57846,2,0,0,0,0,2,0,0,0,0,0,0,0,"Thalorien Dawnseeker - In Combat - Cast 'Heroic Strike'");
 
 -- Thalorien Dawnseeker Text
-DELETE FROM `creature_text` WHERE `entry`=@ENTRY;
-INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`BroadcastTextId`,`comment`) VALUES 
+DELETE FROM `creature_text` WHERE `CreatureID`=@ENTRY;
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`comment`) VALUES 
 (@ENTRY, 0, 0, 'We must defend the Sunwell from the enemy at all costs.', 12, 0, 100, 0, 0, 16769, 37154, 'Thalorien Dawnseeker'),
 (@ENTRY, 1, 0, 'I am ordering you to withdraw to the Sunwell proper to help prepare the defenses.', 12, 0, 100, 0, 0, 16770, 37155, 'Thalorien Dawnseeker'),
 (@ENTRY, 2, 0, 'I will make my stand here and buy you as much time as I am able. Use it well and make our prince proud.', 12, 0, 100, 0, 0, 16771, 37156, 'Thalorien Dawnseeker'),
@@ -46,8 +46,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,0,0,0,0,100,0,2000,3000,9000,10000,11,50688,0,0,0,0,0,2,0,0,0,0,0,0,0,"Morlen Coldgrip - In Combat - Cast 'Plague Strike' (Dungeon & Raid)");
 
 -- Morlen Coldgrip Text
-DELETE FROM `creature_text` WHERE `entry`=@ENTRY;
-INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`BroadcastTextId`,`comment`) VALUES 
+DELETE FROM `creature_text` WHERE `CreatureID`=@ENTRY;
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`comment`) VALUES 
 (@ENTRY, 0, 0, 'You will fall as your lands and your city have before you. My lord will a great victory here, and none will remember you name!', 14, 0, 100, 0, 0, 0, 37160, 'Morlen Coldgrip'),
 (@ENTRY, 1, 0, 'Forward!', 14, 0, 100, 0, 0, 0, 37162, 'Morlen Coldgrip'),
 (@ENTRY, 2, 0, 'Ghouls, slay this patheric high elf!', 14, 0, 100, 0, 0, 0, 37301, 'Morlen Coldgrip'),
