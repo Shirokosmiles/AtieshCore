@@ -267,6 +267,8 @@ Player::Player(WorldSession* session): Unit(true)
     m_flyhackTimer = 0;
     if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FLYHACK_ENABLED))
         m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
+    m_mountTimer = 0;
+    m_ACKmounted = false;
     m_deathTimer = 0;
     m_deathExpireTime = 0;
     m_skipOnePacketForASH = false;
@@ -1292,6 +1294,17 @@ void Player::Update(uint32 p_time)
         }
         else
             m_flyhackTimer -= p_time;
+    }
+
+    if (m_ACKmounted && m_mountTimer > 0)
+    {
+        if (p_time >= m_mountTimer)
+        {
+            m_mountTimer = 0;
+            m_ACKmounted = false;
+        }
+        else
+            m_mountTimer -= p_time;
     }
 
     if (m_timeSyncTimer > 0)
@@ -23953,6 +23966,12 @@ void Player::SetVanishTimer()
 {
     m_vanishTimer = sWorld->getIntConfig(CONFIG_VANISH_VISION_TIMER);
     m_visiblevanish = true;
+}
+
+void Player::SetUnderACKmount()
+{
+    m_mountTimer = 3000;
+    m_ACKmounted = true;
 }
 
 uint32 Player::GetCorpseReclaimDelay(bool pvp) const

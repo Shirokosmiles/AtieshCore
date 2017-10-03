@@ -1812,6 +1812,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool UnderVisibleVanish() const { return m_visiblevanish; }
         void SetVanishTimer();
 
+        bool UnderACKmount() const { return m_ACKmounted; }
+        void SetUnderACKmount();
+
         uint32 GetDeathTimer() const { return m_deathTimer; }
         uint32 GetCorpseReclaimDelay(bool pvp) const;
         void UpdateCorpseReclaimDelay();
@@ -2374,6 +2377,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         uint32 m_vanishTimer;
         uint32 m_flyhackTimer;
+        uint32 m_mountTimer;
+        bool   m_ACKmounted;
 
         uint32 m_deathTimer;
         time_t m_deathExpireTime;

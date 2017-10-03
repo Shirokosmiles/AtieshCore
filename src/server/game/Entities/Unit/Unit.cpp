@@ -8656,6 +8656,8 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
         data << uint32(GameTime::GetGameTime());   // Packet counter
         data << player->GetCollisionHeight(true);
         player->SendDirectMessage(&data);
+
+        player->SetUnderACKmount();
     }
 
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOUNT);
@@ -8713,6 +8715,8 @@ void Unit::Dismount()
         if (Unit* charm = player->GetCharm())
             if (charm->GetTypeId() == TYPEID_UNIT && charm->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED) && !charm->HasUnitState(UNIT_STATE_STUNNED))
                 charm->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+
+        player->SetUnderACKmount();
     }
 }
 
@@ -14973,6 +14977,9 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
             }
         }
         else
+            return true;
+
+        if (GetPlayerMovingMe()->UnderACKmount())
             return true;
 
         Position npos = movementInfo.pos;
