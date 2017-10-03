@@ -26818,7 +26818,7 @@ bool Player::CheckOnFlyHack()
         if (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
         {
             float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ() + 1.8f, true); // smart flyhacks -> SimpleFly
-            if (npos.GetPositionZ() - z > 2.8f)
+            if (npos.GetPositionZ() - z > 4.8f)
                 if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), z))
                 {
                     TC_LOG_ERROR("server", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
