@@ -379,6 +379,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
     else if (plrMover && plrMover->GetTransport())                // if we were on a transport, leave
     {
+        plrMover->SetSkipOnePacketForASH(true);
         plrMover->GetTransport()->RemovePassenger(plrMover);
         if (crMover && crMover->GetTransport() && crMover->GetTransport()->isPassenger(crMover))
             crMover->GetTransport()->RemovePassenger(crMover);
