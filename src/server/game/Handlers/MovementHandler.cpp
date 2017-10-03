@@ -526,6 +526,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
             return;
     }
 
+    _player->SetUnderACKmount();
     // skip all forced speed changes except last and unexpected
     // in run/mounted case used one ACK and it must be skipped.m_forced_speed_changes[MOVE_RUN} store both.
     if (_player->m_forced_speed_changes[force_move_type] > 0)

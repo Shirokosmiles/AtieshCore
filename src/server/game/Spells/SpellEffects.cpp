@@ -4642,6 +4642,9 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             m_caster->GetMotionMaster()->MoveCharge(*m_preGeneratedPath, speed);
 
         m_caster->AddUnitState(UNIT_STATE_CHARGING);
+
+        if (m_caster->ToPlayer())
+            m_caster->ToPlayer()->SetUnderACKmount();
     }
 
     if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
