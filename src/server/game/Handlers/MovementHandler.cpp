@@ -325,6 +325,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // We were teleported, skip packets that were broadcast before teleport
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
         {
+            if (plrMover)
+                plrMover->UpdateMovementInfo(movementInfo);
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
@@ -333,6 +335,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
         if (fabs(movementInfo.transport.pos.GetPositionX()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionY()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionZ()) > 75.0f)
         {
+            if (plrMover)
+                plrMover->UpdateMovementInfo(movementInfo);
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
@@ -340,6 +344,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         if (!Trinity::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
             movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
         {
+            if (plrMover)
+                plrMover->UpdateMovementInfo(movementInfo);
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
@@ -379,7 +385,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
     else if (plrMover && plrMover->GetTransport())                // if we were on a transport, leave
     {
-        plrMover->SetSkipOnePacketForASH(true);
+        plrMover->SetUnderACKmount(); // just for safe
         plrMover->GetTransport()->RemovePassenger(plrMover);
         if (crMover && crMover->GetTransport() && crMover->GetTransport()->isPassenger(crMover))
             crMover->GetTransport()->RemovePassenger(crMover);
