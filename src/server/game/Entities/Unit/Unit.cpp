@@ -14955,7 +14955,7 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
     float time = GetLastMoveClientTimestamp();
     if (time)
     {
-        if (IsFlying() || IsFalling() || IsInFlight())
+        if (IsFalling() || IsInFlight())
             return true;
 
         if (GetTransport())
