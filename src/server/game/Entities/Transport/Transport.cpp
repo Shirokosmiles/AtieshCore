@@ -261,7 +261,10 @@ void Transport::AddPassenger(WorldObject* passenger)
         TC_LOG_DEBUG("entities.transport", "Object %s boarded transport %s.", passenger->GetName().c_str(), GetName().c_str());
 
         if (Player* plr = passenger->ToPlayer())
+        {
+            plr->SetUnderACKmount();
             sScriptMgr->OnAddPassenger(this, plr);
+        }
 
         if (Creature* crt = passenger->ToCreature()) // reg pet or totem on transport
         {
@@ -317,6 +320,7 @@ void Transport::RemovePassenger(WorldObject* passenger)
         {
             sScriptMgr->OnRemovePassenger(this, plr);
             plr->SetFallInformation(0, plr->GetPositionZ());
+            plr->SetUnderACKmount();
         }
 
         if (Creature* crt = passenger->ToCreature())
