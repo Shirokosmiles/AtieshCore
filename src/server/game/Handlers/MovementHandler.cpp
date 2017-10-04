@@ -326,7 +326,10 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
         {
             if (plrMover)
+            {
+                plrMover->SetSkipOnePacketForASH(true);
                 plrMover->UpdateMovementInfo(movementInfo);
+            }
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
@@ -336,7 +339,10 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         if (fabs(movementInfo.transport.pos.GetPositionX()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionY()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionZ()) > 75.0f)
         {
             if (plrMover)
+            {
+                plrMover->SetSkipOnePacketForASH(true);
                 plrMover->UpdateMovementInfo(movementInfo);
+            }
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
@@ -345,7 +351,10 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
         {
             if (plrMover)
+            {
+                plrMover->SetSkipOnePacketForASH(true);
                 plrMover->UpdateMovementInfo(movementInfo);
+            }
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
@@ -364,6 +373,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             }
             else if (plrMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
             {
+                plrMover->SetSkipOnePacketForASH(true);
                 plrMover->GetTransport()->RemovePassenger(plrMover);
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
                 {
