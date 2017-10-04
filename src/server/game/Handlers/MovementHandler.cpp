@@ -315,6 +315,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (!movementInfo.pos.IsPositionValid())
     {
+        if (plrMover)
+        {
+            plrMover->SetSkipOnePacketForASH(true);
+            plrMover->UpdateMovementInfo(movementInfo);
+        }
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
