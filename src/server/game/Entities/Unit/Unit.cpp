@@ -4142,6 +4142,11 @@ void Unit::RemoveAurasDueToItemSpell(uint32 spellId, ObjectGuid castItemGuid)
     {
         if (iter->second->GetBase()->GetCastItemGUID() == castItemGuid)
         {
+            if (SpellInfo const* spellInfo = iter->second->GetBase()->GetSpellInfo())
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                    if (uint32 triggeredSpellId = spellInfo->Effects[i].TriggerSpell)
+                        RemoveAurasDueToSpell(triggeredSpellId);
+
             RemoveAura(iter);
             iter = m_appliedAuras.lower_bound(spellId);
         }
