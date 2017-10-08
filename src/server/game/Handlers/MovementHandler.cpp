@@ -286,10 +286,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     uint16 opcode = recvData.GetOpcode();
 
     Unit* mover = _player->GetUnitBeingMoved();
-    Player* plrMover = mover->ToPlayer();
-    Creature* crMover = mover->ToCreature();
-
     ASSERT(mover != nullptr);                      // there must always be a mover
+
+    Player* plrMover = mover->ToPlayer();
+    Creature* crMover = nullptr;
+    if (plrMover)
+        Creature* crMover = plrMover->GetPet();    
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (plrMover && plrMover->IsBeingTeleported())
