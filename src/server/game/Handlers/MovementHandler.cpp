@@ -291,7 +291,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     Player* plrMover = mover->ToPlayer();
     Creature* crMover = nullptr;
     if (plrMover)
-        Creature* crMover = plrMover->GetPet();    
+        crMover = plrMover->GetPet();    
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (plrMover && plrMover->IsBeingTeleported())
