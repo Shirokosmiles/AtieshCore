@@ -32,8 +32,6 @@
 #include "WorldPacket.h"
 #include "CombatAI.h"
 #include "log.h"
-#include "Transport.h"
-#include "TransportMgr.h"
 
 static BossBoundaryData const boundaries =
 {
@@ -1274,10 +1272,41 @@ public:
     }
 };
 
+class go_mimiron_activate_tram : public GameObjectScript
+{
+public:
+    go_mimiron_activate_tram() : GameObjectScript("go_mimiron_activate_tram") { }
+
+    struct go_mimiron_activate_tramAI : public GameObjectAI
+    {
+        go_mimiron_activate_tramAI(GameObject* go) : GameObjectAI(go), instance(go->GetInstanceScript()) { }
+
+        InstanceScript* instance;
+
+        bool OnGossipHello(Player* /*player*/, GameObject* go)
+        {
+            InstanceScript* instance = go->GetInstanceScript();
+            if (!instance)
+                return false;
+
+            if (GameObject* tram = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(DATA_MIMIRON_TRAM)))
+                tram->SetGoState(GO_STATE_ACTIVE);
+
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return GetUlduarAI<go_mimiron_activate_tramAI>(go);
+    }
+};
+
 void AddSC_instance_ulduar()
 {
     new instance_ulduar();
     new spell_ulduar_teleporter();
     new npc_steelforged_defender();
     new go_transport_to_mimiron();
+    new go_mimiron_activate_tram();
 }
