@@ -293,6 +293,12 @@ public:
             cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
             zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMap);
 
+        if (Player* plr = object->ToPlayer())
+        {
+            handler->PSendSysMessage(LANG_TRANSOFFSET_POSITION,
+                plr->GetTransOffsetX(), plr->GetTransOffsetY(), plr->GetTransOffsetZ(), plr->GetTransOffsetO());
+        }
+
         LiquidData liquidStatus;
         ZLiquidStatus status = map->GetLiquidStatus(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), MAP_ALL_LIQUIDS, &liquidStatus);
 

@@ -19,6 +19,7 @@
 #include "AreaBoundary.h"
 #include "CreatureAI.h"
 #include "GameObject.h"
+#include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "Item.h"
 #include "Map.h"
@@ -30,6 +31,9 @@
 #include "Vehicle.h"
 #include "WorldPacket.h"
 #include "CombatAI.h"
+#include "log.h"
+#include "Transport.h"
+#include "TransportMgr.h"
 
 static BossBoundaryData const boundaries =
 {
@@ -1234,9 +1238,46 @@ public:
     };
 };
 
+//go_transport_to_mimiron
+class go_transport_to_mimiron : public GameObjectScript
+{
+public:
+    go_transport_to_mimiron() : GameObjectScript("go_transport_to_mimiron") { }
+
+    struct go_transport_to_mimironAI : public GameObjectAI
+    {
+        go_transport_to_mimironAI(GameObject* go) : GameObjectAI(go), instance(go->GetInstanceScript())
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {            
+            TC_LOG_ERROR("server", "go_transport_to_mimiron : initialized");
+            if (me->GetTransport())
+                TC_LOG_ERROR("server", "go_transport_to_mimiron : initialized Gettransport yes");
+        }
+
+        void Reset() override
+        {
+            Initialize();
+        }
+
+    protected:
+        InstanceScript* instance;
+        ObjectGuid GunshipGUID;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_transport_to_mimironAI(go);
+    }
+};
+
 void AddSC_instance_ulduar()
 {
     new instance_ulduar();
     new spell_ulduar_teleporter();
     new npc_steelforged_defender();
+    new go_transport_to_mimiron();
 }

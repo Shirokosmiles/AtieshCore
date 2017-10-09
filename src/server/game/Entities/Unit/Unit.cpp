@@ -14970,6 +14970,9 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         if (GetTransport())
             return true;
 
+        if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+            return true;
+
         if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
             return true;
 
