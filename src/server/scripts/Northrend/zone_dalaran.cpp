@@ -167,8 +167,9 @@ class npc_minigob_manabonk : public CreatureScript
 
             void Reset() override
             {
+                playerGuid = ObjectGuid();
                 me->SetVisible(false);
-                events.ScheduleEvent(EVENT_SELECT_TARGET, IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_SELECT_TARGET, Seconds(1));
             }
 
             void GetPlayersInDalaran(std::vector<Player*>& playerList) const
@@ -214,50 +215,49 @@ class npc_minigob_manabonk : public CreatureScript
                                 me->AddObjectToRemoveList();
 
                             me->SetVisible(true);
-                            DoCast(me, SPELL_TELEPORT_VISUAL);
+                            DoCastSelf(SPELL_TELEPORT_VISUAL);
                             if (Player* player = SelectTargetInDalaran(PlayerInDalaranList))
                             {
-                                me->SetOwnerGUID(player->GetGUID());
+                                playerGuid = player->GetGUID();
                                 Position pos = player->GetPosition();
                                 float dist = frand(10.0f, 30.0f);
                                 float angle = frand(0.0f, 1.0f) * M_PI * 2.0f;
                                 player->MovePositionToFirstCollision(pos, dist, angle);
                                 me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
                             }
-                            events.ScheduleEvent(EVENT_LAUGH_1, 2 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_LAUGH_1, Seconds(2));
                             break;
                         }
                         case EVENT_LAUGH_1:
                             me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH_NO_SHEATHE);
-                            events.ScheduleEvent(EVENT_WANDER, 3 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_WANDER, Seconds(3));
                             break;
                         case EVENT_WANDER:
                             me->GetMotionMaster()->MoveRandom(8);
-                            events.ScheduleEvent(EVENT_PAUSE, MINUTE * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_PAUSE, Minutes(1));
                             break;
                         case EVENT_PAUSE:
                             me->GetMotionMaster()->MoveIdle();
-                            events.ScheduleEvent(EVENT_CAST, 2 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_CAST, Seconds(2));
                             break;
                         case EVENT_CAST:
-                            if (Player* player = me->GetMap()->GetPlayer(me->GetOwnerGUID()))
+                            if (Player* player = me->GetMap()->GetPlayer(playerGuid))
                             {
                                 DoCast(player, SPELL_MANABONKED);
                                 SendMailToPlayer(player);
                             }
                             else
-                            {
                                 me->AddObjectToRemoveList();
-                            }
-                            events.ScheduleEvent(EVENT_LAUGH_2, 8 * IN_MILLISECONDS);
+
+                            events.ScheduleEvent(EVENT_LAUGH_2, Seconds(8));
                             break;
                         case EVENT_LAUGH_2:
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
-                            events.ScheduleEvent(EVENT_BLINK, 3 * IN_MILLISECONDS);
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH_NO_SHEATHE);
+                            events.ScheduleEvent(EVENT_BLINK, Seconds(3));
                             break;
                         case EVENT_BLINK:
-                            DoCast(me, SPELL_IMPROVED_BLINK);
-                            events.ScheduleEvent(EVENT_DESPAWN, 4 * IN_MILLISECONDS);
+                            DoCastSelf(SPELL_IMPROVED_BLINK);
+                            events.ScheduleEvent(EVENT_DESPAWN, Seconds(4));
                             break;
                         case EVENT_DESPAWN:
                             me->AddObjectToRemoveList();
@@ -269,6 +269,8 @@ class npc_minigob_manabonk : public CreatureScript
             }
 
         private:
+
+            ObjectGuid playerGuid;
             EventMap events;
     };
 
