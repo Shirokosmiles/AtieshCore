@@ -1,10 +1,1 @@
--- Transport to Mimiron button
-UPDATE `gameobject_template` SET `ScriptName`='go_mimiron_activate_tram' WHERE `entry`=194437;
-
--- gobject move spawn
-UPDATE `gameobject` SET `position_x`=2306.87, `position_y`=274.237, `position_z`=424.288, `orientation`=1.52255, `rotation2`=0.689847, `rotation3`=0.723956 WHERE `guid`=45164;
-
--- Transport Tram - for future
-UPDATE `gameobject_template` SET `ScriptName`='go_transport_to_mimiron' WHERE `entry`='194675';
-DELETE FROM `trinity_string` where `entry` IN (179);
-INSERT INTO `trinity_string` (`entry`, `content_default`) VALUES ('179', 'TransOffsetX: %f TransOffsetY: %f TransOffsetZ: %f TransOffsetO: %f');
+UPDATE `gameobject_template` SET `entry`='194675', `type`='11', `displayId`='8587', `name`='Tram', `IconName`='', `castBarCaption`='', `unk1`='', `size`='1', `Data0`='0', `Data1`='0', `Data2`='0', `Data3`='0', `Data4`='0', `Data5`='0', `Data6`='0', `Data7`='0', `Data8`='0', `Data9`='0', `Data10`='0', `Data11`='0', `Data12`='0', `Data13`='0', `Data14`='0', `Data15`='0', `Data16`='0', `Data17`='0', `Data18`='0', `Data19`='0', `Data20`='0', `Data21`='0', `Data22`='0', `Data23`='0', `AIName`='', `ScriptName`='go_transport_to_mimiron', `VerifiedBuild`='12340' WHERE (`entry`='194675');

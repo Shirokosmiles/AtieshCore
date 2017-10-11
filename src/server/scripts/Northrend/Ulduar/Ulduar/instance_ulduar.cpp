@@ -124,6 +124,9 @@ ObjectData const objectData[] =
 {
     { GO_MIMIRON_ELEVATOR,             DATA_MIMIRON_ELEVATOR },
     { GO_MIMIRON_BUTTON,               DATA_MIMIRON_BUTTON   },
+    { GO_MIMIRON_TRAM,                 DATA_MIMIRON_TRAM     },
+    { Doodad_UL_Train_Turnaround01,    DATA_MIMIRON_TRAM_TURNOUT_1 },
+    { Doodad_UL_Train_Turnaround02,    DATA_MIMIRON_TRAM_TURNOUT_2 },
     { GO_DOODAD_UL_UNIVERSEGLOBE01,    DATA_UNIVERSE_GLOBE   },
     { GO_DOODAD_UL_ULDUAR_TRAPDOOR_03, DATA_ALGALON_TRAPDOOR },
     { GO_RAZOR_HARPOON_1,              GO_RAZOR_HARPOON_1    },
@@ -1236,6 +1239,15 @@ public:
     };
 };
 
+/*
+enum TramEvents
+{
+    EVENT_NONE = 0,
+    EVENT_CAST = 1,
+    EVENT_BUTTON_RDY = 2,
+    EVENT_BUTTON_APPEAR = 3
+};
+
 //go_transport_to_mimiron
 class go_transport_to_mimiron : public GameObjectScript
 {
@@ -1249,26 +1261,22 @@ public:
             Initialize();
         }
 
+        InstanceScript* instance;
+
         void Initialize()
-        {            
-            TC_LOG_ERROR("server", "go_transport_to_mimiron : initialized");
-            if (me->GetTransport())
-                TC_LOG_ERROR("server", "go_transport_to_mimiron : initialized Gettransport yes");
+        {
+            me->SetLootState(GO_JUST_DEACTIVATED);
         }
 
         void Reset() override
         {
             Initialize();
-        }
-
-    protected:
-        InstanceScript* instance;
-        ObjectGuid GunshipGUID;
+        }       
     };
 
     GameObjectAI* GetAI(GameObject* go) const override
     {
-        return new go_transport_to_mimironAI(go);
+        return GetUlduarAI<go_transport_to_mimironAI>(go);
     }
 };
 
@@ -1279,34 +1287,107 @@ public:
 
     struct go_mimiron_activate_tramAI : public GameObjectAI
     {
-        go_mimiron_activate_tramAI(GameObject* go) : GameObjectAI(go), instance(go->GetInstanceScript()) { }
+        go_mimiron_activate_tramAI(GameObject* go) : GameObjectAI(go), instance(go->GetInstanceScript())
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _event.Reset();
+            _event.ScheduleEvent(EVENT_CAST, 35000);
+        }
+
+        void Reset() override
+        {
+            Initialize();
+        }
 
         InstanceScript* instance;
+        Player* clicker;
 
-        bool OnGossipHello(Player* /*player*/, GameObject* go)
-        {
-            InstanceScript* instance = go->GetInstanceScript();
-            if (!instance)
-                return false;
+        bool GossipHello(Player* player) override
+        {           
+            switch (me->GetEntry())
+            {
+                case 194914:
+                case 194438:
+                    instance->SetData(DATA_MIMIRON_TRAM, 0);
+                    break;
+                case 194912:
+                case 194437:                    
+                    instance->SetData(DATA_MIMIRON_TRAM, 1);
+                    break;
+            }
 
-            if (GameObject* tram = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(DATA_MIMIRON_TRAM)))
-                tram->SetGoState(GO_STATE_ACTIVE);
+            _event.ScheduleEvent(EVENT_CAST, 0);
+            _event.ScheduleEvent(EVENT_BUTTON_RDY, 5000);
 
+            me->SetGoState(GO_STATE_ACTIVE); //animation of button
+            clicker = player;
             return true;
         }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!me)
+                return;
+
+            if (_event.Empty())
+                return;
+
+            _event.Update(diff);
+
+            while (uint32 eventId = _event.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CAST:
+                        if (GameObject* turn1 = instance->GetGameObject(DATA_MIMIRON_TRAM_TURNOUT_1))
+                            turn1->SetGoState(GO_STATE_READY);
+
+                        if (GameObject* turn2 = instance->GetGameObject(DATA_MIMIRON_TRAM_TURNOUT_2))
+                            turn2->SetGoState(GO_STATE_READY);
+                        break;
+                    case EVENT_BUTTON_RDY:
+                        me->SetGoState(GO_STATE_READY); //animation of button
+                        
+                        if (GameObject* turn1 = instance->GetGameObject(DATA_MIMIRON_TRAM_TURNOUT_1))
+                            turn1->SetGoState(GO_STATE_ACTIVE);
+
+                        if (GameObject* turn2 = instance->GetGameObject(DATA_MIMIRON_TRAM_TURNOUT_2))
+                            turn2->SetGoState(GO_STATE_ACTIVE);
+
+                        if (GameObject* tram = instance->GetGameObject(DATA_MIMIRON_TRAM))
+                        {
+                            // Activate
+                            tram->SetLootState(GO_READY);
+                            tram->UseDoorOrButton(0u, false, clicker);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            GameObjectAI::UpdateAI(diff);
+        }
+
+    private:
+        EventMap _event;
     };
 
     GameObjectAI* GetAI(GameObject* go) const override
     {
         return GetUlduarAI<go_mimiron_activate_tramAI>(go);
     }
-};
+}; */
 
 void AddSC_instance_ulduar()
 {
     new instance_ulduar();
     new spell_ulduar_teleporter();
     new npc_steelforged_defender();
-    new go_transport_to_mimiron();
-    new go_mimiron_activate_tram();
+    //new go_transport_to_mimiron();
+    //new go_mimiron_activate_tram();
 }
