@@ -26812,6 +26812,8 @@ bool Player::CheckOnFlyHack()
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
         TC_LOG_ERROR("server", "Unit::========================================================");
         TC_LOG_ERROR("server", "Player IsFlying but CanFly is false");
+
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH_CANFLYWRONG, GetPlayerMovingMe()->GetName().c_str());
         return false;
     }
 
@@ -26841,6 +26843,8 @@ bool Player::CheckOnFlyHack()
                 TC_LOG_ERROR("server", "Player::========================================================");
                 TC_LOG_ERROR("server", "Player::CheckOnFlyHack :  normalZ = %f", z);
                 TC_LOG_ERROR("server", "Player::CheckOnFlyHack :  playerZ = %f", npos.GetPositionZ());
+
+                sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
                 return false;
             }
     }
@@ -26851,6 +26855,8 @@ bool Player::CheckOnFlyHack()
             TC_LOG_ERROR("server", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
             TC_LOG_ERROR("server", "Player::========================================================");
             TC_LOG_ERROR("server", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
+
+            sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetPlayerMovingMe()->GetName().c_str());
             return false;
         }
     }

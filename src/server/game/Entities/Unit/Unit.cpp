@@ -14978,6 +14978,9 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
 
         if (GetPlayerMovingMe())
         {
+            if (GetPlayerMovingMe()->UnderACKmount())
+                return true;
+
             if (GetPlayerMovingMe()->IsSkipOnePacketForASH())
             {
                 GetPlayerMovingMe()->SetSkipOnePacketForASH(false);
@@ -14985,9 +14988,6 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
             }
         }
         else
-            return true;
-
-        if (GetPlayerMovingMe()->UnderACKmount())
             return true;
 
         Position npos = movementInfo.pos;
@@ -15021,6 +15021,8 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  difftime = %f", difftime);
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  ClientTimeDelay = %f", delay);
         TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  Ping = %f", realping);
+
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, GetPlayerMovingMe()->GetName().c_str());
     }
     else
         return true;
