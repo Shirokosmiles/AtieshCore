@@ -1288,8 +1288,9 @@ void Player::Update(uint32 p_time)
     {
         if (p_time >= m_flyhackTimer)
         {
-            if (!CheckOnFlyHack())
+            if (!CheckOnFlyHack() && sWorld->getBoolConfig(CONFIG_AFH_KICK_ENABLED))
                 GetSession()->KickPlayer();
+
             m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
         }
         else

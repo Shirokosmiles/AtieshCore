@@ -1373,6 +1373,8 @@ void World::LoadConfigSettings(bool reload)
     // AntiCheat- anti FlyHack
     m_bool_configs[CONFIG_ANTICHEAT_FLYHACK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FlyHack.Enabled", false);
     m_bool_configs[CONFIG_ANTICHEAT_SPEEDHACK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Enabled", false);
+    m_bool_configs[CONFIG_AFH_KICK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FlyHack.Kick.Enabled", false);
+    m_bool_configs[CONFIG_ASH_KICK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Kick.Enabled", false);
     m_int_configs[CONFIG_ANTICHEAT_FLYHACK_TIMER] = sConfigMgr->GetIntDefault("AntiCheats.FlyHackTimer", 1000);
 
     // Dungeon finder

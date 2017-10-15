@@ -3970,8 +3970,22 @@ AntiCheats.SpeedHack.Enabled = 1
 
 AntiCheats.FlyHackTimer = 1000
 
-Appender.Cheat=2,4,15,Cheat.log
-Logger.cheat=4,Cheat
+#    AntiCheats.FlyHack.Kick.Enabled
+#        Description: Enable AntiCheat.FlyHack Kick when detected
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.FlyHack.Kick.Enabled = 1
+
+#    AntiCheats.SpeedHack.Kick.Enabled
+#        Description: Enable AntiCheat.SpeedHack Kick when detected
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.SpeedHack.Kick.Enabled = 1
+
+#Appender.Cheat=2,4,15,Cheat.log
+#Logger.cheat=4,Cheat
 
 #
 ###################################################################################################

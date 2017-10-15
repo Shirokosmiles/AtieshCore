@@ -37,6 +37,7 @@
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "WorldSession.h"
+#include "World.h"
 #define MOVEMENT_PACKET_TIME_DELAY 0
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvData*/)
@@ -429,10 +430,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     /* start SpeedHack Detection */
     if (plrMover && !mover->CheckMovementInfo(movementInfo))
-    {
-        plrMover->GetSession()->KickPlayer();
-        return;
-    }
+        if (sWorld->getBoolConfig(CONFIG_ASH_KICK_ENABLED))
+        {
+            plrMover->GetSession()->KickPlayer();
+            return;
+        }
 
     /* process position-change */
     mover->UpdateMovementInfo(movementInfo);
