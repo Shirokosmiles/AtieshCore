@@ -15009,20 +15009,20 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         float x, y;
         GetPosition(x, y);
 
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  SpeedHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-        TC_LOG_ERROR("server", "Unit::========================================================");
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  oldX = %f", x);
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  oldY = %f", y);
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  newX = %f", npos.GetPositionX());
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  newY = %f", npos.GetPositionY());
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  distance = %f", distance);
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  normal distance = %f", normaldistance);
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  movetime = %f", movetime);
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  difftime = %f", difftime);
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  ClientTimeDelay = %f", delay);
-        TC_LOG_ERROR("server", "Unit::CheckMovementInfo :  Ping = %f", realping);
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  SpeedHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+        TC_LOG_WARN("cheat", "Unit::========================================================");
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  oldX = %f", x);
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  oldY = %f", y);
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  newX = %f", npos.GetPositionX());
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  newY = %f", npos.GetPositionY());
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  distance = %f", distance);
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  normal distance = %f", normaldistance);
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  movetime = %f", movetime);
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  difftime = %f", difftime);
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  ClientTimeDelay = %f", delay);
+        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  Ping = %f", realping);
 
-        sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, GetPlayerMovingMe()->GetName().c_str());
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, GetPlayerMovingMe()->GetName().c_str(), normaldistance, distance);
     }
     else
         return true;

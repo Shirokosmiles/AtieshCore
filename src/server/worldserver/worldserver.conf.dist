@@ -3970,6 +3970,9 @@ AntiCheats.SpeedHack.Enabled = 1
 
 AntiCheats.FlyHackTimer = 1000
 
+Appender.Cheat=2,4,15,Cheat.log
+Logger.cheat=4,Cheat
+
 #
 ###################################################################################################
 
