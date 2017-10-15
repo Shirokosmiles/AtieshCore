@@ -993,6 +993,8 @@ void Spell::EffectJump(SpellEffIndex effIndex)
         return;
 
     float speedXY, speedZ;
+    if (m_caster->ToPlayer())
+        m_caster->ToPlayer()->SetUnderACKmount();
     CalculateJumpSpeeds(effIndex, m_caster->GetExactDist2d(unitTarget), speedXY, speedZ);
     m_caster->GetMotionMaster()->MoveJump(*unitTarget, speedXY, speedZ, EVENT_JUMP, false);
 }
@@ -1019,6 +1021,8 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     else
         CalculateJumpSpeeds(effIndex, dist, speedXY, speedZ);
 
+    if (m_caster->ToPlayer())
+        m_caster->ToPlayer()->SetUnderACKmount();
     m_caster->GetMotionMaster()->MoveJump(*destTarget, speedXY, speedZ, EVENT_JUMP, !m_targets.GetObjectTargetGUID().IsEmpty());
 }
 
@@ -4731,6 +4735,8 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
         m_caster->GetPosition(x, y);
     }
 
+    if (unitTarget->ToPlayer())
+        unitTarget->ToPlayer()->SetUnderACKmount();
     unitTarget->KnockbackFrom(x, y, speedxy, speedz);
 }
 
@@ -4741,6 +4747,11 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
 
     if (!unitTarget)
         return;
+
+    if (unitTarget->ToPlayer())
+        unitTarget->ToPlayer()->SetUnderACKmount();
+    if (m_caster->ToPlayer())
+        m_caster->ToPlayer()->SetUnderACKmount();
 
     float speedxy = m_spellInfo->Effects[effIndex].MiscValue / 10.f;
     float modificator = sqrt(damage);
