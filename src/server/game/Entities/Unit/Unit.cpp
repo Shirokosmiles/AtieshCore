@@ -14953,7 +14953,8 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
 
 void Unit::UpdateMovementInfo(MovementInfo const& movementInfo)
 {
-    SetLastMoveClientTimestamp(movementInfo.time);
+    SetLastMoveClientTimestamp(movementInfo.time); // unused for now. will be needed for speed cheat detection
+    SetLastMoveServerTimestamp(getMSTime()); // unused for now. will probably needed in the future
 }
 
 bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
@@ -14995,12 +14996,13 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         float movetime = movementInfo.time;
         float realping = GetPlayerMovingMe()->GetSession()->GetLatency();
         float ping = realping;
-        if (ping < 250.0f)
-            ping = 250.0f;
+        if (ping < 60.0f)
+            ping = 60.0f;
         float speed = GetSpeed(MOVE_RUN);
         if (IsFlying() || GetPlayerMovingMe()->CanFly())
             speed = GetSpeed(MOVE_FLIGHT);
-        float delay = (getMSTime() - movementInfo.time) / 10000000000 + (ping * 0.001f);
+        float delaysentrecieve = (time - GetLastMoveServerTimestamp()) / 10000000000;
+        float delay = (getMSTime() - movementInfo.time) / 10000000000 + (ping * 0.001f) + delaysentrecieve;        
         float difftime = (movetime - time) * 0.001f + delay;
         float normaldistance = speed * difftime + 0.1f;
         if (distance < normaldistance)
@@ -15009,18 +15011,19 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         float x, y;
         GetPosition(x, y);
 
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  SpeedHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-        TC_LOG_WARN("cheat", "Unit::========================================================");
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  oldX = %f", x);
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  oldY = %f", y);
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  newX = %f", npos.GetPositionX());
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  newY = %f", npos.GetPositionY());
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  distance = %f", distance);
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  normal distance = %f", normaldistance);
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  movetime = %f", movetime);
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  difftime = %f", difftime);
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  ClientTimeDelay = %f", delay);
-        TC_LOG_WARN("cheat", "Unit::CheckMovementInfo :  Ping = %f", realping);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  SpeedHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+        TC_LOG_INFO("anticheat", "Unit::========================================================");
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldX = %f", x);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldY = %f", y);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  newX = %f", npos.GetPositionX());
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  newY = %f", npos.GetPositionY());
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  distance = %f", distance);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  normal distance = %f", normaldistance);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  movetime = %f", movetime);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  delay sent ptk - recieve pkt (previous) = %f", delaysentrecieve);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  difftime = %f", difftime);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  ClientTimeDelay = %f", delay);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  Ping = %f", realping);
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, GetPlayerMovingMe()->GetName().c_str(), normaldistance, distance);
     }

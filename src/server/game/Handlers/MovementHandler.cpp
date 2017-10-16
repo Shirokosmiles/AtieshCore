@@ -429,12 +429,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     /* start SpeedHack Detection */
-    if (plrMover && !mover->CheckMovementInfo(movementInfo))
-        if (sWorld->getBoolConfig(CONFIG_ASH_KICK_ENABLED))
-        {
-            plrMover->GetSession()->KickPlayer();
-            return;
-        }
+    if (plrMover && !mover->CheckMovementInfo(movementInfo) && sWorld->getBoolConfig(CONFIG_ASH_KICK_ENABLED))
+    {
+        plrMover->GetSession()->KickPlayer();
+        return;
+    }
 
     /* process position-change */
     mover->UpdateMovementInfo(movementInfo);

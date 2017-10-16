@@ -26810,9 +26810,9 @@ bool Player::CheckOnFlyHack()
 
     if (IsFlying() && !CanFly()) // kick flyhacks
     {
-        TC_LOG_WARN("anticheat", "Player::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-        TC_LOG_WARN("anticheat", "Player::========================================================");
-        TC_LOG_WARN("anticheat", "Player IsFlying but CanFly is false");
+        TC_LOG_INFO("anticheat", "Player::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+        TC_LOG_INFO("anticheat", "Player::========================================================");
+        TC_LOG_INFO("anticheat", "Player IsFlying but CanFly is false");
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH_CANFLYWRONG, GetPlayerMovingMe()->GetName().c_str());
         return false;
@@ -26840,10 +26840,10 @@ bool Player::CheckOnFlyHack()
         if (npos.GetPositionZ() - z > 4.8f)
             if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), z))
             {
-                TC_LOG_WARN("cheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-                TC_LOG_WARN("cheat", "Player::========================================================");
-                TC_LOG_WARN("cheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
-                TC_LOG_WARN("cheat", "Player::CheckOnFlyHack :  playerZ = %f", npos.GetPositionZ());
+                TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+                TC_LOG_INFO("anticheat", "Player::========================================================");
+                TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
+                TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = %f", npos.GetPositionZ());
 
                 sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
                 return false;
@@ -26853,9 +26853,9 @@ bool Player::CheckOnFlyHack()
     {
         if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ()))
         {
-            TC_LOG_WARN("cheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-            TC_LOG_WARN("cheat", "Player::========================================================");
-            TC_LOG_WARN("cheat", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
+            TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+            TC_LOG_INFO("anticheat", "Player::========================================================");
+            TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
 
             sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetPlayerMovingMe()->GetName().c_str());
             return false;

@@ -1925,7 +1925,9 @@ class TC_GAME_API Unit : public WorldObject
         virtual bool CanSwim() const;
 
         void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }
+        void SetLastMoveServerTimestamp(uint32 timestamp) { lastMoveServerTimestamp = timestamp; }
         uint32 GetLastMoveClientTimestamp() const { return lastMoveClientTimestamp; }
+        uint32 GetLastMoveServerTimestamp() const { return lastMoveServerTimestamp; }
 
         void RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker);
 
@@ -2066,7 +2068,9 @@ class TC_GAME_API Unit : public WorldObject
 
         /* Player Movement fields START*/
         // Timestamp on client clock of the moment the most recently processed movement packet was SENT by the client
-        uint32 lastMoveClientTimestamp;
+        uint32 lastMoveClientTimestamp;        
+        // Timestamp on server clock of the moment the most recently processed movement packet was RECEIVED from the client
+        uint32 lastMoveServerTimestamp;
 
         uint32 m_rootTimes;
 
