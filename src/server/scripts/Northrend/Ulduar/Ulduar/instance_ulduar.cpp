@@ -31,7 +31,6 @@
 #include "Vehicle.h"
 #include "WorldPacket.h"
 #include "CombatAI.h"
-#include "log.h"
 
 static BossBoundaryData const boundaries =
 {
