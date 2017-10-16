@@ -14995,8 +14995,8 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         float movetime = movementInfo.time;
         float realping = GetPlayerMovingMe()->GetSession()->GetLatency();
         float ping = realping;
-        if (ping < 120.0f)
-            ping = 120.0f;
+        if (ping < 250.0f)
+            ping = 250.0f;
         float speed = GetSpeed(MOVE_RUN);
         if (IsFlying() || GetPlayerMovingMe()->CanFly())
             speed = GetSpeed(MOVE_FLIGHT);
