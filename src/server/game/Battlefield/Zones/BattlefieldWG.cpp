@@ -437,6 +437,10 @@ void BattlefieldWintergrasp::OnBattleStart()
         }
     }
 
+    for (ObjectGuid teleGuid : _teleporterList)
+        if (GameObject* go = GetGameObject(teleGuid))
+            go->SetFaction(WintergraspFaction[GetDefenderTeam()]);
+
     // rebuild
     for (WintergraspBuilding* building : _buildingSet)
         building->Rebuild();
@@ -722,6 +726,7 @@ void BattlefieldWintergrasp::OnCreatureCreate(Creature* creature)
                         creature->AddAura(SPELL_HORDE_FLAG, creature);
                         _vehicleSet[team].insert(creature->GetGUID());
                         UpdateVehicleCountWG();
+                        ApplyBuff(creature, false);
                     }
                     else
                     {
@@ -906,6 +911,9 @@ void BattlefieldWintergrasp::OnGameObjectCreate(GameObject* gameObject)
                     capturePoint->SetCapturePointData(gameObject);
             }
             break;
+        case GO_WINTERGRASP_VEHICLE_TELEPORTER:
+            _teleporterList.insert(gameObject->GetGUID());
+            break;
         default:
             break;
     }
@@ -913,6 +921,9 @@ void BattlefieldWintergrasp::OnGameObjectCreate(GameObject* gameObject)
 
 void BattlefieldWintergrasp::OnGameObjectRemove(GameObject* gameObject)
 {
+    if (gameObject->GetEntry() == GO_WINTERGRASP_VEHICLE_TELEPORTER)
+        _teleporterList.erase(gameObject->GetGUID());
+
     for (WintergraspBuilding* building : _buildingSet)
         building->CleanRelatedObject(gameObject->GetGUID());
 }
@@ -1237,25 +1248,34 @@ void BattlefieldWintergrasp::UpdateTenacity()
 {
     uint32 const alliancePlayers = _playersInWar[TEAM_ALLIANCE].size();
     uint32 const hordePlayers = _playersInWar[TEAM_HORDE].size();
-    int32 newStack = 0;
+    uint32 newStack = 0;
+    TeamId oldTeam = _tenacityTeam;
 
     if (alliancePlayers && hordePlayers)
     {
         if (alliancePlayers < hordePlayers)
-            newStack = int32((float(hordePlayers) / float(alliancePlayers) - 1.f) * 4.f);  // positive, should cast on alliance
+        {
+            _tenacityTeam = TEAM_ALLIANCE;
+            newStack = uint32((float(hordePlayers) / float(alliancePlayers) - 1.f) * 4.f);            
+        }
         else if (alliancePlayers > hordePlayers)
-            newStack = int32((1.f - float(alliancePlayers) / float(hordePlayers)) * 4.f);  // negative, should cast on horde
+        {
+            _tenacityTeam = TEAM_HORDE;
+            newStack = uint32((float(alliancePlayers) / float(hordePlayers) - 1.f) * 4.f);            
+        }
+        else
+            _tenacityTeam = TEAM_NEUTRAL;
     }
 
-    if (newStack == int32(_tenacityStack))
+    if (newStack == _tenacityStack)
         return;
 
     _tenacityStack = newStack;
 
     // Remove old buff
-    if (_tenacityTeam != TEAM_NEUTRAL)
+    if (oldTeam != TEAM_NEUTRAL)
     {
-        for (auto itr = _players[_tenacityTeam].begin(); itr != _players[_tenacityTeam].end(); ++itr)
+        for (auto itr = _players[oldTeam].begin(); itr != _players[oldTeam].end(); ++itr)
         {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
             {
@@ -1266,7 +1286,7 @@ void BattlefieldWintergrasp::UpdateTenacity()
             }
         }
 
-        for (auto itr = _vehicleSet[_tenacityTeam].begin(); itr != _vehicleSet[_tenacityTeam].end(); ++itr)
+        for (auto itr = _vehicleSet[oldTeam].begin(); itr != _vehicleSet[oldTeam].end(); ++itr)
         {
             if (Creature* creature = GetCreature(*itr))
             {
@@ -1279,52 +1299,31 @@ void BattlefieldWintergrasp::UpdateTenacity()
     }
 
     // Apply new buff
-    if (newStack)
+    if (_tenacityStack)
     {
-        _tenacityTeam = newStack > 0 ? TEAM_ALLIANCE : TEAM_HORDE;
-
-        if (newStack < 0)
-            newStack = -newStack;
-        if (newStack > 20)
-            newStack = 20;
-
-        uint32 buff_honor = SPELL_GREATEST_HONOR;
-        if (newStack < 15)
-            buff_honor = SPELL_GREATER_HONOR;
-        if (newStack < 10)
-            buff_honor = SPELL_GREAT_HONOR;
-        if (newStack < 5)
-            buff_honor = 0;
-
         for (auto itr = _playersInWar[_tenacityTeam].begin(); itr != _playersInWar[_tenacityTeam].end(); ++itr)
-        {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->SetAuraStack(SPELL_TENACITY, player, newStack);
-        }
+                ApplyBuff(player, true);
 
         for (auto itr = _vehicleSet[_tenacityTeam].begin(); itr != _vehicleSet[_tenacityTeam].end(); ++itr)
-        {
             if (Creature* creature = GetCreature(*itr))
-                creature->SetAuraStack(SPELL_TENACITY_VEHICLE, creature, newStack);
-        }
-
-        if (buff_honor != 0)
-        {
-            for (auto itr = _playersInWar[_tenacityTeam].begin(); itr != _playersInWar[_tenacityTeam].end(); ++itr)
-            {
-                if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                    player->CastSpell(player, buff_honor, true);
-            }
-
-            for (auto itr = _vehicleSet[_tenacityTeam].begin(); itr != _vehicleSet[_tenacityTeam].end(); ++itr)
-            {
-                if (Creature* creature = GetCreature(*itr))
-                    creature->CastSpell(creature, buff_honor, true);
-            }
-        }
+                ApplyBuff(creature, false);
     }
-    else
-        _tenacityTeam = TEAM_NEUTRAL;
+}
+
+void BattlefieldWintergrasp::ApplyBuff(Unit* target, bool type) const
+{
+    uint32 buff_honor = SPELL_GREATEST_HONOR;
+    if (_tenacityStack < 5)
+        buff_honor = 0;
+    else if (_tenacityStack < 10)
+        buff_honor = SPELL_GREAT_HONOR;
+    else if (_tenacityStack < 15)
+        buff_honor = SPELL_GREATER_HONOR;
+    
+    target->SetAuraStack(type ? SPELL_TENACITY : SPELL_TENACITY_VEHICLE, target, std::min(_tenacityStack, uint32(20)));
+    if (buff_honor)
+        target->CastSpell(target, buff_honor, true);
 }
 
 void BattlefieldWintergrasp::SendWarning(uint8 id, Player const* target)

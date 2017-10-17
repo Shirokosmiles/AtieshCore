@@ -332,7 +332,8 @@ enum WintergraspGameObject
     GO_WINTERGRASP_FORTRESS_GATE                    = 190375,
     GO_WINTERGRASP_VAULT_GATE                       = 191810,
 
-    GO_WINTERGRASP_KEEP_COLLISION_WALL              = 194323
+    GO_WINTERGRASP_KEEP_COLLISION_WALL              = 194323,
+    GO_WINTERGRASP_VEHICLE_TELEPORTER               = 192951
 };
 
 enum WintergraspQuests
@@ -455,6 +456,8 @@ class TC_GAME_API BattlefieldWintergrasp : public Battlefield
         WintergraspGraveyardId GetSpiritGraveyardId(uint32 areaId) const;
 
     private:
+        void ApplyBuff(Unit* target, bool type) const;
+
         WintergraspBuilding* GetBuilding(uint32 entry) const;
         WintergraspBuilding* GetBuilding(ObjectGuid guid) const;
         WintergraspWorkshop* GetWorkshop(WintergraspWorkshopId id) const;
@@ -463,6 +466,7 @@ class TC_GAME_API BattlefieldWintergrasp : public Battlefield
         BuildingSet _buildingSet;
         GuidUnorderedSet _vehicleSet[PVP_TEAMS_COUNT];
         GuidUnorderedSet _keepCannonList;
+        GuidUnorderedSet _teleporterList;
         ObjectGuid _titansRelicGUID;
         ObjectGuid _stalkerGUID;
         TeamId _tenacityTeam;
