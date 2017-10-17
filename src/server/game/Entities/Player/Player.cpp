@@ -26830,7 +26830,15 @@ bool Player::CheckOnFlyHack()
     if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
         return true;
 
-    if (!GetPlayerMovingMe())
+    if (GetPlayerMovingMe())
+    {
+        if (GetPlayerMovingMe()->UnderACKmount())
+            return true;
+
+        if (GetPlayerMovingMe()->IsSkipOnePacketForASH())
+            return true;
+    }
+    else
         return true;
 
     Position npos = GetPosition();
