@@ -302,6 +302,7 @@ Unit::Unit(bool isWorldObject) :
     m_canDualWield = false;
 
     lastMoveClientTimestamp = 0;
+    lastMoveServerTimestamp = 0;
 
     m_rootTimes = 0;
 
