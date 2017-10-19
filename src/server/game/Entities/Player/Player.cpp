@@ -271,7 +271,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_ACKmounted = false;
     m_deathTimer = 0;
     m_deathExpireTime = 0;
-    m_skipOnePacketForASH = false;
+    m_skipOnePacketForASH = true;
 
     m_swingErrorMsg = 0;
 

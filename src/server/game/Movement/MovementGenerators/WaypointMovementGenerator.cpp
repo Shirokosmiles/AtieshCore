@@ -432,6 +432,9 @@ void FlightPathMovementGenerator::DoReset(Player* player)
 
 bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
 {
+    if (!player)
+        return false;
+
     uint32 pointId = (uint32)player->movespline->currentPathIdx();
     if (pointId > _currentNode)
     {
