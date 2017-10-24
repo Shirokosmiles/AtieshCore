@@ -26879,19 +26879,25 @@ bool Player::CheckOnFlyHack()
         return true;
 
     Position npos = GetPosition();
+    float pz = npos.GetPositionZ();
     if (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
         float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ() + 1.8f, true); // smart flyhacks -> SimpleFly
-        if (npos.GetPositionZ() - z > 4.8f)
+        if (pz - z > 2.8f)
             if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), z))
             {
-                TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-                TC_LOG_INFO("anticheat", "Player::========================================================");
-                TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
-                TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = %f", npos.GetPositionZ());
+                MovePositionToFirstCollision(npos, 2.5f, GetOrientation() + M_PI);
+                z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ() + 1.8f, true); // smart flyhacks -> SimpleFly
+                if (pz - z > 2.8f)
+                {
+                    TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+                    TC_LOG_INFO("anticheat", "Player::========================================================");
+                    TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
+                    TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = %f", npos.GetPositionZ());
 
-                sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
-                return false;
+                    sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
+                    return false;
+                }
             }
     }
     else
