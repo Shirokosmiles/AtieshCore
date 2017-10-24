@@ -2232,6 +2232,18 @@ void Guild::BroadcastPacket(WorldPacket* packet) const
             player->SendDirectMessage(packet);
 }
 
+void Guild::ItemBroadcastToGuild(Player* player, std::string const& msg) const
+{
+    if (player)
+    {
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, LANG_UNIVERSAL, player, nullptr, msg);
+        for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+            if (Player* player = itr->second->FindPlayer())
+                player->SendDirectMessage(&data);
+    }
+}
+
 void Guild::MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 maxLevel, uint32 minRank)
 {
     uint32 count = 0;

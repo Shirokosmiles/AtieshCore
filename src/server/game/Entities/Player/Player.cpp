@@ -14131,6 +14131,43 @@ void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, 
         GetGroup()->BroadcastPacket(&data, true);
     else
         SendDirectMessage(&data);
+
+    if (sWorld->getBoolConfig(CONFIG_LOOT_GUILD_ENABLED) && GetSession() &&  GetGuild())
+    {   
+        ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(item->GetEntry());
+        if (itemProto && itemProto->Quality >= ITEM_QUALITY_EPIC)
+        {
+            std::string msg, color;
+            switch (itemProto->Quality)
+            {
+                /*
+                just colors:
+                ITEM_QUALITY_POOR = cff9d9d9d
+                ITEM_QUALITY_NORMAL = cffffffff
+                ITEM_QUALITY_UNCOMMON = cff1eff00
+                ITEM_QUALITY_RARE = cff0070dd
+                */
+            case ITEM_QUALITY_EPIC:
+                color = "cffa335ee";
+                break;
+            case ITEM_QUALITY_LEGENDARY:
+                color = "cffff8000";
+                break;
+            case ITEM_QUALITY_ARTIFACT:
+                color = "cffe6cc80";
+                break;
+            case ITEM_QUALITY_HEIRLOOM:
+                color = "cffe6cc80";
+                break;
+            default:
+                break;
+            }
+
+            msg = "has received |" + color + "|Hitem:" + std::to_string(itemProto->ItemId) + "|h[" + itemProto->Name1 + "]|h|r";
+            GetGuild()->ItemBroadcastToGuild(this, msg);
+            //TC_LOG_ERROR("server", "Player::SendNewItem :  msg = %s", msg);
+        }
+    }
 }
 
 /*********************************************************/
@@ -20657,6 +20694,7 @@ void Player::Say(std::string const& text, Language language, WorldObject const* 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
+    //TC_LOG_ERROR("server", "Player::Say :  msg = %s", _text);
 }
 
 void Player::Say(uint32 textId, WorldObject const* target /*= nullptr*/)

@@ -4046,3 +4046,18 @@ CrossfactionBG.enable = 1
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+# GUILD LOOT CONFIG
+#
+#    Description: Guild announce when member take a loot with Quality >= EPIC
+#    Default:     1 - enabled
+#
+#    Guild.LootBroadcast.Enabled = 1 - enabled.
+#    Guild.LootBroadcast.Enabled = 0 - disabled.
+
+Guild.LootBroadcast.Enabled = 1
+
+#
+###################################################################################################
