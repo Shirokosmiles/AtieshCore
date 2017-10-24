@@ -556,9 +556,6 @@ void Transport::UpdatePosition(float x, float y, float z, float o)
     Relocate(x, y, z, o);
     UpdateModelPosition();
 
-    if (!GetMap())
-        return;
-
     UpdatePassengerPositions(_passengers);
 
     /* There are four possible scenarios that trigger loading/unloading passengers:
@@ -740,6 +737,13 @@ void Transport::UpdatePassengerPositions(PassengerSet& passengers)
     for (PassengerSet::iterator itr = passengers.begin(); itr != passengers.end(); ++itr)
     {
         WorldObject* passenger = *itr;
+
+        if (!passenger->GetMap()) // if Transport under delete process - passengers should be removed 
+        {
+            RemovePassenger(*itr);
+            continue;
+        }            
+
         // transport teleported but passenger not yet (can happen for players)
         if (passenger->GetMap() != GetMap())
             continue;
