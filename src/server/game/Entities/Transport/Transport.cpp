@@ -44,6 +44,13 @@ Transport::Transport() : GameObject(),
 
 Transport::~Transport()
 {
+    while (!_passengers.empty())
+    {
+        WorldObject* obj = *_passengers.begin();
+        RemovePassenger(obj);
+    }
+
+    _passengers.clear(); // forced clear passengers list, for safe delete
     ASSERT(_passengers.empty());
     UnloadStaticPassengers();
 }
@@ -548,6 +555,9 @@ void Transport::UpdatePosition(float x, float y, float z, float o)
 
     Relocate(x, y, z, o);
     UpdateModelPosition();
+
+    if (!GetMap())
+        return;
 
     UpdatePassengerPositions(_passengers);
 
