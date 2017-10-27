@@ -738,12 +738,6 @@ void Transport::UpdatePassengerPositions(PassengerSet& passengers)
     {
         WorldObject* passenger = *itr;
 
-        if (!passenger->GetMap()) // if Transport under delete process - passengers should be removed 
-        {
-            RemovePassenger(*itr);
-            continue;
-        }            
-
         // transport teleported but passenger not yet (can happen for players)
         if (passenger->GetMap() != GetMap())
             continue;
