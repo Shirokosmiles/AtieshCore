@@ -26864,7 +26864,7 @@ bool Player::CheckOnFlyHack()
     if (IsFlying() || IsInFlight())
         return true;
 
-    if (GetTransport() || GetVehicle() || GetVehicleKit())
+    if (GetTransport())
         return true;
 
     if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
