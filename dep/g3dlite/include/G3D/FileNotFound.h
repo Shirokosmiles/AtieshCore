@@ -9,7 +9,7 @@
 #define G3D_FileNotFound_h
 
 #include "G3D/platform.h"
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
 
@@ -19,11 +19,11 @@ namespace G3D {
 */
 class FileNotFound {
 public:
-    String filename;
-    String message;
+    std::string filename;
+    std::string message;
 
     FileNotFound() {}
-    FileNotFound(const String& f, const String& m) : filename(f), message(m) {}
+    FileNotFound(const std::string& f, const std::string& m) : filename(f), message(m) {}
     virtual ~FileNotFound(){};
 };
 

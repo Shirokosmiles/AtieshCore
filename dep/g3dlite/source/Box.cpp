@@ -21,16 +21,6 @@ namespace G3D {
 Box::Box() : _area(0), _volume(0) {
 }
 
-size_t Box::hashCode() const {
-    return (size_t)(_area * 10.0f) ^ (size_t)(_volume * 10.0f) ^ _center.hashCode() ^ _edgeVector[0].hashCode();
-}
-
-bool Box::operator==(const Box& other) const {
-    return _center == other._center &&
-        _edgeVector[0] == other._edgeVector[0] &&
-        _edgeVector[1] == other._edgeVector[1] &&
-        _edgeVector[2] == other._edgeVector[2];
-}
 
 Box::Box
    (const Point3& min,
@@ -257,7 +247,7 @@ CoordinateFrame Box::localFrame() const {
 
 void Box::getFaceCorners(int f, Point3& v0, Point3& v1, Point3& v2, Point3& v3) const {
     switch (f) {
-    case 0: // -Z
+    case 0:
         v0 = corner(0); v1 = corner(2); v2 = corner(3); v3 = corner(1);
         break;
 
@@ -284,30 +274,6 @@ void Box::getFaceCorners(int f, Point3& v0, Point3& v1, Point3& v2, Point3& v3) 
     default:
         debugAssert((f >= 0) && (f < 6));
     }
-}
-
-/*
-    Faces are in the following order:
-	0: -Z
-	1: X
-	2: Z
-	3: Y
-	4: -X
-	5: -Y
-*/
-void Box::getFacePlane(
-        int                 f,
-        Plane&              plane) const {
-            debugAssert((f >= 0) && (f < 6));
-    Point3 v0, v1, v2, v3; 
-    getFaceCorners(f, v0, v1, v2, v3);
-    plane = Plane(v0, v2, v1); // Reverse winding to point the plane the right direction
-        
-    // Get the vector that points from the center to the face
-    const int edgeVectorIndexArray[6] = {2, 0, 2, 1, 0, 1};
-    const float signArray[6] = {-1, 1, 1, 1, -1, -1};
-    const Vector3& halfEdgeVector= _edgeVector[edgeVectorIndexArray[f]] * 0.5f * signArray[f];
-    plane = Plane(halfEdgeVector, halfEdgeVector.squaredMagnitude() >= 0.0000000001 ? center() + halfEdgeVector : Vector3::nan());
 }
 
 
@@ -415,33 +381,6 @@ bool Box::culledBy
     return false;
 }
 
-bool Box::culledBy(const Frustum& frustum) const {
-    Array<Plane> planes;
-    frustum.getPlanes(planes);
-    bool culled = culledBy(planes);
-    if (!culled) {
-        for (int i = 0; i < 6; ++i) {
-
-            bool culledByPlane = true;
-            Plane plane;
-            getFacePlane(i, plane);
-            if (!plane.normal().isNaN()) {
-                for (int j = 0; j < frustum.vertexPos.size(); ++j) {
-                    const Vector4& frustumVertex = frustum.vertexPos[j];
-                    if (!plane.halfSpaceContains(frustumVertex)) {
-                        culledByPlane = false;
-                        break;
-                    }
-                }
-                if (culledByPlane == true) {
-                    culled = true;
-                }
-            }
-        }
-    }
-    return culled;
-}
-
 
 bool Box::contains
     (const Point3&      point) const {
@@ -474,15 +413,15 @@ bool Box::contains
 
 
 
-void Box::getRandomSurfacePoint(Vector3& P, Vector3& N, Random& rnd) const {
+void Box::getRandomSurfacePoint(Vector3& P, Vector3& N) const {
     float aXY = extent(0) * extent(1);
     float aYZ = extent(1) * extent(2);
     float aZX = extent(2) * extent(0);
 
-    float r = rnd.uniform(0, aXY + aYZ + aZX);
+    float r = (float)uniformRandom(0, aXY + aYZ + aZX);
 
     // Choose evenly between positive and negative face planes
-    float d = (rnd.uniform(0, 1) < 0.5f) ? -1.0f : 1.0f;
+    float d = (uniformRandom(0, 1) < 0.5f) ? -1.0f : 1.0f;
 
     // The probability of choosing a given face is proportional to
     // its area.
@@ -505,11 +444,11 @@ void Box::getRandomSurfacePoint(Vector3& P, Vector3& N, Random& rnd) const {
 }
 
 
-Vector3 Box::randomInteriorPoint(Random& rnd) const {
+Vector3 Box::randomInteriorPoint() const {
     Vector3 sum = _center;
 
     for (int a = 0; a < 3; ++a) {
-        sum += _edgeVector[a] * (float)rnd.uniform(-0.5, 0.5);
+        sum += _edgeVector[a] * (float)uniformRandom(-0.5, 0.5);
     }
 
     return sum;

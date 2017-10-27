@@ -32,7 +32,7 @@ Vector3int32::Vector3int32(const Any& any) {
     case Any::TABLE:
         
         for (Any::AnyTable::Iterator it = any.table().begin(); it.isValid(); ++it) {
-            const String& key = toLower(it->key);
+            const std::string& key = toLower(it->key);
             
             if (key == "x") {
                 x = it->value;
@@ -113,7 +113,7 @@ void Vector3int32::deserialize(class BinaryInput& bi) {
     z = bi.readInt32();
 }
 
-String Vector3int32::toString() const {
+std::string Vector3int32::toString() const {
     return G3D::format("(%d, %d, %d)", x, y, z);
 }
 

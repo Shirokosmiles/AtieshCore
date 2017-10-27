@@ -42,7 +42,7 @@ void Vector3int16::deserialize(class BinaryInput& bi) {
     z = bi.readInt16();
 }
 
-String Vector3int16::toString() const {
+std::string Vector3int16::toString() const {
     return G3D::format("(%d, %d, %d)", x, y, z);
 }
 

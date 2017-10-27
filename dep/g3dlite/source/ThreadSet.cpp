@@ -106,7 +106,7 @@ void ThreadSet::clear() {
 }
     
 
-int ThreadSet::insert(const shared_ptr<Thread>& t) {
+int ThreadSet::insert(const ThreadRef& t) {
     m_lock.lock();
     bool found = false;
     for (int i = 0; i < m_thread.size() && ! found; ++i) {
@@ -121,7 +121,7 @@ int ThreadSet::insert(const shared_ptr<Thread>& t) {
 }
     
 
-bool ThreadSet::remove(const shared_ptr<Thread>& t) {
+bool ThreadSet::remove(const ThreadRef& t) {
     m_lock.lock();
     bool found = false;
     for (int i = 0; i < m_thread.size() && ! found; ++i) {
@@ -135,7 +135,7 @@ bool ThreadSet::remove(const shared_ptr<Thread>& t) {
 }
     
 
-bool ThreadSet::contains(const shared_ptr<Thread>& t) const {
+bool ThreadSet::contains(const ThreadRef& t) const {
     ThreadSet* me = const_cast<ThreadSet*>(this);
     me->m_lock.lock();
     bool found = false;

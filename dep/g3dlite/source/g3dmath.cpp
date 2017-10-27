@@ -11,27 +11,9 @@
 #include <cstdlib>
 #include <cstring>
 #include "G3D/BIN.h"
-#include "G3D/Random.h"
+
 
 namespace G3D {
-
-float ignoreFloat;
-double ignoreDouble;
-int ignoreInt;
-
-float lerpAngle(float a, float b, float t) {
-    a = wrap(a, 0, 2.0f * pif());
-    b = wrap(b, 0, 2.0f * pif());
-    if (b - a > pif()) {
-        a += 2.0f * pif();
-    }
-    return lerp(a, b, t);
-}
-
-int roundStochastically(float f) {
-    const int   i = iRound(f);
-    return i + ((Random::common().uniform() >= (f - float(i))) ? 0 : 1);
-}
 
 float gaussRandom(float mean, float stdev) {
 
@@ -124,6 +106,18 @@ int highestBit(uint32 x) {
     return base + lut[x];
 }
 
+
+int iRandom(int low, int high) {
+    int r = iFloor(low + (high - low + 1) * (double)rand() / RAND_MAX);
+    
+    // There is a *very small* chance of generating
+    // a number larger than high.
+    if (r > high) {
+        return high;
+    } else {
+        return r;
+    }
+}
 
 
 }

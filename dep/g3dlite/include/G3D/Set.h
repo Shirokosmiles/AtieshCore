@@ -16,7 +16,7 @@
 #include "G3D/Table.h"
 #include "G3D/MemoryManager.h"
 #include <assert.h>
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
 
@@ -41,7 +41,7 @@ class Set {
 
 public:
 
-    void clearAndSetMemoryManager(const shared_ptr<MemoryManager>& m) {
+    void clearAndSetMemoryManager(const MemoryManager::Ref& m) {
         memberTable.clearAndSetMemoryManager(m);
     }
 

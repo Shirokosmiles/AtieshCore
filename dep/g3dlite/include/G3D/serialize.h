@@ -4,16 +4,16 @@
 #include "G3D/BinaryInput.h"
 #include "G3D/BinaryOutput.h"
 #include "G3D/Array.h"
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
     
 
-inline void serialize(const String& s, BinaryOutput& b) {
+inline void serialize(const std::string& s, BinaryOutput& b) {
     b.writeString32(s);
 }
 
-inline void deserialize(String& s, BinaryInput& b) {
+inline void deserialize(std::string& s, BinaryInput& b) {
     s = b.readString32();
 }
 

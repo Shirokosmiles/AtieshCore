@@ -28,7 +28,6 @@
 #include "G3D/GMutex.h"
 #include "G3D/units.h"
 #include "G3D/FileSystem.h"
-#include "G3D/Array.h"
 #include <time.h>
 
 #include <cstring>
@@ -89,19 +88,10 @@ namespace G3D {
 static bool checkForCPUID();
 
 /** Called from init */
-static void getG3DVersion(String& s);
+static void getG3DVersion(std::string& s);
 
 /** Called from init */
 static G3DEndian checkEndian();
-
-void* System_malloc(size_t s) {
-    return System::malloc(s);
-}
-
-
-void System_free(void* p) {
-    System::free(p); 
-}
 
 
 System& System::instance() {
@@ -241,7 +231,7 @@ void System::init() {
 
         if (success) {
             char c[1000];
-            sprintf(c, "Windows %d.%d build %d Platform %d %ls",
+            sprintf(c, "Windows %d.%d build %d Platform %d %s",
                 osVersionInfo.dwMajorVersion,
                 osVersionInfo.dwMinorVersion,
                 osVersionInfo.dwBuildNumber,
@@ -265,7 +255,7 @@ void System::init() {
             if (r[strlen(r) - 1] == '\n') {
                 r[strlen(r) - 1] = '\0';
             }
-            pclose(f);
+            fclose(f);
             f = NULL;
 
             m_operatingSystem = r;
@@ -328,7 +318,7 @@ void System::init() {
 }
 
 
-void getG3DVersion(String& s) {
+void getG3DVersion(std::string& s) {
 
     const char* build = 
 #       ifdef G3D_64BIT
@@ -365,84 +355,20 @@ void getG3DVersion(String& s) {
 
 // Places where specific files were most recently found.  This is
 // used to cache seeking of common files.
-static Table<String, String> lastFound;
+static Table<std::string, std::string> lastFound;
 
 // Places to look in findDataFile
-static Array<String> directoryArray;
-
-void System::initializeDirectoryArray(Array<String>& directoryArray, bool caseSensitive) {
-    const String initialAppDataDir(instance().m_appDataDir);
-    // Initialize the directory array
-    RealTime t0 = System::time();
-
-    std::vector<String> baseDirArray;
-        
-    baseDirArray.push_back(FileSystem::currentDirectory());
-
-    if (! initialAppDataDir.empty()) {
-        baseDirArray.push_back(initialAppDataDir);
-        baseDirArray.push_back(pathConcat(initialAppDataDir, "data"));
-        baseDirArray.push_back(pathConcat(initialAppDataDir, "data.zip"));
-    } else {
-        baseDirArray.push_back("data");
-        baseDirArray.push_back("data.zip");
-    }
-
-    getG3DDataPaths(baseDirArray);
-
-    static const String subdirs[] = 
-        {"font", "gui", "shader", "model", "cubemap", "icon", "material", "image", "md2", "md3", "ifs", "3ds", "sky", "music", "sound", "scene", ""};
-    for (int j = 0; j < int(baseDirArray.size()); ++j) {
-        const String& d = baseDirArray[j];
-//logPrintf("%s", d.c_str());
-        if (d.empty() || FileSystem::exists(d)) {
-//logPrintf(" exists\n");
-            directoryArray.append(d);
-            for (int i = 0; ! subdirs[i].empty(); ++i) {
-                const String& p = pathConcat(d, subdirs[i]);
-                if (FileSystem::exists(p, true, caseSensitive)) {
-                    directoryArray.append(p);
-                }
-            }
-        } else {
-//logPrintf(" does not exist\n");
-        }
-    }
-    logLazyPrintf("Initializing System::findDataFile took %fs\n", System::time() - t0);
-}
-
-void System::getG3DDataPaths(std::vector<String>& paths) {
-    instance().init();
-
-    if (! _internal::g3dInitializationSpecification().deployMode) {
-        const char* c = System::getEnv("G3D10DATA");
-        const String& fullG3D10DATA = isNull(c) ? "" : c;
-        const char splitChar = 
-    #           ifdef G3D_WINDOWS
-                ';'
-    #           else
-                ':'
-    #           endif
-                ;
-
-        const Array<String>& allG3D10DATAPaths = stringSplit(fullG3D10DATA, splitChar);
-        for (int i = 0; i < allG3D10DATAPaths.size(); ++i) {
-              if (! allG3D10DATAPaths[i].empty()) {
-                  paths.push_back(FileSystem::resolve(allG3D10DATAPaths[i]));
-              }
-        }
-    }
-}
+static Array<std::string> directoryArray;
 
 #define MARK_LOG()
 //#define MARK_LOG() logPrintf("%s(%d)\n", __FILE__, __LINE__)
-String System::findDataFile
-(const String&  _full,
+std::string System::findDataFile
+(const std::string&  _full,
  bool                errorIfNotFound,
  bool                caseSensitive) {
 MARK_LOG();
 
-    const String full = FilePath::expandEnvironmentVariables(_full);
+    const std::string full = FilePath::expandEnvironmentVariables(_full);
 
     // First check if the file exists as requested.  This will go
     // through the FileSystemCache, so most calls do not touch disk.
@@ -452,7 +378,7 @@ MARK_LOG();
 
 MARK_LOG();
     // Now check where we previously found this file.
-    String* last = lastFound.getPointer(full);
+    std::string* last = lastFound.getPointer(full);
     if (last != NULL) {
         if (FileSystem::exists(*last, true, caseSensitive)) {
             // Even if cwd has changed the file is still present.
@@ -466,15 +392,73 @@ MARK_LOG();
 
 MARK_LOG();
 
-    const String initialAppDataDir(instance().m_appDataDir);
-    if (directoryArray.size() == 0) {
-        initializeDirectoryArray(directoryArray, caseSensitive);
-    }
+    const std::string initialAppDataDir(instance().m_appDataDir);
+    const char* g3dPath = getenv("G3D9DATA");
 
+    if (directoryArray.size() == 0) {
+        // Initialize the directory array
+        RealTime t0 = System::time();
+
+        Array<std::string> baseDirArray;
+        
+        baseDirArray.append(FileSystem::currentDirectory());
+MARK_LOG();
+        if (! initialAppDataDir.empty()) {
+MARK_LOG();
+            baseDirArray.append(initialAppDataDir);
+            baseDirArray.append(pathConcat(initialAppDataDir, "data"));
+            baseDirArray.append(pathConcat(initialAppDataDir, "data.zip"));
+        } else {
+MARK_LOG();
+            baseDirArray.append("data");
+            baseDirArray.append("data.zip");
+        }
+MARK_LOG();
+
+#       ifdef G3D_WINDOWS
+        if (g3dPath == NULL) {
+            // If running the demos under visual studio from the G3D.sln file,
+            // this will locate the data directory.
+            const char* paths[] = {"../data-files/", "../../data-files/", "../../../data-files/", NULL};
+            for (int i = 0; paths[i]; ++i) {
+                if (FileSystem::exists(pathConcat(paths[i], "G3D-DATA-README.TXT"), true, caseSensitive)) {
+                    g3dPath = paths[i];
+                    break;
+                }
+            }
+        }
+#       endif
+
+        if (g3dPath && (initialAppDataDir != g3dPath)) {
+            baseDirArray.append(g3dPath);
+        }
+
+        static const std::string subdirs[] = 
+            {"font", "gui", "shader", "model", "cubemap", "icon", "material", "image", "md2", "md3", "ifs", "3ds", "sky", "music", "sound", "scene", ""};
+        for (int j = 0; j < baseDirArray.size(); ++j) {
+            std::string d = baseDirArray[j];
+//logPrintf("%s", d.c_str());
+            if ((d == "") || FileSystem::exists(d)) {
+//logPrintf(" exists\n");
+                directoryArray.append(d);
+                for (int i = 0; ! subdirs[i].empty(); ++i) {
+                    const std::string& p = pathConcat(d, subdirs[i]);
+                    if (FileSystem::exists(p, true, caseSensitive)) {
+                        directoryArray.append(p);
+                    }
+                }
+            } else {
+//logPrintf(" does not exist\n");
+            }
+        }
+
+        logLazyPrintf("Initializing System::findDataFile took %fs\n", System::time() - t0);
+
+    }
 MARK_LOG();
 
     for (int i = 0; i < directoryArray.size(); ++i) {
-        const String& p = pathConcat(directoryArray[i], full);
+        const std::string& p = pathConcat(directoryArray[i], full);
         if (FileSystem::exists(p, true, caseSensitive)) {
             lastFound.set(full, p);
             return p;
@@ -485,19 +469,22 @@ MARK_LOG();
     if (errorIfNotFound) {
         // Generate an error message.  Delay this operation until we know that we need it;
         // otherwise all of the string concatenation would run on each successful find.
-        String locations;
+        std::string locations;
         for (int i = 0; i < directoryArray.size(); ++i) {
             locations += "\'" + pathConcat(directoryArray[i], full) + "'\n";
         }
 MARK_LOG();
 
-        String msg = "Could not find '" + full + "'.\n\n";
+        std::string msg = "Could not find '" + full + "'.\n\n";
         msg +=     "  cwd                    = '" + FileSystem::currentDirectory() + "'\n";
-        if (System::getEnv("G3D10DATA")) {
-            msg += "  G3D10DATA               = '" + String(System::getEnv("G3D10DATA")) + "'";
+        if (g3dPath) {
+            msg += "  G3D9DATA               = '" + std::string(g3dPath) + "'";
+            if (! FileSystem::exists(g3dPath, true, caseSensitive)) {
+                msg += " (illegal path!)";
+            }
             msg += "\n";
         } else {
-            msg += "  G3D10DATA               = (environment variable is not defined)\n";
+            msg += "  G3D9DATA               = (environment variable is not defined)\n";
         }
 MARK_LOG();
         msg +=     "  GApp::Settings.dataDir = '" + initialAppDataDir + "'";
@@ -520,7 +507,7 @@ MARK_LOG();
 }
 #undef MARK_LOG
 
-void System::setAppDataDir(const String& path) {
+void System::setAppDataDir(const std::string& path) {
     instance().m_appDataDir = path;
 
     // Wipe the findDataFile cache
@@ -535,8 +522,8 @@ void System::cleanup() {
 }
 
 
-const String& System::build() {
-    const static String b =
+const std::string& System::build() {
+    const static std::string b =
 #   ifdef _DEBUG
         "Debug";
 #   else 
@@ -723,7 +710,7 @@ void System::memset(void* dst, uint8 value, size_t numBytes) {
 
 
 /** Removes the 'd' that icompile / Morgan's VC convention appends. */
-static String computeAppName(const String& start) {
+static std::string computeAppName(const std::string& start) {
     if (start.size() < 2) {
         return start;
     }
@@ -732,11 +719,11 @@ static String computeAppName(const String& start) {
         // Maybe remove the 'd'; see if ../ or ../../ has the same name
         char tmp[1024];
         (void)getcwd(tmp, sizeof(tmp));
-        String drive, base, ext;
-        Array<String> path;
+        std::string drive, base, ext;
+        Array<std::string> path;
         parseFilename(tmp, drive, path, base, ext);
 
-        String shortName = start.substr(0, start.size() - 1);
+        std::string shortName = start.substr(0, start.size() - 1);
 
         if ((path.size() > 1) && (toLower(path.last()) == toLower(shortName))) {
             return shortName;
@@ -751,13 +738,13 @@ static String computeAppName(const String& start) {
 }
 
 
-String& System::appName() {
-    static String n = computeAppName(filenameBase(currentProgramFilename()));
+std::string& System::appName() {
+    static std::string n = computeAppName(filenameBase(currentProgramFilename()));
     return n;
 }
 
 
-String System::currentProgramFilename() {
+std::string System::currentProgramFilename() {
     char filename[2048];
 
 #   ifdef G3D_WINDOWS
@@ -968,12 +955,11 @@ RealTime System::time() {
 
 
 ////////////////////////////////////////////////////////////////
-#define ALIGNMENT_SIZE 16 // must be at least sizeof(size_t)
 
-#define REALPTR_TO_USERPTR(x)   ((uint8*)(x) + ALIGNMENT_SIZE)
-#define USERPTR_TO_REALPTR(x)   ((uint8*)(x) - ALIGNMENT_SIZE)
-#define USERSIZE_TO_REALSIZE(x)       ((x) + ALIGNMENT_SIZE)
-#define REALSIZE_FROM_USERPTR(u) (*(size_t*)USERPTR_TO_REALPTR(ptr) + ALIGNMENT_SIZE)
+#define REALPTR_TO_USERPTR(x)   ((uint8*)(x) + sizeof(size_t))
+#define USERPTR_TO_REALPTR(x)   ((uint8*)(x) - sizeof(size_t))
+#define USERSIZE_TO_REALSIZE(x)       ((x) + sizeof(size_t))
+#define REALSIZE_FROM_USERPTR(u) (*(size_t*)USERPTR_TO_REALPTR(ptr) + sizeof(size_t))
 #define USERSIZE_FROM_USERPTR(u) (*(size_t*)USERPTR_TO_REALPTR(ptr))
 
 class BufferPool {
@@ -1037,18 +1023,18 @@ private:
 
     Spinlock            m_lock;
 
-    inline void __fastcall lock() {
+    void lock() {
         m_lock.lock();
     }
 
-    inline void __fastcall unlock() {
+    void unlock() {
         m_lock.unlock();
     }
 
     /** 
      Malloc out of the tiny heap. Returns NULL if allocation failed.
      */
-    inline UserPtr __fastcall tinyMalloc(size_t bytes) {
+    inline UserPtr tinyMalloc(size_t bytes) {
         // Note that we ignore the actual byte size
         // and create a constant size block.
         (void)bytes;
@@ -1078,13 +1064,13 @@ private:
     }
 
     /** Returns true if this is a pointer into the tiny heap. */
-    bool __fastcall inTinyHeap(UserPtr ptr) {
+    bool inTinyHeap(UserPtr ptr) {
         return 
             (ptr >= tinyHeap) && 
             (ptr < (uint8*)tinyHeap + maxTinyBuffers * tinyBufferSize);
     }
 
-    void __fastcall tinyFree(UserPtr ptr) {
+    void tinyFree(UserPtr ptr) {
         assert(ptr);
         assert(tinyPoolSize < maxTinyBuffers);
  //           "Tried to free a tiny pool buffer when the tiny pool freelist is full.");
@@ -1119,7 +1105,7 @@ private:
 
     /** Allocate out of a specific pool.  Return NULL if no suitable 
         memory was found. */
-    UserPtr poolMalloc(MemBlock* pool, int& poolSize, const int maxPoolSize, size_t bytes) {
+    UserPtr malloc(MemBlock* pool, int& poolSize, size_t bytes) {
 
         // OPT: find the smallest block that satisfies the request.
 
@@ -1141,28 +1127,6 @@ private:
             }
         }
 
-        if (poolSize == maxPoolSize) {
-            // Free even-indexed pools, and compact array in the same loop
-            for (int i = 0; i < poolSize; i += 2) {
-                bytesAllocated -= USERSIZE_TO_REALSIZE(pool[i].bytes);
-                ::free(USERPTR_TO_REALPTR(pool[i].ptr));
-                pool[i].ptr = NULL;
-                pool[i].bytes = 0;
-                // Compact: (i/2) is the next open slot
-                pool[i/2].ptr   = pool[i+1].ptr;
-                pool[i/2].bytes = pool[i+1].bytes;
-                pool[i+1].ptr = NULL;
-                pool[i+1].bytes = 0;
-            }
-            poolSize = poolSize/2;
-            if (maxPoolSize == maxMedBuffers) {
-                ++medPoolPurgeCount;
-            } else if (maxPoolSize == maxSmallBuffers) {
-                ++smallPoolPurgeCount;
-            }
-
-        }
-
         return NULL;
     }
 
@@ -1173,9 +1137,6 @@ public:
     int mallocsFromTinyPool;
     int mallocsFromSmallPool;
     int mallocsFromMedPool;
-
-    int smallPoolPurgeCount;
-    int medPoolPurgeCount;
 
     /** Amount of memory currently allocated (according to the application). 
         This does not count the memory still remaining in the buffer pool,
@@ -1200,9 +1161,6 @@ public:
         smallPoolSize        = 0;
 
         medPoolSize          = 0;
-
-        smallPoolPurgeCount = 0;
-        medPoolPurgeCount   = 0;
 
 
         // Initialize the tiny heap as a bunch of pointers into one
@@ -1274,7 +1232,7 @@ public:
     }
 
 
-    UserPtr __fastcall malloc(size_t bytes) {
+    UserPtr malloc(size_t bytes) {
         lock();
         ++totalMallocs;
 
@@ -1283,7 +1241,6 @@ public:
             UserPtr ptr = tinyMalloc(bytes);
 
             if (ptr) {
-                debugAssertM((intptr_t)ptr % 16 == 0, "BufferPool::tinyMalloc returned non-16 byte aligned memory");
                 ++mallocsFromTinyPool;
                 unlock();
                 return ptr;
@@ -1295,10 +1252,9 @@ public:
         // through to a small buffer
         if (bytes <= smallBufferSize) {
             
-            UserPtr ptr = poolMalloc(smallPool, smallPoolSize, maxSmallBuffers, bytes);
+            UserPtr ptr = malloc(smallPool, smallPoolSize, bytes);
 
             if (ptr) {
-                debugAssertM((intptr_t)ptr % 16 == 0, "BufferPool::poolMalloc(small) returned non-16 byte aligned memory");
                 ++mallocsFromSmallPool;
                 unlock();
                 return ptr;
@@ -1309,10 +1265,9 @@ public:
             // through into a medium allocation because that would
             // waste the medium buffer's resources.
 
-            UserPtr ptr = poolMalloc(medPool, medPoolSize, maxMedBuffers, bytes);
+            UserPtr ptr = malloc(medPool, medPoolSize, bytes);
 
             if (ptr) {
-                debugAssertM((intptr_t)ptr % 16 == 0, "BufferPool::poolMalloc(med) returned non-16 byte aligned memory");
                 ++mallocsFromMedPool;
                 unlock();
                 debugAssertM(ptr != NULL, "BufferPool::malloc returned NULL");
@@ -1328,6 +1283,7 @@ public:
         // Allocate 4 extra bytes for our size header (unfortunate,
         // since malloc already added its own header).
         RealPtr ptr = ::malloc(USERSIZE_TO_REALSIZE(bytes));
+
         if (ptr == NULL) {
 #           ifdef G3D_WINDOWS
                 // Check for memory corruption
@@ -1345,7 +1301,6 @@ public:
                 (System::outOfMemoryCallback()(USERSIZE_TO_REALSIZE(bytes), true) == true)) {
                 // Re-attempt the malloc
                 ptr = ::malloc(USERSIZE_TO_REALSIZE(bytes));
-                
             }
         }
 
@@ -1365,7 +1320,7 @@ public:
         }
 
         ((size_t*)ptr)[0] = bytes;
-        debugAssertM((intptr_t)REALPTR_TO_USERPTR(ptr) % 16 == 0, "::malloc returned non-16 byte aligned memory");
+
         return REALPTR_TO_USERPTR(ptr);
     }
 
@@ -1410,7 +1365,7 @@ public:
         ::free(USERPTR_TO_REALPTR(ptr));
     }
 
-    String mallocRatioString() const {
+    std::string performance() const {
         if (totalMallocs > 0) {
             int pooled = mallocsFromTinyPool +
                          mallocsFromSmallPool + 
@@ -1418,7 +1373,7 @@ public:
 
             int total = totalMallocs;
 
-            return format("Percent of Mallocs: %5.1f%% <= %db, %5.1f%% <= %db, "
+            return format("malloc performance: %5.1f%% <= %db, %5.1f%% <= %db, "
                           "%5.1f%% <= %db, %5.1f%% > %db",
                           100.0 * mallocsFromTinyPool  / total,
                           BufferPool::tinyBufferSize,
@@ -1433,22 +1388,9 @@ public:
         }
     }
 
-    String status() const {
-        String tinyPoolString = format("Tiny Pool: %5.1f%% of %d x %db Free", 100.0 * tinyPoolSize / maxTinyBuffers, 
-                                       maxTinyBuffers, tinyBufferSize);
-        String poolSizeString = format("Pool Sizes: %5d/%d x %db, %5d/%d x %db, %5d/%d x %db",
-                                       tinyPoolSize,     maxTinyBuffers,     tinyBufferSize, 
-                                       smallPoolSize,    maxSmallBuffers,    smallBufferSize,
-                                       medPoolSize,      maxMedBuffers,      medBufferSize);
-
-        int pooled = mallocsFromTinyPool +
-            mallocsFromSmallPool + 
-            mallocsFromMedPool;
-        int outOfPoolsMallocs = totalMallocs - pooled;
-        String outOfBufferMemoryString = format("Total out of pools mallocs: %d; Bytes allocated: %d", outOfPoolsMallocs, int(bytesAllocated));
-        String purgeString = format("Small Pool Purges: %d; Med Pool Purges: %d", smallPoolPurgeCount, medPoolPurgeCount);
-        return mallocRatioString() + "\n" + poolSizeString + "\n" + outOfBufferMemoryString + "\n" + purgeString;
-
+    std::string status() const {
+        return format("preallocated shared buffers: %5d/%d x %db",
+            maxTinyBuffers - tinyPoolSize, maxTinyBuffers, tinyBufferSize);
     }
 };
 
@@ -1457,7 +1399,15 @@ public:
 // is deallocated.
 static BufferPool* bufferpool = NULL;
 
-String System::mallocStatus() {    
+std::string System::mallocPerformance() {    
+#ifndef NO_BUFFERPOOL
+    return bufferpool->performance();
+#else
+    return "NO_BUFFERPOOL";
+#endif
+}
+
+std::string System::mallocStatus() {    
 #ifndef NO_BUFFERPOOL
     return bufferpool->status();
 #else
@@ -1614,8 +1564,8 @@ void System::alignedFree(void* _ptr) {
 }
 
 
-void System::setEnv(const String& name, const String& value) {
-    String cmd = name + "=" + value;
+void System::setEnv(const std::string& name, const std::string& value) {
+    std::string cmd = name + "=" + value;
 #   ifdef G3D_WINDOWS
         _putenv(cmd.c_str());
 #   else
@@ -1625,33 +1575,33 @@ void System::setEnv(const String& name, const String& value) {
 }
 
 
-const char* System::getEnv(const String& name) {
+const char* System::getEnv(const std::string& name) {
     return getenv(name.c_str());
 }
 
 
-static void var(TextOutput& t, const String& name, const String& val) {
-    t.writeSymbols(name, "=");
+static void var(TextOutput& t, const std::string& name, const std::string& val) {
+    t.writeSymbols(name,"=");
     t.writeString(val);
     t.writeNewline();
 }
 
 
-static void var(TextOutput& t, const String& name, const bool val) {
+static void var(TextOutput& t, const std::string& name, const bool val) {
     t.writeSymbols(name, "=", val ? "Yes" : "No");
     t.writeNewline();
 }
 
 
-static void var(TextOutput& t, const String& name, const int val) {
-    t.writeSymbols(name, "=");
+static void var(TextOutput& t, const std::string& name, const int val) {
+    t.writeSymbols(name,"=");
     t.writeNumber(val);
     t.writeNewline();
 }
 
 
 void System::describeSystem(
-    String&        s) {
+    std::string&        s) {
 
     TextOutput t;
     describeSystem(t);
@@ -1668,7 +1618,7 @@ void System::describeSystem(
         var(t, "Name", System::currentProgramFilename());
         char cwd[1024];
         (void)getcwd(cwd, 1024);
-        var(t, "cwd", String(cwd));
+        var(t, "cwd", std::string(cwd));
     }
     t.popIndent();
     t.writeSymbols("}");
@@ -1710,11 +1660,10 @@ void System::describeSystem(
     t.writeNewline();
     t.pushIndent();
     {
-        const char* g3dPath = getenv("G3D10DATA");
+        const char* g3dPath = getenv("G3D9DATA");
         var(t, "Link version", G3D_VER);
         var(t, "Compile version", System::version());
-        var(t, "G3DSpecification::deployMode", _internal::g3dInitializationSpecification().deployMode);
-        var(t, "G3D10DATA", String(g3dPath ? g3dPath : ""));
+        var(t, "G3D9DATA", std::string(g3dPath ? g3dPath : ""));
     }
     t.popIndent();
     t.writeSymbols("}");
@@ -1722,14 +1671,14 @@ void System::describeSystem(
     t.writeNewline();
 }
 
-String System::currentDateString() {
+std::string System::currentDateString() {
     time_t t1;
     ::time(&t1);
     tm* t = localtime(&t1);
     return format("%d-%02d-%02d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday); 
 }
 
-String System::currentTimeString() {
+std::string System::currentTimeString() {
     time_t t1;
     ::time(&t1);
     tm* t = localtime(&t1);
@@ -1740,7 +1689,7 @@ String System::currentTimeString() {
 
 // Windows 64-bit
 void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, uint32& edx) {
-	int regs[4] = {int(eax), int(ebx), int(ecx), int(edx)};
+	int regs[4] = {eax, ebx, ecx, edx};
 	__cpuid(regs, func);
 	eax = regs[0];
 	ebx = regs[1];

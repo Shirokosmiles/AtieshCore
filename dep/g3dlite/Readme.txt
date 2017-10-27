@@ -1,7 +1,6 @@
  Due to issues with G3D normally requiring X11 and the ZIP-library, the library version in this sourcetree contains a modified version.
 The applied patches are added as .diff-files to the repository for future reference (knowing what was changed is quite handy).
 
-
 G3D-v8.0_hotfix1.diff - 2010-08-27 - remove dependency on zip/z11 libraries, add support for 64-bit arch
 G3D-v8.0_hotfix2.diff - 2012-01-14 - fix typo in isNaN(float x)
 G3D-v8.0_hotfix3.diff - 2012-08-26 - fix compilation on Fedora Linux
@@ -18,4 +17,3 @@ G3D-v9.0 hotfix4.diff - 2015-07-02 - backport G3D10 fix
 G3D-v9.0 hotfix5.diff - 2015-07-31 - fix MSVC 2015 warning: dep/g3dlite/include/G3D/Quat.h(352): warning C4458: declaration of 'x' hides class member
 G3D-v9.0 hotfix6.diff - 2015-11-04 - fix adding std::shared_ptr, std::weak_ptr, std::dynamic_pointer_cast, std::static_pointer_cast and std::enable_shared_from_this to global namespace
 G3D-v9.0 hotfix7.diff - 2016-10-10 - fix warning on clang 3.8 backported from G3D 10
-G3D-v10.0 hotfix1.diff - 2016-11-30 - updated to G3D10, reapplied all previous patches and removed unneeded changes, removed enet dependency (disable networking), Removed SSE4.1 dependency

@@ -6,7 +6,7 @@
  \cite Based on a lexer written by Aaron Orenstein. 
  
  \created 2001-11-27
- \edited  2014-01-25
+ \edited  2012-07-22
  */
 
 #include "G3D/fileutils.h"
@@ -39,39 +39,38 @@ double Token::number() const {
 }
 
 
-bool TextInput::parseBoolean(const String& _string) {
+bool TextInput::parseBoolean(const std::string& _string) {
      return toLower(_string) == "true";
 }
 
-
-double TextInput::parseNumber(const String& s) {
-    if (s == "-1.#IND00" || s == "-1.#IND" || s == "nan" || s == "NaN" || s == "1.#QNAN") {
+double TextInput::parseNumber(const std::string& _string) {
+    std::string s = toLower(_string);
+    if (s == "-1.#ind00" || s == "-1.#ind" || s == "nan" || s == "NaN") {
         return nan();
     }
     
-    if (s == "1.#INF00" || s == "1.#INF" || s == "inf" || s == "+inf" || s == "Infinity") {
+    if (s == "1.#inf00" || s == "1.#inf" || s == "inf" || s == "+inf" || s == "Infinity") {
         return inf();
     }
     
-    if (s == "-1.#INF00" || s == "-1.#INF" || s == "-inf" || s == "-Infinity") {
+    if (s == "-1.#inf00" || s == "-1.#inf" || s == "-inf" || s == "-Infinity") {
         return -inf();
     }
     
     double n;
-    if ((s.length() > 2) &&
-        (s[0] == '0') &&
-        ((s[1] == 'x') || (s[1] == 'X'))) {
+    if ((_string.length() > 2) &&
+        (_string[0] == '0') &&
+        (_string[1] == 'x')) {
         // Hex
         uint32 i;
-        sscanf(s.c_str(), "%x", &i);
+        sscanf(_string.c_str(), "%x", &i);
         n = i;
     } else {
-        sscanf(s.c_str(), "%lg", &n);
+        sscanf(_string.c_str(), "%lg", &n);
     }
 
     return n;
 }
-
 
 TextInput::Settings::Settings () :
     cppBlockComments(true),
@@ -135,7 +134,7 @@ void TextInput::read(Token& t) {
 }
 
 
-String TextInput::readUntilDelimiterAsString(const char delimiter1, const char delimiter2) {
+std::string TextInput::readUntilDelimiterAsString(const char delimiter1, const char delimiter2) {
 /*
     // Reset the read position back to the start of that token
     currentCharOffset = t.bytePosition();
@@ -148,7 +147,7 @@ String TextInput::readUntilDelimiterAsString(const char delimiter1, const char d
         return "";
     }
     */
-    String s;
+    std::string s;
 
     if (stack.size() > 0) {
         // Need to back up.  This only works if the stack is actually
@@ -178,13 +177,13 @@ String TextInput::readUntilDelimiterAsString(const char delimiter1, const char d
 }
 
 
-String TextInput::readUntilNewlineAsString() {
+std::string TextInput::readUntilNewlineAsString() {
     return readUntilDelimiterAsString('\r', '\n');
 }
 
 
-static void toUpper(Set<String>& set) {
-    Array<String> symbols;
+static void toUpper(Set<std::string>& set) {
+    Array<std::string> symbols;
     set.getMembers(symbols);
     set.clear();
     for (int i = 0; i < symbols.size(); ++i) {
@@ -281,7 +280,7 @@ void TextInput::nextToken(Token& t) {
         whitespaceDone = true;
 
         // generate newlines tokens for '\n' and '\r' and '\r\n'
-        while (isWhitespace(c)) {
+        while (isWhiteSpace(c)) {
             if (options.generateNewlineTokens && isNewline(c)) {
                 t._type         = Token::NEWLINE;
                 t._extendedType = Token::NEWLINE_TYPE;
@@ -327,7 +326,7 @@ void TextInput::nextToken(Token& t) {
         }
 
         // parse comments and generate tokens if enabled
-        String commentString;
+        std::string commentString;
 
         // check for line comments first
         bool isLineComment = false;
@@ -675,7 +674,6 @@ numLabel:
         if ((c == '0') && (peekInputChar(1) == 'x')) {
             // Hex number
             t._string += "0x";
-            t._extendedType = Token::HEX_INTEGER_TYPE;
 
             // skip the 0x
             eatInputChar();
@@ -712,87 +710,64 @@ numLabel:
                 if (options.msvcFloatSpecials && (c == '#')) {
                     isSpecial = true;
                     // We are reading a floating point special value
-                    // of the form -1.#IND00, -1.#INF00, 1.#INF00
-                    // (with or without the trailing 00)
-                    // or 1.#QNAN
+                    // of the form -1.#IND00, -1.#INF00, or 1.#INF00
+                    // (with or without the trailing 00
                     c = eatAndPeekInputChar();
                     char test = c;
                     if (! options.caseSensitive) {
                         test = toupper(c);
                     }
-                    if (test != 'I' && test != 'Q') {
+                    if (test != 'I') {
                         throw BadMSVCSpecial
                             ("Incorrect floating-point special (inf or nan) "
                              "format.",
                             t.line(), charNumber);
                     }
-                    if (test == 'I') {
-                        c = eatAndPeekInputChar();
-                        test = c;
-                        if (!options.caseSensitive) {
-                            test = toupper(c);
-                        }
-                        if (test != 'N') {
-                            throw BadMSVCSpecial
-                                (
-                                "Incorrect floating-point special (inf or nan) "
-                                "format.",
-                                t.line(), charNumber);
-                        }
-                        t._string += "#IN";
-                        c = eatAndPeekInputChar();
-                        test = c;
-                        if (!options.caseSensitive) {
-                            test = toupper(c);
-                        }
-                        if ((test != 'F') && (test != 'D')) {
-                            throw BadMSVCSpecial
-                                (
-                                "Incorrect floating-point special (inf or nan) "
-                                "format.",
-                                t.line(), charNumber);
-                        }
-                        t._string += c;
+                    c = eatAndPeekInputChar();
+                    test = c;
+                    if (! options.caseSensitive) {
+                        test = toupper(c);
+                    }
+                    if (test != 'N') {
+                        throw BadMSVCSpecial
+                            (
+                             "Incorrect floating-point special (inf or nan) "
+                             "format.",
+                            t.line(), charNumber);
+                    }
+                    t._string += "#IN";
+                    c = eatAndPeekInputChar();
+                    test = c;
+                    if (! options.caseSensitive) {
+                        test = toupper(c);
+                    }
+                    if ((test != 'F') && (test != 'D')) {
+                        throw BadMSVCSpecial
+                            (
+                             "Incorrect floating-point special (inf or nan) "
+                             "format.",
+                            t.line(), charNumber);
+                    }
+                    t._string += c;
 
-                        // On older systems, there may be an extra 00 tacked on.
-                        for (int j = 0; j < 2; ++j) {
+                    // On older systems, there may be an extra 00 tacked on.
+                    for (int j = 0; j < 2; ++j) {
+                        c = eatAndPeekInputChar();
+                        if (c == '0') {
                             c = eatAndPeekInputChar();
-                            if (c == '0') {
-                                c = eatAndPeekInputChar();
-                                if (c != '0') {
-                                    throw BadMSVCSpecial
-                                        (
-                                        "Incorrect floating-point special (inf or nan) "
-                                        "format.",
-                                        t.line(), charNumber);
-                                }
-                                else {
-                                    eatInputChar();
-                                    t._string += "00";
-                                }
-                            }
-                            else {
-                                break;
-                            }
-                        }
-                    } else { // test == 'Q'
-                        t._string += "#Q";
-                        char remainingChars[3] = { 'N', 'A', 'N' };
-                        for (int i = 0; i < 3; ++i) {
-                            test = eatAndPeekInputChar();
-                            if (!options.caseSensitive) {
-                                test = toupper(test);
-                            }
-                            if (test != remainingChars[i]) {
+                            if (c != '0') {
                                 throw BadMSVCSpecial
-                                    (
-                                    "Incorrect floating-point special (inf or nan) "
-                                    "format.",
-                                    t.line(), charNumber);
+                                (
+                                 "Incorrect floating-point special (inf or nan) "
+                                 "format.",
+                                t.line(), charNumber);
+                            } else {
+                                eatInputChar();
+                                t._string += "00";
                             }
-                            t._string += remainingChars[i];
+                        } else {
+                            break;
                         }
-                        eatInputChar();
                     }
 
                 } else {
@@ -844,7 +819,7 @@ numLabel:
 
         // See if this symbol is actually a boolean
         if ((options.trueSymbols.size() > 0) || (options.falseSymbols.size() > 0)) {
-            String str = t._string;
+            std::string str = t._string;
             if (! options.caseSensitive) {
                 str = toUpper(str);
             }
@@ -1089,12 +1064,12 @@ Token TextInput::readStringToken() {
                          Token::STRING, t._type);
 }
 
-String TextInput::readString() {
+std::string TextInput::readString() {
     return readStringToken()._string;
 }
 
 
-void TextInput::readString(const String& s) {
+void TextInput::readString(const std::string& s) {
     const Token& t = readStringToken();
 
     if (t._string == s) {                         // fast path
@@ -1121,12 +1096,12 @@ Token TextInput::readCommentToken() {
 }
 
 
-String TextInput::readComment() {
+std::string TextInput::readComment() {
     return readCommentToken()._string;
 }
 
 
-void TextInput::readComment(const String& s) {
+void TextInput::readComment(const std::string& s) {
     const Token& t = readCommentToken();
 
     if (t._string == s) {                         // fast path
@@ -1152,11 +1127,11 @@ Token TextInput::readNewlineToken() {
                          Token::NEWLINE, t._type);
 }
 
-String TextInput::readNewline() {
+std::string TextInput::readNewline() {
     return readNewlineToken()._string;
 }
 
-void TextInput::readNewline(const String& s) {
+void TextInput::readNewline(const std::string& s) {
     const Token& t = readNewlineToken();
 
     if (t._string == s) {                         // fast path
@@ -1189,12 +1164,12 @@ void TextInput::readSymbolToken(Token& t) {
 }
 
 
-String TextInput::readSymbol() {
+std::string TextInput::readSymbol() {
     return readSymbolToken()._string;
 }
 
 
-void TextInput::readSymbol(const String& symbol) {
+void TextInput::readSymbol(const std::string& symbol) {
     Token t;
     readSymbolToken(t);
 
@@ -1208,23 +1183,23 @@ void TextInput::readSymbol(const String& symbol) {
 }
 
 
-TextInput::TextInput(const String& filename, const Settings& opt) : options(opt) {
+TextInput::TextInput(const std::string& filename, const Settings& opt) : options(opt) {
     init();
     if (options.sourceFileName.empty()) {
         options.sourceFileName = filename;
     }
 
-    String zipfile;
+    std::string zipfile;
     if (FileSystem::inZipfile(filename, zipfile)) {
         // TODO: this could be faster if we directly read the zipfile
-        const String& input = readWholeFile(filename);
+        const std::string& input = readWholeFile(filename);
         size_t n = input.size();
         buffer.resize(n);
         System::memcpy(buffer.getCArray(), input.c_str(), n);
     } else {
         // Read directly into the array
         const uint64 n = FileSystem::size(filename);
-        alwaysAssertM(n != uint64(-1), String("File does not exist: ") + filename);
+        alwaysAssertM(n != uint64(-1), std::string("File does not exist: ") + filename);
         buffer.resize(size_t(n));
         FILE* f = FileSystem::fopen(filename.c_str(), "rb");
         fread(buffer.getCArray(), 1, size_t(n), f);
@@ -1248,7 +1223,7 @@ void TextInput::initFromString(const char* str, int len, const Settings& setting
 }
 
 
-TextInput::TextInput(FS fs, const String& str, const Settings& opt) {
+TextInput::TextInput(FS fs, const std::string& str, const Settings& opt) {
     (void)fs;
     initFromString(str.c_str(), (int)str.size(), opt);
 }
@@ -1260,14 +1235,14 @@ TextInput::TextInput(FS fs, const char* str, size_t len, const Settings& opt) : 
 }
 
 
-const String& TextInput::filename() const {
+const std::string& TextInput::filename() const {
     return options.sourceFileName;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
 
 TextInput::TokenException::TokenException(
-    const String&  src,
+    const std::string&  src,
     int                 ln,
     int                 ch) : ParseError(src, ln, ch, format("%s(%d) : ", src.c_str(), ln)),
                               sourceFile(src) {
@@ -1294,7 +1269,7 @@ static const char* tokenTypeToString(Token::Type t) {
 }
 
 TextInput::WrongTokenType::WrongTokenType(
-    const String&  src,
+    const std::string&  src,
     int                 ln,
     int                 ch,
     Token::Type         e,
@@ -1307,7 +1282,7 @@ TextInput::WrongTokenType::WrongTokenType(
 
 
 TextInput::BadMSVCSpecial::BadMSVCSpecial(
-    const String&  src,
+    const std::string&  src,
     int                 ln,
     int                 ch) :
     TokenException(src, ln, ch) {
@@ -1315,11 +1290,11 @@ TextInput::BadMSVCSpecial::BadMSVCSpecial(
 
 
 TextInput::WrongSymbol::WrongSymbol(
-    const String&  src,
+    const std::string&  src,
     int                 ln,
     int                 ch,
-    const String&  e,
-    const String&  a) : 
+    const std::string&  e,
+    const std::string&  a) : 
     TokenException(src, ln, ch), expected(e), actual(a) {
 
     message += format("Expected symbol '%s', found symbol '%s'.",
@@ -1328,11 +1303,11 @@ TextInput::WrongSymbol::WrongSymbol(
 
 
 TextInput::WrongString::WrongString(
-    const String&  src,
+    const std::string&  src,
     int                 ln,
     int                 ch,
-    const String&  e,
-    const String&  a) : 
+    const std::string&  e,
+    const std::string&  a) : 
     TokenException(src, ln, ch), expected(e), actual(a) {
 
     message += format("Expected string '%s', found string '%s'.",

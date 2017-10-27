@@ -7,9 +7,9 @@
  
   \cite Portions based on Dave Eberly's Magic Software Library at <A HREF="http://www.magic-software.com">http://www.magic-software.com</A>
   \created 2001-06-02
-  \edited  2014-07-13
+  \edited  2013-04-13
 
-  Copyright 2000-2015, Morgan McGuire.
+  Copyright 2000-2013, Morgan McGuire.
   All rights reserved.
  */
 
@@ -20,8 +20,6 @@
 #include "G3D/Vector3.h"
 #include "G3D/Array.h"
 #include "G3D/Plane.h"
-#include "G3D/Frustum.h"
-#include "G3D/Random.h"
 
 namespace G3D {
 
@@ -81,10 +79,6 @@ public:
     static Box inf();
 
     Any toAny() const;
-
-    size_t hashCode() const;
-
-    bool operator==(const Box& other) const;
 
     void serialize(class BinaryOutput& b) const;
     void deserialize(class BinaryInput& b);
@@ -194,20 +188,6 @@ z/
         Vector3&            v1,
         Vector3&            v2,
         Vector3&            v3) const;
-    /*
-        Faces are in the following order:
-	    0: -Z
-	    1: X
-	    2: Z
-	    3: Y
-	    4: -X
-	    5: -Y
-
-        If the face plane is degenerate then a plane will be returned that has a normal with nan values
-	 */
-    void getFacePlane(
-        int                 f,
-        Plane&              plane) const;
 
 
     /**
@@ -229,9 +209,6 @@ z/
      int32&                     cullingPlaneIndex = dummy,
      const uint32               testMask      = -1) const;
 
-    /** Conservative culling test */
-    bool culledBy(const Frustum& frustum) const;
-
     bool contains(
         const Vector3&      point) const;
 
@@ -239,12 +216,12 @@ z/
 
     float volume() const;
 
-    void getRandomSurfacePoint(Point3& P, Vector3& N = Vector3::ignore, Random& rnd = Random::common()) const;
+    void getRandomSurfacePoint(Vector3& P, Vector3& N = Vector3::ignore()) const;
 
     /**
      Uniformly distributed on the interior (includes surface)
      */
-    Point3 randomInteriorPoint(Random& rnd = Random::common()) const;
+    Vector3 randomInteriorPoint() const;
 
     void getBounds(class AABox&) const;
 

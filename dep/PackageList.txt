@@ -21,8 +21,8 @@ fmt (a small, safe and fast formatting library)
   Version: 4.0.0 5f39721c0a41be404a23c3893cdea89e598c9531
 
 G3D (a commercial-grade C++ 3D engine available as Open Source (BSD License)
-  http://g3d.cs.williams.edu/g3d/www/index.html
-  Version: 10.0 r595
+  http://g3d.sourceforge.net/
+  Version: 9.0-Release r4036
 
 jemalloc (a general-purpose scalable concurrent malloc-implementation)
   http://www.canonware.com/jemalloc/

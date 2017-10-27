@@ -10,11 +10,11 @@
  All rights reserved.
  */
 
-#ifndef G3D_format_h
-#define G3D_format_h
+#ifndef G3D_FORMAT_H
+#define G3D_FORMAT_H
 
 #include "G3D/platform.h"
-#include "G3D/G3DString.h"
+#include <string>
 #include <stdio.h>
 #include <cstdarg>
 
@@ -27,14 +27,14 @@ namespace G3D {
   string is under 160 characters (not including terminator) and slower
   when the string is longer.
  */
-String   __cdecl format(
+std::string   __cdecl format(
     const char*                 fmt
     ...) G3D_CHECK_PRINTF_ARGS;
 
 /**
   Like format, but can be called with the argument list from a ... function.
  */
-String vformat(
+std::string vformat(
     const char*                 fmt,
     va_list                     argPtr) G3D_CHECK_VPRINTF_ARGS;
 

@@ -4,9 +4,9 @@
   \maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
   \created 2004-01-10
-  \edited  2014-07-11
+  \edited  2013-06-11
 
-  Copyright 2000-2015, Morgan McGuire.
+  Copyright 2000-2013, Morgan McGuire.
   All rights reserved.
 */
 
@@ -61,15 +61,6 @@ Any AABox::toAny() const {
 const AABox& AABox::empty() {
     static const AABox b;
     return b;
-}
-
-
-AABox AABox::minkowskiSum(const AABox& other) const {
-    if (isEmpty()) {
-        return other - other.center();
-    } else {
-        return AABox(low() - (other.center() - other.low()), high() + (other.high() - other.center()));
-    }
 }
 
 

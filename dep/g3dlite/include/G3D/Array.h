@@ -5,9 +5,9 @@
   \cite Portions written by Aaron Orenstein, a@orenstein.name
  
   \created 2001-03-11
-  \edited  2016-02-03
+  \edited  2013-01-28
 
-  Copyright 2000-2016, Morgan McGuire, http://graphics.cs.williams.edu
+  Copyright 2000-2012, Morgan McGuire, http://graphics.cs.williams.edu
   All rights reserved.
  */
 
@@ -15,11 +15,9 @@
 #define G3D_Array_h
 
 #include "G3D/platform.h"
-#include "G3D/DoNotInitialize.h"
 #include "G3D/debug.h"
 #include "G3D/MemoryManager.h"
 #include "G3D/System.h"
-#include "G3D/Random.h"
 #ifdef G3D_DEBUG
 //   For formatting error messages
 #    include "G3D/format.h"
@@ -48,6 +46,7 @@ const bool DONT_SHRINK_UNDERLYING_ARRAY = false;
 const int SORT_INCREASING = 1;
 /** Constant for Array::sort */
 const int SORT_DECREASING = -1;
+
 
 
 /**
@@ -106,11 +105,11 @@ private:
     size_t              num;
     size_t              numAllocated;
 
-    shared_ptr<MemoryManager>  m_memoryManager;
+    MemoryManager::Ref  m_memoryManager;
 
     /** \param n Number of elements
     */
-    void init(size_t n, const shared_ptr<MemoryManager>& m) {
+    void init(size_t n, const MemoryManager::Ref& m) {
         m_memoryManager = m;
         this->num = 0;
         this->numAllocated = 0;
@@ -161,35 +160,30 @@ private:
          alwaysAssertM(data, "Memory manager returned NULL: out of memory?");
 
          // Call the copy constructors
-         {
-             const size_t N = G3D::min(oldNum, numAllocated);
-             const T* end = data + N;
-             T* oldPtr = oldData;
-             for (T* ptr = data; ptr < end; ++ptr, ++oldPtr) {
+         {const size_t N = G3D::min(oldNum, numAllocated);
+          const T* end = data + N;
+          T* oldPtr = oldData;
+          for (T* ptr = data; ptr < end; ++ptr, ++oldPtr) {
 
-                 // Use placement new to invoke the constructor at the location
-                 // that we determined.  Use the copy constructor to make the assignment.
-                 const T* constructed = new (ptr) T(*oldPtr);
+             // Use placement new to invoke the constructor at the location
+             // that we determined.  Use the copy constructor to make the assignment.
+             const T* constructed = new (ptr) T(*oldPtr);
 
-                 (void)constructed;
-                 debugAssertM(constructed == ptr, 
-                     "new returned a different address than the one provided by Array.");
-             }
-         }
+             (void)constructed;
+             debugAssertM(constructed == ptr, 
+                 "new returned a different address than the one provided by Array.");
+         }}
 
          // Call destructors on the old array (if there is no destructor, this will compile away)
-         {
-            const T* end = oldData + oldNum;
-            for (T* ptr = oldData; ptr < end; ++ptr) {
-                ptr->~T();
-            }
-         }
+         {const T* end = oldData + oldNum;
+          for (T* ptr = oldData; ptr < end; ++ptr) {
+              ptr->~T();
+         }}
 
          m_memoryManager->free(oldData);
     }
 
 public:
-
    /**
     Assignment operator.  Will be private in a future release because this is slow and can be invoked by accident by novice C++ programmers.
     If you really want to copy an Array, use the explicit copy constructor.
@@ -329,21 +323,11 @@ public:
        (*this)[4] = v4;
     }
 
-    /** Creates an array containing v0...v4. */
-    Array(const T& v0, const T& v1, const T& v2, const T& v3, const T& v4, const T& v5) {
-       init(6, MemoryManager::create());
-       (*this)[0] = v0;
-       (*this)[1] = v1;
-       (*this)[2] = v2;
-       (*this)[3] = v3;
-       (*this)[4] = v4;
-       (*this)[5] = v5;
-    }
-
 
    /**
     Copy constructor.  Copying arrays is slow...perhaps you want to pass a reference or a pointer instead?
     */
+   //TODO: patch rest of the API to prevent returning Arrays by value, then make explicit 
    Array(const Array& other) : num(0) {
        _copy(other);
    }
@@ -424,7 +408,7 @@ public:
        resize(0, shrink);
    }
 
-   void clearAndSetMemoryManager(const shared_ptr<MemoryManager>& m) {
+   void clearAndSetMemoryManager(const MemoryManager::Ref& m) {
        clear();
        debugAssert(data == NULL);
        m_memoryManager = m;
@@ -436,7 +420,7 @@ public:
        clear(false);
    }
 
-   inline shared_ptr<MemoryManager> memoryManager() const {
+   inline MemoryManager::Ref memoryManager() const {
        return m_memoryManager;
    }
 
@@ -758,19 +742,16 @@ public:
    /**
     Append the elements of array.  Cannot be called with this array
     as an argument.
-
-    Can append elements of any array that are implicitly convertable (e.g., 
-    pointers to subclass instances) to type \a T.
     */
-   template<class S> void append(const Array<S>& array) {
-       debugAssert((void*)this != (void*)&array);
+   void append(const Array<T>& array) {
+       debugAssert(this != &array);
        size_t oldNum = num;
        size_t arrayLength = array.length();
 
        resize(num + arrayLength, false);
-       const S* src = array.getCArray();
+
        for (size_t i = 0; i < arrayLength; ++i) {
-           data[oldNum + i] = src[i];
+           data[oldNum + i] = array.data[i];
        }
    }
 
@@ -780,22 +761,6 @@ public:
     */
    inline T& next() {
        resize(num + 1, false);
-       return last();
-   }
-
-   /** Returns a pointer to memory for the next element, invoking
-       either its DoNotInitialize constructor for performance, or its
-       default constructor if the array needs to be resized anyway.
-
-       If T does not have a DoNotInitialize constructor then this will
-       fail at compile time. */
-   inline T& next(DoNotInitialize dni) {
-       if (numAllocated > num) {
-           new (data + num) T(dni);
-           ++num;
-       } else {
-           resize(num + 1, false);
-       }
        return last();
    }
 
@@ -912,15 +877,6 @@ public:
                                             (int)n, (int)num));
        return data[n];
    }
-
-   // OS X's clang distinguishes between uint64 and size_t
-#   ifdef G3D_OSX
-   inline T& operator[](size_t n) {
-       debugAssertM(n < (size_t)num, format("Array index out of bounds. n = %d, size() = %d",
-                                            (int)n, (int)num));
-       return data[n];
-   }
-#   endif
    
    inline T& operator[](uint64 n) {
        debugAssertM(n < (uint64)num, format("Array index out of bounds. n = %d, size() = %d", (int)n, (int)num));
@@ -942,14 +898,6 @@ public:
         return data[n];
     }
 
-#   ifdef G3D_OSX
-    inline const T& operator[](size_t n) const {
-        debugAssert((n < (size_t)num));
-        debugAssert(data!=NULL);
-        return data[n];
-    }
-#   endif
-
     inline const T& operator[](uint64 n) const {
         debugAssert((n < (uint64)num));
         debugAssert(data!=NULL);
@@ -959,13 +907,13 @@ public:
     inline T& randomElement() {
         debugAssert(num > 0);
         debugAssert(data!=NULL);
-        return data[Random::common().integer(0, (int)num - 1)];
+        return data[iRandom(0, (int)num - 1)];
     }
 
     inline const T& randomElement() const {
         debugAssert(num > 0);
-        debugAssert(data != NULL);
-        return data[Random::common().integer(0, int(num) - 1)];
+        debugAssert(data!=NULL);
+        return data[iRandom(0, num - 1)];
     }
 
     /**
@@ -974,7 +922,7 @@ public:
     */
     inline const T& last() const {
         debugAssert(num > 0);
-        debugAssert(data != NULL);
+        debugAssert(data!=NULL);
         return data[num - 1];
     }
 
@@ -1045,9 +993,8 @@ public:
      Returns the index of (the first occurance of) an index or -1 if
      not found.  Searches from the right.
      */
-	template<class S>
-    int rfindIndex(const S& value) const {
-        for (int i = int(num) - 1; i >= 0; --i) {
+    int rfindIndex(const T& value) const {
+        for (int i = num -1 ; i >= 0; --i) {
             if (data[i] == value) {
                 return i;
             }
@@ -1059,8 +1006,7 @@ public:
      Returns the index of (the first occurance of) an index or -1 if
      not found.
      */
-	template<class S>
-    int findIndex(const S& value) const {
+    int findIndex(const T& value) const {
         for (size_t i = 0; i < num; ++i) {
             if (data[i] == value) {
                 return (int)i;
@@ -1073,8 +1019,7 @@ public:
      Finds an element and returns the iterator to it.  If the element
      isn't found then returns end().
      */
-	template<class S>
-    Iterator find(const S& value) {
+    Iterator find(const T& value) {
         for (int i = 0; i < num; ++i) {
             if (data[i] == value) {
                 return data + i;
@@ -1083,8 +1028,7 @@ public:
         return end();
     }
 
-	template<class S>
-    ConstIterator find(const S& value) const {
+    ConstIterator find(const T& value) const {
         for (int i = 0; i < num; ++i) {
             if (data[i] == value) {
                 return data + i;
@@ -1232,7 +1176,7 @@ return( lhs < rhs? true : false );
         
         @param comparator A function, or class instance with an overloaded operator() that compares
         two elements of type <code>T</code> and returns 0 if they are equal, -1 if the second is smaller,
-        and 1 if the first is smaller (i.e., following the conventions of String::compare).  For example:
+        and 1 if the first is smaller (i.e., following the conventions of std::string::compare).  For example:
 
         <pre>
         int compare(int A, int B) {
@@ -1459,16 +1403,10 @@ return( lhs < rhs? true : false );
     /** Redistributes the elements so that the new order is statistically independent
         of the original order. O(n) time.*/
     void randomize() {
-        randomize(Random::common());
-    }
-
-    /** Redistributes the elements so that the new order is statistically independent
-    of the original order. O(n) time.*/
-    void randomize(Random& rng) {
         T temp;
 
         for (int i = size() - 1; i >= 0; --i) {
-            const int x = rng.integer(0, i);
+            int x = iRandom(0, i);
 
             temp = data[i];
             data[i] = data[x];
@@ -1476,42 +1414,20 @@ return( lhs < rhs? true : false );
         }
     }
 
-    /** Redistributes the elements so that the new order is statistically independent
-        of the original order. O(n) time. Randomizes both arrays in the same way. */
-    template<class B> 
-    void randomize(Array<B>& b, Random& rng) {
-        alwaysAssertM(b.size() == size(), "Both arrays must have the same length");
-        T temp;
-        B tempB;
-
-        for (int i = size() - 1; i >= 0; --i) {
-            const int x = rng.integer(0, i);
-
-            temp = data[i];
-            data[i] = data[x];
-            data[x] = temp;
-
-            tempB = b[i];
-            b[i] = b[x];
-            b[x] = tempB;
-        }
-    }
 
     /** Ensures that future append() calls can grow up to size \a n without allocating memory.*/
     void reserve(int n) {
         debugAssert(n >= size());
-        if (size_t(n) > numAllocated) {
-            const int oldSize = size();
-            resize(n, false);
-            resize(oldSize, false);
-        }
+        const int oldSize = size();
+        resize(n);
+        resize(oldSize, false);
     }
 
-    /** Number of bytes used by the array object and the memory allocated for it's data pointer. Does *not*
-        include the memory of objects pointed to by objects in the data array */
-    size_t sizeInMemory() const {
-        return sizeof(Array<T>) + (sizeof(T) * numAllocated);
-    }
+	/** Number of bytes used by the array object and the memory allocated for it's data pointer. Does *not*
+	  * include the memory of objects pointed to by objects in the data array */
+	size_t sizeInMemory() const {
+		return sizeof(Array<T>) + (sizeof(T) * numAllocated);
+	}
 
     /** Remove all NULL elements in linear time without affecting order of the other elements. */
     void removeNulls() {

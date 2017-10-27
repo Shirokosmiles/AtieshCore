@@ -19,22 +19,14 @@
 #include "G3D/G3DGameUnits.h"
 #include "G3D/BinaryFormat.h"
 #include "G3D/FileNotFound.h"
-#include "G3D/G3DString.h"
-#include <vector>
-
+#include <string>
 
 #ifdef G3D_OSX
-#   define Zone OSX_Zone
-#   define Fixed OSX_Fixed
-#   define Point OSX_Point
+#define Zone OSX_Zone
 #   include <CoreServices/CoreServices.h>
-#   undef Point
-#   undef Fixed
-#   undef nil
 #endif
-namespace G3D {
 
-    template<class T, size_t MIN_ELEMENTS> class Array;
+namespace G3D {
     
 /** G3D, SDL, and IJG libraries require license documentation
     to be distributed with your program.  This generates the
@@ -43,7 +35,7 @@ namespace G3D {
     any license you want.
     @deprecated Use System::license
 */
-String license();
+std::string license();
 
 /**
 @brief The order in which the bytes of an integer are stored on a
@@ -103,16 +95,16 @@ private:
     bool           m_has3DNOW;
     bool           m_has3DNOW2;
     bool           m_hasAMDMMX;
-    String    m_cpuVendor;
+    std::string    m_cpuVendor;
     int            m_numCores;
 
     /** this holds the data directory set by the application (currently
         GApp) for use by findDataFile */
-    String    m_appDataDir;
+    std::string    m_appDataDir;
 
     G3DEndian      m_machineEndian;
-    String    m_cpuArch;
-    String    m_operatingSystem;
+    std::string    m_cpuArch;
+    std::string    m_operatingSystem;
 
 #   ifdef G3D_WINDOWS
     /** Used by getTick() for timing */
@@ -122,7 +114,7 @@ private:
     struct timeval m_start;
 #endif
 
-    String    m_version;
+    std::string    m_version;
     OutOfMemoryCallback m_outOfMemoryCallback;
 
 #ifdef G3D_OSX
@@ -217,7 +209,7 @@ public:
         return instance().m_has3DNOW;
     }
 
-    inline static const String& cpuVendor() {
+    inline static const std::string& cpuVendor() {
         return instance().m_cpuVendor;
     }
 
@@ -229,22 +221,22 @@ public:
     }
 
     /** e.g., "Windows", "GNU/Linux" */
-    inline static const String& operatingSystem() {
+    inline static const std::string& operatingSystem() {
         return instance().m_operatingSystem;
     }
     
     /** e.g., 80686 */
-    inline static const String& cpuArchitecture() {
+    inline static const std::string& cpuArchitecture() {
         return instance().m_cpuArch;
     }
 
     /**
        Returns the current date as a string in the form YYYY-MM-DD
     */
-    static String currentDateString();
+    static std::string currentDateString();
 
     /** Returns the current 24-hour local time as a string in the form HH:MM:SS */
-    static String currentTimeString();
+    static std::string currentTimeString();
 
     /**
        Uses pooled storage to optimize small allocations (1 byte to 5
@@ -266,15 +258,17 @@ public:
      */
     static void* realloc(void* block, size_t bytes);
 
+    /** Returns a string describing how well System::malloc is using
+        its internal pooled storage.  "heap" memory was slow to
+        allocate; the other data sizes are comparatively fast.*/
+    static std::string mallocPerformance();
     static void resetMallocPerformanceCounters();
 
     /** 
        Returns a string describing the current usage of the buffer pools used for
-       optimizing System::malloc, and describing how well System::malloc is using
-        its internal pooled storage.  "heap" memory was slow to
-        allocate; the other data sizes are comparatively fast.
+       optimizing System::malloc.
      */
-    static String mallocStatus();
+    static std::string mallocStatus();
 
     /**
      Free data allocated with System::malloc.
@@ -313,14 +307,14 @@ public:
 
      @cite Linux version written by Nicolai Haehnle <prefect_@gmx.net>, http://www.flipcode.com/cgi-bin/msg.cgi?showThread=COTD-getexename&forum=cotd&id=-1
      */
-    static String currentProgramFilename();
+    static std::string currentProgramFilename();
 
     /** Name of this program. Note that you can mutate this string to
         set your app name explicitly.*/
-    static String& appName();
+    static std::string& appName();
 
     /** G3D Version string */
-    inline static const String& version() {
+    inline static const std::string& version() {
         return instance().m_version;
     }
 
@@ -330,7 +324,7 @@ public:
        Either "Debug" or "Release", depending on whether _DEBUG was
        defined at compile-time for the library.
       */
-    static const String& build();
+    static const std::string& build();
 
     /**
      Causes the current thread to yield for the specified duration
@@ -406,10 +400,10 @@ public:
     }
 
     /** Set an environment variable for the current process */
-    static void setEnv(const String& name, const String& value);
+    static void setEnv(const std::string& name, const std::string& value);
     
     /** Get an environment variable for the current process.  Returns NULL if the variable doesn't exist. */
-    static const char* getEnv(const String& name);
+    static const char* getEnv(const std::string& name);
 
     /**
      Prints a human-readable description of this machine
@@ -419,13 +413,7 @@ public:
        (class TextOutput& t);
 
     static void describeSystem
-       (String&        s);
-
-    /**
-     Appends search paths specified by G3D10DATA environment
-     variable to paths vector, since cannot rely on Array.
-    */
-    static void getG3DDataPaths(std::vector<String>& paths);
+       (std::string&        s);
 
     /**
      Tries to locate the resource by looking in related directories.
@@ -438,12 +426,12 @@ public:
          - Last directory in which a file was found
          - Current directory
          - System::appDataDir (which is usually GApp::Settings.dataDir, which defaults to the directory containing the program binary)
+         - $G3D9DATA directory
          - System::appDataDir() + "data/"  (note that this may be a zipfile named "data" with no extension)
          - System::appDataDir() + "data.zip/"
-         - ../data-files/ 
-         - ../../data-files/
-         - ../../../data-files/
-         - $G3D10DATA directories. This must be a semicolon (windows) or colon (OS X/Linux) separated list of paths. It may be a single path.
+         - ../data-files/  (windows)
+         - ../../data-files/ (windows)
+         - ../../../data-files/ (windows)
 
        Plus the following subdirectories of those:
 
@@ -461,7 +449,7 @@ public:
 
         \param exceptionIfNotFound If true and the file is not found, throws G3D::FileNotFound.
      */    
-    static String findDataFile(const String& full, bool exceptionIfNotFound = true, bool caseSensitive =
+    static std::string findDataFile(const std::string& full, bool exceptionIfNotFound = true, bool caseSensitive =
 #ifdef G3D_WINDOWS
         false
 #else
@@ -469,19 +457,12 @@ public:
 #endif
         );
 
-    static void initializeDirectoryArray(Array<String, 10>& directoryArray, bool caseSensitive =
-#ifdef G3D_WINDOWS
-        false
-#else
-        true
-#endif
-        );
     /**
         Sets the path that the application is using as its data directory.
         Used by findDataDir as an initial search location.  GApp sets this
         upon constrution.
     */
-    static void setAppDataDir(const String& path);
+    static void setAppDataDir(const std::string& path);
 
 };
 

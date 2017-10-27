@@ -12,7 +12,7 @@
 #define G3D_PROMPT_H
 
 #include "platform.h"
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
 
@@ -57,8 +57,8 @@ inline int prompt(
  Displays a GUI prompt with "Ok" as the only choice.
  */
 void msgBox(
-    const String& message,
-    const String& title = "Message");
+    const std::string& message,
+    const std::string& title = "Message");
 
 
 }; // namespace

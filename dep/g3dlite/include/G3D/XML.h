@@ -7,7 +7,7 @@
  @created 2010-02-11
  @edited  2010-02-24
 
- Copyright 2000-2015, Morgan McGuire.
+ Copyright 2000-2012, Morgan McGuire.
  All rights reserved.
  */
 
@@ -18,7 +18,7 @@
 #include "G3D/Table.h"
 #include "G3D/Array.h"
 #include "G3D/format.h"
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
 
@@ -67,13 +67,13 @@ public:
 
     enum Type {VALUE, TAG};
 
-    typedef Table<String, XML> AttributeTable;
+    typedef Table<std::string, XML> AttributeTable;
 
 private:
 
     Type                      m_type;
-    String                    m_name;
-    String                    m_value;
+    std::string               m_name;
+    std::string               m_value;
     AttributeTable            m_attribute;
     Array<XML>                m_child;
 
@@ -81,7 +81,7 @@ public:
 
     XML() : m_type(VALUE) {}
 
-    XML(const String& v) : m_type(VALUE), m_value(v) {}
+    XML(const std::string& v) : m_type(VALUE), m_value(v) {}
 
     XML(const double& v) : m_type(VALUE), m_value(format("%f", v)) {}
 
@@ -90,36 +90,30 @@ public:
     XML(int v) : m_type(VALUE), m_value(format("%d", v)) {}
 
     /** \param tagType Must be XML::TAG to dismbiguate from the string constructor */
-    XML(Type tagType, const String& name, const AttributeTable& at, const Array<XML>& ch = Array<XML>()) : m_type(TAG), m_name(name), m_attribute(at), m_child(ch) {
+    XML(Type tagType, const std::string& name, const AttributeTable& at, const Array<XML>& ch = Array<XML>()) : m_type(TAG), m_name(name), m_attribute(at), m_child(ch) {
         (void)tagType;
         debugAssert(tagType == TAG);
     }
 
     /** \param tagType Must be XML::TAG to dismbiguate from the string constructor */
-    XML(Type tagType, const String& name, const Array<XML>& ch = Array<XML>()) : m_type(TAG), m_name(name), m_child(ch) {
+    XML(Type tagType, const std::string& name, const Array<XML>& ch = Array<XML>()) : m_type(TAG), m_name(name), m_child(ch) {
         (void)tagType;
         debugAssert(tagType == TAG);
     }
 
     XML(TextInput& t);
 
-    void serialize(TextOutput& t, bool collapseEmptyTags = false) const;
+    void serialize(TextOutput& t) const;
 
     void deserialize(TextInput& t);
 
-    void load(const String& filename);
+    void load(const std::string& filename);
 
-    void save(const String& filename, bool collapseEmptyTags = false) const;
+    void save(const std::string& filename) const;
 
-    void parse(const String &s);
+    void parse(const std::string &s);
 
-    /** 
-        If collapseEmptyTags, writes tags with no children as a single tag
-    
-        For example: <name atr0="val0"></name>
-        Is instead: <name atr0="val0"/>
-    */
-    void unparse(String& s, bool collapseEmptyTags = false) const;
+    void unparse(std::string& s) const;
 
     const AttributeTable& attributeTable() const {
         return m_attribute;
@@ -146,17 +140,17 @@ public:
     }
 
     /** Return the attribute with this name. */
-    const XML& operator[](const String& k) const {
+    const XML& operator[](const std::string& k) const {
         return m_attribute[k];
     }
 
-    bool containsAttribute(const String& k) const {
+    bool containsAttribute(const std::string& k) const {
         return m_attribute.containsKey(k);
     }
 
     /** Note that the result is always copied, making this inefficient
         for return values that are not VALUEs. */
-    XML get(const String& k, const XML& defaultVal) const {
+    XML get(const std::string& k, const XML& defaultVal) const {
         const XML* x = m_attribute.getPointer(k);
         if (x) {
             return *x;
@@ -170,12 +164,12 @@ public:
     }
 
     /** The name, if this is a TAG. */
-    const String name() const {
+    const std::string name() const {
         return m_name;
     }
 
     /** Returns "" if a TAG. */
-    const String& string() const {
+    const std::string& string() const {
         return m_value;
     }
 
@@ -185,7 +179,7 @@ public:
     /** Returns false if a TAG. */
     bool boolean() const;
 
-    operator String() const {
+    operator std::string() const {
         return m_value;
     }
 

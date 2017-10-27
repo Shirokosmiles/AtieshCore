@@ -22,10 +22,10 @@
 
 namespace G3D {
 
-String __cdecl format(const char* fmt,...) {
+std::string __cdecl format(const char* fmt,...) {
     va_list argList;
     va_start(argList,fmt);
-    String result = vformat(fmt, argList);
+    std::string result = vformat(fmt, argList);
     va_end(argList);
 
     return result;
@@ -35,7 +35,7 @@ String __cdecl format(const char* fmt,...) {
 // Both MSVC seems to use the non-standard vsnprintf
 // so we are using vscprintf to determine buffer size, however
 // only MSVC7 and up headers include vscprintf for some reason.
-String vformat(const char *fmt, va_list argPtr) {
+std::string vformat(const char *fmt, va_list argPtr) {
     // We draw the line at a 1MB string.
     const int maxSize = 1000000;
 
@@ -63,19 +63,19 @@ String vformat(const char *fmt, va_list argPtr) {
             vsprintf(heapBuffer, fmt, argPtr);            
         }
 
-        String formattedString(heapBuffer);
+        std::string formattedString(heapBuffer);
         System::free(heapBuffer);
         return formattedString;
     } else {
 
         vsprintf(stackBuffer, fmt, argPtr);
-        return String(stackBuffer);
+        return std::string(stackBuffer);
     }
 }
 
 #elif defined(_MSC_VER) && (_MSC_VER < 1300)
 
-String vformat(const char *fmt, va_list argPtr) {
+std::string vformat(const char *fmt, va_list argPtr) {
     // We draw the line at a 1MB string.
     const int maxSize = 1000000;
 
@@ -106,20 +106,20 @@ String vformat(const char *fmt, va_list argPtr) {
 
         heapBuffer[heapSize-1] = '\0';
 
-        String heapString(heapBuffer);
+        std::string heapString(heapBuffer);
         System::free(heapBuffer);
 
         return heapString;
     } else {
 
-        return String(stackBuffer);
+        return std::string(stackBuffer);
     }
 }
 
 #else
 
 // glibc 2.1 has been updated to the C99 standard
-String vformat(const char* fmt, va_list argPtr) {
+std::string vformat(const char* fmt, va_list argPtr) {
     // If the string is less than 161 characters,
     // allocate it on the stack because this saves
     // the malloc/free time.  The number 161 is chosen
@@ -142,7 +142,7 @@ String vformat(const char* fmt, va_list argPtr) {
       debugAssert(numChars2 == numChars);
       (void)numChars2;
 
-      String result(heapBuffer);
+      std::string result(heapBuffer);
       
       System::free(heapBuffer);
 
@@ -150,7 +150,7 @@ String vformat(const char* fmt, va_list argPtr) {
 
     } else {
 
-      return String(stackBuffer);
+      return std::string(stackBuffer);
 
     }
 }

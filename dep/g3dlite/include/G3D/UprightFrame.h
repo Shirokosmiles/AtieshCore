@@ -82,7 +82,7 @@ public:
 class UprightSpline : public Spline<UprightFrame> {
 protected:
 
-    virtual void ensureShortestPath(UprightFrame* A, int N) const override {
+    virtual void ensureShortestPath(UprightFrame* A, int N) const {
         UprightFrame::unwrapYaw(A, N);
     }
 
@@ -102,7 +102,7 @@ public:
     */
     explicit UprightSpline(const Any& any);
 
-    virtual Any toAny(const String& myName) const override;
+    virtual Any toAny(const std::string& myName) const override;
 
     Any toAny() const;
 

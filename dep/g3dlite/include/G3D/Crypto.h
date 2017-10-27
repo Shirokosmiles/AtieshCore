@@ -14,7 +14,7 @@
 #include "G3D/platform.h"
 #include "G3D/g3dmath.h"
 #include "G3D/System.h"
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
 

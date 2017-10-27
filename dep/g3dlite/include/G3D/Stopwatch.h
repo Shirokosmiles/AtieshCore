@@ -45,12 +45,12 @@ namespace G3D {
 class Stopwatch {
 private:
 
-    String             myName;
+    std::string             myName;
 
     bool                    m_enabled;
 
     double                  startTime;
-    String             prevMark;
+    std::string             prevMark;
     double                  prevTime;
 
     /** True between tick and tock */
@@ -86,7 +86,7 @@ private:
 
 public:
 
-    Stopwatch(const String& name = "Stopwatch");
+    Stopwatch(const std::string& name = "Stopwatch");
 
     void setEnabled(bool e) {
         m_enabled = e;
@@ -146,7 +146,7 @@ public:
         
         Does nothing if the stopwatch is disabled.
      */
-    void after(const String& s = "");
+    void after(const std::string& s = "");
 
 };
 

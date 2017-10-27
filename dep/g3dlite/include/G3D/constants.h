@@ -1,9 +1,9 @@
 /**
-  \file G3D/constants.h
+  @file G3D/constants.h
 
-  \maintainer Morgan McGuire, http://graphics.cs.williams.edu
-  \created 2009-05-20
-  \edited  2015-01-02
+  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
+  @created 2009-05-20
+  @edited  2010-05-20
 */
 #ifndef G3D_constants_h
 #define G3D_constants_h
@@ -42,108 +42,81 @@ public:
 };
 
 
-/** \def RefractionHint
-   Values for UniversalSurface::GPUGeom::refractionHint. */
-G3D_DECLARE_ENUM_CLASS(RefractionHint,
+/** Values for UniversalSurface::GPUGeom::refractionHint. */
+class RefractionQuality {
+public:
+    enum Value {
         /** No refraction; a translucent object will appear as if it had the same index of refraction
             as the surrounding medium and objects will be undistorted in the background. */
-        NONE, 
+        NONE = 0, 
 
         /** Use a static environment map (cube or paraboloid) for computing transmissivity.*/
-        //STATIC_PROBE, 
+        STATIC_ENV = 25, 
 
         /** Use a dynamically rendered 2D environment map; distort the background.  This looks good for many scenes
-            but avoids the cost of rendering a cube map for DYNAMIC_ENV. UniversalSurface considers this hint
-            to mean that blending is not required, so G3D::Renderer::cullAndSort will categorize
-            UniversalSurface with this hint as opaque and a G3D::Renderer will send them to the RenderPassType::UNBLENDED_SCREEN_SPACE_REFRACTION_SAMPLES pass.
-            */
-        DYNAMIC_FLAT,
-
-        /** Combine DYNAMIC_FLAT mode with order-independent transparency. UniversalSurface considers this hint to
-            require blending, so G3D::Renderer::cullAndSort will categorize
-            send UniversalSurface with this hint as transparent and a Renderer
-            will then send them to the RenderPassType::SINGLE_PASS_UNORDERED_BLENDED_SAMPLES pass. 
-            \sa DefaultRenderer::setOrderIndependentTransparency
-            \sa DefaultRenderer::cullAndSort
-        */
-        DYNAMIC_FLAT_OIT,
+            but avoids the cost of rendering a cube map for DYNAMIC_ENV. */
+        DYNAMIC_FLAT = 50,
 
         /** Use a dynamically rendered 2D environment map that is re-captured per transparent object.  This works well
             for transparent objects that are separated by a significant camera space z distance but overlap in screen space.*/
-        //DYNAMIC_FLAT_MULTILAYER,
+        DYNAMIC_FLAT_MULTILAYER = 55,
 
         /** Render a dynamic environment map */
-        //DYNAMIC_PROBE, 
+        DYNAMIC_ENV = 75, 
 
-        /** True ray tracing. */
-        RAY_TRACE);
+        /** Use the best method available, ideally true ray tracing. */
+        BEST = 100
+    };
+
+private:
+
+    static const char* toString(int i, Value& v);
+
+    Value value;
+
+public:
+    G3D_DECLARE_ENUM_CLASS_METHODS(RefractionQuality);
+
+};
 
 
 /** Values for UniversalSurface::GPUGeom::mirrorHint. */
-G3D_DECLARE_ENUM_CLASS(MirrorQuality,
+class MirrorQuality {
+public:
+
+    enum Value {
         /** Reflections are black */
-        NONE, 
+        NONE = 0, 
         
         /** Use a static environment map.  This is what most games use */
-        STATIC_PROBE,
+        STATIC_ENV = 25, 
         
-        /** Use a screen-space hack to approximate reflection */
-        SCREEN_SPACE,
+        /** Planar reflection, typically for water or glass windows.  This assumes that the mirror is flat;
+        it is distinct from RefractionQuality::DYNAMIC_FLAT, which assumes the <i>background</i> is flat.*/
+        DYNAMIC_PLANAR = 50,
 
         /** Render a dynamic environment map. */
-        DYNAMIC_PROBE, 
+        DYNAMIC_ENV = 75, 
         
-        /** True ray tracing. */
-        RAY_TRACE);
+        /** Use the best method available, ideally true ray tracing. */
+        BEST = 100
+    };
 
+private:
 
-/** \brief How the alpha value should be interpreted for partial coverage. 
+    static const char* toString(int i, Value& v);
 
-    This must be kept in sync with AlphaHint.glsl
-    \sa UniversalMaterial */
-G3D_DECLARE_ENUM_CLASS(AlphaHint,
-        /** Used by UniversalMaterial to specify a default behavior:
-        
-            - use BLEND for surfaces with some 0.0 < alpha < 1.0
-            - use ONE for surfaces with all alpha = 1.0. 
-            - use BINARY for surfaces with both alpha = 0 and alpha = 1 at locations, but no intermediate values
-        */
-        DETECT,
+    Value value;
 
-        /** Treat the surface as completely covered, forcing alpha = 1.0 everywhere */
-        ONE,
-
-        /** Alpha is rounded per sample before being applied. Alpha >= 0.5 is rendered, alpha < 0.5 is discarded. 
-            This enables faster deferred shading and more accurate post-processing because the surface can be exactly represented in the 
-            GBuffer. It creates some aliasing on surface edges, however. */
-        BINARY,
-
-        /** Convert alpha to coverage values using
-           <code>glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB)</code>.
-           Requires a MSAA framebuffer to be bound.
-
-           Not currently supported by UniversalSurface.
-           
-           See http://www.dhpoware.com/samples/glMultiSampleAntiAliasing.html for an example.*/
-        COVERAGE_MASK,
-        
-        /** Render surfaces with partial coverage from back to front,
-            using Porter and Duff's OVER operator.  This leaves the
-            depth buffer inconsistent with the color buffer and
-            requires a sort, but often gives the best appearance. 
-            
-            Even surfaces with a binary alpha cutout can benefit from
-            blending because the transition under minification or magnification
-            between alpha = 0 and alpha = 1 will create fractional values.*/
-        BLEND
-    );
+public:
+    G3D_DECLARE_ENUM_CLASS_METHODS(MirrorQuality);
+};
 
 } // namespace G3D
 
 G3D_DECLARE_ENUM_CLASS_HASHCODE(G3D::PrimitiveType)
-G3D_DECLARE_ENUM_CLASS_HASHCODE(G3D::RefractionHint)
+G3D_DECLARE_ENUM_CLASS_HASHCODE(G3D::RefractionQuality)
 G3D_DECLARE_ENUM_CLASS_HASHCODE(G3D::MirrorQuality)
-G3D_DECLARE_ENUM_CLASS_HASHCODE(G3D::AlphaHint)
 
 #endif
 

@@ -158,7 +158,7 @@ void Plane::getEquation(double& a, double& b, double& c, double& d) const {
 }
 
 
-String Plane::toString() const {
+std::string Plane::toString() const {
     return format("Plane(%g, %g, %g, %g)", _normal.x, _normal.y, _normal.z, _distance);
 }
 

@@ -6,7 +6,7 @@
  \created 2001-03-04
  \edited  2012-07-29
 
- Copyright 2000-2015, Morgan McGuire.
+ Copyright 2000-2012, Morgan McGuire.
  All rights reserved.
 */
 
@@ -19,7 +19,7 @@
 #include "G3D/Matrix3.h"
 #include "G3D/Array.h"
 #include <math.h>
-#include "G3D/G3DString.h"
+#include <string>
 #include <stdio.h>
 #include <cstdarg>
 #include <assert.h>
@@ -112,7 +112,7 @@ public:
 
     static CoordinateFrame fromXYZYPRRadians(float x, float y, float z, float yaw = 0.0f, float pitch = 0.0f, float roll = 0.0f);
 
-    String toXYZYPRDegreesString() const;
+    std::string toXYZYPRDegreesString() const;
 
     /** Construct a coordinate frame from translation = (x,y,z) and
      rotations (in that order) about Y, object space X, object space
@@ -153,7 +153,7 @@ public:
      Produces an XML serialization of this coordinate frame.
      @deprecated
      */
-    String toXML() const;
+    std::string toXML() const;
 
     /**
      Returns the heading of the lookVector as an angle in radians relative to

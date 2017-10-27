@@ -4,7 +4,7 @@
   \created 2009-04-26
   \edited  2012-07-23
 
-  Copyright 2000-2015, Morgan McGuire, http://graphics.cs.williams.edu
+  Copyright 2000-2012, Morgan McGuire, http://graphics.cs.williams.edu
   All rights reserved.
  */
 #ifndef G3D_SmallArray_h
@@ -47,7 +47,7 @@ public:
         resize(0, shrinkIfNecessary);
     }
 
-    void clearAndSetMemoryManager(shared_ptr<MemoryManager>& m) {
+    void clearAndSetMemoryManager(MemoryManager::Ref& m) {
         clear();
         m_rest.clearAndSetMemoryManager(m);
     }
@@ -76,15 +76,6 @@ public:
             m_embedded[m_size - 1] = v;
         } else {
             m_rest.append(v);
-        }
-    }
-
-    template<int J>
-    void append(const SmallArray<T, J>& other) {
-        int prev = size();
-        resize(prev + other.size());
-        for (int i = 0; i < other.size(); ++i) {
-            (*this)[i + prev] = other[i];
         }
     }
 

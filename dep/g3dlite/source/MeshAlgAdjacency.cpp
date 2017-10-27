@@ -5,7 +5,7 @@
   @created 2003-09-14
   @edited  2010-04-26
 
-  Copyright 2000-2015, Morgan McGuire.
+  Copyright 2000-2012, Morgan McGuire.
   All rights reserved.
 
  */
@@ -45,7 +45,7 @@ private:
 public:
 
     MeshEdgeTable() {
-        shared_ptr<AreaMemoryManager> mm = AreaMemoryManager::create();
+        AreaMemoryManager::Ref mm = AreaMemoryManager::create();
         table.clearAndSetMemoryManager(mm);
     }
 

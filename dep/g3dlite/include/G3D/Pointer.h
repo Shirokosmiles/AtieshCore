@@ -4,9 +4,9 @@
   \maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
   \created 2007-05-16
-  \edited  2016-06-05
+  \edited  2012-10-06
 
-  Copyright 2000-2016, Morgan McGuire.
+  Copyright 2000-2012, Morgan McGuire.
   All rights reserved.
  */
 #ifndef G3D_Pointer_h
@@ -14,7 +14,6 @@
 
 #include "G3D/debugAssert.h"
 #include "G3D/ReferenceCount.h"
-#include <functional>
 
 namespace G3D {
 
@@ -95,7 +94,7 @@ private:
         }
 
         virtual bool isNull() const {
-            return value == nullptr;
+            return value == NULL;
         }
     };
 
@@ -128,32 +127,6 @@ private:
         virtual bool isNull() const { return false; }
     };
 
-    class StdFcnAccessor : public Interface {
-    private:
-
-        std::function<ValueType(void)>   getMethod;
-        std::function<void(ValueType)>   setMethod;
-
-    public:
-
-        StdFcnAccessor(std::function<ValueType(void)> getMethod, std::function<void(ValueType)> setMethod) : getMethod(getMethod), setMethod(setMethod) {
-        }
-
-        virtual void set(ValueType v) {
-            setMethod(v);
-        }
-
-        virtual ValueType get() const {
-            return getMethod();
-        }
-
-        virtual Interface* clone() const {
-            return new StdFcnAccessor(getMethod, setMethod);
-        }
-
-        virtual bool isNull() const { return false; }
-    };
-
     template<class T, typename GetMethod, typename SetMethod>
     class Accessor : public Interface {
     private:
@@ -167,7 +140,7 @@ private:
         Accessor(T* object, 
                  GetMethod getMethod, 
                  SetMethod setMethod) : object(object), getMethod(getMethod), setMethod(setMethod) {
-	  debugAssert(notNull(object));
+            debugAssert(object != NULL);
         }
 
         virtual void set(ValueType v) {
@@ -185,7 +158,7 @@ private:
         }
 
         virtual bool isNull() const {
-            return object == nullptr;
+            return object == NULL;
         }
     };
 
@@ -204,7 +177,8 @@ private:
            (const shared_ptr<T>& object, 
             GetMethod getMethod, 
             SetMethod setMethod) : object(object), getMethod(getMethod), setMethod(setMethod) {
-	        debugAssert(notNull(object));
+
+            debugAssert(object != NULL);
         }
 
         virtual void set(ValueType v) {
@@ -230,39 +204,39 @@ private:
 
 public:
 
-    Pointer() : m_interface(nullptr) {};
+    Pointer() : m_interface(NULL) {};
 
     /** Allows implicit cast from real pointer */
     Pointer(ValueType* v) : m_interface(new Memory(v)) {}
 
     inline bool isNull() const {
-        return (m_interface == nullptr) || m_interface->isNull();
+        return (m_interface == NULL) || m_interface->isNull();
     }
 
     // Assignment
     inline Pointer& operator=(const Pointer& r) {
         delete m_interface;
-        if (r.m_interface != nullptr) {
+        if (r.m_interface != NULL) {
             m_interface = r.m_interface->clone();
         } else {
-            m_interface = nullptr;
+            m_interface = NULL;
         }
         return this[0];
     }
 
-    Pointer(const Pointer& p) : m_interface(nullptr) {
+    Pointer(const Pointer& p) : m_interface(NULL) {
         this[0] = p;
     }
 
 
-    /** \param setMethod May be nullptr */
+    /** \param setMethod May be NULL */
     template<class Class>
     Pointer(const shared_ptr<Class>& object,
             ValueType (Class::*getMethod)() const,
             void (Class::*setMethod)(ValueType)) : 
         m_interface(new SharedAccessor<Class, ValueType (Class::*)() const, void (Class::*)(ValueType)>(object, getMethod, setMethod)) {}
 
-    /** \param setMethod May be nullptr */
+    /** \param setMethod May be NULL */
     template<class Class>
     Pointer(const shared_ptr<Class>& object,
             const ValueType& (Class::*getMethod)() const,
@@ -270,56 +244,53 @@ public:
         m_interface(new SharedAccessor<Class, const ValueType& (Class::*)() const, void (Class::*)(ValueType)>(object, getMethod, setMethod)) {}
 
 
-    /** \param setMethod May be nullptr */
+    /** \param setMethod May be NULL */
     Pointer(ValueType (*getMethod)(),
             void (*setMethod)(ValueType)) : 
         m_interface(new FcnAccessor<ValueType (*)(), void (*)(ValueType)>(getMethod, setMethod)) {}
 
-    Pointer(std::function<ValueType(void)> getMethod,
-        std::function<void(ValueType)> setMethod) :
-        m_interface(new StdFcnAccessor(getMethod, setMethod)) {}
-
-    /** \param setMethod May be nullptr */
+    /** \param setMethod May be NULL */
     Pointer(const ValueType& (*getMethod)(),
             void (*setMethod)(ValueType)) : 
         m_interface(new FcnAccessor<const ValueType& (*)(), void (*)(ValueType)>(getMethod, setMethod)) {}
 
-    /** \param setMethod May be nullptr */
+
+    /** \param setMethod May be NULL */
     template<class Class>
     Pointer(const shared_ptr<Class>& object,
             ValueType (Class::*getMethod)() const,
             void (Class::*setMethod)(const ValueType&)) : 
         m_interface(new SharedAccessor<Class, ValueType (Class::*)() const, void (Class::*)(const ValueType&)>(object, getMethod, setMethod)) {}
 
-    /** \param setMethod May be nullptr */
+    /** \param setMethod May be NULL */
     template<class Class>
     Pointer(const shared_ptr<Class>& object,
             const ValueType& (Class::*getMethod)() const,
             void (Class::*setMethod)(const ValueType&)) : 
         m_interface(new SharedAccessor<Class, const ValueType& (Class::*)() const, void (Class::*)(const ValueType&)>(object, getMethod, setMethod)) {}
 
-    /** \param setMethod May be nullptr */
+    /** \param setMethod May be NULL */
     template<class Class>
     Pointer(Class* object,
             const ValueType& (Class::*getMethod)() const,
             void (Class::*setMethod)(const ValueType&)) : 
         m_interface(new Accessor<Class, const ValueType& (Class::*)() const, void (Class::*)(const ValueType&)>(object, getMethod, setMethod)) {}
 
-    /** \param setMethod May be nullptr */
+    /** \param setMethod May be NULL */
     template<class Class>
     Pointer(Class* object,
             ValueType (Class::*getMethod)() const,
             void (Class::*setMethod)(const ValueType&)) : 
         m_interface(new Accessor<Class, ValueType (Class::*)() const, void (Class::*)(const ValueType&)>(object, getMethod, setMethod)) {}
 
-    /** \param setMethod May be nullptr */
+    /** \param setMethod May be NULL */
     template<class Class>
     Pointer(Class* object,
             const ValueType& (Class::*getMethod)() const,
             void (Class::*setMethod)(ValueType)) : 
         m_interface(new Accessor<Class, const ValueType& (Class::*)() const, void (Class::*)(ValueType)>(object, getMethod, setMethod)) {}
 
-    /** \param setMethod May be nullptr */
+    /** \param setMethod May be NULL */
     template<class Class>
     Pointer(Class* object,
             ValueType (Class::*getMethod)() const,
@@ -331,14 +302,14 @@ public:
     }
 
     inline const ValueType getValue() const {
-        debugAssert(m_interface != nullptr);
+        debugAssert(m_interface != NULL);
         return m_interface->get();
     }
 
     /** \brief Assign a value to the referenced element.
-        If this Pointer was initialized with a nullptr setMethod, the call is ignored */
-    inline void setValue(const ValueType& v) const {
-        debugAssert(m_interface != nullptr);
+        If this Pointer was initialized with a NULL setMethod, the call is ignored */
+    inline void setValue(const ValueType& v) {
+        debugAssert(m_interface != NULL);
         m_interface->set(v);
     }
 
@@ -346,8 +317,8 @@ public:
     private:
 
         friend class Pointer;
-        const Pointer* pointer;
-        IndirectValue(const Pointer* p) : pointer(p) {}
+        Pointer* pointer;
+        IndirectValue(Pointer* p) : pointer(p) {}
 
     public:
 
@@ -365,14 +336,9 @@ public:
         return IndirectValue(this);
     }
 
-    inline IndirectValue operator*() const {
-        return IndirectValue(this);
-    }
-
-/*    inline const ValueType operator*() const {
+    inline const ValueType operator*() const {
         return getValue();
     }
-    */
 };
 
 template<class T>
@@ -385,157 +351,6 @@ bool notNull(const Pointer<T>& p) {
     return ! p.isNull();
 }
 
-
-/** Wraps a boolean Pointer with one that inverts its value. */
-class NotAdapter : public ReferenceCountedObject {
-private:
-    friend class Pointer<bool>;
-
-    Pointer<bool>      m_source;
-
-    typedef shared_ptr<NotAdapter> Ptr;
-
-    NotAdapter(const Pointer<bool>& ptr) : m_source(ptr) {
-    }
-
-    /** For use by Pointer<T> */
-    bool get() const {
-        return ! m_source.getValue();
-    }
-
-    /** For use by Pointer<T> */
-    void set(const bool& v) {
-        m_source.setValue(! v);
-    }
-
-public:
-
-    static Pointer<bool> wrap(const Pointer<bool>& ptr) {
-        Ptr p(new NotAdapter(ptr));
-        return Pointer<bool>(p, &NotAdapter::get, &NotAdapter::set);
-    }
-};
-
-
-/** Maps an integer pointer to a power of two G3D::Pointer value \sa NegativeAdapter */
-template<class T>
-class PowerOfTwoAdapter : public ReferenceCountedObject {
-private:
-
-    friend class Pointer<int>;
-
-    Pointer<int>      m_source;
-
-    typedef shared_ptr<PowerOfTwoAdapter> Ptr;
-
-    /** For use by Pointer<T> */
-    T get() const { return m_source.getValue(); }
-
-    /** For use by Pointer<T> */
-    void set(const T& v) { m_source.setValue(ceilPow2(v)); }
-
-    PowerOfTwoAdapter(Pointer<T> ptr) : m_source(ptr) {}
-
-public:
-
-    static Pointer<T> create(Pointer<T> ptr) {
-        Ptr p(new PowerOfTwoAdapter(ptr));
-        return Pointer<T>(p, &PowerOfTwoAdapter::get, &PowerOfTwoAdapter::set);
-    }
-};
-
-/** Negates a numeric type G3D::Pointer value \sa PercentageAdapter */
-template<class T>
-class NegativeAdapter : public ReferenceCountedObject {
-private:
-
-    friend class Pointer<T>;
-
-    Pointer<T>      m_source;
-
-    typedef shared_ptr<NegativeAdapter> Ptr;
-
-    NegativeAdapter(Pointer<T> ptr) : m_source(ptr) {}
-
-    /** For use by Pointer<T> */
-    T get() const { return -m_source.getValue(); }
-
-    /** For use by Pointer<T> */
-    void set(const T& v) { m_source.setValue(-v); }
-
-public:
-
-    static Pointer<T> create(Pointer<T> ptr) {
-        Ptr p(new NegativeAdapter(ptr));
-        return Pointer<T>(p, &NegativeAdapter<T>::get, &NegativeAdapter<T>::set);
-    }
-};
-
-
-/** Maps a floating point fraction to a percentage G3D::Pointer value \sa NegativeAdapter */
-template<class T>
-class PercentageAdapter : public ReferenceCountedObject {
-private:
-
-    friend class Pointer<float>;
-
-    Pointer<float>      m_source;
-
-    typedef shared_ptr<PercentageAdapter> Ptr;
-
-    /** For use by Pointer<T> */
-    T get() const { return 100.0f * m_source.getValue(); }
-
-    /** For use by Pointer<T> */
-    void set(const T& v) { m_source.setValue(v * 0.01f); }
-
-    PercentageAdapter(Pointer<T> ptr) : m_source(ptr) {}
-
-public:
-
-    static Pointer<T> create(Pointer<T> ptr) {
-        Ptr p(new PercentageAdapter(ptr));
-        return Pointer<T>(p, &PercentageAdapter::get, &PercentageAdapter::set);
-    }
-};
-
-
-/** Maps an integer pointer to a perfect square */
-template<class T>
-class SquareAdapter : public ReferenceCountedObject {
-private:
-
-    friend class Pointer<int>;
-
-    Pointer<int>      m_source;
-
-    typedef shared_ptr<SquareAdapter> Ptr;
-
-    /** For use by Pointer<T> */
-    T get() const { return m_source.getValue(); }
-
-    /** For use by Pointer<T> */
-    void set(const T& v) {
-        int low = int(square(floor(sqrt(v))));
-        int high = int(square(ceil(sqrt(v))));
-        if (high - v < v - low) {
-            m_source.setValue(high);
-        }
-        else {
-            m_source.setValue(low);
-        }
-    }
-
-    SquareAdapter(Pointer<T> ptr) : m_source(ptr) {}
-
-public:
-
-    static Pointer<T> create(Pointer<T> ptr) {
-        Ptr p(new SquareAdapter(ptr));
-        return Pointer<T>(p, &SquareAdapter::get, &SquareAdapter::set);
-    }
-};
-
-} // G3D
+}
 
 #endif

@@ -11,7 +11,7 @@
 #include "G3D/platform.h"
 #include "G3D/AtomicInt32.h"
 #include "G3D/debugAssert.h"
-#include "G3D/G3DString.h"
+#include <string>
 
 #ifndef G3D_WINDOWS
 #   include <pthread.h>

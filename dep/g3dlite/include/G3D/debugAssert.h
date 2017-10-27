@@ -26,7 +26,7 @@
 #ifndef G3D_DEBUGASSERT_H
 #define G3D_DEBUGASSERT_H
 
-#include "G3D/G3DString.h"
+#include <string>
 #include "G3D/platform.h"
 
 #include <cstdlib>
@@ -36,16 +36,10 @@
 #   pragma warning (disable : 4127)
 #endif
 
-#ifdef G3D_OSX
-# ifdef G3D_LINUX
-# error This is not linux!
-#endif
-#endif
-
 #ifdef G3D_LINUX
-#if 0 /* G3DFIX: Disabled to avoid requirement for X11 libraries */
     // Needed so we can define a global display
     // pointer for debugAssert.
+#if 0 /* G3DFIX: Disabled to avoid requirement for X11 libraries */
     #include <X11/Xlib.h>
     #include <X11/Xutil.h>
     #include <X11/Xatom.h>
@@ -86,7 +80,7 @@
 namespace G3D {
 typedef bool (*AssertionHook)(
     const char* _expression,
-    const String& message,
+    const std::string& message,
     const char* filename,
     int lineNumber,
     bool useGuiPrompt);
@@ -133,7 +127,7 @@ namespace _internal {
 
 
 #    define debugBreak() G3D::_internal::_releaseInputGrab_(); rawBreak(); G3D::_internal::_restoreInputGrab_();
-#    define debugAssert(exp) debugAssertM(exp, String("Debug assertion failure"))
+#    define debugAssert(exp) debugAssertM(exp, "Debug assertion failure")
 
     #ifdef G3D_DEBUG_NOGUI
         #define __debugPromptShowDialog__ false
@@ -213,14 +207,14 @@ namespace G3D {  namespace _internal {
  */
 bool _handleDebugAssert_(
     const char* expression,
-    const String& message,
+    const std::string& message,
     const char* filename,
     int         lineNumber,
     bool        useGuiPrompt);
 
 bool _handleErrorCheck_(
     const char* expression,
-    const String& message,
+    const std::string& message,
     const char* filename,
     int         lineNumber,
     bool        useGuiPrompt);

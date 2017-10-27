@@ -261,7 +261,7 @@ private:
 #       endif
 
         // Create an area memory manager for fast deallocation
-        shared_ptr<MemoryManager> mm = AreaMemoryManager::create(iRound(sizeof(VN) * normalArray.size() * 1.5));
+        MemoryManager::Ref mm = AreaMemoryManager::create(iRound(sizeof(VN) * normalArray.size() * 1.5));
 
         const float cosThresholdAngle = (float)cos(normalSmoothingAngle);
 
@@ -499,7 +499,7 @@ Welder::Settings::Settings(const Any& any) {
     *this = Settings();
     any.verifyName("Welder::Settings");
     for (Any::AnyTable::Iterator it = any.table().begin(); it.isValid(); ++it) {
-        const String& key = toLower(it->key);
+        const std::string& key = toLower(it->key);
         if (key == "normalsmoothingangle") {
             normalSmoothingAngle = it->value;
         } else if (key == "vertexweldradius") {

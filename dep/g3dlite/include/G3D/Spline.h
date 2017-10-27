@@ -132,17 +132,6 @@ public:
         zero = *(&x) * 0.0f;
     }
 
-    explicit Spline(const Control& c) {
-        static Control x;
-        // Hide the fact from C++ that we are using an
-        // uninitialized variable here by pointer arithmetic.
-        // This is ok because any type that is a legal control
-        // point also supports multiplication by float.
-        zero = *(&x) * 0.0f;
-        control.append(c);
-        time.append(0.0f);
-    }
-
     /** Appends a control point at a specific time that must be
         greater than that of the previous point. */
     void append(float t, const Control& c) {
@@ -333,19 +322,13 @@ public:
 
     /** Accepts a table of properties, or any valid PhysicsFrame specification for a single control*/
     explicit Spline(const Any& any) {
-        if (any.type() == Any::TABLE) {
-            AnyTableReader propertyTable(any);
-            init(propertyTable);
-            propertyTable.verifyDone();
-        } else {
-            time.append(0);
-            control.append(Control(any));
-        }
-        
+        AnyTableReader propertyTable(any);
+        init(propertyTable);
+        propertyTable.verifyDone();
     }
 
     /** Note that invoking classes can call setName on the returned value instead of passing a name in. */
-    virtual Any toAny(const String& myName) const {
+    virtual Any toAny(const std::string& myName) const {
         Any a(Any::TABLE, myName);
     
         a["extrapolationMode"] = extrapolationMode;
@@ -357,25 +340,6 @@ public:
         return a;
     }
 
-    size_t hashCode() const {
-        return (extrapolationMode << 3) ^ (interpolationMode << 10) ^ (control.size() * 10) ^ ((int)(time.last()*100.0f)) ^ ((int)(finalInterval*100.0f));
-    }
-
-    bool operator==(const Spline<Control>& other) const {
-        if (extrapolationMode == other.extrapolationMode 
-            && interpolationMode == other.interpolationMode
-            && control.size() == other.control.size()
-            && finalInterval == other.finalInterval) {
-            bool identical = true;
-            debugAssert(control.size() == time.size() && other.control.size() == other.time.size());
-            for (int i = 0; (i < control.size()) && identical; ++i) {
-                identical = identical && (control[i] == other.control[i]) && (time[i] == other.time[i]);
-            }
-            return identical;
-        } else {
-            return false;
-        }
-    }
 
     /**
        Return the position at time s.  The spline is defined outside

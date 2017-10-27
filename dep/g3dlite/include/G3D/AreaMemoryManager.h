@@ -6,7 +6,7 @@
  \created 2009-01-20
  \edited  2010-10-29
 
- Copyright 2000-2015, Morgan McGuire.
+ Copyright 2000-2012, Morgan McGuire.
  All rights reserved.
  */
 
@@ -56,13 +56,15 @@ private:
     AreaMemoryManager(size_t sizeHint);
 
 public:
-    
+
+    typedef shared_ptr<AreaMemoryManager> Ref;
+
     /** 
         \param sizeHint Total amount of memory expected to be allocated.
         The allocator will allocate memory from the system in increments
         of this size.
     */
-    static shared_ptr<AreaMemoryManager> create(size_t sizeHint = 10 * 1024 * 1024);
+    static AreaMemoryManager::Ref create(size_t sizeHint = 10 * 1024 * 1024);
 
     /** Invokes deallocateAll. */
     ~AreaMemoryManager();

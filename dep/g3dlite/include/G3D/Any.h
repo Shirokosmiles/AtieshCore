@@ -5,9 +5,9 @@
  \maintainer Morgan McGuire
   
  \created 2006-06-11
- \edited  2014-11-08
+ \edited  2013-03-29
 
- Copyright 2000-2015, Morgan McGuire.
+ Copyright 2000-2013, Morgan McGuire.
  All rights reserved.
  */
 
@@ -15,12 +15,11 @@
 #define G3D_Any_h
 
 #include "G3D/platform.h"
-#include "G3D/g3dmath.h"
 #include "G3D/Table.h"
 #include "G3D/Array.h"
 #include "G3D/AtomicInt32.h"
 #include "G3D/stringutils.h"
-#include "G3D/G3DString.h"
+#include <string>
 
 // needed for Token
 #include "G3D/TextInput.h"
@@ -187,12 +186,12 @@ public:
 
     enum Type {NIL, BOOLEAN, NUMBER, STRING, ARRAY, TABLE, EMPTY_CONTAINER};
 
-    static String toString(Type t);
+    static std::string toString(Type t);
 
     /** Where an Any came from in a file.  Useful for throwing parsing errors */
     class Source {
     public:
-        String                 filename;
+        std::string                 filename;
         int                         line;
         int                         character;
 
@@ -206,12 +205,12 @@ public:
     };
 
     typedef Array<Any> AnyArray;
-    typedef Table<String, Any> AnyTable;
+    typedef Table<std::string, Any> AnyTable;
 
 private:
 
     /** Called from deserialize() */
-    static void deserializeComment(TextInput& ti, Token& token, String& comment);
+    static void deserializeComment(TextInput& ti, Token& token, std::string& comment);
 
     /** NIL, BOOLEAN, and NUMBER are stored directly in the Any */
     union SimpleValue {
@@ -232,7 +231,7 @@ private:
     public:
         /** ARRAY, TABLE, or STRING value only.  NULL otherwise. */
         union Value {
-            String*                  s;
+            std::string*             s;
             Array<Any>*              a;
             AnyTable*                t;
             inline Value() : s(NULL) {}
@@ -240,15 +239,15 @@ private:
 
         // Needed so that the destructor knows what is in Value
         // and can call its destructor. 
-        Type                    type;
+        Type                         type;
         
         /** Always points to memory that is allocated with the Data, so
            the destructor does not delete this. */
-        Value                   value;
+        Value                        value;
         
-        String                  comment;
+        std::string                  comment;
 
-        String                  name;
+        std::string                  name;
 
         /** If this Any was created by parsing an #include expression and
             has not been modified since, this is the original comment and
@@ -258,31 +257,27 @@ private:
             Any will turn into an #include expression instead of unparsing
             its contents of the any.         
           */
-        String                  includeLine;
+        std::string                  includeLine;
 
         /** For STRING, ARRAY and TABLE types, m_value is shared between
             multiple instances.  Mutation is allowed only if the reference
             count is exactly 1, otherwise the mutating instance must copy
             the value.  This is not used for other types.
         */
-        AtomicInt32             referenceCount;
+        AtomicInt32                  referenceCount;
 
-        Source                  source;
+        Source                       source;
 
         /** Two-character string of "{}", "[]", or "()"; to be used when unparsing. */
-        const char*             bracket;
+        const char*                  bracket;
 
         /** ';' or ',' separator to be used when unparsing */
-        char                    separator;
-
-        /** True if the input was a hex integer number and should 
-            be preserved as such when saved. */
-        bool                    hexInteger;
+        char                         separator;
 
     private:
 
         /** Called by create() */
-        inline Data(Type t, const char* b, char s, bool h) : type(t), referenceCount(1), bracket(b), separator(s), hexInteger(h) {}
+        inline Data(Type t, const char* b, char s) : type(t), referenceCount(1), bracket(b), separator(s) {}
 
         /** Called by destroy */
         ~Data();
@@ -291,7 +286,7 @@ private:
 
         /** Clones the argument */
         static Data* create(const Data* d);
-        static Data* create(Type t, const char* b = NULL, char s = '\0', bool h = false);
+        static Data* create(Type t, const char* b = NULL, char s = '\0');
 
         /** Free d, invoking its destructor and freeing the memory for
             the value. */
@@ -306,7 +301,7 @@ private:
         The source of a placeholder object is that of the parent
         object until it is written.
     */
-    String         m_placeholderName;
+    std::string         m_placeholderName;
 
     Type                m_type;
     SimpleValue         m_simpleValue;
@@ -342,7 +337,7 @@ private:
     void deserialize(TextInput& ti, Token& token);
 
     /** Read the name of a named Array or Table. */
-    static void deserializeName(TextInput& ti, Token& token, String& name);
+    static void deserializeName(TextInput& ti, Token& token, std::string& name);
     
     /** Read until a separator is consumed or a close paren is hit, and
      return that token.  Considers the passed in token to be the first
@@ -351,7 +346,7 @@ private:
 
     /** Construct an Any that is a proxy for a table fetch from \a data.
      This proxy can be copied exactly once on return from operator[].*/
-    Any(const String& key, Data* data);
+    Any(const std::string& key, Data* data);
 
     bool isPlaceholder() const {
         return ! m_placeholderName.empty();
@@ -361,17 +356,17 @@ private:
     void _append(const Any& v0, const Any& v1);
     void _append(const Any& v0, const Any& v1, const Any& v2);
     void _append(const Any& v0, const Any& v1, const Any& v2, const Any& v3);
-    Any  _get(const String& key, const Any& defaultVal) const;
-    void _set(const String& key, const Any& val);
+    Any  _get(const std::string& key, const Any& defaultVal) const;
+    void _set(const std::string& key, const Any& val);
 
-    void _parse(const String& src);
+    void _parse(const std::string& src);
 
 public:
 
     /** Thrown by operator[] when a key is not present in a const table. */
     class KeyNotFound : public ParseError {
     public:
-        String key;
+        std::string key;
 
         KeyNotFound(const Data* data) {
             if (data) {
@@ -411,11 +406,10 @@ public:
 
     explicit Any(float x);
 
-    // On 64-bit linux int64 can be defined as long which causes a redefinition error.
-#   if defined(G3D_32Bit) || defined(_MSC_VER) || defined(G3D_OSX)
+    #if defined(G3D_32Bit) || defined(_MSC_VER)
     /** NUMBER constructor */
     explicit Any(int64 x) : m_type(NUMBER), m_simpleValue((double)x), m_data(NULL) {}
-#   endif
+	#endif
 
     /** NUMBER constructor */
     explicit Any(long x);
@@ -433,7 +427,7 @@ public:
     explicit Any(bool x);
 
     /** STRING constructor */
-    explicit Any(const String& x);
+    explicit Any(const std::string& x);
 
     /** STRING constructor */
     explicit Any(const char* x);
@@ -442,7 +436,7 @@ public:
         \param brackets must be "" (defaults to {} for table, () for array), "[]", "()", or "{}"
         \param separator must be ';', ',', or '\0' (defaults to ',' for array and ';' for table)
     */  
-    explicit Any(Type t, const String& name = "", const String& brackets = "", const char separator = '\0');
+    explicit Any(Type t, const std::string& name = "", const std::string& brackets = "", const char separator = '\0');
 
     /** Extensible constructor: call the toAny() method of any class. */
     template<class T>
@@ -483,17 +477,17 @@ public:
 
       \sa deserialize, load, unparse
       */
-    static Any parse(const String& src);
+    static Any parse(const std::string& src);
 
-    String unparse(const TextOutput::Settings& s = TextOutput::Settings()) const;
+    std::string unparse(const TextOutput::Settings& s = TextOutput::Settings()) const;
 
     /** \param allowCoercion If false, throws an error if the Any uses features that are not
        supported by JSON such as named arrays.  Otherwise, silently coerces to JSON. */
-    String unparseJSON(const TextOutput::Settings& s = TextOutput::Settings(), bool allowCoercion = true) const;
+    std::string unparseJSON(const TextOutput::Settings& s = TextOutput::Settings(), bool allowCoercion = true) const;
     
     /** Comments appear before values when they are in serialized form.*/
-    const String& comment() const;
-    void setComment(const String& c);
+    const std::string& comment() const;
+    void setComment(const std::string& c);
 
     /** True if this is the NIL value */
     bool isNil() const;
@@ -502,7 +496,7 @@ public:
     double number() const;
     float floatValue() const;
 
-    const String& string() const;
+    const std::string& string() const;
     bool boolean() const;
 
     /** If a valid string, takes the string value and creates a fully
@@ -516,14 +510,14 @@ public:
         Strings that begin with '<' and end with '>' are treated as
         escape sequences and are returned unmodifed.
      */
-    String resolveStringAsFilename(bool errorIfNotFound = true) const;
+    std::string resolveStringAsFilename(bool errorIfNotFound = true) const;
 
     /** If this is named ARRAY or TABLE, returns the name. */
-    const String& name() const;
+    const std::string& name() const;
 
     /** If this is named ARRAY or TABLE, returns true if the name
         begins with \a s.  The comparision is case insensitive. */
-    bool nameBeginsWith(const String& s) const;
+    bool nameBeginsWith(const std::string& s) const;
 
     /** If this is named ARRAY or TABLE, returns true if the name
         begins with \a s.  The comparision is case insensitive. */
@@ -531,7 +525,7 @@ public:
 
     /** If this is named ARRAY or TABLE, returns true if the name is
         \a s.  The comparision is case insensitive. */
-    bool nameEquals(const String& s) const;
+    bool nameEquals(const std::string& s) const;
 
     /** If this is named ARRAY or TABLE, returns true if the name is\a
         s.  The comparision is case insensitive. */
@@ -556,7 +550,7 @@ public:
         ".", may have spaces around them.  The name may not
         contain parentheses.
     */
-    void setName(const String& name);
+    void setName(const std::string& name);
 
     /** Number of elements if this is an ARRAY or TABLE */
     int size() const;
@@ -599,17 +593,17 @@ public:
 
     /** Directly exposes the underlying data structure for table.
     \sa G3D::AnyTableReader*/
-    const Table<String, Any>& table() const;
+    const Table<std::string, Any>& table() const;
 
     /** For a table, returns the element for \a key. Throws KeyNotFound
         exception if the element does not exist.
        */ 
-    const Any& operator[](const String& key) const;
+    const Any& operator[](const std::string& key) const;
 
     // Needed to prevent the operator[](int) overload from catching
     // string literals
     const Any& operator[](const char* key) const {
-        return operator[](String(key));
+        return operator[](std::string(key));
     }
 
     /** 
@@ -635,26 +629,26 @@ public:
         the Any::get() or the const Any::operator[]() methods to avoid
         this behavior and ensure error-checking at fetch time.
      */
-    Any& operator[](const String& key);
+    Any& operator[](const std::string& key);
 
-    /** \copydoc Any::operator[](const String&) */
+    /** \copydoc Any::operator[](const std::string&) */
     inline Any& operator[](const char* key) {
-        return operator[](String(key));
+        return operator[](std::string(key));
     }
     
     /** For a table, returns the element for key \a x and \a
         defaultVal if it does not exist. */
     template<class T>
-    Any get(const String& key, const T& defaultVal) const {
+    Any get(const std::string& key, const T& defaultVal) const {
         return _get(key, Any(defaultVal));
     }
 
     /** Returns true if this key is in the TABLE.  Illegal to call on an object that is not a TABLE. */
-    bool containsKey(const String& key) const;
+    bool containsKey(const std::string& key) const;
     
     /** For a table, assigns the element for key k. */
     template<class T>
-    void set(const String& key, const T& val) {
+    void set(const std::string& key, const T& val) {
         _set(key, Any(val));
     }
 
@@ -664,12 +658,12 @@ public:
     /** The parent directory of the location from which this Any was loaded.  This is useful for 
        interpreting filenames relative to the Any's source location,
        which may not match the current directory if the Any was from an included file. */
-    String sourceDirectory() const;
+    std::string sourceDirectory() const;
 
     /** True if the Anys are exactly equal, ignoring comments.  Applies deeply on arrays and tables. */
     bool operator==(const Any& x) const;
 
-    bool operator==(const String& s) const {
+    bool operator==(const std::string& s) const {
         return *this == Any(s);
     }
 
@@ -687,7 +681,7 @@ public:
 
     bool operator!=(const Any& x) const;
 
-    bool operator!=(const String& s) const {
+    bool operator!=(const std::string& s) const {
         return *this != Any(s);
     }
 
@@ -708,7 +702,7 @@ public:
     operator float() const;
     operator double() const;
     operator bool() const;
-    operator String() const;
+    operator std::string() const;
 
     operator char() const {
         return char(int(*this));
@@ -738,16 +732,16 @@ public:
     /** Parse from a file.
      \sa deserialize, parse, fromFile, loadIfExists
      */
-    void load(const String& filename);
+    void load(const std::string& filename);
 
     /** Load a new Any from \a filename. \sa load, save, loadIfExists */
-    static Any fromFile(const String& filename);
+    static Any fromFile(const std::string& filename);
 
     /** Load \a filename file if it exists, otherwise do not modify this */
-    void loadIfExists(const String& filename);
+    void loadIfExists(const std::string& filename);
 
     /** Uses the serialize method. */
-    void save(const String& filename) const;
+    void save(const std::string& filename) const;
 
     void serialize(TextOutput& to, bool json = false, bool coerce = false) const;
 
@@ -762,7 +756,7 @@ public:
     const Source& source() const;
 
     /** Removes this key from the Any, which must be a table. */
-    void remove(const String& key);
+    void remove(const std::string& key);
 
     /** Removes this key from the Any, which must be an array, and
         shifts other elements down to maintain order. */
@@ -771,52 +765,52 @@ public:
     /** Throws a ParseError if \a value is false.  Useful for quickly
         creating parse rules in classes that deserialize from Any.
     */
-    void verify(bool value, const String& message = "") const;
+    void verify(bool value, const std::string& message = "") const;
 
 
     /** Verifies that the name is identifier \a n (case sensitive). 
         It may contain identifier operators after this */
-    void verifyName(const String& n) const;
+    void verifyName(const std::string& n) const;
 
     /** Verifies that the name is identifier \a n or \a m (case sensitive). 
         It may contain identifier operators after this */
-    void verifyName(const String& n, const String& m) const;
+    void verifyName(const std::string& n, const std::string& m) const;
 
     /** Verifies that the name is identifier \a n or \a m or \a p (case sensitive). 
         It may contain identifier operators after this */
-    void verifyName(const String& n, const String& m, const String& p) const;
+    void verifyName(const std::string& n, const std::string& m, const std::string& p) const;
 
     /** Verifies that the name is identifier \a n or \a m or \a p or \a q (case sensitive). 
         It may contain identifier operators after this */
-    void verifyName(const String& n, const String& m, const String& p, const String& q) const;
+    void verifyName(const std::string& n, const std::string& m, const std::string& p, const std::string& q) const;
 
     /** Verifies that the name <i>begins with</i> identifier \a n (case sensitive). 
         It may contain identifier operators after this */
-    void verifyNameBeginsWith(const String& n) const;
+    void verifyNameBeginsWith(const std::string& n) const;
 
     /** Verifies that the name <i>begins with</i> identifier \a n or \a m (case sensitive). 
         It may contain identifier operators after this */
-    void verifyNameBeginsWith(const String& n, const String& m) const;
+    void verifyNameBeginsWith(const std::string& n, const std::string& m) const;
 
     /** Verifies that the name <i>begins with</i> identifier \a n or \a m or \a p (case sensitive). 
         It may contain identifier operators after this */
-    void verifyNameBeginsWith(const String& n, const String& m, const String& p) const;
+    void verifyNameBeginsWith(const std::string& n, const std::string& m, const std::string& p) const;
 
     /** Verifies that the name <i>begins with</i> identifier \a n or \a m or \a p or \a q (case sensitive). 
         It may contain identifier operators after this */
-    void verifyNameBeginsWith(const String& n, const String& m, const String& p, const String& q) const;
+    void verifyNameBeginsWith(const std::string& n, const std::string& m, const std::string& p, const std::string& q) const;
 
     /** Verifies that the name <i>begins with</i> identifier \a n or \a m or \a p or \a q or \a r (case sensitive). 
         It may contain identifier operators after this */
-    void verifyNameBeginsWith(const String& n, const String& m, const String& p, const String& q, const String& r) const;
+    void verifyNameBeginsWith(const std::string& n, const std::string& m, const std::string& p, const std::string& q, const std::string& r) const;
 
     /** Verifies that the name <i>begins with</i> identifier \a n or \a m or \a p or \a q or \a r or \a s (case sensitive). 
         It may contain identifier operators after this */
-    void verifyNameBeginsWith(const String& n, const String& m, const String& p, const String& q, const String& r, const String& s) const;
+    void verifyNameBeginsWith(const std::string& n, const std::string& m, const std::string& p, const std::string& q, const std::string& r, const std::string& s) const;
 
     /** Verifies that the name <i>begins with</i> identifier \a n or \a m or \a p or \a q or \a r or \a s or \a t(case sensitive). 
         It may contain identifier operators after this */
-    void verifyNameBeginsWith(const String& n, const String& m, const String& p, const String& q, const String& r, const String& s, const String& t) const;
+    void verifyNameBeginsWith(const std::string& n, const std::string& m, const std::string& p, const std::string& q, const std::string& r, const std::string& s, const std::string& t) const;
 
     /** Verifies that the type is \a t. */
     void verifyType(Type t) const;
@@ -833,7 +827,7 @@ public:
     /** Assumes that Any(T) is well-defined, e.g., by T defining a
         T::toAny() method. */
     template<class T>
-    explicit Any(const Array<T>& array, const String& name = "") : m_type(ARRAY), m_data(NULL) {
+    explicit Any(const Array<T>& array, const std::string& name = "") : m_type(ARRAY), m_data(NULL) {
         setName(name);
         resize(array.size());
         for (int i = 0; i < array.size(); ++i) {
@@ -853,9 +847,9 @@ public:
 
     /** Assumes that T defines T(const Any&) */
     template<class T>
-    void getTable(Table<String, T>& table) const {
+    void getTable(Table<std::string, T>& table) const {
         verifyType(TABLE);
-        for (Table<String, Any>::Iterator it = this->table().begin(); it.isValid(); ++it) {
+        for (Table<std::string, Any>::Iterator it = this->table().begin(); it.isValid(); ++it) {
             table.set(it.key(), T(it.value()));
         }
     }
@@ -863,7 +857,7 @@ public:
 private:
 
     void deserializeTable(TextInput& ti);
-    void deserializeArray(TextInput& ti,const String& term);
+    void deserializeArray(TextInput& ti,const std::string& term);
 
     /** Turns an empty container into a table or an array */
     void become(const Type& t);
@@ -896,11 +890,11 @@ private:
 class AnyTableReader {
 private:
    Any              m_any;
-   Set<String> m_alreadyRead;
+   Set<std::string> m_alreadyRead;
 public:
     
     /** Verifies that \a is a TABLE with the given \a name. */
-    AnyTableReader(const String& name, const Any& a);
+    AnyTableReader(const std::string& name, const Any& a);
 
     /** Verifies that \a is a TABLE. */
     AnyTableReader(const Any& a);
@@ -917,18 +911,9 @@ public:
         return m_any;
     }
 
-    /** Force the flag used for detecting if a field has been read */
-    void setReadStatus(const String& s, bool read) {
-        if (read) {
-            m_alreadyRead.insert(s);
-        } else {
-            m_alreadyRead.remove(s);
-        }
-    }
-
 #if 0
     /** Returns the current key */
-    const String& key() const;
+    const std::string& key() const;
 
     /** Returns the current value */
     const Any& value() const;
@@ -936,33 +921,33 @@ public:
     AnyKeyIterator& operator++();
 #endif   
 
-    /** \copydoc get(const String& s, ValueType& v) */
-    void get(const String& s, String& v) {
+    /** \copydoc get(const std::string& s, ValueType& v) */
+    void get(const std::string& s, std::string& v) {
         v = m_any[s].string();
         m_alreadyRead.insert(s);
     }
 
-    /** \copydoc get(const String& s, ValueType& v) */
-    void get(const String& s, uint8& v) {
+    /** \copydoc get(const std::string& s, ValueType& v) */
+    void get(const std::string& s, uint8& v) {
         v = uint8(m_any[s].number());
         m_alreadyRead.insert(s);
     }
 
-    /** \copydoc get(const String& s, ValueType& v) */
-    void get(const String& s, uint16& v) {
+    /** \copydoc get(const std::string& s, ValueType& v) */
+    void get(const std::string& s, uint16& v) {
         v = uint16(m_any[s].number());
         m_alreadyRead.insert(s);
     }
 
     /** Read an entire array at once.*/
     template<class T>
-    void get(const String& s, Array<T>& v) {
+    void get(const std::string& s, Array<T>& v) {
         m_any[s].getArray(v);
         m_alreadyRead.insert(s);
     }
     
     template<class T>
-    void get(const String& s, Table<String, T>& v) {
+    void get(const std::string& s, Table<std::string, T>& v) {
         m_any[s].getTable(v);
         m_alreadyRead.insert(s);
     }
@@ -977,31 +962,13 @@ public:
 
       */
     template<class ValueType>
-    void get(const String& s, ValueType& v) {
-        try {
-            v = ValueType(m_any[s]);
-            m_alreadyRead.insert(s);
-        } catch(const String& e) {
-            ParseError p = ParseError();
-            p.message = e;
-            throw p;
-        }
-    }
-
-	template<class ValueType>
-    void get(const String& s, ValueType& v, ValueType (*factory)(const Any&)) {
-        try {
-            v = ValueType((*factory)(m_any[s]));
-            m_alreadyRead.insert(s);
-        } catch(const String& e) {
-            ParseError p = ParseError();
-            p.message = e;
-            throw p;
-        }
+    void get(const std::string& s, ValueType& v) {
+        v = ValueType(m_any[s]);
+        m_alreadyRead.insert(s);
     }
 
     /** Same as get() */
-    const Any& operator[](const String& s) {
+    const Any& operator[](const std::string& s) {
         m_alreadyRead.insert(s);
         return m_any[s];
     }
@@ -1019,7 +986,7 @@ public:
         \return True if the value was read.
       */
     template<class ValueType>
-    bool getIfPresent(const String& s, ValueType& v) {
+    bool getIfPresent(const std::string& s, ValueType& v) {
         if (m_any.containsKey(s)) {
             debugAssertM(! m_alreadyRead.contains(s), "read twice");
 
@@ -1030,52 +997,9 @@ public:
         }
     }
 
-	/**
-	Helper method for reading values that depend on a factory design pattern.
-
-	E.g., replaces the idiom:
-	\code
-	Any algorithmAny;
-    if (r.getIfPresent("algorithm", algorithmAny)) {
-        algorithm = Algorithm::create(algorithmAny);
-    }
-	\endcode
-
-	with 
-	\code
-	r.getIfPresent("algorithm", algorithm, &Algorithm::create);
-	\endcode
-
-	\sa get
-	*/
-    template<class ValueType>
-    bool getIfPresent(const String& s, ValueType& v, ValueType (*factory)(const Any&)) {
-        if (m_any.containsKey(s)) {
-            debugAssertM(! m_alreadyRead.contains(s), "read twice");
-			v = (*factory)((*this)[s]);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    /** Uses Any::resolveStringAsFilename */
-    bool getFilenameIfPresent(const String& s, String& v) {
-        if (m_any.containsKey(s)) {
-            debugAssertM(! m_alreadyRead.contains(s), "read twice");
-            Any a;
-            get(s, a);
-            v = a.resolveStringAsFilename();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     /** \return True if \a s is in the table and has not yet been read
         using get() or getIfPresent(). */
-    bool containsUnread(const String& s) const {
+    bool containsUnread(const std::string& s) const {
         return m_any.containsKey(s) && ! m_alreadyRead.contains(s);
     }
 

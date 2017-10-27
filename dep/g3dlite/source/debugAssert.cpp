@@ -16,7 +16,7 @@
 #endif
 #include "G3D/format.h"
 #include "G3D/prompt.h"
-#include "G3D/G3DString.h"
+#include <string>
 #include "G3D/debugPrintf.h"
 #include "G3D/Log.h"
 
@@ -68,13 +68,13 @@ static void postToClipboard(const char *text) {
  */
 static void createErrorMessage(
     const char*         expression,
-    const String&  message,
+    const std::string&  message,
     const char*         filename,
     int                 lineNumber,
-    String&        outTitle,
-    String&        outMessage) {
+    std::string&        outTitle,
+    std::string&        outMessage) {
 
-    String le = "";
+    std::string le = "";
     const char* newline = "\n";
 
     #ifdef G3D_WINDOWS
@@ -119,7 +119,7 @@ static void createErrorMessage(
         GetModuleFileNameA(NULL, modulePath, MAX_PATH);
 
         const char* moduleName = strrchr(modulePath, '\\');
-        outTitle = outTitle + String(" - ") + String(moduleName ? (moduleName + 1) : modulePath);
+        outTitle = outTitle + string(" - ") + string(moduleName ? (moduleName + 1) : modulePath);
 
     #else
         (void)outTitle;
@@ -135,13 +135,13 @@ static void createErrorMessage(
 
 bool _handleDebugAssert_(
     const char*         expression,
-    const String&  message,
+    const std::string&  message,
     const char*         filename,
     int                 lineNumber,
     bool                useGuiPrompt) {
 
-    String dialogTitle = "Assertion Failure";
-    String dialogText = "";
+    std::string dialogTitle = "Assertion Failure";
+    std::string dialogText = "";
     createErrorMessage(expression, message, filename, lineNumber, dialogTitle, dialogText);
 
     #ifdef G3D_WINDOWS
@@ -157,9 +157,9 @@ bool _handleDebugAssert_(
     static const char* choices[] = {"Debug", "Ignore", "Exit"};
 
     // Log the error
-    Log::common()->print(String("\n**************************\n\n") + dialogTitle + "\n" + dialogText);
+    Log::common()->print(std::string("\n**************************\n\n") + dialogTitle + "\n" + dialogText);
 
-    const int result = G3D::prompt(dialogTitle.c_str(), dialogText.c_str(), (const char**)choices, 3, useGuiPrompt);
+    int result = G3D::prompt(dialogTitle.c_str(), dialogText.c_str(), (const char**)choices, 3, useGuiPrompt);
 
 #    ifdef G3D_WINDOWS
         // Put the incoming last error back.
@@ -190,18 +190,18 @@ bool _handleDebugAssert_(
 
 bool _handleErrorCheck_(
     const char*         expression,
-    const String&  message,
+    const std::string&  message,
     const char*         filename,
     int                 lineNumber,
     bool                useGuiPrompt) {
 
-    String dialogTitle = "Critical Error";
-    String dialogText = "";
+    std::string dialogTitle = "Critical Error";
+    std::string dialogText = "";
 
     createErrorMessage(expression, message, filename, lineNumber, dialogTitle, dialogText);
 
     // Log the error
-    Log::common()->print(String("\n**************************\n\n") + dialogTitle + "\n" + dialogText);
+    Log::common()->print(std::string("\n**************************\n\n") + dialogTitle + "\n" + dialogText);
     #ifdef G3D_WINDOWS
         DWORD lastErr = GetLastError();
         (void)lastErr;
@@ -211,8 +211,8 @@ bool _handleErrorCheck_(
 
     static const char* choices[] = {"Ok"};
 
-    const String& m = 
-        String("An internal error has occured in this program and it will now close.  "
+    const std::string& m = 
+        std::string("An internal error has occured in this program and it will now close.  "
         "The specific error is below. More information has been saved in \"") +
             Log::getCommonLogFilename() + "\".\n\n" + dialogText;
 
@@ -330,7 +330,7 @@ ConsolePrintHook consolePrintHook() {
 }
 
 
-String __cdecl debugPrint(const String& s) {
+std::string __cdecl debugPrint(const std::string& s) {
 #   ifdef G3D_WINDOWS
         const int MAX_STRING_LEN = 1024;
     
@@ -340,7 +340,7 @@ String __cdecl debugPrint(const String& s) {
             OutputDebugStringA(s.c_str());
         } else {
             for (unsigned int i = 0; i < s.size(); i += MAX_STRING_LEN) {
-                String sub = s.substr(i, MAX_STRING_LEN);
+                std::string sub = s.substr(i, MAX_STRING_LEN);
                 OutputDebugStringA(sub.c_str());
             }
         }
@@ -352,17 +352,17 @@ String __cdecl debugPrint(const String& s) {
      return s;
 }
 
-String __cdecl debugPrintf(const char* fmt ...) {
+std::string __cdecl debugPrintf(const char* fmt ...) {
     va_list argList;
     va_start(argList, fmt);
-    String s = G3D::vformat(fmt, argList);
+    std::string s = G3D::vformat(fmt, argList);
     va_end(argList);
 
     return debugPrint(s);
 //    return debugPrint(consolePrint(s));
 }
 
-String consolePrint(const String& s) {
+std::string consolePrint(const std::string& s) {
     FILE* L = Log::common()->getFile();
     fprintf(L, "%s", s.c_str());
 
@@ -375,10 +375,10 @@ String consolePrint(const String& s) {
 }
 
 
-String __cdecl consolePrintf(const char* fmt ...) {
+std::string __cdecl consolePrintf(const char* fmt ...) {
     va_list argList;
     va_start(argList, fmt);
-    String s = G3D::vformat(fmt, argList);
+    std::string s = G3D::vformat(fmt, argList);
     va_end(argList);
 
     return consolePrint(s);

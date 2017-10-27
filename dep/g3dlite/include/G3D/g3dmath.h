@@ -1,15 +1,15 @@
 /**
- \file G3D/g3dmath.h
+ @file g3dmath.h
  
  Math util class.
  
- \maintainer Morgan McGuire, http://graphics.cs.williams.edu
- \cite highestBit by Jukka Liimatta
+ @maintainer Morgan McGuire, http://graphics.cs.williams.edu
+ @cite highestBit by Jukka Liimatta
  
- \created 2001-06-02
- \edited  2016-07-14
+ @created 2001-06-02
+ @edited  2013-01-27
 
- Copyright 2000-2015, Morgan McGuire.
+ Copyright 2000-2013, Morgan McGuire.
  All rights reserved.
  */
 
@@ -61,31 +61,15 @@
 
 /**
 \def G3D_DECLARE_SYMBOL(s)
-Defines SYMBOL_s as a static const String with the value s.
+Defines SYMBOL_s as a static const std::string with the value s.
 Useful for avoiding heap allocation from C-string constants being
 converted at runtime.
 */
 #define G3D_DECLARE_SYMBOL(s) \
-    static const String SYMBOL_##s = #s
+    static const std::string SYMBOL_##s = #s
+
 
 namespace G3D {
-
-/** For use with default output arguments. The value is always undefined. */
-extern float ignoreFloat;
-
-/** For use with default output arguments. The value is always undefined. */
-extern double ignoreDouble;
-
-/** For use with default output arguments. The value is always undefined. */
-extern int ignoreInt;
-
-
-typedef float Radiance;
-typedef float Power;
-typedef float Radiosity;
-typedef float Irradiance;
-typedef float Biradiance;
-typedef float Power;
 
 #ifdef _MSC_VER
 inline double __fastcall drand48() {
@@ -188,9 +172,6 @@ typedef uint64_t    uint64;
 typedef float           float32;
 typedef double          float64;
 
-/** Rounds so that the mean of a set of rounded numbers is close to the mean of the original numbers. */
-int roundStochastically(float f);
-
 int iAbs(int iValue);
 int iCeil(double fValue);
 
@@ -198,10 +179,6 @@ int iCeil(double fValue);
  Clamps the value to the range [low, hi] (inclusive)
  */
 int iClamp(int val, int low, int hi);
-inline int clamp(int val, int low, int hi) {
-    return iClamp(val, low, hi);
-}
-
 int16 iClamp(int16 val, int16 low, int16 hi);
 double clamp(double val, double low, double hi);
 float clamp(float val, float low, float hi);
@@ -258,6 +235,12 @@ inline int iRound(float f) {
     return lrintf(f);
 }
 
+/**
+ Returns a random number uniformly at random between low and hi
+ (inclusive).
+ @deprecated Use Random::integer
+ */
+int iRandom(int low, int hi);
 
 double abs (double fValue);
 double aCos (double fValue);
@@ -295,6 +278,13 @@ inline bool isNaN(uint64 x) {
 int iMod3(int x);
 
 /**
+ Uniform random number between low and hi, inclusive. [low, hi]
+ @deprecated 
+ @sa Random::uniform
+ */
+float uniformRandom(float low = 0.0f, float hi = 1.0f);
+
+/**
  Normally distributed random number. 
 
  @deprecated 
@@ -313,38 +303,32 @@ inline T pow5(T x) {
 
 template <class T>
 inline T min(const T& x, const T& y) {
-  return x < y ? x : y;
-  //    return std::min<T>(x, y);
+    return std::min<T>(x, y);
 }
 
 template <class T>
 inline T min(const T& x, const T& y, const T& z) {
-  return min(min(x,y), z);
-  //    return std::min<T>(std::min<T>(x, y), z);
+    return std::min<T>(std::min<T>(x, y), z);
 }
 
 template <class T>
 inline T min(const T& x, const T& y, const T& z, const T& w) {
-  return min(min(x,y), min(z,w));
-      //return std::min<T>(std::min<T>(x, y), std::min<T>(z, w));
+    return std::min<T>(std::min<T>(x, y), std::min<T>(z, w));
 }
 
 template <class T>
 inline T max(const T& x, const T& y) {
-  return x > y ? x : y;
-  //    return std::max<T>(x, y);
+    return std::max<T>(x, y);
 }
 
 template <class T>
 inline T max(const T& x, const T& y, const T& z) {
-  return max(max(x,y), z);
-  //    return std::max<T>(std::max<T>(x, y), z);
+    return std::max<T>(std::max<T>(x, y), z);
 }
 
 template <class T>
 inline T max(const T& x, const T& y, const T& z, const T& w) {
-  return max(max(x,y), max(z,w));
-  //    return std::max<T>(std::max<T>(x, y), std::max<T>(z, w));
+    return std::max<T>(std::max<T>(x, y), std::max<T>(z, w));
 }
 
 int iMin(int x, int y);
@@ -390,12 +374,6 @@ bool fuzzyLt(double a, double b);
 /** Is a near or less than b? */
 bool fuzzyLe(double a, double b);
 
-
-inline float sign(float x) {
-    return (x == 0.0f) ? 0.0f : copysign(1.0f, x);
-}
-
-
 /**
  Computes 1 / sqrt(x).
  */
@@ -409,10 +387,6 @@ inline float rsq(float x) {
  as the input.
  */
 int ceilPow2(unsigned int in);
-
-inline int ceilPow2(int in) {
-    return ceilPow2(unsigned(in));
-}
 
 /** Returns 2^x */
 inline int pow2(unsigned int x) {
@@ -480,6 +454,16 @@ inline float mul(float a, float b) {
     return a * b;
 }
 
+/**
+ 2^x
+ */
+inline double exp2(double x) {
+    return pow(2.0, x);
+}
+
+inline float exp2(float x) {
+    return powf(2.0f, x);
+}
 
 /** @deprecated Use rsq */
 inline double rsqrt(double x) {
@@ -569,17 +553,6 @@ inline int iClamp(int val, int low, int hi) {
     }
 }
 
-
-inline unsigned int uiClamp(unsigned int val, unsigned int low, unsigned int hi) {
-    debugAssert(low <= hi);
-    if (val <= low) {
-        return low;
-    } else if (val >= hi) {
-        return hi;
-    } else {
-        return val;
-    }
-}
 //----------------------------------------------------------------------------
 
 inline int16 iClamp(int16 val, int16 low, int16 hi) {
@@ -693,17 +666,33 @@ inline double aTan2 (double fY, double fX) {
 }
 
 //----------------------------------------------------------------------------
-inline double sign (double x) {
-    return (x == 0.0) ? 0.0 : copysign(1.0, x);
+inline double sign (double fValue) {
+    if (fValue > 0.0) {
+        return 1.0;
+    }
+
+    if (fValue < 0.0) {
+        return -1.0;
+    }
+
+    return 0.0;
+}
+
+inline float sign (float fValue) {
+    if (fValue > 0.0f) {
+        return 1.0f;
+    }
+
+    if (fValue < 0.0f) {
+        return -1.0f;
+    }
+
+    return 0.0f;
 }
 
 
 inline float uniformRandom(float low, float hi) {
     return (hi - low) * float(::rand()) / float(RAND_MAX) + low;
-}
-
-inline double uniformRandomD(double low, double hi) {
-    return (hi - low) * ::rand() / RAND_MAX + low;
 }
 
 inline double square(double x) {
@@ -783,12 +772,6 @@ inline int ceilPow2(unsigned int in) {
 
     return in + 1;
 }
-
-
-inline int ceilPow2(float in) {
-    return ceilPow2((unsigned int)(ceil(in)));
-}
-
 
 inline bool isPow2(int num) {
     return ((num & -num) == num);
@@ -946,23 +929,6 @@ inline double signedPow(double b, double e) {
     return sign(b) * pow(abs(b), e);
 }
 
-/** Preserves sign while squaring magnitude */
-inline float squareMagnitude(float x) {
-    return square(x) * sign(x);
-}
-
-/** Preserves sign while squaring magnitude */
-inline double squareMagnitude(double x) {
-    return square(x) * sign(x);
-}
-
-/** Preserves sign while squaring magnitude */
-inline int squareMagnitude(int x) {
-    return square(x) * iSign(x);
-}
-
-/** A lerp() for angles in radians that guarantees moving the shortest way around the circle. */
-float lerpAngle(float a, float b, float t);
 
 } // namespace
 

@@ -3,9 +3,9 @@
 
   \maintainer Morgan McGuire, http://graphics.cs.williams.edu
   \created 2004-06-21
-  \edited  2016-03-12
+  \edited  2011-05-24
 
-  Copyright 2000-2016, Morgan McGuire.
+  Copyright 2000-2012, Morgan McGuire.
   All rights reserved.
  */
 
@@ -14,7 +14,7 @@
 
 #include "G3D/platform.h"
 #include "G3D/Array.h"
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
 
@@ -99,10 +99,10 @@ public:
         bool                convertNewlines;
 
         /** Used by writeBoolean */
-        String         trueSymbol;
+        std::string         trueSymbol;
 
         /** Used by writeBoolean */
-        String         falseSymbol;
+        std::string         falseSymbol;
 
         Settings() :
             wordWrap(WRAP_WITHOUT_BREAKING),
@@ -139,7 +139,7 @@ private:
     bool                    inDQuote;
 
     /** Empty if there is none */
-    String             filename;
+    std::string             filename;
 
     Array<char>             data;
 
@@ -154,7 +154,7 @@ private:
     int                     indentSpaces;
 
     /** the newline character(s) */
-    String             newline;
+    std::string             newline;
 
     /** Starts at 1 */
     int                     m_currentLine;
@@ -162,10 +162,10 @@ private:
     void setOptions(const Settings& _opt);
 
     /** Converts to the desired newlines.  Called from vprintf */
-    void convertNewlines(const String& in, String& out);
+    void convertNewlines(const std::string& in, std::string& out);
 
     /** Called from vprintf */
-    void wordWrapIndentAppend(const String& str);
+    void wordWrapIndentAppend(const std::string& str);
 
     /** Appends the character to data, indenting whenever a newline is encountered.
         Called from wordWrapIndentAppend */
@@ -173,7 +173,7 @@ private:
 
 public:
 
-    explicit TextOutput(const String& filename, const Settings& options = Settings());
+    explicit TextOutput(const std::string& filename, const Settings& options = Settings());
 
     /** Constructs a text output that can later be commited to a string instead of a file.*/
     explicit TextOutput(const Settings& options = Settings());
@@ -181,10 +181,6 @@ public:
     /** Returns one plus the number of newlines written since the output was created. */
     int line() const {
         return m_currentLine;
-    }
-
-    int column() const {
-        return currentColumn;
     }
 
     /** Commit to the filename specified on the constructor. 
@@ -195,7 +191,7 @@ public:
     void commit(bool flush = true);
 
     /** Commits to this string */
-    void commitString(String& string);
+    void commitString(std::string& string);
 
     /** Increase indent level by 1 */
     void pushIndent();
@@ -203,11 +199,11 @@ public:
     void popIndent();
 
     /** Produces a new string that contains the output */
-    String commitString();
+    std::string commitString();
 
     /** Writes a quoted string. Special characters in the string (e.g., \\, \\t, \\n) are escaped so that 
         TextInput will produce the identical string on reading.*/
-    void writeString(const String& string);
+    void writeString(const std::string& string);
 
     void writeBoolean(bool b);
 
@@ -215,17 +211,7 @@ public:
 
     void writeNumber(int n);
 
-    /** Guaranteed to parse as a C syntax double */
-    void writeCNumber(double n, bool trailingSpace = true, bool minimal = false);
-
-    /** Guaranteed to parse as a C syntax float */
-    void writeCNumber(float n, bool trailingSpace = true, bool minimal = false);
-
-    /** Guaranteed to parse as a C syntax int */
-    void writeCNumber(int n, bool trailingSpace = true, bool minimal = false);
-
     void writeNewline();
-
     void writeNewlines(int numLines);
 
     /** If the most recently written character was a space, remove it and return true. Can be called repeatedly to back up over multiple spaces. */
@@ -236,7 +222,7 @@ public:
         or be a C++ symbol (e.g. "{", "(", "++", etc.)
         so that they may be properly parsed by TextInput::readSymbol. Symbols are
         printed with a trailing space.*/
-    void writeSymbol(const String& string);
+    void writeSymbol(const std::string& string);
 
     void writeSymbol(char s);
 
@@ -244,12 +230,12 @@ public:
         writeSymbols("name", "=");  The empty symbols are not written.
         */
     void writeSymbols(
-        const String& a,
-        const String& b = "",
-        const String& c = "",
-        const String& d = "",
-        const String& e = "",
-        const String& f = "");
+        const std::string& a,
+        const std::string& b = "",
+        const std::string& c = "",
+        const std::string& d = "",
+        const std::string& e = "",
+        const std::string& f = "");
 
     /** Normal printf conventions.  Note that the output will be reformatted
         for word-wrapping and newlines */
@@ -257,7 +243,7 @@ public:
         G3D_CHECK_PRINTF_METHOD_ARGS;
 
     // Can't pass by reference because that confuses va_start
-    void __cdecl printf(const String fmt, ...);
+    void __cdecl printf(const std::string fmt, ...);
     void __cdecl vprintf(const char* fmt, va_list argPtr) 
         G3D_CHECK_VPRINTF_METHOD_ARGS;
 };
@@ -268,7 +254,7 @@ void serialize(const int& b, TextOutput& to);
 void serialize(const uint8& b, TextOutput& to);
 void serialize(const double& b, TextOutput& to);
 void serialize(const float& b, TextOutput& to);
-void serialize(const String& b, TextOutput& to);
+void serialize(const std::string& b, TextOutput& to);
 void serialize(const char* b, TextOutput& to);
 
 }

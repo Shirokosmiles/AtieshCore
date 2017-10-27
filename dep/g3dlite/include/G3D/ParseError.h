@@ -14,7 +14,7 @@
 
 #include "G3D/platform.h"
 #include "G3D/g3dmath.h"
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
 
@@ -24,7 +24,7 @@ public:
     enum {UNKNOWN = -1};
     
     /** Empty means unknown */
-    String     filename;
+    std::string     filename;
     
     /** For a binary file, the location of the parse error. -1 if unknown.*/
     int64           byte;
@@ -41,20 +41,20 @@ public:
     */
     int             character;
 
-    String     message;
+    std::string     message;
  
     ParseError() : byte(UNKNOWN), line(UNKNOWN), character(UNKNOWN) {}
 
     virtual ~ParseError() {}
 
-    ParseError(const String& f, int l, int c, const String& m) :
+    ParseError(const std::string& f, int l, int c, const std::string& m) :
         filename (f),  byte(UNKNOWN), line(l), character(c), message(m) {}
 
-    ParseError(const String& f, int64 b, const String& m) :
+    ParseError(const std::string& f, int64 b, const std::string& m) :
         filename (f),  byte(b), line(UNKNOWN), character(UNKNOWN), message(m) {}
 
     /** If information is known, ends in ": ", otherwise empty */
-    String formatFileInfo() const;
+    std::string formatFileInfo() const;
 };
 
 }

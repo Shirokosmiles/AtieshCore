@@ -5,7 +5,7 @@
    \created 2008-07-01
    \edited  2010-11-28
 
-   Copyright 2000-2015, Morgan McGuire.
+   Copyright 2000-2012, Morgan McGuire.
    All rights reserved.
 */
 #ifndef G3D_PointHashGrid_h
@@ -133,7 +133,7 @@ private:
         <code>position * m_cellWidth</code>*/
     CellTable           m_data;
 
-    shared_ptr<MemoryManager>  m_memoryManager;
+    MemoryManager::Ref  m_memoryManager;
 
     /** Intentionally unimplemented: prevent copy construction. */
     PointHashGrid(const ThisType&);
@@ -221,7 +221,7 @@ public:
         their positions must be within this radius as well.  You can later change this
         value with clearAndSetRadiusHint().
     */
-    PointHashGrid(float radiusHint, const shared_ptr<MemoryManager>& m = MemoryManager::create()) : m_size(0), m_memoryManager(m) {
+    PointHashGrid(float radiusHint, const MemoryManager::Ref& m = MemoryManager::create()) : m_size(0), m_memoryManager(m) {
         initOffsetArray();
         m_data.clearAndSetMemoryManager(m_memoryManager);
 
@@ -253,7 +253,7 @@ public:
        
        \sa clearAndSetRadiusHint()
     */
-    PointHashGrid(const Array<Value>& init, float radiusHint = -1.0f, const shared_ptr<MemoryManager>& m = MemoryManager::create()) : m_size(0), m_memoryManager(m) {        
+    PointHashGrid(const Array<Value>& init, float radiusHint = -1.0f, const MemoryManager::Ref& m = MemoryManager::create()) : m_size(0), m_memoryManager(m) {        
         initOffsetArray();
         m_data.clearAndSetMemoryManager(m_memoryManager);
 
@@ -1005,7 +1005,7 @@ public:
         clear();
     }
 
-    void clearAndSetMemoryManager(const shared_ptr<MemoryManager>& m) {
+    void clearAndSetMemoryManager(const MemoryManager::Ref& m) {
         ++m_epoch;
         m_size = 0;
         m_bounds = AABox();

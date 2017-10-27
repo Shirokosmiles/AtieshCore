@@ -19,16 +19,19 @@ class ThreadSet : public ReferenceCountedObject {
 public:
     /** Intended to allow future use with a template parameter.*/
     typedef GThread                                        Thread;
-    typedef Array<shared_ptr<Thread>>::Iterator            Iterator;
-    typedef Array<shared_ptr<Thread>>::ConstIterator       ConstIterator;
+
+    typedef shared_ptr<Thread>                ThreadRef;
+    typedef shared_ptr<ThreadSet>             Ref;
+    typedef Array<ThreadRef>::Iterator                     Iterator;
+    typedef Array<ThreadRef>::ConstIterator                ConstIterator;
 
 private:
 
     /** Protects m_thread */
-    GMutex                          m_lock;
+    GMutex                m_lock;
 
     /** Threads in the set */
-    Array<shared_ptr<Thread>>       m_thread;
+    Array<ThreadRef>      m_thread;
 
 public:
     
@@ -63,13 +66,13 @@ public:
 
     /** Inserts a new thread, if it is not already present, and 
         returns the new number of threads.*/
-    int insert(const shared_ptr<Thread>& t);
+    int insert(const ThreadRef& t);
 
     /** Removes a thread. Returns true if the thread was present and
         removed. */
-    bool remove(const shared_ptr<Thread>& t);
+    bool remove(const ThreadRef& t);
 
-    bool contains(const shared_ptr<Thread>& t) const;
+    bool contains(const ThreadRef& t) const;
    
     /** It is an error to mutate the ThreadSet while iterating through it. */
     Iterator begin();

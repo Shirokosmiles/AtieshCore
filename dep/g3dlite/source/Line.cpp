@@ -11,7 +11,7 @@
 
 #include "G3D/Line.h"
 #include "G3D/Plane.h"
-#include "G3D/Any.h"
+
 namespace G3D {
 
 Vector3 Line::intersection(const Plane& plane) const {
@@ -34,22 +34,6 @@ Vector3 Line::intersection(const Plane& plane) const {
 
 Line::Line(class BinaryInput& b) {
     deserialize(b);
-}
-
-Line::Line(const Any& any) {
-    *this = Line();
-    any.verifyName("Line");
-    G3D::AnyTableReader r(any);
-    r.getIfPresent("point", _point);
-    r.getIfPresent("direction", _direction);
-    r.verifyDone();
-}
-
-Any Line::toAny() const {
-    Any a(Any::TABLE, "Line");
-    a["point"] = _point;
-    a["direction"] = _direction;
-    return a;
 }
 
 

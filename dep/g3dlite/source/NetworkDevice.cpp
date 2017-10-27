@@ -24,7 +24,7 @@ namespace G3D {
 NetworkDevice* NetworkDevice::s_instance = NULL;
 
 std::ostream& operator<<(std::ostream& os, const NetAddress& a) {
-    return os << a.toString().c_str();
+    return os << a.toString();
 }
 
 
@@ -136,7 +136,7 @@ NetworkDevice::~NetworkDevice() {
 }
 
 
-String NetworkDevice::localHostName() const {   
+std::string NetworkDevice::localHostName() const {   
     char ac[128];
     if (gethostname(ac, sizeof(ac)) == -1) {
         Log::common()->printf("Error while getting local host name\n");
@@ -231,13 +231,13 @@ void NetworkDevice::addAdapter(const EthernetAdapter& a) {
 }
 
 
-String NetworkDevice::formatIP(uint32 addr) {
+std::string NetworkDevice::formatIP(uint32 addr) {
     return format("%3d.%3d.%3d.%3d", (addr >> 24) & 0xFF, (addr >> 16) & 0xFF,
            (addr >> 8) & 0xFF, addr & 0xFF);
 }
 
 
-String NetworkDevice::formatMAC(const uint8 MAC[6]) {
+std::string NetworkDevice::formatMAC(const uint8 MAC[6]) {
     return format("%02x:%02x:%02x:%02x:%02x:%02x", MAC[0], MAC[1], MAC[2], MAC[3], MAC[4], MAC[5]);
 }
 
@@ -254,7 +254,7 @@ bool NetworkDevice::init() {
 //    WSADATA wsda;            
 //    WSAStartup(MAKEWORD(G3D_WINSOCK_MAJOR_VERSION, G3D_WINSOCK_MINOR_VERSION), &wsda);
         
-    String hostname = "localhost";
+    std::string hostname = "localhost";
     {
         char ac[128];
         if (gethostname(ac, sizeof(ac)) == -1) {
@@ -279,8 +279,8 @@ bool NetworkDevice::init() {
     
     addAdapter(a);
     
-    String machine = localHostName();
-    String addr    = NetAddress(machine, 0).ipString();
+    std::string machine = localHostName();
+    std::string addr    = NetAddress(machine, 0).ipString();
     /*
     logPrintf(
 
@@ -337,7 +337,7 @@ bool NetworkDevice::init() {
     debugAssert(! initialized);
 
     // Used for combining the MAC and ip information
-    typedef Table<String, EthernetAdapter> AdapterTable;
+    typedef Table<std::string, EthernetAdapter> AdapterTable;
 
     AdapterTable table;
 
@@ -684,7 +684,7 @@ ReliableConduit::ReliableConduit
 
     Log::common()->printf("Created TCP socket %d\n", sock);
 
-    String x = addr.toString();
+    std::string x = addr.toString();
     Log::common()->printf("Connecting to %s on TCP socket %d   ", x.c_str(), sock);
 
     int ret = connect(sock, (struct sockaddr *) &(addr.addr), sizeof(addr.addr));
@@ -1271,7 +1271,7 @@ void NetworkDevice::describeSystem(
 
 
 void NetworkDevice::describeSystem(
-    String&        s) {
+    std::string&        s) {
 
     TextOutput t;
     describeSystem(t);

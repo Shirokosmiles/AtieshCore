@@ -56,9 +56,6 @@ int32 byteSize(BinaryFormat f) {
     case VECTOR4INT16_BINFMT:
         return 4 * 4;
 
-    case VECTOR4UINT16_BINFMT:
-        return 4 * 4;
-
     case COLOR3_BINFMT:
         return 3 * 4;
 

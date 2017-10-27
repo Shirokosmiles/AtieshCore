@@ -6,9 +6,9 @@
   \maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
   \created 2001-06-02
-  \edited  2013-09-25
+  \edited  2010-12-25
 
-  Copyright 2000-2015, Morgan McGuire.
+  Copyright 2000-2012, Morgan McGuire.
   All rights reserved.
  */
 
@@ -16,7 +16,6 @@
 #define G3D_Vector3_h
 
 #include "G3D/platform.h"
-#include "G3D/DoNotInitialize.h"
 #include "G3D/g3dmath.h"
 #include "G3D/Random.h"
 #include "G3D/Vector2.h"
@@ -25,7 +24,7 @@
 #include "G3D/PositionTrait.h"
 #include "G3D/Vector2.h"
 #include <iostream>
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
 
@@ -62,9 +61,6 @@ public:
     // coordinates
     float x, y, z;
 
-	/** For use with default output arguments. The value is always undefined. */
-	static Vector3 ignore;
-
 private:
 
     // Hidden operators
@@ -77,7 +73,6 @@ public:
     /** Initializes to zero */
     Vector3();
 
-    Vector3(DoNotInitialize /*dni*/) {}
     /** 
         \param any  Must either Vector3(#, #, #) or Vector3 {x = #, y = #, z = #}.
         Because Point3 is a typedef for Vector3 in the current implementation,
@@ -87,7 +82,7 @@ public:
     explicit Vector3(const Any& any);
     
     /** Converts the Vector3 to an Any, using the specified \a name instead of "Vector3" */
-    Any toAny(const String& name) const;
+    Any toAny(const std::string& name) const;
 
     /** Converts the Vector3 to an Any. */
     Any toAny() const;
@@ -329,7 +324,7 @@ public:
         return G3D::max(G3D::max(x, y), z);
     }
 
-    String toString() const;
+    std::string toString() const;
 
     inline Vector3 clamp(const Vector3& low, const Vector3& high) const {
         return Vector3(
@@ -395,10 +390,13 @@ public:
         That is, so that the probability of \f$\vec{V}\f$ is
         proportional to \f$\max((\vec{v} \cdot \vec{n})^k, 0)\f$.
         Useful in photon mapping for glossy scattering.
-        
+
+        Distribution rendered by G3D::DirectionHistogram:
+        \image html vector3-cospowhemirandom.png
+
         \param n Unit vector at the center of the distribution.
 
-        \cite Ashikhmin and Shirley, An anisotropic Phong BRDF model, Journal of Graphics Tools, 2002
+        @cite Ashikhmin and Shirley, An anisotropic Phong BRDF model, Journal of Graphics Tools, 2002
     */
     static Vector3 cosPowHemiRandom(const Vector3& n, const float k, Random& r = Random::common());
 
@@ -576,12 +574,11 @@ public:
     Vector4 xzzz() const;
     Vector4 yzzz() const;
     Vector4 zzzz() const;
+
+    /** Can be passed to ignore a vector3 parameter */
+    static Vector3& ignore();
 };
 
-/** Preserves sign while squaring magnitude */
-inline Vector3 squareMagnitude(const Vector3& x) {
-    return x.directionOrZero() * x.squaredLength();
-}
 
 
 inline G3D::Vector3 operator*(float s, const G3D::Vector3& v) {

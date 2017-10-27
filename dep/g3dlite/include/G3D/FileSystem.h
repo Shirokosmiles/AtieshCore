@@ -4,7 +4,7 @@
  \author Morgan McGuire, http://graphics.cs.williams.edu
  
  \author  2002-06-06
- \edited  2014-07-09
+ \edited  2012-03-26
  */
 #ifndef G3D_FileSystem_h
 #define G3D_FileSystem_h
@@ -79,9 +79,9 @@ private:
 
     /** Drive letters.  Only used on windows, but defined on all platforms to help
        avoid breaking the Windows build when compiling on another platform. */
-    Array<String>          m_winDrive;
+    Array<std::string>          m_winDrive;
 
-    float                  m_cacheLifetime;
+    float                       m_cacheLifetime;
 
     enum Type {
         /** Not yet checked */
@@ -93,7 +93,7 @@ private:
     class Entry {
     public: 
         /** Name, not including parent path */
-        String             name;
+        std::string             name;
         Type                    type;
         Entry() : type(UNKNOWN) {}
         Entry(const char* n) : name(n), type(UNKNOWN) {}
@@ -114,7 +114,7 @@ private:
         /** When this entry was last updated */
         double                  lastChecked;
 
-        bool contains(const String& child, bool caseSensitive =
+        bool contains(const std::string& child, bool caseSensitive =
 #ifdef G3D_WINDOWS
             false
 #else
@@ -123,18 +123,18 @@ private:
 ) const;
 
         /** Compute the contents of nodeArray from this zipfile. */
-        void computeZipListing(const String& zipfile, const String& pathInsideZipfile);
+        void computeZipListing(const std::string& zipfile, const std::string& pathInsideZipfile);
 
         Dir() : exists(false), isZipfile(false), inZipfile(false), lastChecked(0) {}
     };
 
     /** Maps path names (without trailing slashes, except for the file system root) to contents.
         On Windows, all paths are lowercase */
-    Table<String, Dir>     m_cache;
+    Table<std::string, Dir>     m_cache;
 
     /** Update the cache entry for path if it is not already present.
      \param forceUpdate If true, always override the current cache value.*/
-    Dir& getContents(const String& path, bool forceUpdate);
+    Dir& getContents(const std::string& path, bool forceUpdate);
 
     /** Don't allow public construction. */
     FileSystem();
@@ -145,18 +145,18 @@ private:
 
 #   ifdef G3D_WINDOWS
     /** \copydoc drives */
-    const Array<String>& _drives();
+    const Array<std::string>& _drives();
 #   endif 
 
     /** \copydoc inZipfile */
-    bool _inZipfile(const String& path, String& zipfile);
+    bool _inZipfile(const std::string& path, std::string& zipfile);
 
     /** \copydoc clearCache */
-    void _clearCache(const String& path);
+    void _clearCache(const std::string& path);
 
 	/** \copydoc inZipfile */
-    bool _inZipfile(const String& path) {
-        String ignore;
+    bool _inZipfile(const std::string& path) {
+        std::string ignore;
         return inZipfile(path, ignore);
     }
 
@@ -170,57 +170,51 @@ private:
     }
 
     /** \copydoc createDirectory */
-    void _createDirectory(const String& path);
+    void _createDirectory(const std::string& path);
 
     /** \copydoc exists */
-    bool _exists(const String& f, bool trustCache = true, bool caseSensitive = 
-#       ifdef G3D_WINDOWS
-                 false
-#       else
-                 true
-#       endif
-       );
+    bool _exists(const std::string& f, bool trustCache = true, bool caseSensitive = 
+#ifdef G3D_WINDOWS
+        false
+#else
+        true
+#endif
+        );
 
     /** \copydoc isDirectory */
-    bool _isDirectory(const String& path, bool expandEnvironmentVariables);
+    bool _isDirectory(const std::string& path);
     
     /** \copydoc isFile */
-    bool _isFile(const String& path) {
+    bool _isFile(const std::string& path) {
         return ! isDirectory(path);
     }
     
 	/** \copydoc copyFile */
-    void _copyFile(const String& srcPath, const String& dstPath);
-
-	/** \copydoc copyDir */
-	void _copyDir(const String& srcPath, const String& dstPath);
+    void _copyFile(const std::string& srcPath, const std::string& dstPath);
 
     /** \copydoc resolve */
-    String _resolve(const String& path, const String& cwd = currentDirectory());
-
-    /** \copydoc NFDStandardizeFilename */
-    String _NFDStandardizeFilename(const String& path, const String& cwd = currentDirectory());
+    std::string _resolve(const std::string& path, const std::string& cwd = currentDirectory());
 
     /** \copydoc isNewer */
-    bool _isNewer(const String& src, const String& dst);
+    bool _isNewer(const std::string& src, const std::string& dst);
 
     /** \copydoc currentDirectory */
-    String _currentDirectory();
+    std::string _currentDirectory();
 
     /** \copydoc size */
-    int64 _size(const String& path);
+    int64 _size(const std::string& path);
 
     /** Called from list() */
-    void listHelper(const String& shortSpec, const String& parentPath, Array<String>& result, const ListSettings& settings);
+    void listHelper(const std::string& shortSpec, const std::string& parentPath, Array<std::string>& result, const ListSettings& settings);
 
     /** \copydoc list */
-    void _list(const String& spec, Array<String>& result, const ListSettings& listSettings = ListSettings());
+    void _list(const std::string& spec, Array<std::string>& result, const ListSettings& listSettings = ListSettings());
 
     /** \copydoc isZipfile */
-    bool _isZipfile(const String& path);
+    bool _isZipfile(const std::string& path);
 
     /** \copydoc getFiles */
-    void _getFiles(const String& spec, Array<String>& result, bool includeParentPath = false) {
+    void _getFiles(const std::string& spec, Array<std::string>& result, bool includeParentPath = false) {
         ListSettings set;
         set.includeParentPath = includeParentPath;
         set.directories = false;
@@ -229,7 +223,7 @@ private:
     }
 
     /** \copydoc getDirectories */
-    void _getDirectories(const String& spec, Array<String>& result, bool includeParentPath = false) {
+    void _getDirectories(const std::string& spec, Array<std::string>& result, bool includeParentPath = false) {
         ListSettings set;
         set.includeParentPath = includeParentPath;
         set.directories = true;
@@ -241,9 +235,7 @@ private:
     FILE* _fopen(const char* filename, const char* mode);
 
     /** \copydoc removeFile */
-    void _removeFile(const String& path);
-
-    int _rename(const String& src, const String& dst);
+    void _removeFile(const std::string& path);
 
 public:
 
@@ -255,9 +247,9 @@ public:
 
 #   ifdef G3D_WINDOWS
     /** On Windows, the drive letters that form the file system roots.*/
-    static const Array<String>& drives() {
+    static const Array<std::string>& drives() {
         mutex.lock();
-        const Array<String>& s = instance()._drives();
+        const Array<std::string>& s = instance()._drives();
         mutex.unlock();
         return s;
     }
@@ -269,7 +261,7 @@ public:
        
        \param zipfile The part of \a path that was the zipfile
 	   */
-    static bool inZipfile(const String& path, String& zipfile) {
+    static bool inZipfile(const std::string& path, std::string& zipfile) {
         mutex.lock();
         bool b = instance()._inZipfile(path, zipfile);
         mutex.unlock();
@@ -278,7 +270,7 @@ public:
 
 	/** Clears old cache entries so that exists() and list() will reflect recent changes to the file system.
        \param path Clear only \a path and its subdirectories ("" means clear the entire cache) */
-    static void clearCache(const String& path = "") {
+    static void clearCache(const std::string& path = "") {
         mutex.lock();
         instance()._clearCache(path);
         mutex.unlock();
@@ -305,7 +297,7 @@ public:
         
        If the path itself is a zipfile, returns false.
       */
-    static bool inZipfile(const String& path) {
+    static bool inZipfile(const std::string& path) {
         mutex.lock();
         bool b = instance()._inZipfile(path);
         mutex.unlock();
@@ -319,7 +311,7 @@ public:
 
         \param path May contain wildcards.  May not be inside a zipfile.
      */
-    static void removeFile(const String& path) {
+    static void removeFile(const std::string& path) {
         mutex.lock();
         instance()._removeFile(path);
         mutex.unlock();
@@ -328,7 +320,7 @@ public:
     
 	/** Returns true if \a path is a file that is a zipfile. Note that G3D requires zipfiles to have
         some extension, although it is not required to be "zip" */
-    static bool isZipfile(const String& path) {
+    static bool isZipfile(const std::string& path) {
         mutex.lock();
         bool b = instance()._isZipfile(path);
         mutex.unlock();
@@ -361,7 +353,7 @@ public:
 
         Flushes the cache.
      */
-    static void createDirectory(const String& path) {
+    static void createDirectory(const std::string& path) {
         mutex.lock();
         instance()._createDirectory(path);
         mutex.unlock();
@@ -369,20 +361,13 @@ public:
 
     
 	/** The current working directory (cwd).  Only ends in a slash if this is the root of the file system. */
-    static String currentDirectory() {
+    static std::string currentDirectory() {
         mutex.lock();
-        const String& s = instance()._currentDirectory();
+        const std::string& s = instance()._currentDirectory();
         mutex.unlock();
         return s;
     }
 
-
-    static int rename(const String& src, const String& dst) {
-        mutex.lock();
-        const int i = instance()._rename(src, dst);
-        mutex.unlock();
-        return i;
-    }
     
 	/**
     \param srcPath Must name a file.
@@ -390,23 +375,11 @@ public:
 
     Flushes the cache.
     */
-    static void copyFile(const String& srcPath, const String& dstPath) {
+    static void copyFile(const std::string& srcPath, const std::string& dstPath) {
         mutex.lock();
         instance()._copyFile(srcPath, dstPath);
         mutex.unlock();
     }
-
-	/**
-	\param srcPath Must name a directory or zipfile.
-	\param dstPath Must name a directory
-
-	Flushes the cache.
-	*/
-	static void copyDir(const String& srcPath, const String& dstPath) {
-		mutex.lock();
-		instance()._copyDir(srcPath, dstPath);
-		mutex.unlock();
-	}
 
     
 
@@ -425,7 +398,7 @@ public:
         \param caseSensitive If true, the match must have exactly the same case for the base and extension.  If false,
         case is ignored.  The default on Windows is false and the default on other operating systems is true.
      */
-    static bool exists(const String& f, bool trustCache = true, bool caseSensitive = 
+    static bool exists(const std::string& f, bool trustCache = true, bool caseSensitive = 
 #ifdef G3D_WINDOWS
         false
 #else
@@ -439,34 +412,24 @@ public:
     }
 
     
-    /** Known bug: does not work inside zipfiles */
-    static bool isDirectory(const String& path, bool expandEnvironmentVariablesInPath = true) {
+	/** Known bug: does not work inside zipfiles */
+    static bool isDirectory(const std::string& path) {
         mutex.lock();
-        bool b = instance()._isDirectory(path, expandEnvironmentVariablesInPath);
+        bool b = instance()._isDirectory(path);
         mutex.unlock();
         return b;
     }
 
     
 	/** Known bug: does not work inside zipfiles */
-    static bool isFile(const String& path) {
+    static bool isFile(const std::string& path) {
         mutex.lock();
         bool b = instance()._isFile(path);
         mutex.unlock();
         return b;
     }
 
-    /**
-        Attempts to fully resolve a filename, removing all instances of "." and "..", assuming that there are no Symlinks that would make "." or ".." difficult to reason about.
-        Also ensures that the slashes are consistent. NFD will crash when given a path that does not meet this qualifications
-    */
-
-    static String NFDStandardizeFilename(const String& path, const String& cwd = currentDirectory()) {
-        mutex.lock();
-        const String& s = instance()._NFDStandardizeFilename(path, cwd);
-        mutex.unlock();
-        return s;
-    }
+    
 	/** Fully qualifies a filename.
 
         The filename may contain wildcards, in which case the wildcards will be preserved in the returned value.
@@ -474,9 +437,9 @@ public:
         \param cwd The directory to treat as the "current" directory when resolving a relative path.  The default 
         value is the actual current directory.  (G3D::Any::sourceDirectory is a common alternative) 
     */
-    static String resolve(const String& path, const String& cwd = currentDirectory()) {
+    static std::string resolve(const std::string& path, const std::string& cwd = currentDirectory()) {
         mutex.lock();
-        const String& s = instance()._resolve(path, cwd);
+        const std::string& s = instance()._resolve(path, cwd);
         mutex.unlock();
         return s;
     }
@@ -487,7 +450,7 @@ public:
        
         Known bug: does not work inside zipfiles.
     */
-    static bool isNewer(const String& src, const String& dst) {
+    static bool isNewer(const std::string& src, const std::string& dst) {
         mutex.lock();
         bool b = instance()._isNewer(src, dst);
         mutex.unlock();
@@ -496,7 +459,7 @@ public:
 
     
 	/** Returns the length of the file in bytes, or -1 if the file could not be opened. */
-    static int64 size(const String& path) {
+    static int64 size(const std::string& path) {
         mutex.lock();
         int64 i = instance()._size(path);
         mutex.unlock();
@@ -513,7 +476,7 @@ public:
       is fully qualified (can be done with resolveFilename). 
       
      */
-    static void list(const String& spec, Array<String>& result,
+    static void list(const std::string& spec, Array<std::string>& result,
         const ListSettings& listSettings = ListSettings()) {
         mutex.lock();
         instance()._list(spec, result, listSettings);
@@ -522,7 +485,7 @@ public:
 
     
 	/** list() files */
-    static void getFiles(const String& spec, Array<String>& result, bool includeParentPath = false) {
+    static void getFiles(const std::string& spec, Array<std::string>& result, bool includeParentPath = false) {
         mutex.lock();
         instance()._getFiles(spec, result, includeParentPath);
         mutex.unlock();
@@ -530,7 +493,7 @@ public:
 
     
 	/** list() directories */
-    static void getDirectories(const String& spec, Array<String>& result, bool includeParentPath = false) {
+    static void getDirectories(const std::string& spec, Array<std::string>& result, bool includeParentPath = false) {
         mutex.lock();
         instance()._getDirectories(spec, result, includeParentPath);
         mutex.unlock();
@@ -538,11 +501,11 @@ public:
 
     /** Adds \a filename to usedFiles().  This is called automatically by open() and all 
       G3D routines that open files. */
-    static void markFileUsed(const String& filename);
+    static void markFileUsed(const std::string& filename);
 
     /** All files that have been marked by markFileUsed().  GApp automatically prints this list to log.txt.  It is useful
         for finding the dependencies of your program automatically.*/
-    static const Set<String>& usedFiles();
+    static const Set<std::string>& usedFiles();
 };
 
 
@@ -562,48 +525,42 @@ public:
 */
 class FilePath {
 public:
-    /** Converts \a filename into a legal filename by escaping
-        potentially dangerous characters to have in a filename */
-    static String mangle(const String& filename);
-
-    /** unmangles filenames */
-    static String unMangle(const String& mangledFilename);
 
     /** Appends file onto dirname, ensuring a / if needed. */
-    static String concat(const String& a, const String& b);
+    static std::string concat(const std::string& a, const std::string& b);
 
     /** Returns true if \a f specifies a path that parses as root of the filesystem.
         On OS X and other Unix-based operating systems, "/" is the only root.
         On Windows, drive letters and shares are roots, e.g., "c:\", "\\foo\".
         Does not check on Windows to see if the root is actually mounted or a legal
         drive letter--this is a purely string based test. */
-    static bool isRoot(const String& f);
+    static bool isRoot(const std::string& f);
 
     /** Removes the trailing slash unless \a f is a filesystem root */
-    static String removeTrailingSlash(const String& f);
+    static std::string removeTrailingSlash(const std::string& f);
 
     /** Returns everything to the right of the last '.' */
-    static String ext(const String& path);
+    static std::string ext(const std::string& path);
 
     /** Returns everything to the right of the last slash (or, on Windows, the last ':') */
-    static String baseExt(const String& path);
+    static std::string baseExt(const std::string& path);
 
     /** Returns everything between the right-most slash and the following '.' */
-    static String base(const String& path);
+    static std::string base(const std::string& path);
 
     /** Returns everything to the left of the right-most slash */
-    static String parent(const String& path);
+    static std::string parent(const std::string& path);
 
     /** Returns true if '*' or '?' appear in the filename */
-    static bool containsWildcards(const String& p);
+    static bool containsWildcards(const std::string& p);
 
     /** Convert all slashes to '/' */
-    static String canonicalize(String x);
+    static std::string canonicalize(std::string x);
 
     /** \brief Replaces <code>$VAR</code> and <code>$(VAR)</code> patterns with the corresponding environment variable.
-        Throws String if the environment variable is not defined.
+        Throws std::string if the environment variable is not defined.
      */
-    static String expandEnvironmentVariables(const String& path);
+    static std::string expandEnvironmentVariables(const std::string& path);
 
     /**
       Parses a filename into four useful pieces.
@@ -630,19 +587,19 @@ public:
 
      */
     static void parse
-    (const String&  filename,
-     String&        drive,    
-     Array<String>& path,
-     String&        base,
-     String&        ext);
+    (const std::string&  filename,
+     std::string&        drive,    
+     Array<std::string>& path,
+     std::string&        base,
+     std::string&        ext);
 
     /**
       Returns true if \a path matches \a pattern, with standard filesystem wildcards.
      */
-    static bool matches(const String& path, const String& pattern, bool caseSensitive = true);
+    static bool matches(const std::string& path, const std::string& pattern, bool caseSensitive = true);
 
     /** Replaces characters that are illegal in a filename with legal equivalents.*/
-    static String makeLegalFilename(const String& f, size_t maxLength = 100000);
+    static std::string makeLegalFilename(const std::string& f, size_t maxLength = 100000);
 };
 
 } // namespace G3D

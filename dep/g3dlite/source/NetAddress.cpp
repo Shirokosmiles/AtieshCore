@@ -62,14 +62,14 @@ void NetAddress::init(uint32 host, uint16 port) {
 
 
 NetAddress::NetAddress
-   (const String&          hostname,
+   (const std::string&          hostname,
     uint16                      port) {
     init(hostname, port);
 }
 
 
 void NetAddress::init
-   (const String&          hostname,
+   (const std::string&          hostname,
     uint16                      port) {
 
     uint32 addr;
@@ -110,9 +110,9 @@ NetAddress NetAddress::broadcastAddress(uint16 port) {
 }
 
 
-NetAddress::NetAddress(const String& hostnameAndPort) {
+NetAddress::NetAddress(const std::string& hostnameAndPort) {
 
-    Array<String> part = stringSplit(hostnameAndPort, ':');
+    Array<std::string> part = stringSplit(hostnameAndPort, ':');
 
     debugAssert(part.length() == 2);
     init(part[0], atoi(part[1].c_str()));
@@ -177,12 +177,12 @@ bool NetAddress::ok() const {
 }
 
 
-String NetAddress::ipString() const {
+std::string NetAddress::ipString() const {
     return format("%s", inet_ntoa(*(in_addr*)&(addr.sin_addr)));
 }
 
 
-String NetAddress::toString() const {
+std::string NetAddress::toString() const {
     return ipString() + format(":%d", ntohs(addr.sin_port));
 }
 

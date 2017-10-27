@@ -10,7 +10,7 @@ Copyright 2000-2009, Morgan McGuire.
 All rights reserved.
 
 From the G3D Innovation Engine
-http://g3d.cs.williams.edu
+http://g3d.sf.net
 */
 #include "G3D/Intersect.h"
 

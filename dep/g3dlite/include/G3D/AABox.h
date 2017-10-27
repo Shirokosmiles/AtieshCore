@@ -8,7 +8,7 @@
   \created 2004-01-10
   \edited  2013-04-13
 
-  Copyright 2000-2015, Morgan McGuire.
+  Copyright 2000-2013, Morgan McGuire.
   All rights reserved.
  */
 
@@ -99,16 +99,6 @@ public:
         lo = low;
         hi = high;
     }
-
-    /** 
-        If isEmpty(), returns a centered version of other, 
-        otherwise returns this expanded by other (via the following definition):
-
-        Let this be A, and other be B, 
-        the result will be the smallest box that contains
-        all points c = a + b for a \in A and b \in B.
-    */
-    AABox minkowskiSum(const AABox& other) const;
 
     /**
      Grows to include the bounds of \a a
@@ -294,12 +284,10 @@ public:
             return empty();
         }
 
-        // Choose the lowest high and the highest low
         const Point3& H = hi.min(other.hi);
-        const Point3& L = lo.max(other.lo);
- 
-        if ((H.x < L.x) || (H.y < L.y) || (H.z < L.z)) {
-            // Separating axis discovered
+        const Point3& L = lo.max(other.lo).min(H);
+
+        if (H.x < L.x && H.y < L.y && H.z < L.z) {
             return empty();
         } else {
             return AABox(L, H);

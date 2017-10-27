@@ -927,7 +927,7 @@ public:
     }
 
     int size() const {
-        return (int)memberTable.size();
+        return memberTable.size();
     }
 
     /**
@@ -1561,7 +1561,6 @@ public:
     void getMembers(Array<T>& members) const {
         Array<Member> temp;
         memberTable.getKeys(temp);
-        members.reserve(members.size() + temp.size());
         for (int i = 0; i < temp.size(); ++i) {
             members.append(*(temp.handle));
         }

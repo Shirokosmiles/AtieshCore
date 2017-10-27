@@ -1633,20 +1633,15 @@ float CollisionDetection::collisionTimeForMovingSphereFixedPlane(
 
 
 float CollisionDetection::collisionTimeForMovingSphereFixedTriangle
-   (const Sphere&               sphere,
-    const Vector3&              velocity,
-    const Triangle&             triangle,
-    Vector3&                    outLocation,
-    float                       b[3],
-    bool                        twoSided) {
+(const Sphere&                 sphere,
+ const Vector3&              velocity,
+ const Triangle&             triangle,
+ Vector3&                    outLocation,
+ float                       b[3]) {
 
     if (velocity.dot(triangle.normal()) > 0.0f) {
-        if (twoSided) {
-            return CollisionDetection::collisionTimeForMovingSphereFixedTriangle(sphere, velocity, triangle.otherSide(), outLocation, b, twoSided);
-        } else {
-            // No collision if moving towards a backface
-            return finf();
-        }
+        // No collision if moving towards a backface
+        return finf();
     }
     Vector3 dummy;
     const float time = collisionTimeForMovingSphereFixedPlane(sphere, velocity, triangle.plane(), 

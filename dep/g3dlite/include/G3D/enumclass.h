@@ -49,8 +49,6 @@ namespace G3D {
   G3D_DECLARE_ENUM_CLASS_HASHCODE(Resource);
   \endcode
 
-  Supports enumerations with initializer values.
-
   Extends the "Intelligent Enum" design pattern 
   http://www.codeguru.com/cpp/cpp/cpp_mfc/article.php/c4001/
 
@@ -61,17 +59,14 @@ namespace G3D {
  */
 #define G3D_DECLARE_ENUM_CLASS_METHODS(Classname)\
 private: \
-    void fromString(const G3D::String& x) {\
+    void fromString(const std::string& x) {\
         Value v = (Value)0;\
         const char* s;\
         int i = 0;\
 \
         do {\
             s = toString(i, v);\
-            if (s == NULL) {\
-                throw G3D::String(G3D::format("Attempted to create enum from illegal string %s", x.c_str()));\
-                return;\
-            }\
+            if (s == NULL) { return; /** Needed to get correct compilation on gcc */ } \
             if (x == s) {\
                 value = v;\
                 return;\
@@ -98,7 +93,7 @@ public:\
         }\
     }\
 \
-    explicit Classname(const G3D::String& x) : value((Value)0) {\
+    explicit Classname(const std::string& x) : value((Value)0) {\
         fromString(x);\
     }\
 \
@@ -118,27 +113,11 @@ public:\
 \
     explicit Classname(int v) : value((Value)v) {}\
 \
-    static int count() {\
-        static int c = -1;\
-        if (c == -1) {\
-            Value ignore = Value(0);\
-            for (c = 0; G3D::notNull(toString(c, ignore)); ++c);\
-        }\
-        return c;\
-    }\
-\
-    static Value nthValue(int n) {\
-        Value v = Value(0);\
-        const char* c = toString(n, v);\
-        debugAssertM(G3D::notNull(c), "Value out of range"); (void)c; \
-        return v;\
-    }\
-\
     operator int() const {\
         return (int)value;\
     }\
 \
-    Classname& operator=(const G3D::Any& a) {\
+    Classname& operator=(const Any& a) {\
         value = Classname(a).value;\
         return *this;\
     }\
@@ -264,15 +243,6 @@ Day d2("SATURDAY");
 Any a(d);
 d = a;
 printf("%s = %d\n", d.toString(), d.value);
-\endcode
-
-Provides these methods:
-
-\code
-const char* toString()
-arithmetic operators
-static int count()
-static Value nthValue(n)
 \endcode
 
 \sa G3D_DECLARE_ENUM_CLASS_METHODS, G3D_DECLARE_ENUM_CLASS_HASHCODE, G3D::enumToJavaScriptDeclaration, G3D_BEGIN_ENUM_CLASS_DECLARATION

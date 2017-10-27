@@ -14954,8 +14954,8 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
 
 void Unit::UpdateMovementInfo(MovementInfo const& movementInfo)
 {
-    SetLastMoveClientTimestamp(movementInfo.time); // unused for now. will be needed for speed cheat detection
-    SetLastMoveServerTimestamp(getMSTime()); // unused for now. will probably needed in the future
+    SetLastMoveClientTimestamp(movementInfo.time);
+    SetLastMoveServerTimestamp(getMSTime());
 }
 
 bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)

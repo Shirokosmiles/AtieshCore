@@ -48,9 +48,6 @@ public:
         */
     SmallArray<Face, 6>         faceArray;
 
-    /** The planes in the frustum */
-    void getPlanes(Array<Plane>& plane) const;
-
     /** \param minObjectSpaceDepth Smallest value permitted for the near plane Z - far plane Z (e.g., to force finite bounds)*/
     Box boundingBox(float minObjectSpaceDepth = finf()) const;
 };

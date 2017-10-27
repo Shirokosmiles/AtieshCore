@@ -21,7 +21,7 @@
 #include "G3D/Rect2D.h"
 #include "G3D/WrapMode.h"
 
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
 namespace _internal {
@@ -85,7 +85,7 @@ namespace G3D {
 
   Other "image" classes in G3D:
 
-  G3D::Image - Supports file formats, fast, Color3uint8 and Color4uint8 formats.  No interpolation.
+  G3D::GImage - Supports file formats, fast, Color3uint8 and Color4uint8 formats.  No interpolation.
 
   G3D::shared_ptr<Texture> - Represents image on the graphics card (not directly readable on the CPU).  Supports 2D, 3D, and a variety of interpolation methods, loads file formats.
 
@@ -163,13 +163,8 @@ namespace G3D {
   interpolation is constant outside [0, w - 1] and bicubic outside
   [3, w - 4].  The class does not offer quadratic interpolation because
   the interpolation filter could not center over a pixel.
-
-  In order to allow subclasses to mimic layered textures, Map2Ds can have an optional depth.
-  Only the constructor and resize() handles depth in this class, to access anything but layer 0
-  subclasses must implement the functionality themselves.
-
   
-  \author Morgan McGuire, http://graphics.cs.williams.edu
+  @author Morgan McGuire, http://graphics.cs.williams.edu
  */
 template< typename Storage, 
 typename Compute = typename G3D::_internal::_GetComputeType<Storage>::Type>
@@ -190,7 +185,7 @@ public:
 
 protected:
     
-    Storage             ZERO;
+    Storage ZERO;
 
     /** Width, in pixels. */
     uint32              w;
@@ -198,10 +193,7 @@ protected:
     /** Height, in pixels. */
     uint32              h;
 
-    /** Depth, in pixels, defaults to 1 */
-    uint32              d;
-
-    WrapMode            m_wrapMode;
+    WrapMode            _wrapMode;
 
     /** 0 if no mutating method has been invoked 
         since the last call to setChanged(); */
@@ -253,9 +245,45 @@ public:
 
 protected:
 
-    Map2D(int w, int h, WrapMode wrap, int d = 1) : w(0), h(0), d(1), m_wrapMode(wrap), m_changed(1) {
+    /** Given four control points and a value on the range [0, 1)
+        evaluates the Catmull-rom spline between the times of the
+        middle two control points */
+    Compute bicubic(const Compute* ctrl, double s) const {
+
+        // f = B * S * ctrl'
+
+        // B matrix: Catmull-Rom spline basis
+        static const double B[4][4] = {
+            { 0.0, -0.5,  1.0, -0.5},
+            { 1.0,  0.0, -2.5,  1.5},
+            { 0.0,  0.5,  2.0, -1.5},
+            { 0.0,  0.0, -0.5,  0.5}}; 
+
+        // S: Powers of the fraction
+        double S[4];
+        double s2 = s * s;
+        S[0] = 1.0;
+        S[1] = s;
+        S[2] = s2;
+        S[3] = s2 * s;
+
+        Compute sum(ZERO);
+
+        for (int c = 0; c < 4; ++c) {
+            double coeff = 0.0;
+            for (int power = 0; power < 4; ++power) {
+                coeff += B[c][power] * S[power];
+            }
+            sum += ctrl[c] * coeff;
+        }
+
+        return sum;
+    }
+
+
+    Map2D(int w, int h, WrapMode wrap) : w(0), h(0), _wrapMode(wrap), m_changed(1) {
         ZERO = Storage(Compute(Storage()) * 0);
-        resize(w, h, d);
+        resize(w, h);
     }
 
 public:
@@ -267,18 +295,17 @@ public:
     */
     GMutex mutex;
 
-    static Ref create(int w = 0, int h = 0, WrapMode wrap = WrapMode::ERROR, int d = 1) {
-        return Ref(new Map2D(w, h, wrap, d));
+    static Ref create(int w = 0, int h = 0, WrapMode wrap = WrapMode::ERROR) {
+        return Ref(new Map2D(w, h, wrap));
     }
 
     /** Resizes without clearing, leaving garbage.
       */
-    void resize(uint32 newW, uint32 newH, uint32 newD = 1) {
-        if ((newW != w) || (newH != h) || (newD != d)) {
+    void resize(uint32 newW, uint32 newH) {
+        if ((newW != w) || (newH != h)) {
             w = newW;
             h = newH;
-            d = newD;
-            data.resize(w * h * d);
+            data.resize(w * h);
             setChanged(true);
         }
     }
@@ -353,11 +380,11 @@ public:
     }
 
     inline const Storage& get(int x, int y) const {
-        return get(x, y, m_wrapMode);
+        return get(x, y, _wrapMode);
     }
 
     inline const Storage& get(const Vector2int16& p) const {
-        return get(p.x, p.y, m_wrapMode);
+        return get(p.x, p.y, _wrapMode);
     }
 
     inline const Storage& get(const Vector2int16& p, WrapMode wrap) const {
@@ -403,7 +430,7 @@ public:
     }
 
     void set(int x, int y, const Storage& v) {
-        set(x, y, v, m_wrapMode);
+        set(x, y, v, _wrapMode);
     }
 
 
@@ -501,7 +528,7 @@ public:
     }
 
     inline Compute nearest(float x, float y) const {
-        return nearest(x, y, m_wrapMode);
+        return nearest(x, y, _wrapMode);
     }
 
     inline Compute nearest(const Vector2& p) const {
@@ -544,12 +571,12 @@ public:
         const float fY = y - j;
 
         // Horizontal interpolation, first row
-        const Compute& t0 = (Compute)get(i, j, wrap);
-        const Compute& t1 = (Compute)get(i + 1, j, wrap);
+        const Compute& t0 = get(i, j, wrap);
+        const Compute& t1 = get(i + 1, j, wrap);
 
         // Horizontal interpolation, second row
-        const Compute& t2 = (Compute)get(i, j + 1, wrap);
-        const Compute& t3 = (Compute)get(i + 1, j + 1, wrap);
+        const Compute& t2 = get(i, j + 1, wrap);
+        const Compute& t3 = get(i + 1, j + 1, wrap);
 
         const Compute& A = lerp(t0, t1, fX);
         const Compute& B = lerp(t2, t3, fX);
@@ -559,51 +586,45 @@ public:
     }
 
     Compute bilinear(float x, float y) const {
-        return bilinear(x, y, m_wrapMode);
+        return bilinear(x, y, _wrapMode);
     }
 
     inline Compute bilinear(const Vector2& p) const {
-        return bilinear(p.x, p.y, m_wrapMode);
+        return bilinear(p.x, p.y, _wrapMode);
     }
 
     inline Compute bilinear(const Vector2& p, WrapMode wrap) const {
         return bilinear(p.x, p.y, wrap);
     }
 
-
-    // Weighting polynomial http://paulbourke.net/texture_colour/imageprocess/
-    float R(float x) {
-        static const float coeff[4] = { 1.0f, -4.0f, 6.0f, -4.0f };
-        float result = 0.0f;
-        for (int j = 0; j < 4; ++j) {
-            result += coeff[j] * pow(max(0.0f, x + 2 - j), 3.0f);
-        }
-        return result / 6.0f;
-    }
-
     /**
      Uses Catmull-Rom splines to interpolate between grid
-     values. 
+     values.  Guaranteed to match nearest(x, y) at integers.
      */
     Compute bicubic(float x, float y, WrapMode wrap) const {
-        const int ix = int(x);
-        const int iy = int(y);
+        int i = iFloor(x);
+        int j = iFloor(y);
+        float fX = x - i;
+        float fY = y - j;
 
-        // Fractional part (Bourke's dx, dy)
-        const float fx = x - floor(x);
-        const float fy = y - floor(y);
+        Compute vsample[4];
+        for (int v = 0; v < 4; ++v) {
 
-        Compute result;
-        for (int m = -1; m <= 2; ++m) {
-            for (int n = -1; n <= 2; ++n) {
-                result += get(ix + m, iy + n, WrapMode::CLAMP) * R(float(m) - fx) * R(fy - float(n));
+            // Horizontal interpolation
+            Compute hsample[4];
+            for (int u = 0; u < 4; ++u) {
+                hsample[u] = Compute(get(i + u - 1, j + v - 1, wrap));
             }
+    
+            vsample[v] = bicubic(hsample, fX);
         }
-        return result;
+
+        //  Vertical interpolation
+        return bicubic(vsample, fY);
     }
 
     Compute bicubic(float x, float y) const {
-        return bicubic(x, y, m_wrapMode);
+        return bicubic(x, y, _wrapMode);
     }
 
     inline Compute bicubic(const Vector2& p, WrapMode wrap) const {
@@ -611,7 +632,7 @@ public:
     }
 
     inline Compute bicubic(const Vector2& p) const {
-        return bicubic(p.x, p.y, m_wrapMode);
+        return bicubic(p.x, p.y, _wrapMode);
     }
 
     /** Pixel width */
@@ -633,7 +654,7 @@ public:
 
     /** Rectangle from (0, 0) to (w, h) */
     Rect2D rect2DBounds() const {
-        return Rect2D::xywh(0, 0, float(w), float(h));
+        return Rect2D::xywh(0, 0, w, h);
     }
 
     /** Number of bytes occupied by the image data and this structure */
@@ -643,12 +664,12 @@ public:
 
 
     WrapMode wrapMode() const {
-        return m_wrapMode;
+        return _wrapMode;
     }
 
 
     void setWrapMode(WrapMode m) {
-        m_wrapMode = m;
+        _wrapMode = m;
     }
 };
 

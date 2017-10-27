@@ -4,7 +4,7 @@
   \maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
   \created 2003-10-02
-  \edited  2014-10-24
+  \edited  2012-02-19
  */
 
 #include "G3D/platform.h"
@@ -24,10 +24,10 @@ namespace G3D {
 
     
 Matrix4::Matrix4(const Any& any) {
-    any.verifyNameBeginsWith("Matrix4", "CFrame", "CoordinateFrame", "Point3", "Vector3");
+    any.verifyNameBeginsWith("Matrix4", "CFrame", "CoordinateFrame");
     any.verifyType(Any::ARRAY);
 
-    const String& name = any.name();
+    const std::string& name = any.name();
     if (name == "Matrix4") {
         any.verifySize(16);
 
@@ -64,7 +64,7 @@ Matrix4::Matrix4(const Any& any) {
         *this = diagonal(any[0], any[1], any[2], any[3]);
     } else if (name == "Matrix4::identity") {
         *this = identity();
-    } else if (beginsWith(name, "CFrame") || beginsWith(name, "CoordinateFrame") || beginsWith(name, "Vector3") || beginsWith(name, "Point3")) {
+    } else if (beginsWith(name, "CFrame") || beginsWith(name, "CoordinateFrame")) {
         *this = CFrame(any);
     } else {
         any.verify(false, "Expected Matrix4 constructor");
@@ -129,18 +129,6 @@ Matrix4::Matrix4(const Matrix3& upper3x3, const Vector3& lastCol) {
     elt[3][2] = 0.0f;
     elt[3][3] = 1.0f;
 }
-
-bool Matrix4::fuzzyEq(const Matrix4& b) const {
-    for (int r = 0; r < 4; ++r) {
-        for (int c = 0; c < 4; ++c) {
-            if (! G3D::fuzzyEq(elt[r][c], b[r][c])) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
 
 
 Matrix3 Matrix4::upper3x3() const {
@@ -219,8 +207,8 @@ Matrix4 Matrix4::perspectiveProjection(
        c = -1.0;
        d = -2.0 * nearval;
     } else {
-       c = -(farval + nearval) / (farval - nearval);
-       d = -(2.0 * farval * nearval) / (farval - nearval);
+       c = -(farval+nearval) / (farval-nearval);
+       d = -(2.0*farval*nearval) / (farval-nearval);
     }
 
     debugAssertM(abs(upDirection) == 1.0, "upDirection must be -1 or +1");
@@ -265,13 +253,14 @@ void Matrix4::getPerspectiveProjectionParameters(
     debugAssertM(elt[3][0] == 0, "Not a projection matrix");
     debugAssertM(elt[3][1] == 0, "Not a projection matrix");
 
-    if (c == -1.0) {
+    if (c == -1) {
         farval = finf();
         nearval = -d / 2.0;
     } else {
-        nearval = d / (c - 1.0);
-        farval = d * nearval / (d + 2.0 * nearval);
+        nearval = d * ((c - 1.0) / (c + 1.0) - 1.0) / (-2.0 * (c - 1.0) / (c + 1.0));
+        farval = nearval * ((c - 1.0) / (c + 1.0));
     }
+
 
     left = (a - 1.0) * nearval / x;
     right = 2.0 * nearval / x + left;
@@ -414,8 +403,8 @@ bool Matrix4::operator!=(const Matrix4& other) const {
 bool Matrix4::operator==(const Matrix4& other) const {
 
     // If the bit patterns are identical, they must be
-    // the same matrix.  They might still differ due 
-    // to floating point issues such as -0 == 0.
+    // the same matrix.  If not, they *might* still have
+    // equal elements due to floating point weirdness.
     if (memcmp(this, &other, sizeof(Matrix4)) == 0) {
         return true;
     } 
@@ -549,7 +538,7 @@ void Matrix4::deserialize(class BinaryInput& b) {
     }
 }
 
-String Matrix4::toString() const {
+std::string Matrix4::toString() const {
     return G3D::format("[%g, %g, %g, %g; %g, %g, %g, %g; %g, %g, %g, %g; %g, %g, %g, %g]", 
             elt[0][0], elt[0][1], elt[0][2], elt[0][3],
             elt[1][0], elt[1][1], elt[1][2], elt[1][3],

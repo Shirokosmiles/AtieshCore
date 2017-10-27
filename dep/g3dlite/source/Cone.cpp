@@ -18,8 +18,6 @@
 namespace G3D {
 
 
-
-
 float Cone::solidAngleFromHalfAngle(float halfAngle){
     return 2.0f * pif() * (1 - cosf(halfAngle));
 }

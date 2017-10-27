@@ -215,7 +215,7 @@ BinaryOutput::BinaryOutput() {
 
 
 BinaryOutput::BinaryOutput(
-    const String&  filename,
+    const std::string&  filename,
     G3DEndian           fileEndian) {
 
     m_pos = 0;
@@ -329,8 +329,8 @@ void BinaryOutput::commit(bool flush) {
     }
 
     // Make sure the directory exists.
-    String root, base, ext, path;
-    Array<String> pathArray;
+    std::string root, base, ext, path;
+    Array<std::string> pathArray;
     parseFilename(m_filename, root, pathArray, base, ext); 
 
     path = root + stringJoin(pathArray, '/');
@@ -349,17 +349,14 @@ void BinaryOutput::commit(bool flush) {
     m_ok = (file != NULL) && m_ok;
 
     if (m_ok) {
-        debugAssertM(file, String("Could not open '") + m_filename + "'");
+        debugAssertM(file, std::string("Could not open '") + m_filename + "'");
 
         if (m_buffer != NULL) {
             m_alreadyWritten += m_bufferLen;
 
             size_t success = fwrite(m_buffer, m_bufferLen, 1, file);
             (void)success;
-			if (success != 1) {
-				debugAssertM(false, String("Could not write to '") + m_filename + "'");
-				throw String("BinaryOutput::commit could not write to '") + m_filename + "'";
-			}
+            debugAssertM(success == 1, std::string("Could not write to '") + m_filename + "'");
         }
         if (flush) {
             fflush(file);

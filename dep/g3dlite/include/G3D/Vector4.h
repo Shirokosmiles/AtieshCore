@@ -22,7 +22,7 @@
 #include "G3D/Table.h"
 #include "G3D/HashTrait.h"
 #include "G3D/PositionTrait.h"
-#include "G3D/G3DString.h"
+#include <string>
 
 namespace G3D {
 
@@ -176,14 +176,10 @@ public:
 
     float dot (const Vector4& rkVector) const;
 
-    inline float squaredMagnitude() {
-        return x*x + y*y + z*z + w*w;
-    };
-
     Vector4 min(const Vector4& v) const;
     Vector4 max(const Vector4& v) const;
 
-    String toString() const;
+    std::string toString() const;
 
     /**
      Linear interpolation
@@ -593,19 +589,6 @@ inline Vector4& Vector4::operator= (const Vector4& rkVector) {
     w = rkVector.w;
     return *this;
 }
-
-//----------------------------------------------------------------------------
-
-inline bool Vector4::fuzzyEq(const Vector4& other) const {
-    return G3D::fuzzyEq((*this - other).squaredMagnitude(), 0);
-}
-
-//----------------------------------------------------------------------------
-
-inline bool Vector4::fuzzyNe(const Vector4& other) const {
-    return G3D::fuzzyNe((*this - other).squaredMagnitude(), 0);
-}
-
 
 //----------------------------------------------------------------------------
 inline bool Vector4::operator== (const Vector4& rkVector) const {

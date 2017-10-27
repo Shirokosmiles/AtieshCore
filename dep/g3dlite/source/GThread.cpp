@@ -4,7 +4,7 @@
  GThread class.
 
  @created 2005-09-24
- @edited  2016-06-22
+ @edited  2010-09-22
  */
 
 #include "G3D/GThread.h"
@@ -18,7 +18,7 @@ namespace _internal {
 
 class BasicThread: public GThread {
 public:
-    BasicThread(const String& name, void (*proc)(void*), void* param):
+    BasicThread(const std::string& name, void (*proc)(void*), void* param):
         GThread(name), m_wrapperProc(proc), m_param(param) { }
 protected:
     virtual void threadMain() {
@@ -34,7 +34,7 @@ private:
 } // namespace _internal
 
 
-GThread::GThread(const String& name):
+GThread::GThread(const std::string& name):
     m_status(STATUS_CREATED),
     m_name(name) {
 
@@ -64,7 +64,7 @@ GThread::~GThread() {
 }
 
 
-GThreadRef GThread::create(const String& name, void (*proc)(void*), void* param) {
+GThreadRef GThread::create(const std::string& name, void (*proc)(void*), void* param) {
     return shared_ptr<GThread>(new _internal::BasicThread(name, proc, param));
 }
 
@@ -208,84 +208,6 @@ void* GThread::internalThreadProc(void* param) {
     return (void*)NULL;
 }
 #endif
-
-
-class _internalGThreadWorkerNew : public GThread {
-public:
-    /** Start for this thread, which differs from the others */
-    const int                 threadID;
-    const Vector3int32        start;
-    const Vector3int32        upTo;
-    const Vector3int32        stride;
-    std::function<void(int, int, int, int)> callback;
-        
-    _internalGThreadWorkerNew
-           (int                 threadID,
-            const Vector3int32& start, 
-            const Vector3int32& upTo, 
-            const std::function<void(int, int, int, int)>& callback,
-            const Vector3int32& stride) : 
-        GThread("runConcurrently worker"),
-        threadID(threadID),
-        start(start),
-        upTo(upTo), 
-        stride(stride),
-        callback(callback) {}
-        
-    virtual void threadMain() {
-        for (int z = start.z; z < upTo.z; z += stride.z) {
-            for (int y = start.y; y < upTo.y; y += stride.y) {
-                for (int x = start.x; x < upTo.x; x += stride.x) {
-                    callback(x, y, z, threadID);
-                }
-            }
-        }
-    }
-};
-
-
-void GThread::runConcurrently
-   (const Vector3int32& start, 
-    const Vector3int32& upTo, 
-    const std::function<void (int, int, int, int)>& callback,
-    int                 maxThreads) {
-
-    // Create a group of threads
-    if (maxThreads == GThread::NUM_CORES) {
-        maxThreads = GThread::numCores();
-    }
-
-    ThreadSet threadSet;
-    if ((upTo.y - start.y == 1) && (upTo.z - start.z == 1)) {
-        // 1D iteration
-        const int numElements = upTo.x - start.x;
-        const int numThreads = min(maxThreads, numElements);
-        const Vector3int32 stride(1, 1, 1);
-        const int runLength = numElements / numThreads;
-        for (int t = 0; t < numThreads; ++t) {
-            Vector3int32 A = start + Vector3int32(t * runLength, 0, 0);
-            Vector3int32 B(min(upTo.x, A.x + runLength), upTo.y, upTo.z);
-            if (t == numThreads - 1) {
-                // On the last iteration, run all of the way to the end even if we rounded down in the division
-                B.x = upTo.x;
-            }
-            threadSet.insert(shared_ptr<_internalGThreadWorkerNew >(new _internalGThreadWorkerNew(t, A, B, callback, stride)));
-        }
-    } else {
-        // 2D or 3D iteration
-        const int numRows = upTo.y - start.y;
-        const int numThreads = min(maxThreads, numRows);
-        const Vector3int32 stride(1, numThreads, 1);
-        for (int t = 0; t < numThreads; ++t) {
-            threadSet.insert(shared_ptr<_internalGThreadWorkerNew >(new _internalGThreadWorkerNew(t, start + Vector3int32(0, t, 0), upTo, callback, stride)));
-        }
-    }
-
-    // Run the threads, reusing the current thread and blocking until
-    // all complete
-    threadSet.start(USE_CURRENT_THREAD);
-    threadSet.waitForCompletion();
-}
 
 
 

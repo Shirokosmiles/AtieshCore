@@ -8,14 +8,13 @@
   \cite Portions based on Dave Eberly's Magic Software Library at <A HREF="http://www.magic-software.com">http://www.magic-software.com</A>
  
   \created 2001-06-02
-  \edited  2013-09-25
+  \edited  2011-05-05
  */
 
 #ifndef G3D_Matrix3_h
 #define G3D_Matrix3_h
 
 #include "G3D/platform.h"
-#include "G3D/DoNotInitialize.h"
 #include "G3D/Vector3.h"
 #include "G3D/Vector4.h"
 #include "G3D/debugAssert.h"
@@ -56,8 +55,6 @@ public:
         - Matrix3::identity()
     */
     Matrix3(const Any& any);
-
-    Matrix3(DoNotInitialize /*dni*/) {}
 
     static Matrix3 fromColumns(const Vector3& c0, const Vector3& c1, const Vector3& c2) {
         Matrix3 m;
@@ -339,7 +336,7 @@ public:
 
     static void tensorProduct (const Vector3& rkU, const Vector3& rkV,
                                Matrix3& rkProduct);
-    String toString() const;
+    std::string toString() const;
 
     static const float EPSILON; 
 

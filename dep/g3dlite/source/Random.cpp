@@ -6,7 +6,7 @@
  \created 2009-01-02
  \edited  2012-03-29
 
- Copyright 2000-2015, Morgan McGuire.
+ Copyright 2000-2012, Morgan McGuire.
  All rights reserved.
  */
 #include "G3D/Random.h"
@@ -107,7 +107,7 @@ void Random::generate() {
     }
 
     // Rest
-    for (unsigned int i = N - M; i < N - 1; ++i) {    
+    for (unsigned int i = N - M + 1; i < N - 1; ++i) {    
         uint32 x = (state[i] & UPPER_MASK) | (state[i + 1] & LOWER_MASK);
         state[i] = state[i + (M - N)] ^ (x >> 1) ^ mag01[x & 1];
     }
@@ -136,7 +136,7 @@ int Random::integer(int low, int high) {
 }
 
     
-float Random::gaussian(float mean, float variance) {
+float Random::gaussian(float mean, float stdev) {
 
     // Using Box-Mueller method from http://www.taygeta.com/random/gaussian.html
     // Modified to specify standard deviation and mean of distribution
@@ -151,7 +151,8 @@ float Random::gaussian(float mean, float variance) {
     } while (w > 1.0f);
 
     // Transform to gassian distribution
-    return x2 * variance * sqrtf((-2.0f * logf(w) ) / w) + mean; 
+    // Multiply by sigma (stdev ^ 2) and add mean.
+    return x2 * (float)square(stdev) * sqrtf((-2.0f * logf(w) ) / w) + mean; 
 }
 
 

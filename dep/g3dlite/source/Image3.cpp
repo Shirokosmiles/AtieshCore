@@ -1,10 +1,10 @@
 /**
-  \file Image3.cpp
+  @file Image3.cpp
 
-  \maintainer Morgan McGuire, http://graphics.cs.williams.edu
+  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
-  \created 2007-01-31
-  \edited  2016-02-15
+  @created 2007-01-31
+  @edited  2012-12-25
 */
 
 
@@ -21,14 +21,14 @@
 
 namespace G3D {
 
-Image3::Image3(int w, int h, WrapMode wrap, int depth) : Map2D<Color3, Color3>(w, h, wrap, depth) {
+Image3::Image3(int w, int h, WrapMode wrap) : Map2D<Color3, Color3>(w, h, wrap) {
     setAll(Color3::black());
 }
 
 
 Image3::Ref Image3::fromImage3unorm8(const shared_ptr<Image3unorm8>& im) {
     Ref out = createEmpty(im->wrapMode());
-    out->resize(im->width(), im->height(), 1);
+    out->resize(im->width(), im->height());
 
     int N = im->width() * im->height();
     const Color3unorm8* src = reinterpret_cast<Color3unorm8*>(im->getCArray());
@@ -40,24 +40,24 @@ Image3::Ref Image3::fromImage3unorm8(const shared_ptr<Image3unorm8>& im) {
 }
 
 
-Image3::Ref Image3::createEmpty(int width, int height, WrapMode wrap, int depth) {
-    return shared_ptr<Image3>(new Image3(width, height, wrap, depth));
+Image3::Ref Image3::createEmpty(int width, int height, WrapMode wrap) {
+    return shared_ptr<Image3>(new Image3(width, height, wrap));
 }
 
 
 Image3::Ref Image3::createEmpty(WrapMode wrap) {
-    return createEmpty(0, 0, wrap, 1);
+    return createEmpty(0, 0, wrap);
 }
 
 
-Image3::Ref Image3::fromFile(const String& filename, WrapMode wrap) {
+Image3::Ref Image3::fromFile(const std::string& filename, WrapMode wrap) {
     Ref out = createEmpty(wrap);
     out->load(filename);
     return out;
 }
 
 
-void Image3::load(const String& filename) {
+void Image3::load(const std::string& filename) {
     shared_ptr<Image> image = Image::fromFile(filename);
     if (image->format() != ImageFormat::RGB32F()) {
         image->convertToRGB8();
@@ -92,52 +92,52 @@ void Image3::load(const String& filename) {
 }
 
 
-Image3::Ref Image3::fromArray(const class Color3unorm8* ptr, int w, int h, WrapMode wrap, int d) {
+Image3::Ref Image3::fromArray(const class Color3unorm8* ptr, int w, int h, WrapMode wrap) {
     Ref out = createEmpty(wrap);
-    out->copyArray(ptr, w, h, d);
+    out->copyArray(ptr, w, h);
     return out;
 }
 
 
-Image3::Ref Image3::fromArray(const class Color1* ptr, int w, int h, WrapMode wrap, int d) {
+Image3::Ref Image3::fromArray(const class Color1* ptr, int w, int h, WrapMode wrap) {
     Ref out = createEmpty(wrap);
-    out->copyArray(ptr, w, h, d);
+    out->copyArray(ptr, w, h);
     return out;
 }
 
 
-Image3::Ref Image3::fromArray(const class Color1unorm8* ptr, int w, int h, WrapMode wrap, int d) {
+Image3::Ref Image3::fromArray(const class Color1unorm8* ptr, int w, int h, WrapMode wrap) {
     Ref out = createEmpty(wrap);
-    out->copyArray(ptr, w, h, d);
+    out->copyArray(ptr, w, h);
     return out;
 }
 
 
-Image3::Ref Image3::fromArray(const class Color3* ptr, int w, int h, WrapMode wrap, int d) {
+Image3::Ref Image3::fromArray(const class Color3* ptr, int w, int h, WrapMode wrap) {
     Ref out = createEmpty(wrap);
-    out->copyArray(ptr, w, h, d);
+    out->copyArray(ptr, w, h);
     return out;
 }
 
 
-Image3::Ref Image3::fromArray(const class Color4unorm8* ptr, int w, int h, WrapMode wrap, int d) {
+Image3::Ref Image3::fromArray(const class Color4unorm8* ptr, int w, int h, WrapMode wrap) {
     Ref out = createEmpty(wrap);
-    out->copyArray(ptr, w, h, d);
+    out->copyArray(ptr, w, h);
     return out;
 }
 
 
-Image3::Ref Image3::fromArray(const class Color4* ptr, int w, int h, WrapMode wrap, int d) {
+Image3::Ref Image3::fromArray(const class Color4* ptr, int w, int h, WrapMode wrap) {
     Ref out = createEmpty(wrap);
-    out->copyArray(ptr, w, h, d);
+    out->copyArray(ptr, w, h);
     return out;
 }
 
 
-void Image3::copyArray(const Color3unorm8* src, int w, int h, int d) {
-    resize(w, h, d);
+void Image3::copyArray(const Color3unorm8* src, int w, int h) {
+    resize(w, h);
 
-    int N = w * h * d;
+    int N = w * h;
     Color3* dst = data.getCArray();
     // Convert int8 -> float
     for (int i = 0; i < N; ++i) {
@@ -146,10 +146,10 @@ void Image3::copyArray(const Color3unorm8* src, int w, int h, int d) {
 }
 
 
-void Image3::copyArray(const Color4unorm8* src, int w, int h, int d) {
-    resize(w, h, d);
+void Image3::copyArray(const Color4unorm8* src, int w, int h) {
+    resize(w, h);
 
-    int N = w * h * d;
+    int N = w * h;
     Color3* dst = data.getCArray();
     
     // Strip alpha and convert
@@ -159,16 +159,16 @@ void Image3::copyArray(const Color4unorm8* src, int w, int h, int d) {
 }
 
 
-void Image3::copyArray(const Color3* src, int w, int h, int d) {
-    resize(w, h, d);
-    System::memcpy(getCArray(), src, w * h * d * sizeof(Color3));
+void Image3::copyArray(const Color3* src, int w, int h) {
+    resize(w, h);
+    System::memcpy(getCArray(), src, w * h * sizeof(Color3));
 }
 
 
-void Image3::copyArray(const Color4* src, int w, int h, int d) {
-    resize(w, h, d);
+void Image3::copyArray(const Color4* src, int w, int h) {
+    resize(w, h);
 
-    int N = w * h * d;
+    int N = w * h;
     Color3* dst = data.getCArray();
     
     // Strip alpha
@@ -178,9 +178,9 @@ void Image3::copyArray(const Color4* src, int w, int h, int d) {
 }
 
 
-void Image3::copyArray(const Color1unorm8* src, int w, int h, int d) {
+void Image3::copyArray(const Color1unorm8* src, int w, int h) {
     resize(w, h);
-    int N = w * h * d;
+    int N = w * h;
 
     Color3* dst = getCArray();
     for (int i = 0; i < N; ++i) {
@@ -189,9 +189,9 @@ void Image3::copyArray(const Color1unorm8* src, int w, int h, int d) {
 }
 
 
-void Image3::copyArray(const Color1* src, int w, int h, int d) {
-    resize(w, h, d);
-    int N = w * h * d;
+void Image3::copyArray(const Color1* src, int w, int h) {
+    resize(w, h);
+    int N = w * h;
 
     Color3* dst = getCArray();
     for (int i = 0; i < N; ++i) {
@@ -201,9 +201,9 @@ void Image3::copyArray(const Color1* src, int w, int h, int d) {
 
 
 /** Saves in any of the formats supported by G3D::GImage. */
-void Image3::save(const String& filename) {
+void Image3::save(const std::string& filename) {
     // To avoid saving as floating point image.  FreeImage cannot convert floating point to RGB8.
-    shared_ptr<Image3unorm8> unorm8 = Image3unorm8::fromImage3(dynamic_pointer_cast<Image3>(shared_from_this()));
+    Image3unorm8::Ref unorm8 = Image3unorm8::fromImage3(dynamic_pointer_cast<Image3>(shared_from_this()));
     unorm8->save(filename);
 }
 

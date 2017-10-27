@@ -15,11 +15,9 @@
 #include <time.h>
 
 #ifdef G3D_WINDOWS
-#   pragma warning(disable : 4091)
-#   include <imagehlp.h>
-#   pragma warning(default : 4091)
+    #include <imagehlp.h>
 #else
-#   include <stdarg.h>
+    #include <stdarg.h>
 #endif
 
 namespace G3D {
@@ -41,22 +39,24 @@ void logLazyPrintf(const char* fmt, ...) {
 
 Log* Log::commonLog = NULL;
 
-Log::Log(const String& filename) {
+Log::Log(const std::string& filename, int stripFromStackBottom) : 
+    stripFromStackBottom(stripFromStackBottom) {
+
     this->filename = filename;
 
     logFile = FileSystem::fopen(filename.c_str(), "w");
 
     if (logFile == NULL) {
-        String drive, base, ext;
-        Array<String> path;
+        std::string drive, base, ext;
+        Array<std::string> path;
         parseFilename(filename, drive, path, base, ext);
-        String logName = base + ((ext != "") ? ("." + ext) : ""); 
+        std::string logName = base + ((ext != "") ? ("." + ext) : ""); 
 
         // Write time is greater than 1ms.  This may be a network drive.... try another file.
         #ifdef G3D_WINDOWS
-            logName = String(std::getenv("TEMP")) + logName;
+            logName = std::string(std::getenv("TEMP")) + logName;
         #else
-            logName = String("/tmp/") + logName;
+            logName = std::string("/tmp/") + logName;
         #endif
 
         logFile = FileSystem::fopen(logName.c_str(), "w");
@@ -105,19 +105,12 @@ Log* Log::common() {
 }
 
 
-Log* Log::common(const String& filename) {
-    alwaysAssertM(isNull(commonLog), "Common log already exists");
-    commonLog = new Log(filename);
-    return commonLog;
-}
-
-
-String Log::getCommonLogFilename() {
+std::string Log::getCommonLogFilename() {
     return common()->filename;
 }
 
 
-void Log::section(const String& s) {
+void Log::section(const std::string& s) {
     fprintf(logFile, "_____________________________________________________\n");
     fprintf(logFile, "\n    ###    %s    ###\n\n", s.c_str());
 }
@@ -142,13 +135,13 @@ void __cdecl Log::lazyvprintf(const char* fmt, va_list argPtr) {
 }
 
 
-void Log::print(const String& s) {
+void Log::print(const std::string& s) {
     fprintf(logFile, "%s", s.c_str());
     fflush(logFile);
 }
 
 
-void Log::println(const String& s) {
+void Log::println(const std::string& s) {
     fprintf(logFile, "%s\n", s.c_str());
     fflush(logFile);
 }

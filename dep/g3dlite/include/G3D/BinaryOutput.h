@@ -6,7 +6,7 @@
  \created 2001-08-09
  \edited  2011-08-24
 
- Copyright 2000-2015, Morgan McGuire.
+ Copyright 2000-2012, Morgan McGuire.
  All rights reserved.
  */
 
@@ -15,7 +15,7 @@
 
 #include "G3D/platform.h"
 #include <assert.h>
-#include "G3D/G3DString.h"
+#include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdio.h>
@@ -51,7 +51,7 @@ namespace G3D {
  */
 class BinaryOutput {
 private:
-    String     m_filename;
+    std::string     m_filename;
 
     bool            m_committed;
 
@@ -126,7 +126,7 @@ public:
      to memory.
      */
     BinaryOutput(
-        const String&  filename,
+        const std::string&  filename,
         G3DEndian           fileEndian);
 
     ~BinaryOutput();
@@ -160,7 +160,7 @@ public:
         return m_fileEndian;
     }
 
-    String getFilename() const {
+    std::string getFilename() const {
         return m_filename;
     }
 
@@ -176,9 +176,6 @@ public:
 
      @param flush If true (default) the file is ready for reading when the method returns, otherwise 
       the method returns immediately and writes the file in the background.
-
-	  String exception will be thrown for file write failure.
-
     */
     void commit(bool flush = true);
 
@@ -334,12 +331,12 @@ public:
     /**
      Write a string with NULL termination.
      */
-    inline void writeString(const String& s) {
+    inline void writeString(const std::string& s) {
         writeString(s.c_str());
     }
 
     /** Write a string that always consumes len bytes, truncating or padding as necessary*/
-    inline void writeString(const String& s, int len) {
+    inline void writeString(const std::string& s, int len) {
         const int pad = len - ((int)s.length() + 1);
         if (pad >= 0) {
             writeString(s.c_str());
@@ -358,7 +355,7 @@ public:
      Write a string, ensuring that the total length
      including NULL is even.
      */
-    void writeStringEven(const String& s) {
+    void writeStringEven(const std::string& s) {
         writeStringEven(s.c_str());
     }
 
@@ -370,7 +367,7 @@ public:
      Write a NULL-terminated string with a 32-bit length field in front
      of it.  The NULL character is included in the length count.
      */
-    void writeString32(const String& s) {
+    void writeString32(const std::string& s) {
         writeString32(s.c_str());
     }
 

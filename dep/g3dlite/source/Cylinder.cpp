@@ -1,12 +1,12 @@
 /**
- \file Cylinder.cpp
+ @file Cylinder.cpp
   
- \maintainer Morgan McGuire, http://graphics.cs.williams.edu
+ @maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
- \created 2003-02-07
- \edited  2015-09-17
+ @created 2003-02-07
+ @edited  2006-02-18
 
- Copyright 2000-2015, Morgan McGuire.
+ Copyright 2000-2006, Morgan McGuire.
  All rights reserved.
  */
 
@@ -18,7 +18,6 @@
 #include "G3D/CoordinateFrame.h"
 #include "G3D/Line.h"
 #include "G3D/AABox.h"
-#include "G3D/Any.h"
 
 namespace G3D {
 
@@ -35,22 +34,6 @@ Cylinder::Cylinder(const Vector3& _p1, const Vector3& _p2, float _r)
     : p1(_p1), p2(_p2), mRadius(_r) {
 }
 
-Cylinder::Cylinder(const Any & a) {
-    AnyTableReader r(a);
-    r.getIfPresent("radius", mRadius);
-    r.getIfPresent("p1", p1);
-    r.getIfPresent("p2", p2);
-    r.verifyDone();
-}
-
-Any Cylinder::toAny() const {
-    Any a;
-    a["radius"] = mRadius;
-    a["p1"] = p1;
-    a["p2"] = p2;
-    return Any();
-}
-
 
 void Cylinder::serialize(class BinaryOutput& b) const {
     p1.serialize(b);
@@ -63,14 +46,6 @@ void Cylinder::deserialize(class BinaryInput& b) {
     p1.deserialize(b);
     p2.deserialize(b);
     mRadius = (float)b.readFloat64();
-}
-
-size_t Cylinder::hashCode() const {
-    return (size_t)(mRadius*100.0f) ^ p1.hashCode() ^ p2.hashCode();
-}
-
-bool Cylinder::operator==(const Cylinder & other) const {
-    return (mRadius == other.mRadius) && (p1 == other.p1) && (p2 == other.p2);
 }
 
 
@@ -124,7 +99,7 @@ void Cylinder::getReferenceFrame(CoordinateFrame& cframe) const {
 }
 
 
-void Cylinder::getRandomSurfacePoint(Vector3& p, Vector3& N, Random& rnd) const {
+void Cylinder::getRandomSurfacePoint(Vector3& p, Vector3& N) const {
     float h = height();
     float r = radius();
 
@@ -140,8 +115,8 @@ void Cylinder::getRandomSurfacePoint(Vector3& p, Vector3& N, Random& rnd) const 
 
         // Select a point uniformly at random on a disk
         // @cite http://mathworld.wolfram.com/DiskPointPicking.html
-        float a = rnd.uniform(0, (float)twoPi());
-        float r2 = sqrt(rnd.uniform(0, 1)) * r;
+        float a = uniformRandom(0, (float)twoPi());
+        float r2 = sqrt(uniformRandom(0, 1)) * r;
         p.x = cos(a) * r2;
         p.z = sin(a) * r2;
 
@@ -158,13 +133,13 @@ void Cylinder::getRandomSurfacePoint(Vector3& p, Vector3& N, Random& rnd) const 
         }
     } else {
         // Side
-        float a = rnd.uniform(0, (float)twoPi());
+        float a = uniformRandom(0, (float)twoPi());
         N.x = cos(a);
         N.y = 0;
         N.z = sin(a);
         p.x = N.x * r;
         p.z = N.y * r;
-        p.y = rnd.uniform(-h / 2.0f, h / 2.0f);
+        p.y = uniformRandom(-h / 2.0f, h / 2.0f);
     }
 
     // Transform to world space
@@ -176,7 +151,7 @@ void Cylinder::getRandomSurfacePoint(Vector3& p, Vector3& N, Random& rnd) const 
 }
 
 
-Vector3 Cylinder::randomInteriorPoint(Random& rnd) const {
+Vector3 Cylinder::randomInteriorPoint() const {
     float h = height();
     float r = radius();
 
@@ -184,11 +159,11 @@ Vector3 Cylinder::randomInteriorPoint(Random& rnd) const {
 
     // Select a point uniformly at random on a disk
     // @cite http://mathworld.wolfram.com/DiskPointPicking.html
-    float a = rnd.uniform(0, (float)twoPi());
-    float r2 = sqrt(rnd.uniform(0, 1)) * r;
+    float a = uniformRandom(0, (float)twoPi());
+    float r2 = sqrt(uniformRandom(0, 1)) * r;
 
-    const Vector3 p(  cos(a) * r2,
-                rnd.uniform(-h / 2.0f, h / 2.0f),
+    Vector3 p(  cos(a) * r2,
+                uniformRandom(-h / 2.0f, h / 2.0f),
                 sin(a) * r2);
 
     // Transform to world space

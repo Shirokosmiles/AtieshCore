@@ -42,8 +42,8 @@ void Matrix::serialize(TextOutput& t) const {
 }
 
 
-String Matrix::toString(const String& name) const {
-    String s;
+std::string Matrix::toString(const std::string& name) const {
+    std::string s;
 
     if (name != "") {
         s += format("%s = \n", name.c_str());

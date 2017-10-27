@@ -1,12 +1,12 @@
 /**
-  \file G3D/Table.h
+  @file Table.h
 
   Templated hash table class.
 
   @maintainer Morgan McGuire, http://graphics.cs.williams.edu
   @created 2001-04-22
-  @edited  2014-05-13
-  Copyright 2000-2015, Morgan McGuire.
+  @edited  2013-01-22
+  Copyright 2000-2013, Morgan McGuire.
   All rights reserved.
  */
 
@@ -14,7 +14,7 @@
 #define G3D_Table_h
 
 #include <cstddef>
-#include "G3D/G3DString.h"
+#include <string>
 
 #include "G3D/platform.h"
 #include "G3D/Array.h"
@@ -41,27 +41,27 @@ namespace G3D {
  <pre>
  class Foo {
  public:
-     String     name;
+     std::string     name;
      int             index;
      static size_t hashCode(const Foo& key) {
-          return HashTrait<String>::hashCode(key.name) + key.index;
+          return HashTrait<std::string>::hashCode(key.name) + key.index;
      }
   };
 
   template<> struct HashTrait<class Foo> {
-       static size_t hashCode(const Foo& key) { return HashTrait<String>::hashCode(key.name) + key.index; }
+       static size_t hashCode(const Foo& key) { return HashTrait<std::string>::hashCode(key.name) + key.index; }
   }; 
 
 
   // Use Foo::hashCode
-  Table<Foo, String, Foo> fooTable1;
+  Table<Foo, std::string, Foo> fooTable1;
 
   // Use HashTrait<Foo>
-  Table<Foo, String>      fooTable2;
+  Table<Foo, std::string>      fooTable2;
   </pre>
 
 
- Key must be a pointer, an int, a String or provide overloads for: 
+ Key must be a pointer, an int, a std::string or provide overloads for: 
 
   <PRE>
     template<> struct HashTrait<class Key> {
@@ -80,7 +80,7 @@ namespace G3D {
     bool operator==(const Key&, const Key&);
   </PRE>
 
- G3D pre-defines HashTrait specializations for common types (like <CODE>int</CODE> and <CODE>String</CODE>).
+ G3D pre-defines HashTrait specializations for common types (like <CODE>int</CODE> and <CODE>std::string</CODE>).
  If you use a Table with a different type you must write those functions yourself.  For example,
  an enum would use:
 
@@ -143,17 +143,17 @@ private:
 
     public:
 
-        static Node* create(const Key& k, const Value& v, size_t h, Node* n, shared_ptr<MemoryManager>& mm) {
+        static Node* create(const Key& k, const Value& v, size_t h, Node* n, MemoryManager::Ref& mm) {
             Node* node = (Node*)mm->alloc(sizeof(Node));
             return new (node) Node(k, v, h, n);
         }
 
-        static Node* create(const Key& k, size_t hashCode, Node* n, shared_ptr<MemoryManager>& mm) {
+        static Node* create(const Key& k, size_t hashCode, Node* n, MemoryManager::Ref& mm) {
             Node* node = (Node*)mm->alloc(sizeof(Node));
             return new (node) Node(k, hashCode, n);
         }
 
-        static void destroy(Node* n, shared_ptr<MemoryManager>& mm) {
+        static void destroy(Node* n, MemoryManager::Ref& mm) {
             n->~Node();
             mm->free(n);
         }
@@ -161,7 +161,7 @@ private:
         /**
         Clones a whole chain;
         */
-        Node* clone(shared_ptr<MemoryManager>& mm) {
+        Node* clone(MemoryManager::Ref& mm) {
            return create(this->entry.key, this->entry.value, hashCode, (next == NULL) ? NULL : next->clone(mm), mm);
         }
     };
@@ -196,7 +196,7 @@ private:
      */
     size_t              m_numBuckets;
 
-    shared_ptr<MemoryManager>  m_memoryManager;
+    MemoryManager::Ref  m_memoryManager;
 
     void* alloc(size_t s) const {
         return m_memoryManager->alloc(s);
@@ -306,7 +306,7 @@ public:
     }
 
     /** Changes the internal memory manager to m */
-    void clearAndSetMemoryManager(const shared_ptr<MemoryManager>& m) {
+    void clearAndSetMemoryManager(const MemoryManager::Ref& m) {
         clear();
         debugAssert(m_bucket == NULL);
         m_memoryManager = m;
@@ -867,18 +867,6 @@ public:
         return getCreateEntry(key, created).value;
     }
 
-
-   /**
-    Returns true if any key maps to value using operator==.
-    */
-    bool containsValue(const Value& value) const {
-        for (Iterator it = begin(); it.isValid(); ++it) {
-            if (it.value == value) {
-                return true;
-            }
-        }
-        return false;
-    }
 
    /**
     Returns true if key is in the table.
