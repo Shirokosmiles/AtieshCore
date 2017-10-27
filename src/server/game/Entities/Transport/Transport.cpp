@@ -284,7 +284,7 @@ void Transport::AddPassenger(WorldObject* passenger)
                     crt->SetTransportHomePosition(x, y, z, o);
 
                     if (crt->IsPet())
-                        crt->Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
+                        GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
                     else if (crt->IsTotem())
                         GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);
 
@@ -314,12 +314,7 @@ void Transport::RemovePassenger(WorldObject* passenger)
         erased = _passengers.erase(passenger) > 0;
 
     if (erased || _staticPassengers.erase(passenger)) // static passenger can remove itself in case of grid unload
-    {
-        passenger->SetTransport(nullptr);
-        passenger->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-        passenger->m_movementInfo.transport.Reset();
-        TC_LOG_DEBUG("entities.transport", "Object %s removed from transport %s.", passenger->GetName().c_str(), GetName().c_str());
-
+    {   
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(this, plr);
@@ -327,12 +322,35 @@ void Transport::RemovePassenger(WorldObject* passenger)
         }
 
         if (Creature* crt = passenger->ToCreature())
+        {
             if (crt->IsPet())
             {
                 sScriptMgr->OnRemovePassengerPet(this, crt);
                 if (Unit* owner = crt->GetOwner())
-                    crt->Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
+                    GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
             }
+            else if (crt->IsTotem())
+            {
+                if (Unit* owner = crt->GetOwner())
+                {
+                    float x, y, z, o;
+                    crt->m_movementInfo.transport.pos.GetPosition(x, y, z, o);
+                    crt->SetTransportHomePosition(x, y, z, o);
+
+                    CalculatePassengerPosition(x, y, z, &o);
+                    crt->SetHomePosition(x, y, z, o);
+
+                    GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);
+                }
+            }
+
+            sScriptMgr->OnRemovePassengerPet(this, crt);
+        }
+
+        passenger->SetTransport(nullptr);
+        passenger->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+        passenger->m_movementInfo.transport.Reset();
+        TC_LOG_DEBUG("entities.transport", "Object %s removed from transport %s.", passenger->GetName().c_str(), GetName().c_str());
     }
 }
 
@@ -737,12 +755,6 @@ void Transport::UpdatePassengerPositions(PassengerSet& passengers)
     for (PassengerSet::iterator itr = passengers.begin(); itr != passengers.end(); ++itr)
     {
         WorldObject* passenger = *itr;
-
-        if (!passenger->GetMap()) // if Transport under delete process - passengers should be removed 
-        {
-            RemovePassenger(*itr);
-            continue;
-        }            
 
         // transport teleported but passenger not yet (can happen for players)
         if (passenger->GetMap() != GetMap())
