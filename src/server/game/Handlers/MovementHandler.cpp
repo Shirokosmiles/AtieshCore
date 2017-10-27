@@ -428,6 +428,13 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
 
+    if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED) && opcode == MSG_MOVE_JUMP && plrMover && mover->IsFalling())
+    {
+        TC_LOG_INFO("anticheat", "MovementHandler::player is jumping when falling");
+        plrMover->GetSession()->KickPlayer();
+        return;        
+    }
+
     /* start SpeedHack Detection */
     if (plrMover && !mover->CheckMovementInfo(movementInfo) && sWorld->getBoolConfig(CONFIG_ASH_KICK_ENABLED))
     {

@@ -3993,6 +3993,13 @@ AntiCheats.FlyHack.Kick.Enabled = 1
 
 AntiCheats.SpeedHack.Kick.Enabled = 1
 
+#    AntiCheats.DoubleJump.Enabled
+#        Description: Enable AntiCheat.DoubleJump Kick when player sent opcode jump when has flag falling (client can't do this)
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.DoubleJump.Enabled = 1
+
 #
 ###################################################################################################
 
