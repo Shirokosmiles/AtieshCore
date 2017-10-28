@@ -24,6 +24,7 @@
 #include "Transport.h"
 #include "ObjectAccessor.h"
 #include "CellImpl.h"
+#include "Player.h"
 
 using namespace Trinity;
 
@@ -35,30 +36,32 @@ void VisibleNotifier::SendToSelf()
     {
         for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
         {
-            if ((*itr) && vis_guids.find((*itr)->GetGUID()) != vis_guids.end())
-            {
-                vis_guids.erase((*itr)->GetGUID());
+            if (*itr)
+                if ((*itr)->GetGUID())
+                    if (vis_guids.find((*itr)->GetGUID()) != vis_guids.end())
+                    {
+                        vis_guids.erase((*itr)->GetGUID());
 
-                switch ((*itr)->GetTypeId())
-                {
-                    case TYPEID_GAMEOBJECT:
-                        i_player.UpdateVisibilityOf((*itr)->ToGameObject(), i_data, i_visibleNow);
-                        break;
-                    case TYPEID_PLAYER:
-                        i_player.UpdateVisibilityOf((*itr)->ToPlayer(), i_data, i_visibleNow);
-                        if (!(*itr)->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
-                            (*itr)->ToPlayer()->UpdateVisibilityOf(&i_player);
-                        break;
-                    case TYPEID_UNIT:
-                        i_player.UpdateVisibilityOf((*itr)->ToCreature(), i_data, i_visibleNow);
-                        break;
-                    case TYPEID_DYNAMICOBJECT:
-                        i_player.UpdateVisibilityOf((*itr)->ToDynObject(), i_data, i_visibleNow);
-                        break;
-                    default:
-                        break;
-                }
-            }
+                        switch ((*itr)->GetTypeId())
+                        {
+                            case TYPEID_GAMEOBJECT:
+                                i_player.UpdateVisibilityOf((*itr)->ToGameObject(), i_data, i_visibleNow);
+                                break;
+                            case TYPEID_PLAYER:
+                                i_player.UpdateVisibilityOf((*itr)->ToPlayer(), i_data, i_visibleNow);
+                                if (!(*itr)->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
+                                    (*itr)->ToPlayer()->UpdateVisibilityOf(&i_player);
+                                break;
+                            case TYPEID_UNIT:
+                                i_player.UpdateVisibilityOf((*itr)->ToCreature(), i_data, i_visibleNow);
+                                break;
+                            case TYPEID_DYNAMICOBJECT:
+                                i_player.UpdateVisibilityOf((*itr)->ToDynObject(), i_data, i_visibleNow);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
         }
     }
 
