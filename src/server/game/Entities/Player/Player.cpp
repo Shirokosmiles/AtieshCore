@@ -14139,7 +14139,12 @@ void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, 
         ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(item->GetEntry());
         if (itemProto && itemProto->Quality >= ITEM_QUALITY_EPIC)
         {
-            std::string msg, color;
+            std::string msg, receive, name, color;
+            if(getGender() == GENDER_MALE)
+                receive = m_session->GetTrinityString(LANG_GUILD_LOOT_ANNOUNCE_1);
+            else
+                receive = m_session->GetTrinityString(LANG_GUILD_LOOT_ANNOUNCE_2);
+
             switch (itemProto->Quality)
             {
                 /*
@@ -14165,7 +14170,14 @@ void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, 
                 break;
             }
 
-            msg = "has received |" + color + "|Hitem:" + std::to_string(itemProto->ItemId) + "|h[" + itemProto->Name1 + "]|h|r";
+            name = itemProto->Name1;
+            LocaleConstant localeConstant = m_session->GetSessionDbLocaleIndex();
+            // local name
+            if (localeConstant != LOCALE_enUS)
+                if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemProto->ItemId))
+                    ObjectMgr::GetLocaleString(il->Name, localeConstant, name);
+
+            msg = receive + " |" + color + "|Hitem:" + std::to_string(itemProto->ItemId) + "|h[" + name + "]|h|r";
             GetGuild()->ItemBroadcastToGuild(this, msg);
             //TC_LOG_ERROR("server", "Player::SendNewItem :  msg = %s", msg);
         }
