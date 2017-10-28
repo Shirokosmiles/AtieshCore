@@ -35,7 +35,7 @@ void VisibleNotifier::SendToSelf()
     {
         for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
         {
-            if (vis_guids.find((*itr)->GetGUID()) != vis_guids.end())
+            if ((*itr) && vis_guids.find((*itr)->GetGUID()) != vis_guids.end())
             {
                 vis_guids.erase((*itr)->GetGUID());
 
