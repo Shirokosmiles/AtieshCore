@@ -26905,8 +26905,8 @@ bool Player::CheckOnFlyHack()
             if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), z))
             {
                 MovePositionToFirstCollision(npos, 2.5f, GetOrientation() + M_PI);
-                z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ() + 1.8f, true); // smart flyhacks -> SimpleFly
-                if (pz - z > 2.8f)
+                float tz = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ() + 1.8f, true); // smart flyhacks -> SimpleFly
+                if (pz - tz > 2.8f)
                 {
                     TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
                     TC_LOG_INFO("anticheat", "Player::========================================================");
