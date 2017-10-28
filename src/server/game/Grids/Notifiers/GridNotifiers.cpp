@@ -24,7 +24,6 @@
 #include "Transport.h"
 #include "ObjectAccessor.h"
 #include "CellImpl.h"
-#include "Player.h"
 
 using namespace Trinity;
 
