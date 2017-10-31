@@ -2600,7 +2600,7 @@ class spell_yogg_saron_death_ray_warning_visual : public SpellScriptLoader     /
                 if (Unit* caster = GetCaster())
                 {
                     caster->CastSpell(caster, SPELL_DEATH_RAY_PERIODIC, true);
-                    caster->CastSpell(nullptr, SPELL_DEATH_RAY_DAMAGE_VISUAL, true);
+                    //caster->CastSpell(caster, SPELL_DEATH_RAY_DAMAGE_VISUAL, false);
                     // TODO: set better movement
                     caster->GetMotionMaster()->MoveConfused();
                 }
