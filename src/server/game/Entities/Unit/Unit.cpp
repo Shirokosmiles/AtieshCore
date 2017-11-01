@@ -377,6 +377,7 @@ Unit::Unit(bool isWorldObject) :
     _oldFactionId = 0;
     _isWalkingBeforeCharm = false;
     _instantCast = false;
+    _isJumping = false;
 }
 
 ////////////////////////////////////////////////////////////
@@ -11518,7 +11519,7 @@ void Unit::PauseMovement(uint32 timer/* = 0*/, uint8 slot/* = 0*/)
     if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(slot))
         movementGenerator->Pause(timer);
 
-    StopMoving();
+    //StopMoving(); //ccrs i will rape you
 }
 
 void Unit::ResumeMovement(uint32 timer/* = 0*/, uint8 slot/* = 0*/)

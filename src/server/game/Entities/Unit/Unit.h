@@ -1922,6 +1922,9 @@ class TC_GAME_API Unit : public WorldObject
         virtual bool CanFly() const = 0;
         bool IsFlying() const   { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); }
         bool IsFalling() const;
+        bool IsJumping() const { return _isJumping; }
+        void SetIsJumping(bool jump) { _isJumping = jump; }
+
         virtual bool CanSwim() const;
 
         void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }
@@ -2095,6 +2098,7 @@ class TC_GAME_API Unit : public WorldObject
         bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
         bool needtodismount;
         bool _instantCast;
+        bool _isJumping;
 
         uint32 _oldFactionId;           ///< faction before charm
         bool _isWalkingBeforeCharm;     ///< Are we walking before we were charmed?

@@ -614,8 +614,8 @@ void SmartAI::AttackStart(Unit* who)
 
     if (who && me->Attack(who, mCanAutoAttack))
     {
-        me->GetMotionMaster()->Clear(MOTION_SLOT_ACTIVE);
-        me->PauseMovement();
+        //me->GetMotionMaster()->Clear(MOTION_SLOT_ACTIVE); //ccrs i will rape you
+        me->PauseMovement(0, MOTION_SLOT_ACTIVE);           //ccrs i will rape you
 
         if (mCanCombatMove)
         {

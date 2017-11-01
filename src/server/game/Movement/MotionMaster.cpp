@@ -32,6 +32,7 @@
 #include "PathGenerator.h"
 #include "Player.h"
 #include "PointMovementGenerator.h"
+#include "JumpMovementGenerator.h"
 #include "RandomMovementGenerator.h"
 #include "ScriptSystem.h"
 #include "SplineChainMovementGenerator.h"
@@ -435,13 +436,9 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
 
     _owner->GetNearPoint(_owner, x, y, z, _owner->GetCombatReach(), dist, _owner->GetAngle(srcX, srcY) + float(M_PI));
 
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(x, y, z);
-    init.SetParabolic(max_height, 0);
-    init.SetOrientationFixed(true);
-    init.SetVelocity(speedXY);
-    init.Launch();
-    Mutate(new EffectMovementGenerator(0), MOTION_SLOT_CONTROLLED);
+    TC_LOG_DEBUG("misc", "Creature (Entry: %u GUID: %u) MoveKnockbackFrom at point (X: %f Y: %f Z: %f) and speedXY = %f, max_height = %f",
+        _owner->GetEntry(), _owner->GetGUID().GetCounter(), x, y, z, speedXY, max_height);
+    Mutate(new JumpMovementGenerator<Creature>(EVENT_JUMP, x, y, z, 0.0f, speedXY, max_height, false, true), MOTION_SLOT_CONTROLLED);
 }
 
 void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)
@@ -460,21 +457,24 @@ void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)
 
 void MotionMaster::MoveJump(float x, float y, float z, float o, float speedXY, float speedZ, uint32 id, bool hasOrientation /* = false*/)
 {
-    TC_LOG_DEBUG("misc", "Unit (GUID: %u) jumps to point (X: %f Y: %f Z: %f).", _owner->GetGUID().GetCounter(), x, y, z);
     if (speedXY < 0.01f)
         return;
 
     float moveTimeHalf = speedZ / Movement::gravity;
     float max_height = (_owner->GetExactDist2d(x, y) * moveTimeHalf) / 10.0f;
 
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(x, y, z, false);
-    init.SetParabolic(max_height, 0);
-    init.SetVelocity(speedXY);
-    if (hasOrientation)
-        init.SetFacing(o);
-    init.Launch();
-    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
+    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    {
+        TC_LOG_DEBUG("misc", "Player (GUID: %u) MoveJump at point (X: %f Y: %f Z: %f) and speedXY = %f, max_height = %f",
+            _owner->GetGUID().GetCounter(), x, y, z, speedXY, max_height);
+        Mutate(new JumpMovementGenerator<Player>(id, x, y, z, o, speedXY, max_height, hasOrientation), MOTION_SLOT_CONTROLLED);
+    }
+    else
+    {
+        TC_LOG_DEBUG("misc", "Creature (Entry: %u GUID: %u) MoveJump at point (X: %f Y: %f Z: %f) and speedXY = %f, max_height = %f",
+            _owner->GetEntry(), _owner->GetGUID().GetCounter(), x, y, z, speedXY, max_height);
+        Mutate(new JumpMovementGenerator<Creature>(id, x, y, z, o, speedXY, max_height, hasOrientation), MOTION_SLOT_CONTROLLED);
+    }
 }
 
 void MotionMaster::MoveCirclePath(float x, float y, float z, float radius, bool clockwise, uint8 stepCount)
