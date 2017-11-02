@@ -383,6 +383,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             {
                 plrMover->SetSkipOnePacketForASH(true);
                 plrMover->GetTransport()->RemovePassenger(plrMover);
+                if (crMover->GetTransport())
+                    crMover->GetTransport()->RemovePassenger(crMover);
+
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
                 {
                     transport->AddPassenger(plrMover);
