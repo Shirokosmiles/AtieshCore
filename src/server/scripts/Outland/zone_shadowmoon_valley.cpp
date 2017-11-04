@@ -1376,7 +1376,7 @@ public:
 
 enum Enraged_Dpirits
 {
-// QUESTS
+    // QUESTS
     QUEST_ENRAGED_SPIRITS_FIRE_EARTH        = 10458,
     QUEST_ENRAGED_SPIRITS_AIR               = 10481,
     QUEST_ENRAGED_SPIRITS_WATER             = 10480,
@@ -1398,14 +1398,15 @@ enum Enraged_Dpirits
     SPELL_AIR_SPIRIT_CHAIN_LIGHTNING        = 12058,
     SPELL_HURRICANE                         = 32717,
     SPELL_ENRAGE                            = 8599,
-    
+
     // ENRAGED FIRE SPIRIT SPELLS - Will be using the enrage spell from Air Spirit
     SPELL_FEL_FIREBALL                      = 36247,
+    SPELL_FEL_FIRE_AURA                     = 36006, // Earth spirit uses this one
 
     // ENRAGED EARTH SPIRIT SPELLS
     SPELL_FIERY_BOULDER                     = 38498,
     SPELL_SUMMON_ENRAGED_EARTH_SHARD        = 38365,
-
+    
     // SOULS
     NPC_EARTHEN_SOUL                        = 21073,
     NPC_FIERY_SOUL                          = 21097,
@@ -1430,11 +1431,11 @@ enum Enraged_Dpirits
 
 enum Enraged_Spirits_Events
 {
-    EVENT_ENRAGED_WATER_SPIRIT               = 1,
-    EVENT_ENRAGED_FIRE_SPIRIT                = 2,
-    EVENT_ENRAGED_EARTH_SPIRIT               = 3,
-    EVENT_ENRAGED_AIR_SPIRIT_CHAIN_LIGHTNING = 4,
-    EVENT_ENRAGED_AIR_SPIRIT_HURRICANE       = 5
+    EVENT_ENRAGED_WATER_SPIRIT                  = 1,
+    EVENT_ENRAGED_FIRE_SPIRIT                   = 2,
+    EVENT_ENRAGED_EARTH_SPIRIT                  = 3,
+    EVENT_ENRAGED_AIR_SPIRIT_CHAIN_LIGHTNING    = 4,
+    EVENT_ENRAGED_AIR_SPIRIT_HURRICANE          = 5
 };
 
 class npc_enraged_spirit : public CreatureScript
@@ -1444,7 +1445,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-    return new npc_enraged_spiritAI(creature);
+        return new npc_enraged_spiritAI(creature);
     }
 
     struct npc_enraged_spiritAI : public ScriptedAI
@@ -1452,7 +1453,7 @@ public:
         npc_enraged_spiritAI(Creature* creature) : ScriptedAI(creature) { }
 
         void Reset() override { }
-        
+
         void EnterCombat(Unit* /*who*/) override
         {
             switch (me->GetEntry())
@@ -1461,13 +1462,17 @@ public:
                     _events.ScheduleEvent(EVENT_ENRAGED_WATER_SPIRIT, Seconds(0), Seconds(1));
                     break;
                 case NPC_ENRAGED_FIRE_SPIRIT:
-                    _events.ScheduleEvent(EVENT_ENRAGED_FIRE_SPIRIT, Seconds(0), Seconds(1));
+                    if (!me->GetAura(SPELL_FEL_FIRE_AURA))
+                        DoCastSelf(SPELL_FEL_FIRE_AURA);
+                    _events.ScheduleEvent(EVENT_ENRAGED_FIRE_SPIRIT, Seconds(2), Seconds(10));
                     break;
                 case NPC_ENRAGED_EARTH_SPIRIT:
-                    _events.ScheduleEvent(EVENT_ENRAGED_EARTH_SPIRIT, Seconds(0), Seconds(1));
+                    if (!me->GetAura(SPELL_FEL_FIRE_AURA))
+                        DoCastSelf(SPELL_FEL_FIRE_AURA);
+                    _events.ScheduleEvent(EVENT_ENRAGED_EARTH_SPIRIT, Seconds(3), Seconds(4));
                     break;
                 case NPC_ENRAGED_AIR_SPIRIT:
-                    _events.ScheduleEvent(EVENT_ENRAGED_AIR_SPIRIT_CHAIN_LIGHTNING, Seconds(0), Seconds(1));
+                    _events.ScheduleEvent(EVENT_ENRAGED_AIR_SPIRIT_CHAIN_LIGHTNING, Seconds(10));
                     break;
                 default:
                     break;
@@ -1476,8 +1481,10 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (!UpdateVictim())
+                return;
             _events.Update(diff);
-            
+
             while (uint32 eventId = _events.ExecuteEvent())
             {
                 switch (eventId)
@@ -1485,17 +1492,17 @@ public:
                     case EVENT_ENRAGED_WATER_SPIRIT:
                         if (UpdateVictim())
                             DoCastVictim(SPELL_STORMBOLT);
-                        _events.Repeat(Seconds(6), Seconds(9));
+                        _events.Repeat(Seconds(17), Seconds(23));
                         break;
                     case EVENT_ENRAGED_FIRE_SPIRIT:
                         if (UpdateVictim())
                             DoCastVictim(SPELL_FEL_FIREBALL);
-                        _events.Repeat(Seconds(7), Seconds(9));
+                        _events.Repeat(Seconds(6), Seconds(12));
                         break;
                     case EVENT_ENRAGED_EARTH_SPIRIT:
                         if (UpdateVictim())
                             DoCastVictim(SPELL_FIERY_BOULDER);
-                        _events.Repeat(Seconds(2), Seconds(3));
+                        _events.Repeat(Seconds(6), Seconds(9));
                         break;
                     case EVENT_ENRAGED_AIR_SPIRIT_CHAIN_LIGHTNING:
                         if (UpdateVictim())
@@ -1505,21 +1512,18 @@ public:
                     case EVENT_ENRAGED_AIR_SPIRIT_HURRICANE:
                         if (UpdateVictim())
                             DoCastVictim(SPELL_HURRICANE);
-                        _events.ScheduleEvent(EVENT_ENRAGED_AIR_SPIRIT_CHAIN_LIGHTNING, Seconds(10), Seconds(13));
+                        _events.ScheduleEvent(EVENT_ENRAGED_AIR_SPIRIT_CHAIN_LIGHTNING, Seconds(15), Seconds(20));
                         break;
                     default:
                         break;
                 }
             }
-            
-            if (!UpdateVictim())
-                return;
-            
-            if (me->GetEntry() == NPC_ENRAGED_FIRE_SPIRIT || me->GetEntry() == NPC_ENRAGED_AIR_SPIRIT)
-                if (HealthBelowPct(35) && !me->GetAura(SPELL_ENRAGE))
-                    DoCastSelf(SPELL_ENRAGE);
-            
-            DoMeleeAttackIfReady();
+
+        if (me->GetEntry() == NPC_ENRAGED_FIRE_SPIRIT || me->GetEntry() == NPC_ENRAGED_AIR_SPIRIT)
+            if (HealthBelowPct(35) && !me->GetAura(SPELL_ENRAGE))
+                DoCastSelf(SPELL_ENRAGE);
+
+        DoMeleeAttackIfReady();
         }
 
         void JustDied(Unit* /*killer*/) override
