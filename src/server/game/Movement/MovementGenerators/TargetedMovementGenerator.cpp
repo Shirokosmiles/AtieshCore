@@ -52,7 +52,7 @@ bool TargetedMovementGenerator<T, D>::DoUpdate(T* owner, uint32 diff)
         return true;
     }
 
-    if (owner->ToCreature() && owner->ToCreature()->isCreatureAsCasterForExceptEvade())
+    if (owner->ToCreature() && owner->ToCreature()->isCreatureNotTargetMove())
         return true;
 
     if (_interrupt || _recalculateTravel)
@@ -118,7 +118,7 @@ void TargetedMovementGenerator<T, D>::SetTargetLocation(T* owner, bool updateDes
     if (!owner || !owner->IsAlive())
         return;
 
-    if (owner->ToCreature() && owner->ToCreature()->isCreatureAsCasterForExceptEvade())
+    if (owner->ToCreature() && owner->ToCreature()->isCreatureNotTargetMove())
         return;
 
     if (owner->IsJumping())

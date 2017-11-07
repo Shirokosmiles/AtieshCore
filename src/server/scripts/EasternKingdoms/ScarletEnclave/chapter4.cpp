@@ -46,7 +46,8 @@ public:
         void Initialize()
         {
             uiStage_timer = 2000;
-            me->SetCreatureAsCasterForExceptEvade(true);
+            me->SetIgnoreEvade(true);
+            me->SetNotTargetMove(true);
         }
 
         uint32 uiStage_timer;

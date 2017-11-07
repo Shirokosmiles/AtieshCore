@@ -294,11 +294,16 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         }
         bool CanNotReachTarget() const { return m_cannotReachTarget; }
 
-        void SetCreatureAsCasterForExceptEvade(bool setcaster = false)
+        void SetIgnoreEvade(bool setcaster = false)
         {
-            m_isCaster = setcaster;
+            m_isIgnoreEvade = setcaster;
         }
-        bool isCreatureAsCasterForExceptEvade() const { return m_isCaster; } // will not calculate path at this target, HACK for except evade for some special NPC like ballista for DK zone
+        void SetNotTargetMove(bool setignoremover = false)
+        {
+            m_isNotTargetMove = setignoremover;
+        }
+        bool isCreatureIgnoreEvade() const { return m_isIgnoreEvade; }     // will not evaded for some special NPC like ballista for DK zone
+        bool isCreatureNotTargetMove() const { return m_isNotTargetMove; } // will not calculate path at this target, HACK for except evade for some special NPC like ballista for DK zone
 
         void SetHomePosition(float x, float y, float z, float o) { m_homePosition.Relocate(x, y, z, o); }
         void SetHomePosition(Position const& pos) { m_homePosition.Relocate(pos); }
@@ -310,11 +315,12 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         void GetTransportHomePosition(float& x, float& y, float& z, float& ori) const { m_transportHomePosition.GetPosition(x, y, z, ori); }
         Position const& GetTransportHomePosition() const { return m_transportHomePosition; }
 
-        uint32 GetWaypointPath() const { return m_path_id; }
-        void LoadPath(uint32 pathid) { m_path_id = pathid; }
+        uint32 GetWaypointPath() const { return _waypointPathId; }
+        void LoadPath(uint32 pathid) { _waypointPathId = pathid; }
 
-        uint32 GetCurrentWaypointID() const { return m_waypointID; }
-        void UpdateWaypointID(uint32 wpID) { m_waypointID = wpID; }
+        // nodeId, pathId
+        std::pair<uint32, uint32> GetCurrentWaypointInfo() const { return _currentWaypointNodeInfo; }
+        void UpdateCurrentWaypointInfo(uint32 nodeId, uint32 pathId) { _currentWaypointNodeInfo = { nodeId, pathId }; }
 
         bool IsReturningHome() const;
 
@@ -404,7 +410,8 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool m_AlreadyCallAssistance;
         bool m_AlreadySearchedAssistance;
         bool m_cannotReachTarget;
-        bool m_isCaster;
+        bool m_isIgnoreEvade;
+        bool m_isNotTargetMove;
         uint32 m_cannotReachTimer;
         bool m_AI_locked;
 
@@ -428,9 +435,9 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         void ForcedDespawn(uint32 timeMSToDespawn = 0, Seconds const& forceRespawnTimer = Seconds(0));
         bool CheckNoGrayAggroConfig(uint32 playerLevel, uint32 creatureLevel) const; // No aggro from gray creatures
 
-        //WaypointMovementGenerator vars
-        uint32 m_waypointID;
-        uint32 m_path_id;
+        // Waypoint path
+        uint32 _waypointPathId;
+        std::pair<uint32/*nodeId*/, uint32/*pathId*/> _currentWaypointNodeInfo;
 
         //Formation var
         CreatureGroup* m_formation;
