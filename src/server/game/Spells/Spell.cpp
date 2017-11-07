@@ -3173,6 +3173,13 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     _spellEvent = new SpellEvent(this);
     m_caster->m_Events.AddEvent(_spellEvent, m_caster->m_Events.CalculateTime(1));
 
+    if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsJumping())
+    {
+        SendCastResult(SPELL_FAILED_SPELL_IN_PROGRESS);
+        finish(false);
+        return;
+    }
+
     //Prevent casting at cast another spell (ServerSide check)
     if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CAST_IN_PROGRESS) && m_caster->IsNonMeleeSpellCast(false, true, true) && m_cast_count)
     {

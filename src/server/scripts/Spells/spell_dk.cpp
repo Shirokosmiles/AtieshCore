@@ -2559,6 +2559,9 @@ public:
             if (caster == victim)
                 caster = GetExplTargetUnit();
                 caster->CastSpell(victim, SPELL_DK_DEATH_GRIP, true);
+
+            if (victim && victim->GetTypeId() == TYPEID_UNIT && victim->IsNonMeleeSpellCast(false))
+                victim->InterruptNonMeleeSpells(false);
         }
 
         void Register() override
