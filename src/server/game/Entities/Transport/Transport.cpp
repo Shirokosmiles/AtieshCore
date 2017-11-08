@@ -289,8 +289,9 @@ void Transport::AddPassenger(WorldObject* passenger)
                         GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);
 
                 }
+
+                sScriptMgr->OnAddPassengerPetOrTotem(this, crt);
             }
-            sScriptMgr->OnAddPassengerPetOrTotem(this, crt);
         }
     }
 }
@@ -325,9 +326,10 @@ void Transport::RemovePassenger(WorldObject* passenger)
         {
             if (crt->IsPet())
             {
-                sScriptMgr->OnRemovePassengerPet(this, crt);
                 if (Unit* owner = crt->GetOwner())
                     GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
+
+                sScriptMgr->OnRemovePassengerPetOrTotem(this, crt);
             }
             else if (crt->IsTotem())
             {
@@ -340,11 +342,11 @@ void Transport::RemovePassenger(WorldObject* passenger)
                     CalculatePassengerPosition(x, y, z, &o);
                     crt->SetHomePosition(x, y, z, o);
 
-                    GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);
+                    GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);                    
                 }
-            }
 
-            sScriptMgr->OnRemovePassengerPet(this, crt);
+                sScriptMgr->OnRemovePassengerPetOrTotem(this, crt);
+            }
         }
 
         passenger->SetTransport(nullptr);

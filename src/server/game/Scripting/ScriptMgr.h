@@ -603,7 +603,7 @@ class TC_GAME_API TransportScript : public ScriptObject, public UpdatableScript<
         virtual void OnRemovePassenger(Transport* /*transport*/, Player* /*player*/) { }
 
         // Called when a creature pet exits the transport.
-        virtual void OnRemovePassengerPet(Transport* /*transport*/, Creature* /*creature*/) { }
+        virtual void OnRemovePassengerPetOrTotem(Transport* /*transport*/, Creature* /*creature*/) { }
 
         // Called when a transport moves.
         virtual void OnRelocate(Transport* /*transport*/, uint32 /*waypointId*/, uint32 /*mapId*/, float /*x*/, float /*y*/, float /*z*/) { }
@@ -992,7 +992,7 @@ class TC_GAME_API ScriptMgr
         void OnAddPassengerPetOrTotem(Transport* transport, Creature* creature);
         void OnAddCreaturePassenger(Transport* transport, Creature* creature);
         void OnRemovePassenger(Transport* transport, Player* player);
-        void OnRemovePassengerPet(Transport* transport, Creature* creature);
+        void OnRemovePassengerPetOrTotem(Transport* transport, Creature* creature);
         void OnTransportUpdate(Transport* transport, uint32 diff);
         void OnRelocate(Transport* transport, uint32 waypointId, uint32 mapId, float x, float y, float z);
 

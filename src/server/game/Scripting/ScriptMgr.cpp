@@ -1826,13 +1826,13 @@ void ScriptMgr::OnRemovePassenger(Transport* transport, Player* player)
     tmpscript->OnRemovePassenger(transport, player);
 }
 
-void ScriptMgr::OnRemovePassengerPet(Transport* transport, Creature* creature)
+void ScriptMgr::OnRemovePassengerPetOrTotem(Transport* transport, Creature* creature)
 {
     ASSERT(transport);
     ASSERT(creature);
 
     GET_SCRIPT(TransportScript, transport->GetScriptId(), tmpscript);
-    tmpscript->OnRemovePassengerPet(transport, creature);
+    tmpscript->OnRemovePassengerPetOrTotem(transport, creature);
 }
 
 void ScriptMgr::OnTransportUpdate(Transport* transport, uint32 diff)
