@@ -296,6 +296,7 @@ class boss_valithria_dreamwalker : public CreatureScript
                 _over75PercentTalkDone = false;
                 _justDied = false;
                 _done = false;
+                me->SetIgnoreEvade(true);
             }
 
             void InitializeAI() override
@@ -310,6 +311,7 @@ class boss_valithria_dreamwalker : public CreatureScript
 
             void Reset() override
             {
+                me->AI()->EnterEvadeMode();
                 me->SetHealth(_spawnHealth);
                 me->SetReactState(REACT_PASSIVE);
                 me->LoadCreaturesAddon();
