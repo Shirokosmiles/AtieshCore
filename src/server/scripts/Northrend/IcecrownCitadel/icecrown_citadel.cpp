@@ -826,8 +826,7 @@ class boss_sister_svalna : public CreatureScript
 
             void JustReachedHome() override
             {
-                _JustReachedHome();
-                me->SetReactState(REACT_PASSIVE);
+                _JustReachedHome();                
                 me->SetDisableGravity(false);
                 me->SetHover(false);
             }
