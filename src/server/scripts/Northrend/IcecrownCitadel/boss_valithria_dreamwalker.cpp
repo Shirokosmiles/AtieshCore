@@ -140,6 +140,9 @@ enum Events
     // Nightmare Cloud
     EVENT_CHECK_PLAYER                      = 17,
     EVENT_EXPLODE                           = 18,
+
+    //Evade mode
+    EVENT_EVADE_CHECK                       = 19
 };
 
 enum Misc
@@ -305,13 +308,18 @@ class boss_valithria_dreamwalker : public CreatureScript
                     if (data->curhealth)
                         _spawnHealth = data->curhealth;
 
-                if (!me->isDead())
-                    Reset();
+                StartloadSettings();
             }
 
             void Reset() override
             {
                 me->AI()->EnterEvadeMode();
+                StartloadSettings();
+                Initialize();
+            }
+
+            void StartloadSettings()
+            {
                 me->SetHealth(_spawnHealth);
                 me->SetReactState(REACT_PASSIVE);
                 me->LoadCreaturesAddon();
@@ -321,7 +329,6 @@ class boss_valithria_dreamwalker : public CreatureScript
                 // Glyph of Dispel Magic - not a percent heal by effect, its cast with custom basepoints
                 me->ApplySpellImmune(0, IMMUNITY_ID, 56131, true);
                 _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                Initialize();
             }
 
             void AttackStart(Unit* /*target*/) override
@@ -452,6 +459,7 @@ class boss_valithria_dreamwalker : public CreatureScript
                     {
                         case EVENT_INTRO_TALK:
                             Talk(SAY_VALITHRIA_ENTER_COMBAT);
+                            _events.ScheduleEvent(EVENT_EVADE_CHECK, urand(45000, 48000));
                             break;
                         case EVENT_BERSERK:
                             Talk(SAY_VALITHRIA_BERSERK);
@@ -465,6 +473,13 @@ class boss_valithria_dreamwalker : public CreatureScript
                             break;
                         case EVENT_DREAM_SLIP:
                             DoCast(me, SPELL_DREAM_SLIP);
+                            break;
+                        case EVENT_EVADE_CHECK:
+                            evadecheck = GetPlayerAtMinimumRange(160.0f);
+                            if (!evadecheck)
+                                EnterEvadeMode();
+                            else if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == IN_PROGRESS)
+                                _events.ScheduleEvent(EVENT_EVADE_CHECK, urand(45000, 48000));
                             break;
                         default:
                             break;
@@ -481,6 +496,8 @@ class boss_valithria_dreamwalker : public CreatureScript
             }
 
         private:
+            Player* evadecheck;
+
             EventMap _events;
             InstanceScript* _instance;
             uint32 _spawnHealth;
