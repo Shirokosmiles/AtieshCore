@@ -34,6 +34,14 @@ void Trinity::Banner::Show(char const* applicationName, void(*log)(char const* t
     log("                                 C O R E  /\\___/");
     log("http://TrinityCore.org                    \\/__/\n");
     */
+
+    log("████─█─█─███─███─███─█───█─█─█");
+    log("█──█─█─█─█────█──█───██─██─█─█");
+    log("████─█─█─███──█──███─█─█─█─█─█");
+    log("█─█──█─█───█──█──█───█───█─█─█");
+    log("█─█──███─███──█──███─█───█─███");
+    log("\n");
+
     if (logExtraInfo)
         logExtraInfo();
 }
