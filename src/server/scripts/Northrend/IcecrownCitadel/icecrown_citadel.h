@@ -122,7 +122,8 @@ enum ICDataTypes
     DATA_UPPERSPIRE_TELE_ACT           = 41, /// also used by conditions
     DATA_BLOOD_QUEEN_LANA_THEL_COUNCIL = 42,
     DATA_BLOOD_PRINCE_COUNCIL_INTRO    = 43,
-    DATA_SINDRAGOSA_INTRO              = 44
+    DATA_SINDRAGOSA_INTRO              = 44,
+    DATA_PUTRICIDE_TRAP                = 45
 };
 
 enum ICCreaturesIds
@@ -241,6 +242,7 @@ enum ICCreaturesIds
     NPC_TEAR_GAS_TARGET_STALKER                 = 38317,
     NPC_MUTATED_ABOMINATION_10                  = 37672,
     NPC_MUTATED_ABOMINATION_25                  = 38285,
+    NPC_PUTRICIDE_TRAP                          = 38879,
 
     // Blood Prince Council
     NPC_PRINCE_KELESETH                         = 37972,
