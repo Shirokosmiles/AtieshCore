@@ -49,7 +49,20 @@ class boss_nexus_commanders : public CreatureScript
 
         struct boss_nexus_commandersAI : public BossAI
         {
-            boss_nexus_commandersAI(Creature* creature) : BossAI(creature, DATA_COMMANDER) { }
+            boss_nexus_commandersAI(Creature* creature) : BossAI(creature, DATA_COMMANDER)
+            {
+                Initialize();
+            }
+
+            void Initialize()
+            {
+                me->SetRespawnDelay(3600);
+            }
+
+            void Reset() override
+            {
+                Initialize();
+            }
 
             void EnterCombat(Unit* /*who*/) override
             {
