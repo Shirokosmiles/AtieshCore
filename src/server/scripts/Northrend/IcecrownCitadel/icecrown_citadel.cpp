@@ -744,31 +744,31 @@ class boss_sister_svalna : public CreatureScript
 
         struct boss_sister_svalnaAI : public BossAI
         {
-            boss_sister_svalnaAI(Creature* creature) : BossAI(creature, DATA_SISTER_SVALNA),
-                _isEventInProgress(false)
+            boss_sister_svalnaAI(Creature* creature) : BossAI(creature, DATA_SISTER_SVALNA)
             {
+                Initialize();
             }
 
-            void InitializeAI() override
+            void Initialize()
             {
-                if (!me->isDead())
-                    Reset();
-
-                me->SetReactState(REACT_PASSIVE);
+                me->SetDisableGravity(true);
+                me->SetHover(true);
+                me->SetReactState(REACT_DEFENSIVE);
             }
 
             void Reset() override
             {
-                _Reset();
-                me->SetReactState(REACT_DEFENSIVE);
-                _isEventInProgress = false;
+                Initialize();
+                events.Reset();
+
+                if (me->HasAura(SPELL_DIVINE_SURGE))
+                    me->RemoveAurasDueToSpell(SPELL_DIVINE_SURGE);
             }
 
             void JustDied(Unit* /*killer*/) override
             {
                 _JustDied();
                 Talk(SAY_SVALNA_DEATH);
-                me->setActive(false);
 
                 uint64 delay = 1;
                 for (uint32 i = 0; i < 4; ++i)
@@ -782,21 +782,6 @@ class boss_sister_svalna : public CreatureScript
                         }
                     }
                 }
-            }
-
-            void EnterCombat(Unit* /*attacker*/) override
-            {
-                _EnterCombat();
-                if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
-                {
-                    crok->AI()->Talk(SAY_CROK_COMBAT_SVALNA);
-                    crok->SetReactState(REACT_AGGRESSIVE);
-                }
-                DoCastSelf(SPELL_DIVINE_SURGE, true);
-                me->setActive(true);
-                events.ScheduleEvent(EVENT_SVALNA_COMBAT, 9000);
-                events.ScheduleEvent(EVENT_IMPALING_SPEAR, urand(40000, 50000));
-                events.ScheduleEvent(EVENT_AETHER_SHIELD, urand(100000, 110000));
             }
 
             void KilledUnit(Unit* victim) override
@@ -824,13 +809,6 @@ class boss_sister_svalna : public CreatureScript
                 }
             }
 
-            void JustReachedHome() override
-            {
-                _JustReachedHome();                
-                me->SetDisableGravity(false);
-                me->SetHover(false);
-            }
-
             void DoAction(int32 action) override
             {
                 switch (action)
@@ -839,14 +817,10 @@ class boss_sister_svalna : public CreatureScript
                         me->CastCustomSpell(SPELL_CARESS_OF_DEATH, SPELLVALUE_MAX_TARGETS, 1, me, true);
                         break;
                     case ACTION_START_GAUNTLET:
-                        me->setActive(true);
-                        _isEventInProgress = true;
                         me->SetImmuneToAll(true);
                         events.ScheduleEvent(EVENT_SVALNA_START, 25000);
                         break;
                     case ACTION_RESURRECT_CAPTAINS:
-                        _isEventInProgress = true;
-                        me->setActive(true);
                         events.ScheduleEvent(EVENT_SVALNA_RESURRECT, 7000);
                         for (uint32 i = 0; i < 4; ++i)
                             if (Creature* crusader = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
@@ -856,7 +830,6 @@ class boss_sister_svalna : public CreatureScript
                         Talk(SAY_SVALNA_CAPTAIN_DEATH);
                         break;
                     case ACTION_RESET_EVENT:
-                        me->setActive(false);
                         Reset();
                         break;
                     default:
@@ -871,16 +844,6 @@ class boss_sister_svalna : public CreatureScript
                     me->RemoveAurasDueToSpell(SPELL_AETHER_SHIELD);
                     Talk(EMOTE_SVALNA_BROKEN_SHIELD, caster);
                 }
-            }
-
-            void MovementInform(uint32 type, uint32 id) override
-            {
-                if (type != EFFECT_MOTION_TYPE || id != POINT_LAND)
-                    return;
-
-                me->SetImmuneToAll(false);
-                me->SetDisableGravity(false);
-                me->SetHover(false);
             }
 
             void SpellHitTarget(Unit* target, SpellInfo const* spell) override
@@ -905,7 +868,7 @@ class boss_sister_svalna : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (!me || !me->IsAlive() || !_isEventInProgress)
+                if (!me || !me->IsAlive())
                     return;
 
                 events.Update(diff);
@@ -923,36 +886,44 @@ class boss_sister_svalna : public CreatureScript
                         case EVENT_SVALNA_RESURRECT:
                             Talk(SAY_SVALNA_RESURRECT_CAPTAINS);
                             me->CastSpell(me, SPELL_REVIVE_CHAMPION, false);
+                            events.ScheduleEvent(EVENT_SVALNA_COMBAT, urand(7000, 10000));
                             break;
                         case EVENT_SVALNA_COMBAT:
-                            me->setActive(true);
+                            me->SetImmuneToAll(false);
+                            me->SetDisableGravity(false);
+                            me->SetHover(false);
                             me->SetReactState(REACT_AGGRESSIVE);
-                            me->GetMotionMaster()->Clear();
-                            if (Unit* nearTarget = me->SelectNearestTarget(40.0f))
-                                ScriptedAI::AttackStart(nearTarget);
+
+                            DoZoneInCombat();
                             Talk(SAY_SVALNA_AGGRO);
+
+                            if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
+                            {
+                                crok->AI()->Talk(SAY_CROK_COMBAT_SVALNA);
+                                crok->SetReactState(REACT_AGGRESSIVE);
+                            }
+                            DoCastSelf(SPELL_DIVINE_SURGE, true);         
+
+                            events.ScheduleEvent(EVENT_IMPALING_SPEAR, urand(6000, 7000));                            
+                            events.ScheduleEvent(EVENT_AETHER_SHIELD, urand(5000, 6000));
                             break;
                         case EVENT_IMPALING_SPEAR:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, true, -SPELL_IMPALING_SPEAR))
-                            {
-                                DoCast(me, SPELL_AETHER_SHIELD);
                                 DoCast(target, SPELL_IMPALING_SPEAR);
-                            }
+
                             events.ScheduleEvent(EVENT_IMPALING_SPEAR, urand(20000, 25000));
+                            break;
+                        case EVENT_AETHER_SHIELD:
+                            DoCastSelf(SPELL_AETHER_SHIELD, true);
+                            events.ScheduleEvent(EVENT_AETHER_SHIELD, urand(100000, 110000));
                             break;
                         default:
                             break;
                     }
-
-                    if (me->HasUnitState(UNIT_STATE_CASTING))
-                        return;
                 }
 
                 DoMeleeAttackIfReady();
             }
-
-        private:
-            bool _isEventInProgress;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
