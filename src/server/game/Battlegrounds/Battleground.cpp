@@ -705,22 +705,18 @@ void Battleground::RewardReputationToTeam(uint32 a_faction_id, uint32 h_faction_
             if (itr->second.OfflineRemoveTime)
                  continue;
             
-            Player* player = ObjectAccessor::FindPlayer(itr->first);
-            
-            if (!player)
+            if (Player* player = ObjectAccessor::FindPlayer(itr->first))
             {
-                TC_LOG_ERROR("bg.battleground", "BattleGround:RewardReputationToTeam: %u not found!", itr->first);
-                continue;
+                uint32 team = player->GetTeam();
+                if (team == TeamID)
+                    if (_GetPlayerForTeam(TeamID, itr, "RewardReputationToTeam"))
+                    {
+                        uint32 repGain = Reputation;
+                        AddPct(repGain, player->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
+                        AddPct(repGain, player->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, player->GetCFSTeam() == ALLIANCE ? a_faction_id : h_faction_id));
+                        player->GetReputationMgr().ModifyReputation(player->GetCFSTeam() == ALLIANCE ? a_factionEntry : h_factionEntry, repGain);
+                    }
             }
-            uint32 team = player->GetTeam();
-            if (team == TeamID)                
-                if (Player* player = _GetPlayerForTeam(TeamID, itr, "RewardReputationToTeam"))
-                {
-                    uint32 repGain = Reputation;
-                    AddPct(repGain, player->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
-                    AddPct(repGain, player->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, player->GetCFSTeam() == ALLIANCE ? a_faction_id : h_faction_id));
-                    player->GetReputationMgr().ModifyReputation(player->GetCFSTeam() == ALLIANCE ? a_factionEntry : h_factionEntry, repGain);
-                }
         }
     }
 }
