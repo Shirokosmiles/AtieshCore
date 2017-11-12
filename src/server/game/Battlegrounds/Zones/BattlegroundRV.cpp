@@ -132,6 +132,12 @@ bool BattlegroundRV::SetupBattleground()
         || !AddObject(BG_RV_OBJECT_PILAR_3, BG_RV_OBJECT_TYPE_PILAR_3, 763.611145f, -261.856750f, 25.909504f, 0.000000f, 0, 0, 0, RESPAWN_IMMEDIATELY)
         || !AddObject(BG_RV_OBJECT_PILAR_4, BG_RV_OBJECT_TYPE_PILAR_4, 802.211609f, -284.493256f, 24.648525f, 0.000000f, 0, 0, 0, RESPAWN_IMMEDIATELY)
 
+    // Fake Pilars
+        || !AddObject(BG_RV_OBJECT_PILAR_FAKE_1, BG_RV_OBJECT_TYPE_PILAR_1, 763.632385f, -306.162384f, 25.909504f, 3.141593f, 0, 0, 0, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_RV_OBJECT_PILAR_FAKE_2, BG_RV_OBJECT_TYPE_PILAR_2, 723.644287f, -284.493256f, 24.648525f, 3.141593f, 0, 0, 0, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_RV_OBJECT_PILAR_FAKE_3, BG_RV_OBJECT_TYPE_PILAR_3, 763.611145f, -261.856750f, 25.909504f, 0.000000f, 0, 0, 0, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_RV_OBJECT_PILAR_FAKE_4, BG_RV_OBJECT_TYPE_PILAR_4, 802.211609f, -284.493256f, 24.648525f, 0.000000f, 0, 0, 0, RESPAWN_IMMEDIATELY)
+
     // Pilars Collision
         || !AddObject(BG_RV_OBJECT_PILAR_COLLISION_1, BG_RV_OBJECT_TYPE_PILAR_COLLISION_1, 763.632385f, -306.162384f, 30.639660f, 3.141593f, 0, 0, 0, RESPAWN_IMMEDIATELY)
         || !AddObject(BG_RV_OBJECT_PILAR_COLLISION_2, BG_RV_OBJECT_TYPE_PILAR_COLLISION_2, 723.644287f, -284.493256f, 32.382710f, 0.000000f, 0, 0, 0, RESPAWN_IMMEDIATELY)
@@ -159,42 +165,23 @@ void BattlegroundRV::TogglePillarCollision()
         {
             if (i >= BG_RV_OBJECT_PILAR_COLLISION_1)
             {
-                GOState state;
                 switch (i)
                 {
                     case BG_RV_OBJECT_PILAR_COLLISION_1:
-                        state = GetBGObject(BG_RV_OBJECT_PILAR_1)->GetGoState();
-                        if (state == GO_STATE_ACTIVE)
-                            state = GO_STATE_READY;
-                        else if (state == GO_STATE_READY)
-                            state = GO_STATE_ACTIVE;
+                        (GetBGObject(BG_RV_OBJECT_PILAR_1)->GetGoState() == GO_STATE_ACTIVE) ? DoorClose(i) : DoorOpen(i);
                         break;
                     case BG_RV_OBJECT_PILAR_COLLISION_2:
-                        state = GetBGObject(BG_RV_OBJECT_PILAR_2)->GetGoState();
-                        if (state == GO_STATE_ACTIVE)
-                            state = GO_STATE_READY;
-                        else if (state == GO_STATE_READY)
-                            state = GO_STATE_ACTIVE;
+                        (GetBGObject(BG_RV_OBJECT_PILAR_2)->GetGoState() == GO_STATE_ACTIVE) ? DoorClose(i) : DoorOpen(i);
                         break;
                     case BG_RV_OBJECT_PILAR_COLLISION_3:
-                        state = GetBGObject(BG_RV_OBJECT_PILAR_3)->GetGoState(); 
-                        if (state == GO_STATE_ACTIVE)
-                            state = GO_STATE_READY;
-                        else if (state == GO_STATE_READY)
-                            state = GO_STATE_ACTIVE;
+                        (GetBGObject(BG_RV_OBJECT_PILAR_3)->GetGoState() == GO_STATE_ACTIVE) ? DoorClose(i) : DoorOpen(i);
                         break;
                     case BG_RV_OBJECT_PILAR_COLLISION_4:
-                        state = GetBGObject(BG_RV_OBJECT_PILAR_4)->GetGoState();
-                        if (state == GO_STATE_ACTIVE)
-                            state = GO_STATE_READY;
-                        else if (state == GO_STATE_READY)
-                            state = GO_STATE_ACTIVE;
+                        (GetBGObject(BG_RV_OBJECT_PILAR_4)->GetGoState() == GO_STATE_ACTIVE) ? DoorClose(i) : DoorOpen(i);
                         break;
                     default:
                         break;
                 }
-                
-                go->SetGoState(state);
             }
 
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
