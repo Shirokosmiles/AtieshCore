@@ -169,5 +169,8 @@ void BattlegroundRV::TogglePillarCollision()
         }
     }
 
+    for (uint8 i = BG_RV_OBJECT_FIRE_1; i <= BG_RV_OBJECT_FIREDOOR_2; ++i)
+        _pillarCollision ? DoorOpen(i) : DoorClose(i);
+
     _pillarCollision = !_pillarCollision;
 }
