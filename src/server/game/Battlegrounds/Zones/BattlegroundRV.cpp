@@ -164,15 +164,31 @@ void BattlegroundRV::TogglePillarCollision()
                 {
                     case BG_RV_OBJECT_PILAR_COLLISION_1:
                         state = GetBGObject(BG_RV_OBJECT_PILAR_1)->GetGoState();
+                        if (state == GO_STATE_ACTIVE)
+                            state = GO_STATE_READY;
+                        else if (state == GO_STATE_READY)
+                            state = GO_STATE_ACTIVE;
                         break;
                     case BG_RV_OBJECT_PILAR_COLLISION_2:
                         state = GetBGObject(BG_RV_OBJECT_PILAR_2)->GetGoState();
+                        if (state == GO_STATE_ACTIVE)
+                            state = GO_STATE_READY;
+                        else if (state == GO_STATE_READY)
+                            state = GO_STATE_ACTIVE;
                         break;
                     case BG_RV_OBJECT_PILAR_COLLISION_3:
-                        state = GetBGObject(BG_RV_OBJECT_PILAR_3)->GetGoState();
+                        state = GetBGObject(BG_RV_OBJECT_PILAR_3)->GetGoState(); 
+                        if (state == GO_STATE_ACTIVE)
+                            state = GO_STATE_READY;
+                        else if (state == GO_STATE_READY)
+                            state = GO_STATE_ACTIVE;
                         break;
                     case BG_RV_OBJECT_PILAR_COLLISION_4:
                         state = GetBGObject(BG_RV_OBJECT_PILAR_4)->GetGoState();
+                        if (state == GO_STATE_ACTIVE)
+                            state = GO_STATE_READY;
+                        else if (state == GO_STATE_READY)
+                            state = GO_STATE_ACTIVE;
                         break;
                     default:
                         break;
