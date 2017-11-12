@@ -2809,8 +2809,6 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
         }
         return;
     }
-    if (!itemTarget)
-        return;
 
     uint32 enchant_id = m_spellInfo->Effects[effIndex].MiscValue;
 
