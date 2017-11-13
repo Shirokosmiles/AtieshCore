@@ -376,14 +376,19 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                 {
                     transport->AddPassenger(plrMover);
                     if (crMover && !transport->isPassenger(crMover))
+                    {
+                        if (crMover->GetTransport()) // remove pet from transport if owner hasn't transport but pet has (it's strange, but keep this safe check)
+                            crMover->GetTransport()->RemovePassenger(crMover);
+
                         transport->AddPassenger(crMover);
+                    }
                 }
             }
             else if (plrMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
             {
                 plrMover->SetSkipOnePacketForASH(true);
                 plrMover->GetTransport()->RemovePassenger(plrMover);
-                if (crMover->GetTransport())
+                if (crMover && crMover->GetTransport())
                     crMover->GetTransport()->RemovePassenger(crMover);
 
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
