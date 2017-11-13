@@ -293,10 +293,11 @@ public:
             cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
             zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMap);
 
-        if (Player* plr = object->ToPlayer())
+        if (Player* plr = object->ToPlayer()) // for OffSet coords on Elevators (not transport)
         {
-            handler->PSendSysMessage(LANG_TRANSOFFSET_POSITION,
-                plr->GetTransOffsetX(), plr->GetTransOffsetY(), plr->GetTransOffsetZ(), plr->GetTransOffsetO());
+            if (!plr->GetTransport() && plr->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+                handler->PSendSysMessage(LANG_TRANSOFFSET_POSITION,
+                    plr->GetTransOffsetX(), plr->GetTransOffsetY(), plr->GetTransOffsetZ(), plr->GetTransOffsetO());
         }
 
         LiquidData liquidStatus;
