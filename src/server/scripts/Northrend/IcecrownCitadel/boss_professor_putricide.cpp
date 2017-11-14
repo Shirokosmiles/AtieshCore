@@ -732,10 +732,13 @@ class npc_putricide_oozeAI : public ScriptedAI
         npc_putricide_oozeAI(Creature* creature, uint32 auraSpellId, uint32 hitTargetSpellId) : ScriptedAI(creature),
             _auraSpellId(auraSpellId), _hitTargetSpellId(hitTargetSpellId), _newTargetSelectTimer(0), _instance(creature->GetInstanceScript()) { }
 
-        void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (!_newTargetSelectTimer && spell->Id == sSpellMgr->GetSpellIdForDifficulty(_hitTargetSpellId, me))
                 _newTargetSelectTimer = 1000;
+
+            if (!target || !target->IsAlive())
+                _newTargetSelectTimer = 0;
         }
 
         void Reset() override
