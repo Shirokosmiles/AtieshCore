@@ -117,12 +117,20 @@ public:
                         Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
                         Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
 						Cell::VisitAllObjects(me, searcher, 30.0f);
-                        for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                            if ((*iter)->HasAura(SPELL_DK_SUMMON_GARGOYLE_1, ownerGuid))
-                            {
-                                victim = (*iter)->GetGUID();
-                                break;
-                            }
+                        if (!targets.empty())
+                        {
+                            for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                                if ((*iter)->HasAura(SPELL_DK_SUMMON_GARGOYLE_1, ownerGuid))
+                                {
+                                    victim = (*iter)->GetGUID();
+                                    break;
+                                }
+                        }
+                        else
+                        {
+                            _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 100);
+                            break;
+                        }
 
                         Unit* target = ObjectAccessor::GetUnit(*me, victim);
 
