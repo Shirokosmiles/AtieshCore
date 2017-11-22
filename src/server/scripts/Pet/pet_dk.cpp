@@ -100,10 +100,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!me->IsAlive())
+            if (!me || !me->IsAlive())
                 return;
-
-            CasterAI::UpdateAI(diff);
+            
             _events.Update(diff);
 
             while (uint32 _eventId = _events.ExecuteEvent())
@@ -200,6 +199,8 @@ public:
                         break;
                 }
             }
+
+            CasterAI::UpdateAI(diff);
         }
 
         void JustDied(Unit* /*killer*/) override
