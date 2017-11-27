@@ -13922,6 +13922,10 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
 
     ASSERT(!m_vehicle);
     (void)vehicle->AddPassenger(this, seatId);
+
+    if (Unit* unitv = vehicle->GetBase())
+        if (unitv->GetMotionMaster()->GetCurrentMovementGeneratorType() == RANDOM_MOTION_TYPE)
+            unitv->PauseMovement(0, MOTION_SLOT_ACTIVE, false);
 }
 
 void Unit::ChangeSeat(int8 seatId, bool next)
@@ -14044,6 +14048,10 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         else
             ToTempSummon()->UnSummon(2000); // Approximation
     }
+
+    if (vehicle)
+        if (Unit* unitv = vehicle->GetBase())
+            unitv->ResumeMovement(0, MOTION_SLOT_ACTIVE);
 }
 
 void Unit::BuildMovementPacket(ByteBuffer *data) const
