@@ -205,6 +205,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
+            _events.Reset();
             // Stop Feeding Gargoyle when it dies
             if (Unit* owner = me->GetOwner())
                 owner->RemoveAurasDueToSpell(SPELL_DK_SUMMON_GARGOYLE_2);
