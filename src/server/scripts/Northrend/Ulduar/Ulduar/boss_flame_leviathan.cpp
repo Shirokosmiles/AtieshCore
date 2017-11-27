@@ -1625,7 +1625,7 @@ class FlameLeviathanPursuedTargetSelector
     };
 
     public:
-        explicit FlameLeviathanPursuedTargetSelector(Unit* unit) : _me(unit) { };
+        explicit FlameLeviathanPursuedTargetSelector() { };
 
         bool operator()(WorldObject* target) const
         {
@@ -1655,9 +1655,6 @@ class FlameLeviathanPursuedTargetSelector
 
             return !playerFound;
         }
-
-    private:
-        Unit const* _me;
 };
 
 class spell_pursue : public SpellScriptLoader
@@ -1678,7 +1675,7 @@ class spell_pursue : public SpellScriptLoader
         private:
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(FlameLeviathanPursuedTargetSelector(GetCaster()));
+                targets.remove_if(FlameLeviathanPursuedTargetSelector());
                 if (!targets.empty())
                 {
                     //! In the end, only one target should be selected
