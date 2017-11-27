@@ -13924,8 +13924,8 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
     (void)vehicle->AddPassenger(this, seatId);
 
     if (Unit* unitv = vehicle->GetBase())
-        if (unitv->GetMotionMaster()->GetCurrentMovementGeneratorType() == RANDOM_MOTION_TYPE)
-            unitv->PauseMovement(0, MOTION_SLOT_ACTIVE, false);
+        if (unitv->GetTypeId() == TYPEID_UNIT && unitv->GetMotionMaster()->GetCurrentMovementGeneratorType() == RANDOM_MOTION_TYPE)
+            unitv->PauseMovement(0, MOTION_SLOT_IDLE, false); //random movement such as IDLE slot, not ACTIVE !
 }
 
 void Unit::ChangeSeat(int8 seatId, bool next)
@@ -14051,7 +14051,8 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
     if (vehicle)
         if (Unit* unitv = vehicle->GetBase())
-            unitv->ResumeMovement(0, MOTION_SLOT_ACTIVE);
+            if (unitv->GetTypeId() == TYPEID_UNIT)
+                unitv->ResumeMovement(0, MOTION_SLOT_IDLE); //random movement such as IDLE slot, not ACTIVE !
 }
 
 void Unit::BuildMovementPacket(ByteBuffer *data) const
