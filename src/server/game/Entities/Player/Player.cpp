@@ -26916,7 +26916,7 @@ bool Player::CheckOnFlyHack()
     if (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
         float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ() + 1.8f, true); // smart flyhacks -> SimpleFly
-        if (pz - z > 2.8f)
+        if (pz - z > 4.8f)
             if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), z))
             {
                 MovePositionToFirstCollision(npos, 2.5f, GetOrientation() + M_PI);
