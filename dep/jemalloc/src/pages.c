@@ -256,8 +256,7 @@ pages_purge_lazy(void *addr, size_t size) {
 #ifdef _WIN32
 	VirtualAlloc(addr, size, MEM_RESET, PAGE_READWRITE);
 	return false;
-#elif defined(JEMALLOC_PURGE_MADVISE_FREE) && \
-    !defined(PAGES_CAN_PURGE_LAZY)
+#elif defined(JEMALLOC_PURGE_MADVISE_FREE)
     return (madvise(addr, size, MADV_FREE) != 0);
 #elif defined(JEMALLOC_PURGE_MADVISE_DONTNEED) && \
     !defined(JEMALLOC_PURGE_MADVISE_DONTNEED_ZEROS)
