@@ -1698,6 +1698,8 @@ uint8 Player::GetChatTag() const
 
 bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options)
 {
+    SetSkipOnePacketForASH(true); // for except kick by antispeedhack
+
     if (!MapManager::IsValidMapCoord(mapid, x, y, z, orientation))
     {
         TC_LOG_ERROR("maps", "Player::TeleportTo: Invalid map (%d) or invalid coordinates (X: %f, Y: %f, Z: %f, O: %f) given when teleporting player '%s' (%s, MapID: %d, X: %f, Y: %f, Z: %f, O: %f).",
@@ -1746,8 +1748,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
     // reset movement flags at teleport, because player will continue move with these flags after teleport
     SetUnitMovementFlags(GetUnitMovementFlags() & MOVEMENTFLAG_MASK_HAS_PLAYER_STATUS_OPCODE);
-    DisableSpline();
-    SetSkipOnePacketForASH(true); // for except kick by antispeedhack
+    DisableSpline();    
 
     if (Transport* transport = GetTransport())
     {
