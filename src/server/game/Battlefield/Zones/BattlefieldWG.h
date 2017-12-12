@@ -456,11 +456,11 @@ class TC_GAME_API BattlefieldWintergrasp : public Battlefield
         WintergraspGraveyardId GetSpiritGraveyardId(uint32 areaId) const;
 
     private:
-        void ApplyBuff(Unit* target, bool type) const;
-
         WintergraspBuilding* GetBuilding(uint32 entry) const;
         WintergraspBuilding* GetBuilding(ObjectGuid guid) const;
         WintergraspWorkshop* GetWorkshop(WintergraspWorkshopId id) const;
+
+        void ApplyTenacity(Unit* target, bool vehicle = false);
 
         WorkshopSet _workshopSet;
         BuildingSet _buildingSet;
