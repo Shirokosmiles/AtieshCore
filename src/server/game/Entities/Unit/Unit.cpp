@@ -14973,7 +14973,7 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
 void Unit::UpdateMovementInfo(MovementInfo const& movementInfo)
 {
     SetLastMoveClientTimestamp(movementInfo.time);
-    SetLastMoveServerTimestamp(getMSTime());
+    SetLastMoveServerTimestamp(getsysTime());
 }
 
 bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)

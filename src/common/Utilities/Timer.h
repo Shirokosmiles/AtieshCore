@@ -31,6 +31,15 @@ inline uint32 getMSTime()
     return uint32(duration_cast<milliseconds>(steady_clock::now() - ApplicationStartTime).count());
 }
 
+inline uint32 getsysTime()
+{
+    using namespace std::chrono;
+
+    static const system_clock::time_point ApplicationStartTime = system_clock::now();
+
+    return uint32(duration_cast<milliseconds>(system_clock::now() - ApplicationStartTime).count());
+}
+
 inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
 {
     // getMSTime() have limited data range and this is case when it overflow in this tick
