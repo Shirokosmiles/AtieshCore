@@ -15027,21 +15027,24 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         else
             return true;
 
-        float stime = GetLastMoveServerTimestamp();
+        float stime, distance, movetime, realping, ping, speed, delaysentrecieve, delay, difftime, normaldistance;
+
+        stime = GetLastMoveServerTimestamp();
+
         Position npos = movementInfo.pos;
-        float distance = GetExactDist2d(npos);
-        float movetime = movementInfo.time;
-        float realping = GetPlayerMovingMe()->GetSession()->GetLatency();
-        float ping = realping;
+        distance = GetExactDist2d(npos);
+        movetime = movementInfo.time;
+        realping = GetPlayerMovingMe()->GetSession()->GetLatency();
+        ping = realping;
         if (ping < 60.0f)
             ping = 60.0f;
-        float speed = GetSpeed(MOVE_RUN);
+        speed = GetSpeed(MOVE_RUN);
         if (IsFlying() || GetPlayerMovingMe()->CanFly())
             speed = GetSpeed(MOVE_FLIGHT);
-        float delaysentrecieve = (ctime - stime) / 10000000000;
-        float delay = (stime - movementInfo.time) / 10000000000 + (ping * 0.001f) + delaysentrecieve;
-        float difftime = (movetime - ctime) * 0.001f + delay;
-        float normaldistance = speed * difftime + 0.1f;
+        delaysentrecieve = (ctime - stime) / 10000000000; // previous delay between sent and receive pkt
+        delay = (stime - movementInfo.time) / 10000000000 + (ping * 0.001f) + delaysentrecieve; // delay between sent and rcv current pkt
+        difftime = (movetime - ctime) * 0.001f + delay; // difftime for set max normal (available) distance
+        normaldistance = speed * difftime + 0.1f;
         if (distance < normaldistance)
             return true;
 
