@@ -1793,10 +1793,8 @@ public:
                 }
             }
 
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
+            if (IsActiveAttacker() && UpdateVictim())
+                DoMeleeAttackIfReady();
         }
 
         void WaypointReached(uint32 waypointId, uint32 /*pathId*/) override

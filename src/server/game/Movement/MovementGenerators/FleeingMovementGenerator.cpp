@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "FleeingMovementGenerator.h"
 #include "VMapFactory.h"
 #include "CreatureAI.h"
 #include "ObjectAccessor.h"
@@ -24,7 +25,6 @@
 #include "PathGenerator.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
-#include "FleeingMovementGenerator.h"
 #include "VMapFactory.h"
 #include "Map.h"
 
