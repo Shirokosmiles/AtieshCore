@@ -14973,7 +14973,7 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
 void Unit::UpdateMovementInfo(MovementInfo const& movementInfo)
 {
     SetLastMoveClientTimestamp(movementInfo.time);
-    SetLastMoveServerTimestamp(getsysTime());
+    SetLastMoveServerTimestamp(GameTime::GetGameTimeMS());
 }
 
 bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
@@ -14981,8 +14981,8 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
     if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_SPEEDHACK_ENABLED))
         return true;
 
-    float time = GetLastMoveClientTimestamp();
-    if (time)
+    float ctime = GetLastMoveClientTimestamp();
+    if (ctime)
     {
         if (IsFalling() || IsInFlight())
             return true;
@@ -15010,6 +15010,7 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         else
             return true;
 
+        float stime = GetLastMoveServerTimestamp();
         Position npos = movementInfo.pos;
         float distance = GetExactDist2d(npos);
         float movetime = movementInfo.time;
@@ -15020,9 +15021,9 @@ bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
         float speed = GetSpeed(MOVE_RUN);
         if (IsFlying() || GetPlayerMovingMe()->CanFly())
             speed = GetSpeed(MOVE_FLIGHT);
-        float delaysentrecieve = (time - GetLastMoveServerTimestamp()) / 10000000000;
-        float delay = (getMSTime() - movementInfo.time) / 10000000000 + (ping * 0.001f) + delaysentrecieve;        
-        float difftime = (movetime - time) * 0.001f + delay;
+        float delaysentrecieve = (ctime - stime) / 10000000000;
+        float delay = (stime - movementInfo.time) / 10000000000 + (ping * 0.001f) + delaysentrecieve;
+        float difftime = (movetime - ctime) * 0.001f + delay;
         float normaldistance = speed * difftime + 0.1f;
         if (distance < normaldistance)
             return true;
