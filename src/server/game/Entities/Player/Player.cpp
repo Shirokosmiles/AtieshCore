@@ -26965,18 +26965,22 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo)
 
         uint32 oldstime = GetLastMoveServerTimestamp();
         uint32 stime = GameTime::GetGameTimeMS();
-
+        uint32 ping, realping;
         Position npos = movementInfo.pos;
         distance = GetExactDist2d(npos);
         movetime = movementInfo.time;
-        
+        realping = GetSession()->GetLatency();
+        ping = realping;
+        if (ping < 60)
+            ping = 60;
+
         speed = GetSpeed(MOVE_RUN);
         if (IsFlying() || GetPlayerMovingMe()->CanFly())
             speed = GetSpeed(MOVE_FLIGHT);
 
         delaysentrecieve = (ctime - oldstime) / 10000000000;
         delay = (movetime - stime) / 10000000000 + delaysentrecieve;
-        difftime = (movetime - ctime) * 0.001f + delay;
+        difftime = (movetime - ctime + ping) * 0.001f + delay;
         normaldistance = speed * difftime; // if movetime faked and lower, difftime should be with "-"
 
         if (distance < normaldistance)
@@ -26990,13 +26994,15 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo)
         TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldY = %f", y);
         TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  newX = %f", npos.GetPositionX());
         TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  newY = %f", npos.GetPositionY());
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  distance = %f", distance);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  packet distance = %f", normaldistance);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  packetdistance = %f", distance);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  available distance = %f", normaldistance);
         TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  movetime = %f", movetime);
         TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  delay sent ptk - recieve pkt (previous) = %f", delaysentrecieve);
         TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  FullDelay = %f", delay);
         TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  difftime = %f", difftime);
-
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  real ping = %u", realping);
+        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  Fping = %u", ping);
+        
         sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, GetName().c_str(), normaldistance, distance);
     }
     else
