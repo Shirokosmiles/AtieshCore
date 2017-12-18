@@ -531,7 +531,10 @@ bool Creature::InitEntry(uint32 entry, CreatureData const* data /*= nullptr*/)
 
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, cinfo->HoverHeight);
 
-    SetCanDualWield(cinfo->flags_extra & CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK);
+    bool dualw = false;
+    if (cinfo->flags_extra & CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK)
+        dualw = true;
+    SetCanDualWield(dualw);
 
     // checked at loading
     m_defaultMovementType = MovementGeneratorType(data ? data->movementType : cinfo->MovementType);
@@ -577,7 +580,10 @@ bool Creature::UpdateEntry(uint32 entry, CreatureData const* data /*= nullptr*/,
 
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynamicflags);
 
-    SetCanDualWield(cInfo->flags_extra & CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK);
+    bool dualw = false;
+    if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK)
+        dualw = true;
+    SetCanDualWield(dualw);
 
     SetAttackTime(BASE_ATTACK,   cInfo->BaseAttackTime);
     SetAttackTime(OFF_ATTACK,    cInfo->BaseAttackTime);

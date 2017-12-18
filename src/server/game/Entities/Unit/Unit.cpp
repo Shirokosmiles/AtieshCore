@@ -300,9 +300,6 @@ Unit::Unit(bool isWorldObject) :
     m_extraAttacks = 0;
     m_canDualWield = false;
 
-    lastMoveClientTimestamp = 0;
-    lastMoveServerTimestamp = 0;
-
     m_rootTimes = 0;
 
     m_state = 0;
@@ -14985,90 +14982,4 @@ float Unit::GetCollisionHeight() const
     CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
 
     return scaleMod * modelData->CollisionHeight;
-}
-
-void Unit::UpdateMovementInfo(MovementInfo const& movementInfo)
-{
-    SetLastMoveClientTimestamp(movementInfo.time);
-    SetLastMoveServerTimestamp(GameTime::GetGameTimeMS());
-}
-
-bool Unit::CheckMovementInfo(MovementInfo const& movementInfo)
-{
-    if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_SPEEDHACK_ENABLED))
-        return true;
-
-    float ctime = GetLastMoveClientTimestamp();
-    if (ctime)
-    {
-        if (IsFalling() || IsInFlight())
-            return true;
-
-        if (GetTransport())
-            return true;
-
-        if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
-            return true;
-
-        if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
-            return true;
-
-        if (GetPlayerMovingMe())
-        {
-            if (GetPlayerMovingMe()->UnderACKmount())
-                return true;
-
-            if (GetPlayerMovingMe()->IsSkipOnePacketForASH())
-            {
-                GetPlayerMovingMe()->SetSkipOnePacketForASH(false);
-                return true;
-            }
-        }
-        else
-            return true;
-
-        float stime, distance, movetime, realping, ping, speed, delaysentrecieve, delay, difftime, normaldistance;
-
-        stime = GetLastMoveServerTimestamp();
-
-        Position npos = movementInfo.pos;
-        distance = GetExactDist2d(npos);
-        movetime = movementInfo.time;
-        realping = GetPlayerMovingMe()->GetSession()->GetLatency();
-        ping = realping;
-        if (ping < 60.0f)
-            ping = 60.0f;
-        speed = GetSpeed(MOVE_RUN);
-        if (IsFlying() || GetPlayerMovingMe()->CanFly())
-            speed = GetSpeed(MOVE_FLIGHT);
-        delaysentrecieve = (ctime - stime) / 10000000000; // previous delay between sent and receive pkt
-        delay = (stime - movementInfo.time) / 10000000000 + (ping * 0.001f) + delaysentrecieve; // delay between sent and rcv current pkt
-        difftime = (movetime - ctime) * 0.001f + delay; // difftime for set max normal (available) distance
-        normaldistance = speed * difftime + 0.1f;
-        if (distance < normaldistance)
-            return true;
-
-        float x, y;
-        GetPosition(x, y);
-
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  SpeedHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-        TC_LOG_INFO("anticheat", "Unit::========================================================");
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldX = %f", x);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldY = %f", y);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  newX = %f", npos.GetPositionX());
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  newY = %f", npos.GetPositionY());
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  distance = %f", distance);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  normal distance = %f", normaldistance);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  movetime = %f", movetime);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  delay sent ptk - recieve pkt (previous) = %f", delaysentrecieve);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  difftime = %f", difftime);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  ClientTimeDelay = %f", delay);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  Ping = %f", realping);
-
-        sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, GetPlayerMovingMe()->GetName().c_str(), normaldistance, distance);
-    }
-    else
-        return true;
-
-    return false;
 }

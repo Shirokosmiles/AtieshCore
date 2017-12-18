@@ -1910,10 +1910,6 @@ class TC_GAME_API Unit : public WorldObject
         void _ExitVehicle(Position const* exitPosition = nullptr);
         void _EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* aurApp = nullptr);
 
-        // should only be used by packet handlers to validate and apply incoming MovementInfos from clients. Do not use internally to modify m_movementInfo
-        void UpdateMovementInfo(MovementInfo const& movementInfo);
-        bool CheckMovementInfo(MovementInfo const& movementInfo);
-
         void BuildMovementPacket(ByteBuffer* data) const;
         static void BuildMovementPacket(Position const& pos, Position const& transportPos, MovementInfo const& movementInfo, ByteBuffer* data);
 
@@ -1926,11 +1922,6 @@ class TC_GAME_API Unit : public WorldObject
         void SetIsJumping(bool jump) { _isJumping = jump; }
 
         virtual bool CanSwim() const;
-
-        void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }
-        void SetLastMoveServerTimestamp(uint32 timestamp) { lastMoveServerTimestamp = timestamp; }
-        uint32 GetLastMoveClientTimestamp() const { return lastMoveClientTimestamp; }
-        uint32 GetLastMoveServerTimestamp() const { return lastMoveServerTimestamp; }
 
         void RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker);
 
@@ -2069,12 +2060,6 @@ class TC_GAME_API Unit : public WorldObject
         void SetConfused(bool apply);
         void SetStunned(bool apply);
         void SetRooted(bool apply);
-
-        /* Player Movement fields START*/
-        // Timestamp on client clock of the moment the most recently processed movement packet was SENT by the client
-        uint32 lastMoveClientTimestamp;        
-        // Timestamp on server clock of the moment the most recently processed movement packet was RECEIVED from the client
-        uint32 lastMoveServerTimestamp;
 
         uint32 m_rootTimes;
 

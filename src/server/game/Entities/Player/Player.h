@@ -977,6 +977,15 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         bool CheckOnFlyHack();
 
+        // should only be used by packet handlers to validate and apply incoming MovementInfos from clients. Do not use internally to modify m_movementInfo
+        void UpdateMovementInfo(MovementInfo const& movementInfo);
+        bool CheckMovementInfo(MovementInfo const& movementInfo);
+
+        void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }
+        void SetLastMoveServerTimestamp(uint32 timestamp) { lastMoveServerTimestamp = timestamp; }
+        uint32 GetLastMoveClientTimestamp() const { return lastMoveClientTimestamp; }
+        uint32 GetLastMoveServerTimestamp() const { return lastMoveServerTimestamp; }
+
         PlayerTaxi m_taxi;
         void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getCFSRace(), getClass(), getLevel()); }
         bool ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc = nullptr, uint32 spellid = 0);
@@ -2543,6 +2552,12 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 m_FakeRace;
         uint8 m_RealRace;
         uint32 m_FakeMorph;
+
+        /* Player Movement fields START*/
+        // Timestamp on client clock of the moment the most recently processed movement packet was SENT by the client
+        uint32 lastMoveClientTimestamp;
+        // Timestamp on server clock of the moment the most recently processed movement packet was RECEIVED from the client
+        uint32 lastMoveServerTimestamp;
 
         WorldLocation _corpseLocation;
 };

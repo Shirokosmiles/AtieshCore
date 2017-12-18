@@ -444,14 +444,15 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     /* start SpeedHack Detection */
-    if (plrMover && !mover->CheckMovementInfo(movementInfo) && sWorld->getBoolConfig(CONFIG_ASH_KICK_ENABLED))
+    if (plrMover && !plrMover->CheckMovementInfo(movementInfo) && sWorld->getBoolConfig(CONFIG_ASH_KICK_ENABLED))
     {
         plrMover->GetSession()->KickPlayer();
         return;
     }
 
     /* process position-change */
-    mover->UpdateMovementInfo(movementInfo);
+    if (plrMover)
+        plrMover->UpdateMovementInfo(movementInfo);
 
     uint32 mstime = GameTime::GetGameTimeMS();
     /*----------------------*/
