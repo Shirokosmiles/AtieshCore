@@ -466,11 +466,10 @@ void Battlefield::PlayerLeavesQueue(Player* player, bool kick /*= false*/)
         OnPlayerLeaveWar(player);
     }
 
+    player->GetSession()->SendBattlefieldLeaveMessage(_battleId);
     // kick or notify
     if (kick)
-        KickPlayer(player);
-    else
-        player->GetSession()->SendBattlefieldLeaveMessage(_battleId);
+        KickPlayer(player);        
 }
 
 bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
