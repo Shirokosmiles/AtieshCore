@@ -427,8 +427,15 @@ void BattlefieldWintergrasp::OnBattleStart()
         relic->UpdateObjectVisibility(true);
     }
 
-    // spawn keep cannons
-    SpawnGroupSpawn(SPAWNGROUP_WINTERGRASP_KEEP_CANNONS);
+    // update keep cannons visibility and faction
+    for (ObjectGuid cannonGuid : _keepCannonList)
+    {
+        if (Creature* creature = GetCreature(cannonGuid))
+        {
+            ShowCreature(creature, false);
+            creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
+        }
+    }
 
     // update keep teleports faction
     for (ObjectGuid teleportGuid : _teleporterList)
@@ -479,8 +486,12 @@ void BattlefieldWintergrasp::OnBattleEnd(bool endByTimer)
     else // successful attack (note that teams have already been swapped, so defender team is the one who won)
         UpdateData(GetDefenderTeam() == TEAM_HORDE ? DATA_WINTERGRASP_WON_HORDE : DATA_WINTERGRASP_WON_ALLIANCE, 1);
 
-    // despawn keep cannons
-    SpawnGroupDespawn(SPAWNGROUP_WINTERGRASP_KEEP_CANNONS);
+    // update keep cannons visibility
+    for (ObjectGuid cannonGuid : _keepCannonList)
+    {
+        if (Creature* creature = GetCreature(cannonGuid))
+            HideCreature(creature);
+    }
 
     // update keep teleports faction
     for (ObjectGuid teleportGuid : _teleporterList)
@@ -545,6 +556,8 @@ void BattlefieldWintergrasp::OnBattleEnd(bool endByTimer)
                 if (creature->IsVehicle())
                     creature->DespawnOrUnsummon();
         }
+
+        _vehicleSet[team].clear();
     }
 
     if (!endByTimer)
@@ -654,10 +667,22 @@ void BattlefieldWintergrasp::OnCreatureCreate(Creature* creature)
             _stalkerGUID = creature->GetGUID();
             break;
         case NPC_WINTERGRASP_TOWER_CANNON:
-            if (creature->GetSpawnGroupId() == SPAWNGROUP_WINTERGRASP_KEEP_CANNONS)
+            if (creature->GetSpawnId() != 0)
             {
                 _keepCannonList.insert(creature->GetGUID());
-                creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
+                if (IsWarTime() && IsEnabled())
+                {
+                    creature->SetVisible(true);
+                    creature->SetReactState(REACT_PASSIVE);
+                    creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
+                }
+                else
+                {
+                    creature->SetReactState(REACT_PASSIVE);
+                    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    creature->SetVisible(false);
+                }
             }
             break;
         case NPC_DWARVEN_SPIRIT_GUIDE:
@@ -772,15 +797,24 @@ void BattlefieldWintergrasp::OnCreatureRemove(Creature* creature)
             case NPC_WINTERGRASP_SIEGE_ENGINE_HORDE:
             case NPC_WINTERGRASP_CATAPULT:
             case NPC_WINTERGRASP_DEMOLISHER:
-                for (uint32 team = 0; team < PVP_TEAMS_COUNT; ++team)
+                if (IsWarTime() && creature->IsAlive())
                 {
-                    if (_vehicleSet[team].erase(creature->GetGUID()) != 0 && IsWarTime())
-                    {
-                        UpdateData(team == TEAM_HORDE ? DATA_WINTERGRASP_VEHICLE_HORDE : DATA_WINTERGRASP_VEHICLE_ALLIANCE, -1);
-                        UpdateVehicleCountWG();
-                    }
+                    uint8 team;
+                    if (creature->GetFaction() == WintergraspFaction[TEAM_ALLIANCE])
+                        team = TEAM_ALLIANCE;
+                    else if (creature->GetFaction() == WintergraspFaction[TEAM_HORDE])
+                        team = TEAM_HORDE;
+                    else
+                        return;
+
+                    _vehicleSet[team].erase(creature->GetGUID());
+                    if (team == TEAM_HORDE)
+                        UpdateData(DATA_WINTERGRASP_VEHICLE_HORDE, -1);
+                    else
+                        UpdateData(DATA_WINTERGRASP_VEHICLE_ALLIANCE, -1);
+                    UpdateVehicleCountWG();
+                    break;
                 }
-                break;
             default:
                 break;
         }
@@ -911,13 +945,18 @@ void BattlefieldWintergrasp::OnGameObjectRemove(GameObject* gameObject)
 
 void BattlefieldWintergrasp::OnUnitDeath(Unit* unit)
 {
-    if (unit->IsVehicle())
+    if (IsWarTime() && unit->IsVehicle())
     {
         for (uint32 team = 0; team < PVP_TEAMS_COUNT; ++team)
         {
-            if (_vehicleSet[team].erase(unit->GetGUID()) != 0 && IsWarTime())
+            auto itr = _vehicleSet[team].find(unit->GetGUID());
+            if (itr != _vehicleSet[team].end())
             {
-                UpdateData(team == TEAM_HORDE ? DATA_WINTERGRASP_VEHICLE_HORDE : DATA_WINTERGRASP_VEHICLE_ALLIANCE, -1);
+                _vehicleSet[team].erase(itr);
+                if (team == TEAM_HORDE)
+                    UpdateData(DATA_WINTERGRASP_VEHICLE_HORDE, -1);
+                else
+                    UpdateData(DATA_WINTERGRASP_VEHICLE_ALLIANCE, -1);
                 UpdateVehicleCountWG();
             }
         }

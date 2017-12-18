@@ -342,11 +342,6 @@ enum WintergraspQuests
     QUEST_WINTERGRASP_VICTORY_HORDE                 = 13183
 };
 
-enum WintergraspSpawnGroupIds
-{
-    SPAWNGROUP_WINTERGRASP_KEEP_CANNONS = 23
-};
-
 struct WintergraspGraveyardData
 {
     WintergraspGraveyardId Id;
