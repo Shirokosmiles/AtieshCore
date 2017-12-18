@@ -397,23 +397,15 @@ void Battlefield::KickPlayer(Player* player)
     if (!player)
         return;
 
-    BFLeaveReason reason = BF_LEAVE_REASON_UNK1;
+    _playersToKick[player->GetTeamId()].erase(player->GetGUID());
+
+    BFLeaveReason reason = BF_LEAVE_REASON_EXITED;
     if (player->getLevel() < _minPlayerLevel)
         reason = BF_LEAVE_REASON_LOW_LEVEL;
     player->GetSession()->SendBattlefieldLeaveMessage(_battleId, reason);
 
-    _playersToKick[player->GetTeamId()].erase(player->GetGUID());
-
     if (player->GetMapId() == _mapId && player->GetZoneId() == _zoneId)
-    {
-        for (BattlefieldCapturePoint* capturePoint : _capturePoints)
-            capturePoint->HandlePlayerLeave(player);
-        
-        RemovePlayerFromResurrectQueue(player->GetGUID());
-        OnPlayerLeaveZone(player);
-
         player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
-    }
 }
 
 void Battlefield::PlayerAcceptsInviteToQueue(Player* player)
@@ -457,21 +449,20 @@ void Battlefield::PlayerLeavesQueue(Player* player, bool kick /*= false*/)
     if (_players[player->GetTeamId()].find(player->GetGUID()) != _players[player->GetTeamId()].end())
         _players[player->GetTeamId()].erase(player->GetGUID());
 
-    if (IsWarTime())
+    // if the player is participating
+    if (_playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end())
     {
-        // if the player is participating
-        if (_playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end())
-        {
-            _playersInWar[player->GetTeamId()].erase(player->GetGUID());
-            player->GetSession()->SendBattlefieldLeaveMessage(_battleId);
-            if (Group* group = player->GetGroup()) // Remove the player from the raid group
-                group->RemoveMember(player->GetGUID());
-
-            OnPlayerLeaveWar(player);
-        }
+        _playersInWar[player->GetTeamId()].erase(player->GetGUID());
+        if (Group* group = player->GetGroup()) // Remove the player from the raid group
+            group->RemoveMember(player->GetGUID());        
     }
 
     RemovePlayerFromResurrectQueue(player->GetGUID());
+
+    for (BattlefieldCapturePoint* capturePoint : _capturePoints)
+        capturePoint->HandlePlayerLeave(player);
+
+    OnPlayerLeaveWar(player);
 
     // kick or notify
     if (kick)
