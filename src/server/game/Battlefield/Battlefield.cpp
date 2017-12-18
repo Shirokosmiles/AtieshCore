@@ -462,6 +462,10 @@ void Battlefield::PlayerLeavesQueue(Player* player, bool kick /*= false*/)
     if (itr != _playerQueue[player->GetTeamId()].end())
         _playerQueue[player->GetTeamId()].erase(itr);
 
+    // already invited
+    if (_invitedPlayers[player->GetTeamId()].find(player->GetGUID()) != _invitedPlayers[player->GetTeamId()].end())
+        _invitedPlayers[player->GetTeamId()].erase(player->GetGUID());
+
     // kick or notify
     if (kick)
         KickPlayer(player);
