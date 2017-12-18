@@ -437,6 +437,9 @@ void Battlefield::PlayerAcceptsInviteToWar(Player* player)
 
 void Battlefield::PlayerLeavesQueue(Player* player, bool kick /*= false*/)
 {
+    for (BattlefieldCapturePoint* capturePoint : _capturePoints)
+        capturePoint->HandlePlayerLeave(player);
+
     // remove player from queue
     auto itr = std::find(_playerQueue[player->GetTeamId()].begin(), _playerQueue[player->GetTeamId()].end(), player->GetGUID());
     if (itr != _playerQueue[player->GetTeamId()].end())
@@ -458,11 +461,8 @@ void Battlefield::PlayerLeavesQueue(Player* player, bool kick /*= false*/)
     }
 
     RemovePlayerFromResurrectQueue(player->GetGUID());
-
-    for (BattlefieldCapturePoint* capturePoint : _capturePoints)
-        capturePoint->HandlePlayerLeave(player);
-
     OnPlayerLeaveWar(player);
+    OnPlayerLeaveZone(player);
 
     // kick or notify
     if (kick)
