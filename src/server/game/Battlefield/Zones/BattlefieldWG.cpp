@@ -394,6 +394,8 @@ bool BattlefieldWintergrasp::SetupBattlefield()
 
     UpdateVehicleCounter(true);
 
+    OnBattleStart();
+
     return true;
 }
 
