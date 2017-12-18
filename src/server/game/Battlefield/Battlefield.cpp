@@ -19,7 +19,6 @@
 #include "CellImpl.h"
 #include "Creature.h"
 #include "DBCStores.h"
-#include "GameObjectData.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -266,18 +265,14 @@ void Battlefield::InvitePlayersInQueueToWar()
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
-        while (!_playerQueue[team].empty())
+        for (auto itr = _playerQueue[team].begin(); itr != _playerQueue[team].end(); itr = _playerQueue[team].erase(itr))
         {
-            ObjectGuid playerGuid = _playerQueue[team].front();
-            if (Player* player = ObjectAccessor::FindConnectedPlayer(playerGuid))
+            if (Player* player = ObjectAccessor::FindConnectedPlayer(*itr))
             {
                 if (!player || player->InArena() || player->GetBattleground() || player->getLevel() < _minPlayerLevel ||
                     _playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end() || // already in war
                     _invitedPlayers[player->GetTeamId()].find(player->GetGUID()) != _invitedPlayers[player->GetTeamId()].end()) // already invited
-                {
-                    _playerQueue[team].pop_front();
                     continue;
-                }
 
                 // vacant space
                 if (_playersInWar[player->GetTeamId()].size() + _invitedPlayers[player->GetTeamId()].size() >= _maxPlayerCount)
@@ -287,7 +282,6 @@ void Battlefield::InvitePlayersInQueueToWar()
                 _invitedPlayers[player->GetTeamId()][player->GetGUID()] = time(nullptr) + _acceptInviteTime;
                 player->GetSession()->SendBattlefieldInvitePlayerToWar(_battleId, _zoneId, _acceptInviteTime);
             }
-            _playerQueue[team].pop_front();
         }
     }
 }
@@ -526,64 +520,6 @@ void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, ObjectGuid gui
     player->SendDirectMessage(&data);
 }
 
-Creature* Battlefield::SpawnCreature(uint32 entry, Position const& pos)
-{
-    if (!_map)
-        return nullptr;
-
-    Creature* creature = new Creature();
-    if (!creature->Create(_map->GenerateLowGuid<HighGuid::Unit>(), _map, PHASEMASK_NORMAL, entry, pos))
-    {
-        TC_LOG_ERROR("battlefield", "Battlefield::SpawnCreature: can't create creature entry %u", entry);
-        delete creature;
-        return nullptr;
-    }
-
-    creature->SetHomePosition(pos);
-
-    // Add to world
-    _map->LoadGrid(pos.GetPositionX(), pos.GetPositionY());
-    _map->AddToMap(creature);
-
-    return creature;
-}
-
-GameObject* Battlefield::SpawnGameObject(uint32 entry, Position const& pos, QuaternionData const& rot)
-{
-    if (!_map)
-        return nullptr;
-
-    GameObject* go = new GameObject();
-    if (!go->Create(_map->GenerateLowGuid<HighGuid::GameObject>(), entry, _map, PHASEMASK_NORMAL, pos, rot, 255, GO_STATE_READY))
-    {
-        TC_LOG_ERROR("battlefield", "Battlefield::SpawnGameObject: can't create gameobject entry %u", entry);
-        delete go;
-        return nullptr;
-    }
-
-    // Add to world
-    _map->LoadGrid(pos.GetPositionX(), pos.GetPositionY());
-    _map->AddToMap(go);
-
-    return go;
-}
-
-void Battlefield::HideCreature(Creature* creature)
-{
-    creature->Respawn(true);
-    creature->SetReactState(REACT_PASSIVE);
-    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-    creature->SetVisible(false);
-}
-
-void Battlefield::ShowCreature(Creature* creature, bool aggressive)
-{
-    creature->SetVisible(true);
-    creature->Respawn(true);
-    creature->SetReactState(aggressive ? REACT_AGGRESSIVE : REACT_PASSIVE);
-    creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-}
-
 void Battlefield::DoPlaySoundToAll(uint32 soundId)
 {
     WorldPacket data;
@@ -641,6 +577,18 @@ void Battlefield::TeamCastSpell(TeamId team, int32 spellId)
                 player->RemoveAuraFromStack(uint32(-spellId));
         }
     }
+}
+
+void Battlefield::SpawnGroupSpawn(uint32 groupId)
+{
+    TC_LOG_DEBUG("battlefield", "Battlefield::SpawnGroupSpawn: spawning SpawnGroup %u", groupId);
+    _map->SpawnGroupSpawn(groupId, true, true);
+}
+
+void Battlefield::SpawnGroupDespawn(uint32 groupId)
+{
+    TC_LOG_DEBUG("battlefield", "Battlefield::SpawnGroupDespawn: despawning SpawnGroup %u", groupId);
+    _map->SpawnGroupDespawn(groupId, true);
 }
 
 bool Battlefield::HasPlayer(Player* player) const
