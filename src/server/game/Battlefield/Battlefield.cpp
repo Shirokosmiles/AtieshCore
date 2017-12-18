@@ -402,25 +402,13 @@ void Battlefield::KickPlayer(Player* player)
         reason = BF_LEAVE_REASON_LOW_LEVEL;
     player->GetSession()->SendBattlefieldLeaveMessage(_battleId, reason);
 
-    _invitedPlayers[player->GetTeamId()].erase(player->GetGUID());
     _playersToKick[player->GetTeamId()].erase(player->GetGUID());
 
     if (player->GetMapId() == _mapId && player->GetZoneId() == _zoneId)
     {
         for (BattlefieldCapturePoint* capturePoint : _capturePoints)
             capturePoint->HandlePlayerLeave(player);
-
-        if (_playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end())
-        {
-            _playersInWar[player->GetTeamId()].erase(player->GetGUID());
-            if (Group* group = player->GetGroup())
-                group->RemoveMember(player->GetGUID());
-
-            OnPlayerLeaveWar(player);
-        }
-
-        _players[player->GetTeamId()].erase(player->GetGUID());
-
+        
         RemovePlayerFromResurrectQueue(player->GetGUID());
         OnPlayerLeaveZone(player);
 
@@ -465,6 +453,18 @@ void Battlefield::PlayerLeavesQueue(Player* player, bool kick /*= false*/)
     // already invited
     if (_invitedPlayers[player->GetTeamId()].find(player->GetGUID()) != _invitedPlayers[player->GetTeamId()].end())
         _invitedPlayers[player->GetTeamId()].erase(player->GetGUID());
+
+    if (_players[player->GetTeamId()].find(player->GetGUID()) != _players[player->GetTeamId()].end())
+        _players[player->GetTeamId()].erase(player->GetGUID());
+
+    if (_playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end())
+    {
+        _playersInWar[player->GetTeamId()].erase(player->GetGUID());
+        if (Group* group = player->GetGroup())
+            group->RemoveMember(player->GetGUID());
+
+        OnPlayerLeaveWar(player);
+    }
 
     // kick or notify
     if (kick)
