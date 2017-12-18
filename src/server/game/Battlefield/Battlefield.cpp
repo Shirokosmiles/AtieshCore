@@ -397,7 +397,7 @@ void Battlefield::KickPlayer(Player* player)
     if (!player)
         return;
 
-    BFLeaveReason reason = BF_LEAVE_REASON_EXITED;
+    BFLeaveReason reason = BF_LEAVE_REASON_UNK1;
     if (player->getLevel() < _minPlayerLevel)
         reason = BF_LEAVE_REASON_LOW_LEVEL;
     player->GetSession()->SendBattlefieldLeaveMessage(_battleId, reason);
@@ -457,19 +457,27 @@ void Battlefield::PlayerLeavesQueue(Player* player, bool kick /*= false*/)
     if (_players[player->GetTeamId()].find(player->GetGUID()) != _players[player->GetTeamId()].end())
         _players[player->GetTeamId()].erase(player->GetGUID());
 
-    if (_playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end())
+    if (IsWarTime())
     {
-        _playersInWar[player->GetTeamId()].erase(player->GetGUID());
-        if (Group* group = player->GetGroup())
-            group->RemoveMember(player->GetGUID());
+        // if the player is participating
+        if (_playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end())
+        {
+            _playersInWar[player->GetTeamId()].erase(player->GetGUID());
+            player->GetSession()->SendBattlefieldLeaveMessage(_battleId);
+            if (Group* group = player->GetGroup()) // Remove the player from the raid group
+                group->RemoveMember(player->GetGUID());
 
-        OnPlayerLeaveWar(player);
+            OnPlayerLeaveWar(player);
+        }
     }
 
-    player->GetSession()->SendBattlefieldLeaveMessage(_battleId);
+    RemovePlayerFromResurrectQueue(player->GetGUID());
+
     // kick or notify
     if (kick)
-        KickPlayer(player);        
+        KickPlayer(player);
+    else
+        player->GetSession()->SendBattlefieldLeaveMessage(_battleId);
 }
 
 bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
