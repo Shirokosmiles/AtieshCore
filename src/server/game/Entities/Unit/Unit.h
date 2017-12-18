@@ -1152,7 +1152,7 @@ class TC_GAME_API Unit : public WorldObject
         uint32 GetMaxSkillValueForLevel(Unit const* target = nullptr) const { return (target ? getLevelForTarget(target) : getLevel()) * 5; }
         void DealDamageMods(Unit const* victim, uint32 &damage, uint32* absorb) const;
         uint32 DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDamage = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* spellProto = nullptr, bool durabilityLoss = true);
-        void Kill(Unit* victim, bool durabilityLoss = true);
+        void Kill(Unit* victim, bool durabilityLoss = true, bool skipreward = false);
         void KillSelf(bool durabilityLoss = true) { Kill(this, durabilityLoss); }
         void DealHeal(HealInfo& healInfo);
 

@@ -854,7 +854,10 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
         if (victim->GetTypeId() == TYPEID_PLAYER && victim != this)
             victim->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health);
 
-        Kill(victim, durabilityLoss);
+        bool bfwaterdmgspell = false;
+        if (spellProto && spellProto->Id == 36444)
+            bfwaterdmgspell = true;
+        Kill(victim, durabilityLoss, bfwaterdmgspell);
     }
     else
     {
@@ -12130,7 +12133,7 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
     return true;
 }
 
-void Unit::Kill(Unit* victim, bool durabilityLoss)
+void Unit::Kill(Unit* victim, bool durabilityLoss, bool skipreward)
 {
     // Prevent killing unit twice (and giving reward from kill twice)
     if (!victim->GetHealth())
@@ -12224,7 +12227,8 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
             }
         }
 
-        player->RewardPlayerAndGroupAtKill(victim, false);
+        if (!skipreward)
+            player->RewardPlayerAndGroupAtKill(victim, false);
     }
 
     // Do KILL and KILLED procs. KILL proc is called only for the unit who landed the killing blow (and its owner - for pets and totems) regardless of who tapped the victim
