@@ -1258,15 +1258,16 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
     if (IsInWorld())
     {
         float x, y, z;
+        float mz = 2.0f;
         if (GetTypeId() == TYPEID_PLAYER)
         {
             GetPosition(x, y, z);
-            z += GetMidsectionHeight();
+            mz = GetMidsectionHeight();
         }
         else
             GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
 
-        return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks, ignoreFlags);
+        return GetMap()->isInLineOfSight(x, y, z + mz, ox, oy, oz + mz, GetPhaseMask(), checks, ignoreFlags);
     }
 
     return true;
