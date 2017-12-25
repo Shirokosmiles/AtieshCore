@@ -23,6 +23,7 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "GameObject.h"
+#include "GameTime.h"
 #include "Log.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"
@@ -993,7 +994,7 @@ void BattlefieldWintergrasp::FillInitialWorldStates(WorldPacket& data)
     data << uint32(WORLDSTATE_WINTERGRASP_SHOW_WORLDSTATE) << uint32(IsWarTime() ? 1 : 0);
 
     for (uint32 i = 0; i < 2; ++i)
-        data << ClockWorldState[i] << uint32(time(nullptr) + (GetTimer() / 1000));
+        data << ClockWorldState[i] << uint32(GameTime::GetGameTime() + (GetTimer() / 1000));
 
     data << uint32(WORLDSTATE_WINTERGRASP_VEHICLE_HORDE) << uint32(GetData(DATA_WINTERGRASP_VEHICLE_HORDE));
     data << uint32(WORLDSTATE_WINTERGRASP_MAX_VEHICLE_HORDE) << uint32(GetData(DATA_WINTERGRASP_MAX_VEHICLE_HORDE));
