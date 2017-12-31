@@ -182,7 +182,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_CLAW, 3000);
             events.ScheduleEvent(EVENT_LEAP, 2000);
@@ -310,9 +310,9 @@ public:
                     if (Creature* announcer = instance->GetCreature(DATA_ANNOUNCER))
                     {
                         if (announcer->GetEntry() == NPC_JAEREN)
-                            announcer->CastSpell(me->GetVictim(), SPELL_RAISE_JAEREN, false, nullptr, nullptr, me->GetGUID());
+                            announcer->CastSpell(me->GetVictim(), SPELL_RAISE_JAEREN);
                         else
-                            announcer->CastSpell(me->GetVictim(), SPELL_RAISE_ARELAS, false, nullptr, nullptr, me->GetGUID());
+                            announcer->CastSpell(me->GetVictim(), SPELL_RAISE_ARELAS);
                     }
                 }
                 else
@@ -415,11 +415,11 @@ public:
             _JustDied();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             LoadEvents();
             Talk(SAY_AGGRO, who);
-            _EnterCombat();
+            _JustEngagedWith();
         }
 
         void KilledUnit(Unit* who) override

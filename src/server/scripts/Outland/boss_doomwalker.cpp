@@ -78,7 +78,7 @@ class boss_doomwalker : public CreatureScript
 
             void KilledUnit(Unit* victim) override
             {
-                victim->CastSpell(victim, SPELL_MARK_DEATH, 0);
+                victim->CastSpell(victim, SPELL_MARK_DEATH, true);
 
                 if (urand(0, 4))
                     return;
@@ -91,7 +91,7 @@ class boss_doomwalker : public CreatureScript
                 Talk(SAY_DEATH);
             }
 
-            void EnterCombat(Unit* /*who*/) override
+            void JustEngagedWith(Unit* /*who*/) override
             {
                 Talk(SAY_AGGRO);
             }

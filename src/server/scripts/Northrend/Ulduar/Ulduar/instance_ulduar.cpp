@@ -1190,7 +1190,7 @@ public:
             CombatAI::Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             UlduarEventsTrash.ScheduleEvent(EVENT_DEFENDERS_HAMSTRING, 2500);
             UlduarEventsTrash.ScheduleEvent(EVENT_DEFENDERS_LIGHTING_BOLT, 2600);

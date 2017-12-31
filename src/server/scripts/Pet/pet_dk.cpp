@@ -314,7 +314,7 @@ class npc_dancing_rune_weapon : public CreatureScript
                 me->SetRedirectThreat(summoner->GetGUID(), 100);
             }
 
-            void SetGUID(ObjectGuid guid, int32 type) override
+            void SetGUID(ObjectGuid const& guid, int32 type) override
             {
                 switch (type)
                 {
@@ -347,8 +347,8 @@ class npc_dancing_rune_weapon : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                CasterAI::UpdateAI(diff);
-                DoMeleeAttackIfReady();
+                if (!me || !me->IsAlive())
+                    return;
 
                 _events.Update(diff);
                 
@@ -371,6 +371,9 @@ class npc_dancing_rune_weapon : public CreatureScript
                     break;
                     }
                 }
+
+                CasterAI::UpdateAI(diff);
+                DoMeleeAttackIfReady();
             }
 
         private:

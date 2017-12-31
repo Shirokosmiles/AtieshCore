@@ -182,7 +182,7 @@ public:
 
         void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -375,7 +375,7 @@ public:
             ImmuneFlagSet(false);
         }
 
-        void SetGUID(ObjectGuid playerGUID, int32 /*id*/) override
+        void SetGUID(ObjectGuid const& playerGUID, int32 /*id*/) override
         {
             _playerGUID = playerGUID;
             SetEscortPaused(false);

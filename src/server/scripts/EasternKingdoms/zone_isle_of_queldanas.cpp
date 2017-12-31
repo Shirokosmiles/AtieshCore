@@ -347,7 +347,7 @@ public:
                 events.ScheduleEvent(EVENT_STEP_15, 3 * IN_MILLISECONDS);
         }
 
-        void SetGUID(ObjectGuid guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
         {
             uiPlayer = guid;
         }

@@ -272,14 +272,14 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (instance->GetBossState(DATA_EADRIC_THE_PURE) != SPECIAL)
             {
                 events.ScheduleEvent(EVENT_VENGEANCE, 500);
                 events.ScheduleEvent(EVENT_RADIANCE, urand(7000, 15000));
                 Talk(SAY_AGGRO_E, who);
-                _EnterCombat();
+                _JustEngagedWith();
             }
         }
 
@@ -468,7 +468,7 @@ public:
             summons.Despawn(summon);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (instance->GetBossState(DATA_ARGENT_CONFESSOR_PALETRESS) != SPECIAL)
             {
@@ -476,7 +476,7 @@ public:
                 events.ScheduleEvent(EVENT_HOLY_FIRE, urand(9000, 12000));
                 events.ScheduleEvent(EVENT_RENEW, urand(15000, 17000));
                 Talk(SAY_AGGRO_P, who);
-                _EnterCombat();
+                _JustEngagedWith();
             }
         }
 
@@ -616,7 +616,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }
@@ -843,7 +843,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             switch (me->GetEntry())
             {
@@ -1081,7 +1081,7 @@ class spell_paletress_summon_memory : public SpellScriptLoader
 
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
-                GetHitUnit()->CastSpell(GetHitUnit(), memorySpellId[urand(0, 24)], true, nullptr, nullptr, GetCaster()->GetGUID());
+                GetHitUnit()->CastSpell(GetHitUnit(), memorySpellId[urand(0, 24)], GetCaster()->GetGUID());
             }
 
             void Register() override
@@ -1117,7 +1117,7 @@ class spell_paletress_reflective_shield : public SpellScriptLoader
                 if (dmgInfo.GetAttacker() == GetTarget())
                     return;
                 int32 bp = absorbAmount / 4;
-                GetTarget()->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_SHIELD_REFLECT, &bp, nullptr, nullptr, true, nullptr, aurEff);
+                GetTarget()->CastSpell(dmgInfo.GetAttacker(), SPELL_SHIELD_REFLECT, CastSpellExtraArgs(aurEff).AddSpellBP0(bp));
             }
 
             void Register() override

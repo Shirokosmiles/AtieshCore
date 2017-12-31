@@ -104,7 +104,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -364,7 +364,7 @@ public:
         npc_nerubar_victimAI(Creature* creature) : ScriptedAI(creature) { }
 
         void Reset() override { }
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
 
@@ -461,7 +461,7 @@ public:
             Initialize();
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
 
@@ -1453,7 +1453,7 @@ public:
             Initialize();
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (me->IsValidAttackTarget(who))
                 AttackStart(who);
@@ -1565,7 +1565,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
         }
 
@@ -1757,7 +1757,7 @@ public:
                 player->FailQuest(QUEST_GET_ME_OUTA_HERE);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
                 if (roll_chance_i(20))
@@ -2108,7 +2108,7 @@ public:
             Initialize();
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void AttackStart(Unit* /*who*/) override { }
 
@@ -2352,7 +2352,6 @@ public:
                     charGossipItem = GOSSIP_ITEM_GUARD_MITCHELLS;
                     break;
                 default:
-                    charGossipItem = "";
                     return false;
             }
 
@@ -2476,7 +2475,7 @@ public:
             _playerGUID.Clear();
         }
 
-        void SetGUID(ObjectGuid guid, int32 /*action*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
         {
             if (!_playerGUID.IsEmpty())
                 return;

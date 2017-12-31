@@ -141,7 +141,7 @@ class spell_gen_adaptive_warding : public AuraScript
             default:
                 return;
         }
-        GetTarget()->CastSpell(GetTarget(), spellId, true, nullptr, aurEff);
+        GetTarget()->CastSpell(GetTarget(), spellId, aurEff);
     }
 
     void Register() override
@@ -495,7 +495,9 @@ class spell_gen_blood_reserve : public AuraScript
         PreventDefaultAction();
 
         Unit* caster = eventInfo.GetActionTarget();
-        caster->CastCustomSpell(SPELL_GEN_BLOOD_RESERVE_HEAL, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), caster, TRIGGERED_FULL_MASK, nullptr, aurEff);
+        CastSpellExtraArgs args(aurEff);
+        args.SpellValueOverrides.AddBP0(aurEff->GetAmount());
+        caster->CastSpell(caster, SPELL_GEN_BLOOD_RESERVE_HEAL, args);
         caster->RemoveAura(SPELL_GEN_BLOOD_RESERVE_AURA);
     }
 
@@ -534,7 +536,9 @@ class spell_gen_blade_warding : public AuraScript
         for (uint8 i = 0; i < stacks; ++i)
             bp += spellInfo->Effects[EFFECT_0].CalcValue(caster);
 
-        caster->CastCustomSpell(SPELL_GEN_BLADE_WARDING_TRIGGERED, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetActor(), TRIGGERED_FULL_MASK, nullptr, aurEff);
+        CastSpellExtraArgs args(aurEff);
+        args.SpellValueOverrides.AddBP0(bp);
+        caster->CastSpell(eventInfo.GetActor(), SPELL_GEN_BLADE_WARDING_TRIGGERED, args);
     }
 
     void Register() override
@@ -814,7 +818,11 @@ class spell_gen_chaos_blast : public SpellScript
         int32 basepoints0 = 100;
         Unit* caster = GetCaster();
         if (Unit* target = GetHitUnit())
-            caster->CastCustomSpell(target, SPELL_CHAOS_BLAST, &basepoints0, nullptr, nullptr, true);
+        {
+            CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+            args.SpellValueOverrides.AddBP0(basepoints0);
+            caster->CastSpell(target, SPELL_CHAOS_BLAST, args);
+        }
     }
 
     void Register() override
@@ -1275,7 +1283,7 @@ class spell_gen_defend : public AuraScript
             for (uint8 i = 0; i < GetSpellInfo()->StackAmount; ++i)
                 target->RemoveAurasDueToSpell(SPELL_VISUAL_SHIELD_1 + i);
 
-            target->CastSpell(target, SPELL_VISUAL_SHIELD_1 + GetAura()->GetStackAmount() - 1, true, nullptr, aurEff);
+            target->CastSpell(target, SPELL_VISUAL_SHIELD_1 + GetAura()->GetStackAmount() - 1, aurEff);
         }
         else
             GetTarget()->RemoveAurasDueToSpell(GetId());
@@ -1482,7 +1490,7 @@ class spell_gen_elune_candle : public SpellScript
         else
             spellId = SPELL_ELUNE_CANDLE_NORMAL;
 
-        GetCaster()->CastSpell(GetHitUnit(), spellId, true, nullptr);
+        GetCaster()->CastSpell(GetHitUnit(), spellId, true);
     }
 
     void Register() override
@@ -1655,7 +1663,7 @@ class spell_gen_lifebloom : public SpellScriptLoader
                     return;
 
                 // final heal
-                GetTarget()->CastSpell(GetTarget(), _spellId, true, nullptr, aurEff, GetCasterGUID());
+                GetTarget()->CastSpell(GetTarget(), _spellId, { aurEff, GetCasterGUID() });
             }
 
             void Register() override
@@ -2099,7 +2107,7 @@ class spell_gen_moss_covered_feet : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActionTarget()->CastSpell(nullptr, SPELL_FALL_DOWN, true, nullptr, aurEff);
+        eventInfo.GetActionTarget()->CastSpell(nullptr, SPELL_FALL_DOWN, aurEff);
     }
 
     void Register() override
@@ -2122,7 +2130,9 @@ class spell_gen_negative_energy_periodic : public AuraScript
     {
         PreventDefaultAction();
 
-        GetTarget()->CastCustomSpell(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, SPELLVALUE_MAX_TARGETS, aurEff->GetTickNumber() / 10 + 1, nullptr, true, nullptr, aurEff);
+        CastSpellExtraArgs args(aurEff);
+        args.SpellValueOverrides.AddMod(SPELLVALUE_MAX_TARGETS, aurEff->GetTickNumber() / 10 + 1);
+        GetTarget()->CastSpell(nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, args);
     }
 
     void Register() override
@@ -2301,7 +2311,7 @@ class spell_gen_obsidian_armor : public AuraScript
             default:
                 return;
         }
-        GetTarget()->CastSpell(GetTarget(), spellId, true, nullptr, aurEff);
+        GetTarget()->CastSpell(GetTarget(), spellId, aurEff);
     }
 
     void Register() override
@@ -2420,7 +2430,7 @@ class spell_gen_paralytic_poison : public AuraScript
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
             return;
 
-        GetTarget()->CastSpell(nullptr, SPELL_PARALYSIS, true, nullptr, aurEff);
+        GetTarget()->CastSpell(nullptr, SPELL_PARALYSIS, aurEff);
     }
 
     void Register() override
@@ -3152,7 +3162,7 @@ class spell_gen_turkey_marker : public AuraScript
 
         // on stack 15 cast the achievement crediting spell
         if (GetStackAmount() >= 15)
-            target->CastSpell(target, SPELL_TURKEY_VENGEANCE, true, nullptr, aurEff, GetCasterGUID());
+            target->CastSpell(target, SPELL_TURKEY_VENGEANCE, { aurEff, GetCasterGUID() });
     }
 
     void OnPeriodic(AuraEffect const* /*aurEff*/)
@@ -3233,8 +3243,9 @@ class spell_gen_vampiric_touch : public AuraScript
             return;
 
         Unit* caster = eventInfo.GetActor();
-        int32 bp = damageInfo->GetDamage() / 2;
-        caster->CastCustomSpell(SPELL_VAMPIRIC_TOUCH_HEAL, SPELLVALUE_BASE_POINT0, bp, caster, true, nullptr, aurEff);
+        CastSpellExtraArgs args(aurEff);
+        args.SpellValueOverrides.AddBP0(damageInfo->GetDamage() / 2);
+        caster->CastSpell(caster, SPELL_VAMPIRIC_TOUCH_HEAL, args);
     }
 
     void Register() override

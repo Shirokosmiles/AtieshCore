@@ -144,7 +144,7 @@ public:
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
-                victim->CastSpell(victim, SPELL_SUMMON_CORPSE_SCARABS_PLR, true, nullptr, nullptr, me->GetGUID());
+                victim->CastSpell(victim, SPELL_SUMMON_CORPSE_SCARABS_PLR, me->GetGUID());
 
             Talk(SAY_SLAY);
         }
@@ -157,9 +157,9 @@ public:
             instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             Talk(SAY_AGGRO);
 
             summons.DoZoneInCombat();
@@ -200,7 +200,7 @@ public:
                             if (ObjectGuid target = Trinity::Containers::SelectRandomContainerElement(guardCorpses))
                                 if (Creature* creatureTarget = ObjectAccessor::GetCreature(*me, target))
                                 {
-                                    creatureTarget->CastSpell(creatureTarget, SPELL_SUMMON_CORPSE_SCARABS_MOB, true, nullptr, nullptr, me->GetGUID()); //provide original caster for spell as Anub
+                                    creatureTarget->CastSpell(creatureTarget, SPELL_SUMMON_CORPSE_SCARABS_MOB, me->GetGUID());
                                     creatureTarget->AI()->Talk(EMOTE_SCARAB);
                                     creatureTarget->DespawnOrUnsummon(2000);
                                 }

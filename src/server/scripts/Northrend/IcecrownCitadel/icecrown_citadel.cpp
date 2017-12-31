@@ -833,7 +833,7 @@ class boss_sister_svalna : public CreatureScript
                 switch (action)
                 {
                     case ACTION_KILL_CAPTAIN:
-                        me->CastCustomSpell(SPELL_CARESS_OF_DEATH, SPELLVALUE_MAX_TARGETS, 1, me, true);
+                        DoCastSelf(SPELL_CARESS_OF_DEATH, CastSpellExtraArgs(TRIGGERED_FULL_MASK).AddSpellMod(SPELLVALUE_MAX_TARGETS, 1));
                         break;
                     case ACTION_START_GAUNTLET:
                         me->SetImmuneToAll(true);
@@ -876,7 +876,9 @@ class boss_sister_svalna : public CreatureScript
                         if (TempSummon* summon = target->SummonCreature(NPC_IMPALING_SPEAR, *target))
                         {
                             Talk(EMOTE_SVALNA_IMPALE, target);
-                            summon->CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, 1, target, false);
+                            CastSpellExtraArgs args;
+                            args.SpellValueOverrides.AddBP0(1);
+                            summon->CastSpell(target, VEHICLE_SPELL_RIDE_HARDCODED, args);
                             summon->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_UNK1 | UNIT_FLAG2_ALLOW_ENEMY_INTERACT);
                         }
                         break;
@@ -1017,9 +1019,9 @@ class npc_crok_scourgebane : public CreatureScript
                 }
             }
 
-            void SetGUID(ObjectGuid guid, int32 type/* = 0*/) override
+            void SetGUID(ObjectGuid const& guid, int32 id) override
             {
-                if (type == ACTION_VRYKUL_DEATH)
+                if (id == ACTION_VRYKUL_DEATH)
                 {
                     _aliveTrash.erase(guid);
                     if (_aliveTrash.empty())
@@ -1294,7 +1296,7 @@ struct npc_argent_captainAI : public ScriptedAI
             }
         }
 
-        void EnterCombat(Unit* /*target*/) override
+        void JustEngagedWith(Unit* /*target*/) override
         {
             me->SetHomePosition(*me);
             if (IsUndead)
