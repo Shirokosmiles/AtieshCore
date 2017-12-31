@@ -20,28 +20,27 @@
 #include "ObjectAccessor.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
-#include "Creature.h"
 #include "CreatureGroups.h"
 
-enum COF_Paths
+enum COG_Paths
 {
-    STORMWIND_PATH = 80500,
-    GOLDSHIRE_PATH = 80501,
-    WOODS_PATH     = 80502,
-    HOUSE_PATH     = 80503,
-    LISA_PATH      = 80700
+    STORMWIND_PATH  = 80500,
+    GOLDSHIRE_PATH  = 80501,
+    WOODS_PATH      = 80502,
+    HOUSE_PATH      = 80503,
+    LISA_PATH       = 80700
 };
 
-enum COF_Waypoints
+enum COG_Waypoints
 {
-    STORMWIND_WAYPOINT = 57,
-    GOLDSHIRE_WAYPOINT = 32,
-    WOODS_WAYPOINT     = 22,
-    HOUSE_WAYPOINT     = 35,
-    LISA_WAYPOINT      = 4
+    STORMWIND_WAYPOINT  = 57,
+    GOLDSHIRE_WAYPOINT  = 32,
+    WOODS_WAYPOINT      = 22,
+    HOUSE_WAYPOINT      = 35,
+    LISA_WAYPOINT       = 4
 };
 
-enum COF_Sounds
+enum COG_Sounds
 {
     BANSHEE_DEATH           = 1171,
     BANSHEEPREAGGRO         = 1172,
@@ -51,7 +50,7 @@ enum COF_Sounds
     GHOSTDEATH              = 3416
 };
 
-enum COF_Creatures
+enum COG_Creatures
 {
     NPC_DANA    = 804,
     NPC_CAMERON = 805,
@@ -61,224 +60,204 @@ enum COF_Creatures
     NPC_JOSE    = 811
 };
 
-enum COF_Events
+enum COG_Events
 {
-    EVENT_WP_START_GOLDSHIRE = 1,
-    EVENT_WP_START_WOODS     = 2,
-    EVENT_WP_START_HOUSE     = 3,
-    EVENT_WP_START_LISA      = 4,
-    EVENT_PLAY_SOUNDS        = 5,
-    EVENT_BEGIN_EVENT        = 6
+    EVENT_WP_START_GOLDSHIRE    = 1,
+    EVENT_WP_START_WOODS        = 2,
+    EVENT_WP_START_HOUSE        = 3,
+    EVENT_WP_START_LISA         = 4,
+    EVENT_PLAY_SOUNDS           = 5,
+    EVENT_BEGIN_EVENT           = 6
 };
 
-class npc_cameron : public CreatureScript
+struct npc_cameron : public ScriptedAI
 {
-public:
-    npc_cameron() : CreatureScript("npc_cameron") { }
-
-    struct npc_cameronAI : public ScriptedAI
+    npc_cameron(Creature* creature) : ScriptedAI(creature)
     {
-        npc_cameronAI(Creature* creature) : ScriptedAI(creature)
+        _started = false;
+    }
+
+    static uint32 SoundPicker()
+    {
+        return RAND(
+            BANSHEE_DEATH,
+            BANSHEEPREAGGRO,
+            CTHUN_YOU_WILL_DIE,
+            CTHUN_DEATH_IS_CLOSE,
+            HUMAN_FEMALE_EMOTE_CRY,
+            GHOSTDEATH
+        );
+    }
+
+    void MoveTheChildren()
+    {
+        std::vector<Position> MovePosPositions =
         {
-            _started = false;
-            ///! @Riztazz
-            ///! only for testing, should be called elsewhere
-            ///! its delayed by 10 seconds so everything is loaded around cameron before we start anything
-            ///! otherwise we might have issues with getting guids when cameron loads before everything else
-            ///! if you're going to use it in UpdateAI (checking localTime) do a delayed start as well
-            _events.ScheduleEvent(EVENT_BEGIN_EVENT, Seconds(10));
+            { -9373.521f, -67.71767f, 69.201965f, 1.117011f },
+            { -9374.94f, -62.51654f, 69.201965f, 5.201081f },
+            { -9371.013f, -71.20811f, 69.201965f, 1.937315f },
+            { -9368.419f, -66.47543f, 69.201965f, 3.141593f },
+            { -9372.376f, -65.49946f, 69.201965f, 4.206244f },
+            { -9377.477f, -67.8297f, 69.201965f, 0.296706f }
+        };
+
+        Trinity::Containers::RandomShuffle(MovePosPositions);
+
+        // first we break formation because children will need to move on their own now
+        for (auto guid : _childrenGUIDs)
+            if (Creature* child = ObjectAccessor::GetCreature(*me, guid))
+                if (child->GetFormation())
+                    child->GetFormation()->RemoveMember(child);
+
+        // Move each child to an random position
+        for (uint32 i = 0; i < _childrenGUIDs.size(); ++i)
+        {
+            if (Creature* children = ObjectAccessor::GetCreature(*me, _childrenGUIDs.at(i)))
+            {
+                children->SetWalk(true);
+                children->GetMotionMaster()->MovePoint(0, MovePosPositions[i], true, MovePosPositions[i].GetOrientation());
+            }
         }
+        me->SetWalk(true);
+        me->GetMotionMaster()->MovePoint(0, MovePosPositions.back(), true, MovePosPositions.back().GetOrientation());
+    }
 
-        void BeginMovementEvent()
+    void WaypointReached(uint32 waypointId, uint32 pathId) override
+    {
+        switch (pathId)
         {
-            _childrenGUIDs.clear();
+            case STORMWIND_PATH:
+            {
+                if (waypointId == STORMWIND_WAYPOINT)
+                {
+                    me->GetMotionMaster()->MoveRandom(10.f);
+                    _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, 11min);
+                }
 
-            if (Creature* dana = me->FindNearestCreature(NPC_DANA, 25.0f))
-                _childrenGUIDs.push_back(dana->GetGUID());
+                break;
+            }
+            case GOLDSHIRE_PATH:
+            {
+                if (waypointId == GOLDSHIRE_WAYPOINT)
+                {
+                    me->GetMotionMaster()->MoveRandom(10.f);
+                    _events.ScheduleEvent(EVENT_WP_START_WOODS, 15min);
+                }
+                break;
+            }
+            case WOODS_PATH:
+            {
+                if (waypointId == WOODS_WAYPOINT)
+                {
+                    me->GetMotionMaster()->MoveRandom(10.f);
+                    _events.ScheduleEvent(EVENT_WP_START_HOUSE, 6min);
+                    _events.ScheduleEvent(EVENT_WP_START_LISA, 2s);
+                }
 
-            if (Creature* john = me->FindNearestCreature(NPC_JOHN, 25.0f))
-                _childrenGUIDs.push_back(john->GetGUID());
+                break;
+            }
+            case HOUSE_PATH:
+            {
+                if (waypointId == HOUSE_WAYPOINT)
+                {
+                    // Move childeren at last point 
+                    MoveTheChildren();
 
-            if (Creature* lisa = me->FindNearestCreature(NPC_LISA, 25.0f))
-                _childrenGUIDs.push_back(lisa->GetGUID());
+                    // After 30 seconds a random sound should play
+                    _events.ScheduleEvent(EVENT_PLAY_SOUNDS, 30s);
+                }
+                break;
+            }
+        }
+    }
 
-            if (Creature* aaron = me->FindNearestCreature(NPC_AARON, 25.0f))
-                _childrenGUIDs.push_back(aaron->GetGUID());
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
 
-            if (Creature* jose = me->FindNearestCreature(NPC_JOSE, 25.0f))
-                _childrenGUIDs.push_back(jose->GetGUID());
+        time_t time = GameTime::GetGameTime();
+        tm localTm;
+        localtime_r(&time, &localTm);
 
-            me->GetMotionMaster()->MovePath(STORMWIND_PATH, false);
+        // Start event at 7 am
+        if ((localTm.tm_hour == 7 && localTm.tm_min == 0 && localTm.tm_sec == 0) && !_started)
+        {
+            // Begin pathing
+            _events.ScheduleEvent(EVENT_BEGIN_EVENT, 2s);
             _started = true;
         }
 
-        static uint32 SoundPicker()
+        // Reset event at 8 am
+        if ((localTm.tm_hour == 8 && localTm.tm_min == 0 && localTm.tm_sec == 0) && _started)
+            _started = false;
+
+        while (uint32 eventId = _events.ExecuteEvent())
         {
-            return RAND(
-                BANSHEE_DEATH,
-                BANSHEEPREAGGRO,
-                CTHUN_YOU_WILL_DIE,
-                CTHUN_DEATH_IS_CLOSE,
-                HUMAN_FEMALE_EMOTE_CRY,
-                GHOSTDEATH
-            );
-        }
-
-        void MoveTheChildren()
-        {
-            std::vector<Position> MovePosPositions =
+            switch (eventId)
             {
-                { -9373.521f, -67.71767f, 69.201965f, 1.117011f },
-                { -9374.94f, -62.51654f, 69.201965f, 5.201081f },
-                { -9371.013f, -71.20811f, 69.201965f, 1.937315f },
-                { -9368.419f, -66.47543f, 69.201965f, 3.141593f },
-                { -9372.376f, -65.49946f, 69.201965f, 4.206244f },
-                { -9377.477f, -67.8297f, 69.201965f, 0.296706f }
-            };
-
-            Trinity::Containers::RandomShuffle(MovePosPositions);
-
-            //! first we break formation because children will need to move on their own now
-            if (!_childrenGUIDs.empty())
-            {
-                for (GuidVector::iterator itr = _childrenGUIDs.begin(); itr != _childrenGUIDs.end(); ++itr)
-                    if (*itr)
-                    {
-                        if (Creature* child = ObjectAccessor::GetCreature(*me, (*itr)))
-                        {
-                            if (child->GetFormation())
-                                child->GetFormation()->RemoveMember(child);
-
-                            child->GetMotionMaster()->MovePoint(0, MovePosPositions.at(*itr));
-                            me->SetHomePosition(MovePosPositions.at(*itr));
-                        }
-                    }
-            }
-
-            me->GetMotionMaster()->MovePoint(0, MovePosPositions.back());
-            me->SetHomePosition(MovePosPositions.back());
-        }
-
-        void WaypointReached(uint32 waypointId, uint32 pathId) override
-        {
-            switch (pathId)
-            {
-                case STORMWIND_PATH:
+                case EVENT_WP_START_GOLDSHIRE:
+                    me->GetMotionMaster()->MovePath(GOLDSHIRE_PATH, false);
+                    break;
+                case EVENT_WP_START_WOODS:
+                    me->GetMotionMaster()->MovePath(WOODS_PATH, false);
+                    break;
+                case EVENT_WP_START_HOUSE:
+                    me->GetMotionMaster()->MovePath(HOUSE_PATH, false);
+                    break;
+                case EVENT_WP_START_LISA:
+                    for (uint32 i = 0; i < _childrenGUIDs.size(); ++i)
+                        if (Creature* lisa = ObjectAccessor::GetCreature(*me, _childrenGUIDs.at(i)))
+                            if (lisa->GetEntry() == NPC_LISA)
+                                lisa->GetMotionMaster()->MovePath(LISA_PATH, false);
+                    break;
+                case EVENT_PLAY_SOUNDS:
+                    me->PlayDistanceSound(SoundPicker());
+                    break;
+                case EVENT_BEGIN_EVENT:
                 {
-                    if (waypointId == STORMWIND_WAYPOINT)
-                    {
-                        me->SetHomePosition(me->GetPosition());
-                        me->GetMotionMaster()->MoveRandom(10.f);
-                        _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, Seconds(2)); // Minutes(11)
-                    }
+                    _childrenGUIDs.clear();
+
+                    // Get all childeren's guid's.
+                    if (Creature* dana = me->FindNearestCreature(NPC_DANA, 25.0f))
+                        _childrenGUIDs.push_back(dana->GetGUID());
+
+                    if (Creature* john = me->FindNearestCreature(NPC_JOHN, 25.0f))
+                        _childrenGUIDs.push_back(john->GetGUID());
+
+                    if (Creature* lisa = me->FindNearestCreature(NPC_LISA, 25.0f))
+                        _childrenGUIDs.push_back(lisa->GetGUID());
+
+                    if (Creature* aaron = me->FindNearestCreature(NPC_AARON, 25.0f))
+                        _childrenGUIDs.push_back(aaron->GetGUID());
+
+                    if (Creature* jose = me->FindNearestCreature(NPC_JOSE, 25.0f))
+                        _childrenGUIDs.push_back(jose->GetGUID());
+
+                    // If Formation was disbanded, remake.
+                    if (!me->GetFormation()->isFormed())
+                        for (auto guid : _childrenGUIDs)
+                            if (Creature* child = ObjectAccessor::GetCreature(*me, guid))
+                                child->SearchFormation();
+
+                    // Start movement
+                    me->GetMotionMaster()->MovePath(STORMWIND_PATH, false);
+                    _started = true;
 
                     break;
                 }
-                case GOLDSHIRE_PATH:
-                {
-                    if (waypointId == GOLDSHIRE_WAYPOINT)
-                    {
-                        me->SetHomePosition(me->GetPosition());
-                        me->GetMotionMaster()->MoveRandom(10.f);
-                        _events.ScheduleEvent(EVENT_WP_START_WOODS, Seconds(2)); // Minutes(15)
-                    }
+                default:
                     break;
-                }
-                case WOODS_PATH:
-                {
-                    if (waypointId == WOODS_WAYPOINT)
-                    {
-                        me->SetHomePosition(me->GetPosition());
-                        me->GetMotionMaster()->MoveRandom(10.f);
-                        _events.ScheduleEvent(EVENT_WP_START_HOUSE, Seconds(2));  // Minutes(6)
-                        _events.ScheduleEvent(EVENT_WP_START_LISA, Seconds(2));
-                    }
-
-                    break;
-                }
-                case HOUSE_PATH:
-                {
-                    if (waypointId == HOUSE_WAYPOINT)
-                    {
-                        MoveTheChildren();
-
-                        // After 30 seconds a random sound should play
-                        _events.ScheduleEvent(EVENT_PLAY_SOUNDS, Seconds(30));
-                    }
-                    break;
-                }
             }
         }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-
-            time_t time = GameTime::GetGameTime();
-            tm localTm;
-            localtime_r(&time, &localTm);
-
-            // Start event at 7 am
-            ///! @Riztazz
-            ///! THIS SHOULD BE MOVED TO EVENT_MAP AND CHECKED EVERY NOW AND AGAIN
-            ///! RIGHT NOW YOU'RE CALLING IT EVERY 50ms
-            if ((localTm.tm_hour >= 7) && !_started )
-            {
-                _events.ScheduleEvent(EVENT_BEGIN_EVENT, Seconds(10));
-            }
-
-            // Reset event at 8 am
-            if ((localTm.tm_hour >= 8) && _started)
-                _started = false;
-
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_WP_START_GOLDSHIRE:
-                        me->GetMotionMaster()->MovePath(GOLDSHIRE_PATH, false);
-                        break;
-                    case EVENT_WP_START_WOODS:
-                        me->GetMotionMaster()->MovePath(WOODS_PATH, false);
-                        break;
-                    case EVENT_WP_START_HOUSE:
-                        me->GetMotionMaster()->MovePath(HOUSE_PATH, false);
-                        break;
-                    case EVENT_WP_START_LISA:
-                        ///! @Riztazz | U have guid store now, just iterate and find her GUID instead of another grid search
-                        ///! You need to break her formation first if you want her to execute her path
-                        ///! otherwise she will run away when she enters the house
-                        ///! you also need to think about next day, she runs away and rest of the kids stay near cameron
-                        ///! cameron will do a grid search to find all 5 childs but Lisa will be too far away
-                        if (Creature* lisa = me->FindNearestCreature(NPC_LISA, 25.0f))
-                            lisa->GetMotionMaster()->MovePath(LISA_PATH, false);
-
-                        break;
-                    case EVENT_PLAY_SOUNDS:
-                        me->PlayDistanceSound(SoundPicker());
-                        break;
-                    case EVENT_BEGIN_EVENT:
-                        BeginMovementEvent();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-    private:
-        EventMap _events;
-        bool _started;
-        GuidVector _childrenGUIDs;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_cameronAI(creature);
     }
+
+private:
+    EventMap _events;
+    bool _started;
+    GuidVector _childrenGUIDs;
 };
 
 void AddSC_goldshire()
 {
-    new npc_cameron();
+    RegisterCreatureAI(npc_cameron);
 }
