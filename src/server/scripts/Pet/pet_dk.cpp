@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -302,16 +302,16 @@ class npc_dancing_rune_weapon : public CreatureScript
             {
                 /*DoCast(summoner, SPELL_COPY_WEAPON, true);
                 DoCast(summoner, SPELL_DK_RUNE_WEAPON_MARK, true);
-                DoCast(me, SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
+                DoCast(me, SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);*/
                 DoCast(me, SPELL_FAKE_AGGRO_RADIUS_8_YARD, true);
-                DoCast(me, SPELL_DK_RUNE_WEAPON_SCALING_01, true);
+                /*DoCast(me, SPELL_DK_RUNE_WEAPON_SCALING_01, true);
                 DoCast(me, SPELL_DK_RUNE_WEAPON_SCALING, true);
                 DoCast(me, SPELL_PET_SCALING__MASTER_SPELL_06__SPELL_HIT_EXPERTISE_SPELL_PENETRATION, true);
                 DoCast(me, SPELL_DK_PET_SCALING_03, true);*/
                 
                 _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6 * IN_MILLISECONDS);
                 
-                me->SetRedirectThreat(summoner->GetGUID(), 100);
+                me->GetThreatManager().RegisterRedirectThreat(SPELL_FAKE_AGGRO_RADIUS_8_YARD, summoner->GetGUID(), 100);
             }
 
             void SetGUID(ObjectGuid const& guid, int32 type) override

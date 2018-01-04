@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -198,7 +198,7 @@ class boss_ingvar_the_plunderer : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (!events.IsInPhase(PHASE_EVENT) && !UpdateVictim())
+                if (!UpdateVictim())
                     return;
 
                 events.Update(diff);
@@ -231,9 +231,7 @@ class boss_ingvar_the_plunderer : public CreatureScript
                             ScheduleSecondPhase();
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                             me->SetImmuneToPC(false);
-                            if (Unit* target = me->GetThreatManager().SelectVictim())
-                                AttackStart(target);
-                            else
+                            if (!me->IsThreatened())
                             {
                                 EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
                                 return;

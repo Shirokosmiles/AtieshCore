@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -3836,9 +3836,9 @@ class spell_gen_shadowmeld : public SpellScript
     {
         if (Unit* target = GetCaster())
         {
-            target->CombatStop(true);
+            target->AttackStop();
 
-            target->getHostileRefManager().UpdateVisibility();
+            //target->getHostileRefManager().UpdateVisibility(); - old? unused?
 
             Unit::AttackerSet const& attackers = target->getAttackers();
             for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)

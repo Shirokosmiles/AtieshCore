@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -581,25 +581,15 @@ class npc_green_dragon_combat_trigger : public CreatureScript
                 if (!me->IsInCombat())
                     return;
 
-                // @TODO check out of bounds on all encounter creatures, evade if matched
-
-                std::list<HostileReference*> const& threatList = me->GetThreatManager().getThreatList();
-                if (threatList.empty())
-                {
-                    EnterEvadeMode();
-                    return;
-                }
-
                 // check evade every second tick
                 _evadeCheck ^= true;
                 if (!_evadeCheck)
                     return;
 
-                // check if there is any player on threatlist, if not - evade
-                for (std::list<HostileReference*>::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-                    if (Unit* target = (*itr)->getTarget())
-                        if (target->GetTypeId() == TYPEID_PLAYER)
-                            return; // found any player, return
+                // check if there is any player engaged, if not - evade
+                for (auto const& pair : me->GetCombatManager().GetPvECombatRefs())
+                    if (pair.second->GetOther(me)->GetTypeId() == TYPEID_PLAYER)
+                        return;
 
                 EnterEvadeMode();
             }

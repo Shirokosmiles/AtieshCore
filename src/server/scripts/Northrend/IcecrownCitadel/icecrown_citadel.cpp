@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1360,7 +1360,7 @@ struct npc_argent_captainAI : public ScriptedAI
                 me->UpdateEntry(newEntry, me->GetCreatureData());
                 DoCast(me, SPELL_UNDEATH, true);
                 if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
-                    me->CombatStart(crok, true);
+                    me->AttackedTarget(crok, true);
             }
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -945,7 +945,7 @@ public:
                         return false;
                     }
                 }
-                else if (rider->GetThreatManager().isThreatListEmpty())
+                else if (rider->GetThreatManager().IsThreatListEmpty())
                 {
                     SetGrandChampionToEvadeMode(rider->ToCreature());
                     return false;
@@ -1007,7 +1007,7 @@ public:
                                                     {
                                                         // Grand Champion
                                                         // Resetting rider's threat (DoResetThreat() cannot be used on external unit)
-                                                        rider->GetThreatManager().resetAllAggro();
+                                                        rider->GetThreatManager().ResetAllThreat();
                                                         // Setting gaze on the new player
                                                         if (plr->GetVehicleBase())
                                                             rider->GetThreatManager().AddThreat(plr->GetVehicleBase(), 100000.0f, nullptr, true, true);

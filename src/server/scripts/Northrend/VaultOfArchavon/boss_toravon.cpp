@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -184,7 +184,7 @@ class spell_toravon_random_aggro : public SpellScript
         if (!caster->IsAIEnabled)
             return;
 
-        caster->GetThreatManager().resetAllAggro();
+        caster->GetThreatManager().ResetAllThreat();
 
         if (Unit* target = caster->AI()->SelectTarget(SELECT_TARGET_RANDOM, 1))
             caster->GetThreatManager().AddThreat(target, 1000000);
