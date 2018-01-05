@@ -27002,7 +27002,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo)
             speed = GetSpeed(MOVE_FLIGHT);
 
         delaysentrecieve = (ctime - oldstime) / 10000000000;
-        delay = (movetime - stime) / 10000000000 + delaysentrecieve;
+        delay = fabsf(movetime - stime) / 10000000000 + delaysentrecieve;
         difftime = (movetime - ctime + ping) * 0.001f + delay;
         normaldistance = speed * difftime; // if movetime faked and lower, difftime should be with "-"
 
