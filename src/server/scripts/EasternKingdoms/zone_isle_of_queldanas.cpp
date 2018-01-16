@@ -453,7 +453,7 @@ public:
 
             if (Creature *introducer = player->FindNearestCreature(NPC_CASTER_BUNNY, 20.0f, true))
             {
-                introducer->Kill(player->FindNearestCreature(NPC_CASTER_BUNNY, 20.0f, true), false);
+                Unit::Kill(introducer, introducer, false);
             }
             return true;
         }
