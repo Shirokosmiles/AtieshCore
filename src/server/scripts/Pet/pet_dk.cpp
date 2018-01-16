@@ -123,7 +123,7 @@ public:
                                 if ((*iter)->HasAura(SPELL_DK_SUMMON_GARGOYLE_1, ownerGuid))
                                 {
                                     victim = (*iter)->GetGUID();
-                                    break;
+                                    continue;
                                 }
                         }
                         else
@@ -132,7 +132,9 @@ public:
                             break;
                         }
 
-                        Unit* target = ObjectAccessor::GetUnit(*me, victim);
+                        Unit* target = nullptr;
+                        if (victim)
+                            target = ObjectAccessor::GetUnit(*me, victim);
 
                         if (!target)
                         {
