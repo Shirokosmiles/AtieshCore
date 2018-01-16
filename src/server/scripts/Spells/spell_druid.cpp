@@ -24,6 +24,7 @@
 #include "ScriptMgr.h"
 #include "Containers.h"
 #include "GameTime.h"
+#include "Optional.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellHistory.h"
@@ -333,7 +334,7 @@ class spell_dru_enrage : public SpellScriptLoader
                 if (AuraEffect const* aurEff = target->GetAuraEffectOfRankedSpell(SPELL_DRUID_KING_OF_THE_JUNGLE, EFFECT_0))
                 {
                     CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-                    args.SpellValueOverrides.AddBP0(aurEff->GetAmount());
+                    args.AddSpellBP0(aurEff->GetAmount());
                     target->CastSpell(target, SPELL_DRUID_ENRAGE_MOD_DAMAGE, args);
                 }
 
@@ -506,7 +507,7 @@ class spell_dru_frenzied_regeneration : public AuraScript
         int32 const mod = std::min(static_cast<int32>(rage), 100);
         int32 const regen = CalculatePct(GetTarget()->GetMaxHealth(), GetTarget()->CalculateSpellDamage(nullptr, GetSpellInfo(), EFFECT_1) * mod / 100.f);
         CastSpellExtraArgs args(aurEff);
-        args.SpellValueOverrides.AddBP0(regen);
+        args.AddSpellBP0(regen);
         GetTarget()->CastSpell(nullptr, SPELL_DRUID_FRENZIED_REGENERATION_HEAL, args);
         GetTarget()->SetPower(POWER_RAGE, rage - mod);
     }
@@ -577,7 +578,7 @@ class spell_dru_glyph_of_innervate : public SpellScriptLoader
                 amount /= spellInfo->GetMaxTicks();
 
                 CastSpellExtraArgs args(aurEff);
-                args.SpellValueOverrides.AddBP0(amount);
+                args.AddSpellBP0(amount);
                 caster->CastSpell(nullptr, SPELL_DRUID_GLYPH_OF_INNERVATE_REGEN, args);
             }
 
@@ -660,7 +661,7 @@ class spell_dru_glyph_of_rejuvenation : public SpellScriptLoader
                     return;
 
                 CastSpellExtraArgs args(aurEff);
-                args.SpellValueOverrides.AddBP0(CalculatePct(healInfo->GetHeal(), aurEff->GetAmount()));
+                args.AddSpellBP0(CalculatePct(healInfo->GetHeal(), aurEff->GetAmount()));
                 eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), SPELL_DRUID_GLYPH_OF_REJUVENATION_HEAL, args);
             }
 
@@ -957,7 +958,7 @@ class spell_dru_leader_of_the_pack : public SpellScriptLoader
                     return;
 
                 CastSpellExtraArgs args(aurEff);
-                args.SpellValueOverrides.AddBP0(caster->CountPctFromMaxHealth(aurEff->GetAmount()));
+                args.AddSpellBP0(caster->CountPctFromMaxHealth(aurEff->GetAmount()));
                 caster->CastSpell(nullptr, SPELL_DRUID_IMP_LEADER_OF_THE_PACK_HEAL, args);
 
                 // Because of how proc system works, we can't store proc cd on db, it would be applied to entire aura
@@ -972,7 +973,7 @@ class spell_dru_leader_of_the_pack : public SpellScriptLoader
                 ASSERT(impLotpMana);
 
                 CastSpellExtraArgs args2(aurEff);
-                args2.SpellValueOverrides.AddBP0(CalculatePct(caster->GetMaxPower(POWER_MANA), impLotpMana->GetSpellInfo()->Effects[EFFECT_1].CalcValue()));
+                args2.AddSpellBP0(CalculatePct(caster->GetMaxPower(POWER_MANA), impLotpMana->GetSpellInfo()->Effects[EFFECT_1].CalcValue()));
                 caster->CastSpell(nullptr, SPELL_DRUID_IMP_LEADER_OF_THE_PACK_MANA, args2);
             }
 
@@ -1012,18 +1013,18 @@ class spell_dru_lifebloom : public SpellScriptLoader
                 int32 healAmount = aurEff->GetAmount();
                 if (Unit* caster = GetCaster())
                 {
-                    healAmount = caster->SpellHealingBonusDone(GetTarget(), GetSpellInfo(), healAmount, HEAL, stack);
+                    healAmount = caster->SpellHealingBonusDone(target, GetSpellInfo(), healAmount, HEAL, { }, stack);
 
                     // restore mana
                     CastSpellExtraArgs args(aurEff);
                     args.OriginalCaster = GetCasterGUID();
-                    args.SpellValueOverrides.AddBP0(CalculatePct(caster->GetCreateMana(), GetSpellInfo()->ManaCostPercentage) * stack / 2);
+                    args.AddSpellBP0(CalculatePct(caster->GetCreateMana(), GetSpellInfo()->ManaCostPercentage) * stack / 2);
                     caster->CastSpell(caster, SPELL_DRUID_LIFEBLOOM_ENERGIZE, args);
                 }
 
                 CastSpellExtraArgs args(aurEff);
                 args.OriginalCaster = GetCasterGUID();
-                args.SpellValueOverrides.AddBP0(healAmount);
+                args.AddSpellBP0(healAmount);
                 target->CastSpell(GetTarget(), SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, args);
             }
 
@@ -1051,7 +1052,7 @@ class spell_dru_lifebloom : public SpellScriptLoader
 
                             CastSpellExtraArgs args(aurEff);
                             args.OriginalCaster = GetCasterGUID();
-                            args.SpellValueOverrides.AddBP0(healAmount);
+                            args.AddSpellBP0(healAmount);
                             target->CastSpell(target, SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, args);
 
                             // restore mana
@@ -1059,7 +1060,7 @@ class spell_dru_lifebloom : public SpellScriptLoader
 
                             CastSpellExtraArgs args2(aurEff);
                             args2.OriginalCaster = GetCasterGUID();
-                            args2.SpellValueOverrides.AddBP0(returnMana);
+                            args2.AddSpellBP0(returnMana);
                             caster->CastSpell(caster, SPELL_DRUID_LIFEBLOOM_ENERGIZE, args2);
                         }
                     }
@@ -1103,7 +1104,7 @@ class spell_dru_living_seed : public SpellScriptLoader
                     return;
 
                 CastSpellExtraArgs args(aurEff);
-                args.SpellValueOverrides.AddBP0(CalculatePct(healInfo->GetHeal(), aurEff->GetAmount()));
+                args.AddSpellBP0(CalculatePct(healInfo->GetHeal(), aurEff->GetAmount()));
                 GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_DRUID_LIVING_SEED_PROC, args);
             }
 
@@ -1138,7 +1139,7 @@ class spell_dru_living_seed_proc : public SpellScriptLoader
             {
                 PreventDefaultAction();
                 CastSpellExtraArgs args(aurEff);
-                args.SpellValueOverrides.AddBP0(aurEff->GetAmount());
+                args.AddSpellBP0(aurEff->GetAmount());
                 GetTarget()->CastSpell(GetTarget(), SPELL_DRUID_LIVING_SEED_HEAL, args);
             }
 
@@ -1481,7 +1482,7 @@ class spell_dru_savage_defense : public SpellScriptLoader
                 PreventDefaultAction();
                 Unit* caster = eventInfo.GetActor();
                 CastSpellExtraArgs args(aurEff);
-                args.SpellValueOverrides.AddBP0(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), aurEff->GetAmount()));
+                args.AddSpellBP0(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), aurEff->GetAmount()));
                 caster->CastSpell(nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, args);
             }
 
@@ -1671,7 +1672,7 @@ class spell_dru_survival_instincts : public SpellScriptLoader
             {
                 Unit* target = GetTarget();
                 CastSpellExtraArgs args(aurEff);
-                args.SpellValueOverrides.AddBP0(target->CountPctFromMaxHealth(aurEff->GetAmount()));
+                args.AddSpellBP0(target->CountPctFromMaxHealth(aurEff->GetAmount()));
                 target->CastSpell(target, SPELL_DRUID_SURVIVAL_INSTINCTS, args);
             }
 
@@ -1747,7 +1748,7 @@ class spell_dru_tiger_s_fury : public SpellScriptLoader
                 if (AuraEffect const* aurEff = GetHitUnit()->GetAuraEffectOfRankedSpell(SPELL_DRUID_KING_OF_THE_JUNGLE, EFFECT_1))
                 {
                     CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-                    args.SpellValueOverrides.AddBP0(aurEff->GetAmount());
+                    args.AddSpellBP0(aurEff->GetAmount());
                     GetHitUnit()->CastSpell(GetHitUnit(), SPELL_DRUID_TIGER_S_FURY_ENERGIZE, args);
                 }
             }
@@ -1943,7 +1944,7 @@ class spell_dru_t3_8p_bonus : public SpellScriptLoader
                 Unit* caster = eventInfo.GetActor();
                 int32 amount = CalculatePct(spellInfo->CalcPowerCost(caster, spellInfo->GetSchoolMask()), aurEff->GetAmount());
                 CastSpellExtraArgs args(aurEff);
-                args.SpellValueOverrides.AddBP0(amount);
+                args.AddSpellBP0(amount);
                 caster->CastSpell(nullptr, SPELL_DRUID_EXHILARATE, args);
             }
 
@@ -2166,7 +2167,7 @@ class spell_dru_t10_balance_4p_bonus : public SpellScriptLoader
                 amount += target->GetRemainingPeriodicAmount(caster->GetGUID(), SPELL_DRUID_LANGUISH, SPELL_AURA_PERIODIC_DAMAGE);
 
                 CastSpellExtraArgs args(aurEff);
-                args.SpellValueOverrides.AddBP0(amount);
+                args.AddSpellBP0(amount);
                 caster->CastSpell(target, SPELL_DRUID_LANGUISH, args);
             }
 
@@ -2274,7 +2275,7 @@ class spell_dru_t10_restoration_4p_bonus_dummy : public SpellScriptLoader
                 PreventDefaultAction();
 
                 CastSpellExtraArgs args(aurEff);
-                args.SpellValueOverrides.AddBP0(eventInfo.GetHealInfo()->GetHeal());
+                args.AddSpellBP0(eventInfo.GetHealInfo()->GetHeal());
                 eventInfo.GetActor()->CastSpell(nullptr, SPELL_DRUID_REJUVENATION_T10_PROC, args);
             }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2018 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,6 +21,8 @@
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "CreatureGroups.h"
+#include "ScriptedCreature.h"
+#include "CreatureAIImpl.h"
 
 enum COG_Paths
 {
@@ -70,6 +72,11 @@ enum COG_Events
     EVENT_BEGIN_EVENT           = 6
 };
 
+enum COG_GameEvent
+{
+    GAME_EVENT_CHILDEREN_OF_GOLDSHIRE = 76
+};
+
 struct npc_cameron : public ScriptedAI
 {
     npc_cameron(Creature* creature) : ScriptedAI(creature)
@@ -112,7 +119,7 @@ struct npc_cameron : public ScriptedAI
         // Move each child to an random position
         for (uint32 i = 0; i < _childrenGUIDs.size(); ++i)
         {
-            if (Creature* children = ObjectAccessor::GetCreature(*me, _childrenGUIDs.at(i)))
+            if (Creature* children = ObjectAccessor::GetCreature(*me, _childrenGUIDs[i]))
             {
                 children->SetWalk(true);
                 children->GetMotionMaster()->MovePoint(0, MovePosPositions[i], true, MovePosPositions[i].GetOrientation());
@@ -171,25 +178,29 @@ struct npc_cameron : public ScriptedAI
         }
     }
 
-    void UpdateAI(uint32 diff) override
+    void OnGameEvent(bool start, uint16 eventId) override
     {
-        _events.Update(diff);
-
-        time_t time = GameTime::GetGameTime();
-        tm localTm;
-        localtime_r(&time, &localTm);
-
-        // Start event at 7 am
-        if ((localTm.tm_hour == 7 && localTm.tm_min == 0 && localTm.tm_sec == 0) && !_started)
+        if (start && eventId == GAME_EVENT_CHILDEREN_OF_GOLDSHIRE)
         {
+            // Start event at 7 am
             // Begin pathing
             _events.ScheduleEvent(EVENT_BEGIN_EVENT, 2s);
             _started = true;
         }
-
-        // Reset event at 8 am
-        if ((localTm.tm_hour == 8 && localTm.tm_min == 0 && localTm.tm_sec == 0) && _started)
+        else if (!start && eventId == GAME_EVENT_CHILDEREN_OF_GOLDSHIRE)
+        {
+            // Reset event at 8 am
             _started = false;
+            _events.Reset();
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!_started)
+            return;
+
+        _events.Update(diff);
 
         while (uint32 eventId = _events.ExecuteEvent())
         {
@@ -206,9 +217,16 @@ struct npc_cameron : public ScriptedAI
                     break;
                 case EVENT_WP_START_LISA:
                     for (uint32 i = 0; i < _childrenGUIDs.size(); ++i)
-                        if (Creature* lisa = ObjectAccessor::GetCreature(*me, _childrenGUIDs.at(i)))
+                    {
+                        if (Creature* lisa = ObjectAccessor::GetCreature(*me, _childrenGUIDs[i]))
+                        {
                             if (lisa->GetEntry() == NPC_LISA)
+                            {
                                 lisa->GetMotionMaster()->MovePath(LISA_PATH, false);
+                                break;
+                            }
+                        }
+                    }
                     break;
                 case EVENT_PLAY_SOUNDS:
                     me->PlayDistanceSound(SoundPicker());
@@ -241,7 +259,6 @@ struct npc_cameron : public ScriptedAI
 
                     // Start movement
                     me->GetMotionMaster()->MovePath(STORMWIND_PATH, false);
-                    _started = true;
 
                     break;
                 }

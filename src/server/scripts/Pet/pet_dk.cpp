@@ -31,6 +31,7 @@
 #include "MoveSplineInit.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
+#include "ItemTemplate.h"
 
 enum DeathKnightSpells
 {
@@ -337,9 +338,16 @@ class npc_dancing_rune_weapon : public CreatureScript
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
                 {
-                    damageInfo->attacker = me;
-                    damageInfo->damage /= 2;
-                    me->DealDamage(target, damageInfo->damage, nullptr, DIRECT_DAMAGE, SpellSchoolMask(damageInfo->damageSchoolMask));
+                    damageInfo->Attacker = me;
+                    uint32 damage = 0;
+                    SpellSchoolMask schoolMask;
+                    for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+                    {
+                        damage = damageInfo->Damages[i].Damage / 2;
+                        schoolMask = SpellSchoolMask(damageInfo->Damages[i].DamageSchoolMask);
+                    }
+
+                    Unit::DealDamage(me, target, damage, nullptr, DIRECT_DAMAGE, schoolMask);
                     me->SendAttackStateUpdate(damageInfo);
                     //me->ProcDamageAndSpell(damageInfo->target, damageInfo->procAttacker, damageInfo->procVictim, damageInfo->procEx, damageInfo->damage, damageInfo->attackType);
                 }
