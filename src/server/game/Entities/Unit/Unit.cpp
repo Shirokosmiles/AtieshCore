@@ -12692,6 +12692,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
             IsAIEnabled = false;
         }
         player->SetClientControl(this, true);
+        player->SetUnderACKmount();
     }
 
     EngageWithTarget(charmer);

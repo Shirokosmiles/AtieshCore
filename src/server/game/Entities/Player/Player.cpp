@@ -26989,6 +26989,9 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo)
         if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
             return true;
 
+        if (!IsControlledByPlayer())
+            return true;
+
         if (GetPlayerMovingMe())
         {
             if (GetPlayerMovingMe()->UnderACKmount())
