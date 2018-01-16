@@ -180,7 +180,6 @@ void AddSC_blasted_lands();
 void AddSC_duskwood();
 //void AddSC_eastern_plaguelands();
 void AddSC_ghostlands();
-void AddSC_goldshire();
 void AddSC_hinterlands();
 void AddSC_isle_of_queldanas();
 void AddSC_redridge_mountains();
@@ -361,7 +360,6 @@ void AddEasternKingdomsScripts()
     AddSC_duskwood();
     //AddSC_eastern_plaguelands();
     AddSC_ghostlands();
-    AddSC_goldshire();
     AddSC_hinterlands();
     AddSC_isle_of_queldanas();
     AddSC_redridge_mountains();
