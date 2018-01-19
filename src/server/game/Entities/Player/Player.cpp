@@ -23794,14 +23794,7 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
             ++itr;
             continue;
         }
-
-        // check on attr (dismanle on shield wall)
-        if (spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT) && spellInfo->HasAttribute(SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE) && !spellInfo->HasAttribute(SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY))
-        {
-            ++itr;
-            continue;
-        }
-            
+        
         RemoveOwnedAura(itr); // no alt item, remove aura, restart check            
     }
 
