@@ -212,11 +212,7 @@ bool CombatManager::IsInCombatWith(ObjectGuid const& guid) const
 
 bool CombatManager::IsInCombatWith(Unit const* who) const
 {
-    ObjectGuid whoguid = who->GetGUID();
-    if (whoguid)
-        return IsInCombatWith(whoguid);
-    else
-        return false;
+    return IsInCombatWith(who->GetGUID());
 }
 
 void CombatManager::InheritCombatStatesFrom(Unit const* who)
@@ -226,26 +222,22 @@ void CombatManager::InheritCombatStatesFrom(Unit const* who)
     {
         if (!IsInCombatWith(ref.first))
         {
-            if (Unit* target = ref.second->GetOther(who))
-            {
-                if ((_owner->IsImmuneToPC() && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE)) ||
-                    (_owner->IsImmuneToNPC() && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE)))
-                    continue;
-                SetInCombatWith(target);
-            }
+            Unit* target = ref.second->GetOther(who);
+            if ((_owner->IsImmuneToPC() && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE)) ||
+                (_owner->IsImmuneToNPC() && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE)))
+                continue;
+            SetInCombatWith(target);
         }
     }
     for (auto& ref : mgr._pvpRefs)
     {
         if (!IsInCombatWith(ref.first))
         {
-            if (Unit* target = ref.second->GetOther(who))
-            {
-                if ((_owner->IsImmuneToPC() && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE)) ||
-                    (_owner->IsImmuneToNPC() && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE)))
-                    continue;
-                SetInCombatWith(target);
-            }
+            Unit* target = ref.second->GetOther(who);
+            if ((_owner->IsImmuneToPC() && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE)) ||
+                (_owner->IsImmuneToNPC() && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE)))
+                continue;
+            SetInCombatWith(target);
         }
     }
 }
