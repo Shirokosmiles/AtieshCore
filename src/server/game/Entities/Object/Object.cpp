@@ -2313,7 +2313,6 @@ void WorldObject::MovePosition(Position &pos, float dist, float angle)
 void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float angle)
 {
     Map* map = GetMap();
-    uint32 phasemask = GetPhaseMask();
     angle += GetOrientation();
     float destx, desty, destz, tdestz;
     destx = pos.m_positionX + dist * std::cos(angle);
@@ -2338,7 +2337,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         destx -= CONTACT_DISTANCE * std::cos(angle);
         desty -= CONTACT_DISTANCE * std::sin(angle);
         dist = std::sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
-        tdestz = map->GetHeight(phasemask, destx, desty, destz + 2.8f, true);
+        tdestz = map->GetHeight(GetPhaseMask(), destx, desty, destz + 1.8f, true);
         needtorecheck = true;
     }
 
@@ -2351,7 +2350,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         destx -= CONTACT_DISTANCE * std::cos(angle);
         desty -= CONTACT_DISTANCE * std::sin(angle);
         dist = std::sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
-        tdestz = map->GetHeight(phasemask, destx, desty, destz + 2.8f, true);
+        tdestz = map->GetHeight(GetPhaseMask(), destx, desty, destz + 1.8f, true);
         needtorecheck = true;
     }
 
@@ -2380,7 +2379,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
 
     Trinity::NormalizeMapCoord(pos.m_positionX);
     Trinity::NormalizeMapCoord(pos.m_positionY);
-    UpdateAllowedPositionZ(destx, desty, pos.m_positionZ);
+    UpdateAllowedPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
     pos.SetOrientation(GetOrientation());
 }
 

@@ -63,15 +63,12 @@ void FleeingMovementGenerator<T>::DoInitialize(T* owner)
         init.MoveTo(startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ);
         init.SetWalk(false);
 
-        if (owner->GetTypeId() == TYPEID_PLAYER)
-        {
-            float _speed = owner->GetSpeed(MOVE_RUN);
-            float _checkspeed = owner->IsMounted() ? 14.0f : 7.0f;
-            if (_speed > _checkspeed)
-                _speed = _checkspeed;
+        float _speed = owner->GetSpeed(MOVE_RUN);
+        float _checkspeed = owner->IsMounted() ? 14.0f : 7.0f;
+        if (_speed > _checkspeed)
+            _speed = _checkspeed;
 
-            init.SetVelocity(_speed);
-        }        
+        init.SetVelocity(_speed);
         
         int32 traveltime = init.Launch();
         _timer.Reset(traveltime + urand(150, 250));
@@ -192,15 +189,12 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     init.MovebyPath(_path->GetPath());
     init.SetWalk(false);
 
-    if (owner->GetTypeId() == TYPEID_PLAYER)
-    {
-        float _speed = owner->GetSpeed(MOVE_RUN);
-        float _checkspeed = owner->IsMounted() ? 14.0f : 7.0f;
-        if (_speed > _checkspeed)
-            _speed = _checkspeed;
+    float _speed = owner->GetSpeed(MOVE_RUN);
+    float _checkspeed = owner->IsMounted() ? 14.0f : 7.0f;
+    if (_speed > _checkspeed)
+        _speed = _checkspeed;
 
-        init.SetVelocity(_speed);
-    }
+    init.SetVelocity(_speed);
 
     int32 traveltime = init.Launch();
     _timer.Reset(traveltime + urand(800, 1500));
