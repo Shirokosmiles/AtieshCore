@@ -1461,11 +1461,11 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                             inwater = false;
 
                         // highest available point
-                        tstZ1 = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true, 25.0f);
+                        tstZ1 = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ + m_caster->GetCollisionHeight(), true, 25.0f);
                         // upper or floor
-                        tstZ2 = map->GetHeight(phasemask, tstX, tstY, prevZ, true, 25.0f);
+                        tstZ2 = map->GetHeight(phasemask, tstX, tstY, prevZ + m_caster->GetCollisionHeight(), true, 25.0f);
                         //lower than floor
-                        tstZ3 = map->GetHeight(phasemask, tstX, tstY, prevZ - maxtravelDistZ / 2, true, 25.0f);
+                        tstZ3 = map->GetHeight(phasemask, tstX, tstY, prevZ - maxtravelDistZ / 2 + m_caster->GetCollisionHeight(), true, 25.0f);
 
                         //distance of rays, will select the shortest in 3D
                         srange1 = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX) + (tstZ1 - prevZ)*(tstZ1 - prevZ));
@@ -1528,11 +1528,11 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         }
 
                         // highest available point
-                        destz1 = map->GetHeight(phasemask, destx, desty, prevZ + maxtravelDistZ, true, 25.0f);
+                        destz1 = map->GetHeight(phasemask, destx, desty, prevZ + maxtravelDistZ + m_caster->GetCollisionHeight(), true, 25.0f);
                         // upper or floor
-                        destz2 = map->GetHeight(phasemask, destx, desty, prevZ, true, 25.0f);
+                        destz2 = map->GetHeight(phasemask, destx, desty, prevZ + m_caster->GetCollisionHeight(), true, 25.0f);
                         //lower than floor
-                        destz3 = map->GetHeight(phasemask, destx, desty, prevZ - maxtravelDistZ / 2, true, 25.0f);
+                        destz3 = map->GetHeight(phasemask, destx, desty, prevZ - maxtravelDistZ / 2 + m_caster->GetCollisionHeight(), true, 25.0f);
 
                         //distance of rays, will select the shortest in 3D
                         srange1 = sqrt((desty - prevY)*(desty - prevY) + (destx - prevX)*(destx - prevX) + (destz1 - prevZ)*(destz1 - prevZ));
