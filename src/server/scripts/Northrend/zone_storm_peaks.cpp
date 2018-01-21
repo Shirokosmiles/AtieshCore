@@ -393,34 +393,66 @@ class npc_hyldsmeet_protodrake : public CreatureScript
 
         class npc_hyldsmeet_protodrakeAI : public CreatureAI
         {
-            public:
-                npc_hyldsmeet_protodrakeAI(Creature* creature) : CreatureAI(creature), _accessoryRespawnTimer(0) { }
+        public:
+            npc_hyldsmeet_protodrakeAI(Creature* creature) : CreatureAI(creature), _accessoryRespawnTimer(0) { }
 
-                void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply) override
+            void PassengerBoarded(Unit* who, int8 seat, bool apply) override
+            {
+                if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
                 {
                     if (apply)
-                        return;
-
-                    if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
-                        _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
-                }
-
-                void UpdateAI(uint32 diff) override
-                {
-                    //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
-                    //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
-                    Vehicle* _vehicleKit = me->GetVehicleKit();
-                    if (_accessoryRespawnTimer && _accessoryRespawnTimer <= diff && _vehicleKit)
                     {
-                        _vehicleKit->InstallAllAccessories(true);
-                        _accessoryRespawnTimer = 0;
+                        who->SetDisplayId(who->GetNativeDisplayId()); // This will reset combat reach to default
+                        who->ToCreature()->SetReactState(REACT_PASSIVE);
                     }
-                    else
-                        _accessoryRespawnTimer -= diff;
+                }
+                else if (who->GetTypeId() == TYPEID_PLAYER)
+                {
+                    if (auto vehicleKit = me->GetVehicleKit())
+                    {
+                        if (auto passenger = vehicleKit->GetPassenger(1))
+                        {
+                            if (passenger->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
+                            {
+                                if (apply)
+                                {
+                                    passenger->SetFloatValue(UNIT_FIELD_COMBATREACH, 99.0f);
+                                    passenger->resetAttackTimer();
+                                    passenger->ToCreature()->AI()->AttackStart(who);
+                                }
+                                else
+                                {
+                                    passenger->SetDisplayId(passenger->GetNativeDisplayId());
+                                    passenger->ToCreature()->AI()->EnterEvadeMode(CreatureAI::EVADE_REASON_BOUNDARY);
+                                }
+                            }
+                        }
+                    }
                 }
 
-            private:
-                uint32 _accessoryRespawnTimer;
+                if (apply)
+                    return;
+
+                if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
+                    _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
+                //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
+                Vehicle* _vehicleKit = me->GetVehicleKit();
+                if (_accessoryRespawnTimer && _accessoryRespawnTimer <= diff && _vehicleKit)
+                {
+                    _vehicleKit->InstallAllAccessories(true);
+                    _accessoryRespawnTimer = 0;
+                }
+                else
+                    _accessoryRespawnTimer -= diff;
+            }
+
+        private:
+            uint32 _accessoryRespawnTimer;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
