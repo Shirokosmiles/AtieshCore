@@ -13613,6 +13613,8 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
 
     if (Player* player = ToPlayer())
     {
+        player->SetUnderACKmount();
+
         if (vehicle->GetBase()->GetTypeId() == TYPEID_PLAYER && player->IsInCombat())
         {
             vehicle->GetBase()->RemoveAura(const_cast<AuraApplication*>(aurApp));

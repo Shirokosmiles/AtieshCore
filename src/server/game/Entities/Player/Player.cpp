@@ -27017,7 +27017,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo)
         if (ToUnit()->IsFalling() ||  IsInFlight())
             return true;
 
-        if (GetTransport())
+        if (GetTransport() || GetVehicle() || GetVehicleKit())
             return true;
 
         if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
