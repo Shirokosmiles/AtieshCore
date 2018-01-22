@@ -286,9 +286,6 @@ class TC_GAME_API UnitAI
         // Called at any Damage to any victim (before damage apply)
         virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/) { }
 
-        // Called at any damage dealt by owner
-        virtual void OwnerMeleeDamageDealt(Unit* /*owner*/, CalcDamageInfo* /*damageInfo*/) { }
-
         // Called at any Damage from any attacker (before damage apply)
         // Note: it for recalculation damage or special reaction at damage
         virtual void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/) { }

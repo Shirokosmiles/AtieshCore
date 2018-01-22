@@ -1507,12 +1507,6 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         ToPlayer()->CastItemCombatSpell(dmgInfo);
     }
 
-    for (Unit* unit : m_Controlled)
-    {
-        if (unit->IsAIEnabled && unit->GetAI())
-            unit->GetAI()->OwnerMeleeDamageDealt(this, damageInfo);
-    }
-
     // Do effect if any damage done to target
     if (damageInfo->Damages[0].Damage + damageInfo->Damages[1].Damage)
     {
