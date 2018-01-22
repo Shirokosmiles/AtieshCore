@@ -241,6 +241,8 @@ public:
                         me->SetImmuneToPC(false);
                         phase = PHASE_ATTACKING;
 
+                        me->SetReactState(REACT_AGGRESSIVE);
+
                         if (Player* target = ObjectAccessor::GetPlayer(*me, playerGUID))
                             AttackStart(target);
                         wait_timer = 0;
