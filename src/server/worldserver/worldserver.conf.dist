@@ -3039,6 +3039,23 @@ AllowTrackBothResources = 0
 PlayerStart.AllReputation = 0
 
 #
+#    Weekend.XP.Days
+#        Description: Enables XP increase during last days of the week.
+#
+#        Default:     0 - (Disabled)
+#                     2 - (Weekend - Saturdays and Sundays)
+#                     7 - (Always active)
+
+Weekend.XP.Days = 0
+
+#
+#    Weekend.XP.Rate
+#        Description: Experience rates during weekend
+#        Default:     1 - (Weekend.XP.Rate, normal experience gain)
+
+Weekend.XP.Rate = 1
+
+#
 #    PlayerStart.AllSpells
 #        Description: If enabled, players will start with all their class spells (not talents).
 #                     You must populate playercreateinfo_spell_custom table with the spells you
