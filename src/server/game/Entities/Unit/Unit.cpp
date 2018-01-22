@@ -12227,11 +12227,6 @@ void Unit::SetControlled(bool apply, UnitState state)
                 break;
             default:
                 return;
-
-            SetFeared(false);
-            break;
-        default:
-            return;
         }
 
         // Unit States might have been already cleared but auras still present. I need to check with HasAuraType
