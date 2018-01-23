@@ -389,10 +389,11 @@ class npc_eye_of_acherus : public CreatureScript
                 me->SetDisableGravity(true);
                 me->SetControlled(true, UNIT_STATE_ROOT);
 
+                me->StopMoving();
                 Movement::MoveSplineInit init(me);
-                init.MoveTo(EyeOFAcherusFallPoint.GetPositionX(), EyeOFAcherusFallPoint.GetPositionY(), EyeOFAcherusFallPoint.GetPositionZ(), false, true);
-                init.SetFall();
-                init.Launch();
+                init.Stop();
+
+                me->GetMotionMaster()->MovePoint(POINT_EYE_FALL, EyeOFAcherusFallPoint, false);
 
                 _events.ScheduleEvent(EVENT_MOVE_START, 3500);
             }
