@@ -45,11 +45,19 @@ enum win_friends
     QUEST_HOW_TO_WIN_FRIENDS          = 12720,
 
     NPC_SCARLET_PREACHER              = 28939,
+    NPC_SCARLET_MARKSMAN              = 28610,
     SPELL_HOLY_FURY                   = 34809,
     SPELL_HOLY_SMITE                  = 15498,
     SPELL_TURN_UNDEAD                 = 19725,
+    SPELL_MULTI_SHOT                  = 18651,
+    SPELL_RAPTOR_STRIKE               = 32915,
+    SPELL_MARKSMAN_SHOOT              = 6660,
 
     EVENT_CAST_TURN_UNDEAD            = 9,
+    EVENT_CAST_MULTI_SHOT             = 10,
+    EVENT_CAST_RAPTOR_STRIKE          = 11,
+    EVENT_CAST_HOLY_SMITE             = 12,
+    EVENT_CAST_MARKSMAN_SHOOT         = 13,
 };
 
 class npc_crusade_persuaded : public CreatureScript
@@ -75,9 +83,20 @@ public:
             speechCounter = 0;
             playerGUID.Clear();
             isinquisitor = false;
+            isMarksman = false;
 
-            if (me->GetEntry() == NPC_SCARLET_PREACHER)
-                isinquisitor = true;
+            switch (me->GetEntry())
+            {
+                case NPC_SCARLET_PREACHER:
+                    isinquisitor = true;
+                    break;
+                case NPC_SCARLET_MARKSMAN:
+                    isMarksman = true;
+                    isMarksmanRDD = true;
+                    break;
+                default:
+                    break;
+            }
         }
 
         uint32 speechTimer;
@@ -120,7 +139,17 @@ public:
         void JustEngagedWith(Unit* /*target*/) override
         {
             if (isinquisitor)
-                _events.ScheduleEvent(EVENT_CAST_TURN_UNDEAD, 0);
+            {
+                _events.ScheduleEvent(EVENT_CAST_TURN_UNDEAD, Seconds(1));
+                _events.ScheduleEvent(EVENT_CAST_HOLY_SMITE, 0);
+            }
+
+            if (isMarksman)
+            {
+                _events.ScheduleEvent(EVENT_CAST_MULTI_SHOT, Seconds(4));
+                _events.ScheduleEvent(EVENT_CAST_MARKSMAN_SHOOT, 0);
+            }
+
             DoZoneInCombat();
         }
 
@@ -195,6 +224,24 @@ public:
             if (!UpdateVictim())
                 return;
 
+            if (isMarksman)
+            {
+                Unit* tvictim = me->GetVictim();
+                if (me->IsWithinMeleeRange(me->GetVictim()) && isMarksmanRDD)
+                {
+                    _events.CancelEvent(EVENT_CAST_MULTI_SHOT);
+                    _events.ScheduleEvent(EVENT_CAST_RAPTOR_STRIKE, 0);
+                    isMarksmanRDD = false;
+                }
+                else if (!me->IsWithinMeleeRange(me->GetVictim()) && !isMarksmanRDD)
+                {
+                    _events.CancelEvent(EVENT_CAST_RAPTOR_STRIKE);
+                    _events.ScheduleEvent(EVENT_CAST_MULTI_SHOT, Seconds(4));
+                    _events.ScheduleEvent(EVENT_CAST_MARKSMAN_SHOOT, 0);
+                    isMarksmanRDD = true;
+                }
+            }
+
             _events.Update(diff);
 
             while (uint32 _eventId = _events.ExecuteEvent())
@@ -224,25 +271,47 @@ public:
 
                         _events.ScheduleEvent(EVENT_CAST_TURN_UNDEAD, Seconds(3));
                         break;
-                    }                
+                    }
+                    case EVENT_CAST_MULTI_SHOT:
+                    {
+                        DoCastVictim(SPELL_MULTI_SHOT);
+                        _events.ScheduleEvent(EVENT_CAST_MULTI_SHOT, Seconds(10));
+                        break;
+                    }
+                    case EVENT_CAST_RAPTOR_STRIKE:
+                    {
+                        DoCastVictim(SPELL_RAPTOR_STRIKE);
+                        _events.ScheduleEvent(EVENT_CAST_RAPTOR_STRIKE, Seconds(4));
+                        break;
+                    }
+                    case EVENT_CAST_HOLY_SMITE:
+                    {
+                        DoCastVictim(SPELL_HOLY_SMITE);
+                        _events.ScheduleEvent(EVENT_CAST_HOLY_SMITE, Seconds(3));
+                        break;
+                    }
+                    case EVENT_CAST_MARKSMAN_SHOOT:
+                    {
+                        DoCastVictim(SPELL_MARKSMAN_SHOOT);
+                        _events.ScheduleEvent(EVENT_CAST_MARKSMAN_SHOOT, Seconds(2));
+                        break;
+                    }
                     default:
                         break;
                 }
             }
-            
-            if (isinquisitor)
-                DoSpellAttackIfReady(SPELL_HOLY_SMITE);
-            else
-                DoMeleeAttackIfReady();
+
+            DoMeleeAttackIfReady();
 
             ScriptedAI::UpdateAI(diff);
         }
 
     private:
         bool isinquisitor;
+        bool isMarksman;
+        bool isMarksmanRDD;
         EventMap _events;
     };
-
 };
 
 /*######
