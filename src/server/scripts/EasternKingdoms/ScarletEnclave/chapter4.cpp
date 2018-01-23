@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CombatAI.h"
 #include "ScriptMgr.h"
+#include "MotionMaster.h"
 #include "ObjectAccessor.h"
+#include "Player.h"
+#include "ScriptedEscortAI.h"
 
  //Scarlet courier
 enum Ballista
@@ -36,9 +38,9 @@ public:
         return new npc_scarlet_ballistaAI(creature);
     }
 
-    struct npc_scarlet_ballistaAI : public CombatAI
+    struct npc_scarlet_ballistaAI : public ScriptedAI
     {
-        npc_scarlet_ballistaAI(Creature* creature) : CombatAI(creature)
+        npc_scarlet_ballistaAI(Creature* creature) : ScriptedAI(creature)
         {
             Initialize();
         }
@@ -56,7 +58,7 @@ public:
         {
             targetGUID.Clear();
             Initialize();
-            CombatAI::Reset();
+            ScriptedAI::Reset();
         }
 
         void UpdateAI(uint32 diff) override
@@ -90,7 +92,7 @@ public:
                 return;
 
             DoSpellAttackIfReady(SPELL_BALLISTA_ASSAULT);
-            CombatAI::UpdateAI(diff);
+            ScriptedAI::UpdateAI(diff);
         }
 
     private:

@@ -15,14 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "Cell.h"
+#include "CellImpl.h"
 #include "CreatureTextMgr.h"
 #include "GameObject.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "ScriptMgr.h"
+#include "ScriptedEscortAI.h"
+#include "SpellInfo.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "ScriptedEscortAI.h"
-#include "SpellInfo.h"
 
 //How to win friends and influence enemies
 // texts signed for creature 28939 but used for 28939, 28940, 28610
@@ -39,6 +43,13 @@ enum win_friends
     SPELL_PERSUASIVE_STRIKE           = 52781,
     SPELL_THREAT_PULSE                = 58111,
     QUEST_HOW_TO_WIN_FRIENDS          = 12720,
+
+    NPC_SCARLET_PREACHER              = 28939,
+    SPELL_HOLY_FURY                   = 34809,
+    SPELL_HOLY_SMITE                  = 15498,
+    SPELL_TURN_UNDEAD                 = 19725,
+
+    EVENT_CAST_TURN_UNDEAD            = 9,
 };
 
 class npc_crusade_persuaded : public CreatureScript
@@ -63,6 +74,10 @@ public:
             speechTimer = 0;
             speechCounter = 0;
             playerGUID.Clear();
+            isinquisitor = false;
+
+            if (me->GetEntry() == NPC_SCARLET_PREACHER)
+                isinquisitor = true;
         }
 
         uint32 speechTimer;
@@ -74,6 +89,8 @@ public:
             Initialize();
             me->SetReactState(REACT_AGGRESSIVE);
             me->RestoreFaction();
+            ScriptedAI::Reset();
+            _events.Reset();
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -98,6 +115,18 @@ public:
                     }
                 }
             }
+        }
+
+        void JustEngagedWith(Unit* /*target*/) override
+        {
+            if (isinquisitor)
+                _events.ScheduleEvent(EVENT_CAST_TURN_UNDEAD, 0);
+            DoZoneInCombat();
+        }
+
+        void JustExitedCombat() override
+        {
+            _events.Reset();
         }
 
         void UpdateAI(uint32 diff) override
@@ -157,11 +186,61 @@ public:
                 return;
             }
 
+            if (isinquisitor)
+            {
+                if (!me->HasAura(SPELL_HOLY_FURY))
+                    DoCastSelf(SPELL_HOLY_FURY);
+            }
+
             if (!UpdateVictim())
                 return;
 
-            DoMeleeAttackIfReady();
+            _events.Update(diff);
+
+            while (uint32 _eventId = _events.ExecuteEvent())
+            {
+                switch (_eventId)
+                {
+                    case EVENT_CAST_TURN_UNDEAD:
+                    {
+                        // Find victim of Summon Gargoyle spell
+                        std::list<Unit*> targets;
+                        Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
+                        Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+                        Cell::VisitAllObjects(me, searcher, 30.0f);
+                        Unit* victim = nullptr;
+                        if (!targets.empty())
+                        {
+                            for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                                if ((*iter)->GetCreatureTypeMask() & CREATURE_TYPEMASK_DEMON_OR_UNDEAD)
+                                {
+                                    victim = (*iter);
+                                    continue;
+                                }
+                        }
+
+                        if (victim)
+                            DoCastVictim(SPELL_TURN_UNDEAD);
+
+                        _events.ScheduleEvent(EVENT_CAST_TURN_UNDEAD, Seconds(3));
+                        break;
+                    }                
+                    default:
+                        break;
+                }
+            }
+            
+            if (isinquisitor)
+                DoSpellAttackIfReady(SPELL_HOLY_SMITE);
+            else
+                DoMeleeAttackIfReady();
+
+            ScriptedAI::UpdateAI(diff);
         }
+
+    private:
+        bool isinquisitor;
+        EventMap _events;
     };
 
 };
