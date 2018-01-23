@@ -26939,7 +26939,7 @@ bool Player::CheckOnFlyHack()
         return false;
     }
 
-    if (IsFlying() || IsInFlight())
+    if (IsFlying() || IsLevitating() || IsInFlight())
         return true;
 
     if (GetTransport() || GetVehicle() || GetVehicleKit())
