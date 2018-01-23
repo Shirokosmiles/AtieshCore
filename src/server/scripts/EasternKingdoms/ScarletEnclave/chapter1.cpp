@@ -949,6 +949,8 @@ public:
             //DoCast(me, 35177, true);
             //me->MonsterSay("Mommy?", LANG_UNIVERSAL, 0);
             me->SetReactState(REACT_DEFENSIVE);
+            _follow = false;
+            _owner = me->GetOwner();
         }
 
         void FindMinions(Unit* owner)
@@ -971,43 +973,57 @@ public:
             }
         }
 
+        void JustEngagedWith(Unit* /*target*/) override
+        {
+            me->SetHomePosition(*me);
+            if (_follow)
+                _follow = false;
+            DoZoneInCombat(nullptr, 10.f);
+        }
+
+        void JustExitedCombat() override
+        {
+            if (_owner)
+            {
+                me->GetMotionMaster()->MoveFollow(_owner, 1.0f, 0);
+                _follow = true;
+            }
+        }
+
         void UpdateAI(uint32 /*diff*/) override
         {
-            if (!me->IsInCombat())
+            if (!me || !me->IsAlive())
+                return;
+
+            if (_owner && !me->IsInCombat() && _owner->IsInCombat())
             {
-                if (Unit* owner = me->GetOwner())
+                if (_owner->getAttackerForHelper())
+                    AttackStart(_owner->getAttackerForHelper());
+                else
+                    FindMinions(_owner);
+            }
+            else if (!me->IsInCombat() && !_follow)
+            {
+                if (_owner)
                 {
-                    Player* plrOwner = owner->ToPlayer();
-                    if (plrOwner && plrOwner->IsInCombat())
-                    {
-                        if (plrOwner->getAttackerForHelper() && plrOwner->getAttackerForHelper()->GetEntry() == NPC_GHOSTS)
-                            AttackStart(plrOwner->getAttackerForHelper());
-                        else
-                            FindMinions(owner);
-                    }
+                    me->GetMotionMaster()->MoveFollow(_owner, 1.0f, 0);
+                    _follow = true;
                 }
+                else
+                    _owner = me->GetOwner(); // and setting follow will in new update
             }
 
             if (!UpdateVictim() || !me->GetVictim())
                 return;
 
             //ScriptedAI::UpdateAI(diff);
-            //Check if we have a current target
-            if (me->EnsureVictim()->GetEntry() == NPC_GHOSTS)
-            {
-                if (me->isAttackReady())
-                {
-                    //If we are within range melee the target
-                    if (me->IsWithinMeleeRange(me->GetVictim()))
-                    {
-                        me->AttackerStateUpdate(me->GetVictim());
-                        me->resetAttackTimer();
-                    }
-                }
-            }
+            DoMeleeAttackIfReady();
         }
-    };
 
+    private:
+        Unit* _owner;
+        bool _follow;
+    };
 };
 
 /*####
