@@ -387,11 +387,8 @@ class npc_eye_of_acherus : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
 
                 me->SetDisableGravity(true);
-                me->SetControlled(true, UNIT_STATE_ROOT);
-
+                me->SetControlled(false, UNIT_STATE_ROOT);
                 me->StopMoving();
-                Movement::MoveSplineInit init(me);
-                init.Stop();
 
                 me->GetMotionMaster()->MovePoint(POINT_EYE_FALL, EyeOFAcherusFallPoint, false);
 
@@ -433,7 +430,7 @@ class npc_eye_of_acherus : public CreatureScript
                 {
                     me->SetSheath(SHEATH_STATE_MELEE);
                     me->RemoveAllAuras();
-                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    //me->SetControlled(false, UNIT_STATE_ROOT);
                     if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
                     {
                         owner->RemoveAura(SPELL_EYE_FLIGHT_BOOST);
