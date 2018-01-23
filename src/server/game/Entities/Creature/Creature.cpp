@@ -892,7 +892,7 @@ void Creature::Update(uint32 diff)
                                                   !EnsureVictim()->GetCharmerOrOwnerPlayerOrPlayerItself() ||                // or the victim/owner/charmer is not a player
                                                   !EnsureVictim()->GetCharmerOrOwnerPlayerOrPlayerItself()->IsGameMaster()); // or the victim/owner/charmer is not a GameMaster
 
-                if (!IsInEvadeMode() && (!bInCombat || IsPolymorphed() || (CanNotReachTarget() && !isCreatureIgnoreEvade()))) // regenerate health if not in combat or if polymorphed
+                if (!isCreatureIgnoreEvade() && !IsInEvadeMode() && (!bInCombat || IsPolymorphed() || CanNotReachTarget())) // regenerate health if not in combat or if polymorphed
                     RegenerateHealth();
 
                 if (getPowerType() == POWER_ENERGY)
@@ -903,7 +903,7 @@ void Creature::Update(uint32 diff)
                 m_regenTimer = CREATURE_REGEN_INTERVAL;
             }
 
-            if (CanNotReachTarget() && !isCreatureIgnoreEvade() && !IsInEvadeMode() && !GetMap()->IsRaid())
+            if (!isCreatureIgnoreEvade() && CanNotReachTarget() && !IsInEvadeMode() && !GetMap()->IsRaid())
             {
                 m_cannotReachTimer += diff;
                 if (m_cannotReachTimer >= CREATURE_NOPATH_EVADE_TIME)
