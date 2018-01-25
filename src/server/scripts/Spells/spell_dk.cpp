@@ -1675,7 +1675,7 @@ class spell_dk_pestilence : public SpellScriptLoader
                         float donePct = aurOld->GetDonePct();
                         float critChance = aurOld->GetCritChance();
 
-                        if (AuraEffect* aurEffOld = aurOld->GetEffect(EFFECT_0))
+                        if (aurOld->GetEffect(EFFECT_0))
                         {
                             caster->CastSpell(hitUnit, SPELL_DK_BLOOD_PLAGUE, true); // Spread the disease to hitUnit.
 
@@ -1693,7 +1693,7 @@ class spell_dk_pestilence : public SpellScriptLoader
                     {
                         float donePct = aurOld->GetDonePct();
 
-                        if (AuraEffect* aurEffOld = aurOld->GetEffect(EFFECT_0))
+                        if (aurOld->GetEffect(EFFECT_0))
                         {
                             caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true); // Spread the disease to hitUnit.
 
