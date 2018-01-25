@@ -344,8 +344,8 @@ public:
 
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->Mount(25279);
+                me->SetWalk(false);
                 me->SetSpeedRate(MOVE_RUN, 2.0f);
-                me->UpdateSpeed(MOVE_RUN);
                 me->SetVisible(true);
 
                 UpdateWorldState(me->GetMap(), WORLD_STATE_REMAINS, 0);
@@ -484,8 +484,7 @@ public:
                     NPCChangeTarget(uiThassarianGUID);
 
                     me->Dismount();
-                    me->SetSpeedRate(MOVE_RUN, 2.0f);
-                    me->UpdateSpeed(MOVE_RUN);
+                    me->SetSpeedRate(MOVE_RUN, 1.0f);
                     me->CastSpell(me, SPELL_THE_MIGHT_OF_MOGRAINE, true); // need to fix, on player only
 
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, uiKoltiraGUID))
