@@ -1827,16 +1827,19 @@ class spell_malygos_vortex_visual : public SpellScriptLoader
                 {
                     for (ThreatReference const* ref : caster->GetThreatManager().GetUnsortedThreatList())
                     {
-                        if (Player* targetPlayer = ref->GetVictim()->ToPlayer())
+                        if (ref && ref->GetVictim())
                         {
-                            if (targetPlayer->IsGameMaster())
-                                continue;
-
-                            if (InstanceScript* instance = caster->GetInstanceScript())
+                            if (Player* targetPlayer = ref->GetVictim()->ToPlayer())
                             {
-                                // Teleport spell - I'm not sure but might be it must be cast by each vehicle when it's passenger leaves it.
-                                if (Creature* trigger = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_TRIGGER)))
-                                    trigger->CastSpell(targetPlayer, SPELL_VORTEX_6, true);
+                                if (targetPlayer->IsGameMaster())
+                                    continue;
+
+                                if (InstanceScript* instance = caster->GetInstanceScript())
+                                {
+                                    // Teleport spell - I'm not sure but might be it must be cast by each vehicle when it's passenger leaves it.
+                                    if (Creature* trigger = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_TRIGGER)))
+                                        trigger->CastSpell(targetPlayer, SPELL_VORTEX_6, true);
+                                }
                             }
                         }
                     }
