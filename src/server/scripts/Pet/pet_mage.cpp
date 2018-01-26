@@ -150,6 +150,9 @@ class npc_pet_mage_mirror_image : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
+                if (!me || !me->IsAlive())
+                    return;
+
                 Unit* owner = me->GetCharmerOrOwner();
                 if (!owner)
                     return;
@@ -169,7 +172,7 @@ class npc_pet_mage_mirror_image : public CreatureScript
                     return;
 
                 // assign target if image doesnt have any or the target is not actual
-                if (!target || me->GetVictim() != target)
+                if (!target || !me->GetVictim() || me->GetVictim() != target)
                 {
                     Unit* ownerTarget = nullptr;
                     if (Player* playerOwner = me->GetCharmerOrOwner()->ToPlayer())
