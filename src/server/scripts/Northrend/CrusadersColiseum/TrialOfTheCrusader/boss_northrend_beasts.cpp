@@ -206,10 +206,9 @@ struct boss_northrend_beastsAI : public BossAI
     boss_northrend_beastsAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId)
     {
         SetBoundary(instance->GetBossBoundary(DATA_NORTHREND_BEASTS));
-        Initialize();
     }
 
-    void Initialize()
+    void Reset() override
     {
         events.Reset();
         events.SetPhase(PHASE_EVENT);
@@ -219,16 +218,14 @@ struct boss_northrend_beastsAI : public BossAI
         HandleInitialMovement();
     }
 
-    void Reset() override
-    {
-        Initialize();
-    }
-
     void HandleInitialMovement()
     {
         switch (me->GetEntry())
         {
             case NPC_GORMOK:
+                me->GetMotionMaster()->MoveAlongSplineChain(POINT_INITIAL_MOVEMENT, SPLINE_INITIAL_MOVEMENT, false);
+                events.ScheduleEvent(EVENT_ENGAGE, 7s);
+                break;
             case NPC_DREADSCALE:
                 me->GetMotionMaster()->MoveAlongSplineChain(POINT_INITIAL_MOVEMENT, SPLINE_INITIAL_MOVEMENT, false);
                 break;
@@ -345,12 +342,6 @@ struct boss_gormok : public boss_northrend_beastsAI
     {
         if (apply && seatId == GORMOK_HAND_SEAT)
             who->CastSpell(who, SPELL_RISING_ANGER, true);
-    }
-
-    void MovementInform(uint32 type, uint32 pointId) override
-    {
-        if (type == SPLINE_CHAIN_MOTION_TYPE && pointId == POINT_INITIAL_MOVEMENT)
-            events.ScheduleEvent(EVENT_ENGAGE, 7s);
     }
 
     void ExecuteEvent(uint32 eventId) override
