@@ -206,9 +206,10 @@ struct boss_northrend_beastsAI : public BossAI
     boss_northrend_beastsAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId)
     {
         SetBoundary(instance->GetBossBoundary(DATA_NORTHREND_BEASTS));
+        Initialize();
     }
 
-    void Reset() override
+    void Initialize()
     {
         events.Reset();
         events.SetPhase(PHASE_EVENT);
@@ -216,6 +217,11 @@ struct boss_northrend_beastsAI : public BossAI
         me->SetReactState(REACT_PASSIVE);
         me->SetCombatPulseDelay(0);
         HandleInitialMovement();
+    }
+
+    void Reset() override
+    {
+        Initialize();
     }
 
     void HandleInitialMovement()
@@ -624,10 +630,10 @@ struct boss_jormungarAI : public boss_northrend_beastsAI
 {
     boss_jormungarAI(Creature* creature, uint32 bossId) : boss_northrend_beastsAI(creature, bossId)
     {
-        Initialize();
+        Initialize_jormungar();
     }
 
-    void Initialize()
+    void Initialize_jormungar()
     {
         otherWormEntry = 0;
         modelStationary = 0;
@@ -641,7 +647,7 @@ struct boss_jormungarAI : public boss_northrend_beastsAI
 
     void Reset() override
     {
-        Initialize();
+        Initialize_jormungar();
         boss_northrend_beastsAI::Reset();
     }
 
@@ -937,7 +943,7 @@ struct boss_icehowl : public boss_northrend_beastsAI
 
     void MovementInform(uint32 type, uint32 pointId) override
     {
-        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE && type != SPLINE_CHAIN_MOTION_TYPE)
+        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE && type != JUMP_MOTION_TYPE && type != SPLINE_CHAIN_MOTION_TYPE)
             return;
 
         switch (pointId)
