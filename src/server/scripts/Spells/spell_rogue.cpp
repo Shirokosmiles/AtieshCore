@@ -168,6 +168,36 @@ class spell_rog_cheat_death : public SpellScriptLoader
         }
 };
 
+// 45182 - Cheat Death Dummy Aura
+class spell_rog_cheat_death_dummy : public SpellScriptLoader
+{
+public:
+    spell_rog_cheat_death_dummy() : SpellScriptLoader("spell_rog_cheat_death_dummy") { }
+
+    class spell_rog_cheat_death_dummy_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_rog_cheat_death_dummy_AuraScript);
+
+        void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
+        {
+            uint32 absorbChance = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+            uint32 dmg = dmgInfo.GetDamage();
+
+            absorbAmount = CalculatePct(dmg, absorbChance);
+        }
+
+        void Register() override
+        {
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_rog_cheat_death_dummy_AuraScript::Absorb, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_rog_cheat_death_dummy_AuraScript();
+    }
+};
+
 // -51664 - Cut to the Chase
 class spell_rog_cut_to_the_chase : public SpellScriptLoader
 {
@@ -1123,6 +1153,7 @@ void AddSC_rogue_spell_scripts()
 {
     new spell_rog_blade_flurry();
     new spell_rog_cheat_death();
+    new spell_rog_cheat_death_dummy();
     new spell_rog_cut_to_the_chase();
     new spell_rog_deadly_brew();
     new spell_rog_deadly_poison();
