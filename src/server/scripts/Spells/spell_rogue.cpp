@@ -178,6 +178,12 @@ public:
     {
         PrepareAuraScript(spell_rog_cheat_death_dummy_AuraScript);
 
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
+        {
+            // Set absorbtion amount to unlimited
+            amount = -1;
+        }
+
         void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
         {
             uint32 absorbChance = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
@@ -188,7 +194,8 @@ public:
 
         void Register() override
         {
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_rog_cheat_death_dummy_AuraScript::Absorb, EFFECT_0, SPELL_AURA_DUMMY);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_rog_cheat_death_dummy_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_DUMMY);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_rog_cheat_death_dummy_AuraScript::Absorb, EFFECT_0);
         }
     };
 
