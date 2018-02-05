@@ -13607,6 +13607,7 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
     if (Player* player = ToPlayer())
     {
         player->SetUnderACKmount();
+        player->SetSkipOnePacketForASH(true);
 
         if (vehicle->GetBase()->GetTypeId() == TYPEID_PLAYER && player->IsInCombat())
         {
@@ -13714,6 +13715,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     {
         player->SetFallInformation(0, GetPositionZ());
         player->SetUnderACKmount();
+        player->SetSkipOnePacketForASH(true);
     }
     else if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
     {

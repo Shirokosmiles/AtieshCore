@@ -26924,6 +26924,9 @@ bool Player::CheckOnFlyHack()
     if (GetTransport() || GetVehicle() || GetVehicleKit())
         return true;
 
+    if (HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
+        return true;
+
     if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
         return true;
 
@@ -26997,6 +27000,9 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo)
             return true;
 
         if (GetTransport() || GetVehicle() || GetVehicleKit())
+            return true;
+
+        if (HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
             return true;
 
         if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
