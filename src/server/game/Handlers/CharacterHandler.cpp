@@ -904,22 +904,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     {
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 
-        if (pCurrChar->HasAtLoginFlag(AT_LOGIN_START_MONEY))
-        {
-            if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS)) // if enabled plr will take a bonus
-            {            
-                // here will script for adding money or something more
-                int32 moneybonus = sWorld->getIntConfig(CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS);
-
-                // send server info
-                chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus);
-
-                pCurrChar->ModifyMoney(moneybonus);                
-            }
-
-            pCurrChar->RemoveAtLoginFlag(AT_LOGIN_START_MONEY);
-        }
-
         PlayerInfo const* info = sObjectMgr->GetPlayerInfo(pCurrChar->getRace(), pCurrChar->getClass());
         for (uint32 spellId : info->castSpells)
             pCurrChar->CastSpell(pCurrChar, spellId, true);
@@ -993,7 +977,23 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
             repMgr.SendState(nullptr);
         }
     }
-    
+
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_START_MONEY)) // moved from firstLogin - now we can set this Flag (512) from DB - characters.at_login
+    {
+        if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS)) // if enabled plr will take a bonus
+        {
+            // here will script for adding money or something more
+            int32 moneybonus = sWorld->getIntConfig(CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS);
+
+            // send server info
+            chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus);
+
+            pCurrChar->ModifyMoney(moneybonus);
+        }
+
+        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_START_MONEY);
+    }
+
     // show time before shutdown if shutdown planned.
     if (sWorld->IsShuttingDown())
         sWorld->ShutdownMsg(true, pCurrChar);
