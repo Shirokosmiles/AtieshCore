@@ -1408,6 +1408,11 @@ void World::LoadConfigSettings(bool reload)
     // Guild - broadcast loot
     m_bool_configs[CONFIG_LOOT_GUILD_ENABLED] = sConfigMgr->GetBoolDefault("Guild.LootBroadcast.Enabled", false);
 
+    // First Login Acc Bonus script
+    m_bool_configs[CONFIG_FIRST_LOGIN_ACC_BONUS] = sConfigMgr->GetBoolDefault("FLAB.Script.Enabled", false);
+    m_int_configs[CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS] = sConfigMgr->GetIntDefault("FLAB.Script.MaxChars", 0);
+    m_int_configs[CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS] = sConfigMgr->GetIntDefault("FLAB.Script.BonusMoney", 1);
+
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetIntDefault("DungeonFinder.OptionsMask", 1);
 

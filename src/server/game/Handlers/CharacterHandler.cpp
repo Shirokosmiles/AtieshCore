@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
 #include "Battleground.h"
 #include "CalendarMgr.h"
@@ -566,6 +567,16 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
             newChar.SetAtLoginFlag(AT_LOGIN_FIRST);               // First login
 
+            if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS))
+            {
+                if (uint32 charCount = AccountMgr::GetCharactersCount(GetAccountId()))
+                {
+                    if (charCount <= sWorld->getIntConfig(CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS))
+                    {
+                        newChar.SetAtLoginFlag(AT_LOGIN_START_MONEY);  // First login with bonus
+                    }
+                }
+            }
                                                                   // Player created, save it now
             newChar.SaveToDB(true);
             createInfo->CharCount += 1;
@@ -895,6 +906,22 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     if (firstLogin)
     {
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
+
+        if (pCurrChar->HasAtLoginFlag(AT_LOGIN_START_MONEY))
+        {
+            if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS)) // if enabled plr will take a bonus
+            {            
+                // here will script for adding money or something more
+                int32 moneybonus = sWorld->getIntConfig(CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS);
+
+                // send server info
+                chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus);
+
+                pCurrChar->ModifyMoney(moneybonus);                
+            }
+
+            pCurrChar->RemoveAtLoginFlag(AT_LOGIN_START_MONEY);
+        }
 
         PlayerInfo const* info = sObjectMgr->GetPlayerInfo(pCurrChar->getRace(), pCurrChar->getClass());
         for (uint32 spellId : info->castSpells)
