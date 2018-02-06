@@ -983,9 +983,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS)) // if enabled plr will take a bonus
         {
             // here will script for adding money or something more
-            int32 moneybonus = sWorld->getIntConfig(CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS);
-            
-            // send server info
+            uint32 moneybonus = sWorld->getIntConfig(CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS);
+
+            // send bonus announce
             chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus / GOLD, (moneybonus%GOLD) / SILVER, moneybonus%SILVER);
 
             pCurrChar->ModifyMoney(moneybonus);
