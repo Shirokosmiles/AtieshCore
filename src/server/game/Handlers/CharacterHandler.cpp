@@ -569,13 +569,10 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
             if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS))
             {
-                if (uint32 charCount = AccountMgr::GetCharactersCount(GetAccountId()))
-                {
-                    if (charCount <= sWorld->getIntConfig(CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS))
-                    {
-                        newChar.SetAtLoginFlag(AT_LOGIN_START_MONEY);  // First login with bonus
-                    }
-                }
+                uint32 charCount = AccountMgr::GetCharactersCount(GetAccountId());
+ 
+                if (charCount <= sWorld->getIntConfig(CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS))
+                    newChar.SetAtLoginFlag(AT_LOGIN_START_MONEY);  // First login with bonus
             }
                                                                   // Player created, save it now
             newChar.SaveToDB(true);
