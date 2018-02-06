@@ -984,9 +984,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         {
             // here will script for adding money or something more
             int32 moneybonus = sWorld->getIntConfig(CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS);
-
+            
             // send server info
-            chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus);
+            chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus / GOLD, (moneybonus%GOLD) / SILVER, moneybonus%SILVER);
 
             pCurrChar->ModifyMoney(moneybonus);
         }
