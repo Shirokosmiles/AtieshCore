@@ -982,14 +982,20 @@ public:
     {
         npc_twilight_whelpAI(Creature* creature) : ScriptedAI(creature)
         {
-            Reset();
+            Initialize_whelp();
         }
 
-        void Reset() override
+        void Initialize_whelp()
         {
             me->RemoveAllAuras();
             DoZoneInCombat();
             events.ScheduleEvent(EVENT_FADE_ARMOR, 1000);
+        }
+
+        void Reset() override
+        {
+            events.Reset();
+            Initialize_whelp();
         }
 
         void UpdateAI(uint32 diff) override
