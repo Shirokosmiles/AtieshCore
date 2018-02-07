@@ -638,7 +638,9 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            Player* player = killer->ToPlayer();
+            Player* player = nullptr;
+            if (killer)
+                player = killer->ToPlayer();
 
             if (!player)
                 return;

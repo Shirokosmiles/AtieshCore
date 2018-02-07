@@ -370,7 +370,10 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            Player* player = killer->ToPlayer();
+            Player* player = nullptr;
+            if (killer)
+                player = killer->ToPlayer();
+
             if (!player)
                 return;
 
@@ -1274,8 +1277,11 @@ public:
             leryssa->SetWalk(false);
             leryssa->GetMotionMaster()->MovePoint(0, 3722.114502f, 3564.201660f, 477.441437f);
 
-            if (Player* player = killer->ToPlayer())
-                player->RewardPlayerAndGroupAtEvent(NPC_PRINCE_VALANAR, 0);
+            if (killer)
+            {
+                if (Player* player = killer->ToPlayer())
+                    player->RewardPlayerAndGroupAtEvent(NPC_PRINCE_VALANAR, 0);
+            }
         }
     };
 
@@ -1987,7 +1993,10 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            Player* player = killer->ToPlayer();
+            Player* player = nullptr;
+            if (killer)
+                player = killer->ToPlayer();
+
             if (!player)
                 return;
 

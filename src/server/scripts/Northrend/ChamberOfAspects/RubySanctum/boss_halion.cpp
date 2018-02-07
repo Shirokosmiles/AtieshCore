@@ -450,7 +450,7 @@ class boss_twilight_halion : public CreatureScript
                     if (me->IsDamageEnoughForLootingAndReward())
                         halion->LowerPlayerDamageReq(halion->GetMaxHealth());
 
-                    if (halion->IsAlive())
+                    if (halion->IsAlive() && killer)
                         Unit::Kill(killer, halion);
                 }
 

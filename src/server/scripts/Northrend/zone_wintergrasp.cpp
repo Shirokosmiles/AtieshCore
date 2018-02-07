@@ -544,7 +544,7 @@ class npc_wg_give_promotion_credit : public CreatureScript
 
             void JustDied(Unit* killer) override
             {
-                if (killer->GetTypeId() != TYPEID_PLAYER)
+                if (killer && killer->GetTypeId() != TYPEID_PLAYER)
                     return;
 
                 BattlefieldWintergrasp* wintergrasp = static_cast<BattlefieldWintergrasp*>(sBattlefieldMgr->GetBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP));

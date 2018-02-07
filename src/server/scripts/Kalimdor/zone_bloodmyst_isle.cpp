@@ -73,8 +73,11 @@ public:
             switch (urand(0, 2))
             {
                 case 0:
-                    if (Player* player = killer->ToPlayer())
-                        player->KilledMonsterCredit(NPC_EXPEDITION_RESEARCHER);
+                    if (killer)
+                    {
+                        if (Player* player = killer->ToPlayer())
+                            player->KilledMonsterCredit(NPC_EXPEDITION_RESEARCHER);
+                    }
                     spawnCreatureID = NPC_EXPEDITION_RESEARCHER;
                     break;
                 case 1:
@@ -266,10 +269,13 @@ public:
             {
                 Group* group = me->GetLootRecipientGroup();
 
-                if (killer->GetGUID() == legoso->GetGUID() ||
-                    (group && group->IsMember(killer->GetGUID())) ||
-                    killer->GetGUID().GetCounter() == legoso->AI()->GetData(DATA_EVENT_STARTER_GUID))
-                    legoso->AI()->DoAction(ACTION_LEGOSO_SIRONAS_KILLED);
+                if (killer)
+                {
+                    if (killer->GetGUID() == legoso->GetGUID() ||
+                        (group && group->IsMember(killer->GetGUID())) ||
+                        killer->GetGUID().GetCounter() == legoso->AI()->GetData(DATA_EVENT_STARTER_GUID))
+                        legoso->AI()->DoAction(ACTION_LEGOSO_SIRONAS_KILLED);
+                }
             }
         }
 
