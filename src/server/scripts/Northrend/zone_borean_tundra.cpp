@@ -1277,11 +1277,8 @@ public:
             leryssa->SetWalk(false);
             leryssa->GetMotionMaster()->MovePoint(0, 3722.114502f, 3564.201660f, 477.441437f);
 
-            if (killer)
-            {
-                if (Player* player = killer->ToPlayer())
-                    player->RewardPlayerAndGroupAtEvent(NPC_PRINCE_VALANAR, 0);
-            }
+            if (killer && killer->GetTypeId() == TYPEID_PLAYER)
+                killer->ToPlayer()->RewardPlayerAndGroupAtEvent(NPC_PRINCE_VALANAR, 0);
         }
     };
 

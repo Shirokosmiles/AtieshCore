@@ -368,6 +368,7 @@ class boss_lady_deathwhisper : public CreatureScript
                         darnavan->SetReactState(REACT_PASSIVE);
                         darnavan->m_Events.AddEvent(new DaranavanMoveEvent(*darnavan), darnavan->m_Events.CalculateTime(10000));
                         darnavan->AI()->Talk(SAY_DARNAVAN_RESCUED);
+
                         if (killer)
                         {
                             if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
@@ -893,6 +894,7 @@ class npc_darnavan : public CreatureScript
             void JustDied(Unit* killer) override
             {
                 _events.Reset();
+
                 if (killer)
                 {
                     if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())

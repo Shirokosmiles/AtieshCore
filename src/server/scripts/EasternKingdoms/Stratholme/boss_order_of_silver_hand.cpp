@@ -130,7 +130,7 @@ public:
                     break;
             }
 
-            if (instance->GetData(TYPE_SH_QUEST))
+            if (killer && instance->GetData(TYPE_SH_QUEST))
             {
                 if (killer)
                 {

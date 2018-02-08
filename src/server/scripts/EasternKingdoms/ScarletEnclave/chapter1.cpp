@@ -863,7 +863,7 @@ public:
         void JustDied(Unit* killer) override
         {
             Creature* deathcharger = me->FindNearestCreature(28782, 30);
-            if (!deathcharger)
+            if (!deathcharger || !killer)
                 return;
 
             if (killer && killer->GetTypeId() == TYPEID_PLAYER && deathcharger->GetTypeId() == TYPEID_UNIT && deathcharger->IsVehicle())
