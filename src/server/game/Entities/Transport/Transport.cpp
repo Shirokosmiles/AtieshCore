@@ -284,7 +284,12 @@ void Transport::AddPassenger(WorldObject* passenger)
                     crt->SetTransportHomePosition(x, y, z, o);
 
                     if (crt->IsPet())
-                        GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
+                    {
+                        if (crt->GetVictim() && crt->IsInCombat())
+                            GetMap()->CreatureRelocation(crt, crt->GetVictim()->GetPositionX(), crt->GetVictim()->GetPositionY(), crt->GetVictim()->GetPositionZ() + crt->GetVictim()->GetCollisionHeight(), crt->GetVictim()->GetOrientation());
+                        else
+                            GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + owner->GetCollisionHeight(), owner->GetOrientation());
+                    }
                     else if (crt->IsTotem())
                         GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);
 
@@ -327,7 +332,12 @@ void Transport::RemovePassenger(WorldObject* passenger)
             if (crt->IsPet())
             {
                 if (Unit* owner = crt->GetOwner())
-                    GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
+                {
+                    if (crt->GetVictim() && crt->IsInCombat())
+                        GetMap()->CreatureRelocation(crt, crt->GetVictim()->GetPositionX(), crt->GetVictim()->GetPositionY(), crt->GetVictim()->GetPositionZ() + crt->GetVictim()->GetCollisionHeight(), crt->GetVictim()->GetOrientation());
+                    else
+                        GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + owner->GetCollisionHeight(), owner->GetOrientation());
+                }
 
                 sScriptMgr->OnRemovePassengerPetOrTotem(this, crt);
             }

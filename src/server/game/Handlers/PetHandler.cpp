@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "WorldSession.h"
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
@@ -29,6 +28,7 @@
 #include "Pet.h"
 #include "PetAI.h"
 #include "Player.h"
+#include "Transport.h"
 #include "Spell.h"
 #include "SpellHistory.h"
 #include "SpellInfo.h"
@@ -36,6 +36,7 @@
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldSession.h"
 
 void WorldSession::HandleDismissCritter(WorldPacket& recvData)
 {
@@ -176,6 +177,21 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 case COMMAND_FOLLOW:                        //spellid=1792  //FOLLOW
                     pet->AttackStop();
                     pet->InterruptNonMeleeSpells(false);
+                    if (Unit* owner = pet->GetOwner())
+                    {
+                        if (Transport* transportowner = owner->GetTransport())
+                        {
+                            if (pet->GetTransport() && pet->GetTransport()->GetGUID() != transportowner->GetGUID())
+                            {
+                                pet->GetTransport()->RemovePassenger(pet);
+                                if (!transportowner->isPassenger(pet))
+                                    transportowner->AddPassenger(pet);
+                            }
+                        }
+                        else if (pet->GetTransport())
+                            pet->GetTransport()->RemovePassenger(pet);
+                    }
+
                     pet->GetMotionMaster()->MoveFollow(_player, PET_FOLLOW_DIST, pet->GetFollowAngle());
                     if (pet->ToPet())
                         pet->ToPet()->ClearCastWhenWillAvailable();
@@ -227,6 +243,18 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 petAI->_AttackStart(TargetUnit); // force target switch
                             else
                                 AI->AttackStart(TargetUnit);
+
+                            if (Transport* transporttarget = TargetUnit->GetTransport())
+                            {
+                                if (pet->GetTransport() && pet->GetTransport()->GetGUID() != transporttarget->GetGUID())
+                                {
+                                    pet->GetTransport()->RemovePassenger(pet);
+                                    if (!transporttarget->isPassenger(pet))
+                                        transporttarget->AddPassenger(pet);
+                                }
+                            }
+                            else if (pet->GetTransport())
+                                pet->GetTransport()->RemovePassenger(pet);
 
                             //10% chance to play special pet attack talk, else growl
                             if (pet->IsPet() && ((Pet*)pet)->getPetType() == SUMMON_PET && pet != TargetUnit && urand(0, 100) < 10)
