@@ -1955,6 +1955,14 @@ ChatFlood.MuteTime = 10
 Channel.RestrictedLfg = 1
 
 #
+#    Channel.AllowedLfg
+#        Description: Allow access at LookupForGroup channel to characters without condition of LFG state.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Channel.AllowedLfg = 0
+
+#
 #    ChatLevelReq.Channel
 #    ChatLevelReq.Whisper
 #    ChatLevelReq.Emote
