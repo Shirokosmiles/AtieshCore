@@ -26,6 +26,7 @@
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
+#include "Transport.h"
 #include "Spell.h"
 #include "SpellHistory.h"
 #include "SpellInfo.h"
@@ -455,6 +456,27 @@ void PetAI::HandleReturnMovement()
             ClearCharmInfoFlags();
             me->GetCharmInfo()->SetIsReturning(true);
             me->GetMotionMaster()->Clear();
+            if (Unit* owner = me->GetOwner())
+            {
+                if (Transport* transportowner = owner->GetTransport())
+                {
+                    if (me->GetTransport())
+                    {
+                        if (me->GetTransport()->GetGUID() != transportowner->GetGUID())
+                            me->GetTransport()->RemovePassenger(me);
+
+                        if (!transportowner->isPassenger(me))
+                            transportowner->AddPassenger(me);
+                    }
+                    else
+                    {
+                        if (!transportowner->isPassenger(me))
+                            transportowner->AddPassenger(me);
+                    }
+                }
+                else if (me->GetTransport())
+                    me->GetTransport()->RemovePassenger(me);
+            }
             me->GetMotionMaster()->MoveFollow(me->GetCharmerOrOwner(), PET_FOLLOW_DIST, me->GetFollowAngle());
         }
     }
@@ -480,6 +502,25 @@ void PetAI::DoAttack(Unit* target, bool chase)
             me->GetCharmInfo()->SetIsCommandAttack(oldCmdAttack); // For passive pets commanded to attack so they will use spells
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveChase(target, me->GetPetChaseDistance());
+
+            if (Transport* transporttarget = target->GetTransport())
+            {
+                if (me->GetTransport())
+                {
+                    if (me->GetTransport()->GetGUID() != transporttarget->GetGUID())
+                        me->GetTransport()->RemovePassenger(me);
+
+                    if (!transporttarget->isPassenger(me))
+                        transporttarget->AddPassenger(me);
+                }
+                else
+                {
+                    if (!transporttarget->isPassenger(me))
+                        transporttarget->AddPassenger(me);
+                }
+            }
+            else if (me->GetTransport())
+                me->GetTransport()->RemovePassenger(me);
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {

@@ -181,9 +181,16 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     {
                         if (Transport* transportowner = owner->GetTransport())
                         {
-                            if (pet->GetTransport() && pet->GetTransport()->GetGUID() != transportowner->GetGUID())
+                            if (pet->GetTransport())
                             {
-                                pet->GetTransport()->RemovePassenger(pet);
+                                if (pet->GetTransport()->GetGUID() != transportowner->GetGUID())
+                                    pet->GetTransport()->RemovePassenger(pet);
+
+                                if (!transportowner->isPassenger(pet))
+                                    transportowner->AddPassenger(pet);
+                            }
+                            else
+                            {
                                 if (!transportowner->isPassenger(pet))
                                     transportowner->AddPassenger(pet);
                             }
@@ -244,13 +251,20 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             else
                                 AI->AttackStart(TargetUnit);
 
-                            if (Transport* transporttarget = TargetUnit->GetTransport())
+                            if (Transport* transporvictim = TargetUnit->GetTransport())
                             {
-                                if (pet->GetTransport() && pet->GetTransport()->GetGUID() != transporttarget->GetGUID())
+                                if (pet->GetTransport())
                                 {
-                                    pet->GetTransport()->RemovePassenger(pet);
-                                    if (!transporttarget->isPassenger(pet))
-                                        transporttarget->AddPassenger(pet);
+                                    if (pet->GetTransport()->GetGUID() != transporvictim->GetGUID())
+                                        pet->GetTransport()->RemovePassenger(pet);
+
+                                    if (!transporvictim->isPassenger(pet))
+                                        transporvictim->AddPassenger(pet);
+                                }
+                                else
+                                {
+                                    if (!transporvictim->isPassenger(pet))
+                                        transporvictim->AddPassenger(pet);
                                 }
                             }
                             else if (pet->GetTransport())
