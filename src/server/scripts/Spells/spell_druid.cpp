@@ -1013,8 +1013,6 @@ class spell_dru_lifebloom : public SpellScriptLoader
                 int32 healAmount = aurEff->GetAmount();
                 if (Unit* caster = GetCaster())
                 {
-                    healAmount = caster->SpellHealingBonusDone(target, GetSpellInfo(), healAmount, HEAL, { }, stack);
-
                     // restore mana
                     CastSpellExtraArgs args(aurEff);
                     args.OriginalCaster = GetCasterGUID();
@@ -1041,30 +1039,8 @@ class spell_dru_lifebloom : public SpellScriptLoader
             void HandleDispel(DispelInfo* dispelInfo)
             {
                 if (Unit* target = GetUnitOwner())
-                {
                     if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
-                    {
-                        // final heal
-                        int32 healAmount = aurEff->GetAmount();
-                        if (Unit* caster = GetCaster())
-                        {
-                            healAmount = caster->SpellHealingBonusDone(target, GetSpellInfo(), healAmount, HEAL, dispelInfo->GetRemovedCharges());
-
-                            CastSpellExtraArgs args(aurEff);
-                            args.OriginalCaster = GetCasterGUID();
-                            args.AddSpellBP0(healAmount);
-                            target->CastSpell(target, SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, args);
-
-                            // restore mana
-                            int32 returnMana = CalculatePct(caster->GetCreateMana(), GetSpellInfo()->ManaCostPercentage) * dispelInfo->GetRemovedCharges() / 2;
-
-                            CastSpellExtraArgs args2(aurEff);
-                            args2.OriginalCaster = GetCasterGUID();
-                            args2.AddSpellBP0(returnMana);
-                            caster->CastSpell(caster, SPELL_DRUID_LIFEBLOOM_ENERGIZE, args2);
-                        }
-                    }
-                }
+                        OnRemoveEffect(target, aurEff, dispelInfo->GetRemovedCharges()); // final heal
             }
 
             void Register() override
