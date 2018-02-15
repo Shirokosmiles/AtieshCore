@@ -1535,7 +1535,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
             uint32 damage = aurEff->GetAmount();
             if (Unit* caster = aurEff->GetCaster())
             {
-                damage = caster->SpellDamageBonusDone(this, spellInfo, damage, SPELL_DIRECT_DAMAGE, { });
+                damage = caster->SpellDamageBonusDone(this, spellInfo, damage, SPELL_DIRECT_DAMAGE, aurEff->GetEffIndex(), { });
                 damage = SpellDamageBonusTaken(caster, spellInfo, damage, SPELL_DIRECT_DAMAGE);
             }
 
@@ -6864,7 +6864,7 @@ void Unit::EnergizeBySpell(Unit* victim, SpellInfo const* spellInfo, int32 damag
     victim->GetThreatManager().ForwardThreatForAssistingMe(this, float(damage)/2, spellInfo, true);
 }
 
-uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uint32 pdamage, DamageEffectType damagetype, Optional<float> const& donePctTotal, uint32 stack /*= 1*/) const
+uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uint32 pdamage, DamageEffectType damagetype, uint8 effIndex, Optional<float> const& donePctTotal, uint32 stack /*= 1*/) const
 {
     if (!spellProto || !victim || damagetype == DIRECT_DAMAGE)
         return pdamage;
@@ -6876,7 +6876,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     // For totems get damage bonus from owner
     if (GetTypeId() == TYPEID_UNIT && IsTotem())
         if (Unit* owner = GetOwner())
-            return owner->SpellDamageBonusDone(victim, spellProto, pdamage, damagetype, donePctTotal, stack);
+            return owner->SpellDamageBonusDone(victim, spellProto, pdamage, damagetype, effIndex, donePctTotal, stack);
 
     float ApCoeffMod = 1.0f;
     int32 DoneTotal = 0;
@@ -6951,7 +6951,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
         DoneAdvertisedBenefit += static_cast<Guardian const*>(this)->GetBonusDamage();
 
     // Check for table values
-    float coeff = 0.f;
+    float coeff = spellProto->Effects[effIndex].BonusMultiplier;
     if (SpellBonusEntry const* bonus = sSpellMgr->GetSpellBonusData(spellProto->Id))
     {
         WeaponAttackType const attType = (spellProto->IsRangedWeaponSpell() && spellProto->DmgClass != SPELL_DAMAGE_CLASS_MELEE) ? RANGED_ATTACK : BASE_ATTACK;
@@ -7728,12 +7728,12 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
     return damage;
 }
 
-uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, uint32 healamount, DamageEffectType damagetype, Optional<float> const& donePctTotal, uint32 stack /*= 1*/) const
+uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, uint32 healamount, DamageEffectType damagetype, uint8 effIndex, Optional<float> const& donePctTotal, uint32 stack /*= 1*/) const
 {
     // For totems get healing bonus from owner (statue isn't totem in fact)
     if (GetTypeId() == TYPEID_UNIT && IsTotem())
         if (Unit* owner = GetOwner())
-            return owner->SpellHealingBonusDone(victim, spellProto, healamount, damagetype, donePctTotal, stack);
+            return owner->SpellHealingBonusDone(victim, spellProto, healamount, damagetype, effIndex, donePctTotal, stack);
 
     // No bonus healing for potion spells
     if (spellProto->SpellFamilyName == SPELLFAMILY_POTION)
@@ -7803,7 +7803,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         DoneAdvertisedBenefit += static_cast<Guardian const*>(this)->GetBonusDamage();
 
     // Check for table values
-    float coeff = 0.f;
+    float coeff = spellProto->Effects[effIndex].BonusMultiplier;
     if (SpellBonusEntry const* bonus = sSpellMgr->GetSpellBonusData(spellProto->Id))
     {
         WeaponAttackType const attType = (spellProto->IsRangedWeaponSpell() && spellProto->DmgClass != SPELL_DAMAGE_CLASS_MELEE) ? RANGED_ATTACK : BASE_ATTACK;
