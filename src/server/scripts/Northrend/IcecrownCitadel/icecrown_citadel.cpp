@@ -438,12 +438,16 @@ class npc_highlord_tirion_fordring_lh : public CreatureScript
                                 if (Creature* factionNPC = me->FindNearestCreature(_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? NPC_SE_HIGH_OVERLORD_SAURFANG : NPC_SE_MURADIN_BRONZEBEARD, 50.0f))
                                 {
                                     me->setActive(true);
+                                    me->SetFarVisible(true);
                                     _theLichKing = theLichKing->GetGUID();
                                     theLichKing->setActive(true);
+                                    theLichKing->SetFarVisible(true);
                                     _bolvarFordragon = bolvarFordragon->GetGUID();
                                     bolvarFordragon->setActive(true);
+                                    bolvarFordragon->SetFarVisible(true);
                                     _factionNPC = factionNPC->GetGUID();
                                     factionNPC->setActive(true);
+                                    factionNPC->SetFarVisible(true);
                                 }
                             }
                         }
@@ -535,6 +539,7 @@ class npc_highlord_tirion_fordring_lh : public CreatureScript
                             {
                                 bolvarFordragon->AI()->Talk(SAY_BOLVAR_INTRO_1);
                                 bolvarFordragon->setActive(false);
+                                bolvarFordragon->SetFarVisible(false);
                             }
                             break;
                         case EVENT_LK_INTRO_5:
@@ -542,6 +547,7 @@ class npc_highlord_tirion_fordring_lh : public CreatureScript
                             {
                                 theLichKing->AI()->Talk(SAY_LK_INTRO_5);
                                 theLichKing->setActive(false);
+                                theLichKing->SetFarVisible(false);
                             }
                             break;
                         case EVENT_SAURFANG_INTRO_1:
@@ -836,6 +842,9 @@ class boss_sister_svalna : public CreatureScript
                         DoCastSelf(SPELL_CARESS_OF_DEATH, CastSpellExtraArgs(TRIGGERED_FULL_MASK).AddSpellMod(SPELLVALUE_MAX_TARGETS, 1));
                         break;
                     case ACTION_START_GAUNTLET:
+                        me->setActive(true);
+                        me->SetFarVisible(true);
+                        _isEventInProgress = true;
                         me->SetImmuneToAll(true);
                         events.ScheduleEvent(EVENT_SVALNA_START, 25000);
                         break;
@@ -849,6 +858,8 @@ class boss_sister_svalna : public CreatureScript
                         Talk(SAY_SVALNA_CAPTAIN_DEATH);
                         break;
                     case ACTION_RESET_EVENT:
+                        me->setActive(false);
+                        me->SetFarVisible(false);
                         Reset();
                         break;
                     default:
@@ -1005,6 +1016,7 @@ class npc_crok_scourgebane : public CreatureScript
                     _events.ScheduleEvent(EVENT_CROK_INTRO_3, 14000);
                     _events.ScheduleEvent(EVENT_START_PATHING, 37000);
                     me->setActive(true);
+                    me->SetFarVisible(true);
                     for (uint32 i = 0; i < 4; ++i)
                         if (Creature* crusader = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
                             crusader->AI()->DoAction(ACTION_START_GAUNTLET);
@@ -1014,6 +1026,7 @@ class npc_crok_scourgebane : public CreatureScript
                     _isEventActive = false;
                     _isEventDone = _instance->GetBossState(DATA_SISTER_SVALNA) == DONE;
                     me->setActive(false);
+                    me->SetFarVisible(false);
                     _aliveTrash.clear();
                     _currentWPid = 0;
                 }
@@ -1031,6 +1044,7 @@ class npc_crok_scourgebane : public CreatureScript
                         {
                             _isEventActive = false;
                             me->setActive(false);
+                            me->SetFarVisible(false);
                             Talk(SAY_CROK_FINAL_WP);
                             if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
                                 svalna->AI()->DoAction(ACTION_RESURRECT_CAPTAINS);
@@ -1060,6 +1074,7 @@ class npc_crok_scourgebane : public CreatureScript
                         {
                             _isEventActive = false;
                             me->setActive(false);
+                            me->SetFarVisible(false);
                             Talk(SAY_CROK_FINAL_WP);
                             if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
                                 svalna->AI()->DoAction(ACTION_RESURRECT_CAPTAINS);
@@ -1285,6 +1300,7 @@ struct npc_argent_captainAI : public ScriptedAI
                 }
 
                 me->setActive(true);
+                me->SetFarVisible(true);
             }
             else if (action == ACTION_RESURRECT_CAPTAINS)
             { 
