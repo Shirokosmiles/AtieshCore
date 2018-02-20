@@ -1,6 +1,6 @@
 -- Ethereal Crypt Raider text
-DELETE FROM `creature_text` WHERE `entry` = 18311;
-INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
+DELETE FROM `creature_text` WHERE `CreatureID` = 18311;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
 (18311, 0, 0, "If you hear the whisper, you're dying...", 12, 0, 50, 0, 0, 0, 0, "Ethereal Crypt Raider - talk 1", 0),
 (18311, 0, 1, "You're far from home, stranger.", 12, 0, 50, 0, 0, 0, 0, "Ethereal Crypt Raider - talk 2", 0),
 (18311, 0, 2, "What have the netherwinds brought us?", 12, 0, 50, 0, 0, 0, 0, "Ethereal Crypt Raider - talk 3", 0);
@@ -18,8 +18,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,5,0,4,0,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"etherial crypt raider - talk");
 
 -- Ethereal Sorcerer text
-DELETE FROM `creature_text` WHERE `entry` = 18313;
-INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
+DELETE FROM `creature_text` WHERE `CreatureID` = 18313;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
 (18313, 0, 0, "Welcome to the Void...", 12, 0, 50, 0, 0, 0, 0, "Ethereal Sorcerer - talk 1", 0),
 (18313, 0, 1, "You're far from home, stranger.", 12, 0, 50, 0, 0, 0, 0, "Ethereal Sorcerer - talk 2", 0),
 (18313, 0, 2, "If you hear the whisper, you're dying...", 12, 0, 50, 0, 0, 0, 0, "Ethereal Sorcerer - talk 3", 0);
@@ -48,8 +48,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,16,0,4,0,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"Ethereal Sorcerer - talk");
 
 -- Ethereal Priest text
-DELETE FROM `creature_text` WHERE `entry` = 18317;
-INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
+DELETE FROM `creature_text` WHERE `CreatureID` = 18317;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
 (18317, 0, 0, "What have the netherwinds brought us?", 12, 0, 50, 0, 0, 0, 0, "Ethereal Priest - talk 1", 0),
 (18317, 0, 1, "Welcome to the Void...", 12, 0, 50, 0, 0, 0, 0, "Ethereal Priest - talk 2", 0);
 
@@ -67,8 +67,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,6,0,4,0,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"Ethereal Priest - talk");
 
 -- Ethereal Darkcaster text
-DELETE FROM `creature_text` WHERE `entry` = 18331;
-INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
+DELETE FROM `creature_text` WHERE `CreatureID` = 18331;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
 (18331, 0, 0, "You're far from home, stranger.", 12, 0, 50, 0, 0, 0, 0, "Ethereal Darkcaster - talk 1", 0),
 (18331, 0, 1, "What have the netherwinds brought us?", 12, 0, 50, 0, 0, 0, 0, "Ethereal Darkcaster - talk 2", 0),
 (18331, 0, 2, "Welcome to the Void...", 12, 0, 50, 0, 0, 0, 0, "Ethereal Darkcaster - talk 3", 0),
@@ -87,8 +87,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,5,0,4,0,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"Ethereal Darkcaster - talk");
 
 -- Nexus Stalker text
-DELETE FROM `creature_text` WHERE `entry` = 18314;
-INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
+DELETE FROM `creature_text` WHERE `CreatureID` = 18314;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
 (18314, 0, 0, "What have the netherwinds brought us?", 12, 0, 50, 0, 0, 0, 0, "Nexus Stalker - talk 1", 0),
 (18314, 0, 1, "If you hear the whisper, you're dying...", 12, 0, 50, 0, 0, 0, 0, "Nexus Stalker - talk 2", 0);
 
@@ -103,8 +103,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,3,0,4,0,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"Nexus Stalker - talk");
 
 -- Ethereal Spellbinder text
-DELETE FROM `creature_text` WHERE `entry` = 18312;
-INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
+DELETE FROM `creature_text` WHERE `CreatureID` = 18312;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
 (18312, 0, 0, "Welcome to the Void...", 12, 0, 50, 0, 0, 0, 0, "Ethereal Spellbinder - talk 1", 0),
 (18312, 0, 1, "You're far from home, stranger.", 12, 0, 50, 0, 0, 0, 0, "Ethereal Spellbinder - talk 2", 0);
 
@@ -122,8 +122,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,6,0,4,0,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"Etherel Spellbinder - talk");
 
 -- Ethereal Theurgist text
-DELETE FROM `creature_text` WHERE `entry` = 18315;
-INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
+DELETE FROM `creature_text` WHERE `CreatureID` = 18315;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `TextRange`, `comment`, `BroadcastTextId`) VALUES
 (18315, 0, 0, "What have the netherwinds brought us?", 12, 0, 50, 0, 0, 0, 0, "Ethereal Theurgist - talk 1", 0);
 
 -- Ethereal Theurgist SAI

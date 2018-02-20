@@ -1,23 +1,37 @@
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18311, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Если ты слышишь шепот, ты умираешь...');
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18311, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Далеко же ты ушёл от дома, странник');
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18311, 0, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Что же нам принесли ветра Пустоты?');
+-- Ethereal Crypt Raider
+DELETE FROM `creature_text_locale` where `CreatureID` IN (18311);
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18311, 0, 0, 'ruRU', 'Если ты слышишь шепот, ты умираешь...');
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18311, 0, 1, 'ruRU', 'Далеко же ты ушёл от дома, странник');
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18311, 0, 2, 'ruRU', 'Что же нам принесли ветра Пустоты?');
 
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18313, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Добро пожаловать в Бездну...');
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18313, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Далеко же ты ушёл от дома, странник');
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18313, 0, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Если ты слышишь шепот, ты умираешь...');
+-- Ethereal Sorcerer
+DELETE FROM `creature_text_locale` where `CreatureID` IN (18313);
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18313, 0, 0, 'ruRU', 'Добро пожаловать в Бездну...');
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18313, 0, 1, 'ruRU', 'Далеко же ты ушёл от дома, странник');
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18313, 0, 2, 'ruRU', 'Если ты слышишь шепот, ты умираешь...');
 
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18314, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Что же нам принесли ветра Пустоты?');
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18314, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Если ты слышишь шепот, ты умираешь...');
+-- Nexus Stalker
+DELETE FROM `creature_text_locale` where `CreatureID` IN (18314);
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18314, 0, 0, 'ruRU', 'Что же нам принесли ветра Пустоты?');
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18314, 0, 1, 'ruRU', 'Если ты слышишь шепот, ты умираешь...');
 
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18315, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Что же нам принесли ветра Пустоты?');
+-- Ethereal Theurgist
+DELETE FROM `creature_text_locale` where `CreatureID` IN (18315);
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18315, 0, 0, 'ruRU', 'Что же нам принесли ветра Пустоты?');
 
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18312, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Добро пожаловать в Бездну...');
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18312, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Далеко же ты ушёл от дома, странник');
+-- Ethereal Spellbinder
+DELETE FROM `creature_text_locale` where `CreatureID` IN (18312);
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18312, 0, 0, 'ruRU', 'Добро пожаловать в Бездну...');
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18312, 0, 1, 'ruRU', 'Далеко же ты ушёл от дома, странник');
 
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18317, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Что же нам принесли ветра Пустоты?');
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18317, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Добро пожаловать в Бездну...');
+-- Ethereal Priest
+DELETE FROM `creature_text_locale` where `CreatureID` IN (18317);
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18317, 0, 0, 'ruRU', 'Что же нам принесли ветра Пустоты?');
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18317, 0, 1, 'ruRU', 'Добро пожаловать в Бездну...');
 
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18331, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Далеко же ты ушёл от дома, странник');
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18331, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Что же нам принесли ветра Пустоты?');
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18331, 0, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Добро пожаловать в Бездну...');
-INSERT INTO `locales_creature_text` (`entry`, `groupid`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES (18331, 0, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Если ты слышишь шепот, ты умираешь...');
+-- Ethereal Darkcaster
+DELETE FROM `creature_text_locale` where `CreatureID` IN (18331);
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18331, 0, 0, 'ruRU', 'Далеко же ты ушёл от дома, странник');
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18331, 0, 1, 'ruRU', 'Что же нам принесли ветра Пустоты?');
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18331, 0, 2, 'ruRU', 'Добро пожаловать в Бездну...');
+INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES (18331, 0, 3, 'ruRU', 'Если ты слышишь шепот, ты умираешь...');

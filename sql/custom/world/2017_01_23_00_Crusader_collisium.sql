@@ -119,8 +119,8 @@ UPDATE `creature_template` SET `gossip_menu_id`=@GOSSIP_MENU WHERE `entry`=@HERA
 --
 
 -- Roleplaying event is missing creature_text data
-DELETE FROM `creature_text` WHERE `entry` IN (@HERALD_H,@HERALD_A) AND `groupid` BETWEEN 9 AND 13;
-INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`probability`,`sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES
+DELETE FROM `creature_text` WHERE `CreatureID` IN (@HERALD_H,@HERALD_A) AND `GroupID` BETWEEN 9 AND 13;
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Probability`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES
 (@HERALD_H,9,0,'$n has risen to the ranks of champion in our tournament.  We are proud to present $ghim:her; to you today.',14,100,8574,35304,2,'Jaeren Sunsworn - SAY_JAEREN_INTRODUCE_PLAYER_0'),
 (@HERALD_H,10,0,'Champions on the tournament grounds speak highly of this $c.  Today we present, $n.',14,100,8574,35305,2,'Jaeren Sunsworn - SAY_JAEREN_INTRODUCE_PLAYER_1'),
 (@HERALD_H,11,0,'One would be hard pressed to find a more steadfast champion than this $c.  Today we present, $n. ',14,100,8574,35306,2,'Jaeren Sunsworn - SAY_JAEREN_INTRODUCE_PLAYER_2'),
@@ -133,24 +133,24 @@ INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`probability`,
 (@HERALD_A,13,0,'Many champions have fallen to the skills displayed by $n.  We are proud to present this formidable $c.',14,100,8574,35308,2,'Arelas Brightstar - SAY_ARELAS_INTRODUCE_PLAYER_4');
 
 -- Jaina Proudmoore is missing her texts
-DELETE FROM `creature_text` WHERE `entry`=34992 AND `groupid` IN (0,1);
-INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`probability`,`BroadcastTextId`,`TextRange`,`comment`) VALUES
+DELETE FROM `creature_text` WHERE `CreatureID`=34992 AND `GroupID` IN (0,1);
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Probability`,`BroadcastTextId`,`TextRange`,`comment`) VALUES
 (34992,0,0,'Of course they will.',12,100,35323,2,'Lady Jaina Proudmoore - SAY_JAINA_INTRO_1'),
 (34992,1,0,'They''re worthy fighters, you''ll see.',12,100,35329,2,'Lady Jaina Proudmoore - SAY_JAINA_INTRO_2');
 
 -- Two of the texts in instance were 'say' instead of 'yell'
-UPDATE `creature_text` SET `type`=14 WHERE `entry`=@HERALD_A AND `groupid`=0;
-UPDATE `creature_text` SET `type`=14 WHERE `entry`=@HERALD_H AND `groupid`=0;
+UPDATE `creature_text` SET `Type`=14 WHERE `CreatureID`=@HERALD_A AND `groupid`=0;
+UPDATE `creature_text` SET `Type`=14 WHERE `CreatureID`=@HERALD_H AND `groupid`=0;
 
 -- Most of the texts in instance should be zonewide
-UPDATE `creature_text` SET `TextRange`=2 WHERE `entry`=34990 AND `groupid` BETWEEN 50 AND 53;
-UPDATE `creature_text` SET `TextRange`=2 WHERE `entry`=34995 AND `groupid` BETWEEN 50 AND 52;
-UPDATE `creature_text` SET `TextRange`=2 WHERE `entry`=34994;
-UPDATE `creature_text` SET `TextRange`=2 WHERE `entry` BETWEEN 34900 AND 34910 AND `groupid`=0 AND `id`=0;
-UPDATE `creature_text` SET `TextRange`=2 WHERE `entry`=34996 AND `groupid` BETWEEN 50 AND 58 AND `id`=0;
-UPDATE `creature_text` SET `TextRange`=2 WHERE `entry` IN (@HERALD_A,@HERALD_H) AND `groupid` BETWEEN 0 AND 8 AND `id`=0;
-UPDATE `creature_text` SET `TextRange`=2 WHERE `entry` IN (34657,34701,34702,34703,34705,34883,34887,35569,35570,35571,35572,35617) AND `groupid`=0 AND `id`=0;
-UPDATE `creature_text` SET `TextRange`=2 WHERE `entry` IN (34928,35119,35451);
+UPDATE `creature_text` SET `TextRange`=2 WHERE `CreatureID`=34990 AND `groupid` BETWEEN 50 AND 53;
+UPDATE `creature_text` SET `TextRange`=2 WHERE `CreatureID`=34995 AND `groupid` BETWEEN 50 AND 52;
+UPDATE `creature_text` SET `TextRange`=2 WHERE `CreatureID`=34994;
+UPDATE `creature_text` SET `TextRange`=2 WHERE `CreatureID` BETWEEN 34900 AND 34910 AND `groupid`=0 AND `id`=0;
+UPDATE `creature_text` SET `TextRange`=2 WHERE `CreatureID`=34996 AND `groupid` BETWEEN 50 AND 58 AND `id`=0;
+UPDATE `creature_text` SET `TextRange`=2 WHERE `CreatureID` IN (@HERALD_A,@HERALD_H) AND `groupid` BETWEEN 0 AND 8 AND `id`=0;
+UPDATE `creature_text` SET `TextRange`=2 WHERE `CreatureID` IN (34657,34701,34702,34703,34705,34883,34887,35569,35570,35571,35572,35617) AND `groupid`=0 AND `id`=0;
+UPDATE `creature_text` SET `TextRange`=2 WHERE `CreatureID` IN (34928,35119,35451);
 UPDATE `creature_text` SET `TextRange`=2 WHERE `BroadcastTextId`=35491;
 
 --
