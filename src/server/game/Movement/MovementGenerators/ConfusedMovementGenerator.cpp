@@ -58,7 +58,15 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* owner)
 
         Movement::MoveSplineInit init(owner);
         init.MoveTo(startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ);
-        init.SetWalk(false);
+        init.SetWalk(true);
+
+        float _speed = owner->GetSpeed(MOVE_WALK);
+        float _checkspeed = owner->IsMounted() ? 5.0f : 2.5f;
+        if (_speed > _checkspeed)
+            _speed = _checkspeed;
+
+        init.SetVelocity(_speed);
+
         int32 traveltime = init.Launch();
         _timer.Reset(traveltime + urand(150, 250));
     }
@@ -142,6 +150,14 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(_path->GetPath());
         init.SetWalk(true);
+
+        float _speed = owner->GetSpeed(MOVE_WALK);
+        float _checkspeed = owner->IsMounted() ? 5.0f : 2.5f;
+        if (_speed > _checkspeed)
+            _speed = _checkspeed;
+
+        init.SetVelocity(_speed);
+
         int32 traveltime = init.Launch();
         _timer.Reset(traveltime + urand(800, 1500));        
 
