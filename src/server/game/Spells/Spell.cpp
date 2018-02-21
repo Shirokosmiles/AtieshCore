@@ -2807,6 +2807,15 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                         return SPELL_MISS_EVADE;
                 }
             }
+
+            if (unit->IsTotem() && unit->IsMagnet())
+            {
+                if (m_spellInfo->HasAttribute(SPELL_ATTR1_UNK18) && m_damage <= 0)
+                {
+                    unit->KillSelf();
+                    return SPELL_MISS_IMMUNE;                    
+                }                    
+            }
         }
         else if (m_caster->IsFriendlyTo(unit))
         {
