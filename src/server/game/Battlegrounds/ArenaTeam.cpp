@@ -18,6 +18,7 @@
 
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
+#include "BattlegroundMgr.h"
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "Group.h"
@@ -317,6 +318,19 @@ void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
     // Remove member from team
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
     {
+        // Remove queues of members
+        if (Player* player = ObjectAccessor::FindPlayer(itr->Guid))
+        {
+            if (BattlegroundQueueTypeId bgQueue = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_AA, GetType()))
+            {
+                GroupQueueInfo ginfo;
+                BattlegroundQueue & queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
+                if (queue.GetPlayerGroupInfoData(itr->Guid, &ginfo))
+                    if (!ginfo.IsInvitedToBGInstanceGUID)
+                        queue.RemovePlayer(itr->Guid, true);
+            }
+        }
+
         if (itr->Guid == guid)
         {
             Members.erase(itr);
