@@ -3049,6 +3049,8 @@ void AuraEffect::HandleAuraModIncreaseSwimSpeed(AuraApplication const* aurApp, u
     Unit* target = aurApp->GetTarget();
 
     target->UpdateSpeed(MOVE_SWIM);
+    if (target->ToPlayer())
+        target->ToPlayer()->SetUnderACKmount();
 }
 
 void AuraEffect::HandleAuraModDecreaseSpeed(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const

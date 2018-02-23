@@ -26998,6 +26998,8 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo)
             ping = 60;
 
         speed = GetSpeed(MOVE_RUN);
+        if (isSwimming())
+            speed = GetSpeed(MOVE_SWIM);
         if (IsFlying() || GetPlayerMovingMe()->CanFly())
             speed = GetSpeed(MOVE_FLIGHT);
 
