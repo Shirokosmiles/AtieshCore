@@ -579,11 +579,11 @@ enum SMART_ACTION
     SMART_ACTION_SCENE_CANCEL                       = 130,    // don't use on 3.3.5a
     SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    // Group ID, min secs, max secs, spawnflags
     SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // Group ID, min secs, max secs, spawnflags
+    SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    // spawnType, spawnId
 
     // From SunWell Core SMART_ACTIONs
-    //SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS			= 133,    // flags
     SMART_ACTION_SET_COMBAT_DISTANCE				= 134,    // combatDistance
-	SMART_ACTION_SET_CASTER_COMBAT_DIST				= 135,    // followDistance, resetToMax
+    SMART_ACTION_SET_CASTER_COMBAT_DIST				= 135,    // followDistance, resetToMax
 	//SMART_ACTION_SET_SIGHT_DIST						= 136,    // sightDistance
 	//SMART_ACTION_FLEE								= 137,    // fleeTime
 	//SMART_ACTION_ADD_THREAT							= 138,    // +threat, -threat
@@ -1155,6 +1155,12 @@ struct SmartAction
             uint32 stopMovement;
             uint32 movementExpired;
         } stopMotion;
+
+        struct
+        {
+            uint32 spawnType;
+            uint32 spawnId;
+        } respawnData;
 
         //! Note for any new future actions
         //! All parameters must have type uint32
