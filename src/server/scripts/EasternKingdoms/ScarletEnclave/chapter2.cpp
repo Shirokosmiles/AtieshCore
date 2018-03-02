@@ -149,8 +149,6 @@ public:
                 _events.ScheduleEvent(EVENT_CAST_MULTI_SHOT, Seconds(4));
                 _events.ScheduleEvent(EVENT_CAST_MARKSMAN_SHOOT, 0);
             }
-
-            DoZoneInCombat();
         }
 
         void JustExitedCombat() override
