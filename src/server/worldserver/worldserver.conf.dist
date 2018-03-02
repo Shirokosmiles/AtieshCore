@@ -35,7 +35,12 @@
 #    AUCTION HOUSE BOT BUYER CONFIG
 #    LOGGING SYSTEM SETTINGS
 #    PACKET SPOOF PROTECTION SETTINGS
+#    MISC ANTI-CHEAT SETTINGS
+#    TRANSMOGRIFICATION CONFIG
 #    METRIC SETTINGS
+#    CROSSFACTION BG CONFIG
+#    GUILD LOOT CONFIG
+#    FIRST LOGIN ACC BONUS CONFIG
 #
 ###################################################################################################
 
@@ -4210,7 +4215,7 @@ Transmogrification.IgnoreReqSkill = 0
 Transmogrification.IgnoreReqSpell = 0
 Transmogrification.IgnoreReqLevel = 0
 Transmogrification.IgnoreReqEvent = 0
-Transmogrification.IgnoreReqStats = 0
+Transmogrification.IgnoreReqStats = 1
 
 #
 #    SET FEATURE
