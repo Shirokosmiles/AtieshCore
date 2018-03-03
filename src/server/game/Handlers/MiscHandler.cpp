@@ -1277,7 +1277,7 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
     Battleground* bg = _player->GetBattleground();
     if (bg)
     {
-        if (_player->ShouldForgetBGPlayers() && bg)
+        if (_player->ShouldForgetBGPlayers())
         {
             _player->DoForgetPlayersInBG(bg);
             _player->SetForgetBGPlayers(false);

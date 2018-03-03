@@ -939,7 +939,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
             repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1091), 42999, false); // The Wyrmrest Accord
 
             // Factions depending on team, like cities and some more stuff
-            switch (pCurrChar->GetTeam())
+            switch (pCurrChar->GetCFSTeam())
             {
                 case ALLIANCE:
                     repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  72), 42999, false); // Stormwind
