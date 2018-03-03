@@ -15,22 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss Black Knight
-SD%Complete: 100%
-SDComment:
-SDCategory: Trial of the Champion
-EndScriptData */
-
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "InstanceScript.h"
+#include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellMgr.h"
 #include "trial_of_the_champion.h"
-#include "MotionMaster.h"
-#include "ObjectAccessor.h"
 
 enum Yells
 {
@@ -151,7 +143,7 @@ public:
                 if (!target->ToPlayer())
                     return;
 
-                if (Creature* knight = instance->GetCreature(DATA_THE_BLACK_KNIGHT))
+                if (Creature* knight = instance->GetCreature(DATA_BLACK_KNIGHT))
                     // If corpse explosion hits any player during encounter
                     // we cannot give achievement id 3804
                     knight->AI()->SetData(1, 0);
@@ -198,7 +190,7 @@ public:
         {
             if (who == me)
                 return;
-            if (Creature* knight = instance->GetCreature(DATA_THE_BLACK_KNIGHT))
+            if (Creature* knight = instance->GetCreature(DATA_BLACK_KNIGHT))
             {
                 if (!knight->HasAura(SPELL_BLACK_KNIGHT_DIE))
                     knight->AI()->KilledUnit(who);
@@ -224,7 +216,7 @@ public:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 50.0f, true))
                         {
                             ResetThreatList();
-                            me->GetThreatManager().AddThreat(target, 10.0f, nullptr, true, true);
+                            AddThreat(target, 10.0f);
                             me->AI()->AttackStart(target);
                         }
                         events.ScheduleEvent(EVENT_CLAW, urand(12000, 15000));
@@ -247,7 +239,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetTrialOfTheChampionAI<npc_risen_ghoulAI>(creature);
+        return GetTrialOfChampionAI<npc_risen_ghoulAI>(creature);
     }
 };
 
@@ -258,7 +250,7 @@ public:
 
     struct boss_black_knightAI : public BossAI
     {
-        boss_black_knightAI(Creature* creature) : BossAI(creature, DATA_THE_BLACK_KNIGHT)
+        boss_black_knightAI(Creature* creature) : BossAI(creature, DATA_BLACK_KNIGHT)
         {
             Initialize();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -310,9 +302,9 @@ public:
                     if (Creature* announcer = instance->GetCreature(DATA_ANNOUNCER))
                     {
                         if (announcer->GetEntry() == NPC_JAEREN)
-                            announcer->CastSpell(me->GetVictim(), SPELL_RAISE_JAEREN);
+                            announcer->CastSpell(me->GetVictim(), SPELL_RAISE_JAEREN, false);
                         else
-                            announcer->CastSpell(me->GetVictim(), SPELL_RAISE_ARELAS);
+                            announcer->CastSpell(me->GetVictim(), SPELL_RAISE_ARELAS, false);
                     }
                 }
                 else
@@ -323,7 +315,7 @@ public:
 
                     // Army of the Dead
                     // disabling movement temporarily so the spell wont get interrupted
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_REMOVE_CLIENT_CONTROL);
+                    me->SetControlled(true, UNIT_STATE_ROOT);
                     DoCast(SPELL_ARMY_DEAD);
                 }
             }
@@ -486,7 +478,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetTrialOfTheChampionAI<boss_black_knightAI>(creature);
+        return GetTrialOfChampionAI<boss_black_knightAI>(creature);
     }
 };
 
@@ -570,7 +562,7 @@ public:
 
         void UpdateAI(uint32 uiDiff) override
         {
-			EscortAI::UpdateAI(uiDiff);
+            EscortAI::UpdateAI(uiDiff);
 
             UpdateVictim();
         }
@@ -579,179 +571,178 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetTrialOfTheChampionAI<npc_black_knight_skeletal_gryphonAI>(creature);
+        return GetTrialOfChampionAI<npc_black_knight_skeletal_gryphonAI>(creature);
     }
 };
 
 class spell_black_knight_deaths_push : public SpellScriptLoader
 {
-    public:
-        spell_black_knight_deaths_push() : SpellScriptLoader("spell_black_knight_deaths_push") { }
+public:
+    spell_black_knight_deaths_push() : SpellScriptLoader("spell_black_knight_deaths_push") { }
 
-        class spell_black_knight_deaths_push_AuraScript : public AuraScript
+    class spell_black_knight_deaths_push_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_black_knight_deaths_push_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            PrepareAuraScript(spell_black_knight_deaths_push_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-				return ValidateSpellInfo(
-				{
-					SPELL_DEATH_RESPITE_DND,
-					SPELL_FEIGN_DEATH
-				});
-            }
-
-            void HandleScript(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                // The spell applies a dummy aura with short duration
-                // when the dummy aura is removed, announcer 'dies'
-                GetTarget()->RemoveAura(SPELL_DEATH_RESPITE_DND);
-                GetTarget()->CastSpell(GetTarget(), SPELL_FEIGN_DEATH, true);
-                GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            }
-
-            void Register() override
-            {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_black_knight_deaths_push_AuraScript::HandleScript, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_black_knight_deaths_push_AuraScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_DEATH_RESPITE_DND) ||
+                !sSpellMgr->GetSpellInfo(SPELL_FEIGN_DEATH))
+                return false;
+            return true;
         }
+
+        void HandleScript(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            // The spell applies a dummy aura with short duration
+            // when the dummy aura is removed, announcer 'dies'
+            GetTarget()->RemoveAura(SPELL_DEATH_RESPITE_DND);
+            GetTarget()->CastSpell(GetTarget(), SPELL_FEIGN_DEATH, true);
+            GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_black_knight_deaths_push_AuraScript::HandleScript, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_black_knight_deaths_push_AuraScript();
+    }
 };
 
 class spell_black_knight_obliterate : public SpellScriptLoader
 {
-    public:
-        spell_black_knight_obliterate() : SpellScriptLoader("spell_black_knight_obliterate") { }
+public:
+    spell_black_knight_obliterate() : SpellScriptLoader("spell_black_knight_obliterate") { }
 
-        class spell_black_knight_obliterate_SpellScript : public SpellScript
+    class spell_black_knight_obliterate_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_black_knight_obliterate_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            PrepareSpellScript(spell_black_knight_obliterate_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-				return ValidateSpellInfo(
-				{
-					SPELL_BLOOD_PLAGUE,
-					SPELL_FROST_FEVER,
-					SPELL_BLOOD_PLAGUE_H,
-					SPELL_FROST_FEVER_H
-
-				});
-            }
-
-            void CalculateDamage()
-            {
-                if (!GetHitUnit())
-                    return;
-                uint32 bloodPlague = GetCaster()->GetMap()->IsHeroic() ? SPELL_BLOOD_PLAGUE_H : SPELL_BLOOD_PLAGUE;
-                uint32 frostFever = GetCaster()->GetMap()->IsHeroic() ? SPELL_FROST_FEVER_H : SPELL_FROST_FEVER;
-
-                int32 damage = GetHitDamage();
-                int32 bonus = 0;
-                if (GetHitUnit()->HasAura(frostFever))
-                {
-                    bonus += int32(damage * 0.3f);
-                    GetHitUnit()->RemoveAurasDueToSpell(frostFever);
-                }
-                if (GetHitUnit()->HasAura(bloodPlague))
-                {
-                    bonus += int32(damage * 0.3f);
-                    GetHitUnit()->RemoveAurasDueToSpell(bloodPlague);
-                }
-                SetHitDamage(damage + bonus);
-            }
-
-            void Register() override
-            {
-                OnHit += SpellHitFn(spell_black_knight_obliterate_SpellScript::CalculateDamage);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_black_knight_obliterate_SpellScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_BLOOD_PLAGUE) ||
+                !sSpellMgr->GetSpellInfo(SPELL_FROST_FEVER) ||
+                !sSpellMgr->GetSpellInfo(SPELL_BLOOD_PLAGUE_H) ||
+                !sSpellMgr->GetSpellInfo(SPELL_FROST_FEVER_H))
+                return false;
+            return true;
         }
+
+        void CalculateDamage()
+        {
+            if (!GetHitUnit())
+                return;
+            uint32 bloodPlague = GetCaster()->GetMap()->IsHeroic() ? SPELL_BLOOD_PLAGUE_H : SPELL_BLOOD_PLAGUE;
+            uint32 frostFever = GetCaster()->GetMap()->IsHeroic() ? SPELL_FROST_FEVER_H : SPELL_FROST_FEVER;
+
+            int32 damage = GetHitDamage();
+            int32 bonus = 0;
+            if (GetHitUnit()->HasAura(frostFever))
+            {
+                bonus += int32(damage * 0.3f);
+                GetHitUnit()->RemoveAurasDueToSpell(frostFever);
+            }
+            if (GetHitUnit()->HasAura(bloodPlague))
+            {
+                bonus += int32(damage * 0.3f);
+                GetHitUnit()->RemoveAurasDueToSpell(bloodPlague);
+            }
+            SetHitDamage(damage + bonus);
+        }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_black_knight_obliterate_SpellScript::CalculateDamage);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_black_knight_obliterate_SpellScript();
+    }
 };
 
 class spell_black_knight_army_of_the_dead : public SpellScriptLoader
 {
-    public:
-        spell_black_knight_army_of_the_dead() : SpellScriptLoader("spell_black_knight_army_of_the_dead") { }
+public:
+    spell_black_knight_army_of_the_dead() : SpellScriptLoader("spell_black_knight_army_of_the_dead") { }
 
-        class spell_black_knight_army_of_the_dead_AuraScript : public AuraScript
+    class spell_black_knight_army_of_the_dead_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_black_knight_army_of_the_dead_AuraScript);
+
+        void RemoveFlag(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_black_knight_army_of_the_dead_AuraScript);
-
-            void RemoveFlag(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                // that is wrong, movement disabled by spell (channel)
-                // On aura remove we must remove disable movement flag
-                if (Unit* caster = GetCaster())
-                    caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_REMOVE_CLIENT_CONTROL);
-            }
-
-            void Register() override
-            {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_black_knight_army_of_the_dead_AuraScript::RemoveFlag, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_black_knight_army_of_the_dead_AuraScript();
+            // that is wrong, movement disabled by spell (channel)
+            // On aura remove we must remove disable movement flag
+            if (Unit* caster = GetCaster())
+                caster->SetControlled(false, UNIT_STATE_ROOT);
         }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_black_knight_army_of_the_dead_AuraScript::RemoveFlag, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_black_knight_army_of_the_dead_AuraScript();
+    }
 };
 
 class spell_black_knight_ghoul_explode : public SpellScriptLoader
 {
-    public:
-        spell_black_knight_ghoul_explode() : SpellScriptLoader("spell_black_knight_ghoul_explode") { }
+public:
+    spell_black_knight_ghoul_explode() : SpellScriptLoader("spell_black_knight_ghoul_explode") { }
 
-        class spell_black_knight_ghoul_explode_AuraScript : public AuraScript
+    class spell_black_knight_ghoul_explode_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_black_knight_ghoul_explode_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            PrepareAuraScript(spell_black_knight_ghoul_explode_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-				return ValidateSpellInfo({ SPELL_EXPLODE });
-            }
-
-            void CastExplode(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                // On Ghoul Explode aura apply, start casting Explode
-                GetTarget()->CastSpell(GetTarget(), SPELL_EXPLODE);
-            }
-
-            void Register() override
-            {
-                AfterEffectApply += AuraEffectApplyFn(spell_black_knight_ghoul_explode_AuraScript::CastExplode, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_black_knight_ghoul_explode_AuraScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_EXPLODE))
+                return false;
+            return true;
         }
+
+        void CastExplode(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            // On Ghoul Explode aura apply, start casting Explode
+            GetTarget()->CastSpell(GetTarget(), SPELL_EXPLODE);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_black_knight_ghoul_explode_AuraScript::CastExplode, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_black_knight_ghoul_explode_AuraScript();
+    }
 };
 
 // Achievement id 3804 - I've Had Worse
 class achievement_ive_had_worse : public AchievementCriteriaScript
 {
-    public:
-        achievement_ive_had_worse() : AchievementCriteriaScript("achievement_ive_had_worse") { }
+public:
+    achievement_ive_had_worse() : AchievementCriteriaScript("achievement_ive_had_worse") { }
 
-        bool OnCheck(Player* /*player*/, Unit* target) override
-        {
-            if (target->GetEntry() != NPC_BLACK_KNIGHT)
-                return false;
-            if (!ENSURE_AI(boss_black_knight::boss_black_knightAI, target->GetAI())->achievementCredit)
-                return false;
-            return true;
-        }
+    bool OnCheck(Player* /*player*/, Unit* target) override
+    {
+        if (target->GetEntry() != NPC_BLACK_KNIGHT)
+            return false;
+        if (!ENSURE_AI(boss_black_knight::boss_black_knightAI, target->GetAI())->achievementCredit)
+            return false;
+        return true;
+    }
 };
 
 void AddSC_boss_black_knight()

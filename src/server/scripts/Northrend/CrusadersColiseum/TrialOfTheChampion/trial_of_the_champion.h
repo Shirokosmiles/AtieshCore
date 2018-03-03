@@ -19,12 +19,8 @@
 #ifndef TRIAL_OF_CHAMPION_H_
 #define TRIAL_OF_CHAMPION_H_
 
-#include "CreatureAIImpl.h"
-
 #define ToCScriptName "instance_trial_of_the_champion"
-#define DataHeader "ToC5"
-
-uint32 const EncounterCount = 4;
+#define DataHeader "TC"
 
 Position const LesserChampLoc[18] =
 {
@@ -71,13 +67,14 @@ float const allianceOrientation = 3.114f; // Facing towards horde spectators
 float const gateOrientation = 1.582f; // Facing towards main gate
 float const centerOrientation = 4.714f; // Facing towards the center of arena
 
-enum TCData64
+enum DataTypes
 {
     // Encounter States/Boss GUIDs
-    DATA_GRAND_CHAMPIONS            = 0,
-    DATA_EADRIC_THE_PURE            = 1,
-    DATA_ARGENT_CONFESSOR_PALETRESS = 2,
-    DATA_THE_BLACK_KNIGHT           = 3,
+    DATA_GRAND_CHAMPIONS,
+    DATA_ARGENT_CHALLENGE,
+    DATA_BLACK_KNIGHT,
+
+    MAX_ENCOUNTER,
 
     // Additional Data
     DATA_ANNOUNCER,
@@ -118,7 +115,7 @@ enum TCData64
     DATA_BLACK_KNIGHT_VEHICLE
 };
 
-enum TCCreatureIds
+enum Creatures
 {
     // Horde Champions
     NPC_MOKRA                                       = 35572,
@@ -134,6 +131,20 @@ enum TCCreatureIds
     NPC_JAELYNE                                     = 34657,
     NPC_LANA                                        = 34703,
 
+    // Horde Lesser Champions
+    NPC_ORGRIMMAR_CHAMPION                          = 35314,
+    NPC_SILVERMOON_CHAMPION                         = 35326,
+    NPC_THUNDER_BLUFF_CHAMPION                      = 35325,
+    NPC_SEN_JIN_CHAMPION                            = 35323,
+    NPC_UNDERCITY_CHAMPION                          = 35327,
+
+    // Alliance Lesser Champions
+    NPC_STORMWIND_CHAMPION                          = 35328,
+    NPC_GNOMEREGAN_CHAMPION                         = 35331,
+    NPC_EXODAR_CHAMPION                             = 35330,
+    NPC_DARNASSUS_CHAMPION                          = 35332,
+    NPC_IRONFORGE_CHAMPION                          = 35329,
+
     // Argent Champions
     NPC_EADRIC                                      = 35119,
     NPC_PALETRESS                                   = 34928,
@@ -142,9 +153,37 @@ enum TCCreatureIds
     NPC_ARGENT_MONK                                 = 35305,
     NPC_PRIESTESS                                   = 35307,
 
+    // Memories
+    NPC_MEMORY_HOGGER                               = 34942,
+    NPC_MEMORY_VANCLEEF                             = 35028,
+    NPC_MEMORY_MUTANUS                              = 35029,
+    NPC_MEMORY_HEROD                                = 35030,
+    NPC_MEMORY_LUCIFRON                             = 35031,
+    NPC_MEMORY_THUNDERAAN                           = 35032,
+    NPC_MEMORY_CHROMAGGUS                           = 35033,
+    NPC_MEMORY_HAKKAR                               = 35034,
+    NPC_MEMORY_VEKNILASH                            = 35036,
+    NPC_MEMORY_KALITHRESH                           = 35037,
+    NPC_MEMORY_MALCHEZAAR                           = 35038,
+    NPC_MEMORY_GRUUL                                = 35039,
+    NPC_MEMORY_VASHJ                                = 35040,
+    NPC_MEMORY_ARCHIMONDE                           = 35041,
+    NPC_MEMORY_ILLIDAN                              = 35042,
+    NPC_MEMORY_DELRISSA                             = 35043,
+    NPC_MEMORY_MURU                                 = 35044,
+    NPC_MEMORY_INGVAR                               = 35045,
+    NPC_MEMORY_CYANIGOSA                            = 35046,
+    NPC_MEMORY_ECK                                  = 35047,
+    NPC_MEMORY_ONYXIA                               = 35048,
+    NPC_MEMORY_HEIGAN                               = 35049,
+    NPC_MEMORY_IGNIS                                = 35050,
+    NPC_MEMORY_VEZAX                                = 35051,
+    NPC_MEMORY_ALGALON                              = 35052,
+
     // The Black Knight
     NPC_BLACK_KNIGHT                                = 35451,
 
+    NPC_RISEN_GHOUL                                 = 35590,
     NPC_RISEN_JAEREN                                = 35545,
     NPC_RISEN_ARELAS                                = 35564,
     NPC_DESECRATION_STALKER                         = 35614,
@@ -173,9 +212,10 @@ enum TCCreatureIds
     NPC_SPECTATOR_GNOME                             = 34910
 };
 
-enum TCGameObjects
+enum GameObjects
 {
     GO_MAIN_GATE                                    = 195647,
+    GO_NORTH_PORTCULLIS                             = 195650,
 
     GO_CHAMPION_S_CACHE                             = 195709,
     GO_CHAMPION_S_CACHE_H                           = 195710,
@@ -187,7 +227,7 @@ enum TCGameObjects
     GO_CONFESSOR_S_CACHE_H                          = 195324
 };
 
-enum TCVehicles
+enum Vehicles
 {
     // Grand Champions Alliance Vehicles
     VEHICLE_MARSHAL_JACOB_ALERIUS_MOUNT             = 35637,
@@ -195,34 +235,25 @@ enum TCVehicles
     VEHICLE_COLOSOS_MOUNT                           = 35768,
     VEHICLE_EVENSONG_MOUNT                          = 34658,
     VEHICLE_LANA_STOUTHAMMER_MOUNT                  = 35636,
-    // Faction Champions (Alliance)
-    VEHICLE_DARNASSUS_CHAMPION                      = 35332,
-    VEHICLE_EXODAR_CHAMPION                         = 35330,
-    VEHICLE_STORMWIND_CHAMPION                      = 35328,
-    VEHICLE_GNOMEREGAN_CHAMPION                     = 35331,
-    VEHICLE_IRONFORGE_CHAMPION                      = 35329,
+
     // Grand Champions Horde Vehicles
-    VEHICLE_MOKRA_SKILLCRUSHER_MOUNT                = 35638,
+    VEHICLE_MOKRA_SKULLCRUSHER_MOUNT                = 35638,
     VEHICLE_ERESSEA_DAWNSINGER_MOUNT                = 35635,
     VEHICLE_RUNOK_WILDMANE_MOUNT                    = 35640,
     VEHICLE_ZUL_TORE_MOUNT                          = 35641,
     VEHICLE_DEATHSTALKER_VESCERI_MOUNT              = 35634,
-    // Faction Champions (Horde)
-    VEHICLE_UNDERCITY_CHAMPION                      = 35327,
-    VEHICLE_THUNDER_BLUFF_CHAMPION                  = 35325,
-    VEHICLE_ORGRIMMAR_CHAMPION                      = 35314,
-    VEHICLE_SILVERMOON_CHAMPION                     = 35326,
-    VEHICLE_SENJIN_CHAMPION                         = 35323,
+
     // Player vehicles
     VEHICLE_ARGENT_WARHORSE_COSMETIC                = 35644,
-    VEHICLE_ARGENT_WARHORSE                         = 36557,
-    VEHICLE_ARGENT_BATTLEWORG                       = 36558,
+    VEHICLE_ARGENT_WARHORSE_A                       = 36557,
+    VEHICLE_ARGENT_BATTLEWORG_H                     = 36558,
     VEHICLE_ARGENT_BATTLEWORG_COSMETIC              = 36559,
+
     // The Black Knight's vehicle
     VEHICLE_BLACK_KNIGHT                            = 35491
 };
 
-enum TotcWaypointData
+enum WaypointData
 {
     DATA_GENERATE_WAYPOINTS_FOR_BOSS_1              = 1,
     DATA_GENERATE_WAYPOINTS_FOR_BOSS_2,
@@ -243,24 +274,24 @@ enum Seats
     SEAT_ID_0                                       = 0
 };
 
-enum FlagSpells
+enum PennantSpells
 {
-    SPELL_FLAG_DARNASSUS                            = 63406,
-    SPELL_FLAG_EXODAR                               = 63423,
-    SPELL_FLAG_GNOMEREGAN                           = 63396,
-    SPELL_FLAG_IRONFORGE                            = 63427,
-    SPELL_FLAG_ORGRIMMAR                            = 63433,
-    SPELL_FLAG_SENJIN                               = 63399,
-    SPELL_FLAG_SILVERMOON                           = 63403,
-    SPELL_FLAG_STORMWIND                            = 62594,
-    SPELL_FLAG_THUNDER_BLUFF                        = 63436,
-    SPELL_FLAG_UNDERCITY                            = 63430
+    SPELL_PENNANT_DARNASSUS                         = 63406,
+    SPELL_PENNANT_EXODAR                            = 63423,
+    SPELL_PENNANT_GNOMEREGAN                        = 63396,
+    SPELL_PENNANT_IRONFORGE                         = 63427,
+    SPELL_PENNANT_ORGRIMMAR                         = 63433,
+    SPELL_PENNANT_SEN_JIN                           = 63399,
+    SPELL_PENNANT_SILVERMOON                        = 63403,
+    SPELL_PENNANT_STORMWIND                         = 62594,
+    SPELL_PENNANT_THUNDER_BLUFF                     = 63436,
+    SPELL_PENNANT_UNDERCITY                         = 63430
 };
 
-template <class AI, class T>
-inline AI* GetTrialOfTheChampionAI(T* obj)
+template<class AI>
+AI* GetTrialOfChampionAI(Creature* creature)
 {
-    return GetInstanceAI<AI>(obj, ToCScriptName);
+    return GetInstanceAI<AI>(creature, ToCScriptName);
 }
 
-#endif // TRIAL_OF_CHAMPION_H_
+#endif
