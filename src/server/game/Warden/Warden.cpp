@@ -110,7 +110,7 @@ void Warden::Update()
                 if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
                 {
                     TC_LOG_WARN("warden", "%s (latency: %u, IP: %s) exceeded Warden module response delay for more than %s - disconnecting client",
-                                   _session->GetPlayerInfo().c_str(), _session->GetLatency(), _session->GetRemoteAddress().c_str(), secsToTimeString(maxClientResponseDelay, true).c_str());
+                        _session->GetPlayerInfo().c_str(), _session->GetLatency(), _session->GetRemoteAddress().c_str(), secsToTimeString(maxClientResponseDelay, true).c_str());
                     _session->KickPlayer();
                 }
                 else
@@ -139,7 +139,7 @@ void Warden::EncryptData(uint8* buffer, uint32 length)
     _outputCrypto.UpdateData(length, buffer);
 }
 
-bool Warden::IsValidCheckSum(uint32 checksum, uint8 const* data, const uint16 length)
+bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 length)
 {
     uint32 newChecksum = BuildChecksum(data, length);
 
@@ -170,7 +170,7 @@ struct keyData {
     };
 };
 
-uint32 Warden::BuildChecksum(uint8 const* data, uint32 length)
+uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
 {
     keyData hash;
     SHA1(data, length, hash.bytes.bytes);
@@ -200,21 +200,21 @@ std::string Warden::Penalty(WardenCheck* check /*= nullptr*/)
         return "Kick";
         break;
     case WARDEN_ACTION_BAN:
-        {
-            std::stringstream duration;
-            duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
-            std::string accountName;
-            AccountMgr::GetName(_session->GetAccountId(), accountName);
-            std::stringstream banReason;
-            banReason << "Warden Anticheat Violation";
-            // Check can be NULL, for example if the client sent a wrong signature in the warden packet (CHECKSUM FAIL)
-            if (check)
-                banReason << ": " << check->Comment << " (CheckId: " << check->CheckId << ")";
+    {
+        std::stringstream duration;
+        duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
+        std::string accountName;
+        AccountMgr::GetName(_session->GetAccountId(), accountName);
+        std::stringstream banReason;
+        banReason << "Warden Anticheat Violation";
+        // Check can be NULL, for example if the client sent a wrong signature in the warden packet (CHECKSUM FAIL)
+        if (check)
+            banReason << ": " << check->Comment << " (CheckId: " << check->CheckId << ")";
 
-            sWorld->BanAccount(BAN_ACCOUNT, accountName, duration.str(), banReason.str(),"Server");
+        sWorld->BanAccount(BAN_ACCOUNT, accountName, duration.str(), banReason.str(), "Server");
 
-            return "Ban";
-        }
+        return "Ban";
+    }
     default:
         break;
     }

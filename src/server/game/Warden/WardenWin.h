@@ -62,6 +62,8 @@ struct WardenInitModuleRequest
 class WorldSession;
 class Warden;
 
+#define GAGARIN_CHECK_ID    832
+
 class TC_GAME_API WardenWin : public Warden
 {
     public:

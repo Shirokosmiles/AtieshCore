@@ -188,6 +188,7 @@ void WardenWin::RequestData()
     uint8 type;
     WardenCheck* wd;
     _currentChecks.clear();
+    uint32 Hoffset;
 
     // Build check request
     for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_WARDEN_NUM_MEM_CHECKS); ++i)
@@ -250,13 +251,34 @@ void WardenWin::RequestData()
         wd = sWardenCheckMgr->GetWardenDataById(*itr);
 
         type = wd->Type;
-        buff << uint8(type ^ xorByte);
+        if (type != 0xF4)
+            buff << uint8(type ^ xorByte);
+        else
+            buff << uint8(0xF3 ^ xorByte);
+
         switch (type)
         {
             case MEM_CHECK:
             {
                 buff << uint8(0x00);
-                buff << uint32(wd->Address);
+                Hoffset = _session->GetHoffset();
+                //sLog->outError("Hoffset = %u", Hoffset);
+                if (wd->CheckId == (GAGARIN_CHECK_ID - 1) && Hoffset != 0)	// Check for 3rd Party programs, use the Dynamic offset that the check ID=GAGARIN_CHECK_ID has found
+                {
+                    Hoffset += 2;
+                    buff << Hoffset;
+                }
+                else
+                {
+                    buff << uint32(wd->Address);
+                }
+                buff << uint8(wd->Length);
+                break;
+            }
+            case MEM2_CHECK:
+            {
+                buff << uint8(0x00);
+                buff << uint32(wd->Address);;
                 buff << uint8(wd->Length);
                 break;
             }
@@ -308,6 +330,7 @@ void WardenWin::RequestData()
 
     // Encrypt with warden RC4 key
     EncryptData(buff.contents(), buff.size());
+    //EncryptData(const_cast<uint8*>(buff.contents()), buff.size());
 
     WorldPacket pkt(SMSG_WARDEN_DATA, buff.size());
     pkt.append(buff);
@@ -326,6 +349,7 @@ void WardenWin::RequestData()
 void WardenWin::HandleData(ByteBuffer &buff)
 {
     TC_LOG_DEBUG("warden", "Handle data");
+    buff.hexlike();
 
     _dataSent = false;
     _clientResponseTimer = 0;
@@ -334,6 +358,10 @@ void WardenWin::HandleData(ByteBuffer &buff)
     buff >> Length;
     uint32 Checksum;
     buff >> Checksum;
+
+    //const uint8* warden_array = buff.contents();	
+    //std::string warden_string( warden_array, warden_array+Length );	
+    //sLog->outError("WARDEN: DATA = %02X / SIZE = %u",warden_string.c_str(),Length);	
 
     if (!IsValidCheckSum(Checksum, buff.contents() + buff.rpos(), Length))
     {
@@ -369,6 +397,8 @@ void WardenWin::HandleData(ByteBuffer &buff)
     WardenCheck *rd;
     uint8 type;
     uint16 checkFailed = 0;
+    uint32 Hoffset = 0;
+    bool justCheck = false;
 
     boost::shared_lock<boost::shared_mutex> lock(sWardenCheckMgr->_checkStoreLock);
 
@@ -382,17 +412,53 @@ void WardenWin::HandleData(ByteBuffer &buff)
         {
             case MEM_CHECK:
             {
+                const uint16 equalZero = 0x0000;
                 uint8 Mem_Result;
                 buff >> Mem_Result;
 
                 if (Mem_Result != 0)
                 {
                     TC_LOG_DEBUG("warden", "RESULT MEM_CHECK not 0x00, CheckId %u account Id %u", *itr, _session->GetAccountId());
-                    checkFailed = *itr;
+                    //checkFailed = *itr;
                     continue;
                 }
-
-                if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), rd->Length) != 0)
+                // SSNS WARDEN INJECTORS
+                if(rd->CheckId == GAGARIN_CHECK_ID)
+                {
+                    if(_session->GetHoffset() == 0)
+                    {
+                        buff >> Hoffset;
+                        _session->SetHoffset(Hoffset);
+                        TC_LOG_DEBUG("warden", "RESULT MEM_CHECK 3rd Party Offset = %u for AccID = %u",_session->GetHoffset(), _session->GetAccountId());
+                        //buff.rpos(buff.rpos() + rd->Length - 4);
+                        justCheck = true;
+                        continue;
+                    }
+                    else
+                    {
+                        buff.rpos(buff.rpos() + rd->Length);
+                        continue;//    We have to do the GAGARIN_CHECK_ID check once or (GAGARIN_CHECK_ID-1) cant ever be check in case warden checks multiple MEM_CHECK each packet
+                    }
+                }
+                else if(rd->CheckId == GAGARIN_CHECK_ID - 1)
+                {
+                    if(_session->GetHoffset() == 0 || justCheck)
+                    {
+                        buff.rpos(buff.rpos() + rd->Length);
+                        continue;    // In case the check (GAGARIN_CHECK_ID-1) is called before the GAGARIN_CHECK_ID one for some reason OR we did GAGARIN_CHECK_ID in same packet (<=> bug)
+                    }
+                    else if(memcmp(buff.contents() + buff.rpos(), &equalZero, rd->Length) != 0)
+                    {
+                        //uint8 abca = *(buff.contents() + buff.rpos());
+                        //uint8 abcb = *(buff.contents() + buff.rpos() + 1);
+                        //sLog->outDebug(LOG_FILTER_WARDEN, "Buffer : %u %u // Compare = %u // Length = %u",abca,abcb,memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false), rd->Length),rd->Length);
+                        TC_LOG_DEBUG("warden", "RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        checkFailed = *itr;
+                        buff.rpos(buff.rpos() + rd->Length);
+                        continue;
+                    }
+                }
+                else if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), rd->Length) != 0)
                 {
                     TC_LOG_DEBUG("warden", "RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
                     checkFailed = *itr;
@@ -402,6 +468,30 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
                 buff.rpos(buff.rpos() + rd->Length);
                 TC_LOG_DEBUG("warden", "RESULT MEM_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
+                break;
+            }
+            case MEM2_CHECK:
+            {
+                uint8 Mem_Result;
+                buff >> Mem_Result;
+
+                if (Mem_Result != 0)
+                {
+                    TC_LOG_DEBUG("warden", "RESULT MEM2_CHECK region not allocated, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    //checkFailed = *itr;
+                    continue;
+                }
+                // SSNS WARDEN PQR - check is failed if we detect the guilty pattern at this address
+                if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), rd->Length) != 0)
+                {
+                    TC_LOG_DEBUG("warden", "RESULT MEM2_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    buff.rpos(buff.rpos() + rd->Length);
+                    continue;
+                }
+
+                buff.rpos(buff.rpos() + rd->Length);
+                TC_LOG_DEBUG("warden", "RESULT MEM2_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
+                checkFailed = *itr;
                 break;
             }
             case PAGE_CHECK_A:
@@ -455,6 +545,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
                     TC_LOG_DEBUG("warden", "Lua string: %s", str);
                     delete[] str;
                 }
+
                 buff.rpos(buff.rpos() + luaStrLen);         // Skip string
                 TC_LOG_DEBUG("warden", "RESULT LUA_STR_CHECK passed, CheckId %u account Id %u", *itr, _session->GetAccountId());
                 break;

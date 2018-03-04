@@ -303,6 +303,9 @@ class TC_GAME_API WorldSession
         void InitializeSession();
         void InitializeSessionCallback(SQLQueryHolder* realmHolder);
 
+        uint32 GetHoffset() const { return m_Hoffset; }
+        void SetHoffset(uint32 Hoffset) { m_Hoffset = Hoffset; }
+
         rbac::RBACData* GetRBACData();
         bool HasPermission(uint32 permissionId);
         void LoadPermissions();
@@ -1053,6 +1056,7 @@ class TC_GAME_API WorldSession
         uint32 _accountId;
         std::string _accountName;
         uint8 m_expansion;
+        uint32 m_Hoffset;
 
         typedef std::list<AddonInfo> AddonsList;
 
