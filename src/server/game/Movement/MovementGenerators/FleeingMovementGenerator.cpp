@@ -46,7 +46,6 @@ void FleeingMovementGenerator<T>::DoInitialize(T* owner)
     //owner->ClearUnitState(UNIT_STATE_MOVING);
     owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
     owner->AddUnitState(UNIT_STATE_FLEEING);
-    owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
 
     if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED) || owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
         _timer.Reset(200);
@@ -71,7 +70,8 @@ void FleeingMovementGenerator<T>::DoInitialize(T* owner)
         init.SetVelocity(_speed);
         
         int32 traveltime = init.Launch();
-        _timer.Reset(traveltime + urand(150, 250));
+        owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
+        _timer.Reset(traveltime);
     }
 }
 
@@ -84,7 +84,7 @@ template<>
 void FleeingMovementGenerator<Player>::DoFinalize(Player* owner)
 {
     owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
-    owner->ClearUnitState(UNIT_STATE_FLEEING);
+    owner->ClearUnitState(UNIT_STATE_FLEEING | UNIT_STATE_FLEEING_MOVE);
     owner->StopMoving();
 }
 
@@ -100,6 +100,7 @@ void FleeingMovementGenerator<Creature>::DoFinalize(Creature* owner)
 template<class T>
 void FleeingMovementGenerator<T>::DoReset(T* owner)
 {
+    owner->StopMoving();
     DoInitialize(owner);
 }
 
@@ -183,8 +184,6 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
         return;
     }
 
-    owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
-
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(_path->GetPath());
     init.SetWalk(false);
@@ -197,7 +196,8 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     init.SetVelocity(_speed);
 
     int32 traveltime = init.Launch();
-    _timer.Reset(traveltime + urand(800, 1500));
+    owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
+    _timer.Reset(traveltime);
     
     // update position
     owner->UpdateSplinePosition();

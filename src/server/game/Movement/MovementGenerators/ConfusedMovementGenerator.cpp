@@ -41,8 +41,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* owner)
     //owner->ClearUnitState(UNIT_STATE_MOVING);
     owner->AddUnitState(UNIT_STATE_CONFUSED);
     owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
-    owner->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
-    
+
     owner->GetPosition(_x, _y, _z);
 
     if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) || owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
@@ -68,13 +67,15 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* owner)
         init.SetVelocity(_speed);
 
         int32 traveltime = init.Launch();
-        _timer.Reset(traveltime + urand(150, 250));
+        owner->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
+        _timer.Reset(traveltime);
     }
 }
 
 template<class T>
 void ConfusedMovementGenerator<T>::DoReset(T* owner)
 {
+    owner->StopMoving();
     DoInitialize(owner);
 }
 
@@ -145,8 +146,6 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
             return true;
         }        
 
-        owner->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
-
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(_path->GetPath());
         init.SetWalk(true);
@@ -159,7 +158,8 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
         init.SetVelocity(_speed);
 
         int32 traveltime = init.Launch();
-        _timer.Reset(traveltime + urand(800, 1500));        
+        owner->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
+        _timer.Reset(traveltime);
 
         // update position for server and others units/players
         owner->UpdateSplinePosition();
@@ -175,7 +175,7 @@ template<>
 void ConfusedMovementGenerator<Player>::DoFinalize(Player* unit)
 {
     unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
-    unit->ClearUnitState(UNIT_STATE_CONFUSED);
+    unit->ClearUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
     unit->StopMoving();
 }
 
