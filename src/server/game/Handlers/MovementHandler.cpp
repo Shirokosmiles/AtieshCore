@@ -91,7 +91,8 @@ void WorldSession::HandleMoveWorldportAck()
         return;
     }
 
-    GetPlayer()->Relocate(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation());
+    float z = loc.GetPositionZ() + GetPlayer()->GetHoverOffset();
+    GetPlayer()->Relocate(loc.GetPositionX(), loc.GetPositionY(), z, loc.GetOrientation());
     GetPlayer()->SetFallInformation(0, GetPlayer()->GetPositionZ());
     GetPlayer()->ResetMap();
     GetPlayer()->SetMap(newMap);

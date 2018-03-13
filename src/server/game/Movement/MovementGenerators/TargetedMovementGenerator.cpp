@@ -138,29 +138,38 @@ void TargetedMovementGenerator<T, D>::SetTargetLocation(T* owner, bool updateDes
     Position destination;
     if (updateDestination || !_path)
     {
+        float size = owner->GetCombatReach();
+        float hoverDiff = owner->GetHoverOffset() - GetTarget()->GetHoverOffset();
         if (!_offset)
         {
             if (GetTarget()->IsWithinDistInMap(owner, CONTACT_DISTANCE))
                 return;
 
-            GetTarget()->GetContactPoint(owner, destination.m_positionX, destination.m_positionY, destination.m_positionZ);
+            if (hoverDiff)
+                size = size > hoverDiff ? std::sqrt(size * size - hoverDiff * hoverDiff) : 0.0f;
+
+            GetTarget()->GetNearPoint(owner, destination.m_positionX, destination.m_positionY, destination.m_positionZ, size, CONTACT_DISTANCE, GetTarget()->GetAngle(owner));
         }
         else
         {
             float distance = _offset + 1.0f;
-            float size = owner->GetCombatReach();
 
             if (owner->IsPet() && GetTarget()->GetTypeId() == TYPEID_PLAYER)
             {
                 distance = 1.0f;
                 size = 1.0f;
             }
+            else if (hoverDiff)
+                size = size > hoverDiff ? std::sqrt(size * size - hoverDiff * hoverDiff) : 0.0f;
 
             if (GetTarget()->IsWithinDistInMap(owner, distance))
                 return;
 
             GetTarget()->GetClosePoint(destination.m_positionX, destination.m_positionY, destination.m_positionZ, size, _offset, _angle);
         }
+
+        if (owner->IsHovering())
+            owner->UpdateAllowedPositionZ(destination.m_positionX, destination.m_positionY, destination.m_positionZ);
     }
     else
     {

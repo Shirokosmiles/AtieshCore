@@ -21,5 +21,6 @@
 #include "BattlefieldPackets.h"
 #include "QueryPackets.h"
 #include "QuestPackets.h"
+#include "SpellPackets.h"
 
 #endif // AllPackets_h__
