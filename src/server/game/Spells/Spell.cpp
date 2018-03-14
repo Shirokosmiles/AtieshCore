@@ -3337,13 +3337,16 @@ void Spell::prepare(SpellCastTargets const& targets, AuraEffect const* triggered
             // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
             if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth())
             {
-                unitCaster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
-                for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                if (Unit* targetspell = m_targets.GetUnitTarget())
                 {
-                    if (m_spellInfo->Effects[i].GetUsedTargetObjectType() == TARGET_OBJECT_TYPE_UNIT)
+                    targetspell->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+                    for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     {
-                        unitCaster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);
-                        break;
+                        if (m_spellInfo->Effects[i].GetUsedTargetObjectType() == TARGET_OBJECT_TYPE_UNIT)
+                        {
+                            targetspell->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);//
+                            break;
+                        }
                     }
                 }
             }
