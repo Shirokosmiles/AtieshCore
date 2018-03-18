@@ -214,7 +214,7 @@ enum TrinityStrings
     LANG_GAMEOBJECT_DAMAGED               = 177,
     LANG_GRID_POSITION                    = 178,
     LANG_TRANSOFFSET_POSITION             = 179,
-    // 179-185 used in 6.x branch
+    // 180-185 used in master branch
     LANG_TRANSPORT_POSITION               = 186,
     LANG_PARTIAL_GROUP_SUMMON             = 187,
     // Room for more level 1                188-199 not used
