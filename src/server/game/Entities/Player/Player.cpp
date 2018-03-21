@@ -26846,7 +26846,7 @@ bool Player::CheckOnFlyHack()
         return false;
     }
 
-    if (IsFlying() || IsLevitating() || IsInFlight())
+    if (IsFlying() || IsLevitating() || IsInFlight() || IsInWater())
         return true;
 
     if (GetTransport() || GetVehicle() || GetVehicleKit())
@@ -26874,36 +26874,32 @@ bool Player::CheckOnFlyHack()
 
     Position npos = GetPosition();
     float pz = npos.GetPositionZ();
-    if (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+    if (!IsInWater() && !IsUnderWater() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
-        float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ() + 1.8f, true); // smart flyhacks -> SimpleFly
-        if (pz - z > 4.8f)
-            if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), z))
-            {
-                MovePositionToFirstCollision(npos, 2.5f, GetOrientation() + M_PI);
-                float tz = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ() + 1.8f, true); // smart flyhacks -> SimpleFly
-                if (pz - tz > 2.8f)
-                {
-                    TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-                    TC_LOG_INFO("anticheat", "Player::========================================================");
-                    TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
-                    TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = %f", npos.GetPositionZ());
+        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+        TC_LOG_INFO("anticheat", "Player::========================================================");
+        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
 
-                    sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
-                    return false;
-                }
-            }
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetPlayerMovingMe()->GetName().c_str());
+        return false;
     }
     else
     {
-        if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), npos.GetPositionZ()))
+        float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz, true, 50.0f, GetCollisionHeight()); // smart flyhacks -> SimpleFly
+        if (pz - z > 6.8f)
         {
-            TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-            TC_LOG_INFO("anticheat", "Player::========================================================");
-            TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
+            MovePositionToFirstCollision(npos, 1.0f, GetOrientation() + M_PI);
+            float z2 = npos.GetPositionZ();
+            if (fabsf(z - z2) < fabsf(pz - z))
+            {
+                TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+                TC_LOG_INFO("anticheat", "Player::========================================================");
+                TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
+                TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = %f", pz);
 
-            sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetPlayerMovingMe()->GetName().c_str());
-            return false;
+                sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
+                return false;
+            }
         }
     }
 
