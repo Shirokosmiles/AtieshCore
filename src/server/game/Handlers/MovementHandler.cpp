@@ -493,8 +493,10 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         TC_LOG_INFO("anticheat", "MovementHandler::DOUBLE_JUMP by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
         sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, plrMover->GetName().c_str());
         if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED))
+        {
             plrMover->GetSession()->KickPlayer();
-        return;        
+            return;
+        }
     }
 
     if (plrMover && !plrMover->UnderACKmount() && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
@@ -510,8 +512,10 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             TC_LOG_INFO("anticheat", "MovementHandler::Fake_Jumper by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
             sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FAKE, plrMover->GetName().c_str());
             if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED))
+            {
                 plrMover->GetSession()->KickPlayer();
-            return;
+                return;
+            }
         }
     }
 
