@@ -1404,6 +1404,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_AFH_KICK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FlyHack.Kick.Enabled", false);
     m_bool_configs[CONFIG_ASH_KICK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Kick.Enabled", false);
     m_bool_configs[CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.DoubleJump.Enabled", false);
+    m_bool_configs[CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FakeJumper.Enabled", false);
     m_int_configs[CONFIG_ANTICHEAT_FLYHACK_TIMER] = sConfigMgr->GetIntDefault("AntiCheats.FlyHackTimer", 1000);
 
     // Guild - broadcast loot

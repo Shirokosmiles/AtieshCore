@@ -274,6 +274,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_deathTimer = 0;
     m_deathExpireTime = 0;
     m_skipOnePacketForASH = true;
+    m_isjumping = false;
 
     m_swingErrorMsg = 0;
 
@@ -26874,7 +26875,7 @@ bool Player::CheckOnFlyHack()
 
     Position npos = GetPosition();
     float pz = npos.GetPositionZ();
-    if (!IsInWater() && !IsUnderWater() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+    if (!IsInWater() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
         TC_LOG_INFO("anticheat", "Player::========================================================");
@@ -26888,9 +26889,12 @@ bool Player::CheckOnFlyHack()
         float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz, true, 50.0f, GetCollisionHeight()); // smart flyhacks -> SimpleFly
         if (pz - z > 6.8f)
         {
-            MovePositionToFirstCollision(npos, 1.0f, GetOrientation() + M_PI);
-            float z2 = npos.GetPositionZ();
-            if (fabsf(z - z2) < fabsf(pz - z))
+            float waterlevel = GetBaseMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
+            if (waterlevel && waterlevel + GetCollisionHeight() + 2.0f > pz)
+                return true;
+
+            GetClosePoint(npos.m_positionX, npos.m_positionY, npos.m_positionZ, DEFAULT_PLAYER_BOUNDING_RADIUS, 6.0f);
+            if (pz - npos.GetPositionZ() > 6.8f)
             {
                 TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
                 TC_LOG_INFO("anticheat", "Player::========================================================");

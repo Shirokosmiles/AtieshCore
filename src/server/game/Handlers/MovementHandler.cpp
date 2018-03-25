@@ -469,11 +469,18 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight())
+    {
         plrMover->HandleFall(movementInfo);
+        plrMover->SetIsJumping(false);
+    }
 
     // interrupt parachutes upon falling or landing in water
     if (opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM)
+    {
         mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
+        if (plrMover)
+            plrMover->SetIsJumping(false);
+    }
 
     if (plrMover && ((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
     {
@@ -481,11 +488,31 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
 
-    if (opcode == MSG_MOVE_JUMP && sWorld->getBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED) && plrMover && mover->IsFalling())
+    if (opcode == MSG_MOVE_JUMP && plrMover && mover->IsFalling())
     {
-        TC_LOG_INFO("anticheat", "MovementHandler::player is jumping when falling");
-        plrMover->GetSession()->KickPlayer();
+        TC_LOG_INFO("anticheat", "MovementHandler::DOUBLE_JUMP by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, plrMover->GetName().c_str());
+        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED))
+            plrMover->GetSession()->KickPlayer();
         return;        
+    }
+
+    if (plrMover && !plrMover->UnderACKmount() && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
+    {
+        if (!plrMover->IsJumping())
+        {
+            plrMover->SetIsJumping(true);
+            plrMover->SetUnderACKmount();
+        }
+        else
+        {
+            // fake jumper -> for example gagarin air mode with falling flag (like player jumping), but client can't sent a new coords when falling
+            TC_LOG_INFO("anticheat", "MovementHandler::Fake_Jumper by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
+            sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FAKE, plrMover->GetName().c_str());
+            if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED))
+                plrMover->GetSession()->KickPlayer();
+            return;
+        }
     }
 
     /* start SpeedHack Detection */

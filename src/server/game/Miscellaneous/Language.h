@@ -1099,6 +1099,8 @@ enum TrinityStrings
     LANG_GM_ANNOUNCE_AFH_CANFLYWRONG      = 6618,  // AntiFlyHack - flying without canfly 
     LANG_GM_ANNOUNCE_AFK_SWIMMING         = 6619,  // AntiFlyHack - flying swimming not in water
     LANG_GM_ANNOUNCE_AFH                  = 6620,  // AntiFlyHack
+    LANG_GM_ANNOUNCE_DOUBLE_JUMP          = 6621,  // Double jump (client can't sent second packet of jump (only hack))
+    LANG_GM_ANNOUNCE_JUMPER_FAKE          = 6622,  // Gagarin and others can set falling flag and move up as jump
 
     LANG_WORLD_CLOSED                     = 7523,
     LANG_WORLD_OPENED                     = 7524,
