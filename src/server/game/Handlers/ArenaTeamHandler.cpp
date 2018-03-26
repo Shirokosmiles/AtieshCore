@@ -238,7 +238,7 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
     if (BattlegroundQueueTypeId bgQueue = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_AA, arenaTeam->GetType()))
     {
         GroupQueueInfo ginfo;
-        BattlegroundQueue & queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
+        BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
         if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
             if (ginfo.IsInvitedToBGInstanceGUID)
             {
@@ -281,7 +281,7 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket& recvData)
         if (BattlegroundQueueTypeId bgQueue = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_AA, arenaTeam->GetType()))
         {
             GroupQueueInfo ginfo;
-            BattlegroundQueue & queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
+            BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
             if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
                 if (ginfo.IsInvitedToBGInstanceGUID)
                     return;
@@ -340,7 +340,7 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
     if (BattlegroundQueueTypeId bgQueue = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_AA, arenaTeam->GetType()))
     {
         GroupQueueInfo ginfo;
-        BattlegroundQueue & queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
+        BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
         if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
             if (ginfo.IsInvitedToBGInstanceGUID)
             {
