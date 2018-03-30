@@ -3483,7 +3483,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             }
             break;
         case SPELLFAMILY_DEATHKNIGHT:
-            if (spellInfo->SpellIconID == 1933) // Ebon Plague
+            if (spellInfo->SpellFamilyFlags[2] == 0x00000040) // Ebon Plague
                 return false;
             break;
         default:
