@@ -16,112 +16,147 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Baroness_Anastari
-SD%Complete: 90
-SDComment: MC disabled
-SDCategory: Stratholme
-EndScriptData */
-
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "stratholme.h"
 
 enum Spells
 {
-    SPELL_BANSHEEWAIL       = 16565,
-    SPELL_BANSHEECURSE      = 16867,
-    SPELL_SILENCE           = 18327
-    //SPELL_POSSESS           = 17244
+    SPELL_BANSHEEWAIL           = 16565,
+    SPELL_BANSHEECURSE          = 16867,
+    SPELL_SILENCE               = 18327,
+    SPELL_POSSESS               = 17244,    // The charm
+    SPELL_POSSESSED             = 17246     // The damage buff
 };
 
-class boss_baroness_anastari : public CreatureScript
+enum BaronessAnastariEvents
 {
-public:
-    boss_baroness_anastari() : CreatureScript("boss_baroness_anastari") { }
+    EVENT_SPELL_BANSHEEWAIL     = 1,
+    EVENT_SPELL_BANSHEECURSE    = 2,
+    EVENT_SPELL_SILENCE         = 3,
+    EVENT_SPELL_POSSESS         = 4,
+    EVENT_INVISIBLE             = 5,
+    EVENT_CHECK_POSSESSED       = 6
+};
 
-    CreatureAI* GetAI(Creature* creature) const override
+
+struct boss_baroness_anastari : public BossAI
+{
+    boss_baroness_anastari(Creature* creature) : BossAI(creature, TYPE_BARONESS) { }
+
+    EventMap _events;
+    ObjectGuid _possessedTargetGuid;
+
+    void Reset() override
     {
-        return GetStratholmeAI<boss_baroness_anastariAI>(creature);
+        if (!me->IsVisible())
+        {
+            if (Player* possessedTarget = ObjectAccessor::FindConnectedPlayer(_possessedTargetGuid))
+            {
+                if (possessedTarget->IsAlive())
+                {
+                    possessedTarget->RemoveAurasDueToSpell(SPELL_POSSESSED);
+                    possessedTarget->RemoveAurasDueToSpell(SPELL_POSSESS);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetVisible(true);
+                }
+            }
+        }
+        _events.Reset();
     }
 
-    struct boss_baroness_anastariAI : public ScriptedAI
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        boss_baroness_anastariAI(Creature* creature) : ScriptedAI(creature)
+        _events.ScheduleEvent(EVENT_SPELL_BANSHEEWAIL, 1s);
+        _events.ScheduleEvent(EVENT_SPELL_BANSHEECURSE, 11s);
+        _events.ScheduleEvent(EVENT_SPELL_SILENCE, 13s);
+        _events.ScheduleEvent(EVENT_SPELL_POSSESS, 20s, 30s);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        me->GetInstanceScript()->SetData(TYPE_BARONESS, IN_PROGRESS);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!me || !me->IsAlive())
+            return;
+
+        if (!UpdateVictim())
+            return;
+
+        _events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = _events.ExecuteEvent())
         {
-            Initialize();
-            instance = me->GetInstanceScript();
-        }
-
-        void Initialize()
-        {
-            BansheeWail_Timer = 1000;
-            BansheeCurse_Timer = 11000;
-            Silence_Timer = 13000;
-            //Possess_Timer = 35000;
-        }
-
-        InstanceScript* instance;
-
-        uint32 BansheeWail_Timer;
-        uint32 BansheeCurse_Timer;
-        uint32 Silence_Timer;
-        //uint32 Possess_Timer;
-
-        void Reset() override
-        {
-            Initialize();
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetData(TYPE_BARONESS, IN_PROGRESS);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            //BansheeWail
-            if (BansheeWail_Timer <= diff)
+            switch (eventId)
             {
-                if (rand32() % 100 < 95)
-                    DoCastVictim(SPELL_BANSHEEWAIL);
-                //4 seconds until we should cast this again
-                BansheeWail_Timer = 4000;
-            } else BansheeWail_Timer -= diff;
-
-            //BansheeCurse
-            if (BansheeCurse_Timer <= diff)
-            {
-                if (rand32() % 100 < 75)
-                    DoCastVictim(SPELL_BANSHEECURSE);
-                //18 seconds until we should cast this again
-                BansheeCurse_Timer = 18000;
-            } else BansheeCurse_Timer -= diff;
-
-            //Silence
-            if (Silence_Timer <= diff)
-            {
-                if (rand32() % 100 < 80)
-                    DoCastVictim(SPELL_SILENCE);
-                //13 seconds until we should cast this again
-                Silence_Timer = 13000;
-            } else Silence_Timer -= diff;
-
-            DoMeleeAttackIfReady();
+            case EVENT_SPELL_BANSHEEWAIL:
+                DoCastVictim(SPELL_BANSHEEWAIL);
+                _events.ScheduleEvent(EVENT_SPELL_BANSHEEWAIL, 4s);
+                break;
+            case EVENT_SPELL_BANSHEECURSE:
+                DoCastVictim(SPELL_BANSHEECURSE);
+                _events.Repeat(18s);
+                break;
+            case EVENT_SPELL_SILENCE:
+                DoCastVictim(SPELL_SILENCE);
+                _events.ScheduleEvent(EVENT_SPELL_SILENCE, 13s);
+                break;
+            case EVENT_SPELL_POSSESS:
+                if (Unit* possessTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 0, true, false))    // Random target to be possessed
+                {
+                    if (possessTarget->IsAlive())
+                    {
+                        me->CastStop();
+                        DoCast(possessTarget, SPELL_POSSESS);
+                        DoCast(possessTarget, SPELL_POSSESSED);
+                        me->SetReactState(REACT_PASSIVE);
+                        me->SetVisible(false);
+                        _possessedTargetGuid = possessTarget->GetGUID();
+                        _events.ScheduleEvent(EVENT_CHECK_POSSESSED, 0s);
+                    }
+                    else
+                        _events.ScheduleEvent(EVENT_SPELL_POSSESS, 20s, 30s);
+                }
+                break;
+            case EVENT_INVISIBLE:
+                if (Player* possessedTarget = ObjectAccessor::FindConnectedPlayer(_possessedTargetGuid))    // When there's a possessed target
+                {
+                    possessedTarget->RemoveAurasDueToSpell(SPELL_POSSESS);
+                    possessedTarget->RemoveAurasDueToSpell(SPELL_POSSESSED);
+                    me->SetVisible(true);
+                    possessedTarget->SetFullHealth();
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    _events.ScheduleEvent(EVENT_SPELL_POSSESS, 20s, 30s);
+                }
+                break;
+            case EVENT_CHECK_POSSESSED:
+                if (!me->IsVisible())
+                {
+                    if (Player* possessedTarget = ObjectAccessor::FindConnectedPlayer(_possessedTargetGuid))
+                    {
+                        if (!possessedTarget->HasAura(SPELL_POSSESSED) || possessedTarget->GetHealthPct() <= 50)
+                            _events.ScheduleEvent(EVENT_INVISIBLE, 0s);
+                        else
+                            _events.ScheduleEvent(EVENT_CHECK_POSSESSED, 1s);
+                    }
+                }
+                break;
+            }
         }
-    };
-
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_baroness_anastari()
 {
-    new boss_baroness_anastari();
+    RegisterStratholmeCreatureAI(boss_baroness_anastari);
 }
