@@ -50,7 +50,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* owner)
     {
         Position startdest;
         owner->GetPosition(startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ);
-        owner->GetNearPoint(owner, startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ, 2.0f, 1.0f, owner->GetOrientation() * float(M_PI));
+        owner->GetNearPoint(owner, startdest.m_positionX, startdest.m_positionY, startdest.m_positionZ, 1.0f, owner->GetOrientation() * float(M_PI));
 
         float distance = owner->GetExactDist2d(startdest.m_positionX, startdest.m_positionY);
         owner->MovePositionToFirstCollision(startdest, distance, owner->GetOrientation() * float(M_PI));
