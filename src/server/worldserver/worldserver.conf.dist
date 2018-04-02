@@ -4052,6 +4052,13 @@ AntiCheats.FlyHack.Kick.Enabled = 1
 
 AntiCheats.SpeedHack.Kick.Enabled = 1
 
+#    AntiCheats.FakeJumper.Kick.Enabled
+#        Description: Enable AntiCheats.FakeJumper Kick when detected
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.FakeJumper.Kick.Enabled = 1
+
 ###################################################################################################
 #    AntiCheats.FlyHackTimer
 #        Description: Timer for AntiCheat FlyHack check
