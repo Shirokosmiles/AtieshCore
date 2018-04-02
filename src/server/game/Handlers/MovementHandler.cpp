@@ -499,7 +499,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         }
     }
 
-    if (plrMover && !plrMover->UnderACKmount() && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
+    if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED) && plrMover && !plrMover->UnderACKmount() && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
     {
         if (!plrMover->IsJumping())
         {
@@ -511,7 +511,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             // fake jumper -> for example gagarin air mode with falling flag (like player jumping), but client can't sent a new coords when falling
             TC_LOG_INFO("anticheat", "MovementHandler::Fake_Jumper by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
             sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FAKE, plrMover->GetName().c_str());
-            if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED))
+            if (sWorld->getBoolConfig(CONFIG_FAKEJUMPER_KICK_ENABLED))
             {
                 plrMover->GetSession()->KickPlayer();
                 return;
