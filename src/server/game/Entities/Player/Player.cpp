@@ -26847,7 +26847,7 @@ bool Player::CheckOnFlyHack()
         return false;
     }
 
-    if (IsFlying() || IsLevitating() || IsInFlight() || IsInWater())
+    if (IsFlying() || IsLevitating() || IsInFlight())
         return true;
 
     if (GetTransport() || GetVehicle() || GetVehicleKit())
@@ -26875,7 +26875,7 @@ bool Player::CheckOnFlyHack()
 
     Position npos = GetPosition();
     float pz = npos.GetPositionZ();
-    if (!IsInWater() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+    if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), pz) && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
         TC_LOG_INFO("anticheat", "Player::========================================================");
