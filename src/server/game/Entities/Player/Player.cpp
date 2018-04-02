@@ -428,6 +428,8 @@ Player::Player(WorldSession* session): Unit(true)
 
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
+    //experimental
+    m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY);
 }
 
 Player::~Player()
