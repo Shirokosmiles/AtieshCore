@@ -26877,12 +26877,16 @@ bool Player::CheckOnFlyHack()
     float pz = npos.GetPositionZ();
     if (!GetMap()->IsInWater(npos.GetPositionX(), npos.GetPositionY(), pz) && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
-        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-        TC_LOG_INFO("anticheat", "Player::========================================================");
-        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
+        float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz, true, 50.0f, GetCollisionHeight()); // smart flyhacks -> SimpleFly
+        if (pz - z > 6.8f)
+        {
+            TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+            TC_LOG_INFO("anticheat", "Player::========================================================");
+            TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
 
-        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetPlayerMovingMe()->GetName().c_str());
-        return false;
+            sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetPlayerMovingMe()->GetName().c_str());
+            return false;
+        }
     }
     else
     {
