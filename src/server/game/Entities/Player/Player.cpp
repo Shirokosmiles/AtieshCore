@@ -275,6 +275,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_deathExpireTime = 0;
     m_skipOnePacketForASH = true;
     m_isjumping = false;
+    m_canfly = false;
 
     m_swingErrorMsg = 0;
 
@@ -26509,6 +26510,7 @@ bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
     if (!apply)
         SetFallInformation(0, GetPositionZ());
 
+    SetCanFlybyServer(apply);
     WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
     data << GetPackGUID();
     data << uint32(0);          //! movement counter

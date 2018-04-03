@@ -1729,6 +1729,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool IsSkipOnePacketForASH() const { return m_skipOnePacketForASH; }
         void SetIsJumping(bool jump) { m_isjumping = jump; }
         bool IsJumping() const { return m_isjumping; }
+        void SetCanFlybyServer(bool canfly) { m_canfly = canfly; }
+        bool IsCanFlybyServer() const { return m_canfly; }
 
         void RemoveGhoul();
 
@@ -2533,7 +2535,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // Used for skip 1 movement packet after charge or blink
         bool m_skipOnePacketForASH;
         bool m_isjumping;
-
+        bool m_canfly;
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;
         uint32 m_oldpetspell;
