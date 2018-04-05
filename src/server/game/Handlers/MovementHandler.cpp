@@ -519,7 +519,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         }
     }
 
-    if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED) && plrMover && !plrMover->UnderACKmount() && movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING) && !plrMover->IsCanFlybyServer())
+    if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED) && plrMover && !plrMover->UnderACKmount() && movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY) && !plrMover->IsCanFlybyServer())
     {
         TC_LOG_INFO("anticheat", "MovementHandler::Fake_flying mode (using MOVEMENTFLAG_FLYING flag doesn't restricted) by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
         sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FLYING, plrMover->GetName().c_str());

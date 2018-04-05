@@ -765,6 +765,7 @@ enum TrinityStrings
     LANG_PINFO_CHR_GUILD_ONOTE            = 852,
     LANG_PINFO_CHR_PLAYEDTIME             = 853,
     LANG_PINFO_CHR_MAILS                  = 854,
+    LANG_PINFO_CHR_FLY_MODE               = 855,
     LANG_PINFO_CHR_LEVEL_HIGH             = 871,
 
     LANG_CHARACTER_GENDER_MALE            = 855,
