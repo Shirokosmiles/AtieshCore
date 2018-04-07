@@ -21,6 +21,7 @@
 #include "MoveSplineInit.h"
 #include "PathGenerator.h"
 #include "Pet.h"
+#include "Player.h"
 #include "Unit.h"
 #include "Util.h"
 
@@ -121,6 +122,16 @@ bool FollowMovementGenerator::Update(Unit* owner, uint32 diff)
                 bool success = _path->CalculatePath(x, y, z, allowShortcut);
                 if (!success || (_path->GetPathType() & PATHFIND_NOPATH))
                 {
+                    if (owner->GetOwner() && owner->GetOwner()->ToPlayer() && owner->GetOwner()->ToPlayer()->InArena()) // arena force destination for pet (arena nagrand)
+                    {
+                        Movement::MoveSplineInit init(owner);
+                        init.MoveTo(x, y, z, true, true);
+                        init.SetWalk(false);
+                        init.SetFacing(target);
+                        init.Launch();
+                        return true;
+                    }
+
                     owner->StopMoving();
                     return true;
                 }

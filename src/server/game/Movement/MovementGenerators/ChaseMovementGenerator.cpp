@@ -22,6 +22,7 @@
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "PathGenerator.h"
+#include "Player.h"
 #include "Unit.h"
 #include "Util.h"
 
@@ -154,12 +155,22 @@ bool ChaseMovementGenerator::Update(Unit* owner, uint32 diff)
             if (owner->IsHovering())
                 owner->UpdateAllowedPositionZ(x, y, z);
 
-            bool transport = owner->GetTransport();
-            if (!transport)
+            bool forcedestination = owner->GetTransport();
+            if (!forcedestination)
             {
-                bool success = _path->CalculatePath(x, y, z, transport);
+                bool success = _path->CalculatePath(x, y, z);
                 if (!success || (_path->GetPathType() & PATHFIND_NOPATH))
                 {
+                    if (owner->GetOwner() && owner->GetOwner()->ToPlayer() && owner->GetOwner()->ToPlayer()->InArena()) // arena force destination for pet (arena nagrand)
+                    {
+                        Movement::MoveSplineInit init(owner);
+                        init.MoveTo(x, y, z, true, true);
+                        init.SetWalk(false);
+                        init.SetFacing(target);
+                        init.Launch();
+                        return true;
+                    }
+
                     if (cOwner)
                         cOwner->SetCannotReachTarget(true);
                     owner->StopMoving();
@@ -193,7 +204,7 @@ bool ChaseMovementGenerator::Update(Unit* owner, uint32 diff)
             owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
 
             Movement::MoveSplineInit init(owner);
-            if (!transport)
+            if (!forcedestination)
                 init.MovebyPath(_path->GetPath());
             else
                 init.MoveTo(x, y, z, false, true);
