@@ -584,6 +584,7 @@ void PathGenerator::NormalizePath()
 
     for (uint32 i = 0; i < _pathPoints.size(); ++i)
     {
+        _pathPoints[i].z += _sourceUnit->GetCollisionHeight();
         _sourceUnit->UpdateAllowedPositionZ(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
 
         if (petontransport && i != 0)
