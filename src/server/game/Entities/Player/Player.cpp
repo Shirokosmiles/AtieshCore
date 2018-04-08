@@ -26885,7 +26885,7 @@ bool Player::CheckOnFlyHack()
     }
     else
     {
-        float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz, true, 50.0f); // smart flyhacks -> SimpleFly
+        float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz + GetCollisionHeight() + 0.5f, true, 50.0f); // smart flyhacks -> SimpleFly
         float diff = pz - z;
         if (diff > 6.8f)
             if (diff > 6.8f + GetHoverOffset()) // better calculate the second time for false situations, but not call GetHoverOffset everytime (economy resource)
