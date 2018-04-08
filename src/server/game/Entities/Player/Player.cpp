@@ -26885,7 +26885,7 @@ bool Player::CheckOnFlyHack()
     }
     else
     {
-        float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz, true, 50.0f, GetCollisionHeight()); // smart flyhacks -> SimpleFly
+        float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz, true, 50.0f); // smart flyhacks -> SimpleFly
         float diff = pz - z;
         if (diff > 6.8f)
             if (diff > 6.8f + GetHoverOffset()) // better calculate the second time for false situations, but not call GetHoverOffset everytime (economy resource)
@@ -26894,16 +26894,22 @@ bool Player::CheckOnFlyHack()
                 if (waterlevel && waterlevel + GetCollisionHeight() + GetHoverOffset() > pz)
                     return true;
 
-                GetClosePoint(npos.m_positionX, npos.m_positionY, npos.m_positionZ, DEFAULT_PLAYER_BOUNDING_RADIUS, 6.0f);
+                GetClosePoint(npos.m_positionX, npos.m_positionY, npos.m_positionZ, DEFAULT_PLAYER_BOUNDING_RADIUS, 6.0f); // first check
                 if (pz - npos.GetPositionZ() > 6.8f)
                 {
-                    TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
-                    TC_LOG_INFO("anticheat", "Player::========================================================");
-                    TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
-                    TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = %f", pz);
+                    // check dynamic collision for transport (TODO navmesh for transport map)
+                    GetMap()->getObjectHitPos(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight(), npos.m_positionX, npos.m_positionY, npos.m_positionZ + GetCollisionHeight(), npos.m_positionX, npos.m_positionY, npos.m_positionZ, -GetCollisionHeight());
 
-                    sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
-                    return false;
+                    if (pz - npos.GetPositionZ() > 6.8f)
+                    {
+                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+                        TC_LOG_INFO("anticheat", "Player::========================================================");
+                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = %f", pz);
+                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
+                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  checkz = %f", npos.GetPositionZ());
+                        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
+                        return false;
+                    }
                 }
             }
     }
