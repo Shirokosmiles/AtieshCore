@@ -127,12 +127,14 @@ namespace MMAP
 
             uint32 percentageDone(uint32 totalTiles, uint32 totalTilesDone);
 
+            void LoadOffMeshConnections(const char* offMeshFilePath);
+
             TerrainBuilder* m_terrainBuilder;
             TileList m_tiles;
 
             bool m_debugOutput;
 
-            char const* m_offMeshFilePath;
+            std::vector<OffMeshConnection> m_offmeshConnections;
             bool m_skipContinents;
             bool m_skipJunkMaps;
             bool m_skipBattlegrounds;

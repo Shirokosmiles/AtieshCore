@@ -50,6 +50,42 @@ enum NavTerrain
 
 namespace MMAP
 {
+    struct OffMeshConnection
+    {
+        OffMeshConnection() {}
+
+        OffMeshConnection(uint32 mapID, uint32 tileX, uint32 tileY, float startX, float startY, float startZ,
+            float endX, float endY, float endZ, uint32 agentSize)
+        {
+            m_mapID = mapID;
+            m_tileX = tileX;
+            m_tileY = tileY;
+            m_start[0] = startX;
+            m_start[1] = startY;
+            m_start[2] = startZ;
+            m_end[0] = endX;
+            m_end[1] = endY;
+            m_end[2] = endZ;
+            m_agentSize = agentSize;
+        }
+
+        uint32 m_mapID;
+        uint32 m_tileX;
+        uint32 m_tileY;
+        float m_start[3];
+        float m_end[3];
+        uint32 m_agentSize;
+    };
+
+    static const std::vector<OffMeshConnection> DefaultOffMeshConnections =
+    {
+        { 0, 31, 59, -14429.889648, 450.344452, 15.430828, -14424.218750, 444.332855, 12.773965, 2.5 }, // booty bay dock
+        { 562, 31, 20, 6234.545898, 256.902100, 11.075373, 6230.961914, 252.127274, 11.180979, 2.5 },   // Blade's Edge Arena
+        { 562, 31, 20, 6243.081543, 266.918854, 11.059557, 6246.507324, 271.623505, 11.230524, 2.5 }   // Blade's Edge Arena
+        //{ 562, 31, 20, 6230.59f, 251.90f, 11.19f, 6234.70f, 257.03f, 11.07f, 1 },
+        //{ 562, 31, 20, 6246.68f, 271.90f, 11.23f, 6242.68f, 267.07f, 11.09f, 1 }
+    };
+
     inline bool matchWildcardFilter(char const* filter, char const* str)
     {
         if (!filter || !str)
