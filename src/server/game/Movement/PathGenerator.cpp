@@ -575,6 +575,72 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
         _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
     }
 
+    if (_type == PATHFIND_INCOMPLETE && _sourceUnit->GetMapId() == 562) // Blade edge Arena
+    {
+        if ((endPoint[1] - startPoint[1]) > 4.5f)
+        {
+            // start X, y, z
+            float sX, sY, eX, eY, eZ;
+            sX = startPoint[2];
+            sY = startPoint[0];
+            eX = endPoint[2];
+            eY = endPoint[0];
+            eZ = endPoint[1];
+            //A (south-east)
+            if ((sX >= 6180.796875f && sX <= 6226.724609f) && (sY >= 236.296036f && sY <= 277.950043f))
+            {
+                //TC_LOG_INFO("anticheat", "++ PathGenerator::BuildPointPath A");
+                pointCount = 5;
+                _pathPoints.resize(pointCount);
+                _pathPoints[0] = GetStartPosition();
+                _pathPoints[1] = G3D::Vector3(6191.843262f, 264.801849f, 3.5f);
+                _pathPoints[2] = G3D::Vector3(6203.682617f, 281.374512f, 12.5f);
+                _pathPoints[3] = G3D::Vector3(6206.993164f, 280.087006f, 14.0f);
+                _pathPoints[4] = GetEndPosition();
+                _type = PATHFIND_NORMAL;
+            }
+            //B (north-east)
+            else if ((sX >= 6215.437500f && sX <= 6259.274902f) && (sY >= 205.504669f && sY <= 248.468872f))
+            {
+                //TC_LOG_INFO("anticheat", "++ PathGenerator::BuildPointPath B");
+                pointCount = 5;
+                _pathPoints.resize(pointCount);
+                _pathPoints[0] = GetStartPosition();
+                _pathPoints[1] = G3D::Vector3(6248.808105f, 220.637985f, 4.5f);
+                _pathPoints[2] = G3D::Vector3(6261.618652f, 232.819412f, 12.5f);
+                _pathPoints[3] = G3D::Vector3(6260.099121f, 236.207077f, 14.0f);
+                _pathPoints[4] = GetEndPosition();
+                _type = PATHFIND_NORMAL;
+            }
+            //C (north-west)
+            else if ((sX >= 6249.708496f && sX <= 6289.688965f) && (sY >= 247.162811f && sY <= 289.817505f))
+            {
+                //TC_LOG_INFO("anticheat", "++ PathGenerator::BuildPointPath C");
+                pointCount = 5;
+                _pathPoints.resize(pointCount);
+                _pathPoints[0] = GetStartPosition();
+                _pathPoints[1] = G3D::Vector3(6281.279785f, 260.974884f, 3.9f);
+                _pathPoints[2] = G3D::Vector3(6272.071289f, 243.330627f, 12.5f);
+                _pathPoints[3] = G3D::Vector3(6268.463867f, 245.091064f, 14.0f);
+                _pathPoints[4] = GetEndPosition();
+                _type = PATHFIND_NORMAL;
+            }
+            //D (south-west)
+            else if ((sX >= 6216.665039f && sX <= 6265.604980f) && (sY >= 274.625031f && sY <= 317.697571f))
+            {
+                //TC_LOG_INFO("anticheat", "++ PathGenerator::BuildPointPath D");
+                pointCount = 5;
+                _pathPoints.resize(pointCount);
+                _pathPoints[0] = GetStartPosition();
+                _pathPoints[1] = G3D::Vector3(6225.866211f, 305.163391f, 4.6f);
+                _pathPoints[2] = G3D::Vector3(6213.339355f, 292.441376f, 12.5f);
+                _pathPoints[3] = G3D::Vector3(6215.147949f, 289.954590f, 14.0f);
+                _pathPoints[4] = GetEndPosition();
+                _type = PATHFIND_NORMAL;
+            }
+        }
+    }
+
     TC_LOG_DEBUG("maps", "++ PathGenerator::BuildPointPath path type %d size %d poly-size %d\n", _type, pointCount, _polyLength);
 }
 
@@ -971,5 +1037,5 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
 
 bool PathGenerator::IsInvalidDestinationZ(Unit const* target) const
 {
-    return (target->GetPositionZ() - GetActualEndPosition().z) > 5.0f;
+    return (target->GetPositionZ() - GetActualEndPosition().z) > 5.0f && _sourceUnit->GetMapId() != 562;
 }
