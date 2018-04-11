@@ -580,12 +580,9 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
         if ((endPoint[1] - startPoint[1]) > 4.5f)
         {
             // start X, y, z
-            float sX, sY, eX, eY, eZ;
+            float sX, sY;
             sX = startPoint[2];
             sY = startPoint[0];
-            eX = endPoint[2];
-            eY = endPoint[0];
-            eZ = endPoint[1];
             //A (south-east)
             if ((sX >= 6180.796875f && sX <= 6226.724609f) && (sY >= 236.296036f && sY <= 277.950043f))
             {

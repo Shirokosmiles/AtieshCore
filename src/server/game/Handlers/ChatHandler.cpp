@@ -243,7 +243,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
     }
     
-    bool senderinbattleground = sender->InBattleground();   
+    bool senderinbattleground = sender->InBattleground() && !sender->InArena();   
 
     switch (type)
     {
