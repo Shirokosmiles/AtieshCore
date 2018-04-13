@@ -977,17 +977,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         PlayerSocial* GetSocial() { return m_social; }
         void RemoveSocial();
 
-        bool CheckOnFlyHack();
-
-        // should only be used by packet handlers to validate and apply incoming MovementInfos from clients. Do not use internally to modify m_movementInfo
-        void UpdateMovementInfo(MovementInfo const& movementInfo);
-        bool CheckMovementInfo(MovementInfo const& movementInfo);
-
-        void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }
-        void SetLastMoveServerTimestamp(uint32 timestamp) { lastMoveServerTimestamp = timestamp; }
-        uint32 GetLastMoveClientTimestamp() const { return lastMoveClientTimestamp; }
-        uint32 GetLastMoveServerTimestamp() const { return lastMoveServerTimestamp; }
-
         PlayerTaxi m_taxi;
         void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getCFSRace(), getClass(), getLevel()); }
         bool ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc = nullptr, uint32 spellid = 0);
@@ -1016,9 +1005,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void GiveLevel(uint8 level);
 
         void InitStatsForLevel(bool reapplyMods = false);
-
-        bool CanEnterInInstanceOrRaidCustom() const { return m_customAccessInZone; }
-        void SetCanEnterInInstanceOrRaidCustom(bool access) { m_customAccessInZone = access; }
 
         // .cheat command related
         bool GetCommandStatus(uint32 command) const { return (_activeCheats & command) != 0; }
@@ -1049,7 +1035,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
         uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
-
         /// Constructs the player Chat data for the specific functions to use 
         void BuildPlayerChat(WorldPacket* data, uint8 msgtype, std::string const& text, uint32 language) const;
 
@@ -1057,7 +1042,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         std::unordered_set<PetAura const*> m_petAuras;
         void AddPetAura(PetAura const* petSpell);
         void RemovePetAura(PetAura const* petSpell);
-
 
         /// Handles said message in regular chat based on declared language and in config pre-defined Range.
         void Say(std::string const& text, Language language, WorldObject const* = nullptr) override;
@@ -1724,13 +1708,44 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void BuildPlayerRepop();
         void RepopAtGraveyard();
 
-        // for antispeedhack for blink spell
+        /*********************************************************/
+        /***                  CUSTOM SYSTEMS                   ***/
+        /*********************************************************///
+        // AntiCheat
         void SetSkipOnePacketForASH(bool blinked) { m_skipOnePacketForASH = blinked; }
         bool IsSkipOnePacketForASH() const { return m_skipOnePacketForASH; }
-        void SetIsJumping(bool jump) { m_isjumping = jump; }
-        bool IsJumping() const { return m_isjumping; }
+        void SetJumpingbyOpcode(bool jump) { m_isjumping = jump; }
+        bool IsJumpingbyOpcode() const { return m_isjumping; }
         void SetCanFlybyServer(bool canfly) { m_canfly = canfly; }
         bool IsCanFlybyServer() const { return m_canfly; }
+		
+		bool UnderACKmount() const { return m_ACKmounted; }
+		void SetUnderACKmount();
+
+		// should only be used by packet handlers to validate and apply incoming MovementInfos from clients. Do not use internally to modify m_movementInfo
+		void UpdateMovementInfo(MovementInfo const& movementInfo);
+		bool CheckMovementInfo(MovementInfo const& movementInfo); // ASH
+		bool CheckOnFlyHack(); // AFH
+
+		void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }
+		void SetLastMoveServerTimestamp(uint32 timestamp) { lastMoveServerTimestamp = timestamp; }
+		uint32 GetLastMoveClientTimestamp() const { return lastMoveClientTimestamp; }
+		uint32 GetLastMoveServerTimestamp() const { return lastMoveServerTimestamp; }
+
+		// Ingore group/raid-party for some quests in Instances
+		bool CanEnterInInstanceOrRaidCustom() const { return m_customAccessInZone; }
+		void SetCanEnterInInstanceOrRaidCustom(bool access) { m_customAccessInZone = access; }
+
+		// Vanish can be visible near 0.3-0.4 sec after using
+		uint32 GetVanishTimer() const { return m_vanishTimer; }
+		bool UnderVisibleVanish() const { return m_visiblevanish; }
+		void SetVanishTimer();
+
+        // VIP
+        void SetPremiumStatus(bool vipstatus) { m_vip = vipstatus; }
+        bool IsPremium() const { return m_vip; }
+
+        //End of Custom Systems
 
         void RemoveGhoul();
 
@@ -1837,14 +1852,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetDrunkValue(uint8 newDrunkValue, uint32 itemId = 0);
         uint8 GetDrunkValue() const { return GetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_INEBRIATION); }
         static DrunkenState GetDrunkenstateByValue(uint8 value);
-
-        // Vanish can be visible near 0.3-0.4 sec after using
-        uint32 GetVanishTimer() const { return m_vanishTimer; }
-        bool UnderVisibleVanish() const { return m_visiblevanish; }
-        void SetVanishTimer();
-
-        bool UnderACKmount() const { return m_ACKmounted; }
-        void SetUnderACKmount();
 
         uint32 GetDeathTimer() const { return m_deathTimer; }
         uint32 GetCorpseReclaimDelay(bool pvp) const;
@@ -2532,10 +2539,12 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool m_bCanDelayTeleport;
         bool m_bHasDelayedTeleport;
 
-        // Used for skip 1 movement packet after charge or blink
-        bool m_skipOnePacketForASH;
-        bool m_isjumping;
-        bool m_canfly;
+        // RE features        
+        bool m_skipOnePacketForASH; // Used for skip 1 movement packet after charge or blink
+        bool m_isjumping;           // Used for jump-opcode in movementhandler
+        bool m_canfly;              // Used for access at fly flag - handled restricted access
+        bool m_vip;                 // Used for VIP func
+
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;
         uint32 m_oldpetspell;

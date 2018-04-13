@@ -1096,13 +1096,7 @@ enum TrinityStrings
     LANG_GM_ANNOUNCE_COLOR                = 6615,
 
     LANG_GM_SILENCE                       = 6616,  // "Silence is ON for %s" - Spell 1852
-    LANG_GM_ANNOUNCE_ASH                  = 6617,  // AntiSpeedHack
-    LANG_GM_ANNOUNCE_AFH_CANFLYWRONG      = 6618,  // AntiFlyHack - flying without canfly 
-    LANG_GM_ANNOUNCE_AFK_SWIMMING         = 6619,  // AntiFlyHack - flying swimming not in water
-    LANG_GM_ANNOUNCE_AFH                  = 6620,  // AntiFlyHack
-    LANG_GM_ANNOUNCE_DOUBLE_JUMP          = 6621,  // Double jump (client can't sent second packet of jump (only hack))
-    LANG_GM_ANNOUNCE_JUMPER_FAKE          = 6622,  // Gagarin and others can set falling flag and move up as jump
-    LANG_GM_ANNOUNCE_JUMPER_FLYING        = 6623,  // Hitchhiker's Hack and others can set fly unrestricted flag
+    // 6617-6623 for Anticheat reserved    
 
     LANG_WORLD_CLOSED                     = 7523,
     LANG_WORLD_OPENED                     = 7524,
@@ -1170,8 +1164,33 @@ enum TrinityStrings
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
     LANG_SHUTDOWN_DELAYED                         = 11017,
     LANG_SHUTDOWN_CANCELLED                       = 11018,
-    LANG_GUILD_LOOT_ANNOUNCE_1          = 11019,
-    LANG_GUILD_LOOT_ANNOUNCE_2          = 11020,
-    LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE = 11021
+
+    // RE features
+    // Guild loot
+    LANG_GUILD_LOOT_ANNOUNCE_1                    = 11019,
+    LANG_GUILD_LOOT_ANNOUNCE_2                    = 11020,
+    // FLAB
+    LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE     = 11021,
+    // Anticheat
+    LANG_GM_ANNOUNCE_ASH                  = 6617,  // AntiSpeedHack
+    LANG_GM_ANNOUNCE_AFH_CANFLYWRONG      = 6618,  // AntiFlyHack - flying without canfly 
+    LANG_GM_ANNOUNCE_AFK_SWIMMING         = 6619,  // AntiFlyHack - flying swimming not in water
+    LANG_GM_ANNOUNCE_AFH                  = 6620,  // AntiFlyHack
+    LANG_GM_ANNOUNCE_DOUBLE_JUMP          = 6621,  // Double jump (client can't sent second packet of jump (only hack))
+    LANG_GM_ANNOUNCE_JUMPER_FAKE          = 6622,  // Gagarin and others can set falling flag and move up as jump
+    LANG_GM_ANNOUNCE_JUMPER_FLYING        = 6623,  // Hitchhiker's Hack and others can set fly unrestricted flag    
+
+    // 11022 - 11109 free 
+    // Vip Commands
+    LANG_PLAYER_NOT_VIP                   = 11110,
+    LANG_VIP_COMMAND_DISABLED             = 11111,
+    LANG_VIP_ERROR                        = 11112,
+    LANG_VIP_BG                           = 11113,
+    LANG_VIP_STEALTH                      = 11114,
+    LANG_VIP_DEAD                         = 11115,
+    LANG_VIP_CHANGE_RACE                  = 11116,
+    LANG_VIP_CHANGE_CUSTOMIZE             = 11117,
+    LANG_VIP_GROUP                        = 11118,
+    LANG_PLAYER_TARGET_NOT_VIP            = 11119
 };
 #endif

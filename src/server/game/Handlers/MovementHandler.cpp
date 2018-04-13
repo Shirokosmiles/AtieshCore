@@ -471,7 +471,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight())
     {
         plrMover->HandleFall(movementInfo);
-        plrMover->SetIsJumping(false);
+        plrMover->SetJumpingbyOpcode(false);
     }
 
     // interrupt parachutes upon falling or landing in water
@@ -479,7 +479,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     {
         mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
         if (plrMover)
-            plrMover->SetIsJumping(false);
+            plrMover->SetJumpingbyOpcode(false);
     }
 
     if (plrMover && ((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
@@ -501,9 +501,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED) && plrMover && !plrMover->UnderACKmount() && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
     {
-        if (!plrMover->IsJumping())
+        if (!plrMover->IsJumpingbyOpcode())
         {
-            plrMover->SetIsJumping(true);
+            plrMover->SetJumpingbyOpcode(true);
             plrMover->SetUnderACKmount();
         }
         else

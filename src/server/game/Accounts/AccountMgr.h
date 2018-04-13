@@ -68,10 +68,15 @@ class TC_GAME_API AccountMgr
         static bool CheckEmail(uint32 accountId, std::string newEmail);
 
         static uint32 GetId(std::string const& username);
+        static uint32 GetGuidOfOnlineCharacter(uint32 accountId);
         static uint32 GetSecurity(uint32 accountId);
         static uint32 GetSecurity(uint32 accountId, int32 realmId);
         static bool GetName(uint32 accountId, std::string& name);
         static bool GetEmail(uint32 accountId, std::string& email);
+        static bool GetVipStatus(uint32 accountId);
+        static void SetVipStatus(uint32 accountId, uint64 unsetdate);
+        static void RemoveVipStatus(uint32 accountId);
+        static void UpdateVipStatus(uint32 accountId, uint64 unsetdate);
         static uint32 GetCharactersCount(uint32 accountId);
 
         static std::string CalculateShaPassHash(std::string const& name, std::string const& password);

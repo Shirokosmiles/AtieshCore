@@ -523,16 +523,6 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_XP_BG_KILL]  = sConfigMgr->GetFloatDefault("Rate.XP.BattlegroundKill", 1.0f);
     rate_values[RATE_XP_QUEST]    = sConfigMgr->GetFloatDefault("Rate.XP.Quest", 1.0f);
     rate_values[RATE_XP_EXPLORE]  = sConfigMgr->GetFloatDefault("Rate.XP.Explore", 1.0f);
-
-    m_int_configs[CONFIG_WEEKEND_XP_DAYS] = sConfigMgr->GetIntDefault("Weekend.XP.Days", 0);
-    if (m_int_configs[CONFIG_WEEKEND_XP_DAYS] > 7)
-    {
-        TC_LOG_ERROR("server.loading", "Weekend.XP.Days must have value betwween 0 and 7. Using 0 instead.");
-        m_int_configs[CONFIG_WEEKEND_XP_DAYS] = 0;
-    }
-    
-    rate_values[RATE_XP_WEEKEND] = sConfigMgr->GetFloatDefault("Weekend.XP.Rate", 1.0f);
-
     rate_values[RATE_REPAIRCOST]  = sConfigMgr->GetFloatDefault("Rate.RepairCost", 1.0f);
     if (rate_values[RATE_REPAIRCOST] < 0.0f)
     {
@@ -750,8 +740,6 @@ void World::LoadConfigSettings(bool reload)
 
     /// @todo Add MonsterSight (with meaning) in worldserver.conf or put them as define
     m_float_configs[CONFIG_SIGHT_MONSTER] = sConfigMgr->GetFloatDefault("MonsterSight", 50.0f);
-
-    m_int_configs[CONFIG_VANISH_VISION_TIMER] = sConfigMgr->GetIntDefault("VanishVisionTimer", 500);
 
     if (reload)
     {
@@ -1122,7 +1110,6 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_DETECT_POS_COLLISION] = sConfigMgr->GetBoolDefault("DetectPosCollision", true);
 
     m_bool_configs[CONFIG_RESTRICTED_LFG_CHANNEL]      = sConfigMgr->GetBoolDefault("Channel.RestrictedLfg", true);
-    m_bool_configs[CONFIG_ALLOWED_LFG_CHANNEL] = sConfigMgr->GetBoolDefault("Channel.AllowedLfg", false);
     m_int_configs[CONFIG_TALENTS_INSPECTING]           = sConfigMgr->GetIntDefault("TalentsInspecting", 1);
     m_bool_configs[CONFIG_CHAT_FAKE_MESSAGE_PREVENTING] = sConfigMgr->GetBoolDefault("ChatFakeMessagePreventing", false);
     m_int_configs[CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY] = sConfigMgr->GetIntDefault("ChatStrictLinkChecking.Severity", 0);
@@ -1190,8 +1177,6 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER]         = sConfigMgr->GetFloatDefault("Arena.ArenaMatchmakerRatingModifier", 24.0f);
 
     m_bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = sConfigMgr->GetBoolDefault("OffhandCheckAtSpellUnlearn", true);
-
-    m_bool_configs[CROSSFACTION_SYSTEM_BATTLEGROUNDS] = sConfigMgr->GetBoolDefault("CrossfactionBG.enable", true);
 
     m_int_configs[CONFIG_CREATURE_PICKPOCKET_REFILL] = sConfigMgr->GetIntDefault("Creature.PickPocketRefillDelay", 10 * MINUTE);
     m_int_configs[CONFIG_CREATURE_STOP_FOR_PLAYER] = sConfigMgr->GetIntDefault("Creature.MovingStopTimeForPlayer", 3 * MINUTE * IN_MILLISECONDS);
@@ -1398,27 +1383,77 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WARDEN_CLIENT_FAIL_ACTION]    = sConfigMgr->GetIntDefault("Warden.ClientCheckFailAction", 0);
     m_int_configs[CONFIG_WARDEN_CLIENT_RESPONSE_DELAY] = sConfigMgr->GetIntDefault("Warden.ClientResponseDelay", 600);
 
+    /*********************************************************/
+    /***                  CUSTOM SYSTEMS                   ***/
+    /*********************************************************/
     // AntiCheat
-    m_bool_configs[CONFIG_ANTICHEAT_FLYHACK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FlyHack.Enabled", false);
-    m_bool_configs[CONFIG_ANTICHEAT_SPEEDHACK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Enabled", false);
-    m_bool_configs[CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.DoubleJump.Enabled", false);
-    m_bool_configs[CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FakeJumper.Enabled", false);
+    m_bool_configs[CONFIG_ANTICHEAT_FLYHACK_ENABLED]        = sConfigMgr->GetBoolDefault("AntiCheats.FlyHack.Enabled", false);
+    m_bool_configs[CONFIG_ANTICHEAT_SPEEDHACK_ENABLED]      = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Enabled", false);
+    m_bool_configs[CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED]     = sConfigMgr->GetBoolDefault("AntiCheats.DoubleJump.Enabled", false);
+    m_bool_configs[CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED]     = sConfigMgr->GetBoolDefault("AntiCheats.FakeJumper.Enabled", false);
     m_bool_configs[CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FakeFlyingmode.Enabled", false);
     // punishment
-    m_bool_configs[CONFIG_AFH_KICK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FlyHack.Kick.Enabled", false);
-    m_bool_configs[CONFIG_ASH_KICK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Kick.Enabled", false);
-    m_bool_configs[CONFIG_FAKEJUMPER_KICK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FakeJumper.Kick.Enabled", false);
+    m_bool_configs[CONFIG_AFH_KICK_ENABLED]            = sConfigMgr->GetBoolDefault("AntiCheats.FlyHack.Kick.Enabled", false);
+    m_bool_configs[CONFIG_ASH_KICK_ENABLED]            = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Kick.Enabled", false);
+    m_bool_configs[CONFIG_FAKEJUMPER_KICK_ENABLED]     = sConfigMgr->GetBoolDefault("AntiCheats.FakeJumper.Kick.Enabled", false);
     m_bool_configs[CONFIG_FAKEFLYINGMODE_KICK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FakeFlyingmode.Kick.Enabled", false);
     // Anticheat AFH timer
     m_int_configs[CONFIG_ANTICHEAT_FLYHACK_TIMER] = sConfigMgr->GetIntDefault("AntiCheats.FlyHackTimer", 1000);
+    // VIP system
+    m_bool_configs[CONFIG_VIP_DEBUFF]        = sConfigMgr->GetBoolDefault("Config.Vip.Debuff.Command", false);
+    m_bool_configs[CONFIG_VIP_BANK]          = sConfigMgr->GetBoolDefault("Config.Vip.Bank.Command", false);
+    m_bool_configs[CONFIG_VIP_MAIL]          = sConfigMgr->GetBoolDefault("Config.Vip.Mail.Command", false);
+    m_bool_configs[CONFIG_VIP_REPAIR]        = sConfigMgr->GetBoolDefault("Config.Vip.Repair.Command", false);
+    m_bool_configs[CONFIG_VIP_RESET_TALENTS] = sConfigMgr->GetBoolDefault("Config.Vip.Reset.Talents.Command", false);
+    m_bool_configs[CONFIG_VIP_TAXI]          = sConfigMgr->GetBoolDefault("Config.Vip.Taxi.Command", false);
+    m_bool_configs[CONFIG_VIP_HOME]          = sConfigMgr->GetBoolDefault("Config.Vip.Home.Command", false);
+    m_bool_configs[CONFIG_VIP_CHANGE_RACE]   = sConfigMgr->GetBoolDefault("Config.Vip.Change.Race.Command", false);
+    m_bool_configs[CONFIG_VIP_CUSTOMIZE]     = sConfigMgr->GetBoolDefault("Config.Vip.Customize.Command", false);
+    m_bool_configs[CONFIG_VIP_CAPITAL]       = sConfigMgr->GetBoolDefault("Config.Vip.Capital.Command", false);
+    m_bool_configs[CONFIG_VIP_APPEAR]        = sConfigMgr->GetBoolDefault("Config.Vip.Appear.Command", false);
+    m_bool_configs[CONFIG_VIP_ALL_DISABLED] = !sWorld->getBoolConfig(CONFIG_VIP_DEBUFF) &&
+        !sWorld->getBoolConfig(CONFIG_VIP_BANK) &&
+        !sWorld->getBoolConfig(CONFIG_VIP_MAIL) &&
+        !sWorld->getBoolConfig(CONFIG_VIP_REPAIR) &&
+        !sWorld->getBoolConfig(CONFIG_VIP_RESET_TALENTS) &&
+        !sWorld->getBoolConfig(CONFIG_VIP_TAXI) &&
+        !sWorld->getBoolConfig(CONFIG_VIP_HOME) &&
+        !sWorld->getBoolConfig(CONFIG_VIP_CAPITAL) &&
+        !sWorld->getBoolConfig(CONFIG_VIP_CHANGE_RACE) &&
+        !sWorld->getBoolConfig(CONFIG_VIP_CUSTOMIZE) &&
+        !sWorld->getBoolConfig(CONFIG_VIP_APPEAR);
 
+    rate_values[RATE_VIP_XP_KILL]    = sConfigMgr->GetFloatDefault("Rate.XP.Kill.Premium", 1.0f);
+    rate_values[RATE_VIP_XP_QUEST]   = sConfigMgr->GetFloatDefault("Rate.XP.Quest.Premium", 1.0f);
+    rate_values[RATE_VIP_HONOR]      = sConfigMgr->GetFloatDefault("Rate.Honor.Premium", 1.0f);
+    rate_values[RATE_VIP_REPUTATION] = sConfigMgr->GetFloatDefault("Rate.Reputation.Gain.Premium", 1.0f);
     // Guild - broadcast loot
-    m_bool_configs[CONFIG_LOOT_GUILD_ENABLED] = sConfigMgr->GetBoolDefault("Guild.LootBroadcast.Enabled", false);
-
+    m_bool_configs[CONFIG_LOOT_GUILD_ENABLED]                   = sConfigMgr->GetBoolDefault("Guild.LootBroadcast.Enabled", false);
     // First Login Acc Bonus script
-    m_bool_configs[CONFIG_FIRST_LOGIN_ACC_BONUS] = sConfigMgr->GetBoolDefault("FLAB.Script.Enabled", false);
-    m_int_configs[CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS] = sConfigMgr->GetIntDefault("FLAB.Script.MaxChars", 0);
+    m_bool_configs[CONFIG_FIRST_LOGIN_ACC_BONUS]                = sConfigMgr->GetBoolDefault("FLAB.Script.Enabled", false);
+    m_int_configs[CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS]   = sConfigMgr->GetIntDefault("FLAB.Script.MaxChars", 0);
     m_int_configs[CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS] = sConfigMgr->GetIntDefault("FLAB.Script.BonusMoney", 1);
+    // Vanish Fade Delay
+    m_int_configs[CONFIG_VANISH_VISION_TIMER]                   = sConfigMgr->GetIntDefault("VanishVisionTimer", 500);
+    // Allowed LFG channel without LFG state
+    m_bool_configs[CONFIG_ALLOWED_LFG_CHANNEL]                  = sConfigMgr->GetBoolDefault("Channel.AllowedLfg", false);
+    // CrossFaction BG
+    m_bool_configs[CROSSFACTION_SYSTEM_BATTLEGROUNDS]           = sConfigMgr->GetBoolDefault("CrossfactionBG.enable", true);
+    // Mail External 
+    m_bool_configs[CONFIG_EXTERNAL_MAIL_ENABLE]                 = sConfigMgr->GetBoolDefault("External.Mail.Enable", false);
+    m_int_configs[CONFIG_EXTERNAL_MAIL_INTERVAL]                = sConfigMgr->GetIntDefault("External.Mail.Interval", 1);
+    // Whether to use LoS from M2 objects
+    m_bool_configs[CONFIG_CHECK_M2_LOS]                         = sConfigMgr->GetBoolDefault("CheckM2ObjectLoS", true);
+    // Weekend XP bonus
+    m_int_configs[CONFIG_WEEKEND_XP_DAYS]                       = sConfigMgr->GetIntDefault("Weekend.XP.Days", 0);
+    if (m_int_configs[CONFIG_WEEKEND_XP_DAYS] > 7)
+    {
+        TC_LOG_ERROR("server.loading", "Weekend.XP.Days must have value betwween 0 and 7. Using 0 instead.");
+        m_int_configs[CONFIG_WEEKEND_XP_DAYS] = 0;
+    }
+
+    rate_values[RATE_XP_WEEKEND] = sConfigMgr->GetFloatDefault("Weekend.XP.Rate", 1.0f);
+    //End of Custom Systems
 
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetIntDefault("DungeonFinder.OptionsMask", 1);
@@ -1508,19 +1543,12 @@ void World::LoadConfigSettings(bool reload)
 
     // Allow 5-man parties to use raid warnings
     m_bool_configs[CONFIG_CHAT_PARTY_RAID_WARNINGS] = sConfigMgr->GetBoolDefault("PartyRaidWarnings", false);
-    
-    // Mail External 
-    m_bool_configs[CONFIG_EXTERNAL_MAIL_ENABLE] = sConfigMgr->GetBoolDefault("External.Mail.Enable", false);
-    m_int_configs[CONFIG_EXTERNAL_MAIL_INTERVAL] = sConfigMgr->GetIntDefault("External.Mail.Interval", 1);
 
     // Allow to cache data queries
     m_bool_configs[CONFIG_CACHE_DATA_QUERIES] = sConfigMgr->GetBoolDefault("CacheDataQueries", true);
 
     // Whether to use LoS from game objects
     m_bool_configs[CONFIG_CHECK_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("CheckGameObjectLoS", true);
-
-    // Whether to use LoS from M2 objects
-    m_bool_configs[CONFIG_CHECK_M2_LOS] = sConfigMgr->GetBoolDefault("CheckM2ObjectLoS", true);
 
     // call ScriptMgr if we're reloading the configuration
     if (reload)

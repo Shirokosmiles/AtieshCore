@@ -41,6 +41,7 @@
 #    CROSSFACTION BG CONFIG
 #    GUILD LOOT CONFIG
 #    FIRST LOGIN ACC BONUS CONFIG
+#    VIP SYSTEM CONFIG
 #
 ###################################################################################################
 
@@ -4373,6 +4374,41 @@ FLAB.Script.MaxChars = 0
 
 #    Description: a count of money ( 500 gold )
 FLAB.Script.BonusMoney = 5000000
+
+#
+###################################################################################################
+
+###################################################################################################
+#
+# VIP SYSTEM CONFIG
+#
+#    Vip.Command
+#        Description: Enable/Disable custom vip command
+#        Default:     0 - disable
+#    
+
+Config.Vip.Debuff.Command        = 0
+Config.Vip.Bank.Command          = 0
+Config.Vip.Mail.Command          = 0
+Config.Vip.Repair.Command        = 0
+Config.Vip.Reset.Talents.Command = 0
+Config.Vip.Taxi.Command          = 0
+Config.Vip.Home.Command          = 0
+Config.Vip.Change.Race.Command   = 0
+Config.Vip.Customize.Command     = 0
+Config.Vip.Capital.Command       = 0
+Config.Vip.Appear.Command        = 0
+
+#
+#    Vip.Rate
+#        Description: Individual rate for vip player
+#        Default:     1.0f - x1 rate 
+#    
+
+Rate.XP.Kill.Premium         = 1
+Rate.XP.Quest.Premium        = 1
+Rate.Honor.Premium           = 1
+Rate.Reputation.Gain.Premium = 1
 
 #
 ###################################################################################################
