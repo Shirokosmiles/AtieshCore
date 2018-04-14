@@ -2117,7 +2117,7 @@ void World::SetInitialWorldSettings()
 
     m_timers[WUPDATE_WHO_LIST].SetInterval(5 * IN_MILLISECONDS); // update who list cache every 5 seconds
 
-    m_timers[WUPDATE_VIP_STATUS_CHECK].SetInterval(5 * MINUTE * IN_MILLISECONDS); // update vip status every 5 minutes
+    m_timers[WUPDATE_VIP_STATUS_CHECK].SetInterval(1 * MINUTE * IN_MILLISECONDS); // update vip status every 5 minutes
 
     //to set mailtimer to return mails every day between 4 and 5 am
     //mailtimer is increased when updating auctions
@@ -2356,8 +2356,10 @@ void World::Update(uint32 diff)
 
             time_t minutes = diff % HOUR / MINUTE;
             //time_t unsetsec = diff % 60;            
-            if (minutes <= 5)
-                ChatHandler(itr->second->GetPlayer()->GetSession()).PSendSysMessage(itr->second->GetPlayer()->GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_NEAR_END), (secsToTimeString(diff, false, true)).c_str());
+            if (minutes == 5)
+                ChatHandler(itr->second->GetPlayer()->GetSession()).PSendSysMessage(itr->second->GetPlayer()->GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_NEAR_END));
+            if (minutes < 5)
+                ChatHandler(itr->second->GetPlayer()->GetSession()).PSendSysMessage(itr->second->GetPlayer()->GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_EXIST), (secsToTimeString(minutes, false, false)).c_str());
         }
     }
 
