@@ -293,6 +293,15 @@ uint32 AccountMgr::GetGuidOfOnlineCharacter(uint32 accountId)
     return (result) ? (*result)[0].GetUInt32() : 0;
 }
 
+time_t AccountMgr::GetVIPunsetDate(uint32 accountId)
+{
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_PREMIUM_UNSETDATE_BY_ID);
+    stmt->setUInt32(0, accountId);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+    return (result) ? (*result)[0].GetUInt64() : 0;
+}
+
 uint32 AccountMgr::GetSecurity(uint32 accountId)
 {
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ACCESS_GMLEVEL);
@@ -353,11 +362,11 @@ bool AccountMgr::GetVipStatus(uint32 accountId)
     return false;
 }
 
-void AccountMgr::SetVipStatus(uint32 accountId, uint64 unsetdata)
+void AccountMgr::SetVipStatus(uint32 accountId, time_t unsetdate)
 {
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SET_ACCOUNT_PREMIUM);
     stmt->setUInt32(0, accountId);
-    stmt->setUInt64(1, unsetdata);
+    stmt->setUInt64(1, unsetdate);
     stmt->setBool(2, true);
     LoginDatabase.Execute(stmt);
 }
@@ -369,7 +378,7 @@ void AccountMgr::RemoveVipStatus(uint32 accountId)
     LoginDatabase.Execute(stmt);
 }
 
-void AccountMgr::UpdateVipStatus(uint32 accountId, uint64 unsetdata)
+void AccountMgr::UpdateVipStatus(uint32 accountId, time_t unsetdata)
 {
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_PREMIUM);
     stmt->setUInt64(0, unsetdata);

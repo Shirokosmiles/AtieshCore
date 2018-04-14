@@ -1012,6 +1012,17 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         SendNotification(LANG_GM_ON);
 
     bool vip = AccountMgr::GetVipStatus(GetAccountId());
+    if (vip)
+    {
+        time_t unsetdate = AccountMgr::GetVIPunsetDate(GetAccountId());
+        if (GameTime::GetGameTime() > unsetdate)
+        {
+            vip = false;
+            AccountMgr::RemoveVipStatus(GetAccountId());
+        }
+        else
+            pCurrChar->SetPremiumUnsetdate(unsetdate);
+    }
     pCurrChar->SetPremiumStatus(vip);
 
     std::string IP_str = GetRemoteAddress();

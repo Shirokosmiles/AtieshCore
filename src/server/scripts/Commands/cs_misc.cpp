@@ -1921,9 +1921,19 @@ public:
                handler->PSendSysMessage(LANG_PINFO_CHR_MAILS, readmail, totalmail);
         }
 
-        std::string _canfly = handler->GetTrinityString(LANG_ERROR);
-        _canfly = target->IsCanFlybyServer() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
-        handler->PSendSysMessage(LANG_PINFO_CHR_FLY_MODE, _canfly.c_str());
+        if (target)
+        {
+            std::string _canfly = handler->GetTrinityString(LANG_ERROR);
+            _canfly = target->IsCanFlybyServer() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
+            handler->PSendSysMessage(LANG_PINFO_CHR_FLY_MODE, _canfly.c_str());
+
+            std::string _hasvip = handler->GetTrinityString(LANG_ERROR);
+            _hasvip = target->IsPremium() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
+            handler->PSendSysMessage(LANG_PINFO_CHR_VIP_MODE, _hasvip.c_str());
+
+            if (target->IsPremium())
+                handler->PSendSysMessage(LANG_TARGETPLAYER_VIP_TIME_EXIST, (secsToTimeString(target->GetPremiumUnsetdate() - GameTime::GetGameTime(), false, false)).c_str());
+        }
 
         return true;
     }

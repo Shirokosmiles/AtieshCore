@@ -767,6 +767,7 @@ enum TrinityStrings
     LANG_PINFO_CHR_MAILS                  = 854,
     LANG_PINFO_CHR_LEVEL_HIGH             = 871,
     LANG_PINFO_CHR_FLY_MODE               = 882,
+    LANG_PINFO_CHR_VIP_MODE               = 883,
 
     LANG_CHARACTER_GENDER_MALE            = 855,
     LANG_CHARACTER_GENDER_FEMALE          = 856,
@@ -796,7 +797,7 @@ enum TrinityStrings
     //                                    = 879, see LANG_PINFO_CHR_REGMAILS
     LANG_ACCOUNT_SEC_TYPE                 = 880,
     LANG_RBAC_EMAIL_REQUIRED              = 881,
-    // Room for in-game strings             883-999 not used
+    // Room for in-game strings             884-999 not used
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                     = 1000,
@@ -1191,6 +1192,10 @@ enum TrinityStrings
     LANG_VIP_CHANGE_RACE                  = 11116,
     LANG_VIP_CHANGE_CUSTOMIZE             = 11117,
     LANG_VIP_GROUP                        = 11118,
-    LANG_PLAYER_TARGET_NOT_VIP            = 11119
+    LANG_PLAYER_TARGET_NOT_VIP            = 11119,
+    LANG_PLAYER_VIP_TIME_EXIST            = 11120,
+    LANG_PLAYER_VIP_TIME_NEAR_END         = 11121,
+    LANG_PLAYER_VIP_TIME_EXPIRED          = 11122,
+    LANG_TARGETPLAYER_VIP_TIME_EXIST      = 11123
 };
 #endif

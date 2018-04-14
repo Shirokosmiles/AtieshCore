@@ -100,8 +100,8 @@ public:
 
         uint32 days_bonus = atoul(days);
         
-        uint64 current_time = GameTime::GetGameTime();
-        uint64 unsetdate = current_time + 24 * 60 * 60 * days_bonus;
+        time_t current_time = GameTime::GetGameTime();
+        time_t unsetdate = current_time + 24 * 60 * 60 * days_bonus;
 
         bool vip = false;
 
@@ -124,6 +124,7 @@ public:
                 if (Player* p = ObjectAccessor::FindPlayerByLowGUID(guid))
                 {
                     p->SetPremiumStatus(true);
+                    p->SetPremiumUnsetdate(unsetdate);
                     handler->PSendSysMessage("VIP privileges has been set for Account: %u Character:[%s] (online) (GUID: %u), for %u days", accountID, p->GetName().c_str(), p->GetGUID().GetCounter(), days_bonus);
                 }
             }                
@@ -140,6 +141,7 @@ public:
                 days_bonus);
 
             target->SetPremiumStatus(true);
+            target->SetPremiumUnsetdate(unsetdate);
         }
 
         return true;
@@ -216,6 +218,9 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
+
+        if (player->IsPremium())
+            handler->PSendSysMessage(LANG_PLAYER_VIP_TIME_EXIST, (secsToTimeString(player->GetPremiumUnsetdate() - GameTime::GetGameTime(), false, false)).c_str());
 
         if (sWorld->getBoolConfig(CONFIG_VIP_ALL_DISABLED))
         {

@@ -2117,6 +2117,8 @@ void World::SetInitialWorldSettings()
 
     m_timers[WUPDATE_WHO_LIST].SetInterval(5 * IN_MILLISECONDS); // update who list cache every 5 seconds
 
+    m_timers[WUPDATE_VIP_STATUS_CHECK].SetInterval(5 * MINUTE * IN_MILLISECONDS); // update vip status every 5 minutes
+
     //to set mailtimer to return mails every day between 4 and 5 am
     //mailtimer is increased when updating auctions
     //one second is 1000 -(tested on win system)
@@ -2323,6 +2325,36 @@ void World::Update(uint32 diff)
     {
         m_timers[WUPDATE_WHO_LIST].Reset();
         sWhoListStorageMgr->Update();
+    }
+
+    ///- Update VIP status while unsetdate < current time
+    if (m_timers[WUPDATE_VIP_STATUS_CHECK].Passed())
+    {
+        m_timers[WUPDATE_VIP_STATUS_CHECK].Reset();
+        for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+        {
+            if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld() || !itr->second->GetPlayer()->IsPremium())
+                continue;
+
+            time_t unset = itr->second->GetPlayer()->GetPremiumUnsetdate();
+            if (unset <= currentGameTime)
+            {
+                itr->second->GetPlayer()->SetPremiumStatus(false);
+                AccountMgr::RemoveVipStatus(itr->second->GetPlayer()->GetSession()->GetAccountId());
+                ChatHandler(itr->second->GetPlayer()->GetSession()).PSendSysMessage(itr->second->GetPlayer()->GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_EXPIRED));
+                continue;
+            }
+
+            time_t diff = unset - currentGameTime;
+            time_t days = diff / DAY;
+            if (days >= 1)
+                continue;
+
+            time_t minutes = diff % HOUR / MINUTE;
+            //time_t unsetsec = diff % 60;            
+            if (minutes <= 5)
+                ChatHandler(itr->second->GetPlayer()->GetSession()).PSendSysMessage(itr->second->GetPlayer()->GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_NEAR_END), (secsToTimeString(diff, false, true)).c_str());
+        }
     }
 
     /// Handle daily quests reset time
