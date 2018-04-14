@@ -199,6 +199,9 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             pet->GetTransport()->RemovePassenger(pet);
                     }
 
+                    pet->StopMoving();
+                    pet->GetMotionMaster()->Clear(false);
+                    pet->GetMotionMaster()->MoveIdle();
                     pet->GetMotionMaster()->MoveFollow(_player, PET_FOLLOW_DIST, pet->GetFollowAngle());
                     if (pet->ToPet())
                         pet->ToPet()->ClearCastWhenWillAvailable();

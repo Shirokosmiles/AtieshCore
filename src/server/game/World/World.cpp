@@ -2350,6 +2350,10 @@ void World::Update(uint32 diff)
             if (days >= 1)
                 continue;
 
+            time_t hours = diff % DAY / HOUR;
+            if (hours >= 1)
+                continue;
+
             time_t minutes = diff % HOUR / MINUTE;
             //time_t unsetsec = diff % 60;            
             if (minutes <= 5)

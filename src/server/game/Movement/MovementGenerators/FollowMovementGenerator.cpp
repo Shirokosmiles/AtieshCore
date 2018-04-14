@@ -161,7 +161,12 @@ bool FollowMovementGenerator::Update(Unit* owner, uint32 diff)
                 init.MovebyPath(_path->GetPath());
             else
                 init.MoveTo(x, y, z, false, true);
-            init.SetWalk(target->IsWalking());
+            bool walk;
+            if (owner->GetOwner() && owner->GetOwner()->ToPlayer())
+                walk = owner->GetOwner()->ToPlayer()->HasWalkingFlag();
+            else
+                walk = target->IsWalking();
+            init.SetWalk(walk);
             init.SetFacing(target->GetOrientation());
             init.Launch();
         }

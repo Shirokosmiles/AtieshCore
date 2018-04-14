@@ -8637,28 +8637,6 @@ void Unit::UpdateSpeed(UnitMoveType mtype)
             speed = min_speed;
     }
 
-    if (GetTypeId() == TYPEID_UNIT)
-    {
-        if (mtype == MOVE_RUN)
-            speed *= ToCreature()->GetCreatureTemplate()->speed_run;
-
-        if (Unit* owner = GetCharmerOrOwner())
-        {
-            if (ToCreature()->HasUnitTypeMask(UNIT_MASK_MINION) &&
-                ToCreature()->HasUnitState(UNIT_STATE_FOLLOW) && !ToCreature()->IsInCombat())
-            {
-                // Sync speed with owner when near or slower
-                float owner_speed = owner->GetSpeedRate(mtype);
-                if (ToCreature()->IsWithinMeleeRange(owner) || speed < owner_speed)
-                    speed = owner_speed;
-
-                // Decrease speed when near to help prevent stop-and-go movement
-                // and increase speed when away to help prevent falling behind
-                speed *= std::min(0.6f + (GetDistance(owner) / 10.0f), 1.1f);
-            }
-        }
-    }
-
     SetSpeedRate(mtype, speed);
 }
 
