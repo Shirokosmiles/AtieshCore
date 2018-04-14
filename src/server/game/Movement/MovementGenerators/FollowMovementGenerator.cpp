@@ -52,6 +52,9 @@ bool FollowMovementGenerator::Update(Unit* owner, uint32 diff)
     if (!target)
         return false;
 
+    if (owner->IsJumping())
+        return true;
+
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
     {
         owner->StopMoving();
