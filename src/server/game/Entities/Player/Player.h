@@ -1742,13 +1742,13 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 		void SetVanishTimer();
 
         // VIP
-        void SetPremiumStatus(bool vipstatus) { m_vip = vipstatus; }
+        void SetPremiumStatus(bool vipstatus);
         bool IsPremium() const { return m_vip; }
         void SetPremiumUnsetdate(time_t unsetdate) { m_unsetdate = unsetdate; }
         time_t GetPremiumUnsetdate() const { return m_unsetdate; }
 
         // Walking data from move packets
-        void SetWalkingFlag(bool vipstatus) { m_walking = vipstatus; }
+        void SetWalkingFlag(bool walkstatus) { m_walking = walkstatus; }
         bool HasWalkingFlag() const { return m_walking; }
         //End of Custom Systems
 
@@ -2426,6 +2426,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_areaUpdateId;
 
         uint32 m_vanishTimer;
+        uint32 m_premiumTimer;
         uint32 m_flyhackTimer;
         uint32 m_mountTimer;
         bool   m_ACKmounted;

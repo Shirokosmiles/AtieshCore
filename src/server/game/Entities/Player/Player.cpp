@@ -266,6 +266,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_hostileReferenceCheckTimer = 0;
     m_drunkTimer = 0;
     m_vanishTimer = 0;
+    m_premiumTimer = 0;
     m_flyhackTimer = 0;
     if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FLYHACK_ENABLED))
         m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
@@ -1284,6 +1285,44 @@ void Player::Update(uint32 p_time)
         }
         else
             m_vanishTimer -= p_time;
+    }
+
+    if (m_vip && m_premiumTimer > 0)
+    {
+        if (p_time >= m_premiumTimer)
+        {
+            time_t currentGameTime = GameTime::GetGameTime();
+            time_t unset = GetPremiumUnsetdate();
+            if (unset <= currentGameTime)
+            {
+                SetPremiumStatus(false);
+                SetPremiumUnsetdate(0);
+                AccountMgr::RemoveVipStatus(GetSession()->GetAccountId());
+                ChatHandler(GetSession()).PSendSysMessage(GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_EXPIRED));
+            }
+            else
+            {
+                time_t diff = unset - currentGameTime;
+                time_t days = diff / DAY;
+                if (days < 1)
+                {
+                    time_t hours = diff % DAY / HOUR;
+                    if (hours < 1)
+                    {
+                        time_t minutes = diff % HOUR / MINUTE;
+                        //time_t unsetsec = diff % 60;            
+                        if (minutes == 5)
+                            ChatHandler(GetSession()).PSendSysMessage(GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_NEAR_END));
+                        if (minutes < 5)
+                            ChatHandler(GetSession()).PSendSysMessage(GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_EXIST), (secsToTimeString(minutes, false, false)).c_str());
+                    }
+                }
+
+                m_premiumTimer = 1000 * MINUTE;
+            }
+        }
+        else
+            m_premiumTimer -= p_time;
     }
 
     if (m_flyhackTimer > 0)
@@ -24025,6 +24064,15 @@ void Player::SetVanishTimer()
 {
     m_vanishTimer = sWorld->getIntConfig(CONFIG_VANISH_VISION_TIMER);
     m_visiblevanish = true;
+}
+
+void Player::SetPremiumStatus(bool vipstatus)
+{
+    m_vip = vipstatus;
+    if (m_vip)
+        m_premiumTimer = 1000 * MINUTE;
+    else
+        m_premiumTimer = 0;
 }
 
 void Player::SetUnderACKmount()

@@ -188,6 +188,7 @@ public:
                 if (Player* p = ObjectAccessor::FindPlayerByLowGUID(guid))
                 {
                     p->SetPremiumStatus(false);
+                    p->SetPremiumUnsetdate(0);
                     handler->PSendSysMessage("VIP privileges were removed for Account: %u Character:[%s] (online) (GUID: %u)", accountID, p->GetName().c_str(), p->GetGUID().GetCounter());
                 }
             }
@@ -203,6 +204,7 @@ public:
                 target->GetGUID().GetCounter());
 
             target->SetPremiumStatus(false);
+            target->SetPremiumUnsetdate(0);
         }
 
         return true;

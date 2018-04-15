@@ -1019,6 +1019,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         {
             vip = false;
             AccountMgr::RemoveVipStatus(GetAccountId());
+            ChatHandler(pCurrChar->GetSession()).PSendSysMessage(pCurrChar->GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_EXPIRED));
         }
         else
             pCurrChar->SetPremiumUnsetdate(unsetdate);
