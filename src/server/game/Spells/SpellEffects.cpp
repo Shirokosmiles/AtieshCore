@@ -1017,7 +1017,7 @@ inline void CalculateJumpSpeeds(SpellInfo const* spellInfo, uint8 i, float dist,
     else
         speedZ = 10.0f;
 
-    speedXY = dist * 10.0f / speedZ;
+    speedXY = speedZ + sqrt(dist) * 3.0f;
 }
 
 void Spell::EffectJump(SpellEffIndex effIndex)

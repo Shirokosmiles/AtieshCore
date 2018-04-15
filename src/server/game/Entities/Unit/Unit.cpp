@@ -10243,7 +10243,7 @@ void Unit::StopMoving()
     init.Stop();
 }
 
-void Unit::PauseMovement(uint32 timer/* = 0*/, uint8 slot/* = 0*/, bool forced/* = true*/)
+void Unit::PauseMovement(uint32 timer/* = 0*/, uint8 slot/* = 0*/)
 {
     if (slot >= MAX_MOTION_SLOT)
         return;
@@ -10251,7 +10251,7 @@ void Unit::PauseMovement(uint32 timer/* = 0*/, uint8 slot/* = 0*/, bool forced/*
     if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(MovementSlot(slot)))
         movementGenerator->Pause(timer);
 
-    if (forced)
+    if (!IsJumping())
         StopMoving();
 }
 

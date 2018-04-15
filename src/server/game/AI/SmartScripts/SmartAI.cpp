@@ -112,7 +112,7 @@ void SmartAI::PausePath(uint32 delay, bool forced)
 {
     if (!HasEscortState(SMART_ESCORT_ESCORTING))
     {
-        me->PauseMovement(delay, MOTION_SLOT_IDLE, forced);
+        me->PauseMovement(delay, MOTION_SLOT_IDLE);
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
         {
             std::pair<uint32, uint32> waypointInfo = me->GetCurrentWaypointInfo();
@@ -591,8 +591,8 @@ void SmartAI::AttackStart(Unit* who)
 
     if (who && me->Attack(who, mCanAutoAttack))
     {
-        //me->GetMotionMaster()->Clear(MOTION_SLOT_ACTIVE); //ccrs i will rape you
-        me->PauseMovement(0, MOTION_SLOT_ACTIVE, false);    //ccrs i will rape you
+        me->GetMotionMaster()->Clear(MOTION_SLOT_ACTIVE);   //ccrs i will rape you
+        me->PauseMovement(0, MOTION_SLOT_ACTIVE);    //ccrs i will rape you
 
         if (mCanCombatMove)
         {
