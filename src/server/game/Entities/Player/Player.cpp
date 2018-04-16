@@ -279,6 +279,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_canfly = false;
     m_vip = false;
     m_unsetdate = 0;
+    m_coins = 0;
     m_walking = false;
 
     m_swingErrorMsg = 0;

@@ -1745,6 +1745,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetPremiumStatus(bool vipstatus);
         bool IsPremium() const { return m_vip; }
         void SetPremiumUnsetdate(time_t unsetdate) { m_unsetdate = unsetdate; }
+        void SetCoins(uint32 coins) { m_coins = coins; }
+        uint32 GetCoins() const { return m_coins; }
         time_t GetPremiumUnsetdate() const { return m_unsetdate; }
 
         // Walking data from move packets
@@ -2551,6 +2553,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool m_canfly;              // Used for access at fly flag - handled restricted access
         bool m_vip;                 // Used for VIP func
         time_t m_unsetdate;         // time (unixtime) of unsetdate vip previlegies
+        uint32 m_coins;             // Coins for ingame store
         bool m_walking;             // Player walking
 
         // Temporary removed pet cache

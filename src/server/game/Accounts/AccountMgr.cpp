@@ -284,6 +284,15 @@ uint32 AccountMgr::GetId(std::string const& username)
     return (result) ? (*result)[0].GetUInt32() : 0;
 }
 
+uint32 AccountMgr::GetCoins(uint32 accountId)
+{
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_COINS_BY_ID);
+    stmt->setUInt32(0, accountId);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+    return (result) ? (*result)[0].GetUInt32() : 0;
+}
+
 uint32 AccountMgr::GetGuidOfOnlineCharacter(uint32 accountId)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_GET_CHARACTERS_ONLINE_ON_ACCOUNT);
@@ -368,6 +377,14 @@ void AccountMgr::SetVipStatus(uint32 accountId, time_t unsetdate)
     stmt->setUInt32(0, accountId);
     stmt->setUInt64(1, unsetdate);
     stmt->setBool(2, true);
+    LoginDatabase.Execute(stmt);
+}
+
+void AccountMgr::SetCoins(uint32 accountId, uint32 coins)
+{
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_COINS);
+    stmt->setUInt32(0, coins);
+    stmt->setUInt32(1, accountId);    
     LoginDatabase.Execute(stmt);
 }
 

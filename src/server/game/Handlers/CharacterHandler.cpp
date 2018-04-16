@@ -1011,6 +1011,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     if (pCurrChar->IsGameMaster())
         SendNotification(LANG_GM_ON);
 
+    uint32 coins = AccountMgr::GetCoins(GetAccountId());
+    pCurrChar->SetCoins(coins);
+
     bool vip = AccountMgr::GetVipStatus(GetAccountId());
     if (vip)
     {

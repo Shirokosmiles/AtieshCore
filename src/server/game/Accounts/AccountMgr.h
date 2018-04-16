@@ -68,6 +68,7 @@ class TC_GAME_API AccountMgr
         static bool CheckEmail(uint32 accountId, std::string newEmail);
 
         static uint32 GetId(std::string const& username);
+        static uint32 GetCoins(uint32 accountId);
         static uint32 GetGuidOfOnlineCharacter(uint32 accountId);
         static time_t GetVIPunsetDate(uint32 accountId);
         static uint32 GetSecurity(uint32 accountId);
@@ -76,6 +77,7 @@ class TC_GAME_API AccountMgr
         static bool GetEmail(uint32 accountId, std::string& email);
         static bool GetVipStatus(uint32 accountId);
         static void SetVipStatus(uint32 accountId, time_t unsetdate);
+        static void SetCoins(uint32 accountId, uint32 coins);
         static void RemoveVipStatus(uint32 accountId);
         static void UpdateVipStatus(uint32 accountId, time_t unsetdate);
         static uint32 GetCharactersCount(uint32 accountId);
