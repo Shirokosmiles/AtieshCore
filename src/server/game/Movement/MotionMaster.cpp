@@ -419,10 +419,15 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -speedZ);
 
     _owner->GetNearPoint(_owner, x, y, z, dist, _owner->GetAbsoluteAngle(srcX, srcY) + float(M_PI));
+    float bonusZ = _owner->GetExactDist2d(x, y) + _owner->GetCollisionHeight() + max_height;
 
-    TC_LOG_DEBUG("misc", "Creature (Entry: %u GUID: %u) MoveKnockbackFrom at point (X: %f Y: %f Z: %f) and speedXY = %f, max_height = %f",
-        _owner->GetEntry(), _owner->GetGUID().GetCounter(), x, y, z, speedXY, max_height);
-    Mutate(new JumpMovementGenerator<Creature>(EVENT_JUMP, x, y, z, 0.0f, speedXY, max_height, false, true), MOTION_SLOT_CONTROLLED);
+    z = _owner->GetMap()->GetHeight(_owner->GetPhaseMask(), x, y, z + bonusZ, true);
+    _owner->UpdateAllowedPositionZ(x, y, z);
+    z += 0.5f;
+
+    TC_LOG_DEBUG("misc", "Creature (Entry: %u GUID: %u) (X: %f Y: %f Z: %f) MoveKnockbackFrom at point (X: %f Y: %f Z: %f) and speedXY = %f, max_height = %f",
+        _owner->GetEntry(), _owner->GetGUID().GetCounter(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ(), x, y, z, speedXY, max_height);
+    Mutate(new JumpMovementGenerator<Creature>(EVENT_JUMP, x, y, z, 0.0f, speedXY, max_height + _owner->GetCollisionHeight(), false, true), MOTION_SLOT_CONTROLLED);
 }
 
 void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)
