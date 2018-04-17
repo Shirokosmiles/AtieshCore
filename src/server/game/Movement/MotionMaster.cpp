@@ -441,8 +441,14 @@ void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)
     float moveTimeHalf = speedZ / Movement::gravity;
     float dist = 2 * moveTimeHalf * speedXY;
     _owner->GetNearPoint2D(nullptr, x, y, dist, _owner->GetOrientation() + angle);
-    z = _owner->GetPositionZ();
+
+    float max_height = (_owner->GetExactDist2d(x, y) * moveTimeHalf) / 10.0f;
+    float bonusZ = _owner->GetExactDist2d(x, y) + _owner->GetCollisionHeight() + max_height;
+
+    z = _owner->GetMap()->GetHeight(_owner->GetPhaseMask(), x, y, _owner->GetPositionZ() + bonusZ, true);
     _owner->UpdateAllowedPositionZ(x, y, z);
+    z += 0.5f;
+
     MoveJump(x, y, z, 0.0f, speedXY, speedZ);
 }
 
