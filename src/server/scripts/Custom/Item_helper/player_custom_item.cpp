@@ -121,17 +121,18 @@ public:
         if (player->GetCFSTeam() == ALLIANCE)
         {
             AddGossipItemFor(player, GOSSIP_ICON_TAXI, "|TInterface/ICONS/Spell_Arcane_TeleportStormWind:25:25:-15:0|t Штормград", GOSSIP_SENDER_MAIN, 1277, "Вы уверены, что вы хотите попасть в Штормград?", 0, false);
-            if (player->getLevel() < 80)
-            {
+            if (player->getLevel() < 80 && player->IsGameMaster())
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|tПовысить до 80 lvl", GOSSIP_SENDER_MAIN, 300222);
-                AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_holy_wordfortitude:25:25:-15:0|tПолучить баффы", GOSSIP_SENDER_MAIN, 150);
-            }
         }
         if (player->GetCFSTeam() == HORDE)
         {
             AddGossipItemFor(player, GOSSIP_ICON_TAXI, "|TInterface/ICONS/Spell_Arcane_TeleportOrgrimmar:25:25:-15:0|t Оргриммар", GOSSIP_SENDER_MAIN, 1278, "Вы уверены, что вы хотите попасть в Оргриммар?", 0, false);
         }
-        AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|tКлассовые навыки|r", GOSSIP_SENDER_MAIN, 101);
+        if (player->IsGameMaster())
+        {
+            AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|tКлассовые навыки GM|r", GOSSIP_SENDER_MAIN, 101);
+            AddGossipItemFor(player, 0, "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Выдача сумок", GOSSIP_SENDER_MAIN, 218);
+        }
 
         if (player->IsPremium())
         {
@@ -151,7 +152,7 @@ public:
         std::string rep   = "|cff660099Рейт репутации:|r x";
         std::string gold  = "|cff660099Рейт дропа голды:|r x";
         std::string honor = "|cff660099Рейт Хонора:|r x";
-
+        uint32 trainerentry;
         player->PlayerTalkClass->ClearMenus();
 
         if (sender == GOSSIP_SENDER_MAIN)
@@ -849,6 +850,46 @@ public:
                     break;
                 }
                 break;
+            case 104: // Тренер классов
+                CloseGossipMenuFor(player);                
+                switch (player->getClass())
+                {
+                    case CLASS_WARRIOR:
+                            trainerentry = 985;
+                        break;
+                    case CLASS_PALADIN:
+                            trainerentry = 927;
+                        break;
+                    case CLASS_HUNTER:
+                            trainerentry = 987;
+                        break;
+                    case CLASS_ROGUE:
+                            trainerentry = 917;
+                        break;
+                    case CLASS_PRIEST:
+                            trainerentry = 376;
+                        break;
+                    case CLASS_DEATH_KNIGHT:
+                            trainerentry = 28472;
+                        break;
+                    case CLASS_SHAMAN:
+                            trainerentry = 986;
+                        break;
+                    case CLASS_MAGE:
+                            trainerentry = 328;
+                        break;
+                    case CLASS_WARLOCK:
+                            trainerentry = 906;
+                        break;
+                    case CLASS_DRUID:
+                            trainerentry = 3033;
+                        break;
+                }
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+                player->PlayerTalkClass->SendCloseGossip();
+                if (trainerentry)
+                    player->GetSession()->SendTrainerList(ObjectGuid::Empty, trainerentry);
+                break;
             case 1278:
                 if (player->HasAura(45523))
                 {
@@ -920,19 +961,21 @@ public:
                 break;
             case 170:
                 {
-                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_misc_note_02:25:25:-15:0|tСписок доступных комманд", GOSSIP_SENDER_MAIN, 210);
+                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_misc_note_02:25:25:-15:0|tСписок доступных комманд", GOSSIP_SENDER_MAIN, 210);                    
                     AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_misc_tournaments_banner_scourge:25:25:-15:0|tУправление Персонажем", GOSSIP_SENDER_MAIN, 1245);
-                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Ability_mount_rocketmountblue:25:25:-15:0|tПолучить Вип Маунта", GOSSIP_SENDER_MAIN, 212);
-                    AddGossipItemFor(player, 0, "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Выдача сумок", GOSSIP_SENDER_MAIN, 218);
+                    AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t Изменение персонажа ->", GOSSIP_SENDER_MAIN, 1205);
+                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|tКлассовые навыки|r", GOSSIP_SENDER_MAIN, 104);
                     AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_throwingknife_02:25:25:-15:0|tПочинить всю экипировку", GOSSIP_SENDER_MAIN, 216);
                     AddGossipItemFor(player, 0, "|TInterface/ICONS/ability_druid_cower:25:25:-15:0|t Снять Дезертира", GOSSIP_SENDER_MAIN, 217);
                     AddGossipItemFor(player, 0, "|TInterface\\icons\\spell_shadow_deathscream:25:25:-15:0|tСнять Слабость", GOSSIP_SENDER_MAIN, 215);
-                    AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t Изменение персонажа ->", GOSSIP_SENDER_MAIN, 1205);
-                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_chargepositive:25:25:-15:0|tБанк", GOSSIP_SENDER_MAIN, 214);
+                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_holy_wordfortitude:25:25:-15:0|tПолучить баффы", GOSSIP_SENDER_MAIN, 150);
+                    //AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_chargepositive:25:25:-15:0|tБанк", GOSSIP_SENDER_MAIN, 214);
+                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Ability_mount_rocketmountblue:25:25:-15:0|tПолучить Вип Маунта", GOSSIP_SENDER_MAIN, 212); 
                     if (!player ->IsInCombat() || !player ->IsInFlight() || !player ->GetMap()->IsBattlegroundOrArena() || !player ->HasStealthAura() || !player ->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || !player ->isDead())
                     {
                         AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_borrowedtime:25:25:-15:0|t Сбросить 'КД'", GOSSIP_SENDER_MAIN, 1212);
-                    }                   
+                    }
+
                     //AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_borrowedtime:25:25:-15:0|t Сбросить 'КД' заданий", GOSSIP_SENDER_MAIN, 1215);
                     //AddGossipItemFor(player, 0, "|TInterface/icons/Spell_chargepositive:25:25:-15:0|tСменить Цвет Чата", GOSSIP_SENDER_MAIN, 196);
                     AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|tЗакрыть", GOSSIP_SENDER_MAIN, 200110);
