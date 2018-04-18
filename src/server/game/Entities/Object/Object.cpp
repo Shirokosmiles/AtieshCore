@@ -1497,6 +1497,8 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
                 else if (z < ground_z)
                     z = ground_z;
             }
+            else
+                z = GetMapWaterOrGroundLevel(x, y, z);
         }
         else
         {
