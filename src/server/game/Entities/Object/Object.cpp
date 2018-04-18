@@ -1498,7 +1498,11 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
                     z = ground_z;
             }
             else
-                z = GetMapWaterOrGroundLevel(x, y, z);
+            {
+                z = GetMapHeight(x, y, z + (3 * unit->GetCollisionHeight()));
+                if (z < INVALID_HEIGHT)
+                    z = GetMapHeight(x, y, z + 10.0f);
+            }
         }
         else
         {

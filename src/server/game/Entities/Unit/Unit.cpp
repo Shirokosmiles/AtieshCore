@@ -11970,7 +11970,7 @@ void Unit::SendPlaySpellImpact(ObjectGuid guid, uint32 id)
     WorldPacket data(SMSG_PLAY_SPELL_IMPACT, 8 + 4);
     data << uint64(guid); // target
     data << uint32(id); // SpellVisualKit.dbc index
-    SendMessageToSet(&data, false);
+    SendMessageToSet(&data, true);
 }
 
 bool Unit::CanApplyResilience() const

@@ -344,7 +344,10 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
         trainer->SendPlaySpellImpact(_player->GetGUID(), 362); // 113 EmoteSalute
     }
     else
-        GetPlayer()->SendPlaySpellVisual(179); // 53 SpellCastDirected
+    {
+        _player->SendPlaySpellVisual(179); // 53 SpellCastDirected
+        _player->SendPlaySpellImpact(_player->GetGUID(), 362); // 113 EmoteSalute
+    }
 
     // learn explicitly or cast explicitly
     if (trainer_spell->IsCastable())
@@ -359,6 +362,8 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 
     if (!guid)
         GetPlayer()->GetSession()->SendTrainerList(ObjectGuid::Empty, trainerentry);
+
+    _player->SaveToDB();
 }
 
 void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
