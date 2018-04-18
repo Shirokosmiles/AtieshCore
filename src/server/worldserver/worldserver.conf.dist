@@ -4399,6 +4399,12 @@ Config.Vip.Customize.Command     = 0
 Config.Vip.Capital.Command       = 0
 Config.Vip.Appear.Command        = 0
 
+#    Config.Vip.Item.Helper
+#        Description: Enable/Disable Item helper in game
+#        Default:     0 - disable
+#    
+Config.Vip.Item.Helper           = 0
+
 #
 #    Vip.Rate
 #        Description: Individual rate for vip player

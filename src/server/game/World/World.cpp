@@ -1411,6 +1411,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_VIP_CUSTOMIZE]     = sConfigMgr->GetBoolDefault("Config.Vip.Customize.Command", false);
     m_bool_configs[CONFIG_VIP_CAPITAL]       = sConfigMgr->GetBoolDefault("Config.Vip.Capital.Command", false);
     m_bool_configs[CONFIG_VIP_APPEAR]        = sConfigMgr->GetBoolDefault("Config.Vip.Appear.Command", false);
+    m_bool_configs[CONFIG_VIP_ITEM_HELPER]   = sConfigMgr->GetBoolDefault("Config.Vip.Item.Helper", false);
     m_bool_configs[CONFIG_VIP_ALL_DISABLED] = !sWorld->getBoolConfig(CONFIG_VIP_DEBUFF) &&
         !sWorld->getBoolConfig(CONFIG_VIP_BANK) &&
         !sWorld->getBoolConfig(CONFIG_VIP_MAIL) &&

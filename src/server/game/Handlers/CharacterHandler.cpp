@@ -1029,6 +1029,17 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     }
     pCurrChar->SetPremiumStatus(vip);
 
+    if (sWorld->getBoolConfig(CONFIG_VIP_ITEM_HELPER))
+    {
+        if (!pCurrChar->HasItemCount(973))
+            pCurrChar->AddItem(973, 1);
+    }
+    else
+    {
+        if (pCurrChar->HasItemCount(973))
+            pCurrChar->DestroyItemCount(973, 1, true);
+    }
+
     std::string IP_str = GetRemoteAddress();
     TC_LOG_INFO("entities.player.character", "Account: %d (IP: %s) Login Character:[%s] (GUID: %u) Level: %d",
         GetAccountId(), IP_str.c_str(), pCurrChar->GetName().c_str(), pCurrChar->GetGUID().GetCounter(), pCurrChar->getLevel());
