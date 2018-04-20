@@ -19,12 +19,20 @@
 #include "CreatureAI.h"
 #include "Creature.h"
 #include "Player.h"
+#include "MotionMaster.h"
+#include "MovementDefines.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "World.h"
 #include "JumpMovementGenerator.h"
 
 //---- JumpMovementGenerator
+template<class T>
+MovementGeneratorType JumpMovementGenerator<T>::GetMovementGeneratorType() const
+{
+    return JUMP_MOTION_TYPE;
+}
+
 template<class T>
 void JumpMovementGenerator<T>::DoInitialize(T* owner)
 {
@@ -76,6 +84,8 @@ void JumpMovementGenerator<Creature>::MovementInform(Creature* owner)
         owner->AI()->MovementInform(JUMP_MOTION_TYPE, _movementId);
 }
 
+template MovementGeneratorType JumpMovementGenerator<Player>::GetMovementGeneratorType() const;
+template MovementGeneratorType JumpMovementGenerator<Creature>::GetMovementGeneratorType() const;
 template void JumpMovementGenerator<Player>::DoInitialize(Player*);
 template void JumpMovementGenerator<Creature>::DoInitialize(Creature*);
 template void JumpMovementGenerator<Player>::DoFinalize(Player*);

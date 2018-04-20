@@ -17,24 +17,28 @@
  */
 
 #include "FleeingMovementGenerator.h"
-#include "VMapFactory.h"
-#include "CreatureAI.h"
-#include "ObjectAccessor.h"
 #include "Creature.h"
-#include "Player.h"
-#include "PathGenerator.h"
+#include "CreatureAI.h"
+#include "MovementDefines.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "VMapFactory.h"
 #include "Map.h"
+#include "ObjectAccessor.h"
+#include "PathGenerator.h"
+#include "Player.h"
+#include "Unit.h"
 
 #define MIN_QUIET_DISTANCE 28.0f
 #define MAX_QUIET_DISTANCE 43.0f
 
 template<class T>
-FleeingMovementGenerator<T>::~FleeingMovementGenerator()
+FleeingMovementGenerator<T>::~FleeingMovementGenerator() = default;
+
+template<class T>
+MovementGeneratorType FleeingMovementGenerator<T>::GetMovementGeneratorType() const
 {
-    delete _path;
+    return FLEEING_MOTION_TYPE;
 }
 
 template<class T>
@@ -46,6 +50,7 @@ void FleeingMovementGenerator<T>::DoInitialize(T* owner)
     //owner->ClearUnitState(UNIT_STATE_MOVING);
     owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
     owner->AddUnitState(UNIT_STATE_FLEEING);
+    _path = nullptr;
 
     if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED) || owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
         _timer.Reset(200);
@@ -110,6 +115,9 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
     if (!owner || !owner->IsAlive())
         return false;
 
+    if (owner->IsJumping())
+        return true;
+
     if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
     {
         if (owner->HasUnitState(UNIT_STATE_FLEEING_MOVE))
@@ -128,8 +136,10 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* owner, uint32 diff)
         // remove old flag of movement
         if (owner->HasUnitState(UNIT_STATE_FLEEING_MOVE))
         {
-            owner->StopMoving();
             owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
+            owner->StopMoving();
+            _path = nullptr;
+            return true;
         }
     }
     else
@@ -157,6 +167,7 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     {
         _interrupt = true;
         owner->StopMoving();
+        _path = nullptr;
         return;
     }
 
@@ -174,9 +185,11 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     }
 
     if (!_path)
-        _path = new PathGenerator(owner);
+    {
+        _path = std::make_unique<PathGenerator>(owner);
+        _path->SetPathLengthLimit(30.0f);
+    }
 
-    _path->SetPathLengthLimit(30.0f);
     bool result = _path->CalculatePath(destination.GetPositionX(), destination.GetPositionY(), destination.GetPositionZ());
     if (!result || (_path->GetPathType() & PATHFIND_NOPATH))
     {
@@ -232,7 +245,7 @@ void FleeingMovementGenerator<T>::GetPoint(T* owner, Position &position)
         distance = frand(0.4f, 1.0f) * (MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE);
         angle = -casterAngle + frand(-float(M_PI) / 4.0f, float(M_PI) / 4.0f);
     }
-    else    // we are inside quiet range
+    else // we are inside quiet range
     {
         distance = frand(0.6f, 1.2f) * (MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE);
         angle = frand(0.0f, 2.0f * float(M_PI));
@@ -246,6 +259,8 @@ void FleeingMovementGenerator<T>::GetPoint(T* owner, Position &position)
 
 template FleeingMovementGenerator<Player>::~FleeingMovementGenerator();
 template FleeingMovementGenerator<Creature>::~FleeingMovementGenerator();
+template MovementGeneratorType FleeingMovementGenerator<Player>::GetMovementGeneratorType() const;
+template MovementGeneratorType FleeingMovementGenerator<Creature>::GetMovementGeneratorType() const;
 template void FleeingMovementGenerator<Player>::DoInitialize(Player*);
 template void FleeingMovementGenerator<Creature>::DoInitialize(Creature*);
 template void FleeingMovementGenerator<Player>::DoReset(Player*);
@@ -258,6 +273,11 @@ template void FleeingMovementGenerator<Player>::GetPoint(Player*, Position &);
 template void FleeingMovementGenerator<Creature>::GetPoint(Creature*, Position &);
 
 //---- TimedFleeingMovementGenerator
+
+MovementGeneratorType TimedFleeingMovementGenerator::GetMovementGeneratorType() const
+{
+    return TIMED_FLEEING_MOTION_TYPE;
+}
 
 bool TimedFleeingMovementGenerator::Update(Unit* owner, uint32 time_diff)
 {

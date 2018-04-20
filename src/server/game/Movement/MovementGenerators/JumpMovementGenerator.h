@@ -27,9 +27,9 @@ template<class T>
 class JumpMovementGenerator : public MovementGeneratorMedium< T, JumpMovementGenerator<T> >
 {
     public:
-        JumpMovementGenerator(uint32 id, float x, float y, float z, float o, float speedXY = 0.0f, float speedZ = 0.0f, bool hasOrientation = false, bool setorientationFixed = false): _movementId(id), _x(x), _y(y), _z(z), _o(o), _speedXY(speedXY), _speedZ(speedZ), _hasOrientation(hasOrientation), _setorientationFixed(setorientationFixed) { }
+        explicit JumpMovementGenerator(uint32 id, float x, float y, float z, float o, float speedXY = 0.0f, float speedZ = 0.0f, bool hasOrientation = false, bool setorientationFixed = false) : _movementId(id), _x(x), _y(y), _z(z), _o(o), _speedXY(speedXY), _speedZ(speedZ), _hasOrientation(hasOrientation), _setorientationFixed(setorientationFixed) { }
 
-        MovementGeneratorType GetMovementGeneratorType() const override { return JUMP_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override;
 
         void DoInitialize(T*);
         void DoFinalize(T*);
@@ -40,11 +40,10 @@ class JumpMovementGenerator : public MovementGeneratorMedium< T, JumpMovementGen
         void MovementInform(T*);
 
         uint32 _movementId;
-        float _x, _y, _z, _o;        
+        float _x, _y, _z, _o;
         float _speedXY;
         float _speedZ;
         bool _hasOrientation;
         bool _setorientationFixed;
 };
-
 #endif

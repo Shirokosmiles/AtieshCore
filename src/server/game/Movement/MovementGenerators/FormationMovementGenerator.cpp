@@ -18,8 +18,14 @@
 #include "FormationMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
+#include "MovementDefines.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
+
+MovementGeneratorType FormationMovementGenerator::GetMovementGeneratorType() const
+{
+    return FORMATION_MOTION_TYPE;
+}
 
 void FormationMovementGenerator::DoInitialize(Creature* owner)
 {
@@ -65,6 +71,9 @@ bool FormationMovementGenerator::DoUpdate(Creature* owner, uint32 /*diff*/)
 {
     if (!owner)
         return false;
+
+    if (owner->IsJumping())
+        return true;
 
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
     {

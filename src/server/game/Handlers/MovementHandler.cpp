@@ -28,6 +28,8 @@
 #include "Language.h"
 #include "Log.h"
 #include "MapManager.h"
+#include "MotionMaster.h"
+#include "MovementDefines.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
