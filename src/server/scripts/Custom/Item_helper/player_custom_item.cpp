@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 * Copyright (C) 2016-2017 RustEmu <https://gitlab.com/healthstone/>
@@ -40,20 +40,20 @@
 #include <string>
 #include <vector>
 
-#define EMOTE_ALREADY_ITEM "|cff00ffffУ вас уже имеется данная вещь!|r"
+//#define EMOTE_ALREADY_ITEM "|cff00ffffУ вас уже имеется данная вещь!|r"
 #define CONST_ARENA_RENAME 100
 #define CONST_ARENA_CUSTOMIZE 100
 #define CONST_ARENA_CHANGE_FACTION 500
 #define CONST_ARENA_CHANGE_RACE 250
-#define MSG_RENAME_COMPLETE "|cff00ff00Оплата успешно произведена. Сделайте логаут и введите новое имя своего персонажа.Не забудьте после смены имени, выйти из игры и удалить из клиента папку 'Cache'!|r"
-#define MSG_CUSTOMIZE_COMPLETE "|cff00ff00Оплата успешно произведена. Сделайте логаут и измените внешность своего персонажа.Не забудьте после смены внешности, выйти из игры и удалить из клиента папку 'Cache'!|r"
-#define MSG_CHANGE_FACTION_COMPLETE "|cff00ff00Оплата успешно произведена. Сделайте логаут и измените фракцию своего персонажа.Не забудьте после смены фракции, выйти из игры и удалить из клиента папку 'Cache'!|r" 
-#define MSG_CHANGE_RACE_COMPLETE "|cff00ff00Оплата успешно произведена. Сделайте логаут и измените расу своего персонажа.Не забудьте после смены расы, выйти из игры и удалить из клиента папку 'Cache'!|r"
-#define EMOTE_NO_ARENA_POINTS "|cffff0000У вас недостаточно О.А. для совершения покупки!|r"
-#define MSG_RESET_COOLDOWN "|cff0000ffВсе заклинания и способности успешно обновлены! КД сброшено!|r"
-#define EMOTE_COOLDOWN "|cff00ffffВы не можете использовать функцию так часто!|r"
-#define MSG_RESET_QUEST_STATUS_COMPLETE "|cff0000ffКД заданий успешно сброшено!|r"
-#define MSG_RESET_RAID_INSTANCES_COOLDOWN_COMPLETE "|cff0000ffРейдовые подземелья успешно обновлены! КД сброшено!|r"
+//#define MSG_RENAME_COMPLETE "|cff00ff00Оплата успешно произведена. Сделайте логаут и введите новое имя своего персонажа.Не забудьте после смены имени, выйти из игры и удалить из клиента папку 'Cache'!|r"
+//#define MSG_CUSTOMIZE_COMPLETE "|cff00ff00Оплата успешно произведена. Сделайте логаут и измените внешность своего персонажа.Не забудьте после смены внешности, выйти из игры и удалить из клиента папку 'Cache'!|r"
+//#define MSG_CHANGE_FACTION_COMPLETE "|cff00ff00Оплата успешно произведена. Сделайте логаут и измените фракцию своего персонажа.Не забудьте после смены фракции, выйти из игры и удалить из клиента папку 'Cache'!|r" 
+//#define MSG_CHANGE_RACE_COMPLETE "|cff00ff00Оплата успешно произведена. Сделайте логаут и измените расу своего персонажа.Не забудьте после смены расы, выйти из игры и удалить из клиента папку 'Cache'!|r"
+//#define EMOTE_NO_ARENA_POINTS "|cffff0000У вас недостаточно О.А. для совершения покупки!|r"
+//#define MSG_RESET_COOLDOWN "|cff0000ffВсе заклинания и способности успешно обновлены! КД сброшено!|r"
+//#define EMOTE_COOLDOWN "|cff00ffffВы не можете использовать функцию так часто!|r"
+//#define MSG_RESET_QUEST_STATUS_COMPLETE "|cff0000ffКД заданий успешно сброшено!|r"
+//#define MSG_RESET_RAID_INSTANCES_COOLDOWN_COMPLETE "|cff0000ffРейдовые подземелья успешно обновлены! КД сброшено!|r"
 #define CONST_ARENA_POINT 100
 #define CONST_ARENA_POINT2 1000
 #define CONST_HONOR_POINT 2000
@@ -74,9 +74,6 @@ uint32 aurass[] = { 15366, 16609, 48162, 48074, 48170, 43223, 36880, 69994, 3308
 class custom_item : public ItemScript
 {
 private:
-    std::string currentDP = "|TInterface\\icons\\Inv_misc_token_thrallmar:25:25:-15:0|tБонусов на аккаунте : ";
-    std::string notEnoughDP = "У вас недостаточно бонусов, пополните их в личном кабинете";
-
 public:
     custom_item() : ItemScript("custom_item") { }
 
@@ -84,7 +81,7 @@ public:
     {
         if (player->GetMap()->IsBattlegroundOrArena())
         {
-            ChatHandler(player->GetSession()).PSendSysMessage("Вы не можете использовать Итем на арене или бг!");
+            ChatHandler(player->GetSession()).PSendSysMessage("You can not use it on BattleGround or Arena!");
             CloseGossipMenuFor(player);
             return false;
         }
@@ -102,13 +99,13 @@ public:
         }
         if (player->HasStealthAura())
         {
-            ChatHandler(player->GetSession()).PSendSysMessage("Вы не можете использовать итем в режиме незаметности!");
+            ChatHandler(player->GetSession()).PSendSysMessage("You can not use it while you in stealth!");
             CloseGossipMenuFor(player);
             return false;
         }
         if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
         {
-            ChatHandler(player->GetSession()).PSendSysMessage("Вы не можете использовать итем пока мертвы!");
+            ChatHandler(player->GetSession()).PSendSysMessage("You can not use it while you dead!");
             CloseGossipMenuFor(player);
             return false;
         }
@@ -116,29 +113,26 @@ public:
         player->PlayerTalkClass->ClearMenus();
 
         // показатель бонусов с системой определение кол.бонусов (бонус, бонуса, бонусов)
-        AddGossipItemFor(player,GOSSIP_ICON_MONEY_BAG, getString(currentDP, player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 300000);
+        AddGossipItemFor(player,GOSSIP_ICON_MONEY_BAG, getString(player->GetSession()->GetTrinityString(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 300000);
 
-        if (player->GetCFSTeam() == ALLIANCE)
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_TAXI, "|TInterface/ICONS/Spell_Arcane_TeleportStormWind:25:25:-15:0|t Штормград", GOSSIP_SENDER_MAIN, 1277, "Вы уверены, что вы хотите попасть в Штормград?", 0, false);
-            if (player->getLevel() < 80 && player->IsGameMaster())
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|tПовысить до 80 lvl", GOSSIP_SENDER_MAIN, 300222);
-        }
-        if (player->GetCFSTeam() == HORDE)
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_TAXI, "|TInterface/ICONS/Spell_Arcane_TeleportOrgrimmar:25:25:-15:0|t Оргриммар", GOSSIP_SENDER_MAIN, 1278, "Вы уверены, что вы хотите попасть в Оргриммар?", 0, false);
-        }
+        if (player->GetCFSTeam() == ALLIANCE)       
+            AddGossipItemFor(player, GOSSIP_ICON_TAXI, std::string("|TInterface/ICONS/Spell_Arcane_TeleportStormWind:25:25:-15:0|t ") + player->GetSession()->GetTrinityString(LANG_ITEM_STORMWIND), GOSSIP_SENDER_MAIN, 1277, player->GetSession()->GetTrinityString(LANG_ITEM_STORMWIND_SURE), 0, false);
+        else
+            AddGossipItemFor(player, GOSSIP_ICON_TAXI, std::string("|TInterface/ICONS/Spell_Arcane_TeleportOrgrimmar:25:25:-15:0|t ") + player->GetSession()->GetTrinityString(LANG_ITEM_ORGRIMMAR), GOSSIP_SENDER_MAIN, 1278, player->GetSession()->GetTrinityString(LANG_ITEM_ORGRIMMAR_SURE), 0, false);
+
         if (player->IsGameMaster())
         {
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|tКлассовые навыки GM|r", GOSSIP_SENDER_MAIN, 101);
-            AddGossipItemFor(player, 0, "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Выдача сумок", GOSSIP_SENDER_MAIN, 218);
+            AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r", GOSSIP_SENDER_MAIN, 101);
+            AddGossipItemFor(player, 0, "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Delivery of bags", GOSSIP_SENDER_MAIN, 218);
+
+            if (player->getLevel() < 80)
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|t Level up at 80", GOSSIP_SENDER_MAIN, 300222);
         }
 
         if (player->IsPremium())
-        {
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|tУправление Вип Аккаунтом", GOSSIP_SENDER_MAIN, 170);
-        }
-        AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_inscription_weaponscroll01:25:25:-15:0|tИнформация о сервере", GOSSIP_SENDER_MAIN, 777);
+            AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_VIP_MENU), GOSSIP_SENDER_MAIN, 170);
+
+        AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Inv_inscription_weaponscroll01:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 777);
         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
         return false;
     }
@@ -149,9 +143,10 @@ public:
         //uint32 action = player->PlayerTalkClass->GetGossipOptionAction(action);
         //return OnGossipSelect(player, me, sender, action);
 
-        std::string rep   = "|cff660099Рейт репутации:|r x";
-        std::string gold  = "|cff660099Рейт дропа голды:|r x";
-        std::string honor = "|cff660099Рейт Хонора:|r x";
+        std::string XP = "|cff660099" + std::string(player->GetSession()->GetTrinityString(LANG_ITEM_RATES_XP)) + "|r x";
+        std::string rep   = "|cff660099" + std::string(player->GetSession()->GetTrinityString(LANG_ITEM_RATES_REP)) + "|r x";
+        std::string gold  = "|cff660099" + std::string(player->GetSession()->GetTrinityString(LANG_ITEM_RATES_GOLD)) + "|r x";
+        std::string honor = "|cff660099" + std::string(player->GetSession()->GetTrinityString(LANG_ITEM_RATES_HONOR)) + "|r x";
         uint32 trainerentry;
         player->PlayerTalkClass->ClearMenus();
 
@@ -160,17 +155,9 @@ public:
             switch (action)
             {
             case 1277:
-                if (player->HasAura(45523))
-                {
-                    player->PlayerTalkClass->SendCloseGossip();
-                    player->GetSession()->SendAreaTriggerMessage("|cffC67171Нельзя использовать услугу так часто!");
-                }
-                else
-                {
                     CloseGossipMenuFor(player);
                     player->TeleportTo(0, -8831.966797f, 632.503906f, 94.210480f, 4.61f);
                     player->CastSpell(player, 45523, true);
-                }
                 break;
             case 102: // Двойная специализация
                 if (player->GetSpecsCount() == 1 && !(player->getLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL)))
@@ -891,43 +878,36 @@ public:
                     player->GetSession()->SendTrainerList(ObjectGuid::Empty, trainerentry);
                 break;
             case 1278:
-                if (player->HasAura(45523))
-                {
-                    player->PlayerTalkClass->SendCloseGossip();
-                    player->GetSession()->SendAreaTriggerMessage("|cffC67171Нельзя использовать услугу так часто!");
-                }
-                else
-                {
                     CloseGossipMenuFor(player);
                     player->TeleportTo(1, 1569.170410f, -4433.635742f, 6.718508f, 0.f);
                     player->CastSpell(player, 45523, true);
-                }
                 break;
             case 150:
                 if (player->HasAura(45523))
                 {
                     player->PlayerTalkClass->SendCloseGossip();
-                    player->GetSession()->SendAreaTriggerMessage("|cffC67171Нельзя использовать услугу так часто!");
+                    player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_ITEM_MSG_COOLDOWN));
                 }
                 else
                 {
                     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
                     for (int i = 0; i < 16; i++)
                         player->AddAura(aurass[i], player);
-                    player->GetSession()->SendNotification("|cffC67171Отлично, вы получили баффы!");
+                    player->GetSession()->SendNotification("|cffC67171Buffs received!");
                     player->CastSpell(player, 45523, true);
                     player->PlayerTalkClass->SendCloseGossip();
                 }
                 break;
             case 300000:
                 {
+                    std::string iconvip = "|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|t";
                     player->PlayerTalkClass->ClearMenus();
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, getString(currentDP, player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 200110);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, getString(player->GetSession()->GetTrinityString(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 200110);
                     if (!player->IsPremium())
-                        AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|tВип Аккаунт [|cffE80000Купить|r]", GOSSIP_SENDER_MAIN, 160);
+                        AddGossipItemFor(player, 0, iconvip + "Account: [|cffE80000" + player->GetSession()->GetTrinityString(LANG_ITEM_VIP_BUY) + "|r]", GOSSIP_SENDER_MAIN, 160);
                     else
-                        AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|tВип Аккаунт [|cffE80000Увеличить время действий привилегий|r]", GOSSIP_SENDER_MAIN, 161);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|tЗакрыть", GOSSIP_SENDER_MAIN, 200110);
+                        AddGossipItemFor(player, 0, iconvip + "VIP account: [|cffE80000" + player->GetSession()->GetTrinityString(LANG_ITEM_VIP_INCREASE) + "|r]", GOSSIP_SENDER_MAIN, 161);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 200110);
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                 }
                 break;
@@ -945,7 +925,7 @@ public:
                             player->GiveLevel(80);
                             //LoginDatabase.PQuery("UPDATE account SET coin = coin-50 WHERE id = %u", player->GetSession()->GetAccountId());
                             player->SaveToDB();
-                            ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Вы успешно повысили свой уровень!|r");
+                            ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_LEVELUP);
                             player->PlayerTalkClass->SendCloseGossip();
                      //   }
                         /*
@@ -961,34 +941,32 @@ public:
                 break;
             case 170:
                 {
-                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_misc_note_02:25:25:-15:0|tСписок доступных комманд", GOSSIP_SENDER_MAIN, 210);                    
-                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_misc_tournaments_banner_scourge:25:25:-15:0|tУправление Персонажем", GOSSIP_SENDER_MAIN, 1245);
-                    AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t Изменение персонажа ->", GOSSIP_SENDER_MAIN, 1205);
-                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|tКлассовые навыки|r", GOSSIP_SENDER_MAIN, 104);
-                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_throwingknife_02:25:25:-15:0|tПочинить всю экипировку", GOSSIP_SENDER_MAIN, 216);
-                    AddGossipItemFor(player, 0, "|TInterface/ICONS/ability_druid_cower:25:25:-15:0|t Снять Дезертира", GOSSIP_SENDER_MAIN, 217);
-                    AddGossipItemFor(player, 0, "|TInterface\\icons\\spell_shadow_deathscream:25:25:-15:0|tСнять Слабость", GOSSIP_SENDER_MAIN, 215);
-                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_holy_wordfortitude:25:25:-15:0|tПолучить баффы", GOSSIP_SENDER_MAIN, 150);
-                    //AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_chargepositive:25:25:-15:0|tБанк", GOSSIP_SENDER_MAIN, 214);
-                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Ability_mount_rocketmountblue:25:25:-15:0|tПолучить Вип Маунта", GOSSIP_SENDER_MAIN, 212); 
-                    if (!player ->IsInCombat() || !player ->IsInFlight() || !player ->GetMap()->IsBattlegroundOrArena() || !player ->HasStealthAura() || !player ->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || !player ->isDead())
-                    {
-                        AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_borrowedtime:25:25:-15:0|t Сбросить 'КД'", GOSSIP_SENDER_MAIN, 1212);
-                    }
+                    AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Inv_misc_note_02:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_COMMAND_LIST), GOSSIP_SENDER_MAIN, 210);
+                    AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Inv_misc_tournaments_banner_scourge:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CHARACTER_MANAGEMENT), GOSSIP_SENDER_MAIN, 1245);
+                    AddGossipItemFor(player, 0, std::string("|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CHARACTER_CHANGEING), GOSSIP_SENDER_MAIN, 1205);
+                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, std::string("|TInterface\\icons\\achievement_level_80:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLASS_SKILLS), GOSSIP_SENDER_MAIN, 104);
+                    AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Inv_throwingknife_02:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_REPAIR_EQUIP), GOSSIP_SENDER_MAIN, 216);
+                    AddGossipItemFor(player, 0, std::string("|TInterface/ICONS/ability_druid_cower:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_REMOVE_DESERTER), GOSSIP_SENDER_MAIN, 217);
+                    AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\spell_shadow_deathscream:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_REMOVE_WEAKNESS), GOSSIP_SENDER_MAIN, 215);
+                    AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Spell_holy_wordfortitude:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_GIVE_BUFFS), GOSSIP_SENDER_MAIN, 150);
+                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_chargepositive:25:25:-15:0|tBank", GOSSIP_SENDER_MAIN, 214);
+                    //AddGossipItemFor(player, 0, "|TInterface\\icons\\Ability_mount_rocketmountblue:25:25:-15:0|tПолучить Вип Маунта", GOSSIP_SENDER_MAIN, 212); 
+                    if (!player->IsInCombat() || !player->IsInFlight() || !player->GetMap()->IsBattlegroundOrArena() || !player->HasStealthAura() || !player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || !player->isDead())
+                        AddGossipItemFor(player, 0, std::string("|TInterface/ICONS/spell_holy_borrowedtime:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_REMOVE_COOLDOWN), GOSSIP_SENDER_MAIN, 1212);
 
                     //AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_borrowedtime:25:25:-15:0|t Сбросить 'КД' заданий", GOSSIP_SENDER_MAIN, 1215);
                     //AddGossipItemFor(player, 0, "|TInterface/icons/Spell_chargepositive:25:25:-15:0|tСменить Цвет Чата", GOSSIP_SENDER_MAIN, 196);
-                    AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|tЗакрыть", GOSSIP_SENDER_MAIN, 200110);
+                    AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 200110);
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                 }
                 break;
             case 1245:
                 player->PlayerTalkClass->ClearMenus();
-                AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_general:25:25:-15:0|tДвойная специализация|r", GOSSIP_SENDER_MAIN, 102);
-                AddGossipItemFor(player, 0, "|TInterface\\icons\\ability_marksmanship:25:25:-15:0|tСброс талантов|r", GOSSIP_SENDER_MAIN, 103, "Вы уверены, что хотите сбросить таланты?", 0, false);
-                AddGossipItemFor(player, 0, "|TInterface\\icons\\Ability_DualWield:25:25:-15:0|tОружейные навыки|r", GOSSIP_SENDER_MAIN, 106);
-                AddGossipItemFor(player, 0, "|TInterface\\icons\\trade_engineering:25:25:-15:0|tУлучшить навыки защиты и владения оружием до максимума|r", GOSSIP_SENDER_MAIN, 107);
-                AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|tЗакрыть", GOSSIP_SENDER_MAIN, 200110);
+                AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Ability_DualWield:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_DUAL_SPEC), GOSSIP_SENDER_MAIN, 102);
+                AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\ability_marksmanship:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_RESET_TALENT), GOSSIP_SENDER_MAIN, 103, player->GetSession()->GetTrinityString(LANG_ITEM_RESET_TALENT_SURE), 0, false);
+                AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\achievement_general:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_SKILLS_WEAPON), GOSSIP_SENDER_MAIN, 106);
+                AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\trade_engineering:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_MAXSKILL), GOSSIP_SENDER_MAIN, 107);
+                AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 200110);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                 break;
             case 200110:
@@ -998,7 +976,7 @@ public:
                 player->ResetTalents(true);
                 player->SendTalentsInfoData(false);
                 CloseGossipMenuFor(player);
-                ChatHandler(player->GetSession()).PSendSysMessage("Ваши таланты успешно сброшены.");
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_TALENT_RESET_CONFIRM);
                 break;
             case 106: // Оружейные навыки
                 switch (player->getClass())
@@ -1011,24 +989,24 @@ public:
                     player->LearnSpell(264, false); // Луки
                     player->LearnSpell(266, false); // Ружья
                     player->LearnSpell(227, false); // Посохи
-                    ChatHandler(player->GetSession()).PSendSysMessage("Вы успешно изучили все оружейные навыки для своего класса");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 case CLASS_PALADIN:
                     CloseGossipMenuFor(player);
                     player->LearnSpell(197, false); // Двуручные топоры
                     player->LearnSpell(200, false); // Древковое оружие
                     player->LearnSpell(196, false); // Одноручные топоры
-                    ChatHandler(player->GetSession()).PSendSysMessage("Вы успешно изучили все оружейные навыки для своего класса");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 case CLASS_WARLOCK:
                     CloseGossipMenuFor(player);
                     player->LearnSpell(201, false); // Одноручные мечи
-                    ChatHandler(player->GetSession()).PSendSysMessage("Вы успешно изучили все оружейные навыки для своего класса");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 case CLASS_PRIEST:
                     CloseGossipMenuFor(player);
                     player->LearnSpell(1180, false); // Кинжалы
-                    ChatHandler(player->GetSession()).PSendSysMessage("Вы успешно изучили все оружейные навыки для своего класса");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 case CLASS_HUNTER:
                     CloseGossipMenuFor(player);
@@ -1039,13 +1017,13 @@ public:
                     player->LearnSpell(264, false); // Луки
                     player->LearnSpell(2567, false); // Метательное оружие
                     player->LearnSpell(227, false); // Посохи
-                    ChatHandler(player->GetSession()).PSendSysMessage("Вы успешно изучили все оружейные навыки для своего класса");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 case CLASS_MAGE:
                     CloseGossipMenuFor(player);
                     player->LearnSpell(1180, false); // Кинжалы
                     player->LearnSpell(201, false); // Одноручные мечи
-                    ChatHandler(player->GetSession()).PSendSysMessage("Вы успешно изучили все оружейные навыки для своего класса");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 case CLASS_SHAMAN:
                     CloseGossipMenuFor(player);
@@ -1054,7 +1032,7 @@ public:
                     player->LearnSpell(1180, false); // Кинжалы
                     player->LearnSpell(15590, false); // Кулачное оружие
                     player->LearnSpell(196, false); // Одноручные топоры
-                    ChatHandler(player->GetSession()).PSendSysMessage("Вы успешно изучили все оружейные навыки для своего класса");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 case CLASS_ROGUE:
                     CloseGossipMenuFor(player);
@@ -1065,26 +1043,26 @@ public:
                     player->LearnSpell(201, false); // Одноручные мечи
                     player->LearnSpell(266, false); // Ружья
                     player->LearnSpell(196, false); // Одноручные топоры
-                    ChatHandler(player->GetSession()).PSendSysMessage("Вы успешно изучили все оружейные навыки для своего класса");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 case CLASS_DEATH_KNIGHT:
                     CloseGossipMenuFor(player);
                     player->LearnSpell(199, false); // Двуручное дробящее оружие
                     player->LearnSpell(198, false); // Одноручное дробящее оружие
-                    ChatHandler(player->GetSession()).PSendSysMessage("Вы успешно изучили все оружейные навыки для своего класса");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 case CLASS_DRUID:
                     CloseGossipMenuFor(player);
                     player->LearnSpell(199, false); // Двуручное дробящее оружие
                     player->LearnSpell(200, false); // Древковое оружие
                     player->LearnSpell(15590, false); // Кулачное оружие
-                    ChatHandler(player->GetSession()).PSendSysMessage("Вы успешно изучили все оружейные навыки для своего класса");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 }
             case 107: // Улучшить навыки защиты и владения оружием до максимума
                 CloseGossipMenuFor(player);
                 player->UpdateWeaponsSkillsToMaxSkillsForLevel();
-                ChatHandler(player->GetSession()).PSendSysMessage("Ваши навыки защиты и владения оружием улучшены до максимума.");
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MAXSKILL_CONFIRM);
                 break;
                 /*
             case 196:
@@ -1175,19 +1153,19 @@ public:
                 break;
             case 216: 
                 player->DurabilityRepairAll(false, 0.0f, true);
-                ChatHandler(player->GetSession()).PSendSysMessage("Я починил всю вашу экипировку!");
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_REPAIR_CONFIRM);
                 player->PlayerTalkClass->SendCloseGossip();
                 break;
             case 217:
                 if (player->HasAura(58712))
                 {
-                    player->GetSession()->SendAreaTriggerMessage(EMOTE_COOLDOWN);
+                    player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_ITEM_MSG_COOLDOWN));
                     CloseGossipMenuFor(player);
                 }
                 else if (!player->HasAura(26013))
                 {
                     player->PlayerTalkClass->SendCloseGossip();
-                    ChatHandler(player->GetSession()).PSendSysMessage("Ауры Дезертир не найдена!");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_DESERTER_NOT_FOUND);
                 }
                 else
                 {
@@ -1195,14 +1173,14 @@ public:
                     player->RemoveAurasDueToSpell(26013);
                     player->CastSpell(player, 34461, true);
                     player->CastSpell(player, 58712, true);
-                    ChatHandler(player->GetSession()).PSendSysMessage("Аура Дезертир успешно убрана!");
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_DESERTER_REMOVED);
                 }
                 break;
             case 218: // Выдача сумок
                 if (player->HasItemCount(23162, 4))
                 {
                     player->PlayerTalkClass->SendCloseGossip();
-                    ChatHandler(player->GetSession()).PSendSysMessage(EMOTE_ALREADY_ITEM);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_ALREADY_ITEM);
                 }
                 else
                 {
@@ -1212,17 +1190,17 @@ public:
                 break;
             case 1205:
                 player->PlayerTalkClass->ClearMenus();
-                AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t Смена имени [|cffff0000100|r Очков Арены]", GOSSIP_SENDER_MAIN, 2000);
-                AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t Смена внешности [|cffff0000200|r Очков Арены]", GOSSIP_SENDER_MAIN, 2001);
-                AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t Смена фракции [|cffff0000500|r Очков Арены]", GOSSIP_SENDER_MAIN, 2002);
-                AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t Смена расы [|cffff0000250|r Очков Арены]", GOSSIP_SENDER_MAIN, 2003);
-                AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|tЗакрыть", GOSSIP_SENDER_MAIN, 200110);
+                AddGossipItemFor(player, 0, std::string("|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t ") + player->GetSession()->GetTrinityString(LANG_ITEM_CHANGE_NAME) + " [|cffff0000100|r Arena Points]", GOSSIP_SENDER_MAIN, 2000);
+                AddGossipItemFor(player, 0, std::string("|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t ") + player->GetSession()->GetTrinityString(LANG_ITEM_CHANGE_OF_APPEARANCE) + " [|cffff0000200|r Arena Points]", GOSSIP_SENDER_MAIN, 2001);
+                AddGossipItemFor(player, 0, std::string("|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t ") + player->GetSession()->GetTrinityString(LANG_ITEM_CHANGE_FACTION) + " [|cffff0000500|r Arena Points]", GOSSIP_SENDER_MAIN, 2002);
+                AddGossipItemFor(player, 0, std::string("|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t ") + player->GetSession()->GetTrinityString(LANG_ITEM_CHANGE_RACE) + " [|cffff0000250|r Arena Points]", GOSSIP_SENDER_MAIN, 2003);
+                AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 200110);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                 break;
             case 2000: // Смена имени
                 if (player->GetArenaPoints() < CONST_ARENA_RENAME)
                 {
-                    ChatHandler(player->GetSession()).PSendSysMessage(EMOTE_NO_ARENA_POINTS);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_NO_ARENA_POINTS);
                     player->PlayerTalkClass->SendCloseGossip();
                 }
                 else
@@ -1230,13 +1208,13 @@ public:
                     player->PlayerTalkClass->SendCloseGossip();
                     player->SetAtLoginFlag(AT_LOGIN_RENAME);
                     player->ModifyArenaPoints(-CONST_ARENA_RENAME);
-                    ChatHandler(player->GetSession()).PSendSysMessage(MSG_RENAME_COMPLETE);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_RENAME_COMPLETE);
                 }
                 break;
             case 2001: // Смена внешности
                 if (player->GetArenaPoints() < CONST_ARENA_CUSTOMIZE)
                 {
-                    ChatHandler(player->GetSession()).PSendSysMessage(EMOTE_NO_ARENA_POINTS);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_NO_ARENA_POINTS);
                     player->PlayerTalkClass->SendCloseGossip();
                 }
                 else
@@ -1244,13 +1222,13 @@ public:
                     player->PlayerTalkClass->SendCloseGossip();
                     player->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
                     player->ModifyArenaPoints(-CONST_ARENA_CUSTOMIZE);
-                    ChatHandler(player->GetSession()).PSendSysMessage(MSG_CUSTOMIZE_COMPLETE);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_CUSTOMIZE_COMPLETE);
                 }
                 break;
             case 2002: // Смена фракции
                 if (player->GetArenaPoints() < CONST_ARENA_CHANGE_FACTION)
                 {
-                    ChatHandler(player->GetSession()).PSendSysMessage(EMOTE_NO_ARENA_POINTS);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_NO_ARENA_POINTS);
                     player->PlayerTalkClass->SendCloseGossip();
                 }
                 else
@@ -1258,13 +1236,13 @@ public:
                     player->PlayerTalkClass->SendCloseGossip();
                     player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
                     player->ModifyArenaPoints(-CONST_ARENA_CHANGE_FACTION);
-                    ChatHandler(player->GetSession()).PSendSysMessage(MSG_CHANGE_FACTION_COMPLETE);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_CHANGE_FACTION_COMPLETE);
                 }
                 break;
             case 2003: // Смена расы
                 if (player->GetArenaPoints() < CONST_ARENA_CHANGE_RACE)
                 {
-                    ChatHandler(player->GetSession()).PSendSysMessage(EMOTE_NO_ARENA_POINTS);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_NO_ARENA_POINTS);
                     player->PlayerTalkClass->SendCloseGossip();
                 }
                 else
@@ -1272,20 +1250,20 @@ public:
                     player->PlayerTalkClass->SendCloseGossip();
                     player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
                     player->ModifyArenaPoints(-CONST_ARENA_CHANGE_RACE);
-                    ChatHandler(player->GetSession()).PSendSysMessage(MSG_CHANGE_RACE_COMPLETE);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_CHANGE_RACE_COMPLETE);
                 }
                 break;
             case 1212: // Сбросить 'КД'
                 if (player->HasAura(45523))
                 {
                     player->PlayerTalkClass->SendCloseGossip();
-                    player->GetSession()->SendAreaTriggerMessage(MSG_RESET_COOLDOWN);
+                    player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_ITEM_MSG_RESET_COOLDOWN));
                 }
                 else
                 {
                     player->PlayerTalkClass->SendCloseGossip();
                     player->RemoveArenaSpellCooldowns(true);
-                    player->GetSession()->SendAreaTriggerMessage(MSG_RESET_COOLDOWN);
+                    player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_ITEM_MSG_RESET_COOLDOWN));
                     player->CastSpell(player, 45523, true);
                 }
                 break;
@@ -1293,7 +1271,7 @@ public:
                 player->PlayerTalkClass->SendCloseGossip();
                 player->ResetDailyQuestStatus();
                 player->ResetWeeklyQuestStatus();
-                ChatHandler(player->GetSession()).PSendSysMessage(MSG_RESET_QUEST_STATUS_COMPLETE);
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_RESET_RAID_INSTANCES_COOLDOWN_COMPLETE);
                 break;
             case 210:
                 {
@@ -1324,23 +1302,24 @@ public:
                 }
                 break;
             case 777:
-                AddGossipItemFor(player, 0, "|cffD80000Информация о сервере|r", GOSSIP_SENDER_MAIN, 200110);
+                AddGossipItemFor(player, 0, std::string("|cffD80000") + player->GetSession()->GetTrinityString(LANG_ITEM_SERVER_MENU)  + "|r", GOSSIP_SENDER_MAIN, 200110);
                 //AddGossipItemFor(player, 0, "|cff660099Сайт:|r RustEmu.org", GOSSIP_SENDER_MAIN, 2001);
-                AddGossipItemFor(player, 0, "|cffD80000Рейты:|r", GOSSIP_SENDER_MAIN, 200110);
+                AddGossipItemFor(player, 0, std::string("|cffD80000") + player->GetSession()->GetTrinityString(LANG_ITEM_RATES) + "|r", GOSSIP_SENDER_MAIN, 200110);
+                AddGossipItemFor(player, 0, getString(XP, uint32(sWorld->getRate(RATE_XP_KILL))).c_str(), GOSSIP_SENDER_MAIN, 200110);
                 AddGossipItemFor(player, 0, getString(rep, uint32(sWorld->getRate(RATE_REPUTATION_GAIN))).c_str(), GOSSIP_SENDER_MAIN, 200110);
                 AddGossipItemFor(player, 0, getString(gold, uint32(sWorld->getRate(RATE_DROP_MONEY))).c_str(), GOSSIP_SENDER_MAIN, 200110);
                 AddGossipItemFor(player, 0, getString(honor, uint32(sWorld->getRate(RATE_HONOR))).c_str(), GOSSIP_SENDER_MAIN, 200110);
                 //AddGossipItemFor(player, 0, "|cffD80000Администрация|r", GOSSIP_SENDER_MAIN, 2014);
                 //AddGossipItemFor(player, 0, "|cff660099Куратор Проекта:|r Re3os ", GOSSIP_SENDER_MAIN, 2015);
                 //AddGossipItemFor(player, 0, "|cff660099Администратор:|r Emeris", GOSSIP_SENDER_MAIN, 2017);
-                AddGossipItemFor(player, 0, "|cff660099|r Закрыть", GOSSIP_SENDER_MAIN, 200110);
+                AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 200110);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                 break;
             case 212:
                 if (player->HasSpell(50281))
                 {
                     player->PlayerTalkClass->SendCloseGossip();
-                    ChatHandler(player->GetSession()).PSendSysMessage(EMOTE_ALREADY_ITEM);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_ALREADY_ITEM);
                 }
                 else
                 {
@@ -1351,15 +1330,15 @@ public:
                 }
                 break;
             case 160:
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Купить VIP на [ |cffD800007|r ] Дней [150 Бонусов]", GOSSIP_SENDER_MAIN, 500100, "Вы уверены что хотите купить VIP аккаунт на 7 дней ?", 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Купить VIP на [ |cffD8000014|r ] Дней [260 Бонусов]", GOSSIP_SENDER_MAIN, 500101, "Вы уверены что хотите купить VIP аккаунт на 14 дней ?", 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Купить VIP на [ |cffD8000031|r ] День [470 Бонусов]", GOSSIP_SENDER_MAIN, 500102, "Вы уверены что хотите купить VIP аккаунт на 31 день ?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, player->GetSession()->GetTrinityString(LANG_ITEM_BUY_7), GOSSIP_SENDER_MAIN, 500100, player->GetSession()->GetTrinityString(LANG_ITEM_BUY_7_SURE), 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, player->GetSession()->GetTrinityString(LANG_ITEM_BUY_14), GOSSIP_SENDER_MAIN, 500101, player->GetSession()->GetTrinityString(LANG_ITEM_BUY_14_SURE), 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, player->GetSession()->GetTrinityString(LANG_ITEM_BUY_31), GOSSIP_SENDER_MAIN, 500102, player->GetSession()->GetTrinityString(LANG_ITEM_BUY_31_SURE), 0, false);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                 break;
             case 161:
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Увеличить время VIP привилегий на [ |cffD800007|r ] Дней [150 Бонусов]", GOSSIP_SENDER_MAIN, 500100, "Вы уверены что хотите Увеличить время VIP привилегий на 7 дней ?", 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Увеличить время VIP привилегий на [ |cffD8000014|r ] Дней [260 Бонусов]", GOSSIP_SENDER_MAIN, 500101, "Вы уверены что хотите Увеличить время VIP привилегий на 14 дней ?", 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Увеличить время VIP привилегий на [ |cffD8000031|r ] День [470 Бонусов]", GOSSIP_SENDER_MAIN, 500102, "Вы уверены что хотите Увеличить время VIP привилегий на 31 день ?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, player->GetSession()->GetTrinityString(LANG_ITEM_INC_7), GOSSIP_SENDER_MAIN, 500100, player->GetSession()->GetTrinityString(LANG_ITEM_INC_7_SURE), 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, player->GetSession()->GetTrinityString(LANG_ITEM_INC_14), GOSSIP_SENDER_MAIN, 500101, player->GetSession()->GetTrinityString(LANG_ITEM_INC_14_SURE), 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, player->GetSession()->GetTrinityString(LANG_ITEM_INC_31), GOSSIP_SENDER_MAIN, 500102, player->GetSession()->GetTrinityString(LANG_ITEM_INC_31_SURE), 0, false);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                 break;
             case 500100:
@@ -1390,11 +1369,11 @@ public:
                     }
                     else
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Недостаточно бонусов|r");
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699У вас: |cff00FF33%u|r", coins);
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Нужно еще: |cffFF0000%u|r", ostatok);
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_NOT_ENOUGH_COINS);
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_YOU_HAVE_COINS, coins);
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_YOU_NEED_COINS, ostatok);
                         CloseGossipMenuFor(player);
-                        }
+                    }
                 }
                 break;
             case 500101:
@@ -1425,9 +1404,9 @@ public:
                     }
                     else
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Недостаточно бонусов|r");
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699У вас: |cff00FF33%u|r", coins);
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Нужно еще: |cffFF0000%u|r", ostatok);
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_NOT_ENOUGH_COINS);
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_YOU_HAVE_COINS, coins);
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_YOU_NEED_COINS, ostatok);
                         player->PlayerTalkClass->SendCloseGossip();
                     }
                 }
@@ -1460,9 +1439,9 @@ public:
                     }
                     else
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Недостаточно бонусов|r");
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699У вас: |cff00FF33%u|r", coins);
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Нужно еще: |cffFF0000%u|r", ostatok);
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_NOT_ENOUGH_COINS);
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_YOU_HAVE_COINS, coins);
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_YOU_NEED_COINS, ostatok);
                         player->PlayerTalkClass->SendCloseGossip();
                     }
                 }

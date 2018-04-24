@@ -58,8 +58,8 @@ public:
             { "changerace",       rbac::RBAC_PERM_COMMAND_VIP_CHANGERACE,   false, &HandleChangeRaceCommand,       "" },
             { "customize",        rbac::RBAC_PERM_COMMAND_VIP_CUSTOMIZE,    false, &HandleCustomizeCommand,        "" },
             { "app",              rbac::RBAC_PERM_COMMAND_VIP_ARPPEAR,      false, &HandleVipAppearCommand,        "" },
-            { "set",              rbac::RBAC_PERM_COMMAND_VIP_SET,          false, &HandleSetVipCommand,           "" },
-            { "del",              rbac::RBAC_PERM_COMMAND_VIP_REMOVE,       false, &HandleDelVipCommand,           "" },
+            { "set",              rbac::RBAC_PERM_COMMAND_VIP_SET,          true, &HandleSetVipCommand,           "" },
+            { "del",              rbac::RBAC_PERM_COMMAND_VIP_REMOVE,       true, &HandleDelVipCommand,           "" },
             { "",                 rbac::RBAC_PERM_COMMAND_VIP,              false, &HandleVipCommand,              "" },
             
         };
