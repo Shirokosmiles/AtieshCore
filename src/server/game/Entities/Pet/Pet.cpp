@@ -592,6 +592,12 @@ void Pet::Update(uint32 diff)
                 }
             }
 
+            if (GetCharmInfo()->IsOnTransport() && !GetTransport())
+            {
+                if (GetPositionZ() != owner->GetPositionZ())
+                    Relocate(GetPositionX(), GetPositionY(), owner->GetPositionZ());
+            }
+
             if (m_duration > 0)
             {
                 if (uint32(m_duration) > diff)

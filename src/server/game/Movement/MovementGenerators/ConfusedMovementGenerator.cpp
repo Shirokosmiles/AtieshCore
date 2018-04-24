@@ -28,7 +28,9 @@
 #include "Map.h"
 
 template<class T>
-ConfusedMovementGenerator<T>::~ConfusedMovementGenerator() = default;
+ConfusedMovementGenerator<T>::~ConfusedMovementGenerator()
+{
+}
 
 template<class T>
 MovementGeneratorType ConfusedMovementGenerator<T>::GetMovementGeneratorType() const

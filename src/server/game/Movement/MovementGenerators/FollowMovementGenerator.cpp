@@ -122,7 +122,7 @@ bool FollowMovementGenerator::Update(Unit* owner, uint32 diff)
                 if (target->GetGUID() == oPet->GetOwnerGUID())
                     allowShortcut = true;
 
-            bool transport = owner->GetTransport();
+            bool transport = owner->GetTransport() || (owner->ToPet() && owner->ToPet()->GetCharmInfo()->IsOnTransport());
             if (!transport)
             {
                 bool success = _path->CalculatePath(x, y, z, allowShortcut);
