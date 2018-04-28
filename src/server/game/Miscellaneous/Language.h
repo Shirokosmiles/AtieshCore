@@ -1247,27 +1247,28 @@ enum TrinityStrings
     LANG_ITEM_CHANGE_RACE                = 11544,
 
     LANG_ITEM_RATES                      = 11545,
-    LANG_ITEM_RATES_XP                   = 11546,
-    LANG_ITEM_RATES_REP                  = 11547,
-    LANG_ITEM_RATES_GOLD                 = 11548,
-    LANG_ITEM_RATES_HONOR                = 11549,
+    LANG_ITEM_RATES_XP_KILL              = 11546,
+    LANG_ITEM_RATES_XP_QUEST             = 11547,
+    LANG_ITEM_RATES_REP                  = 11548,
+    LANG_ITEM_RATES_GOLD                 = 11549,
+    LANG_ITEM_RATES_HONOR                = 11550,
 
-    LANG_ITEM_BUY_7                      = 11550,
-    LANG_ITEM_BUY_14                     = 11551,
-    LANG_ITEM_BUY_31                     = 11552,
-    LANG_ITEM_BUY_7_SURE                 = 11553,
-    LANG_ITEM_BUY_14_SURE                = 11554,
-    LANG_ITEM_BUY_31_SURE                = 11555,
+    LANG_ITEM_BUY_7                      = 11551,
+    LANG_ITEM_BUY_14                     = 11552,
+    LANG_ITEM_BUY_31                     = 11553,
+    LANG_ITEM_BUY_7_SURE                 = 11554,
+    LANG_ITEM_BUY_14_SURE                = 11555,
+    LANG_ITEM_BUY_31_SURE                = 11556,
 
-    LANG_ITEM_INC_7                      = 11556,
-    LANG_ITEM_INC_14                     = 11557,
-    LANG_ITEM_INC_31                     = 11558,
-    LANG_ITEM_INC_7_SURE                 = 11559,
-    LANG_ITEM_INC_14_SURE                = 11560,
-    LANG_ITEM_INC_31_SURE                = 11561,
+    LANG_ITEM_INC_7                      = 11557,
+    LANG_ITEM_INC_14                     = 11558,
+    LANG_ITEM_INC_31                     = 11559,
+    LANG_ITEM_INC_7_SURE                 = 11560,
+    LANG_ITEM_INC_14_SURE                = 11561,
+    LANG_ITEM_INC_31_SURE                = 11562,
 
-    LANG_ITEM_NOT_ENOUGH_COINS           = 11562,
-    LANG_ITEM_YOU_HAVE_COINS             = 11563,
-    LANG_ITEM_YOU_NEED_COINS             = 11564
+    LANG_ITEM_NOT_ENOUGH_COINS           = 11563,
+    LANG_ITEM_YOU_HAVE_COINS             = 11564,
+    LANG_ITEM_YOU_NEED_COINS             = 11565
 };
 #endif

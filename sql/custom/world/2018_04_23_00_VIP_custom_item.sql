@@ -228,97 +228,102 @@ DELETE FROM `trinity_string` WHERE entry = 11545;
 INSERT INTO `trinity_string` VALUES
 (11545,'Rates:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Рейты:');
 
--- LANG_ITEM_RATES_XP
+-- LANG_ITEM_RATES_XP_KILL
 DELETE FROM `trinity_string` WHERE entry = 11546;
 INSERT INTO `trinity_string` VALUES
-(11546,'Rates XP:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Рейты на опыт:');
+(11546,'Rates XP for kill:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Рейты на опыт за убийство:');
 
--- LANG_ITEM_RATES_REP
+-- LANG_ITEM_RATES_XP_QUEST
 DELETE FROM `trinity_string` WHERE entry = 11547;
 INSERT INTO `trinity_string` VALUES
-(11547,'Rate of reputation:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Рейт репутации:');
+(11547,'Rates XP for quest:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Рейты на опыт за задания:');
 
--- LANG_ITEM_RATES_GOLD
+-- LANG_ITEM_RATES_REP
 DELETE FROM `trinity_string` WHERE entry = 11548;
 INSERT INTO `trinity_string` VALUES
-(11548,'Rate of gold:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Рейт золота:');
+(11548,'Rate of reputation:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Рейт репутации:');
 
--- LANG_ITEM_RATES_HONOR
+-- LANG_ITEM_RATES_GOLD
 DELETE FROM `trinity_string` WHERE entry = 11549;
 INSERT INTO `trinity_string` VALUES
-(11549,'Rate of honor:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Рейт Хонора:');
+(11549,'Rate of gold:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Рейт золота:');
 
--- LANG_ITEM_BUY_7
+-- LANG_ITEM_RATES_HONOR
 DELETE FROM `trinity_string` WHERE entry = 11550;
 INSERT INTO `trinity_string` VALUES
-(11550,'Buy VIP for [ |cffD800007|r ] Days [150 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD800007|r ] Дней [150 Бонусов]');
+(11550,'Rate of honor:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Рейт Хонора:');
 
--- LANG_ITEM_BUY_14
+-- LANG_ITEM_BUY_7
 DELETE FROM `trinity_string` WHERE entry = 11551;
 INSERT INTO `trinity_string` VALUES
-(11551,'Buy VIP for [ |cffD8000014|r ] Days [260 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD8000014|r ] Дней [260 Бонусов]');
+(11551,'Buy VIP for [ |cffD800007|r ] Days [150 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD800007|r ] Дней [150 Бонусов]');
 
--- LANG_ITEM_BUY_31
+-- LANG_ITEM_BUY_14
 DELETE FROM `trinity_string` WHERE entry = 11552;
 INSERT INTO `trinity_string` VALUES
-(11552,'Buy VIP for [ |cffD8000031|r ] Days [470 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD8000031|r ] День [470 Бонусов]');
+(11552,'Buy VIP for [ |cffD8000014|r ] Days [260 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD8000014|r ] Дней [260 Бонусов]');
 
--- LANG_ITEM_BUY_7_SURE
+-- LANG_ITEM_BUY_31
 DELETE FROM `trinity_string` WHERE entry = 11553;
 INSERT INTO `trinity_string` VALUES
-(11553,'Are you sure you want to buy VIP time for 7 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите купить VIP аккаунт на 7 дней ?');
+(11553,'Buy VIP for [ |cffD8000031|r ] Days [470 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD8000031|r ] День [470 Бонусов]');
 
--- LANG_ITEM_BUY_14_SURE
+-- LANG_ITEM_BUY_7_SURE
 DELETE FROM `trinity_string` WHERE entry = 11554;
 INSERT INTO `trinity_string` VALUES
-(11554,'Are you sure you want to buy VIP time for 14 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите купить VIP аккаунт на 14 дней ?');
+(11554,'Are you sure you want to buy VIP time for 7 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите купить VIP аккаунт на 7 дней ?');
 
--- LANG_ITEM_BUY_31_SURE
+-- LANG_ITEM_BUY_14_SURE
 DELETE FROM `trinity_string` WHERE entry = 11555;
 INSERT INTO `trinity_string` VALUES
-(11555,'Are you sure you want to buy VIP time for 31 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите купить VIP аккаунт на 31 день ?');
+(11555,'Are you sure you want to buy VIP time for 14 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите купить VIP аккаунт на 14 дней ?');
 
--- LANG_ITEM_INC_7
+-- LANG_ITEM_BUY_31_SURE
 DELETE FROM `trinity_string` WHERE entry = 11556;
 INSERT INTO `trinity_string` VALUES
-(11556,'Buy additional VIP time for [ |cffD800007|r ] Days [150 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD800007|r ] Дней [150 Бонусов]');
+(11556,'Are you sure you want to buy VIP time for 31 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите купить VIP аккаунт на 31 день ?');
 
--- LANG_ITEM_INC_14
+-- LANG_ITEM_INC_7
 DELETE FROM `trinity_string` WHERE entry = 11557;
 INSERT INTO `trinity_string` VALUES
-(11557,'Buy additional VIP time for [ |cffD8000014|r ] Days [260 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD8000014|r ] Дней [260 Бонусов]');
+(11557,'Buy additional VIP time for [ |cffD800007|r ] Days [150 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD800007|r ] Дней [150 Бонусов]');
 
--- LANG_ITEM_INC_31
+-- LANG_ITEM_INC_14
 DELETE FROM `trinity_string` WHERE entry = 11558;
 INSERT INTO `trinity_string` VALUES
-(11558,'Buy additional VIP time for [ |cffD8000031|r ] Days [470 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD8000031|r ] День [470 Бонусов]');
+(11558,'Buy additional VIP time for [ |cffD8000014|r ] Days [260 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD8000014|r ] Дней [260 Бонусов]');
 
--- LANG_ITEM_INC_7_SURE
+-- LANG_ITEM_INC_31
 DELETE FROM `trinity_string` WHERE entry = 11559;
 INSERT INTO `trinity_string` VALUES
-(11559,'Are you sure you want to buy additional VIP time for 7 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите Увеличить время VIP привилегий на 7 дней ?');
+(11559,'Buy additional VIP time for [ |cffD8000031|r ] Days [470 coins]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD8000031|r ] День [470 Бонусов]');
 
--- LANG_ITEM_INC_14_SURE
+-- LANG_ITEM_INC_7_SURE
 DELETE FROM `trinity_string` WHERE entry = 11560;
 INSERT INTO `trinity_string` VALUES
-(11560,'Are you sure you want to buy additional VIP time for 14 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите Увеличить время VIP привилегий на 14 дней ?');
+(11560,'Are you sure you want to buy additional VIP time for 7 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите Увеличить время VIP привилегий на 7 дней ?');
 
--- LANG_ITEM_INC_31_SURE
+-- LANG_ITEM_INC_14_SURE
 DELETE FROM `trinity_string` WHERE entry = 11561;
 INSERT INTO `trinity_string` VALUES
-(11561,'Are you sure you want to buy additional VIP time for 31 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите Увеличить время VIP привилегий на 31 день ?');
+(11561,'Are you sure you want to buy additional VIP time for 14 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите Увеличить время VIP привилегий на 14 дней ?');
 
--- LANG_ITEM_NOT_ENOUGH_COINS
+-- LANG_ITEM_INC_31_SURE
 DELETE FROM `trinity_string` WHERE entry = 11562;
 INSERT INTO `trinity_string` VALUES
-(11562,'|cff006699Not enough coins|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|cff006699Недостаточно бонусов|r');
+(11562,'Are you sure you want to buy additional VIP time for 31 days ?',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы уверены что хотите Увеличить время VIP привилегий на 31 день ?');
 
--- LANG_ITEM_YOU_HAVE_COINS
+-- LANG_ITEM_NOT_ENOUGH_COINS
 DELETE FROM `trinity_string` WHERE entry = 11563;
 INSERT INTO `trinity_string` VALUES
-(11563,'|cff006699You have: |cff00FF33%u coins|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|cff006699У вас: |cff00FF33%u бонусов|r');
+(11563,'|cff006699Not enough coins|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|cff006699Недостаточно бонусов|r');
 
--- LANG_ITEM_YOU_NEED_COINS
+-- LANG_ITEM_YOU_HAVE_COINS
 DELETE FROM `trinity_string` WHERE entry = 11564;
 INSERT INTO `trinity_string` VALUES
-(11564,'|cff006699You need additional: |cffFF0000%u|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|cff006699Нужно еще: |cffFF0000%u|r');
+(11564,'|cff006699You have: |cff00FF33%u coins|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|cff006699У вас: |cff00FF33%u бонусов|r');
+
+-- LANG_ITEM_YOU_NEED_COINS
+DELETE FROM `trinity_string` WHERE entry = 11565;
+INSERT INTO `trinity_string` VALUES
+(11565,'|cff006699You need additional: |cffFF0000%u|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|cff006699Нужно еще: |cffFF0000%u|r');

@@ -143,7 +143,8 @@ public:
         //uint32 action = player->PlayerTalkClass->GetGossipOptionAction(action);
         //return OnGossipSelect(player, me, sender, action);
 
-        std::string XP = "|cff660099" + std::string(player->GetSession()->GetTrinityString(LANG_ITEM_RATES_XP)) + "|r x";
+        std::string XP = "|cff660099" + std::string(player->GetSession()->GetTrinityString(LANG_ITEM_RATES_XP_KILL)) + "|r x";
+        std::string XP_quest = "|cff660099" + std::string(player->GetSession()->GetTrinityString(LANG_ITEM_RATES_XP_QUEST)) + "|r x";
         std::string rep   = "|cff660099" + std::string(player->GetSession()->GetTrinityString(LANG_ITEM_RATES_REP)) + "|r x";
         std::string gold  = "|cff660099" + std::string(player->GetSession()->GetTrinityString(LANG_ITEM_RATES_GOLD)) + "|r x";
         std::string honor = "|cff660099" + std::string(player->GetSession()->GetTrinityString(LANG_ITEM_RATES_HONOR)) + "|r x";
@@ -1303,12 +1304,13 @@ public:
                 break;
             case 777:
                 AddGossipItemFor(player, 0, std::string("|cffD80000") + player->GetSession()->GetTrinityString(LANG_ITEM_SERVER_MENU)  + "|r", GOSSIP_SENDER_MAIN, 200110);
-                //AddGossipItemFor(player, 0, "|cff660099Сайт:|r RustEmu.org", GOSSIP_SENDER_MAIN, 2001);
+                //AddGossipItemFor(player, 0, "|cff660099Web-site:|r RustEmu.org", GOSSIP_SENDER_MAIN, 2001);
                 AddGossipItemFor(player, 0, std::string("|cffD80000") + player->GetSession()->GetTrinityString(LANG_ITEM_RATES) + "|r", GOSSIP_SENDER_MAIN, 200110);
-                AddGossipItemFor(player, 0, getString(XP, uint32(sWorld->getRate(RATE_XP_KILL))).c_str(), GOSSIP_SENDER_MAIN, 200110);
-                AddGossipItemFor(player, 0, getString(rep, uint32(sWorld->getRate(RATE_REPUTATION_GAIN))).c_str(), GOSSIP_SENDER_MAIN, 200110);
+                AddGossipItemFor(player, 0, getString(XP, uint32(player->IsPremium() ? sWorld->getRate(RATE_XP_KILL) * sWorld->getRate(RATE_VIP_XP_KILL) : sWorld->getRate(RATE_XP_KILL))).c_str(), GOSSIP_SENDER_MAIN, 200110);
+                AddGossipItemFor(player, 0, getString(XP_quest, uint32(player->IsPremium() ? sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_VIP_XP_QUEST) : sWorld->getRate(RATE_XP_QUEST))).c_str(), GOSSIP_SENDER_MAIN, 200110);
+                AddGossipItemFor(player, 0, getString(rep, uint32(player->IsPremium() ? sWorld->getRate(RATE_REPUTATION_GAIN) * sWorld->getRate(RATE_VIP_REPUTATION) : sWorld->getRate(RATE_REPUTATION_GAIN))).c_str(), GOSSIP_SENDER_MAIN, 200110);
                 AddGossipItemFor(player, 0, getString(gold, uint32(sWorld->getRate(RATE_DROP_MONEY))).c_str(), GOSSIP_SENDER_MAIN, 200110);
-                AddGossipItemFor(player, 0, getString(honor, uint32(sWorld->getRate(RATE_HONOR))).c_str(), GOSSIP_SENDER_MAIN, 200110);
+                AddGossipItemFor(player, 0, getString(honor, uint32(player->IsPremium() ? sWorld->getRate(RATE_HONOR) * sWorld->getRate(RATE_VIP_HONOR) : sWorld->getRate(RATE_HONOR))).c_str(), GOSSIP_SENDER_MAIN, 200110);
                 //AddGossipItemFor(player, 0, "|cffD80000Администрация|r", GOSSIP_SENDER_MAIN, 2014);
                 //AddGossipItemFor(player, 0, "|cff660099Куратор Проекта:|r Re3os ", GOSSIP_SENDER_MAIN, 2015);
                 //AddGossipItemFor(player, 0, "|cff660099Администратор:|r Emeris", GOSSIP_SENDER_MAIN, 2017);
