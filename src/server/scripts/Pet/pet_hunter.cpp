@@ -70,6 +70,7 @@ class npc_pet_hunter_snake_trap : public CreatureScript
             {
                 _spellTimer = 0;
                 _isViper = false;
+                me->SetReactState(REACT_AGGRESSIVE);
             }
 
             void JustEngagedWith(Unit* /*who*/) override { }
