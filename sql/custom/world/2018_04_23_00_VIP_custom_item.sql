@@ -21,7 +21,7 @@ INSERT INTO `trinity_string` VALUES
 -- LANG_ITEM_MSG_CHANGE_RACE_COMPLETE
 DELETE FROM `trinity_string` WHERE entry = 11504;
 INSERT INTO `trinity_string` VALUES
-(11504,'|cff00ff00Payment complete. You need to do log-out by character and change race for character.Do not forget to clear folder Cache after rename!|r',NULL,'|cff00ff00Payment validé. Vous devez vous déconnecter de votre personnage et changer de race. N\'oubliez pas d\'effacer le dossier Cache après avoir changé de race !|r',NULL,NULL,NULL,NULL,NULL,'|cff00ff00Оплата успешно произведена. Сделайте логаут и измените расу своего персонажа.Не забудьте после смены внешности, выйти из игры и удалить из клиента папку Cache!|r');
+(11504,'|cff00ff00Payment complete. You need to do log-out by character and change race for character.Do not forget to clear folder Cache after change race!|r',NULL,'|cff00ff00Payment validé. Vous devez vous déconnecter de votre personnage et changer de race. N\'oubliez pas d\'effacer le dossier Cache après avoir changé de race !|r',NULL,NULL,NULL,NULL,NULL,'|cff00ff00Оплата успешно произведена. Сделайте логаут и измените расу своего персонажа.Не забудьте после смены расы, выйти из игры и удалить из клиента папку Cache!|r');
 
 -- LANG_ITEM_MSG_NO_ARENA_POINTS
 DELETE FROM `trinity_string` WHERE entry = 11505;
@@ -221,7 +221,7 @@ INSERT INTO `trinity_string` VALUES
 -- LANG_ITEM_CHANGE_RACE
 DELETE FROM `trinity_string` WHERE entry = 11544;
 INSERT INTO `trinity_string` VALUES
-(11544,'Aura Deserter was successfully removed!',NULL,'Changer la race',NULL,NULL,NULL,NULL,NULL,'Смена расы');
+(11544,'Change race',NULL,'Changer la race',NULL,NULL,NULL,NULL,NULL,'Смена расы');
 
 -- LANG_ITEM_RATES
 DELETE FROM `trinity_string` WHERE entry = 11545;
