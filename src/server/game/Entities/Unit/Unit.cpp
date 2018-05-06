@@ -4577,6 +4577,23 @@ bool Unit::HasAuraWithMechanic(uint32 mechanicMask) const
     return false;
 }
 
+bool Unit::HasAuraFaireFire() const
+{
+    for (AuraApplicationMap::const_iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end(); ++iter)
+    {
+        SpellInfo const* spellInfo = iter->second->GetBase()->GetSpellInfo();
+        if (spellInfo)
+        {
+            if (spellInfo->Attributes & SPELL_ATTR0_NOT_SHAPESHIFT &&
+                spellInfo->AttributesEx & SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY &&
+                spellInfo->AttributesEx & SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 bool Unit::HasStrongerAuraWithDR(SpellInfo const* auraSpellInfo, Unit* caster, bool triggered) const
 {
     DiminishingGroup diminishGroup = auraSpellInfo->GetDiminishingReturnsGroupForSpell(triggered);

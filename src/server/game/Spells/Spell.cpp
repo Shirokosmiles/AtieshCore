@@ -5284,6 +5284,19 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
         return SPELL_FAILED_CUSTOM_ERROR;
     }
 
+    for (uint8 j = EFFECT_0; j < MAX_SPELL_EFFECTS; ++j) // Faire Fire should not restrict to cast stealth
+    {
+        if (!m_spellInfo->Effects[j].IsAura())
+            continue;
+
+        if (m_spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_STEALTH)
+        {
+            if (m_caster->ToUnit() &&
+                m_caster->ToUnit()->HasAuraFaireFire())
+                return SPELL_FAILED_DONT_REPORT;
+        }
+    }
+
     // Check global cooldown
     if (strict && !(_triggeredCastFlags & TRIGGERED_IGNORE_GCD) && HasGlobalCooldown())
         return !m_spellInfo->HasAttribute(SPELL_ATTR0_DISABLED_WHILE_ACTIVE) ? SPELL_FAILED_NOT_READY : SPELL_FAILED_DONT_REPORT;

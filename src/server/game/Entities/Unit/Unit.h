@@ -1320,6 +1320,7 @@ class TC_GAME_API Unit : public WorldObject
         bool HasAuraTypeWithValue(AuraType auraType, int32 value) const;
         bool HasNegativeAuraWithInterruptFlag(uint32 flag, ObjectGuid guid = ObjectGuid::Empty) const;
         bool HasAuraWithMechanic(uint32 mechanicMask) const;
+        bool HasAuraFaireFire() const;
         bool HasStrongerAuraWithDR(SpellInfo const* auraSpellInfo, Unit* caster, bool triggered) const;
 
         AuraEffect* IsScriptOverriden(SpellInfo const* spell, int32 script) const;
