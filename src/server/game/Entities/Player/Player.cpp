@@ -26889,7 +26889,7 @@ void Player::RemoveSocial()
 
 bool Player::CheckOnFlyHack()
 {
-    if (Unit::IsFalling() || IsFalling())
+    if (ToUnit()->IsFalling() || IsFalling())
         return true;
 
     if (IsFlying() && !CanFly()) // kick flyhacks
