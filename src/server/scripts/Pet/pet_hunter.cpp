@@ -20,6 +20,10 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_hun_".
  */
 
+#include "Cell.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "ScriptMgr.h"
 #include "CreatureAIImpl.h"
 #include "ScriptedCreature.h"
@@ -71,9 +75,18 @@ class npc_pet_hunter_snake_trap : public CreatureScript
                 _spellTimer = 0;
                 _isViper = false;
                 me->SetReactState(REACT_AGGRESSIVE);
-            }
 
-            void JustEngagedWith(Unit* /*who*/) override { }
+                std::list<Unit*> targets;
+                Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 8.0f);
+                Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+                Cell::VisitAllObjects(me, searcher, 8.0f);
+
+                if (!targets.empty())
+                {
+                    for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                        AttackStart((*iter));
+                }
+            }
 
             void Reset() override
             {
@@ -97,27 +110,6 @@ class npc_pet_hunter_snake_trap : public CreatureScript
 
                 if (!_isViper)
                     DoCast(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
-            }
-
-            // Redefined for random target selection:
-            void MoveInLineOfSight(Unit* who) override
-            {
-                if (!me->GetVictim() && me->CanCreatureAttack(who))
-                {
-                    if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
-                        return;
-
-                    float attackRadius = me->GetAttackDistance(who);
-                    if (me->IsWithinDistInMap(who, attackRadius) && me->IsWithinLOSInMap(who))
-                    {
-                        if (!(rand32() % 5))
-                        {
-                            me->setAttackTimer(BASE_ATTACK, (rand32() % 10) * 100);
-                            _spellTimer = (rand32() % 10) * 100;
-                            AttackStart(who);
-                        }
-                    }
-                }
             }
 
             void UpdateAI(uint32 diff) override
