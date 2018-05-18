@@ -26954,19 +26954,20 @@ bool Player::CheckOnFlyHack()
                 if (waterlevel && waterlevel + GetCollisionHeight() + GetHoverOffset() > pz)
                     return true;
 
-                GetClosePoint(npos.m_positionX, npos.m_positionY, npos.m_positionZ, DEFAULT_PLAYER_BOUNDING_RADIUS, 6.0f); // first check
-                if (pz - npos.GetPositionZ() > 6.8f)
+                float cx, cy, cz;
+                GetClosePoint(cx, cy, cz, DEFAULT_PLAYER_BOUNDING_RADIUS, 6.0f); // first check
+                if (pz - cz > 6.8f)
                 {
                     // check dynamic collision for transport (TODO navmesh for transport map)
-                    GetMap()->getObjectHitPos(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight(), npos.m_positionX, npos.m_positionY, npos.m_positionZ + GetCollisionHeight(), npos.m_positionX, npos.m_positionY, npos.m_positionZ, -GetCollisionHeight());
+                    GetMap()->getObjectHitPos(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight(), cx, cy, cz + GetCollisionHeight(), cx, cy, cz, -GetCollisionHeight());
 
-                    if (pz - npos.GetPositionZ() > 6.8f)
+                    if (pz - cz > 6.8f)
                     {
                         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
                         TC_LOG_INFO("anticheat", "Player::========================================================");
                         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = %f", pz);
                         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
-                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  checkz = %f", npos.GetPositionZ());
+                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  checkz = %f", cz);
                         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
                         return false;
                     }
