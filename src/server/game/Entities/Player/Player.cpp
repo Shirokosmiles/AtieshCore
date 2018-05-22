@@ -26984,7 +26984,7 @@ void Player::UpdateMovementInfo(MovementInfo const& movementInfo)
     SetLastMoveServerTimestamp(GameTime::GetGameTimeMS());
 }
 
-bool Player::CheckMovementInfo(MovementInfo const& movementInfo)
+bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 {
     if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_SPEEDHACK_ENABLED))
         return true;
@@ -27025,12 +27025,26 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo)
             return true;
 
         float distance, movetime, speed, difftime, normaldistance, delay, delaysentrecieve, x, y;
+        Position npos = movementInfo.pos;
+        distance = GetExactDist2d(npos);
+
+        if (!jump)
+        {
+            float diffz = fabs(movementInfo.pos.GetPositionZ() - GetPositionZ());
+            float tanangle = distance / diffz;
+
+            if (movementInfo.pos.GetPositionZ() > GetPositionZ() &&
+                diffz > 2.0f &&
+                tanangle < 0.52f) // 29,79381 degrees
+            {
+                TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  Climb-Hack detected for Account id : %u, Player %s, diffZ = %f, distance = %f, angle = %f ", GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle);
+                return false;
+            }
+        }
 
         uint32 oldstime = GetLastMoveServerTimestamp();
         uint32 stime = GameTime::GetGameTimeMS();
         uint32 ping, realping;
-        Position npos = movementInfo.pos;
-        distance = GetExactDist2d(npos);
         movetime = movementInfo.time;
         realping = GetSession()->GetLatency();
         ping = realping;

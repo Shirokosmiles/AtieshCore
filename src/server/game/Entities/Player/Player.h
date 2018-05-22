@@ -1724,7 +1724,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
 		// should only be used by packet handlers to validate and apply incoming MovementInfos from clients. Do not use internally to modify m_movementInfo
 		void UpdateMovementInfo(MovementInfo const& movementInfo);
-		bool CheckMovementInfo(MovementInfo const& movementInfo); // ASH
+		bool CheckMovementInfo(MovementInfo const& movementInfo, bool jump); // ASH
 		bool CheckOnFlyHack(); // AFH
 
 		void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }

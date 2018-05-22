@@ -490,14 +490,19 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
 
-    if (opcode == MSG_MOVE_JUMP && plrMover && mover->IsFalling())
+    bool jumpopcode = false;
+    if (opcode == MSG_MOVE_JUMP)
     {
-        TC_LOG_INFO("anticheat", "MovementHandler::DOUBLE_JUMP by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
-        sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, plrMover->GetName().c_str());
-        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED))
+        bool jumpopcode = true;
+        if (plrMover && mover->IsFalling())
         {
-            plrMover->GetSession()->KickPlayer();
-            return;
+            TC_LOG_INFO("anticheat", "MovementHandler::DOUBLE_JUMP by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
+            sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, plrMover->GetName().c_str());
+            if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED))
+            {
+                plrMover->GetSession()->KickPlayer();
+                return;
+            }
         }
     }
 
@@ -533,7 +538,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     /* start SpeedHack Detection */
-    if (plrMover && !plrMover->CheckMovementInfo(movementInfo) && sWorld->getBoolConfig(CONFIG_ASH_KICK_ENABLED))
+    if (plrMover && !plrMover->CheckMovementInfo(movementInfo, jumpopcode) && sWorld->getBoolConfig(CONFIG_ASH_KICK_ENABLED))
     {
         plrMover->GetSession()->KickPlayer();
         return;
