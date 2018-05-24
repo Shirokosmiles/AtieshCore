@@ -1179,7 +1179,8 @@ enum TrinityStrings
     LANG_GM_ANNOUNCE_AFH                  = 6620,  // AntiFlyHack
     LANG_GM_ANNOUNCE_DOUBLE_JUMP          = 6621,  // Double jump (client can't sent second packet of jump (only hack))
     LANG_GM_ANNOUNCE_JUMPER_FAKE          = 6622,  // Gagarin and others can set falling flag and move up as jump
-    LANG_GM_ANNOUNCE_JUMPER_FLYING        = 6623,  // Hitchhiker's Hack and others can set fly unrestricted flag    
+    LANG_GM_ANNOUNCE_JUMPER_FLYING        = 6623,  // Hitchhiker's Hack and others can set fly unrestricted flag
+    LANG_GM_ANNOUNCE_WALLCLIMB            = 6624,  // Wallclimb
 
     // 11022 - 11109 free 
     // Vip Commands

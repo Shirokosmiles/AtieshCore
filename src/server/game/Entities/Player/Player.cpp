@@ -27038,6 +27038,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
                 tanangle < 0.57735026919f) // 30 degrees
             {
                 TC_LOG_INFO("anticheat", "CheckMovementInfo :  Climb-Hack detected for Account id : %u, Player %s, diffZ = %f, distance = %f, angle = %f ", GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle);
+                sWorld->SendGMText(LANG_GM_ANNOUNCE_WALLCLIMB, GetName().c_str(), diffz, distance, tanangle);
                 return false;
             }
         }
