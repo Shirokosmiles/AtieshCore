@@ -27028,7 +27028,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         Position npos = movementInfo.pos;
         distance = GetExactDist2d(npos);
 
-        if (!jump)
+        if (!jump && !CanFly() && !isSwimming())
         {
             float diffz = fabs(movementInfo.pos.GetPositionZ() - GetPositionZ());
             float tanangle = distance / diffz;
