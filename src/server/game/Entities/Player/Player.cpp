@@ -21350,8 +21350,8 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         // not let cheating with start flight mounted
         if (IsMounted())
         {
-            GetSession()->SendActivateTaxiReply(ERR_TAXIPLAYERALREADYMOUNTED);
-            return false;
+            Dismount();
+            RemoveAurasByType(SPELL_AURA_MOUNTED);
         }
 
         if (IsInDisallowedMountForm())
