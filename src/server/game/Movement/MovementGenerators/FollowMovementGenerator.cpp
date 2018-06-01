@@ -167,8 +167,8 @@ bool FollowMovementGenerator::Update(Unit* owner, uint32 diff)
                         z = map->GetHeight(owner->GetPhaseMask(), x, y, z + 2.8f, true);
                 }
 
-                if (z < owner->GetOwner()->GetPositionZ())
-                    z = owner->GetOwner()->GetPositionZ();
+                if (z < target->GetPositionZ())
+                    z = target->GetPositionZ();
             }
 
             owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);

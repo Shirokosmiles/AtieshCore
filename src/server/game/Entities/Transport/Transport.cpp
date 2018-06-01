@@ -285,7 +285,7 @@ void Transport::AddPassenger(WorldObject* passenger)
 
                     if (crt->IsPet())
                     {
-                        if (crt->GetVictim() && crt->IsInCombat())
+                        if (crt->GetVictim())
                             GetMap()->CreatureRelocation(crt, crt->GetVictim()->GetPositionX(), crt->GetVictim()->GetPositionY(), crt->GetVictim()->GetPositionZ() + crt->GetVictim()->GetCollisionHeight(), crt->GetVictim()->GetOrientation());
                         else
                             GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + owner->GetCollisionHeight(), owner->GetOrientation());
@@ -333,7 +333,7 @@ void Transport::RemovePassenger(WorldObject* passenger)
             {
                 if (Unit* owner = crt->GetOwner())
                 {
-                    if (crt->GetVictim() && crt->IsInCombat())
+                    if (crt->GetVictim())
                         GetMap()->CreatureRelocation(crt, crt->GetVictim()->GetPositionX(), crt->GetVictim()->GetPositionY(), crt->GetVictim()->GetPositionZ() + crt->GetVictim()->GetCollisionHeight(), crt->GetVictim()->GetOrientation());
                     else
                         GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + owner->GetCollisionHeight(), owner->GetOrientation());
