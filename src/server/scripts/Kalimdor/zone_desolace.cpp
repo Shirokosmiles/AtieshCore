@@ -476,7 +476,7 @@ public:
             for (uint8 i = 0; i < MAX_CARAVAN_SUMMONS; ++i)
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, summons[i]))
                 {
-                    summon->GetMotionMaster()->Clear(false);
+                    summon->GetMotionMaster()->Clear();
                     summon->StopMoving();
                     summon->GetMotionMaster()->MoveFollow(me, dist, (float) M_PI, MOTION_SLOT_ACTIVE);
                     dist += (i == 1 ? 9.5f : 3.0f);

@@ -87,7 +87,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->CombatStop(true);
             me->StopMoving();
-            me->GetMotionMaster()->Clear(false);
+            me->GetMotionMaster()->Clear();
             me->SetCanFly(true);
 
             me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
@@ -191,7 +191,7 @@ public:
                         float newx = me->GetPositionX() + 20 * std::cos(me->GetOrientation());
                         float newy = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
                         float newz = me->GetPositionZ() + 40.0f;
-                        me->GetMotionMaster()->Clear(false);
+                        me->GetMotionMaster()->Clear();
                         me->GetMotionMaster()->MovePoint(0, newx, newy, newz);
 
                         // Despawn as soon as possible
@@ -411,7 +411,7 @@ class npc_pet_dk_rune_weapon : public CreatureScript
                 me->CombatStop(true);
                 if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW))
                 {
-                    me->GetMotionMaster()->Clear(false);
+                    me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
                 }
                 Init();

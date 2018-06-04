@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016-2018 RustEmu Core <http://www.rustemu.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -28,6 +27,15 @@
 
 //---- JumpMovementGenerator
 template<class T>
+JumpMovementGenerator<T>::JumpMovementGenerator(uint32 id, float x, float y, float z, float o, float speedXY, float speedZ, bool hasOrientation, bool setorientationFixed) : _movementId(id), _x(x), _y(y), _z(z), _o(o), _speedXY(speedXY), _speedZ(speedZ), _hasOrientation(hasOrientation), _setorientationFixed(setorientationFixed)
+{
+    this->Mode = MOTION_MODE_DEFAULT;
+    this->Priority = MOTION_PRIORITY_HIGHEST;
+    this->Flags = MOVEMENTGENERATOR_FLAG_INITIALIZATION_PENDING;
+    this->BaseUnitState = UNIT_STATE_JUMPING;
+}
+
+template<class T>
 MovementGeneratorType JumpMovementGenerator<T>::GetMovementGeneratorType() const
 {
     return JUMP_MOTION_TYPE;
@@ -36,6 +44,15 @@ MovementGeneratorType JumpMovementGenerator<T>::GetMovementGeneratorType() const
 template<class T>
 void JumpMovementGenerator<T>::DoInitialize(T* owner)
 {
+    MovementGenerator::RemoveFlag(MOVEMENTGENERATOR_FLAG_INITIALIZATION_PENDING);
+    MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_INITIALIZED);
+
+    if (!owner)
+        return;
+
+    // TODO: UNIT_FIELD_FLAGS should not be handled by generators
+    //owner->AddUnitState(UNIT_STATE_JUMPING);
+
     Movement::MoveSplineInit init(owner);
     init.MoveTo(_x, _y, _z, false);
     init.SetParabolic(_speedZ, 0);
@@ -50,28 +67,48 @@ void JumpMovementGenerator<T>::DoInitialize(T* owner)
 }
 
 template<class T>
+void JumpMovementGenerator<T>::DoReset(T* owner)
+{
+    MovementGenerator::RemoveFlag(MOVEMENTGENERATOR_FLAG_TRANSITORY | MOVEMENTGENERATOR_FLAG_DEACTIVATED);
+
+    owner->StopMoving();
+    DoInitialize(owner);
+}
+
+template<class T>
 bool JumpMovementGenerator<T>::DoUpdate(T* owner, uint32 /*diff*/)
 {
     if (!owner)
         return false;
 
-    return !owner->movespline->Finalized();
+    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+        MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_INTERRUPTED);
+    else
+        MovementGenerator::RemoveFlag(MOVEMENTGENERATOR_FLAG_INTERRUPTED);
+
+    if (owner->movespline->Finalized())
+    {
+        MovementGenerator::RemoveFlag(MOVEMENTGENERATOR_FLAG_TRANSITORY);
+        MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_INFORM_ENABLED);
+        return false;
+    }
+    return true;
 }
 
 template<class T>
-void JumpMovementGenerator<T>::DoFinalize(T* owner)
+void JumpMovementGenerator<T>::DoDeactivate(T* owner)
 {
-    if (owner->movespline->Finalized())
+    MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_DEACTIVATED);
+}
+
+template<class T>
+void JumpMovementGenerator<T>::DoFinalize(T* owner, bool active, bool movementInform)
+{
+    MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_FINALIZED);
+    if (movementInform && MovementGenerator::HasFlag(MOVEMENTGENERATOR_FLAG_INFORM_ENABLED))
         MovementInform(owner);
 
     owner->SetIsJumping(false);
-}
-
-template<class T>
-void JumpMovementGenerator<T>::DoReset(T* owner)
-{
-    owner->StopMoving();
-    DoInitialize(owner);
 }
 
 template<class T>
@@ -84,13 +121,17 @@ void JumpMovementGenerator<Creature>::MovementInform(Creature* owner)
         owner->AI()->MovementInform(JUMP_MOTION_TYPE, _movementId);
 }
 
+template JumpMovementGenerator<Player>::JumpMovementGenerator(uint32, float, float, float, float, float, float, bool, bool);
+template JumpMovementGenerator<Creature>::JumpMovementGenerator(uint32, float, float, float, float, float, float, bool, bool);
 template MovementGeneratorType JumpMovementGenerator<Player>::GetMovementGeneratorType() const;
 template MovementGeneratorType JumpMovementGenerator<Creature>::GetMovementGeneratorType() const;
 template void JumpMovementGenerator<Player>::DoInitialize(Player*);
 template void JumpMovementGenerator<Creature>::DoInitialize(Creature*);
-template void JumpMovementGenerator<Player>::DoFinalize(Player*);
-template void JumpMovementGenerator<Creature>::DoFinalize(Creature*);
 template void JumpMovementGenerator<Player>::DoReset(Player*);
 template void JumpMovementGenerator<Creature>::DoReset(Creature*);
 template bool JumpMovementGenerator<Player>::DoUpdate(Player*, uint32);
 template bool JumpMovementGenerator<Creature>::DoUpdate(Creature*, uint32);
+template void JumpMovementGenerator<Player>::DoDeactivate(Player*);
+template void JumpMovementGenerator<Creature>::DoDeactivate(Creature*);
+template void JumpMovementGenerator<Player>::DoFinalize(Player*, bool, bool);
+template void JumpMovementGenerator<Creature>::DoFinalize(Creature*, bool, bool);

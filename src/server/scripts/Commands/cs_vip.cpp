@@ -998,11 +998,7 @@ public:
 
 			// stop flight if need
 			if (player->IsInFlight())
-			{
-				player->GetMotionMaster()->MovementExpired();
-				player->CleanupAfterTaxiFlight();
-			}
-			// save only in non-flight case
+                player->FinishTaxiFlight();
 			else
 				player->SaveRecallPosition();
 			// to point to see at target with same orientation

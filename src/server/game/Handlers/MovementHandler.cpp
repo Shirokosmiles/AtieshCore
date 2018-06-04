@@ -133,23 +133,21 @@ void WorldSession::HandleMoveWorldportAck()
     GetPlayer()->SendInitialPacketsAfterAddToMap();
 
     // flight fast teleport case
-    if (GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
+    if (GetPlayer()->IsInFlight())
     {
         if (!_player->InBattleground())
         {
             // short preparations to continue flight
-            MovementGenerator* movementGenerator = GetPlayer()->GetMotionMaster()->top();
+            MovementGenerator* movementGenerator = GetPlayer()->GetMotionMaster()->GetCurrentMovementGenerator();
             movementGenerator->Initialize(GetPlayer());
             return;
         }
 
         // battleground state prepare, stop flight
-        GetPlayer()->GetMotionMaster()->MovementExpired();
-        GetPlayer()->CleanupAfterTaxiFlight();
+        GetPlayer()->FinishTaxiFlight();
     }
 
     // resurrect character at enter into instance where his corpse exist after add to map
-
     if (mEntry->IsDungeon() && !GetPlayer()->IsAlive())
     {
         if (GetPlayer()->GetCorpseLocation().GetMapId() == mEntry->MapID)
@@ -202,22 +200,6 @@ void WorldSession::HandleMoveWorldportAck()
                 _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
             InBattlefield = true;
         }
-    }
-    
-    // flight fast teleport case
-    if (GetPlayer()->IsInFlight())
-    {
-        if (!_player->InBattleground() && !InBattlefield)
-        {
-            // short preparations to continue flight
-            if (MovementGenerator* flight = GetPlayer()->GetMotionMaster()->GetMotionSlot(MOTION_SLOT_CONTROLLED))
-                flight->Initialize(GetPlayer());
-            return;
-        }
-        
-        // stop flight
-        GetPlayer()->GetMotionMaster()->Clear(MOTION_SLOT_CONTROLLED);
-        GetPlayer()->CleanupAfterTaxiFlight();
     }
 
     // honorless target

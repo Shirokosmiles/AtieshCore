@@ -654,7 +654,7 @@ void Pet::Update(uint32 diff)
                         if (tempspellTarget && !GetSpellHistory()->HasGlobalCooldown(spellInfo) && !GetSpellHistory()->HasCooldown(tempspell))
                         {
                             StopMoving();
-                            GetMotionMaster()->Clear(false);
+                            GetMotionMaster()->Clear();
                             GetMotionMaster()->MoveIdle();
 
                             GetCharmInfo()->SetIsCommandAttack(false);
@@ -701,7 +701,7 @@ void Pet::Update(uint32 diff)
                     if (GetCharmerOrOwner()->GetVictim() && GetCharmerOrOwner()->GetVictim()->IsAlive())
                     {
                         StopMoving();
-                        GetMotionMaster()->Clear(false);
+                        GetMotionMaster()->Clear();
                         GetMotionMaster()->MoveIdle();
 
                         GetCharmInfo()->SetIsCommandAttack(true);
@@ -715,7 +715,7 @@ void Pet::Update(uint32 diff)
                     else
                     {
                         StopMoving();
-                        GetMotionMaster()->Clear(false);
+                        GetMotionMaster()->Clear();
                         GetMotionMaster()->MoveIdle();
 
                         GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
