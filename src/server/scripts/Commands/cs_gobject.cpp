@@ -604,6 +604,7 @@ public:
         uint32 entry = 0;
         uint32 type = 0;
         uint32 displayId = 0;
+        uint32 phasemask = 0;
         std::string name;
         uint32 lootId = 0;
 
@@ -647,6 +648,8 @@ public:
         type = gameObjectInfo->type;
         displayId = gameObjectInfo->displayId;
         name = gameObjectInfo->name;
+        if (thisGO)
+            phasemask = thisGO->GetPhaseMask();
         if (type == GAMEOBJECT_TYPE_CHEST)
             lootId = gameObjectInfo->chest.lootId;
         else if (type == GAMEOBJECT_TYPE_FISHINGHOLE)
@@ -669,6 +672,8 @@ public:
         handler->PSendSysMessage(LANG_GOINFO_TYPE, type);
         handler->PSendSysMessage(LANG_GOINFO_LOOTID, lootId);
         handler->PSendSysMessage(LANG_GOINFO_DISPLAYID, displayId);
+        if (thisGO)
+            handler->PSendSysMessage(LANG_GOINFO_PHASEMASK, phasemask);
 
         if (WorldObject* object = handler->getSelectedObject())
         {

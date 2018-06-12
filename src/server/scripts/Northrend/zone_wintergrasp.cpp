@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -23,7 +23,6 @@
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
-#include "GameObjectData.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -31,7 +30,6 @@
 #include "ScriptedGossip.h"
 #include "ScriptSystem.h"
 #include "SpellAuras.h"
-#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 #include "WorldSession.h"
@@ -345,17 +343,9 @@ class npc_wg_spirit_guide : public CreatureScript
 enum WGQueueMisc
 {
     SPELL_FROST_ARMOR = 12544,
-    GO_WINTERGRASP_PORTAL = 193772,
-    EVENT_CHECK_WINTERGRASP_DEFENDER = 1,
-    EVENT_FROST_ARMOR = 2,
+    EVENT_FROST_ARMOR = 1,
     NPC_MAGISTER_SURDIEL = 32170,
     NPC_MAGISTER_BRAEDIN = 32169
-};
-
-Position const PortalPos[] =
-{
-    { 5923.220215f, 570.825317f, 661.087219f, 6.132774f }, // Horde
-    { 5686.8f,      773.175f,    647.752f,    1.83259f  }  // Alliance
 };
 
 class npc_wg_queue : public CreatureScript
@@ -369,7 +359,6 @@ class npc_wg_queue : public CreatureScript
 
             void Reset() override
             {
-                _events.ScheduleEvent(EVENT_CHECK_WINTERGRASP_DEFENDER, Seconds(5));
                 _events.ScheduleEvent(EVENT_FROST_ARMOR, Seconds(1));
             }
 
@@ -379,7 +368,7 @@ class npc_wg_queue : public CreatureScript
                     player->PrepareQuestMenu(me->GetGUID());
 
                 Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP);
-                if (!wintergrasp)
+                if (!wintergrasp || !wintergrasp->IsEnabled())
                     return true;
 
                 if (wintergrasp->IsWarTime())
@@ -407,17 +396,14 @@ class npc_wg_queue : public CreatureScript
                 CloseGossipMenuFor(player);
 
                 Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP);
-                if (!wintergrasp)
+                if (!wintergrasp || !wintergrasp->IsEnabled())
                     return true;
 
                 if (wintergrasp->IsWarTime())
                     wintergrasp->InvitePlayerToWar(player);
-                else
-                {
-                    uint32 timer = wintergrasp->GetTimer() / 1000;
-                    if (timer < 15 * MINUTE)
-                        wintergrasp->InvitePlayerToQueue(player);
-                }
+                else if (wintergrasp->GetTimer() < 15 * MINUTE * IN_MILLISECONDS)
+                    wintergrasp->InvitePlayerToQueue(player);
+
                 return true;
             }
 
@@ -429,38 +415,6 @@ class npc_wg_queue : public CreatureScript
                 {
                     switch (eventId)
                     {
-                        case EVENT_CHECK_WINTERGRASP_DEFENDER:
-                            if (Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP))
-                            {
-                                if (wintergrasp->IsEnabled())
-                                {
-                                    if (GameObject* portal = me->FindNearestGameObject(GO_WINTERGRASP_PORTAL, 25.f))
-                                    {
-                                        if ((wintergrasp->GetDefenderTeam() == TEAM_HORDE && me->GetEntry() == NPC_MAGISTER_BRAEDIN) || (wintergrasp->GetDefenderTeam() == TEAM_ALLIANCE && me->GetEntry() == NPC_MAGISTER_SURDIEL))
-                                            portal->Delete();
-                                    }
-                                    else
-                                    {
-                                        if (wintergrasp->GetDefenderTeam() == TEAM_ALLIANCE && me->GetEntry() == NPC_MAGISTER_BRAEDIN)
-                                            me->SummonGameObject(GO_WINTERGRASP_PORTAL, PortalPos[1], QuaternionData(), 1000);
-                                        else if (wintergrasp->GetDefenderTeam() == TEAM_HORDE && me->GetEntry() == NPC_MAGISTER_SURDIEL)
-                                            me->SummonGameObject(GO_WINTERGRASP_PORTAL, PortalPos[0], QuaternionData(), 1000);
-                                    }
-                                    _events.Repeat(Seconds(5));
-                                }
-                                else
-                                {
-                                    if (!me->FindNearestGameObject(GO_WINTERGRASP_PORTAL, 25.f))
-                                    {
-                                        if (me->GetEntry() == NPC_MAGISTER_BRAEDIN)
-                                            me->SummonGameObject(GO_WINTERGRASP_PORTAL, PortalPos[1], QuaternionData(), 1000);
-                                        else if (me->GetEntry() == NPC_MAGISTER_SURDIEL)
-                                            me->SummonGameObject(GO_WINTERGRASP_PORTAL, PortalPos[0], QuaternionData(), 1000);
-                                    }
-                                    _events.Repeat(Minutes(5));
-                                }
-                            }
-                            break;
                         case EVENT_FROST_ARMOR:
                             DoCastSelf(SPELL_FROST_ARMOR);
                             _events.Repeat(Minutes(3));
@@ -549,7 +503,7 @@ class npc_wg_give_promotion_credit : public CreatureScript
                     return;
 
                 BattlefieldWintergrasp* wintergrasp = static_cast<BattlefieldWintergrasp*>(sBattlefieldMgr->GetBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP));
-                if (!wintergrasp)
+                if (!wintergrasp || !wintergrasp->IsEnabled())
                     return;
 
                 wintergrasp->HandlePromotion(killer->ToPlayer(), me);
@@ -671,7 +625,7 @@ class spell_wintergrasp_defender_teleport : public SpellScriptLoader
                 {
                     if (Player* target = GetExplTargetUnit()->ToPlayer())
                         // check if we are in Wintergrasp at all, SotA uses same teleport spells
-                        if ((target->GetZoneId() == 4197 && target->GetTeamId() != wintergrasp->GetDefenderTeam()) || target->HasAura(SPELL_WINTERGRASP_TELEPORT_TRIGGER))
+                        if ((target->GetZoneId() == ZONEID_WINTERGRASP && target->GetTeamId() != wintergrasp->GetDefenderTeam()) || target->HasAura(SPELL_WINTERGRASP_TELEPORT_TRIGGER))
                             return SPELL_FAILED_BAD_TARGETS;
                 }
                 return SPELL_CAST_OK;
@@ -725,42 +679,14 @@ class spell_wintergrasp_tenacity_refresh : public AuraScript
 {
     PrepareAuraScript(spell_wintergrasp_tenacity_refresh);
 
-    bool Validate(SpellInfo const* spellInfo) override
+    void Refresh(AuraEffect* /*aurEff*/)
     {
-        uint32 triggeredSpellId = spellInfo->Effects[EFFECT_2].CalcValue();
-        return !triggeredSpellId || ValidateSpellInfo({ triggeredSpellId });
-    }
-
-    void Refresh(AuraEffect const* aurEff)
-    {
-        PreventDefaultAction();
-
-        if (uint32 triggeredSpellId = GetSpellInfo()->Effects[aurEff->GetEffIndex()].CalcValue())
-        {
-            int32 bp = 0;
-            if (AuraEffect const* healEffect = GetEffect(EFFECT_0))
-                bp = healEffect->GetAmount();
-
-            CastSpellExtraArgs args(aurEff);
-            args
-                .AddSpellMod(SPELLVALUE_BASE_POINT0, bp)
-                .AddSpellMod(SPELLVALUE_BASE_POINT1, bp);
-            GetTarget()->CastSpell(nullptr, triggeredSpellId, args);
-        }
-
-        RefreshDuration();
-    }
-
-    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-    {
-        if (uint32 triggeredSpellId = GetSpellInfo()->Effects[aurEff->GetEffIndex()].CalcValue())
-            GetTarget()->RemoveAurasDueToSpell(triggeredSpellId);
+        GetAura()->RefreshDuration();
     }
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_wintergrasp_tenacity_refresh::Refresh, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_wintergrasp_tenacity_refresh::OnRemove, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_wintergrasp_tenacity_refresh::Refresh, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 

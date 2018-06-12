@@ -1966,7 +1966,7 @@ class spell_gen_mount : public SpellScriptLoader
                     // check battlefield
                     Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(target->GetZoneId());
                     if (canFly && battlefield && !battlefield->CanFlyIn())
-                         canFly = false;
+                        canFly = false;
 
                     uint32 mount = 0;
                     switch (target->GetBaseSkillValue(SKILL_RIDING))

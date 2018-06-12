@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2018+ RustEmu Core <http://www.rustemu.org/>
+ * Copyright (C) 2008-2018 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -60,9 +61,9 @@ enum BattlefieldObjectiveStates
 
 enum BattlefieldSounds
 {
-    BATTLEFIELD_SOUND_HORDE_WINS = 8454,
+    BATTLEFIELD_SOUND_HORDE_WINS    = 8454,
     BATTLEFIELD_SOUND_ALLIANCE_WINS = 8455,
-    BATTLEFIELD_SOUND_START = 3439
+    BATTLEFIELD_SOUND_START         = 3439
 };
 
 enum BattlefieldTimers
@@ -133,8 +134,8 @@ class TC_GAME_API Battlefield : public ZoneScript
         bool AddOrSetPlayerToCorrectBfGroup(Player* player);
         void RemovePlayerFromResurrectQueue(ObjectGuid playerGUID);
         void SendAreaSpiritHealerQueryOpcode(Player* player, ObjectGuid guid);
-        Creature* SpawnCreature(uint32 entry, Position const& pos);
-        GameObject* SpawnGameObject(uint32 entry, Position const& pos, QuaternionData const& rot);
+        //Creature* SpawnCreature(uint32 entry, Position const& pos, uint32 phaseMask); // removed by RE as wrong way
+        GameObject* SpawnGameObject(uint32 entry, Position const& pos, uint32 phaseMask, QuaternionData const& rot);
         void HideCreature(Creature* creature);
         void ShowCreature(Creature* creature, bool aggressive);
         void DoPlaySoundToAll(uint32 soundId);
@@ -144,6 +145,10 @@ class TC_GAME_API Battlefield : public ZoneScript
         void BroadcastPacketToWar(WorldPacket& data) const;
         void AddCapturePoint(BattlefieldCapturePoint* capturePoint) { _capturePoints.push_back(capturePoint); }
         void TeamCastSpell(TeamId team, int32 spellId);
+
+        // SpawnGroups
+        //void SpawnGroupSpawn(uint32 groupId); // removed by RE as wrong way
+        //void SpawnGroupDespawn(uint32 groupId); // removed by RE as wrong way
 
         bool IsEnabled() const { return _enabled; }
         bool IsWarTime() const { return _active; }
@@ -179,7 +184,7 @@ class TC_GAME_API Battlefield : public ZoneScript
         GuidUnorderedSet _players[PVP_TEAMS_COUNT];
         GuidUnorderedSet _playersInWar[PVP_TEAMS_COUNT];
         GuidUnorderedSet _groups[PVP_TEAMS_COUNT]; // contains the two different raid groups
-        GuidVector _playerQueue[PVP_TEAMS_COUNT];
+        GuidDeque _playerQueue[PVP_TEAMS_COUNT];
         PlayerTimerMap _invitedPlayers[PVP_TEAMS_COUNT];
         PlayerTimerMap _playersToKick[PVP_TEAMS_COUNT];
         std::vector<uint32> _data;

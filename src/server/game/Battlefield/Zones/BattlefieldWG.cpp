@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2018+ RustEmu Core <http://www.rustemu.org/>
+ * Copyright (C) 2008-2018 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -395,8 +396,6 @@ bool BattlefieldWintergrasp::SetupBattlefield()
 
     UpdateVehicleCounter(true);
 
-    OnBattleStart();
-
     return true;
 }
 
@@ -430,14 +429,47 @@ void BattlefieldWintergrasp::OnBattleStart()
         relic->UpdateObjectVisibility(true);
     }
 
+    // rebuild
+    for (WintergraspBuilding* building : _buildingSet)
+        building->Rebuild();
+
+    // update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
+    for (WintergraspWorkshop* workshop : _workshopSet)
+        workshop->UpdateForBattle();
+
     // update keep cannons visibility and faction
-    for (ObjectGuid cannonGuid : _keepCannonList)
+    uint32 newadefensefaction = GetDefenderTeam() == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC_WG : FACTION_HORDE_GENERIC_WG;
+    for (ObjectGuid kcannonGuid : _keepCannonList)
     {
-        if (Creature* creature = GetCreature(cannonGuid))
+        if (Creature* creature = GetCreature(kcannonGuid))
         {
             ShowCreature(creature, false);
-            creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
+            creature->SetFaction(newadefensefaction);
         }
+    }
+
+    // update attack cannons visibility and faction
+    uint32 newattackfaction = GetAttackerTeam() == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC_WG : FACTION_HORDE_GENERIC_WG;
+    for (ObjectGuid acannonGuid : _attackCannonList)
+    {
+        if (Creature* creature = GetCreature(acannonGuid))
+        {
+            ShowCreature(creature, false);            
+            creature->SetFaction(newattackfaction);
+        }
+    }
+
+    TeamId cteam = GetAttackerTeam();
+    for (ObjectGuid guid : _creatureList[GetOtherTeam(cteam)])
+    {
+        if (Creature* creature = GetCreature(guid))
+            HideCreature(creature);
+    }
+
+    for (ObjectGuid guid : _creatureList[cteam])
+    {
+        if (Creature* creature = GetCreature(guid))
+            ShowCreature(creature, true);
     }
 
     // update keep teleports faction
@@ -447,18 +479,10 @@ void BattlefieldWintergrasp::OnBattleStart()
             go->SetFaction(WintergraspFaction[GetDefenderTeam()]);
     }
 
-    // rebuild
-    for (WintergraspBuilding* building : _buildingSet)
-        building->Rebuild();
-
     SetData(DATA_WINTERGRASP_BROKEN_TOWER_ATTACK, 0);
     SetData(DATA_WINTERGRASP_BROKEN_TOWER_DEFENCE, 0);
     SetData(DATA_WINTERGRASP_DAMAGED_TOWER_ATTACK, 0);
     SetData(DATA_WINTERGRASP_DAMAGED_TOWER_DEFENCE, 0);
-
-    // update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
-    for (WintergraspWorkshop* workshop : _workshopSet)
-        workshop->UpdateForBattle();
 
     SendInitWorldStatesToAll();
 
@@ -494,6 +518,26 @@ void BattlefieldWintergrasp::OnBattleEnd(bool endByTimer)
     {
         if (Creature* creature = GetCreature(cannonGuid))
             HideCreature(creature);
+    }
+
+    // update keep cannons visibility
+    for (ObjectGuid acannonGuid : _attackCannonList)
+    {
+        if (Creature* creature = GetCreature(acannonGuid))
+            HideCreature(creature);
+    }
+
+    TeamId cteam = GetDefenderTeam();
+    for (ObjectGuid guid : _creatureList[GetOtherTeam(cteam)])
+    {
+        if (Creature* creature = GetCreature(guid))
+            HideCreature(creature);
+    }
+
+    for (ObjectGuid guid : _creatureList[cteam])
+    {
+        if (Creature* creature = GetCreature(guid))
+            ShowCreature(creature, true);
     }
 
     // update keep teleports faction
@@ -559,8 +603,6 @@ void BattlefieldWintergrasp::OnBattleEnd(bool endByTimer)
                 if (creature->IsVehicle())
                     creature->DespawnOrUnsummon();
         }
-
-        _vehicleSet[team].clear();
     }
 
     if (!endByTimer)
@@ -670,24 +712,48 @@ void BattlefieldWintergrasp::OnCreatureCreate(Creature* creature)
             _stalkerGUID = creature->GetGUID();
             break;
         case NPC_WINTERGRASP_TOWER_CANNON:
-            if (creature->GetSpawnId() != 0)
+        {
+            bool attackcannon = false;
+            // try to get first already prepared link at GO
+            if (!GetGOwest())
             {
-                _keepCannonList.insert(creature->GetGUID());
-                if (IsWarTime() && IsEnabled())
-                {
-                    creature->SetVisible(true);
-                    creature->SetReactState(REACT_PASSIVE);
-                    creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
-                }
-                else
-                {
-                    creature->SetReactState(REACT_PASSIVE);
-                    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    creature->SetVisible(false);
-                }
+                if (GameObject* GOwest = GetGameObject(_westtowerGUID)) // if link are empty -> try to found a GO and set link again
+                    SetGOwest(GOwest);
             }
+
+            if (!GetGOsouth())
+            {
+                if (GameObject* GOsouth = GetGameObject(_southtowerGUID))
+                    SetGOwest(GOsouth);
+            }
+
+            if (!GetGOeast())
+            {
+                if (GameObject* GOeast = GetGameObject(_easttowerGUID))
+                    SetGOwest(GOeast);
+            }
+
+            //ASSERT(GOwest && GOsouth && GOeast); //not all towers are loading in one time (only near player =( )
+            if ((GetGOwest() && creature->GetDistance2d(GetGOwest()) <= 120.0f) || (GetGOsouth() && creature->GetDistance2d(GetGOsouth()) <= 120.0f) || (GetGOeast() && creature->GetDistance2d(GetGOeast()) <= 120.0f))
+            {
+                attackcannon = true;
+                uint32 newattackfaction = GetAttackerTeam() == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC_WG : FACTION_HORDE_GENERIC_WG;
+                creature->SetFaction(newattackfaction);
+                _attackCannonList.insert(creature->GetGUID()); // register cannon as attacker
+                //TC_LOG_ERROR("server", "WG attackCannon :  added");
+            }
+
+            if (!attackcannon)
+            {
+                _keepCannonList.insert(creature->GetGUID()); // register cannon as defender
+                uint32 newdefensefaction = GetDefenderTeam() == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC_WG : FACTION_HORDE_GENERIC_WG;
+                creature->SetFaction(newdefensefaction);
+                //TC_LOG_ERROR("server", "WG keepCannon :  added npc guid : %u, entry : %u, name %s", creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str());
+            }
+
+            creature->SetVisible(true);
             break;
+        }
         case NPC_DWARVEN_SPIRIT_GUIDE:
         case NPC_TAUNKA_SPIRIT_GUIDE:
         {
@@ -780,6 +846,45 @@ void BattlefieldWintergrasp::OnCreatureCreate(Creature* creature)
                         creature->SetFaction(creator->GetFaction());
             }
             break;
+        case NPC_WINTERGRASP_GUARD_HORDE:
+        case NPC_WINTERGRASP_GUARD_ALLIANCE:
+        {
+            // try to get first already prepared link at GO
+            if (!GetGOwest())
+            {
+                if (GameObject* GOwest = GetGameObject(_westtowerGUID)) // if link are empty -> try to found a GO and set link again
+                    SetGOwest(GOwest);
+            }
+
+            if (!GetGOsouth())
+            {
+                if (GameObject* GOsouth = GetGameObject(_southtowerGUID))
+                    SetGOwest(GOsouth);
+            }
+
+            if (!GetGOeast())
+            {
+                if (GameObject* GOeast = GetGameObject(_easttowerGUID))
+                    SetGOwest(GOeast);
+            }
+
+            //ASSERT(GOwest && GOsouth && GOeast); //not all towers are loading in one time (only near player =( )
+            if ((GetGOwest() && creature->GetDistance2d(GetGOwest()) <= 120.0f) || (GetGOsouth() && creature->GetDistance2d(GetGOsouth()) <= 120.0f) || (GetGOeast() && creature->GetDistance2d(GetGOeast()) <= 120.0f))
+            {
+                TeamId team = creature->GetEntry() == NPC_WINTERGRASP_GUARD_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE;
+                if (team == TEAM_ALLIANCE)
+                {
+                    _creatureList[TEAM_ALLIANCE].insert(creature->GetGUID());
+                    //TC_LOG_ERROR("server", "WG Guards :  added ALLIANCE npc guid : %u, entry : %u, name %s", creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str());
+                }
+                else if (team == TEAM_HORDE)
+                {
+                    _creatureList[TEAM_HORDE].insert(creature->GetGUID());
+                    //TC_LOG_ERROR("server", "WG Guards :  added HORDE npc guid : %u, entry : %u, name %s", creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str());
+                }
+            }
+            break;
+        }            
         default:
             break;
     }
@@ -788,6 +893,15 @@ void BattlefieldWintergrasp::OnCreatureCreate(Creature* creature)
 void BattlefieldWintergrasp::OnCreatureRemove(Creature* creature)
 {
     _keepCannonList.erase(creature->GetGUID());
+    _attackCannonList.erase(creature->GetGUID());
+
+    GuidUnorderedSet::iterator itr = std::find(_creatureList[TEAM_ALLIANCE].begin(), _creatureList[TEAM_ALLIANCE].end(), creature->GetGUID());
+    if (itr != _creatureList[TEAM_ALLIANCE].end())
+        _creatureList[TEAM_ALLIANCE].erase(creature->GetGUID());
+
+    itr = std::find(_creatureList[TEAM_HORDE].begin(), _creatureList[TEAM_HORDE].end(), creature->GetGUID());
+    if (itr != _creatureList[TEAM_HORDE].end())
+        _creatureList[TEAM_HORDE].erase(creature->GetGUID());
 
     for (WintergraspBuilding* building : _buildingSet)
         building->CleanRelatedObject(creature->GetGUID());
@@ -800,24 +914,17 @@ void BattlefieldWintergrasp::OnCreatureRemove(Creature* creature)
             case NPC_WINTERGRASP_SIEGE_ENGINE_HORDE:
             case NPC_WINTERGRASP_CATAPULT:
             case NPC_WINTERGRASP_DEMOLISHER:
-                if (IsWarTime() && creature->IsAlive())
+            {
+                for (uint32 team = 0; team < PVP_TEAMS_COUNT; ++team)
                 {
-                    uint8 team;
-                    if (creature->GetFaction() == WintergraspFaction[TEAM_ALLIANCE])
-                        team = TEAM_ALLIANCE;
-                    else if (creature->GetFaction() == WintergraspFaction[TEAM_HORDE])
-                        team = TEAM_HORDE;
-                    else
-                        return;
-
-                    _vehicleSet[team].erase(creature->GetGUID());
-                    if (team == TEAM_HORDE)
-                        UpdateData(DATA_WINTERGRASP_VEHICLE_HORDE, -1);
-                    else
-                        UpdateData(DATA_WINTERGRASP_VEHICLE_ALLIANCE, -1);
-                    UpdateVehicleCountWG();
-                    break;
+                    if (_vehicleSet[team].erase(creature->GetGUID()) != 0 && IsWarTime())
+                    {
+                        UpdateData(team == TEAM_HORDE ? DATA_WINTERGRASP_VEHICLE_HORDE : DATA_WINTERGRASP_VEHICLE_ALLIANCE, -1);
+                        UpdateVehicleCountWG();
+                    }
                 }
+                break;
+            }
             default:
                 break;
         }
@@ -829,6 +936,7 @@ void BattlefieldWintergrasp::OnGameObjectCreate(GameObject* gameObject)
     switch (gameObject->GetEntry())
     {
         case GO_WINTERGRASP_TITAN_S_RELIC:
+        {
             _titansRelicGUID = gameObject->GetGUID();
             if (!IsEnabled() || !IsWarTime())
             {
@@ -846,7 +954,9 @@ void BattlefieldWintergrasp::OnGameObjectCreate(GameObject* gameObject)
                     gameObject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
             }
             break;
+        }
         case GO_WINTERGRASP_KEEP_COLLISION_WALL:
+        {
             if (!IsEnabled())
             {
                 gameObject->SetGoState(GO_STATE_ACTIVE);
@@ -861,6 +971,7 @@ void BattlefieldWintergrasp::OnGameObjectCreate(GameObject* gameObject)
                 }
             }
             break;
+        }
         case GO_WINTERGRASP_VAULT_GATE:
             if (!IsEnabled())
                 gameObject->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
@@ -948,18 +1059,13 @@ void BattlefieldWintergrasp::OnGameObjectRemove(GameObject* gameObject)
 
 void BattlefieldWintergrasp::OnUnitDeath(Unit* unit)
 {
-    if (IsWarTime() && unit->IsVehicle())
+    if (unit->IsVehicle())
     {
         for (uint32 team = 0; team < PVP_TEAMS_COUNT; ++team)
         {
-            auto itr = _vehicleSet[team].find(unit->GetGUID());
-            if (itr != _vehicleSet[team].end())
+            if (_vehicleSet[team].erase(unit->GetGUID()) != 0 && IsWarTime())
             {
-                _vehicleSet[team].erase(itr);
-                if (team == TEAM_HORDE)
-                    UpdateData(DATA_WINTERGRASP_VEHICLE_HORDE, -1);
-                else
-                    UpdateData(DATA_WINTERGRASP_VEHICLE_ALLIANCE, -1);
+                UpdateData(team == TEAM_HORDE ? DATA_WINTERGRASP_VEHICLE_HORDE : DATA_WINTERGRASP_VEHICLE_ALLIANCE, -1);
                 UpdateVehicleCountWG();
             }
         }
@@ -1360,6 +1466,19 @@ void BattlefieldWintergrasp::SendSpellAreaUpdate(uint32 areaId)
     }
 }
 
+void BattlefieldWintergrasp::HideACannonsForTower(ObjectGuid guid)
+{
+    if (GameObject* tower = GetGameObject(guid))
+    {
+        for (ObjectGuid acannonGuid : _attackCannonList)
+        {
+            if (Creature* creature = GetCreature(acannonGuid))
+                if (creature->GetDistance2d(tower) <= 120.0f)
+                    HideCreature(creature);
+        }
+    }
+}
+
 WintergraspGraveyardId BattlefieldWintergrasp::GetSpiritGraveyardId(uint32 areaId) const
 {
     switch (areaId)
@@ -1521,13 +1640,22 @@ void WintergraspBuilding::Initialize(GameObject* gameObject)
             towerId = TOWERID_FORTRESS_NE;
             break;
         case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
+            _battlefield->SetGOwest(gameObject);
+            _battlefield->SetWestTower(gameObject->GetGUID());
             towerId = TOWERID_SHADOWSIGHT;
+            //TC_LOG_ERROR("server", "WintergraspBuilding :  GO_WINTERGRASP_SHADOWSIGHT_TOWER initialized");
             break;
         case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
+            _battlefield->SetGOsouth(gameObject);
+            _battlefield->SetSouthTower(gameObject->GetGUID());
             towerId = TOWERID_WINTER_S_EDGE;
+            //TC_LOG_ERROR("server", "WintergraspBuilding :  GO_WINTERGRASP_WINTER_S_EDGE_TOWER initialized");
             break;
         case GO_WINTERGRASP_FLAMEWATCH_TOWER:
+            _battlefield->SetGOeast(gameObject);
+            _battlefield->SetEastTower(gameObject->GetGUID());
             towerId = TOWERID_FLAMEWATCH;
+            //TC_LOG_ERROR("server", "WintergraspBuilding :  GO_WINTERGRASP_FLAMEWATCH_TOWER initialized");
             break;
         default:
             break;
@@ -1545,40 +1673,12 @@ void WintergraspBuilding::Initialize(GameObject* gameObject)
         {
             WintergraspGameObjectData const& gobData = AttackTowers[towerId - 4].GameObject[position];
             if (_gameObjectList[TEAM_HORDE][position].IsEmpty())
-                if (GameObject* goHorde = _battlefield->SpawnGameObject(gobData.HordeEntry, gobData.Location, gobData.Rotation))
+                if (GameObject* goHorde = _battlefield->SpawnGameObject(gobData.HordeEntry, gobData.Location, gameObject->GetPhaseMask(), gobData.Rotation))
                     _gameObjectList[TEAM_HORDE][position] = goHorde->GetGUID();
 
             if (_gameObjectList[TEAM_ALLIANCE][position].IsEmpty())
-                if (GameObject* goAlliance = _battlefield->SpawnGameObject(gobData.AllianceEntry, gobData.Location, gobData.Rotation))
+                if (GameObject* goAlliance = _battlefield->SpawnGameObject(gobData.AllianceEntry, gobData.Location, gameObject->GetPhaseMask(), gobData.Rotation))
                     _gameObjectList[TEAM_ALLIANCE][position] = goAlliance->GetGUID();
-        }
-
-        if (_creatureList[TEAM_HORDE].size() != AttackTowers[towerId - 4].CreatureBottom.size())
-            _creatureList[TEAM_HORDE].resize(AttackTowers[towerId - 4].CreatureBottom.size(), ObjectGuid::Empty);
-        if (_creatureList[TEAM_ALLIANCE].size() != AttackTowers[towerId - 4].CreatureBottom.size())
-            _creatureList[TEAM_ALLIANCE].resize(AttackTowers[towerId - 4].CreatureBottom.size(), ObjectGuid::Empty);
-
-        // Spawn associated NPCs
-        for (size_t position = 0; position < AttackTowers[towerId - 4].CreatureBottom.size(); ++position)
-        {
-            WintergraspObjectPositionData const& creatureData = AttackTowers[towerId - 4].CreatureBottom[position];
-            if (_creatureList[TEAM_HORDE][position].IsEmpty())
-            {
-                if (Creature* creature = _battlefield->SpawnCreature(creatureData.HordeEntry, creatureData.Location))
-                {
-                    _creatureList[TEAM_HORDE][position] = creature->GetGUID();
-                    creature->SetRespawnTime(2 * MINUTE);
-                }
-            }
-
-            if (_creatureList[TEAM_ALLIANCE][position].IsEmpty())
-            {
-                if (Creature* creature = _battlefield->SpawnCreature(creatureData.AllianceEntry, creatureData.Location))
-                {
-                    _creatureList[TEAM_ALLIANCE][position] = creature->GetGUID();
-                    creature->SetRespawnTime(2 * MINUTE);
-                }
-            }
         }
 
         UpdateCreatureAndGo();
@@ -1588,74 +1688,6 @@ void WintergraspBuilding::Initialize(GameObject* gameObject)
     {
         ASSERT(towerId < TOWERID_MAX);
         _info = &TowerData[towerId];
-
-        if (_bottomCannonList.size() != TowerCannon[towerId].TowerCannonBottom.size())
-            _bottomCannonList.resize(TowerCannon[towerId].TowerCannonBottom.size(), ObjectGuid::Empty);
-
-        // Spawn Turret bottom
-        for (size_t position = 0; position < TowerCannon[towerId].TowerCannonBottom.size(); position++)
-        {
-            Position const& turretPos = TowerCannon[towerId].TowerCannonBottom[position];
-            if (_bottomCannonList[position].IsEmpty())
-            {
-                if (Creature* turret = _battlefield->SpawnCreature(NPC_WINTERGRASP_TOWER_CANNON, turretPos))
-                {
-                    switch (gameObject->GetEntry())
-                    {
-                        case GO_WINTERGRASP_FORTRESS_TOWER_1:
-                        case GO_WINTERGRASP_FORTRESS_TOWER_2:
-                        case GO_WINTERGRASP_FORTRESS_TOWER_3:
-                        case GO_WINTERGRASP_FORTRESS_TOWER_4:
-                            turret->SetFaction(WintergraspFaction[_battlefield->GetDefenderTeam()]);
-                            break;
-                        case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
-                        case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
-                        case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-                            turret->SetFaction(WintergraspFaction[_battlefield->GetAttackerTeam()]);
-                            break;
-                        default:
-                            break;
-                    }
-                    _bottomCannonList[position] = turret->GetGUID();
-                    turret->SetRespawnTime(2 * MINUTE);
-                }
-            }
-        }
-
-        if (_topCannonList.size() != TowerCannon[towerId].TurretTop.size())
-            _topCannonList.resize(TowerCannon[towerId].TurretTop.size(), ObjectGuid::Empty);
-
-        // Spawn Turret top
-        for (size_t position = 0; position < TowerCannon[towerId].TurretTop.size(); ++position)
-        {
-            Position const& turretPos = TowerCannon[towerId].TurretTop[position];
-            if (_topCannonList[position].IsEmpty())
-            {
-                if (Creature* turret = _battlefield->SpawnCreature(NPC_WINTERGRASP_TOWER_CANNON, turretPos))
-                {
-                    switch (gameObject->GetEntry())
-                    {
-                        case GO_WINTERGRASP_FORTRESS_TOWER_1:
-                        case GO_WINTERGRASP_FORTRESS_TOWER_2:
-                        case GO_WINTERGRASP_FORTRESS_TOWER_3:
-                        case GO_WINTERGRASP_FORTRESS_TOWER_4:
-                            turret->SetFaction(WintergraspFaction[_battlefield->GetDefenderTeam()]);
-                            break;
-                        case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
-                        case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
-                        case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-                            turret->SetFaction(WintergraspFaction[_battlefield->GetAttackerTeam()]);
-                            break;
-                        default:
-                            break;
-                    }
-                    _topCannonList[position] = turret->GetGUID();
-                    turret->SetRespawnTime(2 * MINUTE);
-                }
-            }
-        }
-
-        UpdateTurretAttack(!_battlefield->IsWarTime());
     }
 }
 
@@ -1704,9 +1736,6 @@ void WintergraspBuilding::Rebuild()
     {
         case OBJECTTYPE_TOWER:
             UpdateCreatureAndGo();
-        case OBJECTTYPE_KEEP_TOWER:
-            UpdateTurretAttack(false);
-            break;
         default:
             break;
     }
@@ -1722,11 +1751,8 @@ void WintergraspBuilding::Damaged()
     if (_info)
         _battlefield->SendWarning(_info->TextIds.Damaged);
 
-    for (ObjectGuid guid : _topCannonList)
-    {
-        if (Creature* creature = _battlefield->GetCreature(guid))
-            _battlefield->HideCreature(creature);
-    }
+    if (_battlefield->IsAttackTower(_buildGUID))
+        _battlefield->HideACannonsForTower(_buildGUID);
 
     if (_type == OBJECTTYPE_KEEP_TOWER)
         _battlefield->UpdateDamagedTowerCount(_battlefield->GetDefenderTeam());
@@ -1770,22 +1796,7 @@ void WintergraspBuilding::Destroyed()
 
 void WintergraspBuilding::CleanRelatedObject(ObjectGuid guid)
 {
-    if (guid.IsUnit())
-    {
-        GuidVector::iterator itr = std::find(_creatureList[TEAM_ALLIANCE].begin(), _creatureList[TEAM_ALLIANCE].end(), guid);
-        if (itr != _creatureList[TEAM_ALLIANCE].end())
-            *itr = ObjectGuid::Empty;
-        itr = std::find(_creatureList[TEAM_HORDE].begin(), _creatureList[TEAM_HORDE].end(), guid);
-        if (itr != _creatureList[TEAM_HORDE].end())
-            *itr = ObjectGuid::Empty;
-        itr = std::find(_bottomCannonList.begin(), _bottomCannonList.end(), guid);
-        if (itr != _bottomCannonList.end())
-            *itr = ObjectGuid::Empty;
-        itr = std::find(_topCannonList.begin(), _topCannonList.end(), guid);
-        if (itr != _topCannonList.end())
-            *itr = ObjectGuid::Empty;
-    }
-    else if (guid.IsGameObject())
+    if (guid.IsGameObject())
     {
         GuidVector::iterator itr = std::find(_gameObjectList[TEAM_ALLIANCE].begin(), _gameObjectList[TEAM_ALLIANCE].end(), guid);
         if (itr != _gameObjectList[TEAM_ALLIANCE].end())
@@ -1798,18 +1809,6 @@ void WintergraspBuilding::CleanRelatedObject(ObjectGuid guid)
 
 void WintergraspBuilding::UpdateCreatureAndGo()
 {
-    for (ObjectGuid guid : _creatureList[_battlefield->GetOtherTeam(_teamControl)])
-    {
-        if (Creature* creature = _battlefield->GetCreature(guid))
-            _battlefield->HideCreature(creature);
-    }
-
-    for (ObjectGuid guid : _creatureList[_teamControl])
-    {
-        if (Creature* creature = _battlefield->GetCreature(guid))
-            _battlefield->ShowCreature(creature, true);
-    }
-
     for (ObjectGuid guid : _gameObjectList[_battlefield->GetOtherTeam(_teamControl)])
     {
         if (GameObject* go = _battlefield->GetGameObject(guid))
@@ -1820,67 +1819,6 @@ void WintergraspBuilding::UpdateCreatureAndGo()
     {
         if (GameObject* go = _battlefield->GetGameObject(guid))
             go->SetRespawnTime(IsDestroyed() ? DAY : 1);
-    }
-}
-
-void WintergraspBuilding::UpdateTurretAttack(bool disable)
-{
-    for (ObjectGuid guid : _bottomCannonList)
-    {
-        if (Creature* creature = _battlefield->GetCreature(guid))
-        {
-            if (disable || IsDestroyed())
-                _battlefield->HideCreature(creature);
-            else
-            {
-                _battlefield->ShowCreature(creature, false);
-                switch (_buildGUID.GetEntry())
-                {
-                    case GO_WINTERGRASP_FORTRESS_TOWER_1:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_2:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_3:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_4:
-                        creature->SetFaction(WintergraspFaction[_teamControl]);
-                        break;
-                    case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
-                    case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
-                    case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-                        creature->SetFaction(WintergraspFaction[_teamControl]);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-
-    for (ObjectGuid guid : _topCannonList)
-    {
-        if (Creature* creature = _battlefield->GetCreature(guid))
-        {
-            if (disable || IsDestroyed() || IsDamaged())
-                _battlefield->HideCreature(creature);
-            else
-            {
-                _battlefield->ShowCreature(creature, false);
-                switch (_buildGUID.GetEntry())
-                {
-                    case GO_WINTERGRASP_FORTRESS_TOWER_1:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_2:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_3:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_4:
-                        creature->SetFaction(WintergraspFaction[_teamControl]);
-                        break;
-                    case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
-                    case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
-                    case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-                        creature->SetFaction(WintergraspFaction[_teamControl]);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
     }
 }
 
@@ -1908,8 +1846,6 @@ void WintergraspBuilding::UpdateForNoBattle(bool initialize)
     {
         case OBJECTTYPE_TOWER:
             UpdateCreatureAndGo();
-        case OBJECTTYPE_KEEP_TOWER:
-            UpdateTurretAttack(true);
             break;
         default:
             break;

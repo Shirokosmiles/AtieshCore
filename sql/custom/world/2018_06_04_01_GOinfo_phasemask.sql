@@ -1,0 +1,4 @@
+-- LANG_GOINFO_PHASEMASK
+DELETE FROM `trinity_string` WHERE entry = 87;
+INSERT INTO `trinity_string` VALUES
+(87,'Phase: %u',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);

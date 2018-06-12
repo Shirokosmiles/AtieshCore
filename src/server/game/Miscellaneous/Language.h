@@ -117,7 +117,8 @@ enum TrinityStrings
     LANG_GOINFO_SIZE                      = 84,
     LANG_GOINFO_ADDON                     = 85,
     LANG_GOINFO_MODEL                     = 86,
-    // Free 87 - 95
+    LANG_GOINFO_PHASEMASK                 = 87,
+    // Free 88 - 95
 
 
     LANG_GUILD_RENAME_ALREADY_EXISTS      = 96,

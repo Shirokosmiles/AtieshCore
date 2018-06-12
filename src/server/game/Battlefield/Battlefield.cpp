@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2018+ RustEmu Core <http://www.rustemu.org/>
+ * Copyright (C) 2008-2018 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -267,14 +268,18 @@ void Battlefield::InvitePlayersInQueueToWar()
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
-        for (auto itr = _playerQueue[team].begin(); itr != _playerQueue[team].end(); itr = _playerQueue[team].erase(itr))
+        while (!_playerQueue[team].empty())
         {
-            if (Player* player = ObjectAccessor::FindConnectedPlayer(*itr))
+            ObjectGuid playerGuid = _playerQueue[team].front();
+            if (Player* player = ObjectAccessor::FindConnectedPlayer(playerGuid))
             {
                 if (!player || player->InArena() || player->GetBattleground() || player->getLevel() < _minPlayerLevel ||
                     _playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end() || // already in war
                     _invitedPlayers[player->GetTeamId()].find(player->GetGUID()) != _invitedPlayers[player->GetTeamId()].end()) // already invited
+                {
+                    _playerQueue[team].pop_front();
                     continue;
+                }
 
                 // vacant space
                 if (_playersInWar[player->GetTeamId()].size() + _invitedPlayers[player->GetTeamId()].size() >= _maxPlayerCount)
@@ -284,6 +289,7 @@ void Battlefield::InvitePlayersInQueueToWar()
                 _invitedPlayers[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime() + _acceptInviteTime;
                 player->GetSession()->SendBattlefieldInvitePlayerToWar(_battleId, _zoneId, _acceptInviteTime);
             }
+            _playerQueue[team].pop_front();
         }
     }
 }
@@ -398,15 +404,35 @@ void Battlefield::KickPlayer(Player* player)
     if (!player)
         return;
 
-    _playersToKick[player->GetTeamId()].erase(player->GetGUID());
-
     BFLeaveReason reason = BF_LEAVE_REASON_EXITED;
     if (player->getLevel() < _minPlayerLevel)
         reason = BF_LEAVE_REASON_LOW_LEVEL;
     player->GetSession()->SendBattlefieldLeaveMessage(_battleId, reason);
 
+    _invitedPlayers[player->GetTeamId()].erase(player->GetGUID());
+    _playersToKick[player->GetTeamId()].erase(player->GetGUID());
+
     if (player->GetMapId() == _mapId && player->GetZoneId() == _zoneId)
+    {
+        for (BattlefieldCapturePoint* capturePoint : _capturePoints)
+            capturePoint->HandlePlayerLeave(player);
+
+        if (_playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end())
+        {
+            _playersInWar[player->GetTeamId()].erase(player->GetGUID());
+            if (Group* group = player->GetGroup())
+                group->RemoveMember(player->GetGUID());
+
+            OnPlayerLeaveWar(player);
+        }
+
+        _players[player->GetTeamId()].erase(player->GetGUID());
+
+        RemovePlayerFromResurrectQueue(player->GetGUID());
+        OnPlayerLeaveZone(player);
+
         player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+    }
 }
 
 void Battlefield::PlayerAcceptsInviteToQueue(Player* player)
@@ -438,32 +464,10 @@ void Battlefield::PlayerAcceptsInviteToWar(Player* player)
 
 void Battlefield::PlayerLeavesQueue(Player* player, bool kick /*= false*/)
 {
-    for (BattlefieldCapturePoint* capturePoint : _capturePoints)
-        capturePoint->HandlePlayerLeave(player);
-
     // remove player from queue
     auto itr = std::find(_playerQueue[player->GetTeamId()].begin(), _playerQueue[player->GetTeamId()].end(), player->GetGUID());
     if (itr != _playerQueue[player->GetTeamId()].end())
         _playerQueue[player->GetTeamId()].erase(itr);
-
-    // already invited
-    if (_invitedPlayers[player->GetTeamId()].find(player->GetGUID()) != _invitedPlayers[player->GetTeamId()].end())
-        _invitedPlayers[player->GetTeamId()].erase(player->GetGUID());
-
-    if (_players[player->GetTeamId()].find(player->GetGUID()) != _players[player->GetTeamId()].end())
-        _players[player->GetTeamId()].erase(player->GetGUID());
-
-    // if the player is participating
-    if (_playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end())
-    {
-        _playersInWar[player->GetTeamId()].erase(player->GetGUID());
-        if (Group* group = player->GetGroup()) // Remove the player from the raid group
-            group->RemoveMember(player->GetGUID());        
-    }
-
-    RemovePlayerFromResurrectQueue(player->GetGUID());
-    OnPlayerLeaveWar(player);
-    OnPlayerLeaveZone(player);
 
     // kick or notify
     if (kick)
@@ -523,36 +527,36 @@ void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, ObjectGuid gui
     data << guid << time;
     player->SendDirectMessage(&data);
 }
-
-Creature* Battlefield::SpawnCreature(uint32 entry, Position const& pos)
+/*
+Creature* Battlefield::SpawnCreature(uint32 entry, Position const& pos, uint32 phaseMask)
 {
     if (!_map)
         return nullptr;
 
     Creature* creature = new Creature();
-    if (!creature->Create(_map->GenerateLowGuid<HighGuid::Unit>(), _map, PHASEMASK_NORMAL, entry, pos))
+    if (!creature->Create(_map->GenerateLowGuid<HighGuid::Unit>(), _map, phaseMask, entry, pos))
     {
         TC_LOG_ERROR("battlefield", "Battlefield::SpawnCreature: can't create creature entry %u", entry);
         delete creature;
         return nullptr;
     }
 
-    creature->SetHomePosition(pos);
-
-    // Add to world
     _map->LoadGrid(pos.GetPositionX(), pos.GetPositionY());
     _map->AddToMap(creature);
 
-    return creature;
-}
+    creature->SetHomePosition(pos);
+    creature->Relocate(pos);
 
-GameObject* Battlefield::SpawnGameObject(uint32 entry, Position const& pos, QuaternionData const& rot)
+    return creature;
+}*/
+
+GameObject* Battlefield::SpawnGameObject(uint32 entry, Position const& pos, uint32 phaseMask, QuaternionData const& rot)
 {
     if (!_map)
         return nullptr;
 
     GameObject* go = new GameObject();
-    if (!go->Create(_map->GenerateLowGuid<HighGuid::GameObject>(), entry, _map, PHASEMASK_NORMAL, pos, rot, 255, GO_STATE_READY))
+    if (!go->Create(_map->GenerateLowGuid<HighGuid::GameObject>(), entry, _map, phaseMask, pos, rot, 255, GO_STATE_READY))
     {
         TC_LOG_ERROR("battlefield", "Battlefield::SpawnGameObject: can't create gameobject entry %u", entry);
         delete go;
@@ -640,6 +644,18 @@ void Battlefield::TeamCastSpell(TeamId team, int32 spellId)
         }
     }
 }
+
+/*void Battlefield::SpawnGroupSpawn(uint32 groupId)
+{
+    TC_LOG_DEBUG("battlefield", "Battlefield::SpawnGroupSpawn: spawning SpawnGroup %u", groupId);
+    _map->SpawnGroupSpawn(groupId, true, true);
+}
+
+void Battlefield::SpawnGroupDespawn(uint32 groupId)
+{
+    TC_LOG_DEBUG("battlefield", "Battlefield::SpawnGroupDespawn: despawning SpawnGroup %u", groupId);
+    _map->SpawnGroupDespawn(groupId, true);
+}*/
 
 bool Battlefield::HasPlayer(Player* player) const
 {

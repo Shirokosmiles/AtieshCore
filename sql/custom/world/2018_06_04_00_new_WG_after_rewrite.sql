@@ -1,3 +1,6 @@
+SET @CGUID := 300000;
+SET @GGUID := 200000;
+
 -- Add new trinity strings
 DELETE FROM `trinity_string` WHERE `entry` BETWEEN 5083 AND 5092;
 INSERT INTO `trinity_string` (`entry`, `content_default`) VALUES
@@ -24,7 +27,6 @@ UPDATE `creature` SET `phaseMask`=64 WHERE `id`=30739;
 UPDATE `creature` SET `phaseMask`=192 WHERE `guid` IN (131279, 131278, 131276, 131277, 131275, 131274, 88392, 88391, 131272, 131273);
 UPDATE `creature` SET `phaseMask`=32 WHERE `guid` IN (88409, 88411, 88408, 88406, 88405, 88407, 88410);
 
-SET @CGUID = 300000;
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID AND @CGUID+81;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
 -- Alliance Keep Guards
@@ -123,7 +125,6 @@ DELETE FROM `creature_addon` WHERE `guid` IN (131281, 131280);
 -- Stalker texts
 UPDATE `creature_text` SET `CreatureID` = 27869, `comment` = 'Wintergrasp Detection Unit' WHERE `CreatureID` = 15214;
 
-SET @GGUID = 200000;
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @GGUID AND @GGUID+49;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
 -- Walls
