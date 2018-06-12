@@ -3418,11 +3418,13 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             {
                 case 29214: // Wrath of the Plaguebringer
                 case 34700: // Allergic Reaction
+                case 41914: // Parasitic Shadowfiend (Illidan)
+                case 41917: // Parasitic Shadowfiend (Illidan)
                 case 54836: // Wrath of the Plaguebringer
                 case 61987: // Avenging Wrath Marker
                 case 61988: // Divine Shield exclude aura
-                case 41914: // Parasitic Shadowfiend (Illidan)
-                case 41917: // Parasitic Shadowfiend (Illidan)
+                case 72410: // Rune of Blood, Saurfang, Icecrown Citadel
+                case 71204: // Touch of Insignificance, Lady Deathwhisper, Icecrown Citadel
                     return false;
                 case 30877: // Tag Murloc
                 case 61716: // Rabbit Costume
@@ -3483,7 +3485,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             }
             break;
         case SPELLFAMILY_DEATHKNIGHT:
-            if (spellInfo->SpellFamilyFlags[2] == 0x00000040) // Ebon Plague
+            if (spellInfo->SpellFamilyFlags[2] == 0x00000010) // Ebon Plague
                 return false;
             break;
         default:
@@ -3537,6 +3539,8 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
                 case SPELL_AURA_SCHOOL_HEAL_ABSORB:
                 case SPELL_AURA_CHANNEL_DEATH_ITEM:
                 case SPELL_AURA_EMPATHY:
+                case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:
+                case SPELL_AURA_PREVENTS_FLEEING:
                     return false;
                 default:
                     break;
