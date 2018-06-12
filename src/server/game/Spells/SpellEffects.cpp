@@ -4934,6 +4934,11 @@ void Spell::EffectPullTowards(SpellEffIndex effIndex)
     float speedXY = float(m_spellInfo->Effects[effIndex].MiscValue) * 0.1f;
     float speedZ = unitTarget->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
 
+    if (unitTarget->ToPlayer())
+    {
+        unitTarget->ToPlayer()->SetSkipOnePacketForASH(true);
+        unitTarget->ToPlayer()->SetUnderACKmount();
+    }
     unitTarget->GetMotionMaster()->MoveJump(pos, speedXY, speedZ);
 }
 
