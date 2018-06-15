@@ -352,6 +352,9 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 return;
             }
 
+            if (spellInfo->HasAreaAuraEffect()) // for pet aura target can be doesn't exist
+                unit_target = pet->ToUnit();
+
             if (!unit_target)
                 return;
 
