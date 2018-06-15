@@ -27035,7 +27035,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
             float tanangle = distance / diffz;
 
             if (movementInfo.pos.GetPositionZ() > GetPositionZ() &&
-                diffz > 1.3f &&
+                diffz > 1.87f &&
                 tanangle < 0.57735026919f) // 30 degrees
             {
                 TC_LOG_INFO("anticheat", "CheckMovementInfo :  Climb-Hack detected for Account id : %u, Player %s, diffZ = %f, distance = %f, angle = %f ", GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle);
