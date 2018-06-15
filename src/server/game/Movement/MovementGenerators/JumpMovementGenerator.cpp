@@ -22,8 +22,8 @@
 #include "MovementDefines.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
-#include "World.h"
 #include "JumpMovementGenerator.h"
+#include "World.h"
 
 //---- JumpMovementGenerator
 template<class T>
@@ -44,7 +44,7 @@ MovementGeneratorType JumpMovementGenerator<T>::GetMovementGeneratorType() const
 template<class T>
 void JumpMovementGenerator<T>::DoInitialize(T* owner)
 {
-    MovementGenerator::RemoveFlag(MOVEMENTGENERATOR_FLAG_INITIALIZATION_PENDING);
+    MovementGenerator::RemoveFlag(MOVEMENTGENERATOR_FLAG_INITIALIZATION_PENDING | MOVEMENTGENERATOR_FLAG_DEACTIVATED);
     MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_INITIALIZED);
 
     if (!owner)
@@ -69,16 +69,13 @@ void JumpMovementGenerator<T>::DoInitialize(T* owner)
 template<class T>
 void JumpMovementGenerator<T>::DoReset(T* owner)
 {
-    MovementGenerator::RemoveFlag(MOVEMENTGENERATOR_FLAG_TRANSITORY | MOVEMENTGENERATOR_FLAG_DEACTIVATED);
-
-    owner->StopMoving();
     DoInitialize(owner);
 }
 
 template<class T>
 bool JumpMovementGenerator<T>::DoUpdate(T* owner, uint32 /*diff*/)
 {
-    if (!owner)
+    if (!owner || MovementGenerator::HasFlag(MOVEMENTGENERATOR_FLAG_FINALIZED))
         return false;
 
     if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
@@ -88,7 +85,6 @@ bool JumpMovementGenerator<T>::DoUpdate(T* owner, uint32 /*diff*/)
 
     if (owner->movespline->Finalized())
     {
-        MovementGenerator::RemoveFlag(MOVEMENTGENERATOR_FLAG_TRANSITORY);
         MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_INFORM_ENABLED);
         return false;
     }
