@@ -320,10 +320,29 @@ class npc_pet_gen_mojo : public CreatureScript
         }
 };
 
+enum SoulTrader
+{
+    SAY_INRO = 0,        
+    SPELL_PROC_TRIGGER_ON_KILL_AURA = 50051
+};
+
+struct npc_pet_gen_soul_trader : public ScriptedAI
+ {
+    npc_pet_gen_soul_trader(Creature* creature) : ScriptedAI(creature) { }
+    
+    void JustAppeared() override
+    {
+        Talk(SAY_INRO);
+        if (Unit* owner = me->GetOwner())
+            owner->CastSpell(owner, SPELL_PROC_TRIGGER_ON_KILL_AURA, true);
+    }
+};
+
 void AddSC_generic_pet_scripts()
 {
     new npc_pet_gen_baby_blizzard_bear();
     new npc_pet_gen_egbert();
     new npc_pet_gen_pandaren_monk();
     new npc_pet_gen_mojo();
+    RegisterCreatureAI(npc_pet_gen_soul_trader);
 }
