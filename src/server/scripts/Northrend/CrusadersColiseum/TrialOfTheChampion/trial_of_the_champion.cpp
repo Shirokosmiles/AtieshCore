@@ -623,7 +623,7 @@ class npc_announcer_toc5 : public CreatureScript
 
         void SetArgentChampion()
         {
-           switch (RAND(BOSS_EADRIC, BOSS_PALETRESS))
+           switch (urand(BOSS_EADRIC, BOSS_PALETRESS))
            {
                 case BOSS_EADRIC:
                     uiArgentChampion = NPC_EADRIC;
@@ -775,7 +775,7 @@ class npc_announcer_toc5 : public CreatureScript
                                         if (plr && !plr->IsGameMaster() && plr->IsAlive())
                                         {
                                             // 50% chance for race cheering at you or faction cheering at you
-                                            uint32 spectatorEntry = RAND(SpectatorData[plr->getRace()], uint32(instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE ? NPC_SPECTATOR_ALLIANCE : NPC_SPECTATOR_HORDE));
+                                            uint32 spectatorEntry = urand(SpectatorData[plr->getRace()], uint32(instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE ? NPC_SPECTATOR_ALLIANCE : NPC_SPECTATOR_HORDE));
 
                                             if (Creature* spectator = me->FindNearestCreature(spectatorEntry, 200.0f))
                                                 spectator->AI()->Talk(EMOTE_SPECTATOR_CHEER, plr);

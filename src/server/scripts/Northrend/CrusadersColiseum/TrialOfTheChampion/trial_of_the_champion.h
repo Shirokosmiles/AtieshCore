@@ -19,6 +19,12 @@
 #ifndef TRIAL_OF_CHAMPION_H_
 #define TRIAL_OF_CHAMPION_H_
 
+#include "InstanceScript.h"
+#include "Map.h"
+#include "MotionMaster.h"
+#include "ObjectAccessor.h"
+#include "TemporarySummon.h"
+
 #define ToCScriptName "instance_trial_of_the_champion"
 #define DataHeader "TC"
 

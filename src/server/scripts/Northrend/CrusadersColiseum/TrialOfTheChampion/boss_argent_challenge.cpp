@@ -20,6 +20,7 @@
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellInfo.h"
 #include "trial_of_the_champion.h"
 
 enum Yells
