@@ -6591,9 +6591,6 @@ void Player::CheckAreaExploreAndOutdoor()
                     XP = std::max(minScaledXP, XP);
                 }
 
-                if (IsPremium())
-                    XP *= sWorld->getRate(RATE_VIP_XP_KILL); // Rate.XP.Kill.Premium
-
                 GiveXP(XP, nullptr);
                 SendExplorationExperience(areaId, XP);
             }
@@ -6966,9 +6963,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
         AddPct(honor_f, GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HONOR_GAIN_PCT));
     }
 
-    honor_f *= sWorld->getRate(RATE_HONOR);
-    if (IsPremium())
-        honor_f *= sWorld->getRate(RATE_VIP_HONOR); // sConfigMgr->GetFloatDefault("Rate.Honor.Premium", 1.0f);
+    honor_f *= IsPremium() ? sWorld->getRate(RATE_VIP_HONOR) : sWorld->getRate(RATE_HONOR);
     // Back to int now
     honor = int32(honor_f);
     // honor - for show honor points in log
@@ -15313,9 +15308,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     bool rewarded = IsQuestRewarded(quest_id) && !quest->IsDFQuest();
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(this)*sWorld->getRate(RATE_XP_QUEST));
-    if (IsPremium())
-        XP *= sWorld->getRate(RATE_VIP_XP_QUEST); // sConfigMgr->GetFloatDefault("Rate.XP.Quest.Premium", 1.0f);
+    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(this)*(IsPremium() ? sWorld->getRate(RATE_VIP_XP_QUEST) : sWorld->getRate(RATE_XP_QUEST)));
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     XP *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
 
