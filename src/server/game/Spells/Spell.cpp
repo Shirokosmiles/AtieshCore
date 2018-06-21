@@ -2885,6 +2885,7 @@ SpellMissInfo Spell::PreprocessSpellHit(Unit* unit, bool scaleAura, TargetInfo& 
                         return SPELL_MISS_EVADE;
                     else if (playerTarget->UnderBreakbleVanish())
                     {
+                        playerTarget->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
                         playerTarget->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
                         playerTarget->StopVanish();
                         return SPELL_MISS_EVADE;
