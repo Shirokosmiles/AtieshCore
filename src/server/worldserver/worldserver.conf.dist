@@ -35,9 +35,15 @@
 #    AUCTION HOUSE BOT BUYER CONFIG
 #    LOGGING SYSTEM SETTINGS
 #    PACKET SPOOF PROTECTION SETTINGS
+#    METRIC SETTINGS
+#    RUSTEMU CORE FEATURES CONFIG :
+#    CheckGameObjectLoS
+#    Vanish
+#    Mail External
+#    Channel.AllowedLfg
+#    Weekend.XP.Days
 #    MISC ANTI-CHEAT SETTINGS
 #    TRANSMOGRIFICATION CONFIG
-#    METRIC SETTINGS
 #    CROSSFACTION BG CONFIG
 #    GUILD LOOT CONFIG
 #    FIRST LOGIN ACC BONUS CONFIG
@@ -424,15 +430,6 @@ DetectPosCollision = 1
 #                     0 - (Disabled, may break some boss encounters)
 
 CheckGameObjectLoS = 1
-
-#
-#    CheckGameObjectLoS
-#        Description: Include M2 objects (trees etc.) in line of sight checks.
-#                     (only if vmaps are enabled)
-#        Default:     1 - (Enabled) - not blizzlike, but game looks really pretty
-#                     0 - (Disabled) - blizzlike, but you can cast throught trees...
-
-CheckM2ObjectLoS = 1
 
 #
 #    UpdateUptimeInterval
@@ -1144,21 +1141,13 @@ MinDiscoveredScaledXPRatio = 0
 
 MailDeliveryDelay = 3600
 
+#
 #    CleanOldMailTime
 #        Description: The hour at which old mails will be returned or deleted by the server.
 #                     This can be any integer number from 0 to 23. 20 will be 8pm server time.
 #        Default:     4 - 4am
 
 CleanOldMailTime = 4
-
-#
-#
-# Mail External 
-#
-#    
-
-External.Mail.Enable = 0
-External.Mail.Interval = 1
 
 #
 #    SkillChance.Prospecting
@@ -1305,14 +1294,6 @@ BirthdayTime = 1222964635
 #
 
 CacheDataQueries = 1
-
-#   VanishVisionTimer
-#        Description: Vanish Fade Delay. 
-#        Default:     500 - (0.5 sec)
-#
-#
-
-VanishVisionTimer = 500
 
 #
 ###################################################################################################
@@ -1775,7 +1756,6 @@ Creature.MovingStopTimeForPlayer = 180000
 #        Default:     50.000000
 
 MonsterSight = 50.000000
-GuarderSight = 50
 
 #
 ###################################################################################################
@@ -1959,14 +1939,6 @@ ChatFlood.MuteTime = 10
 #                     0 - (Disabled, Allow join to channel in any time)
 
 Channel.RestrictedLfg = 1
-
-#
-#    Channel.AllowedLfg
-#        Description: Allow access at LookupForGroup channel to characters without condition of LFG state.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-Channel.AllowedLfg = 0
 
 #
 #    ChatLevelReq.Channel
@@ -2710,7 +2682,7 @@ Battleground.ReportAFK = 3
 #         Default:     0 - (Disabled)
 #                      1 - (Enabled)
 
-Wintergrasp.Enable = 0
+Wintergrasp.Enable = 1
 
 #
 #     Wintergrasp.PlayerMax
@@ -3051,23 +3023,6 @@ AllowTrackBothResources = 0
 #                     1 - (Enabled)
 
 PlayerStart.AllReputation = 0
-
-#
-#    Weekend.XP.Days
-#        Description: Enables XP increase during last days of the week.
-#
-#        Default:     0 - (Disabled)
-#                     2 - (Weekend - Saturdays and Sundays)
-#                     7 - (Always active)
-
-Weekend.XP.Days = 0
-
-#
-#    Weekend.XP.Rate
-#        Description: Experience rates during weekend
-#        Default:     1 - (Weekend.XP.Rate, normal experience gain)
-
-Weekend.XP.Rate = 1
 
 #
 #    PlayerStart.AllSpells
@@ -3875,7 +3830,6 @@ Appender.Console=1,3,0
 Appender.Server=2,2,0,Server.log,w
 Appender.GM=2,2,15,gm/gm_%s.log
 Appender.DBErrors=2,2,0,DBErrors.log
-Appender.Anticheat=2,3,15,Anticheat.log
 
 #  Logger config values: Given a logger "name"
 #    Logger.name
@@ -3902,7 +3856,6 @@ Logger.scripts.hotswap=3,Console Server
 Logger.sql.sql=5,Console DBErrors
 Logger.sql.updates=3,Console Server
 Logger.mmaps=3,Server
-Logger.anticheat=3,Console Anticheat
 
 #Logger.achievement=3,Console Server
 #Logger.addon=3,Console Server
@@ -4009,6 +3962,124 @@ PacketSpoof.BanDuration = 86400
 ###################################################################################################
 
 ###################################################################################################
+# METRIC SETTINGS
+#
+# These settings control the statistics sent to the metric database (currently InfluxDB)
+#
+#    Metric.Enable
+#        Description: Enables statistics sent to the metric database.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Metric.Enable = 0
+
+#
+#    Metric.Interval
+#        Description: Interval between every batch of data sent in seconds
+#        Default:     10 seconds
+#
+
+Metric.Interval = 10
+
+#
+#    Metric.ConnectionInfo
+#        Description: Connection settings for metric database (currently InfluxDB).
+#        Example:     "hostname;port;database"
+#        Default:     "127.0.0.1;8086;worldserver"
+
+Metric.ConnectionInfo = "127.0.0.1;8086;worldserver"
+
+#
+#    Metric.OverallStatusInterval
+#        Description: Interval between every gathering of overall worldserver status data in seconds
+#        Default:     1 second
+#
+
+Metric.OverallStatusInterval = 1
+
+#
+###################################################################################################
+
+###################################################################################################
+#
+# RUSTEMU CORE FEATURES CONFIG
+#
+###################################################################################################
+
+###################################################################################################
+#    CheckGameObjectLoS
+#        Description: Include M2 objects (trees etc.) in line of sight checks.
+#                     (only if vmaps are enabled)
+#        Default:     1 - (Enabled) - not blizzlike, but game looks really pretty
+#                     0 - (Disabled) - blizzlike, but you can cast throught trees...
+
+CheckM2ObjectLoS = 1
+
+#
+###################################################################################################
+
+###################################################################################################
+#
+#   VanishVisionTimer
+#        Description: Vanish Fade Delay (vanish evade all spells without CC control in this time)
+#        Default:     500 - (0.5 sec)
+#
+
+VanishVisionTimer = 500
+
+#   VanishCCbreakTimer
+#        Description: Vanish Should evade CC spells too, when casted, but it's a little lime.
+#        Default:     150 - (0.15 sec)
+#
+
+VanishCCbreakTimer = 150
+
+#
+###################################################################################################
+
+###################################################################################################
+#
+# Mail External 
+#    
+
+External.Mail.Enable = 0
+External.Mail.Interval = 1
+
+#
+###################################################################################################
+
+###################################################################################################
+#    Channel.AllowedLfg
+#        Description: Allow access at LookupForGroup channel to characters without condition of LFG state.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Channel.AllowedLfg = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+#    Weekend.XP.Days
+#        Description: Enables XP increase during last days of the week.
+#
+#        Default:     0 - (Disabled)
+#                     2 - (Weekend - Saturdays and Sundays)
+#                     7 - (Always active)
+
+Weekend.XP.Days = 0
+
+#
+#    Weekend.XP.Rate
+#        Description: Experience rates during weekend
+#        Default:     1 - (Weekend.XP.Rate, normal experience gain)
+
+Weekend.XP.Rate = 1
+
+#
+###################################################################################################
+
+###################################################################################################
 # MISC ANTI-CHEAT SETTINGS
 #    AntiCheats.FlyHack
 #        Description: Enable AntiCheat.FlyHack
@@ -4046,6 +4117,10 @@ AntiCheats.FakeJumper.Enabled = 1
 #                     0 - (Disabled)
 
 AntiCheats.FakeFlyingmode.Enabled = 1
+
+# Logs
+Appender.Anticheat=2,3,15,Anticheat.log
+Logger.anticheat=3,Console Anticheat
 
 ###################################################################################################
 # Sanctions - Kicks
@@ -4289,45 +4364,6 @@ Transmogrification.SetNpcText = 65001
 
 Transmogrification.SetCostModifier = 3.0
 Transmogrification.SetCopperCost = 0
-
-#
-###################################################################################################
-
-###################################################################################################
-# METRIC SETTINGS
-#
-# These settings control the statistics sent to the metric database (currently InfluxDB)
-#
-#    Metric.Enable
-#        Description: Enables statistics sent to the metric database.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-Metric.Enable = 0
-
-#
-#    Metric.Interval
-#        Description: Interval between every batch of data sent in seconds
-#        Default:     10 seconds
-#
-
-Metric.Interval = 10
-
-#
-#    Metric.ConnectionInfo
-#        Description: Connection settings for metric database (currently InfluxDB).
-#        Example:     "hostname;port;database"
-#        Default:     "127.0.0.1;8086;worldserver"
-
-Metric.ConnectionInfo = "127.0.0.1;8086;worldserver"
-
-#
-#    Metric.OverallStatusInterval
-#        Description: Interval between every gathering of overall worldserver status data in seconds
-#        Default:     1 second
-#
-
-Metric.OverallStatusInterval = 1
 
 #
 ###################################################################################################

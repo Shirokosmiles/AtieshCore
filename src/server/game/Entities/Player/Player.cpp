@@ -266,6 +266,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_hostileReferenceCheckTimer = 0;
     m_drunkTimer = 0;
     m_vanishTimer = 0;
+    m_breakblevanishTimer = 0;
     m_premiumTimer = 0;
     m_flyhackTimer = 0;
     if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FLYHACK_ENABLED))
@@ -297,6 +298,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_WeaponProficiency = 0;
     m_ArmorProficiency = 0;
     m_visiblevanish = false;
+    m_breakablevanish = false;
     m_canParry = false;
     m_canBlock = false;
     m_canTitanGrip = false;
@@ -1286,6 +1288,17 @@ void Player::Update(uint32 p_time)
         }
         else
             m_vanishTimer -= p_time;
+    }
+
+    if (m_breakablevanish && m_breakblevanishTimer > 0)
+    {
+        if (p_time >= m_breakblevanishTimer)
+        {
+            m_breakablevanish = false;
+            m_breakblevanishTimer = 0;
+        }
+        else
+            m_breakblevanishTimer -= p_time;
     }
 
     if (m_vip && m_premiumTimer > 0)
@@ -24061,7 +24074,14 @@ void Player::UpdateAreaDependentAuras(uint32 newArea)
 void Player::SetVanishTimer()
 {
     m_vanishTimer = sWorld->getIntConfig(CONFIG_VANISH_VISION_TIMER);
+    m_breakblevanishTimer = sWorld->getIntConfig(CONFIG_VANISH_CC_BREAK_TIMER);
     m_visiblevanish = true;
+    m_breakablevanish = true;
+}
+
+void Player::StopVanish()
+{
+    m_vanishTimer = m_breakblevanishTimer;
 }
 
 void Player::SetPremiumStatus(bool vipstatus)

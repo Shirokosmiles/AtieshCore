@@ -1737,10 +1737,13 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 		bool CanEnterInInstanceOrRaidCustom() const { return m_customAccessInZone; }
 		void SetCanEnterInInstanceOrRaidCustom(bool access) { m_customAccessInZone = access; }
 
-		// Vanish can be visible near 0.3-0.4 sec after using
+		// Vanish can be visible near 0.3-0.4 sec after using. Also 0.15 sec vanish will evade CC too, but break vanish.
 		uint32 GetVanishTimer() const { return m_vanishTimer; }
+        uint32 GetBreakbleVanishTimer() const { return m_breakblevanishTimer; }
 		bool UnderVisibleVanish() const { return m_visiblevanish; }
+        bool UnderBreakbleVanish() const { return m_breakablevanish; }
 		void SetVanishTimer();
+        void StopVanish(); // set Fade Delay time = Breakable time, player will not under vanish, but this 0.15 sec can evade spells
 
         // VIP
         void SetPremiumStatus(bool vipstatus);
@@ -2429,6 +2432,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_areaUpdateId;
 
         uint32 m_vanishTimer;
+        uint32 m_breakblevanishTimer;
         uint32 m_premiumTimer;
         uint32 m_flyhackTimer;
         uint32 m_mountTimer;
@@ -2440,6 +2444,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_WeaponProficiency;
         uint32 m_ArmorProficiency;
         bool m_visiblevanish;
+        bool m_breakablevanish;
         bool m_canParry;
         bool m_canBlock;
         bool m_canTitanGrip;
