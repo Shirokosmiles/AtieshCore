@@ -887,7 +887,7 @@ public:
                 if (player->HasAura(45523))
                 {
                     player->PlayerTalkClass->SendCloseGossip();
-                    player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_ITEM_MSG_COOLDOWN));
+                    player->GetSession()->SendAreaTriggerMessage("%s", player->GetSession()->GetTrinityString(LANG_ITEM_MSG_COOLDOWN));
                 }
                 else
                 {
@@ -1160,7 +1160,7 @@ public:
             case 217:
                 if (player->HasAura(58712))
                 {
-                    player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_ITEM_MSG_COOLDOWN));
+                    player->GetSession()->SendAreaTriggerMessage("%s", player->GetSession()->GetTrinityString(LANG_ITEM_MSG_COOLDOWN));
                     CloseGossipMenuFor(player);
                 }
                 else if (!player->HasAura(26013))
@@ -1258,13 +1258,13 @@ public:
                 if (player->HasAura(45523))
                 {
                     player->PlayerTalkClass->SendCloseGossip();
-                    player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_ITEM_MSG_RESET_COOLDOWN));
+                    player->GetSession()->SendAreaTriggerMessage("%s", player->GetSession()->GetTrinityString(LANG_ITEM_MSG_RESET_COOLDOWN));
                 }
                 else
                 {
                     player->PlayerTalkClass->SendCloseGossip();
                     player->RemoveArenaSpellCooldowns(true);
-                    player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_ITEM_MSG_RESET_COOLDOWN));
+                    player->GetSession()->SendAreaTriggerMessage("%s", player->GetSession()->GetTrinityString(LANG_ITEM_MSG_RESET_COOLDOWN));
                     player->CastSpell(player, 45523, true);
                 }
                 break;
@@ -1509,7 +1509,7 @@ public:
         LearnSpells(player);
     }
 
-    void OnFreeTalentPointsChanged(Player* player, uint32 points)
+    void OnFreeTalentPointsChanged(Player* player, uint32 points) override
     {
         if (points < 1)
             LearnSpells(player);

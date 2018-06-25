@@ -35,9 +35,11 @@ EndContentData */
 #include "GameObjectAI.h"
 #include "MotionMaster.h"
 #include "Player.h"
+#include "ObjectAccessor.h""
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "TemporarySummon.h"
 
 enum DyingKodo
 {

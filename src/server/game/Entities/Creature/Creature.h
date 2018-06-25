@@ -148,7 +148,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool SetFeatherFall(bool enable, bool packetOnly = false) override;
         bool SetHover(bool enable, bool packetOnly = false) override;
 
-        float GetShieldBlockValuePctMod() const
+        float GetShieldBlockValuePctMod() const override
         {
             return 1.0f;
         }

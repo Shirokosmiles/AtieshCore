@@ -996,7 +996,7 @@ class TC_GAME_API Unit : public WorldObject
         int32 GetMechanicResistChance(SpellInfo const* spellInfo) const;
         bool CanUseAttackType(uint8 attacktype) const;
 
-        virtual float GetShieldBlockValuePctMod() const =0;
+        virtual float GetShieldBlockValuePctMod() const = 0;
         virtual uint32 GetShieldBlockValue() const = 0;
         uint32 GetShieldBlockValue(uint32 soft_cap, uint32 hard_cap) const;
         uint32 GetDefenseSkillValue(Unit const* target = nullptr) const;

@@ -255,7 +255,7 @@ public:
             }
         }
 
-        void EnterEvadeMode(EvadeReason /*why*/)
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             std::list<Creature*> triggers;
             me->GetCreatureListWithEntryInGrid(triggers, NPC_WORLDTRIGGER_LARGE);
@@ -718,7 +718,7 @@ struct npc_hadronox_foeAI : public ScriptedAI
             _nextMovement = Movements(id+1);
     }
 
-    void EnterEvadeMode(EvadeReason /*why*/)
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         me->DespawnOrUnsummon();
     }

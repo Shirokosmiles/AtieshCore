@@ -1870,7 +1870,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         int32 CalculateCorpseReclaimDelay(bool load = false) const;
         void SendCorpseReclaimDelay(uint32 delay) const;
 
-        float GetShieldBlockValuePctMod() const;           // overwrite Unit version (virtual)
+        float GetShieldBlockValuePctMod() const override;            // overwrite Unit version (virtual)
         uint32 GetShieldBlockValue() const override;                 // overwrite Unit version (virtual)
         bool CanParry() const { return m_canParry; }
         void SetCanParry(bool value);
