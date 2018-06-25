@@ -35,7 +35,7 @@ EndContentData */
 #include "GameObjectAI.h"
 #include "MotionMaster.h"
 #include "Player.h"
-#include "ObjectAccessor.h""
+#include "ObjectAccessor.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
@@ -452,7 +452,7 @@ public:
             SummonsFollow();
         }
 
-        void SummonedCreatureDies(Creature* creature, Unit*)
+        void SummonedCreatureDies(Creature* creature, Unit*) override
         {
             if (creature->GetGUID() == summons[0])
                 summons[0] = ObjectGuid();
@@ -462,7 +462,7 @@ public:
                 summons[2] = ObjectGuid();
         }
 
-        void SummonedCreatureDespawn(Creature* creature)
+        void SummonedCreatureDespawn(Creature* creature) override
         {
             if (creature->GetGUID() == summons[0])
                 summons[0] = ObjectGuid();
