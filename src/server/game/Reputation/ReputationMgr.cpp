@@ -367,7 +367,8 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
         if (incremental)
         {
             // int32 *= float cause one point loss?
-            standing = int32(floor((float)standing * (_player->IsPremium() ? sWorld->getRate(RATE_VIP_REPUTATION) : sWorld->getRate(RATE_REPUTATION_GAIN)) + 0.5f));
+            float rate = _player->IsPremium() ? sWorld->getRate(RATE_VIP_REPUTATION) : sWorld->getRate(RATE_REPUTATION_GAIN);
+            standing = int32(floor((float)standing * rate + 0.5f));
             standing += itr->second.Standing + BaseRep;
         }
 
