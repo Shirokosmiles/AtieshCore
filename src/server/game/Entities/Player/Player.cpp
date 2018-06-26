@@ -6956,6 +6956,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, victim->getRace());
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaId());
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, victim);
+            RewardTitleForKills(GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS));
         }
         else
         {
@@ -24635,6 +24636,90 @@ void Player::SetTitle(CharTitlesEntry const* title, bool lost)
     data << uint32(title->bit_index);
     data << uint32(lost ? 0 : 1);                           // 1 - earned, 0 - lost
     SendDirectMessage(&data);
+}
+
+void Player::RewardTitleForRating(uint16 rating)
+{
+    uint32 title = 0;
+    if (rating >= 2400)
+        title = 9;
+    else if (rating >= 2200)
+        title = 8;
+    else if (rating >= 2000)
+        title = 7;
+    else if (rating >= 1900)
+        title = 6;
+    else if (rating >= 1800)
+        title = 5;
+    else if (rating >= 1700)
+        title = 4;
+    else if (rating >= 1600)
+        title = 3;
+    else if (rating >= 1500)
+        title = 2;
+    else if (rating >= 1400)
+        title = 1;
+
+    switch (title)
+    {
+        case 9: title = GetCFSTeam() == TEAM_ALLIANCE ? GRAND_MARSHAL : HIGH_WARLORD; break;
+        case 8: title = GetCFSTeam() == TEAM_ALLIANCE ? FIELD_MARSHAL : WARLORD; break;
+        case 7: title = GetCFSTeam() == TEAM_ALLIANCE ? MARSHAL : GENERAL; break;
+        case 6: title = GetCFSTeam() == TEAM_ALLIANCE ? COMMANDER : LIEUTENANT_GENERAL; break;
+        case 5: title = GetCFSTeam() == TEAM_ALLIANCE ? LIEUTENANT_COMMANDER : CHAMPION; break;
+        case 4: title = GetCFSTeam() == TEAM_ALLIANCE ? KNIGHT_CHAMPION : CENTURION; break;
+        case 3: title = GetCFSTeam() == TEAM_ALLIANCE ? KNIGHT_CAPTAIN : LEGIONNAIRE; break;
+        case 2: title = GetCFSTeam() == TEAM_ALLIANCE ? KNIGHT_LIEUTENANT : BLOOD_GUARD; break;
+        case 1: title = GetCFSTeam() == TEAM_ALLIANCE ? KNIGHT : STONE_GUARD; break;
+        default:
+            break;
+    }
+
+    if (!title)
+        return;
+
+    if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(title))
+    {
+        if (!HasTitle(titleEntry))
+            SetTitle(titleEntry);
+    }
+}
+
+void Player::RewardTitleForKills(uint32 kills)
+{
+    uint32 title = 0;
+    switch (kills)
+    {
+        case 50000: title = 6; break;
+        case 4000: title = 5; break;
+        case 2000: title = 4; break;
+        case 1000: title = 3; break;
+        case 500: title = 2; break;
+        case 100: title = 1; break;
+        default:
+            break;
+    }
+
+    switch (title)
+    {
+        case 6: title = GetCFSTeam() == TEAM_ALLIANCE ? OF_THE_ALLIANCE : OF_THE_HORDE; break;
+        case 5: title = GetCFSTeam() == TEAM_ALLIANCE ? SERGEANT_MAJOR : FIRST_SERGEANT; break;
+        case 4: title = GetCFSTeam() == TEAM_ALLIANCE ? MASTER_SERGEANT : SENIOR_SERGEANT; break;
+        case 3: title = GetCFSTeam() == TEAM_ALLIANCE ? SERGEANT : SERGEANT_H; break;
+        case 2: title = GetCFSTeam() == TEAM_ALLIANCE ? CORPORAL : GRUNT; break;
+        case 1: title = GetCFSTeam() == TEAM_ALLIANCE ? PRIVATE : SCOUT; break;
+        default:
+            break;
+    }
+
+    if (!title)
+        return;
+
+    if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(title))
+    {
+        if (!HasTitle(titleEntry))
+            SetTitle(titleEntry);
+    }
 }
 
 uint32 Player::GetRuneBaseCooldown(uint8 index)

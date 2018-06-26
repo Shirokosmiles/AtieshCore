@@ -864,6 +864,8 @@ void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 
             int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, true);
             itr->ModifyPersonalRating(player, mod, GetType());
 
+            player->RewardTitleForRating(itr->PersonalRating); // Reward player by old rank title for personal rating
+
             // update matchmaker rating
             itr->ModifyMatchmakerRating(MatchmakerRatingChange, GetSlot());
 

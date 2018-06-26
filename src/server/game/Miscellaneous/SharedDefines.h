@@ -61,6 +61,42 @@ enum Gender
     GENDER_NONE                        = 2
 };
 
+enum eRanks
+{
+    /* Alliance */
+    PRIVATE              = 1,
+    CORPORAL             = 2,
+    SERGEANT             = 3,
+    MASTER_SERGEANT      = 4,
+    SERGEANT_MAJOR       = 5,
+    KNIGHT               = 6,
+    KNIGHT_LIEUTENANT    = 7,
+    KNIGHT_CAPTAIN       = 8,
+    KNIGHT_CHAMPION      = 9,
+    LIEUTENANT_COMMANDER = 10,
+    COMMANDER            = 11,
+    MARSHAL              = 12,
+    FIELD_MARSHAL        = 13,
+    GRAND_MARSHAL        = 14,
+    OF_THE_ALLIANCE      = 126,
+  /* Horde */
+    SCOUT                = 15,
+    GRUNT                = 16,
+    SERGEANT_H           = 17,
+    SENIOR_SERGEANT      = 18,
+    FIRST_SERGEANT       = 19,
+    STONE_GUARD          = 20,
+    BLOOD_GUARD          = 21,
+    LEGIONNAIRE          = 22,
+    CENTURION            = 23,
+    CHAMPION             = 24,
+    LIEUTENANT_GENERAL   = 25,
+    GENERAL              = 26,
+    WARLORD              = 27,
+    HIGH_WARLORD         = 28,
+    OF_THE_HORDE         = 127
+};
+
 // Race value is index in ChrRaces.dbc
 enum Races
 {
