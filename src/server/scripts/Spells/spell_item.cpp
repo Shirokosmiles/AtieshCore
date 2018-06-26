@@ -1772,13 +1772,16 @@ class spell_item_shadowmourne : public AuraScript
     {
         if (GetTarget()->HasAura(SPELL_SHADOWMOURNE_CHAOS_BANE_BUFF)) // cant collect shards while under effect of Chaos Bane buff
             return false;
+        if (GetTarget()->HasAuraType(SPELL_AURA_MOD_DISARM))          // cant collect shards while under disarm effect
+            return false;
         return eventInfo.GetProcTarget() && eventInfo.GetProcTarget()->IsAlive();
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_SHADOWMOURNE_SOUL_FRAGMENT, aurEff);
+        if (!GetTarget()->GetSpellHistory()->HasCooldown(SPELL_SHADOWMOURNE_SOUL_FRAGMENT))
+            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOWMOURNE_SOUL_FRAGMENT, aurEff);
 
         // this can't be handled in AuraScript of SoulFragments because we need to know victim
         if (Aura* soulFragments = GetTarget()->GetAura(SPELL_SHADOWMOURNE_SOUL_FRAGMENT))
@@ -1787,6 +1790,7 @@ class spell_item_shadowmourne : public AuraScript
             {
                 GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE, aurEff);
                 soulFragments->Remove();
+                GetTarget()->GetSpellHistory()->AddCooldown(SPELL_SHADOWMOURNE_SOUL_FRAGMENT, 0, std::chrono::seconds(20));
             }
         }
     }
