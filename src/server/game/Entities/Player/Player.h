@@ -2214,6 +2214,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         Spell* m_spellModTakingSpell;
 
         float GetAverageItemLevel() const;
+        float GetGearScore() const;
         bool isDebugAreaTriggers;
 
         void ClearWhisperWhiteList() { WhisperList.clear(); }

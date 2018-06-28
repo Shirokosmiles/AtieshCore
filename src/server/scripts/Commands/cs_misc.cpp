@@ -1906,6 +1906,7 @@ public:
             std::string _hasvip = handler->GetTrinityString(LANG_ERROR);
             _hasvip = target->IsPremium() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
             handler->PSendSysMessage(LANG_PINFO_CHR_VIP_MODE, _hasvip.c_str());
+            handler->PSendSysMessage("GearScore : ", target->GetGearScore());
 
             if (target->IsPremium())
                 handler->PSendSysMessage(LANG_TARGETPLAYER_VIP_TIME_EXIST, (secsToTimeString(target->GetPremiumUnsetdate() - GameTime::GetGameTime(), false, false)).c_str());

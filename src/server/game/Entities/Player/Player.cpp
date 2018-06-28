@@ -26598,6 +26598,22 @@ float Player::GetAverageItemLevel() const
     return ((float)sum) / count;
 }
 
+float Player::GetGearScore() const
+{
+    float sum = 0;
+    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        // don't check tabard, ranged, offhand or shirt
+        if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_BODY)
+            continue;
+
+        if (m_items[i] && m_items[i]->GetTemplate())
+            sum += m_items[i]->GetTemplate()->GetItemLevelIncludingQuality();
+    }
+
+    return (float)sum;
+}
+
 void Player::_LoadInstanceTimeRestrictions(PreparedQueryResult result)
 {
     if (!result)
