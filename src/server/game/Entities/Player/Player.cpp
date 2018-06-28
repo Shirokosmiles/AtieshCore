@@ -24690,7 +24690,7 @@ void Player::RewardTitleForKills(uint32 kills)
     uint32 title = 0;
     switch (kills)
     {
-        case 50000: title = 6; break;
+        //case 50000: title = 6; break; - this rank working with achievment in 100k HK
         case 4000: title = 5; break;
         case 2000: title = 4; break;
         case 1000: title = 3; break;
@@ -24702,7 +24702,7 @@ void Player::RewardTitleForKills(uint32 kills)
 
     switch (title)
     {
-        case 6: title = GetCFSTeam() == TEAM_ALLIANCE ? OF_THE_ALLIANCE : OF_THE_HORDE; break;
+        //case 6: title = GetCFSTeam() == TEAM_ALLIANCE ? OF_THE_ALLIANCE : OF_THE_HORDE; break;
         case 5: title = GetCFSTeam() == TEAM_ALLIANCE ? SERGEANT_MAJOR : FIRST_SERGEANT; break;
         case 4: title = GetCFSTeam() == TEAM_ALLIANCE ? MASTER_SERGEANT : SENIOR_SERGEANT; break;
         case 3: title = GetCFSTeam() == TEAM_ALLIANCE ? SERGEANT : SERGEANT_H; break;
