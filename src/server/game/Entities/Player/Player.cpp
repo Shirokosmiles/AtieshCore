@@ -26617,20 +26617,96 @@ float Player::GetAverageItemLevel() const
     return ((float)sum) / count;
 }
 
-float Player::GetGearScore() const
+uint32 Player::GetGearScore() const
 {
-    float sum = 0;
+    uint8 level = getLevel();
+    uint8 R = 0;    // rare (uint)
+    float Q = 0.0f; // quility
+    float W = 0.0f; // slot cost - worth
+    float A = 0.0f; // coefficent A
+    float B = 0.0f; // coefficent B
+    float itemlevel = 0.0f;
+    uint32 itemGS = 0;
+    uint32 fullGS = 0;
     for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
-        // don't check tabard, ranged, offhand or shirt
-        if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_BODY)
-            continue;
+        if (i == EQUIPMENT_SLOT_HEAD || i == EQUIPMENT_SLOT_CHEST || i == EQUIPMENT_SLOT_LEGS || i == EQUIPMENT_SLOT_MAINHAND || i == EQUIPMENT_SLOT_OFFHAND)
+            W = 1.0f;
+        else if (i == EQUIPMENT_SLOT_SHOULDERS || i == EQUIPMENT_SLOT_WAIST || i == EQUIPMENT_SLOT_FEET || i == EQUIPMENT_SLOT_HANDS)
+            W = 0.75f;
+        else if (i == EQUIPMENT_SLOT_NECK || i == EQUIPMENT_SLOT_WRISTS || i == EQUIPMENT_SLOT_LEGS ||
+            i == EQUIPMENT_SLOT_FINGER1 || i == EQUIPMENT_SLOT_FINGER2 || i == EQUIPMENT_SLOT_TRINKET1 || i == EQUIPMENT_SLOT_TRINKET2 ||
+            i == EQUIPMENT_SLOT_BACK)
+            W = 0.5625f;
+        else if (i == EQUIPMENT_SLOT_RANGED)
+            W = 0.3164f;
+        else if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_BODY)
+            W = 0.0f;
 
         if (m_items[i] && m_items[i]->GetTemplate())
-            sum += m_items[i]->GetTemplate()->GetItemLevelIncludingQuality();
-    }
+        {
+            switch (m_items[i]->GetTemplate()->Quality)
+            {
+                case ITEM_QUALITY_POOR:
+                case ITEM_QUALITY_NORMAL:
+                    R = 2;
+                    Q = 0.005f;
+                    break;
+                case ITEM_QUALITY_UNCOMMON:
+                case ITEM_QUALITY_RARE:
+                    R = 2;
+                    Q = 1.0f;
+                    break;
+                case ITEM_QUALITY_EPIC:
+                    R = 4;
+                    Q = 1.0f;
+                    break;
+                case ITEM_QUALITY_LEGENDARY:
+                    R = 4;
+                    Q = 1.3f;
+                    break;
+                case ITEM_QUALITY_ARTIFACT: // idk about this
+                case ITEM_QUALITY_HEIRLOOM:
+                    R = 3;
+                    Q = 1.0f;
+                    break;
+            }
 
-    return (float)sum;
+            if (m_items[i]->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)
+                W = 2.0f;
+
+            itemlevel = m_items[i]->GetTemplate()->ItemLevel;
+            if (itemlevel > 120.0f)
+            {
+                switch (R)
+                {
+                    case 4: A = 91.45f; B = 0.6500f; break;
+                    case 3: A = 81.37f; B = 0.8125f; break;
+                    case 2: A = 73.00f; B = 1.0f; break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch (R)
+                {
+                    case 4: A = 26.0f; B = 1.2f; break;
+                    case 3: A = 0.75f; B = 1.8f; break;
+                    case 2: A = 8.0f; B = 2.0f; break;
+                    case 1: A = 0.0f; B = 1.2f; break;
+                    default:
+                        break;
+                }
+            }
+
+            itemGS = 1.8618 * W * Q * (itemlevel - A) / B;
+            fullGS += itemGS;
+            //TC_LOG_ERROR("server", "GetGearScore :  slot = %i, itemGS = %u", i, itemGS);
+        }
+    }
+    //TC_LOG_ERROR("server", "GetGearScore = %u", fullGS);
+    return fullGS;
 }
 
 void Player::_LoadInstanceTimeRestrictions(PreparedQueryResult result)
