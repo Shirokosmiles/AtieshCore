@@ -1182,6 +1182,7 @@ enum TrinityStrings
     LANG_GM_ANNOUNCE_JUMPER_FAKE          = 6622,  // Gagarin and others can set falling flag and move up as jump
     LANG_GM_ANNOUNCE_JUMPER_FLYING        = 6623,  // Hitchhiker's Hack and others can set fly unrestricted flag
     LANG_GM_ANNOUNCE_WALLCLIMB            = 6624,  // Wallclimb
+    LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL   = 6625,  // Movement under Controll (not restricted)
 
     // 11022 - 11109 free 
     // Vip Commands

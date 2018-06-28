@@ -1721,7 +1721,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool IsCanFlybyServer() const { return m_canfly; }
 		
 		bool UnderACKmount() const { return m_ACKmounted; }
+        bool UnderACKRootUpd() const { return m_rootUpd; }
 		void SetUnderACKmount();
+        void SetRootACKUpd(uint32 delay);
 
 		// should only be used by packet handlers to validate and apply incoming MovementInfos from clients. Do not use internally to modify m_movementInfo
 		void UpdateMovementInfo(MovementInfo const& movementInfo);
@@ -2439,7 +2441,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_premiumTimer;
         uint32 m_flyhackTimer;
         uint32 m_mountTimer;
+        uint32 m_rootUpdTimer;
         bool   m_ACKmounted;
+        bool   m_rootUpd;
 
         uint32 m_deathTimer;
         time_t m_deathExpireTime;

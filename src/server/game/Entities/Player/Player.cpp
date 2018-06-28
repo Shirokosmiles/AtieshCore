@@ -272,7 +272,9 @@ Player::Player(WorldSession* session): Unit(true)
     if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FLYHACK_ENABLED))
         m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
     m_mountTimer = 0;
+    m_rootUpdTimer = 0;
     m_ACKmounted = false;
+    m_rootUpd = false;
     m_deathTimer = 0;
     m_deathExpireTime = 0;
     m_skipOnePacketForASH = true;
@@ -1361,6 +1363,17 @@ void Player::Update(uint32 p_time)
         }
         else
             m_mountTimer -= p_time;
+    }
+
+    if (m_rootUpd && m_rootUpdTimer > 0)
+    {
+        if (p_time >= m_rootUpdTimer)
+        {
+            m_rootUpdTimer = 0;
+            m_rootUpd = false;
+        }
+        else
+            m_rootUpdTimer -= p_time;
     }
 
     if (m_timeSyncTimer > 0)
@@ -24100,6 +24113,12 @@ void Player::SetUnderACKmount()
     m_ACKmounted = true;
 }
 
+void Player::SetRootACKUpd(uint32 delay)
+{
+    m_rootUpdTimer = 500 + delay;
+    m_rootUpd = true;
+}
+
 uint32 Player::GetCorpseReclaimDelay(bool pvp) const
 {
     if (pvp)
@@ -27119,6 +27138,18 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
             return true;
 
+        Position npos = movementInfo.pos;
+        if (HasUnitState(UNIT_STATE_NOT_MOVE) && !UnderACKRootUpd())
+        {
+            bool unrestricted = npos.GetPositionX() != GetPositionX() || npos.GetPositionY() != GetPositionY();
+            if (unrestricted)
+            {
+                TC_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore controll Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+                sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, GetSession()->GetAccountId(), GetName().c_str());
+                return false;
+            }
+        }
+
         if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
             return true;
 
@@ -27140,7 +27171,6 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
             return true;
 
         float distance, movetime, speed, difftime, normaldistance, delay, delaysentrecieve, x, y;
-        Position npos = movementInfo.pos;
         distance = GetExactDist2d(npos);
 
         if (!jump && !CanFly() && !isSwimming())
