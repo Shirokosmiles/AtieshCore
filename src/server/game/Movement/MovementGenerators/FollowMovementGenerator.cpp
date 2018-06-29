@@ -155,10 +155,10 @@ bool FollowMovementGenerator::Update(Unit* owner, uint32 diff)
                     allowShortcut = true;
             }
 
-            bool transport = owner->GetTransport() || (owner->ToPet() && owner->ToPet()->GetCharmInfo()->IsOnTransport());
+            bool transport = owner->GetTransport();
+            bool success = _path->CalculatePath(x, y, z, allowShortcut);
             if (!transport)
             {
-                bool success = _path->CalculatePath(x, y, z, allowShortcut);
                 if (!success || (_path->GetPathType() & PATHFIND_NOPATH))
                 {
                     if (owner->GetOwner() && owner->GetOwner()->ToPlayer() && owner->GetOwner()->ToPlayer()->InArena()) // arena force destination for pet (arena nagrand)
@@ -172,7 +172,6 @@ bool FollowMovementGenerator::Update(Unit* owner, uint32 diff)
                     }
 
                     owner->StopMoving();
-                    return true;
                 }
             }
             else

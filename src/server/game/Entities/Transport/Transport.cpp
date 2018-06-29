@@ -255,7 +255,7 @@ void Transport::DelayedUpdate(uint32 /*diff*/)
     DelayedTeleportTransport();
 }
 
-void Transport::AddPassenger(WorldObject* passenger)
+void Transport::AddPassenger(WorldObject* passenger, bool skiprelocate)
 {
     if (!IsInWorld())
         return;
@@ -283,15 +283,18 @@ void Transport::AddPassenger(WorldObject* passenger)
                     crt->SetHomePosition(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
                     crt->SetTransportHomePosition(x, y, z, o);
 
-                    if (crt->IsPet())
+                    if (!skiprelocate)
                     {
-                        if (crt->GetVictim())
-                            GetMap()->CreatureRelocation(crt, crt->GetVictim()->GetPositionX(), crt->GetVictim()->GetPositionY(), crt->GetVictim()->GetPositionZ() + crt->GetVictim()->GetCollisionHeight(), crt->GetVictim()->GetOrientation());
-                        else
-                            GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + owner->GetCollisionHeight(), owner->GetOrientation());
+                        if (crt->IsPet())
+                        {
+                            if (crt->GetVictim())
+                                GetMap()->CreatureRelocation(crt, crt->GetVictim()->GetPositionX(), crt->GetVictim()->GetPositionY(), crt->GetVictim()->GetPositionZ() + crt->GetVictim()->GetCollisionHeight(), crt->GetVictim()->GetOrientation());
+                            else
+                                GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + owner->GetCollisionHeight(), owner->GetOrientation());
+                        }
+                        else if (crt->IsTotem())
+                            GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);
                     }
-                    else if (crt->IsTotem())
-                        GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);
 
                 }
 

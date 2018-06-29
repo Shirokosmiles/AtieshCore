@@ -160,6 +160,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
             switch (spellid)
             {
                 case COMMAND_STAY:                          //flat=1792  //STAY
+                {
                     pet->StopMoving();
                     pet->GetMotionMaster()->Clear();
                     pet->GetMotionMaster()->MoveIdle();
@@ -174,9 +175,26 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     if (pet->ToPet())
                         pet->ToPet()->ClearCastWhenWillAvailable();
                     break;
+                }
                 case COMMAND_FOLLOW:                        //spellid=1792  //FOLLOW
+                {
                     pet->AttackStop();
                     pet->InterruptNonMeleeSpells(false);
+                    if (pet->ToPet())
+                        pet->ToPet()->ClearCastWhenWillAvailable();
+
+                    pet->StopMoving();
+                    pet->GetMotionMaster()->Clear();
+                    pet->GetMotionMaster()->MoveIdle();                    
+
+                    charmInfo->SetCommandState(COMMAND_FOLLOW);
+                    charmInfo->SetIsCommandAttack(false);
+                    charmInfo->SetIsAtStay(false);
+                    charmInfo->SetIsReturning(true);
+                    charmInfo->SetIsCommandFollow(true);
+                    charmInfo->SetIsFollowing(false);
+                    charmInfo->RemoveStayPosition();
+
                     if (Unit* owner = pet->GetOwner())
                     {
                         if (Transport* transportowner = owner->GetTransport())
@@ -187,33 +205,20 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                     pet->GetTransport()->RemovePassenger(pet);
 
                                 if (!transportowner->isPassenger(pet))
-                                    transportowner->AddPassenger(pet);
+                                    transportowner->AddPassenger(pet, true);
                             }
                             else
                             {
                                 if (!transportowner->isPassenger(pet))
-                                    transportowner->AddPassenger(pet);
+                                    transportowner->AddPassenger(pet, true);
                             }
                         }
                         else if (pet->GetTransport())
                             pet->GetTransport()->RemovePassenger(pet);
                     }
-
-                    pet->StopMoving();
-                    pet->GetMotionMaster()->Clear();
-                    pet->GetMotionMaster()->MoveIdle();
                     pet->GetMotionMaster()->MoveFollow(_player, PET_FOLLOW_DIST, pet->GetFollowAngle());
-                    if (pet->ToPet())
-                        pet->ToPet()->ClearCastWhenWillAvailable();
-                    charmInfo->SetCommandState(COMMAND_FOLLOW);
-
-                    charmInfo->SetIsCommandAttack(false);
-                    charmInfo->SetIsAtStay(false);
-                    charmInfo->SetIsReturning(true);
-                    charmInfo->SetIsCommandFollow(true);
-                    charmInfo->SetIsFollowing(false);
-                    charmInfo->RemoveStayPosition();
                     break;
+                }
                 case COMMAND_ATTACK:                        //spellid=1792  //ATTACK
                 {
                     // Can't attack if owner is pacified

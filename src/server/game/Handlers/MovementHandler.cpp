@@ -360,23 +360,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
                 {
                     transport->AddPassenger(plrMover);
-                    if (crMover && !transport->isPassenger(crMover))
+                    if (crMover)
                     {
-                        if (crMover->GetVictim() && crMover->IsInCombatWith(crMover->GetVictim()))
+                        if (!crMover->GetVictim()) // if pet is not in combat
                         {
-                            if (Transport* transportvictim = crMover->GetVictim()->GetTransport())
-                            {
-                                if (crMover->GetTransport() && crMover->GetTransport()->GetGUID() != transportvictim->GetGUID())
-                                {
-                                    crMover->GetTransport()->RemovePassenger(crMover);
-                                    if (!transportvictim->isPassenger(crMover))
-                                        transportvictim->AddPassenger(crMover);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (crMover->GetTransport()) // remove pet from transport if owner hasn't transport but pet has (it's strange, but keep this safe check)
+                            if (crMover->GetTransport() && !transport->isPassenger(crMover)) // remove pet from another transport, if exist
                                 crMover->GetTransport()->RemovePassenger(crMover);
 
                             if (!transport->isPassenger(crMover))
@@ -389,37 +377,21 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             {
                 plrMover->SetSkipOnePacketForASH(true);
                 plrMover->GetTransport()->RemovePassenger(plrMover);
-                if (crMover && crMover->GetTransport())
+                if (crMover)
                 {
-                    if (crMover->GetVictim() && crMover->IsInCombatWith(crMover->GetVictim()))
+                    if (!crMover->GetVictim()) // if pet is not in combat
                     {
-                        if (Transport* transportvictim = crMover->GetVictim()->GetTransport())
-                        {
-                            if (crMover->GetTransport() && crMover->GetTransport()->GetGUID() != transportvictim->GetGUID())
-                                crMover->GetTransport()->RemovePassenger(crMover);
-                        }
+                        if (crMover->GetTransport() && crMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
+                            crMover->GetTransport()->RemovePassenger(crMover);
                     }
-                    else
-                        crMover->GetTransport()->RemovePassenger(crMover);
-                }
+                }                
 
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
                 {
                     transport->AddPassenger(plrMover);
-                    if (crMover && !transport->isPassenger(crMover))
+                    if (crMover)
                     {
-                        if (crMover->GetVictim() && crMover->IsInCombatWith(crMover->GetVictim()))
-                        {
-                            if (Transport* transportvictim = crMover->GetVictim()->GetTransport())
-                            {
-                                if (crMover->GetTransport() && crMover->GetTransport()->GetGUID() != transportvictim->GetGUID())
-                                    crMover->GetTransport()->RemovePassenger(crMover);
-
-                                if (!transportvictim->isPassenger(crMover))
-                                    transportvictim->AddPassenger(crMover);
-                            }
-                        }
-                        else
+                        if (!crMover->GetVictim()) // if pet is not in combat
                         {
                             if (!transport->isPassenger(crMover))
                                 transport->AddPassenger(crMover);
@@ -442,8 +414,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     {
         plrMover->SetUnderACKmount(); // just for safe
         plrMover->GetTransport()->RemovePassenger(plrMover);
-        if (crMover && crMover->GetTransport() && crMover->GetTransport()->isPassenger(crMover))
-            crMover->GetTransport()->RemovePassenger(crMover);
+        if (crMover && crMover->GetTransport())
+        {
+            if (!crMover->GetVictim()) // if pet is not in combat
+                crMover->GetTransport()->RemovePassenger(crMover);
+        }
         movementInfo.transport.Reset();
     }
 
