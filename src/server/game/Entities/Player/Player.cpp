@@ -24115,7 +24115,7 @@ void Player::SetUnderACKmount()
 
 void Player::SetRootACKUpd(uint32 delay)
 {
-    m_rootUpdTimer = 500 + delay;
+    m_rootUpdTimer = 1500 + delay;
     m_rootUpd = true;
 }
 
