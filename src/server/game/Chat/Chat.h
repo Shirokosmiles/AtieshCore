@@ -127,6 +127,8 @@ class TC_GAME_API ChatHandler
         char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = nullptr);
         char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = nullptr);
 
+        uint32    extractKeyFromAllTypeLinks(char* text);
+
         // if args have single value then it return in arg2 and arg1 == nullptr
         void      extractOptFirstArg(char* args, char** arg1, char** arg2);
         char*     extractQuotedArg(char* args);
@@ -152,7 +154,7 @@ class TC_GAME_API ChatHandler
     protected:
         explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false) { }     // for CLI subclass
         static bool SetDataForCommandInTable(std::vector<ChatCommand>& table, char const* text, uint32 permission, std::string const& help, std::string const& fullcommand);
-        bool ExecuteCommandInTable(std::vector<ChatCommand> const& table, char const* text, std::string const& fullcmd);
+        bool ExecuteCommandInTable(std::vector<ChatCommand> const& table, char const* text, std::string const& fullcmd, std::string BaseCMD, std::string additionalsubnames, std::string fullvalue);
         bool ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd);
 
     private:

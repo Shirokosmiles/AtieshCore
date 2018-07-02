@@ -250,7 +250,7 @@ void ChatHandler::SendSysMessage(uint32 entry)
     SendSysMessage(GetTrinityString(entry));
 }
 
-bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, char const* text, std::string const& fullcmd)
+bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, char const* text, std::string const& fullcmd, std::string BaseCMD, std::string additionalsubnames, std::string fullvalue)
 {
     char const* oldtext = text;
     std::string cmd = "";
@@ -286,10 +286,17 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
         if (match)
             continue;
 
+        if (BaseCMD == "")
+            BaseCMD = table[i].Name;
+
         // select subcommand from child commands list
         if (!table[i].ChildCommands.empty())
         {
-            if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd))
+            // add in parameter new subcommand name if command right
+            if (!table[i].Handler && BaseCMD != table[i].Name)
+                additionalsubnames += table[i].Name + std::string(" ");
+
+            if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd, BaseCMD, additionalsubnames, fullvalue))
             {
                 if (m_session && !m_session->HasPermission(rbac::RBAC_PERM_COMMANDS_NOTIFY_COMMAND_NOT_FOUND_ERROR))
                     return false;
@@ -310,6 +317,8 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
             continue;
 
         SetSentErrorMessage(false);
+        if (fullvalue == "")
+            fullvalue = text;
         // table[i].Name == "" is special case: send original command to handler
         if ((table[i].Handler)(this, table[i].Name[0] != '\0' ? text : oldtext))
         {
@@ -340,19 +349,97 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                     (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
                     guid.ToString().c_str());
 
+                std::string value = text;
+                uint32 cmdvalueId = 0;
+                if (additionalsubnames != "") // if we have a subcommands
+                {
+                    if (value == "")
+                    {
+                        value = cmd;
+                        cmd = additionalsubnames;
+                    }
+                    else
+                        cmd = additionalsubnames + cmd;
+                }
+                else /**/ // if no subcommands
+                {                    
+                    bool switchcmdandvalue = false;
+
+                    if (BaseCMD != cmd)
+                    {
+                        bool solocommand = false;
+                        if (value == BaseCMD) // like .commands
+                        {
+                            value = "";
+                            solocommand = true;
+                        }
+
+                        if (!solocommand)
+                        {
+                            // |color|Hplayer:name|h[name]|h|r
+                            char const* p = fullvalue.data();
+                            cmdvalueId = extractKeyFromAllTypeLinks((char*)p);
+                            if (!cmdvalueId)
+                            {
+                                char const* cp = cmd.data();
+                                cmdvalueId = extractKeyFromAllTypeLinks((char*)cp);
+                                if (cmdvalueId)
+                                    switchcmdandvalue = true;
+                            }
+                        }
+                    }
+                    else
+                        cmd = "";
+
+                    if (switchcmdandvalue)
+                    {
+                        if (value == "")
+                        {
+                            value = cmd;
+                            cmd = "";
+                        }
+                        else
+                            cmd += " " + value;
+                    }
+                }
+
+                //if (BaseCMD == cmd) - additem or learn (but unlearn not!) - there are exist only basecmd and subcmd, but text = "", why - idk
+                if (!cmdvalueId)
+                {
+                    char const* fp = fullvalue.data();
+                    uint32 checkvalue = extractKeyFromAllTypeLinks((char*)fp);
+                    if (!checkvalue)
+                    {
+                        char const* fcp = cmd.data();
+                        checkvalue = extractKeyFromAllTypeLinks((char*)fcp);
+                        if (checkvalue)
+                            cmdvalueId = checkvalue;
+                    }
+                    else
+                        cmdvalueId = checkvalue;
+                }
+
+                if (!cmdvalueId)                       // it's Impossible, but...
+                    cmdvalueId = atoul(value.c_str()); // just safe recheck : cmdvalueId should be 100%, but ... IF smthing wrong -> just kepp in database uint32 (value - it's string), for anticrash
+
+                //TC_LOG_ERROR("server", "base cmd name = %s, parameter = %s, value = %s", BaseCMD, cmd, value);
+
                 // Database Logging
                 ObjectGuid sel_guid = player->GetTarget();
                 PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_LOG);
                 stmt->setString(0, player->GetName());
                 stmt->setUInt32(1, m_session->GetAccountId());
                 stmt->setString(2, fullcmd.c_str());
+                stmt->setString(3, BaseCMD.c_str());
+                stmt->setString(4, cmd.c_str());
+                stmt->setUInt32(5, cmdvalueId);
                 char position[96];
                 sprintf(position, "X: %f Y: %f Z: %f Map: %u", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId());
-                stmt->setString(3, position);
+                stmt->setString(6, position);
                 char selection[96];
                 sprintf(selection, "%s: %s (GUID: %u)", sel_guid.GetTypeName(), (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "", sel_guid.GetCounter());
-                stmt->setString(4, selection);
-                stmt->setInt32(5, int32(realm.Id.Realm));
+                stmt->setString(7, selection);
+                stmt->setInt32(8, int32(realm.Id.Realm));
                 LoginDatabase.Execute(stmt);
             }
         }
@@ -429,7 +516,7 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
 
 bool ChatHandler::_ParseCommands(char const* text)
 {
-    if (ExecuteCommandInTable(getCommandTable(), text, text))
+    if (ExecuteCommandInTable(getCommandTable(), text, text, "", "", ""))
         return true;
 
     // Pretend commands don't exist for regular players
@@ -898,6 +985,29 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
     strtok(nullptr, " ");                                      // skip link tail (to allow continue strtok(nullptr, s) use after return from function
     SendSysMessage(LANG_WRONG_LINK_TYPE);
     return nullptr;
+}
+
+static char const* const commandsKeys[] =
+{
+    "Hspell",                                               // normal spell
+    "Htalent",                                              // talent spell
+    "Henchant",                                             // enchanting recipe spell
+    "Htrade",                                               // profession/skill spell
+    "Hglyph",                                               // glyph
+    "Hitem",                                                // item (additem)
+    nullptr
+};
+
+uint32 ChatHandler::ChatHandler::extractKeyFromAllTypeLinks(char* text)
+{
+    int type = 0;
+    char* param1_str = nullptr;
+    char* idS = extractKeyFromLink(text, commandsKeys, &type, &param1_str);
+    if (!idS)
+        return 0;
+
+    uint32 id = atoul(idS);
+    return id;
 }
 
 GameObject* ChatHandler::GetNearbyGameObject()
