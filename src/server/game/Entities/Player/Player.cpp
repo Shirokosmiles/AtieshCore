@@ -27215,14 +27215,17 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
             return true;
 
         Position npos = movementInfo.pos;
-        if (HasUnitState(UNIT_STATE_NOT_MOVE) && !UnderACKRootUpd())
+        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_IGNORE_CONTROL_MOVEMENT_ENABLED))
         {
-            bool unrestricted = npos.GetPositionX() != GetPositionX() || npos.GetPositionY() != GetPositionY();
-            if (unrestricted)
+            if (HasUnitState(UNIT_STATE_NOT_MOVE) && !UnderACKRootUpd())
             {
-                TC_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore controll Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
-                sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, GetSession()->GetAccountId(), GetName().c_str());
-                return false;
+                bool unrestricted = npos.GetPositionX() != GetPositionX() || npos.GetPositionY() != GetPositionY();
+                if (unrestricted)
+                {
+                    TC_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore controll Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+                    sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, GetSession()->GetAccountId(), GetName().c_str());
+                    return false;
+                }
             }
         }
 

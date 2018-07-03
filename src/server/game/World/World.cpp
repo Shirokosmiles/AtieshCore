@@ -1393,6 +1393,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED]     = sConfigMgr->GetBoolDefault("AntiCheats.DoubleJump.Enabled", false);
     m_bool_configs[CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED]     = sConfigMgr->GetBoolDefault("AntiCheats.FakeJumper.Enabled", false);
     m_bool_configs[CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FakeFlyingmode.Enabled", false);
+    m_bool_configs[CONFIG_ANTICHEAT_IGNORE_CONTROL_MOVEMENT_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.IgnoreControlMovement.Enabled", false);
     // punishment
     m_bool_configs[CONFIG_AFH_KICK_ENABLED]            = sConfigMgr->GetBoolDefault("AntiCheats.FlyHack.Kick.Enabled", false);
     m_bool_configs[CONFIG_ASH_KICK_ENABLED]            = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Kick.Enabled", false);

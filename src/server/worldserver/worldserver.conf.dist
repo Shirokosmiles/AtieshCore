@@ -4127,6 +4127,13 @@ AntiCheats.FakeJumper.Enabled = 1
 
 AntiCheats.FakeFlyingmode.Enabled = 1
 
+#    AntiCheats.IgnoreControlMovement.Enabled
+#        Description: Enable AntiCheat.IgnoreControlMovement : when player in root state - client can't send a new movement packets.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+AntiCheats.IgnoreControlMovement.Enabled = 0
+
 # Logs
 Appender.Anticheat=2,3,15,Anticheat.log
 Logger.anticheat=3,Console Anticheat
