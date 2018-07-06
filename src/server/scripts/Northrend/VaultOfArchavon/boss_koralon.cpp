@@ -72,6 +72,13 @@ class boss_koralon : public CreatureScript
                 _JustEngagedWith();
             }
 
+            void JustDied(Unit* killer) override
+            {
+                _JustDied();
+                if (killer)
+                    killer->RaidInfoByMe(me);
+            }
+
             void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())

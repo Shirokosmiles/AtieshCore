@@ -2225,6 +2225,29 @@ void Group::BroadcastGroupUpdate(void)
     }
 }
 
+void Group::CalculateRolesAndAnnounce(int8& ppl, int8& lives, int8& tanks, int8 &healers, int8& damagers, uint32& gs)
+{
+    for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
+    {
+        Player* pp = ObjectAccessor::FindPlayer(citr->guid);
+        if (pp)
+        {
+            /*if (pp->IsHealerTalentSpec()) //TODO implement talentSpecs
+                ++healers;
+            else if (pp->IsTankTalentSpec())
+                ++tanks;
+            else*/
+                ++damagers;
+
+            ++ppl;
+            if (pp->IsAlive())
+                ++lives;
+
+            gs += pp->GetGearScore();
+        }
+    }
+}
+
 void Group::ResetMaxEnchantingLevel()
 {
     m_maxEnchantingLevel = 0;

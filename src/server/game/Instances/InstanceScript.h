@@ -242,10 +242,16 @@ class TC_GAME_API InstanceScript : public ZoneScript
         void UpdateEncounterStateForSpellCast(uint32 spellId, Unit* source);
 
         // Used only during loading
-        void SetCompletedEncountersMask(uint32 newMask) { completedEncounters = newMask; }
+        void SetCompletedEncountersMask(uint32 newMask, uint32 Count)
+        { 
+            completedEncounters = newMask; 
+            completedEncountersCount = Count;
+        }
 
         // Returns completed encounters mask for packets
         uint32 GetCompletedEncounterMask() const { return completedEncounters; }
+        // Returns completed encounters count
+        uint32 GetCompletedEncounterCount() const { return completedEncountersCount; }
 
         void SendEncounterUnit(uint32 type, Unit* unit = nullptr, uint8 param1 = 0, uint8 param2 = 0);
 
@@ -304,6 +310,7 @@ class TC_GAME_API InstanceScript : public ZoneScript
         ObjectInfoMap _gameObjectInfo;
         ObjectGuidMap _objectGuids;
         uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
+        uint32 completedEncountersCount;
         std::vector<InstanceSpawnGroupInfo> const* const _instanceSpawnGroups;
         std::unordered_set<uint32> _activatedAreaTriggers;
 

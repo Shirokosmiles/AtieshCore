@@ -63,6 +63,13 @@ struct boss_toravon : public BossAI
         _JustEngagedWith();
     }
 
+    void JustDied(Unit* killer) override
+    {
+        _JustDied();
+        if (killer)
+            killer->RaidInfoByMe(me);
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())

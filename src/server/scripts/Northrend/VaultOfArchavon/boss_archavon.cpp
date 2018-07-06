@@ -86,6 +86,13 @@ class boss_archavon : public CreatureScript
                 _JustEngagedWith();
             }
 
+            void JustDied(Unit* killer) override
+            {
+                _JustDied();
+                if (killer)
+                    killer->RaidInfoByMe(me);
+            }
+
             // Below UpdateAI may need review/debug.
             void UpdateAI(uint32 diff) override
             {

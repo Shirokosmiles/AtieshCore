@@ -1099,6 +1099,7 @@ class TC_GAME_API Unit : public WorldObject
         void SendPlaySpellImpact(ObjectGuid guid, uint32 id);
 
         void DeMorph();
+        void RaidInfoByMe(Unit* victim);
 
         void SendAttackStateUpdate(CalcDamageInfo* damageInfo);
         void SendAttackStateUpdate(uint32 HitInfo, Unit* target, uint8 SwingType, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, uint32 Resist, VictimState TargetState, uint32 BlockedAmount);

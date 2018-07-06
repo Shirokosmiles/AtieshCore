@@ -99,6 +99,13 @@ class boss_emalon : public CreatureScript
                     summoned->AI()->AttackStart(me->GetVictim());
             }
 
+            void JustDied(Unit* killer) override
+            {
+                _JustDied();
+                if (killer)
+                    killer->RaidInfoByMe(me);
+            }
+
             void JustEngagedWith(Unit* who) override
             {
                 if (!summons.empty())

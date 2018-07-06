@@ -1432,6 +1432,8 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_VIP_REPUTATION] = sConfigMgr->GetFloatDefault("Rate.Reputation.Gain.Premium", 1.0f);
     // Guild - broadcast loot
     m_bool_configs[CONFIG_LOOT_GUILD_ENABLED]                   = sConfigMgr->GetBoolDefault("Guild.LootBroadcast.Enabled", false);
+    // Raid info
+    m_bool_configs[CONFIG_RAID_INFO]                            = sConfigMgr->GetBoolDefault("RaidInfo.Enabled", false);
     // First Login Acc Bonus script
     m_bool_configs[CONFIG_FIRST_LOGIN_ACC_BONUS]                = sConfigMgr->GetBoolDefault("FLAB.Script.Enabled", false);
     m_int_configs[CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS]   = sConfigMgr->GetIntDefault("FLAB.Script.MaxChars", 0);

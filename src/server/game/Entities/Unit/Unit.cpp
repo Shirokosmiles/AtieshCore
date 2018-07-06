@@ -13725,3 +13725,105 @@ float Unit::GetCollisionHeight() const
     float const collisionHeight = scaleMod * modelData->CollisionHeight * modelData->Scale * displayInfo->scale;
     return collisionHeight == 0.0f ? DEFAULT_COLLISION_HEIGHT : collisionHeight;
 }
+
+void Unit::RaidInfoByMe(Unit* victim)
+{
+    if (!sWorld->getBoolConfig(CONFIG_RAID_INFO))
+        return;
+
+    if (!victim)
+        return;
+
+    Player* informer = nullptr;             // killer
+    InstanceScript* pInstance = GetInstanceScript();
+    switch (GetTypeId())
+    {
+        case TYPEID_PLAYER: informer = ToPlayer(); break;
+        case TYPEID_UNIT:
+        {
+            if (Unit* owner = GetCharmerOrOwner())
+                informer = owner->ToPlayer();
+            break;
+        }
+        default:
+            break;
+    }
+
+    if (!informer)
+        return;
+
+    Group* group = informer->GetGroup();
+    if (!group)                             // we always needs in group?
+        return;
+
+    // start collect info
+    int8 ppl = 0;
+    int8 lives = 0;
+    //roles
+    int8 tanks = 0;
+    int8 healers = 0;
+    int8 damagers = 0;
+    uint32 GS = 0;    
+
+    group->CalculateRolesAndAnnounce(ppl, lives, tanks, healers, damagers, GS);
+
+    uint32 AvgGS = GS / ppl;
+
+    std::string guild = "";
+    std::string mapmode = "";
+    uint32 Encounters;
+    uint32 allEncounters;
+    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+    {
+        if (gLeader->GetGuild())
+            guild += "|cffe6cc80from|r |cFF7CFC00[" + gLeader->GetGuildName() + "]|r";
+
+        if (Map* map = gLeader->GetMap())
+        {
+            if (map->IsRaid())
+            {
+                Difficulty diff = gLeader->GetRaidDifficulty();
+                switch (diff)
+                {
+                case 3: mapmode = "25MAN_HEROIC"; break;
+                case 2: mapmode = "10MAN_HEROIC"; break;
+                case 1: mapmode = "25MAN_NORMAL"; break;
+                case 0: mapmode = "10MAN_NORMAL"; break;
+                default:
+                    break;
+                }
+            }
+            else if (map->IsDungeon())
+            {
+                Difficulty diff = gLeader->GetDungeonDifficulty();
+                switch (diff)
+                {
+                case 2: mapmode = "DUNGEON_EPIC"; break;
+                case 1: mapmode = "DUNGEON_HEROIC"; break;
+                case 0: mapmode = "DUNGEON_NORMAL"; break;
+                default:
+                    break;
+                }
+            }
+        }
+
+        if (pInstance)
+        {
+            Encounters = pInstance->GetCompletedEncounterCount();
+            allEncounters = pInstance->GetEncounterCount();
+        }
+    }
+
+    std::string leader = group->GetLeaderName();
+    std::string groupOrRaid = "Group";
+    std::string instancename = victim->GetMap()->GetMapName();
+    if (group->isRaidGroup())
+        groupOrRaid = "Raid";
+    //'|cffff0000[RAID INFO]|r |cffe6cc80%s %s %s defeated by the %s with leader:|r |cFFDCDCDC%s|r %s|cffe6cc80. Players (%i / %i) is alive|r'
+    sWorld->SendWorldText(LANG_GROUP_TEXT_ANNOUNCE_1, instancename.c_str(), mapmode.c_str(), victim->GetName().c_str(), groupOrRaid.c_str(), leader.c_str(), guild.c_str(), lives, ppl);
+    //std::string 2 = "|cffff0000Members:|r |cffe6cc80Tanks -|r |cFF7CFC00%i|r|cffe6cc80, Healers -|r |cFF7CFC00%i|r|cffe6cc80, Damagers -|r |cFF7CFC00%i|r |cffe6cc80 (Avg GS: %f)|r";
+    sWorld->SendWorldText(LANG_GROUP_TEXT_ANNOUNCE_2, tanks, healers, damagers, AvgGS);
+    if (pInstance)
+        sWorld->SendWorldText(LANG_GROUP_TEXT_ANNOUNCE_3, Encounters, allEncounters);
+    //'|cffff0000Status:|r |cffe6cc80(%u / %u) boss completed|r'
+}

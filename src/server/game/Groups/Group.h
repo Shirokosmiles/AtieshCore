@@ -329,6 +329,7 @@ class TC_GAME_API Group
 
         // FG: evil hacks
         void BroadcastGroupUpdate(void);
+        void CalculateRolesAndAnnounce(int8& ppl, int8& lives, int8& tanks, int8 &healers, int8& damagers, uint32& gs);
 
     protected:
         bool _setMembersGroup(ObjectGuid guid, uint8 group);

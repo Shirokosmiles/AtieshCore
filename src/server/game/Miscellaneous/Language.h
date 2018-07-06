@@ -694,7 +694,7 @@ enum TrinityStrings
     LANG_ARENA_TESTING                    = 785,
     LANG_AUTO_ANN                         = 786,
     LANG_ANNOUNCE_COLOR                   = 787,
-    // 788-799 - free
+    // 791-799 - free
 
     // in game strings
     LANG_PET_INVALID_NAME                 = 800,
@@ -1183,6 +1183,11 @@ enum TrinityStrings
     LANG_GM_ANNOUNCE_JUMPER_FLYING        = 6623,  // Hitchhiker's Hack and others can set fly unrestricted flag
     LANG_GM_ANNOUNCE_WALLCLIMB            = 6624,  // Wallclimb
     LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL   = 6625,  // Movement under Controll (not restricted)
+
+    // Raid info
+    LANG_GROUP_TEXT_ANNOUNCE_1            = 788,
+    LANG_GROUP_TEXT_ANNOUNCE_2            = 789,
+    LANG_GROUP_TEXT_ANNOUNCE_3            = 790,
 
     // 11022 - 11109 free 
     // Vip Commands

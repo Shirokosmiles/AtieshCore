@@ -197,6 +197,7 @@ void InstanceSave::SaveToDB()
     // save instance data too
     std::string data;
     uint32 completedEncounters = 0;
+    uint32 completedEncountersCount = 0;
 
     Map* map = sMapMgr->FindMap(GetMapId(), m_instanceid);
     if (map)
@@ -206,6 +207,7 @@ void InstanceSave::SaveToDB()
         {
             data = instanceScript->GetSaveData();
             completedEncounters = instanceScript->GetCompletedEncounterMask();
+            completedEncountersCount = instanceScript->GetCompletedEncounterCount();
         }
     }
 
@@ -215,7 +217,8 @@ void InstanceSave::SaveToDB()
     stmt->setUInt64(2, uint64(GetResetTimeForDB()));
     stmt->setUInt8(3, uint8(GetDifficulty()));
     stmt->setUInt32(4, completedEncounters);
-    stmt->setString(5, data);
+    stmt->setUInt32(5, completedEncountersCount);
+    stmt->setString(6, data);
     CharacterDatabase.Execute(stmt);
 }
 

@@ -4473,3 +4473,18 @@ Rate.Reputation.Gain.Premium = 1
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+# RAID INFO SYSTEM CONFIG
+#
+#    RaidInfo.Enabled
+#        Description: Enable/Disable custom raid info system for world announce of killed bosses
+#        Default:     0 - disable
+#             1 - enabled
+#
+
+RaidInfo.Enabled = 0
+
+#
+###################################################################################################
