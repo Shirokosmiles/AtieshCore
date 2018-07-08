@@ -114,7 +114,9 @@ public:
 
         // показатель бонусов с системой определение кол.бонусов (бонус, бонуса, бонусов)
         AddGossipItemFor(player,GOSSIP_ICON_MONEY_BAG, getString(player->GetSession()->GetTrinityString(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 300000);
-
+        // магазин
+        AddGossipItemFor(player, 0, "|TInterface\\icons\\Ability_Mage_PotentSpirit:25:25:-15:0|tTrade Shop", GOSSIP_SENDER_MAIN, 299998);
+        
         if (player->GetCFSTeam() == ALLIANCE)       
             AddGossipItemFor(player, GOSSIP_ICON_TAXI, std::string("|TInterface/ICONS/Spell_Arcane_TeleportStormWind:25:25:-15:0|t ") + player->GetSession()->GetTrinityString(LANG_ITEM_STORMWIND), GOSSIP_SENDER_MAIN, 1277, player->GetSession()->GetTrinityString(LANG_ITEM_STORMWIND_SURE), 0, false);
         else
@@ -135,6 +137,34 @@ public:
         AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Inv_inscription_weaponscroll01:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 777);
         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
         return false;
+    }
+
+    void BuyItem(Player* player, uint32 itementry, uint32 coast)
+    {
+        if (!player)
+            return;
+
+        uint32 coins = player->GetCoins();
+        uint32 ostatok = coast - coins;
+
+        if (coins < coast)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_NOT_ENOUGH_COINS);
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_YOU_HAVE_COINS, coins);
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_YOU_NEED_COINS, ostatok);
+            CloseGossipMenuFor(player);
+        }
+        else
+        {
+            if (player->AddItem(itementry, 1))
+            {
+                ostatok = coins - coast;
+                player->SetCoins(ostatok);
+                AccountMgr::SetCoins(player->GetSession()->GetAccountId(), ostatok);
+                ChatHandler(player->GetSession()).PSendSysMessage("|cff006699You successfully bought an item %u|r", itementry);
+                CloseGossipMenuFor(player);
+            }
+        }
     }
 
     void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action)
@@ -884,6 +914,7 @@ public:
                     player->CastSpell(player, 45523, true);
                 break;
             case 150:
+            {
                 if (player->HasAura(45523))
                 {
                     player->PlayerTalkClass->SendCloseGossip();
@@ -899,6 +930,219 @@ public:
                     player->PlayerTalkClass->SendCloseGossip();
                 }
                 break;
+            }
+            case 200000:
+            {
+                BuyItem(player, 48691, 5);
+                break;
+            }
+            case 200001:
+            {
+                BuyItem(player, 42985, 5);
+                break;
+            }
+            case 200002:
+            {
+                BuyItem(player, 44107, 5);
+                break;
+            }
+            case 200003:
+            {
+                BuyItem(player, 48687, 5);
+                break;
+            }
+            case 200004:
+            {
+                BuyItem(player, 48689, 5);
+                break;
+            }
+            case 200005:
+            {
+                BuyItem(player, 42984, 5);
+                break;
+            }
+            case 200006:
+            {
+                BuyItem(player, 42952, 5);
+                break;
+            }
+            case 200007:
+            {
+                BuyItem(player, 44103, 5);
+                break;
+            }
+            case 200008:
+            {
+                BuyItem(player, 44105, 5);
+                break;
+            }
+            case 200009:
+            {
+                BuyItem(player, 48677, 5);
+                break;
+            }
+            case 200010:
+            {
+                BuyItem(player, 48683, 5);
+                break;
+            }
+            case 200011:
+            {
+                BuyItem(player, 42950, 5);
+                break;
+            }
+            case 200012:
+            {
+                BuyItem(player, 42951, 5);
+                break;
+            }
+            case 200013:
+            {
+                BuyItem(player, 44102, 5);
+                break;
+            }
+            case 200014:
+            {
+                BuyItem(player, 44101, 5);
+                break;
+            }
+            case 200015:
+            {
+                BuyItem(player, 48685, 5);
+                break;
+            }
+            case 200016:
+            {
+                BuyItem(player, 42949, 5);
+                break;
+            }
+            case 200017:
+            {
+                BuyItem(player, 44100, 5);
+                break;
+            }
+            case 200018:
+            {
+                BuyItem(player, 44099, 5);
+                break;
+            }
+            case 200019:
+            {
+                BuyItem(player, 42944, 10);
+                break;
+            }
+            case 200020:
+            {
+                BuyItem(player, 44091, 10);
+                break;
+            }
+            case 200021:
+            {
+                BuyItem(player, 42945, 10);
+                break;
+            }
+            case 200022:
+            {
+                BuyItem(player, 44096, 10);
+                break;
+            }
+            case 200023:
+            {
+                BuyItem(player, 42948, 10);
+                break;
+            }
+            case 200024:
+            {
+                BuyItem(player, 48716, 10);
+                break;
+            }
+            case 200025:
+            {
+                BuyItem(player, 44094, 10);
+                break;
+            }
+            case 200026:
+            {
+                BuyItem(player, 44092, 10);
+                break;
+            }
+            case 200027:
+            {
+                BuyItem(player, 42943, 10);
+                break;
+            }
+            case 200028:
+            {
+                BuyItem(player, 48718, 10);
+                break;
+            }
+            case 200029:
+            {
+                BuyItem(player, 42947, 10);
+                break;
+            }
+            case 200030:
+            {
+                BuyItem(player, 44095, 10);
+                break;
+            }
+            case 200031:
+            {
+                BuyItem(player, 42946, 10);
+                break;
+            }
+            case 200032:
+            {
+                BuyItem(player, 44093, 10);
+                break;
+            }
+            case 200033:
+            {
+                BuyItem(player, 42992, 10);
+                break;
+            }
+            case 200034:
+            {
+                BuyItem(player, 42991, 5);
+                break;
+            }
+            case 200035:
+            {
+                BuyItem(player, 44098, 5);
+                break;
+            }
+            case 200036:
+            {
+                BuyItem(player, 44097, 5);
+                break;
+            }
+            case 200037:
+            {
+                BuyItem(player, 50255, 5);
+                break;
+            }
+            case 200038:
+            {
+                BuyItem(player, 44115, 5);
+                break;
+            }
+            case 299998:
+            {
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\spell_frost_wizardmark:25:25:-15:0|tBuy Honor Token - 2000 Honor points", GOSSIP_SENDER_MAIN, 299999);
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_chest_chain_07:25:25:-15:0|tBuy Heirloom items", GOSSIP_SENDER_MAIN, 300001);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 200110);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+                break;
+            }
+            case 299999:
+            {
+                // honor token
+                // 44115
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\spell_frost_wizardmark:25:25:-15:0|tWintergrasp Commendation - 5 coins", GOSSIP_SENDER_MAIN, 200038, "Are you sure you want to buy item?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 200110);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+                break;
+            }
             case 300000:
                 {
                     std::string iconvip = "|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|t";
@@ -910,8 +1154,164 @@ public:
                         AddGossipItemFor(player, 0, iconvip + "VIP account: [|cffE80000" + player->GetSession()->GetTrinityString(LANG_ITEM_VIP_INCREASE) + "|r]", GOSSIP_SENDER_MAIN, 161);
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 200110);
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
-                }
+                    break;
+                }                
+            case 300001:
+            {
+                // cloth
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_chest_cloth_25:25:25:-15:0|tCloth armor - 5 coins", GOSSIP_SENDER_MAIN, 300002);
+                // leather
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_chest_leather_03:25:25:-15:0|tLeather armor - 5 coins", GOSSIP_SENDER_MAIN, 300003);
+                // mail
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_chest_chain_07:25:25:-15:0|tMail armor - 5 coins", GOSSIP_SENDER_MAIN, 300004);
+                // plate
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_chest_plate13:25:25:-15:0|tPlate armor - 5 coins", GOSSIP_SENDER_MAIN, 300005);
+                // weapon
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_staff_13:25:25:-15:0|tWeapons - 10 coins", GOSSIP_SENDER_MAIN, 300006);
+                // others
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_gizmo_khoriumpowercore:25:25:-15:0|tOthers - 5 coins", GOSSIP_SENDER_MAIN, 300007);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 200110);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                 break;
+            }            
+            case 300002: // cloth armor
+            {
+                // 48691
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_chest_cloth_49:25:25:-15:0|tTattered Dreadmist Robe", GOSSIP_SENDER_MAIN, 200000, "Are you sure you want to buy item?", 0, false);
+                // 42985
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_misc_bone_taurenskull_01:25:25:-15:0|tTattered Dreadmist Mantle", GOSSIP_SENDER_MAIN, 200001, "Are you sure you want to buy item?", 0, false);
+                // 44107
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_02:25:25:-15:0|tExquisite Sunderseer Mantle", GOSSIP_SENDER_MAIN, 200002, "Are you sure you want to buy item?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 300001);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+                break;
+            }
+            case 300003: // leather armor
+            {
+                // chest
+                // 48687
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_chest_leather_06:25:25:-15:0|tPreened Ironfeather Breastplate", GOSSIP_SENDER_MAIN, 200003, "Are you sure you want to buy item?", 0, false);
+                // 48689
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_chest_leather_07:25:25:-15:0|tStained Shadowcraft Tunic", GOSSIP_SENDER_MAIN, 200004, "Are you sure you want to buy item?", 0, false);
+                //shoulder
+                // 42984
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_06:25:25:-15:0|tPreened Ironfeather Shoulders", GOSSIP_SENDER_MAIN, 200005, "Are you sure you want to buy item?", 0, false);
+                // 42952
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_07:25:25:-15:0|tStained Shadowcraft Spaulders", GOSSIP_SENDER_MAIN, 200006, "Are you sure you want to buy item?", 0, false);
+                // 44103
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_05:25:25:-15:0|tExceptional Stormshroud Shoulders", GOSSIP_SENDER_MAIN, 200007, "Are you sure you want to buy item?", 0, false);
+                // 44105
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_01:25:25:-15:0|tLasting Feralheart Spaulders", GOSSIP_SENDER_MAIN, 200008, "Are you sure you want to buy item?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 300001);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+                break;
+            }
+            case 300004: // mail armor
+            {
+                // chest
+                // 48677
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_chest_chain_07:25:25:-15:0|tChampion's Deathdealer Breastplate", GOSSIP_SENDER_MAIN, 200009, "Are you sure you want to buy item?", 0, false);
+                // 48683
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_chest_chain_11:25:25:-15:0|tMystical Vest of Elements", GOSSIP_SENDER_MAIN, 200010, "Are you sure you want to buy item?", 0, false);
+                //shoulder
+                // 42950
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_01:25:25:-15:0|tChampion Herod's Shoulder", GOSSIP_SENDER_MAIN, 200011, "Are you sure you want to buy item?", 0, false);
+                // 42951
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_29:25:25:-15:0|tMystical Pauldrons of Elements", GOSSIP_SENDER_MAIN, 200012, "Are you sure you want to buy item?", 0, false);
+                // 44102
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_29:25:25:-15:0|tAged Pauldrons of The Five Thunders", GOSSIP_SENDER_MAIN, 200013, "Are you sure you want to buy item?", 0, false);
+                // 44101
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_10:25:25:-15:0|tPrized Beastmaster's Mantle", GOSSIP_SENDER_MAIN, 200014, "Are you sure you want to buy item?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 300001);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+                break;
+            }
+            case 300005: // plate armor
+            {
+                // chest
+                // 48685
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_chest_plate03:25:25:-15:0|tPolished Breastplate of Valor", GOSSIP_SENDER_MAIN, 200015, "Are you sure you want to buy item?", 0, false);
+                //shoulder
+                // 42949
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_30:25:25:-15:0|tPolished Spaulders of Valor", GOSSIP_SENDER_MAIN, 200016, "Are you sure you want to buy item?", 0, false);
+                // 44100
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_10:25:25:-15:0|tPristine Lightforge Spaulders", GOSSIP_SENDER_MAIN, 200017, "Are you sure you want to buy item?", 0, false);
+                // 44099
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_shoulder_20:25:25:-15:0|tStrengthened Stockade Pauldrons", GOSSIP_SENDER_MAIN, 200018, "Are you sure you want to buy item?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 300001);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+                break;
+            }
+            case 300006: // weapon
+            {
+                // melee
+                // daggers
+                // 42944
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_sword_17:25:25:-15:0|tBalanced Heartseeker", GOSSIP_SENDER_MAIN, 200019, "Are you sure you want to buy item?", 0, false);
+                // 44091
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_weapon_shortblade_03:25:25:-15:0|tSharpened Scarlet Kris", GOSSIP_SENDER_MAIN, 200020, "Are you sure you want to buy item?", 0, false);
+
+                // one-hand sword
+                // 42945
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_sword_43:25:25:-15:0|tVenerable Dal'Rend's Sacred Charge", GOSSIP_SENDER_MAIN, 200021, "Are you sure you want to buy item?", 0, false);
+                // 44096
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_sword_36:25:25:-15:0|tBattleworn Thrash Blade", GOSSIP_SENDER_MAIN, 200022, "Are you sure you want to buy item?", 0, false);
+
+                // one-hand mace
+                // 42948
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_hammer_05:25:25:-15:0|tDevout Aurastone Hammer", GOSSIP_SENDER_MAIN, 200023, "Are you sure you want to buy item?", 0, false);
+                // 48716
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_hammer_17:25:25:-15:0|tVenerable Mass of McGowan", GOSSIP_SENDER_MAIN, 200024, "Are you sure you want to buy item?", 0, false);
+                // 44094
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_hammer_07:25:25:-15:0|tThe Blessed Hammer of Grace", GOSSIP_SENDER_MAIN, 200025, "Are you sure you want to buy item?", 0, false);
+
+
+                // two-hand sword
+                // 44092
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_sword_19:25:25:-15:0|tReforged Truesilver Champion", GOSSIP_SENDER_MAIN, 200026, "Are you sure you want to buy item?", 0, false);
+                // two-hand axe
+                // 42943
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_axe_09:25:25:-15:0|tBloodied Arcanite Reaper", GOSSIP_SENDER_MAIN, 200027, "Are you sure you want to buy item?", 0, false);
+                // two-hand mace
+                // 48718
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_gizmo_02:25:25:-15:0|tRepurposed Lava Dredger", GOSSIP_SENDER_MAIN, 200028, "Are you sure you want to buy item?", 0, false);
+
+                // staff
+                // 42947
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_jewelry_talisman_12:25:25:-15:0|tDignified Headmaster's Charge", GOSSIP_SENDER_MAIN, 200029, "Are you sure you want to buy item?", 0, false);
+                // 44095
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_staff_13:25:25:-15:0|tGrand Staff of Jordan", GOSSIP_SENDER_MAIN, 200030, "Are you sure you want to buy item?", 0, false);
+
+                // ranged
+                // 42946
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_weapon_bow_08:25:25:-15:0|tCharmed Ancient Bone Bow", GOSSIP_SENDER_MAIN, 200031, "Are you sure you want to buy item?", 0, false);
+                // 44093
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_weapon_rifle_09:25:25:-15:0|tUpgraded Dwarven Hand Cannon", GOSSIP_SENDER_MAIN, 200032, "Are you sure you want to buy item?", 0, false);
+
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 300001);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+                break;
+            }
+            case 300007:
+            {
+                // trinket
+                // 42992
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_jewelry_talisman_08:25:25:-15:0|tDiscerning Eye of the Beast", GOSSIP_SENDER_MAIN, 200033, "Are you sure you want to buy item?", 0, false);
+                // 42991
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_jewelry_talisman_01:25:25:-15:0|tSwift Hand of Justice", GOSSIP_SENDER_MAIN, 200034, "Are you sure you want to buy item?", 0, false);
+                // 44098
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_jewelry_trinketpvp_01:25:25:-15:0|tInherited Insignia of the Alliance", GOSSIP_SENDER_MAIN, 200035, "Are you sure you want to buy item?", 0, false);
+                // 44097
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_jewelry_trinketpvp_02:25:25:-15:0|tInherited Insignia of the Horde", GOSSIP_SENDER_MAIN, 200036, "Are you sure you want to buy item?", 0, false);
+
+                // ring
+                // 50255
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_jewelry_ring_39:25:25:-15:0|tDread Pirate Ring", GOSSIP_SENDER_MAIN, 200037, "Are you sure you want to buy item?", 0, false);                
+
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 300001);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+                break;
+            }
             case 300222:
                 //{
                     //QueryResult result1 = LoginDatabase.PQuery("SELECT coin FROM account WHERE id = %u", player->GetSession()->GetAccountId());
