@@ -26330,6 +26330,56 @@ void Player::ActivateSpec(uint8 spec)
     }
 }
 
+uint8 Player::GetMostPointsTalentTree() const
+{
+    uint32 specPoints[3] = { 0, 0, 0 };
+    for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
+    {
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
+
+        if (!talentInfo)
+            continue;
+
+        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+
+        if (!talentTabInfo)
+            continue;
+
+        if (talentTabInfo->tabpage < 3)
+        {
+            for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
+            {
+                PlayerTalentMap::iterator plrTalent = m_talents[m_activeSpec]->find(talentInfo->RankID[rank]);
+                if (plrTalent != m_talents[m_activeSpec]->end())
+                    if (plrTalent->second->state != PLAYERSPELL_REMOVED)
+                        specPoints[talentTabInfo->tabpage] += rank;
+            }
+        }
+    }
+    //TC_LOG_ERROR("server", "talents :  1tab = %u, 2tab = %u, 3tab = %u", specPoints[0], specPoints[1], specPoints[2]);
+    uint8 maxIndex = 0;
+    uint8 maxCount = specPoints[0];
+    for (uint8 i = 1; i<3; ++i)
+        if (specPoints[i] > maxCount)
+        {
+            maxIndex = i;
+            maxCount = specPoints[i];
+        }
+    return maxIndex;
+}
+
+bool Player::IsHealerTalentSpec() const
+{
+    uint8 tree = GetMostPointsTalentTree();
+    return ((getClass() == CLASS_DRUID && tree == 2) || (getClass() == CLASS_PALADIN && tree == 0) || (getClass() == CLASS_PRIEST && tree <= 1) || (getClass() == CLASS_SHAMAN && tree == 2));
+}
+
+bool Player::IsTankTalentSpec() const
+{
+    uint8 tree = GetMostPointsTalentTree();
+    return ((getClass() == CLASS_WARRIOR && tree == 2) || (getClass() == CLASS_DRUID && tree == 1 && HasAura(33856)) || (getClass() == CLASS_PALADIN && tree == 1) || (getClass() == CLASS_DEATH_KNIGHT && tree == 1));
+}
+
 void Player::LoadActions(PreparedQueryResult result)
 {
     if (result)

@@ -1476,6 +1476,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 GetSpecsCount() const { return m_specsCount; }
         void SetSpecsCount(uint8 count) { m_specsCount = count; }
         void ActivateSpec(uint8 spec);
+        uint8 GetMostPointsTalentTree() const;
+        bool IsHealerTalentSpec() const;
+        bool IsTankTalentSpec() const;
         void LoadActions(PreparedQueryResult result);
 
         void InitGlyphsForLevel();

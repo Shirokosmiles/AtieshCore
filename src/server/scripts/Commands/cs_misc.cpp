@@ -1907,6 +1907,14 @@ public:
             _hasvip = target->IsPremium() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
             handler->PSendSysMessage(LANG_PINFO_CHR_VIP_MODE, _hasvip.c_str());
             handler->PSendSysMessage("GearScore : %u", target->GetGearScore());
+            std::string _spec = "";
+            if (target->IsHealerTalentSpec())
+                _spec = "Healer";
+            else if (target->IsTankTalentSpec())
+                _spec = "Tank";
+            else
+                _spec = "Damage";
+            handler->PSendSysMessage("Specialization : %s", _spec);
 
             if (target->IsPremium())
                 handler->PSendSysMessage(LANG_TARGETPLAYER_VIP_TIME_EXIST, (secsToTimeString(target->GetPremiumUnsetdate() - GameTime::GetGameTime(), false, false)).c_str());

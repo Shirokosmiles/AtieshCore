@@ -2232,11 +2232,11 @@ void Group::CalculateRolesAndAnnounce(int8& ppl, int8& lives, int8& tanks, int8 
         Player* pp = ObjectAccessor::FindPlayer(citr->guid);
         if (pp)
         {
-            /*if (pp->IsHealerTalentSpec()) //TODO implement talentSpecs
+            if (pp->IsHealerTalentSpec())
                 ++healers;
             else if (pp->IsTankTalentSpec())
                 ++tanks;
-            else*/
+            else
                 ++damagers;
 
             ++ppl;
