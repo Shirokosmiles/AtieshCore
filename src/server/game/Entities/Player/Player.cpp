@@ -20346,6 +20346,7 @@ void Player::_SaveStats(SQLTransaction& trans) const
     stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_MELEE));
     stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_RANGED));
     stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_SPELL));
+    stmt->setFloat(index++, GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER));
 
     trans->Append(stmt);
 }
