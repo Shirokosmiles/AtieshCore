@@ -119,7 +119,8 @@ public:
         AddGossipItemFor(player,GOSSIP_ICON_MONEY_BAG, getString(player->GetSession()->GetTrinityString(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 300000);
         // магазин
         AddGossipItemFor(player, 0, "|TInterface\\icons\\Ability_Mage_PotentSpirit:25:25:-15:0|tTrade Shop", GOSSIP_SENDER_MAIN, 299998);
-        
+        // trainer
+        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, std::string("|TInterface\\icons\\achievement_level_80:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLASS_SKILLS), GOSSIP_SENDER_MAIN, 104);
         if (player->GetCFSTeam() == ALLIANCE)
             AddGossipItemFor(player, GOSSIP_ICON_TAXI, std::string("|TInterface/ICONS/Spell_Arcane_TeleportStormWind:25:25:-15:0|t ") + player->GetSession()->GetTrinityString(LANG_ITEM_STORMWIND), GOSSIP_SENDER_MAIN, 1277, player->GetSession()->GetTrinityString(LANG_ITEM_STORMWIND_SURE), 0, false);
         else
@@ -1349,7 +1350,6 @@ public:
                     AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Inv_misc_note_02:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_COMMAND_LIST), GOSSIP_SENDER_MAIN, 210);
                     AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Inv_misc_tournaments_banner_scourge:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CHARACTER_MANAGEMENT), GOSSIP_SENDER_MAIN, 1245);
                     AddGossipItemFor(player, 0, std::string("|TInterface/ICONS/spell_holy_rapture:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CHARACTER_CHANGEING), GOSSIP_SENDER_MAIN, 1205);
-                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, std::string("|TInterface\\icons\\achievement_level_80:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLASS_SKILLS), GOSSIP_SENDER_MAIN, 104);
                     AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\Inv_throwingknife_02:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_REPAIR_EQUIP), GOSSIP_SENDER_MAIN, 216);
                     AddGossipItemFor(player, 0, std::string("|TInterface/ICONS/ability_druid_cower:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_REMOVE_DESERTER), GOSSIP_SENDER_MAIN, 217);
                     AddGossipItemFor(player, 0, std::string("|TInterface\\icons\\spell_shadow_deathscream:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_REMOVE_WEAKNESS), GOSSIP_SENDER_MAIN, 215);
