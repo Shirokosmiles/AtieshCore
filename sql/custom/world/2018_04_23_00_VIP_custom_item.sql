@@ -51,7 +51,7 @@ INSERT INTO `trinity_string` VALUES
 -- LANG_ITEM_CURRENT_COINS
 DELETE FROM `trinity_string` WHERE entry = 11510;
 INSERT INTO `trinity_string` VALUES
-(11510,'|TInterface\\icons\\Inv_misc_token_thrallmar:25:25:-15:0|tAccount coins: ',NULL,'|TInterface\\icons\\Inv_misc_token_thrallmar:25:25:-15:0|tJetons du compte: ',NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Inv_misc_token_thrallmar:25:25:-15:0|tБонусов на аккаунте : ');
+(11510,'|TInterface\\icons\\Inv_trinket_honorhold:25:25:-15:0|tAccount coins: ',NULL,'|TInterface\\icons\\Inv_misc_token_thrallmar:25:25:-15:0|tJetons du compte: ',NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Inv_misc_token_thrallmar:25:25:-15:0|tБонусов на аккаунте : ');
 
 -- LANG_ITEM_STORMWIND
 DELETE FROM `trinity_string` WHERE entry = 11511;
@@ -256,17 +256,17 @@ INSERT INTO `trinity_string` VALUES
 -- LANG_ITEM_BUY_7
 DELETE FROM `trinity_string` WHERE entry = 11551;
 INSERT INTO `trinity_string` VALUES
-(11551,'Buy VIP for [ |cffD800007|r ] Days [150 coins]',NULL,'Acheter [ |cffD800007|r ] jours de privilèges VIP pour [150 jetons]',NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD800007|r ] Дней [150 Бонусов]');
+(11551,'Buy VIP for [ |cffD800007|r ] Days [20 coins]',NULL,'Acheter [ |cffD800007|r ] jours de privilèges VIP pour [20 jetons]',NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD800007|r ] Дней [20 Бонусов]');
 
 -- LANG_ITEM_BUY_14
 DELETE FROM `trinity_string` WHERE entry = 11552;
 INSERT INTO `trinity_string` VALUES
-(11552,'Buy VIP for [ |cffD8000014|r ] Days [260 coins]',NULL,'Acheter [ |cffD8000014|r ] jours de privilèges VIP pour [260 jetons]',NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD8000014|r ] Дней [260 Бонусов]');
+(11552,'Buy VIP for [ |cffD8000014|r ] Days [40 coins]',NULL,'Acheter [ |cffD8000014|r ] jours de privilèges VIP pour [40 jetons]',NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD8000014|r ] Дней [40 Бонусов]');
 
 -- LANG_ITEM_BUY_31
 DELETE FROM `trinity_string` WHERE entry = 11553;
 INSERT INTO `trinity_string` VALUES
-(11553,'Buy VIP for [ |cffD8000031|r ] Days [470 coins]',NULL,'Acheter [ |cffD8000031|r ] jours de privilèges VIP pour [470 jetons]',NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD8000031|r ] День [470 Бонусов]');
+(11553,'Buy VIP for [ |cffD8000031|r ] Days [80 coins]',NULL,'Acheter [ |cffD8000031|r ] jours de privilèges VIP pour [80 jetons]',NULL,NULL,NULL,NULL,NULL,'Купить VIP на [ |cffD8000031|r ] День [80 Бонусов]');
 
 -- LANG_ITEM_BUY_7_SURE
 DELETE FROM `trinity_string` WHERE entry = 11554;
@@ -286,17 +286,17 @@ INSERT INTO `trinity_string` VALUES
 -- LANG_ITEM_INC_7
 DELETE FROM `trinity_string` WHERE entry = 11557;
 INSERT INTO `trinity_string` VALUES
-(11557,'Buy additional VIP time for [ |cffD800007|r ] Days [150 coins]',NULL,'Acheter [ |cffD800007|r ] jours de privilèges VIP [150 jetons]',NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD800007|r ] Дней [150 Бонусов]');
+(11557,'Buy additional VIP time for [ |cffD800007|r ] Days [20 coins]',NULL,'Acheter [ |cffD800007|r ] jours de privilèges VIP [20 jetons]',NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD800007|r ] Дней [20 Бонусов]');
 
 -- LANG_ITEM_INC_14
 DELETE FROM `trinity_string` WHERE entry = 11558;
 INSERT INTO `trinity_string` VALUES
-(11558,'Buy additional VIP time for [ |cffD8000014|r ] Days [260 coins]',NULL,'Acheter [ |cffD8000014|r ] jours de privilèges VIP [260 jetons]',NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD8000014|r ] Дней [260 Бонусов]');
+(11558,'Buy additional VIP time for [ |cffD8000014|r ] Days [40 coins]',NULL,'Acheter [ |cffD8000014|r ] jours de privilèges VIP [40 jetons]',NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD8000014|r ] Дней [40 Бонусов]');
 
 -- LANG_ITEM_INC_31
 DELETE FROM `trinity_string` WHERE entry = 11559;
 INSERT INTO `trinity_string` VALUES
-(11559,'Buy additional VIP time for [ |cffD8000031|r ] Days [470 coins]',NULL,'Acheter [ |cffD8000031|r ] jours de privilèges VIP [470 jetons]',NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD8000031|r ] День [470 Бонусов]');
+(11559,'Buy additional VIP time for [ |cffD8000031|r ] Days [80 coins]',NULL,'Acheter [ |cffD8000031|r ] jours de privilèges VIP [80 jetons]',NULL,NULL,NULL,NULL,NULL,'Увеличить время VIP привилегий на [ |cffD8000031|r ] День [80 Бонусов]');
 
 -- LANG_ITEM_INC_7_SURE
 DELETE FROM `trinity_string` WHERE entry = 11560;

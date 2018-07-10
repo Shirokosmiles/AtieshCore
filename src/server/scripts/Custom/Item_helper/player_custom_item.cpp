@@ -69,13 +69,16 @@ std::string getString(std::string string, uint32 number)
     return oss.str();
 }
 
-uint32 aurass[] = { 15366, 16609, 48162, 48074, 48170, 43223, 36880, 69994, 33081, 26035, 48469,57623, 47440 };
+uint32 aurass[] = { 15366, 16609, 48162, 48074, 48170, 43223, 36880, 69994, 33081, 26035, 48469, 57623, 47440 };
 
 class custom_item : public ItemScript
 {
-private:
 public:
     custom_item() : ItemScript("custom_item") { }
+
+    uint32 coast7 = 20;
+    uint32 coast14 = 40;
+    uint32 coast31 = 80;
 
     bool OnUse(Player* player, Item* item, SpellCastTargets const& targets)
     {
@@ -117,14 +120,15 @@ public:
         // магазин
         AddGossipItemFor(player, 0, "|TInterface\\icons\\Ability_Mage_PotentSpirit:25:25:-15:0|tTrade Shop", GOSSIP_SENDER_MAIN, 299998);
         
-        if (player->GetCFSTeam() == ALLIANCE)       
+        if (player->GetCFSTeam() == ALLIANCE)
             AddGossipItemFor(player, GOSSIP_ICON_TAXI, std::string("|TInterface/ICONS/Spell_Arcane_TeleportStormWind:25:25:-15:0|t ") + player->GetSession()->GetTrinityString(LANG_ITEM_STORMWIND), GOSSIP_SENDER_MAIN, 1277, player->GetSession()->GetTrinityString(LANG_ITEM_STORMWIND_SURE), 0, false);
         else
             AddGossipItemFor(player, GOSSIP_ICON_TAXI, std::string("|TInterface/ICONS/Spell_Arcane_TeleportOrgrimmar:25:25:-15:0|t ") + player->GetSession()->GetTrinityString(LANG_ITEM_ORGRIMMAR), GOSSIP_SENDER_MAIN, 1278, player->GetSession()->GetTrinityString(LANG_ITEM_ORGRIMMAR_SURE), 0, false);
 
         if (player->IsGameMaster())
         {
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r", GOSSIP_SENDER_MAIN, 101);
+            if (player->GetSession()->HasPermission(rbac::RBAC_PERM_COMMAND_SERVER_RESTART))
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r", GOSSIP_SENDER_MAIN, 101);
             AddGossipItemFor(player, 0, "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Delivery of bags", GOSSIP_SENDER_MAIN, 218);
 
             if (player->getLevel() < 80)
@@ -1747,11 +1751,11 @@ public:
             case 500100:
                 {
                     uint32 coins = player->GetCoins();
-                    uint32 ostatok = 150 - coins; // 7 дней                        
+                    uint32 ostatok = coast7 - coins; // 7 дней                        
 
-                    if (coins >= 150)
+                    if (coins >= coast7)
                     {
-                        ostatok = coins - 150;
+                        ostatok = coins - coast7;
                         time_t unsetdate;
                         if (player->IsPremium())
                         {
@@ -1767,7 +1771,7 @@ public:
                         player->SetPremiumStatus(true);
                         player->SetCoins(ostatok);
                         AccountMgr::SetCoins(player->GetSession()->GetAccountId(), ostatok);
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Time of your VIP privileges has been increased for %u days!|r", 7);
+                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Time of your VIP privileges has been increased for %u days!|r", coast7);
                         CloseGossipMenuFor(player);
                     }
                     else
@@ -1782,11 +1786,11 @@ public:
             case 500101:
                 {
                     uint32 coins = player->GetCoins();
-                    uint32 ostatok = 260 - coins; // 14 дней				
+                    uint32 ostatok = coast14 - coins; // 14 дней				
 
-                    if (coins >= 260)
+                    if (coins >= coast14)
                     {
-                        ostatok = coins - 260;
+                        ostatok = coins - coast14;
                         time_t unsetdate;
                         if (player->IsPremium())
                         {
@@ -1802,7 +1806,7 @@ public:
                         player->SetPremiumStatus(true);
                         player->SetCoins(ostatok);
                         AccountMgr::SetCoins(player->GetSession()->GetAccountId(), ostatok);
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Time of your VIP privileges has been increased for %u days!|r", 14);
+                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Time of your VIP privileges has been increased for %u days!|r", coast14);
                         player->PlayerTalkClass->SendCloseGossip();
                     }
                     else
@@ -1817,11 +1821,11 @@ public:
             case 500102:
                 {
                     uint32 coins = player->GetCoins();
-                    uint32 ostatok = 470 - coins; // 31 день					
+                    uint32 ostatok = coast31 - coins; // 31 день					
 
-                    if (coins >= 470)
+                    if (coins >= coast31)
                     {
-                        ostatok = coins - 470;
+                        ostatok = coins - coast31;
                         time_t unsetdate;
                         if (player->IsPremium())
                         {
@@ -1837,7 +1841,7 @@ public:
                         player->SetPremiumStatus(true);
                         player->SetCoins(ostatok);
                         AccountMgr::SetCoins(player->GetSession()->GetAccountId(), ostatok);
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Time of your VIP privileges has been increased for %u days!|r", 31);
+                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Time of your VIP privileges has been increased for %u days!|r", coast31);
                         player->PlayerTalkClass->SendCloseGossip();
                     }
                     else
@@ -1854,241 +1858,7 @@ public:
     }
 };
 
-class LevelupSpellLearn_PlayerScript : PlayerScript
-{
-public:
-    LevelupSpellLearn_PlayerScript() : PlayerScript("levelup_spell_learn") { }
-
-    void LearnSpells(Player* player)
-    {
-        static std::vector<uint32> npcTrainers =
-        {
-            0, // None
-            985, // Warrior
-            927, // Paladin
-            987, // Hunter
-            917, // Rogue
-            376, // Priest
-            28472, // Death knight
-            986, // Shaman
-            328, // Mage
-            906, // Warlock
-            0, // Monk (5.x)
-            3033, // Druid
-            0 // Demon hunter
-        };
-
-        auto plrClass = player->getClass();
-        if (plrClass >= npcTrainers.size())
-            return;
-
-        if (auto spells = sObjectMgr->GetNpcTrainerSpells(npcTrainers[plrClass]))
-        {
-            for (auto itr = spells->spellList.begin(); itr != spells->spellList.end(); itr++)
-            {
-                auto spell = &itr->second;
-
-                if (spell->SpellID > 0 && player->GetTrainerSpellState(spell) == TRAINER_SPELL_GREEN && !player->HasSpell(spell->SpellID))
-                {
-                    if (spell->IsCastable())
-                        player->CastSpell(player, spell->SpellID, true);
-                    else
-                        player->LearnSpell(spell->SpellID, false);
-                }
-            }
-        }
-    }
-
-    void OnLogin(Player* player, bool) override
-    {
-        LearnSpells(player);
-    }
-
-    void OnLevelChanged(Player* player, uint8 oldLevel) override
-    {
-        LearnSpells(player);
-    }
-
-    void OnFreeTalentPointsChanged(Player* player, uint32 points) override
-    {
-        if (points < 1)
-            LearnSpells(player);
-    }
-};
-
-class rewarded_player : public PlayerScript
-{
-public:
-    rewarded_player() : PlayerScript("rewarded_player") {}
-
-    void OnLevelChanged(Player* player, uint8 newLevel) override
-    {
-        if (player->GetCFSTeam() == ALLIANCE)
-        {
-            switch (++newLevel)
-            {
-            case 10:
-                player->AddItem(54218, 1);
-                ChatHandler(player->GetSession()).PSendSysMessage("|cff00ff00Поздравляем, вы достигли 10 уровня.Получите небольшое вознаграждение. Спасибо за то что вы с нами!|r");
-                break;
-            case 20:
-                player->AddItem(54218, 1);
-                ChatHandler(player->GetSession()).PSendSysMessage("|cff00ff00Поздравляем, вы достигли 20 уровня.Получите небольшое вознаграждение. Спасибо за то что вы с нами!|r");
-                break;
-            case 30:
-                player->AddItem(54218, 1);
-                ChatHandler(player->GetSession()).PSendSysMessage("|cff00ff00Поздравляем, вы достигли 30 уровня.Получите небольшое вознаграждение. Спасибо за то что вы с нами!|r");
-                break;
-            case 40:
-                player->AddItem(54218, 1);
-                ChatHandler(player->GetSession()).PSendSysMessage("|cff00ff00Поздравляем, вы достигли 40 уровня.Получите небольшое вознаграждение. Спасибо за то что вы с нами!|r");
-                break;
-            case 50:
-                player->AddItem(54218, 1);
-                ChatHandler(player->GetSession()).PSendSysMessage("|cff00ff00Поздравляем, вы достигли 50 уровня.Получите небольшое вознаграждение. Спасибо за то что вы с нами!|r");
-                break;
-            case 60:
-                player->AddItem(54218, 1);
-                ChatHandler(player->GetSession()).PSendSysMessage("|cff00ff00Поздравляем, вы достигли 60 уровня.Получите небольшое вознаграждение. Спасибо за то что вы с нами!|r");
-                break;
-            case 70:
-                player->AddItem(54218, 1);
-                ChatHandler(player->GetSession()).PSendSysMessage("|cff00ff00Поздравляем, вы достигли 70 уровня.Получите небольшое вознаграждение. Спасибо за то что вы с нами!|r");
-                break;
-            case 80:
-                player->AddItem(54218, 2);
-                ChatHandler(player->GetSession()).PSendSysMessage("|cff00ff00Поздравляем, вы достигли 80 уровня.Получите небольшое вознаграждение. Спасибо за то что вы с нами!|r");
-                break;
-            }
-        }
-    }
-};
-
-class OnLogin_PlayerScript : public PlayerScript
-{
-public:
-    OnLogin_PlayerScript() : PlayerScript("OnLogin_PlayerScript") { }
-
-    void OnLogin(Player* player, bool /*firstLogin*/) override
-    {
-        if (!player)
-            return;
-
-        if (player->IsPremium())
-        {
-            if (player->HasSpell(50281))
-                return;
-        }
-        else
-            player->RemoveSpell(50281, false);
-        return;
-    }
-};
-
-enum LandrosTexts
-{
-    SAY_WRONG = 1,
-    SAY_CORRECT = 2
-};
-
-enum LandroMenus
-{
-    WELCOME = 8855,
-    PROMOTION_MENU_TEXT = 8856,
-    PROMOTION = 9197
-};
-
-class landro_longshot : public CreatureScript
-{
-public:
-
-    landro_longshot() : CreatureScript("landro_longshot") { }
-
-    struct landro_longshotAI : public ScriptedAI
-    {
-        landro_longshotAI(Creature* creature) : ScriptedAI(creature) { }
-
-        int SelectedReward;
-
-        bool GossipHello(Player* player) override
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Ты желаешь что-то особенное?", GOSSIP_SENDER_MAIN, PROMOTION);
-            player->PlayerTalkClass->SendGossipMenu(WELCOME, me->GetGUID());
-            return true;
-        }
-
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
-        {
-            uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            player->PlayerTalkClass->ClearMenus();
-
-            if (action != 0)
-            {
-                SelectedReward = action;
-            }
-
-            QueryResult GetGossipFields = WorldDatabase.PQuery("SELECT OptionText, ActionMenuID FROM gossip_menu_option WHERE MenuID = %u", action);
-            do
-            {
-                Field * fields = GetGossipFields->Fetch();
-
-                std::string OptionText = fields[0].GetString();
-                uint32  ActionMenuID = fields[1].GetUInt32();
-                if (ActionMenuID != 0)
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, OptionText, GOSSIP_SENDER_MAIN, ActionMenuID);
-                }
-                else
-                {
-                    AddGossipItemFor(player, 0, OptionText, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, "", 0, true);
-                }
-
-            } while (GetGossipFields->NextRow());
-
-            player->PlayerTalkClass->SendGossipMenu(PROMOTION_MENU_TEXT, me->GetGUID());
-            return true;
-        }
-
-        bool GossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 gossipListId, char const* code) override
-        {
-            uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
-            player->PlayerTalkClass->ClearMenus();
-            uint32 codeUINT = (uint32)atol(code);
-            if (!codeUINT)
-                return false;
-            QueryResult SearchForCode = WorldDatabase.PQuery("SELECT item FROM promotion_codes WHERE code = %u AND collection = %u AND used = 0", codeUINT, SelectedReward);
-            if (!SearchForCode)
-            {
-                me->AI()->Talk(SAY_WRONG);
-            }
-            else
-            {
-                me->AI()->Talk(SAY_CORRECT);
-                do
-                {
-                    Field * fields = SearchForCode->Fetch();
-                    player->AddItem(fields[0].GetUInt32(), 1);
-                    WorldDatabase.PQuery("Update promotion_codes SET USED = 1 WHERE code = %u", codeUINT);
-                } while (SearchForCode->NextRow());
-            }
-
-            player->PlayerTalkClass->SendCloseGossip();
-            return true;
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new landro_longshotAI(creature);
-    }
-};
-
 void AddSC_custom_item()
 {
     new custom_item();
-    //new LevelupSpellLearn_PlayerScript();
-    new rewarded_player();
-    new OnLogin_PlayerScript();
-    new landro_longshot();
 }
