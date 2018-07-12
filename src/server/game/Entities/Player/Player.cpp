@@ -24192,7 +24192,7 @@ void Player::RewardPVPCap()
         case 0:
         {
             entryreward = 49426;
-            count = 5;
+            count = 15;
             break;
         }
         case 1:
