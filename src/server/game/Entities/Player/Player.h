@@ -1758,6 +1758,13 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetCoins() const { return m_coins; }
         time_t GetPremiumUnsetdate() const { return m_unsetdate; }
 
+        // PVP Weekly cap
+        void SetPVPCapPoints(uint32 cap, bool weeklyupdate = false);
+        void RewardPVPCapPoints(uint32 reward);
+        void RewardPVPCap();
+        uint32 GetPVPCapPoints() const { return m_pvpcap; }
+        bool IsWeeklyPVPCapComplete() const { return m_pvpcapReceived; }
+
         // Walking data from move packets
         void SetWalkingFlag(bool walkstatus) { m_walking = walkstatus; }
         bool HasWalkingFlag() const { return m_walking; }
@@ -2570,6 +2577,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool m_vip;                 // Used for VIP func
         time_t m_unsetdate;         // time (unixtime) of unsetdate vip previlegies
         uint32 m_coins;             // Coins for ingame store
+        uint32 m_pvpcap;            // PVP Cap for weekly reward
+        bool m_pvpcapReceived;      // PVP Cap for weekly reward was received
         bool m_walking;             // Player walking
 
         // Temporary removed pet cache

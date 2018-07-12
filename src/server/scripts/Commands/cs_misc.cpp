@@ -1907,6 +1907,8 @@ public:
             _hasvip = target->IsPremium() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
             handler->PSendSysMessage(LANG_PINFO_CHR_VIP_MODE, _hasvip.c_str());
             handler->PSendSysMessage("GearScore : %u", target->GetGearScore());
+            uint32 ailvl = target->GetAverageItemLevel();
+            handler->PSendSysMessage("Average Item Level : %u", ailvl);
             std::string _spec = "";
             if (target->IsHealerTalentSpec())
                 _spec = "Healer";
@@ -1915,6 +1917,9 @@ public:
             else
                 _spec = "Damage";
             handler->PSendSysMessage("Specialization : %s", _spec);
+
+            std::string _pvpweeklycap = target->IsWeeklyPVPCapComplete() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
+            handler->PSendSysMessage("Weekly Bonus PVP Cap completed : %s ( %u / %u )", _pvpweeklycap.c_str(), target->GetPVPCapPoints(), sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP));
 
             if (target->IsPremium())
                 handler->PSendSysMessage(LANG_TARGETPLAYER_VIP_TIME_EXIST, (secsToTimeString(target->GetPremiumUnsetdate() - GameTime::GetGameTime(), false, false)).c_str());

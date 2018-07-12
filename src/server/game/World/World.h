@@ -209,6 +209,7 @@ enum WorldBoolConfigs
     CONFIG_VIP_ALL_DISABLED,
     CONFIG_VIP_ITEM_HELPER,
     CONFIG_RAID_INFO,
+    CONFIG_PVP_REWARD,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -429,6 +430,9 @@ enum WorldIntConfigs
     CONFIG_ANTICHEAT_FLYHACK_TIMER,
     CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS,
     CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS,
+    CONFIG_PVP_REWARD_MAXCAP,
+    CONFIG_PVP_REWARD_CAP_FOR_WIN,
+    CONFIG_PVP_REWARD_CAP_FOR_LOSE,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -702,6 +706,8 @@ class TC_GAME_API World
         bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = nullptr, uint32 team = 0);
         void SendZoneText(uint32 zone, const char *text, WorldSession* self = nullptr, uint32 team = 0);
 
+        /// Reset PVP Reward Cap for Online Characters
+        void ResetPVPRewardWeeklyCap();
         /// Are we in the middle of a shutdown?
         bool IsShuttingDown() const { return m_ShutdownTimer > 0; }
         uint32 GetShutDownTimeLeft() const { return m_ShutdownTimer; }

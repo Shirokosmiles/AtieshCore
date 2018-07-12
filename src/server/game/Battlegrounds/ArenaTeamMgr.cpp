@@ -196,4 +196,9 @@ void ArenaTeamMgr::DistributeArenaPoints()
     sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_END);
 
     sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_END);
+
+    // prepare Reset Pvp Reward Weekly Cap
+    PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_RESET_PVPWEEKLYCAP);
+    CharacterDatabase.Execute(stmt2);
+    sWorld->ResetPVPRewardWeeklyCap();
 }

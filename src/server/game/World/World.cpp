@@ -1450,6 +1450,11 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_EXTERNAL_MAIL_INTERVAL]                = sConfigMgr->GetIntDefault("External.Mail.Interval", 1);
     // Whether to use LoS from M2 objects
     m_bool_configs[CONFIG_CHECK_M2_LOS]                         = sConfigMgr->GetBoolDefault("CheckM2ObjectLoS", true);
+    // PVP Reward
+    m_bool_configs[CONFIG_PVP_REWARD]                           = sConfigMgr->GetBoolDefault("PVPBonusCapReward.Enabled", false);
+    m_int_configs[CONFIG_PVP_REWARD_MAXCAP]                     = sConfigMgr->GetIntDefault("PVPBonusCapReward.MaxCap", 1500);
+    m_int_configs[CONFIG_PVP_REWARD_CAP_FOR_WIN]                = sConfigMgr->GetIntDefault("PVPBonusCapReward.CapChanges.Win", 180);
+    m_int_configs[CONFIG_PVP_REWARD_CAP_FOR_LOSE]               = sConfigMgr->GetIntDefault("PVPBonusCapReward.CapChanges.Lose", 60);
     // Weekend XP bonus
     m_int_configs[CONFIG_WEEKEND_XP_DAYS]                       = sConfigMgr->GetIntDefault("Weekend.XP.Days", 0);
     if (m_int_configs[CONFIG_WEEKEND_XP_DAYS] > 7)
@@ -2722,6 +2727,20 @@ void World::SendZoneText(uint32 zone, char const* text, WorldSession* self, uint
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text);
     SendZoneMessage(zone, &data, self, team);
+}
+
+void World::ResetPVPRewardWeeklyCap()
+{
+    SessionMap::const_iterator itr;
+    for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    {
+        if (itr->second &&
+            itr->second->GetPlayer() &&
+            itr->second->GetPlayer()->IsInWorld())
+        {
+            itr->second->GetPlayer()->SetPVPCapPoints(0, true);
+        }
+    }
 }
 
 /// Kick (and save) all players

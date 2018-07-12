@@ -283,6 +283,8 @@ Player::Player(WorldSession* session): Unit(true)
     m_vip = false;
     m_unsetdate = 0;
     m_coins = 0;
+    m_pvpcap = 0;
+    m_pvpcapReceived = false;
     m_walking = false;
 
     m_swingErrorMsg = 0;
@@ -17218,8 +17220,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, instance_mode_mask, "
     // 44           45                46                47                    48          49          50              51           52               53              54
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, "
-    // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69           70          71               72
-    //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels, fishing_steps FROM characters WHERE guid = '%u'", guid);
+    // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69           70          71               72               73
+    //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels, pvpweeklycap, fishing_steps FROM characters WHERE guid = '%u'", guid);
     PreparedQueryResult result = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_FROM);
     if (!result)
     {
@@ -17340,7 +17342,11 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     // set which actionbars the client has active - DO NOT REMOVE EVER AGAIN (can be changed though, if it does change fieldwise)
     SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES, fields[70].GetUInt8());
 
-    m_fishingSteps = fields[72].GetUInt8();
+    m_pvpcap = fields[72].GetUInt32();
+    if (m_pvpcap >= sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP))
+        m_pvpcapReceived = true;
+
+    m_fishingSteps = fields[73].GetUInt8();
 
     InitDisplayIds();
 
@@ -19499,6 +19505,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setString(index++, ss.str());
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES));
         stmt->setUInt32(index++, m_grantableLevels);
+        stmt->setUInt32(index++, m_pvpcap);
     }
     else
     {
@@ -19624,6 +19631,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setString(index++, ss.str());
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES));
         stmt->setUInt32(index++, m_grantableLevels);
+        stmt->setUInt32(index++, m_pvpcap);
 
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
         // Index
@@ -24112,6 +24120,265 @@ void Player::SetPremiumStatus(bool vipstatus)
         m_premiumTimer = 1000 * MINUTE;
     else
         m_premiumTimer = 0;
+}
+
+void Player::SetPVPCapPoints(uint32 cap, bool weeklyupdate)
+{
+    if (!sWorld->getBoolConfig(CONFIG_PVP_REWARD))
+        return;
+
+    uint32 maxcap = sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP);
+    if (cap > maxcap)
+        cap = maxcap;
+
+    m_pvpcap = cap;
+
+    if (weeklyupdate)
+    {
+        m_pvpcapReceived = false;
+        if (GetSession())
+            ChatHandler(GetSession()).PSendSysMessage("Your Weekly Arena Cap was reseted");
+    }
+    else
+    {
+        if (cap < 1500)
+            m_pvpcapReceived = false;
+        else
+            m_pvpcapReceived = true;
+
+        if (GetSession())
+            ChatHandler(GetSession()).PSendSysMessage("Your Weekly Arena Cap was updated : ( %u / %u )", m_pvpcap, maxcap);
+    }
+}
+
+void Player::RewardPVPCapPoints(uint32 reward)
+{
+    if (!sWorld->getBoolConfig(CONFIG_PVP_REWARD))
+        return;
+
+    if (m_pvpcapReceived)
+        return;
+
+    uint32 maxcap = sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP);
+    m_pvpcap += reward;
+
+    if (m_pvpcap >= maxcap)
+    {
+        m_pvpcap = maxcap;
+        RewardPVPCap();
+    }
+
+    if (GetSession())
+        ChatHandler(GetSession()).PSendSysMessage("Your Weekly Arena Cap was updated : ( %u / %u )", m_pvpcap, maxcap);
+}
+
+void Player::RewardPVPCap()
+{
+    m_pvpcapReceived = true;
+    uint32 quility = 0;
+    if (GetAverageItemLevel() >= 270.0f)
+        quility = 1;
+    else if (GetAverageItemLevel() >= 251.0f)
+        quility = 2;
+    else
+        quility = 3;
+
+    uint32 count = 1;
+    uint32 entryreward = 0;
+    uint8 randomlevel = urand(0, 1);
+
+    switch (randomlevel) // if 0 - mounts/and others, if 1 - items
+    {
+        case 0:
+        {
+            entryreward = 49426;
+            count = 5;
+            break;
+        }
+        case 1:
+        {
+            switch (getClass())
+            {
+                case CLASS_WARRIOR:
+                {
+                    uint32 item_list_1[15] = { 51543, 51545, 51541, 51542, 51554, 51364, 51362, 51363, 51354, 51356, 51358, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378), 51353, 51355, 51357 };
+                    uint32 item_list_2[14] = { 40829, 40870, 40790, 40810, 40850, 40890, 40883, 40884, 42081, 42082, 42119, 46374, 42041, 42042 };
+                    uint32 item_list_3[5] = { 40826, 40866, 40789, 40807, 40847 };
+
+                    switch (quility)
+                    {
+                        case 1: entryreward = item_list_1[urand(0, 14)]; break;
+                        case 2: entryreward = item_list_2[urand(0, 13)]; break;
+                        case 3: entryreward = item_list_3[urand(0, 4)]; break;
+                    }
+                    break;
+                }
+                case CLASS_PALADIN:
+                {
+                    if (IsHealerTalentSpec())
+                    {
+                        uint32 item_list_1[21] = { 51470, 51473, 51468, 51469, 51471, 51361, 51359, 51360, 51472, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                        uint32 item_list_2[20] = { 40934, 40964, 40910, 40928, 40940, 40984, 40978, 40949, 42616, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045 };
+                        uint32 item_list_3[6] = { 40933, 40963, 40907, 40927, 40939, 42615 };
+
+                        switch (quility)
+                        {
+                            case 1: entryreward = item_list_1[urand(0, 20)]; break;
+                            case 2: entryreward = item_list_2[urand(0, 19)]; break;
+                            case 3: entryreward = item_list_3[urand(0, 5)]; break;
+                        }
+                    }
+                    else // Retribution or Prot =)
+                    {
+                        uint32 item_list_1[16] = { 51476, 51479, 51474, 51475, 51477, 51364, 51362, 51363, 51478, 51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                        uint32 item_list_2[15] = { 40831, 40872, 40792, 40812, 40852, 40890, 40883, 40884, 42854, 42081, 42082, 42119, 46374, 42041, 42042 };
+                        uint32 item_list_3[6] = { 40828, 40869, 40788, 40808, 40849, 42853 };
+
+                        switch (quility)
+                        {
+                            case 1: entryreward = item_list_1[urand(0, 15)]; break;
+                            case 2: entryreward = item_list_2[urand(0, 14)]; break;
+                            case 3: entryreward = item_list_3[urand(0, 5)]; break;
+                        }
+                    }
+                    break;
+                }
+                case CLASS_HUNTER:
+                {
+                    uint32 item_list_1[15] = { 51460, 51462, 51458, 51459, 51461, 51352, 51350, 51351, 51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_2[13] = { 41158, 41218, 41088, 41144, 41206, 41226, 41236, 41231, 42081, 42082, 46374, 42041, 42042 };
+                    uint32 item_list_3[5] = { 41157, 41217, 41087, 41143, 41205 };
+
+                    switch (quility)
+                    {
+                        case 1: entryreward = item_list_1[urand(0, 14)]; break;
+                        case 2: entryreward = item_list_2[urand(0, 12)]; break;
+                        case 3: entryreward = item_list_3[urand(0, 4)]; break;
+                    }
+                    break;
+                }
+                case CLASS_ROGUE:
+                {
+                    uint32 item_list_1[15] = { 51494, 51496, 51492, 51493, 51495, 51370, 51368, 51369, 51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_2[14] = { 41673, 41684, 41651, 41768, 41656, 41841, 41833, 41837, 42081, 42082, 46374, 42041, 42042, 42119 };
+                    uint32 item_list_3[5] = { 41672, 41683, 41650, 41767, 41655 };
+
+                    switch (quility)
+                    {
+                        case 1: entryreward = item_list_1[urand(0, 14)]; break;
+                        case 2: entryreward = item_list_2[urand(0, 13)]; break;
+                        case 3: entryreward = item_list_3[urand(0, 4)]; break;
+                    }                    
+                    break;
+                }
+                case CLASS_PRIEST:
+                {
+                    // back2 42078, 42080, 42076, 42079, 42077, - ring 42118 - neck 42044, 42046, 42043, 42047, 42045
+                    uint32 item_list_1[31] = { 51484, 51486, 51482, 51483, 51485, 51489, 51491, 51487, 51488, 51490, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_2[30] = { 41855, 41870, 41860, 41875, 41865, 41916, 41935, 41922, 41941, 41928, 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045 };
+                    uint32 item_list_3[10] = { 41854, 41869, 41859, 41874, 41864, 41915, 41934, 41921, 41940, 41927 };
+
+                    switch (quility)
+                    {
+                        case 1: entryreward = item_list_1[urand(0, 30)]; break;
+                        case 2: entryreward = item_list_2[urand(0, 29)]; break;
+                        case 3: entryreward = item_list_3[urand(0, 9)]; break;
+                    }
+                    break;
+                }
+                case CLASS_DEATH_KNIGHT:
+                {
+                    // stat A8: 51354, 51356, 51358, 51353, 51355, 51357
+                    // stat A7: 42081, 42082, 42119, 46374, 42041, 42042
+                    uint32 item_list_1[16] = { 51415, 51418, 51413, 51414, 51416, 51364, 51362, 51363, 51417, 51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_2[15] = { 40830, 40871, 40791, 40811, 40851, 40890, 40883, 40884, 42622, 42081, 42082, 42119, 46374, 42041, 42042 };
+                    uint32 item_list_3[6] = { 40827, 40868, 40787, 40809, 40848, 42621 };
+
+                    switch (quility)
+                    {
+                        case 1: entryreward = item_list_1[urand(0, 15)]; break;
+                        case 2: entryreward = item_list_2[urand(0, 14)]; break;
+                        case 3: entryreward = item_list_3[urand(0, 5)]; break;
+                    }
+                    break;
+                }
+                case CLASS_SHAMAN:
+                {
+                    uint32 item_list_1[42] = { 51511, 51514, 51509, 51510, 51512, // elem
+                        51505, 51508, 51530, 51504, 51506, //enh
+                        51499, 51502, 51497, 51498, 51500, // restor
+                        51376, 51374, 51375, 51373, 51371, 51372, 51352, 51350, 51351, //off-set
+                        51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, 51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_2[50] = { 41020, 41045, 40995, 41008, 41034, // elem
+                        41152, 41212, 41082, 41138, 41200, // enh
+                        41014, 41039, 40994, 41002, 41028, //restor
+                        41066, 41071, 41076, 41061, 41052, 41056, 41226, 41236, 41231, //off-set
+                        41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045, 42081, 42082, 42119, 46374, 42041, 42042 };
+                    uint32 item_list_3[15] = { 41019, 41044, 40993, 41007, 41033, 41151, 41211, 41081, 41137, 41199, 41013, 41038, 40992, 41001, 41027 };
+
+                    switch (quility)
+                    {
+                        case 1: entryreward = item_list_1[urand(0, 41)]; break;
+                        case 2: entryreward = item_list_2[urand(0, 49)]; break;
+                        case 3: entryreward = item_list_3[urand(0, 14)]; break;
+                    }
+                    break;
+                }
+                case CLASS_MAGE:
+                {
+                    // spell A8: 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, back 51334, 51348, 51330, 51346, 51332, ring 51336, neck 51335, 51349, 51331, 51347, 51333, 
+                    // spell A7: 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, back 42078, 42080, 42076, 42079, 42077, ring 42118, neck 42044, 42046, 42043, 42047, 42045, 
+                    uint32 item_list_1[26] = { 51465, 51467, 51463, 51464, 51466, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_2[25] = { 41947, 41966, 41954, 41972, 41960, 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045 };
+                    uint32 item_list_3[5] = { 41946, 41965, 41953, 41971, 41959 };
+
+                    switch (quility)
+                    {
+                        case 1: entryreward = item_list_1[urand(0, 25)]; break;
+                        case 2: entryreward = item_list_2[urand(0, 24)]; break;
+                        case 3: entryreward = item_list_3[urand(0, 4)]; break;
+                    }
+                    break;
+                }
+                case CLASS_WARLOCK:
+                {
+                    uint32 item_list_1[26] = { 51538, 51540, 51536, 51537, 51539, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_2[25] = { 41994, 42012, 41999, 42018, 42006, 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045 };
+                    uint32 item_list_3[5] = { 41993, 42011, 41998, 42017, 42005 };
+
+                    switch (quility)
+                    {
+                        case 1: entryreward = item_list_1[urand(0, 25)]; break;
+                        case 2: entryreward = item_list_2[urand(0, 24)]; break;
+                        case 3: entryreward = item_list_3[urand(0, 4)]; break;
+                    }
+                    break;
+                }
+                case CLASS_DRUID:
+                {
+                    uint32 item_list_1[54] = { 51435, 51438, 51433, 51434, 51436, 51421, 51424, 51419, 51420, 51422, 51427, 51430, 51425, 51426, 51428, 51345, 51343, 51344, 51342, 51340, 51341, 51370, 51368, 51369, 51429, 51437, 51423, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333,51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_2[44] = { 41328, 41282, 41317, 41294, 41305, 41679, 41716, 41662, 41774, 41668, 41322, 41276, 41311, 41288, 41299, 41641, 41631, 41636, 41626, 41618, 41622, 41841, 41833, 41837, 42591, 42585, 42580, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045, 42081, 42082, 42119, 46374, 42041, 42042 };
+                    uint32 item_list_3[18] = { 41327, 41281, 41316, 41293, 41304, 41678, 41715, 41661, 41773, 41667, 41321, 41275, 41310, 41287, 41298, 42589, 42584, 42579 };
+
+                    switch (quility)
+                    {
+                        case 1: entryreward = item_list_1[urand(0, 53)]; break;
+                        case 2: entryreward = item_list_2[urand(0, 43)]; break;
+                        case 3: entryreward = item_list_3[urand(0, 17)]; break;
+                    }
+                    break;
+                }
+            }
+
+            break;
+        }
+    }
+
+    if (entryreward)
+    {
+        if (!AddItem(entryreward, count))
+            SendItemRetrievalMail(entryreward, count);
+    }
 }
 
 void Player::SetUnderACKmount()

@@ -4488,3 +4488,36 @@ RaidInfo.Enabled = 0
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+# PVP Bonus Weekly Cap Reward system
+#
+#    PVPBonusCapReward.Enabled
+#        Description: Enable/Disable custom PVP bonus cap reward for arena. It give bonus weekly reward when cap is complited (1500/1500 by default)
+#        Default:     0 - disable
+#             	      1 - enabled
+#
+
+PVPBonusCapReward.Enabled = 0
+
+#    PVPBonusCapReward.MaxCap
+#        Description: Max values for Weekly Cap
+#        Default:     1500
+
+PVPBonusCapReward.MaxCap = 1500
+
+#    PVPBonusCapReward.CapChanges.Win
+#        Description: Value for cap after Win
+#        Default:     180
+
+PVPBonusCapReward.CapChanges.Win = 180
+
+#    PVPBonusCapReward.CapChanges.Lose
+#        Description: Value for cap after Lose
+#        Default:     1.0f - x1 rate 
+
+PVPBonusCapReward.CapChanges.Lose = 60
+
+#
+###################################################################################################
