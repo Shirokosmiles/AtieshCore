@@ -405,7 +405,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     }
 
     // auto-selection buff level base at target level (in spellInfo)
-    if (targets.GetUnitTarget())
+    if (targets.GetUnitTarget() && targets.GetUnitTarget()->IsFriendlyTo(caster))
     {
         SpellInfo const* actualSpellInfo = spellInfo->GetAuraRankForLevel(targets.GetUnitTarget()->getLevel());
 
