@@ -119,6 +119,18 @@ public:
         AddGossipItemFor(player,GOSSIP_ICON_MONEY_BAG, getString(player->GetSession()->GetTrinityString(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 300000);
         // магазин
         AddGossipItemFor(player, 0, "|TInterface\\icons\\Ability_Mage_PotentSpirit:25:25:-15:0|tTrade Shop", GOSSIP_SENDER_MAIN, 299998);
+
+        std::string flag = "|TInterface\\icons\\Achievement_BG_interruptX_flagcapture_attempts:25:25:-15:0|tYour Weekly PVP Bonus Cap : (";
+        if (player->GetCFSTeam() == HORDE)
+            flag = "|TInterface\\icons\\Achievement_BG_interruptX_flagcapture_attempts_1game:25:25:-15:0|tYour Weekly PVP Bonus Cap : (";
+
+        uint32 pvpcap = player->GetPVPCapPoints();
+        uint32 maxcap = sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP);
+        flag += getString(" ", pvpcap).c_str();
+        flag += getString(" / ", maxcap).c_str();
+
+        // pvp weekly bonus cap
+        AddGossipItemFor(player, 0, flag + " )", GOSSIP_SENDER_MAIN, 200110);
         // trainer
         AddGossipItemFor(player, GOSSIP_ICON_TRAINER, std::string("|TInterface\\icons\\achievement_level_80:25:25:-15:0|t") + player->GetSession()->GetTrinityString(LANG_ITEM_CLASS_SKILLS), GOSSIP_SENDER_MAIN, 104);
         if (player->GetCFSTeam() == ALLIANCE)

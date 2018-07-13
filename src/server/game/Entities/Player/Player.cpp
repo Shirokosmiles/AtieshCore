@@ -24201,7 +24201,7 @@ void Player::RewardPVPCap()
             {
                 case CLASS_WARRIOR:
                 {
-                    uint32 item_list_1[15] = { 51543, 51545, 51541, 51542, 51554, 51364, 51362, 51363, 51354, 51356, 51358, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378), 51353, 51355, 51357 };
+                    uint32 item_list_1[15] = { 51543, 51545, 51541, 51542, 51554, 51364, 51362, 51363, 51354, 51356, 51358, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)), 51353, 51355, 51357 };
                     uint32 item_list_2[14] = { 40829, 40870, 40790, 40810, 40850, 40890, 40883, 40884, 42081, 42082, 42119, 46374, 42041, 42042 };
                     uint32 item_list_3[5] = { 40826, 40866, 40789, 40807, 40847 };
 
@@ -24217,7 +24217,7 @@ void Player::RewardPVPCap()
                 {
                     if (IsHealerTalentSpec())
                     {
-                        uint32 item_list_1[21] = { 51470, 51473, 51468, 51469, 51471, 51361, 51359, 51360, 51472, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                        uint32 item_list_1[21] = { 51470, 51473, 51468, 51469, 51471, 51361, 51359, 51360, 51472, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                         uint32 item_list_2[20] = { 40934, 40964, 40910, 40928, 40940, 40984, 40978, 40949, 42616, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045 };
                         uint32 item_list_3[6] = { 40933, 40963, 40907, 40927, 40939, 42615 };
 
@@ -24230,7 +24230,7 @@ void Player::RewardPVPCap()
                     }
                     else // Retribution or Prot =)
                     {
-                        uint32 item_list_1[16] = { 51476, 51479, 51474, 51475, 51477, 51364, 51362, 51363, 51478, 51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                        uint32 item_list_1[16] = { 51476, 51479, 51474, 51475, 51477, 51364, 51362, 51363, 51478, 51354, 51356, 51358, 51353, 51355, 51357, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                         uint32 item_list_2[15] = { 40831, 40872, 40792, 40812, 40852, 40890, 40883, 40884, 42854, 42081, 42082, 42119, 46374, 42041, 42042 };
                         uint32 item_list_3[6] = { 40828, 40869, 40788, 40808, 40849, 42853 };
 
@@ -24245,7 +24245,7 @@ void Player::RewardPVPCap()
                 }
                 case CLASS_HUNTER:
                 {
-                    uint32 item_list_1[15] = { 51460, 51462, 51458, 51459, 51461, 51352, 51350, 51351, 51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_1[15] = { 51460, 51462, 51458, 51459, 51461, 51352, 51350, 51351, 51354, 51356, 51358, 51353, 51355, 51357, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                     uint32 item_list_2[13] = { 41158, 41218, 41088, 41144, 41206, 41226, 41236, 41231, 42081, 42082, 46374, 42041, 42042 };
                     uint32 item_list_3[5] = { 41157, 41217, 41087, 41143, 41205 };
 
@@ -24259,7 +24259,7 @@ void Player::RewardPVPCap()
                 }
                 case CLASS_ROGUE:
                 {
-                    uint32 item_list_1[15] = { 51494, 51496, 51492, 51493, 51495, 51370, 51368, 51369, 51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_1[15] = { 51494, 51496, 51492, 51493, 51495, 51370, 51368, 51369, 51354, 51356, 51358, 51353, 51355, 51357, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                     uint32 item_list_2[14] = { 41673, 41684, 41651, 41768, 41656, 41841, 41833, 41837, 42081, 42082, 46374, 42041, 42042, 42119 };
                     uint32 item_list_3[5] = { 41672, 41683, 41650, 41767, 41655 };
 
@@ -24274,7 +24274,7 @@ void Player::RewardPVPCap()
                 case CLASS_PRIEST:
                 {
                     // back2 42078, 42080, 42076, 42079, 42077, - ring 42118 - neck 42044, 42046, 42043, 42047, 42045
-                    uint32 item_list_1[31] = { 51484, 51486, 51482, 51483, 51485, 51489, 51491, 51487, 51488, 51490, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_1[31] = { 51484, 51486, 51482, 51483, 51485, 51489, 51491, 51487, 51488, 51490, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                     uint32 item_list_2[30] = { 41855, 41870, 41860, 41875, 41865, 41916, 41935, 41922, 41941, 41928, 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045 };
                     uint32 item_list_3[10] = { 41854, 41869, 41859, 41874, 41864, 41915, 41934, 41921, 41940, 41927 };
 
@@ -24290,7 +24290,7 @@ void Player::RewardPVPCap()
                 {
                     // stat A8: 51354, 51356, 51358, 51353, 51355, 51357
                     // stat A7: 42081, 42082, 42119, 46374, 42041, 42042
-                    uint32 item_list_1[16] = { 51415, 51418, 51413, 51414, 51416, 51364, 51362, 51363, 51417, 51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_1[16] = { 51415, 51418, 51413, 51414, 51416, 51364, 51362, 51363, 51417, 51354, 51356, 51358, 51353, 51355, 51357, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                     uint32 item_list_2[15] = { 40830, 40871, 40791, 40811, 40851, 40890, 40883, 40884, 42622, 42081, 42082, 42119, 46374, 42041, 42042 };
                     uint32 item_list_3[6] = { 40827, 40868, 40787, 40809, 40848, 42621 };
 
@@ -24308,7 +24308,7 @@ void Player::RewardPVPCap()
                         51505, 51508, 51530, 51504, 51506, //enh
                         51499, 51502, 51497, 51498, 51500, // restor
                         51376, 51374, 51375, 51373, 51371, 51372, 51352, 51350, 51351, //off-set
-                        51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, 51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                        51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, 51354, 51356, 51358, 51353, 51355, 51357, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                     uint32 item_list_2[50] = { 41020, 41045, 40995, 41008, 41034, // elem
                         41152, 41212, 41082, 41138, 41200, // enh
                         41014, 41039, 40994, 41002, 41028, //restor
@@ -24328,7 +24328,7 @@ void Player::RewardPVPCap()
                 {
                     // spell A8: 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, back 51334, 51348, 51330, 51346, 51332, ring 51336, neck 51335, 51349, 51331, 51347, 51333, 
                     // spell A7: 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, back 42078, 42080, 42076, 42079, 42077, ring 42118, neck 42044, 42046, 42043, 42047, 42045, 
-                    uint32 item_list_1[26] = { 51465, 51467, 51463, 51464, 51466, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_1[26] = { 51465, 51467, 51463, 51464, 51466, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                     uint32 item_list_2[25] = { 41947, 41966, 41954, 41972, 41960, 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045 };
                     uint32 item_list_3[5] = { 41946, 41965, 41953, 41971, 41959 };
 
@@ -24342,7 +24342,7 @@ void Player::RewardPVPCap()
                 }
                 case CLASS_WARLOCK:
                 {
-                    uint32 item_list_1[26] = { 51538, 51540, 51536, 51537, 51539, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_1[26] = { 51538, 51540, 51536, 51537, 51539, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                     uint32 item_list_2[25] = { 41994, 42012, 41999, 42018, 42006, 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045 };
                     uint32 item_list_3[5] = { 41993, 42011, 41998, 42017, 42005 };
 
@@ -24356,7 +24356,7 @@ void Player::RewardPVPCap()
                 }
                 case CLASS_DRUID:
                 {
-                    uint32 item_list_1[54] = { 51435, 51438, 51433, 51434, 51436, 51421, 51424, 51419, 51420, 51422, 51427, 51430, 51425, 51426, 51428, 51345, 51343, 51344, 51342, 51340, 51341, 51370, 51368, 51369, 51429, 51437, 51423, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333,51354, 51356, 51358, 51353, 51355, 51357, (GetCFSTeam() == TEAM_ALLIANCE ? 51377 : 51378) };
+                    uint32 item_list_1[54] = { 51435, 51438, 51433, 51434, 51436, 51421, 51424, 51419, 51420, 51422, 51427, 51430, 51425, 51426, 51428, 51345, 51343, 51344, 51342, 51340, 51341, 51370, 51368, 51369, 51429, 51437, 51423, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333,51354, 51356, 51358, 51353, 51355, 51357, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                     uint32 item_list_2[44] = { 41328, 41282, 41317, 41294, 41305, 41679, 41716, 41662, 41774, 41668, 41322, 41276, 41311, 41288, 41299, 41641, 41631, 41636, 41626, 41618, 41622, 41841, 41833, 41837, 42591, 42585, 42580, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045, 42081, 42082, 42119, 46374, 42041, 42042 };
                     uint32 item_list_3[18] = { 41327, 41281, 41316, 41293, 41304, 41678, 41715, 41661, 41773, 41667, 41321, 41275, 41310, 41287, 41298, 42589, 42584, 42579 };
 
@@ -24955,15 +24955,15 @@ void Player::RewardTitleForRating(uint16 rating)
 
     switch (title)
     {
-        case 9: title = GetCFSTeam() == TEAM_ALLIANCE ? GRAND_MARSHAL : HIGH_WARLORD; break;
-        case 8: title = GetCFSTeam() == TEAM_ALLIANCE ? FIELD_MARSHAL : WARLORD; break;
-        case 7: title = GetCFSTeam() == TEAM_ALLIANCE ? MARSHAL : GENERAL; break;
-        case 6: title = GetCFSTeam() == TEAM_ALLIANCE ? COMMANDER : LIEUTENANT_GENERAL; break;
-        case 5: title = GetCFSTeam() == TEAM_ALLIANCE ? LIEUTENANT_COMMANDER : CHAMPION; break;
-        case 4: title = GetCFSTeam() == TEAM_ALLIANCE ? KNIGHT_CHAMPION : CENTURION; break;
-        case 3: title = GetCFSTeam() == TEAM_ALLIANCE ? KNIGHT_CAPTAIN : LEGIONNAIRE; break;
-        case 2: title = GetCFSTeam() == TEAM_ALLIANCE ? KNIGHT_LIEUTENANT : BLOOD_GUARD; break;
-        case 1: title = GetCFSTeam() == TEAM_ALLIANCE ? KNIGHT : STONE_GUARD; break;
+        case 9: title = GetCFSTeam() == ALLIANCE ? GRAND_MARSHAL : HIGH_WARLORD; break;
+        case 8: title = GetCFSTeam() == ALLIANCE ? FIELD_MARSHAL : WARLORD; break;
+        case 7: title = GetCFSTeam() == ALLIANCE ? MARSHAL : GENERAL; break;
+        case 6: title = GetCFSTeam() == ALLIANCE ? COMMANDER : LIEUTENANT_GENERAL; break;
+        case 5: title = GetCFSTeam() == ALLIANCE ? LIEUTENANT_COMMANDER : CHAMPION; break;
+        case 4: title = GetCFSTeam() == ALLIANCE ? KNIGHT_CHAMPION : CENTURION; break;
+        case 3: title = GetCFSTeam() == ALLIANCE ? KNIGHT_CAPTAIN : LEGIONNAIRE; break;
+        case 2: title = GetCFSTeam() == ALLIANCE ? KNIGHT_LIEUTENANT : BLOOD_GUARD; break;
+        case 1: title = GetCFSTeam() == ALLIANCE ? KNIGHT : STONE_GUARD; break;
         default:
             break;
     }
@@ -24995,12 +24995,12 @@ void Player::RewardTitleForKills(uint32 kills)
 
     switch (title)
     {
-        //case 6: title = GetCFSTeam() == TEAM_ALLIANCE ? OF_THE_ALLIANCE : OF_THE_HORDE; break;
-        case 5: title = GetCFSTeam() == TEAM_ALLIANCE ? SERGEANT_MAJOR : FIRST_SERGEANT; break;
-        case 4: title = GetCFSTeam() == TEAM_ALLIANCE ? MASTER_SERGEANT : SENIOR_SERGEANT; break;
-        case 3: title = GetCFSTeam() == TEAM_ALLIANCE ? SERGEANT : SERGEANT_H; break;
-        case 2: title = GetCFSTeam() == TEAM_ALLIANCE ? CORPORAL : GRUNT; break;
-        case 1: title = GetCFSTeam() == TEAM_ALLIANCE ? PRIVATE : SCOUT; break;
+        //case 6: title = GetCFSTeam() == ALLIANCE ? OF_THE_ALLIANCE : OF_THE_HORDE; break;
+        case 5: title = GetCFSTeam() == ALLIANCE ? SERGEANT_MAJOR : FIRST_SERGEANT; break;
+        case 4: title = GetCFSTeam() == ALLIANCE ? MASTER_SERGEANT : SENIOR_SERGEANT; break;
+        case 3: title = GetCFSTeam() == ALLIANCE ? SERGEANT : SERGEANT_H; break;
+        case 2: title = GetCFSTeam() == ALLIANCE ? CORPORAL : GRUNT; break;
+        case 1: title = GetCFSTeam() == ALLIANCE ? PRIVATE : SCOUT; break;
         default:
             break;
     }
