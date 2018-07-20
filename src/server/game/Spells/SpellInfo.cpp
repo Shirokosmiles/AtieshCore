@@ -3418,6 +3418,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             {
                 case 29214: // Wrath of the Plaguebringer
                 case 34700: // Allergic Reaction
+                case 40268: // Spiritual Vengeance, Teron Gorefiend, Black Temple
                 case 41914: // Parasitic Shadowfiend (Illidan)
                 case 41917: // Parasitic Shadowfiend (Illidan)
                 case 54836: // Wrath of the Plaguebringer
@@ -3436,6 +3437,11 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
                 default:
                     break;
             }
+            break;
+        case SPELLFAMILY_ROGUE:
+            // Shadow of Death, Teron Gorefiend, Black Temple
+            if (spellInfo->Id == 40251)
+                return false;
             break;
         case SPELLFAMILY_MAGE:
             // Amplify Magic, Dampen Magic
