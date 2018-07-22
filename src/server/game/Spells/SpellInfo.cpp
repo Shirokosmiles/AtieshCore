@@ -3438,11 +3438,6 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
                     break;
             }
             break;
-        case SPELLFAMILY_ROGUE:
-            // Shadow of Death, Teron Gorefiend, Black Temple
-            if (spellInfo->Id == 40251)
-                return false;
-            break;
         case SPELLFAMILY_MAGE:
             // Amplify Magic, Dampen Magic
             if (spellInfo->SpellFamilyFlags[0] == 0x00002000)
@@ -3489,6 +3484,8 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
                 case 57992:     // Envenom (Rank 3)
                 case 57993:     // Envenom (Rank 4)
                     return true;
+                case 40251:     // Shadow of Death, Teron Gorefiend, Black Temple
+                    return false;
                 default:
                     break;
             }
