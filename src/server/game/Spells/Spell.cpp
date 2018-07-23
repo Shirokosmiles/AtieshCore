@@ -6306,6 +6306,9 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
 uint32 Spell::GetCCDelay(SpellInfo const* _spell)
 {
+    if (!_spell->HasAttribute(SPELL_ATTR0_CU_AURA_CC))
+        return 0;
+
     // CCD for spell with auras
     AuraType auraWithCCD[] = {
         SPELL_AURA_MOD_STUN,
@@ -6316,180 +6319,31 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
         SPELL_AURA_MOD_POSSESS
     };
     
-    uint32 delayForStuns = urand(130, 200);
-    uint32 delayForDisorients = urand(130, 225);
-    uint32 delayForFears = urand(80, 225);
-    uint32 NOdelayForInstantSpells = 0;
-    
-    switch (_spell->SpellFamilyName)
-    {
-        case SPELLFAMILY_HUNTER:
-        {
-            // Traps
-            if (_spell->SpellFamilyFlags[0] & 0x8 ||      // Frozen trap
-                _spell->Id == 57879 ||                    // Snake Trap
-                _spell->SpellFamilyFlags[2] & 0x00024000) // Explosive and Immolation Trap
-                return 0;
-            // Entrapment
-            if (_spell->SpellIconID == 20)
-                return 0;
-            // Scatter Shot
-            if (_spell->Id == 19503)
-                return delayForDisorients;
-            // Wyvern Sting
-            if (_spell->Id == 19386)
-                return delayForDisorients;
-            break;
-        }
-        case SPELLFAMILY_MAGE:
-        {
-            switch (_spell->Id)
-            {
-                case 12826: // Polymorph
-                case 42950: // Dragon Breath
-                    return delayForDisorients;
-                    break;
-                case 44572: // Deep Freeze
-                case 64343: // Impact
-                    return delayForStuns;
-                    break;
-            }
-            break;
-        }
-        case SPELLFAMILY_DEATHKNIGHT:
-        {
-            switch (_spell->Id)
-            {
-                case 47481: // Gnaw (ghoul's stun)
-                    return delayForStuns;
-                    break;
-                case 49203: // Hungering Cold
-                case 49576: // Death Grip
-                    return delayForDisorients;
-                    break;
-            }
-            break;
-        }
-        case SPELLFAMILY_DRUID:
-        {
-            switch (_spell->Id)
-            {
-                case 5211: // Bash
-                case 9005: // Pounce
-                case 22570: // Maim
-                case 33786: // Cyclone
-                    return delayForStuns;
-                    break;
-                case 2637: // Hibernate
-                case 45334: // Feral charge
-                    return delayForDisorients;
-                    break;
-            }
-            break;
-        }
-        case SPELLFAMILY_PALADIN:
-        {
-            switch (_spell->Id)
-            {
-                case 853: // Hammer of Justice
-                    return delayForStuns;
-                    break;
-                case 10326: // Turn Evil
-                    return delayForFears;
-                    break;
-                case 20066: // Repentance
-                    return delayForDisorients;
-                    break;
-            }
-            break;
-        }
-        case SPELLFAMILY_PRIEST:
-        {
-            switch (_spell->Id)
-            {
-                case 605: // Mind Control
-                case 10890: // Psychic Scream
-                case 64044: // Psychic Horror
-                    return delayForFears;
-                    break;
-                case 9484: // Shackle Undead
-                    return delayForDisorients;
-                    break;
-            }
-            break;
-        }
-        case SPELLFAMILY_ROGUE:
-        {
-            switch (_spell->Id)
-            {
-                case 408: // Kidney Shot
-                case 1833: // CheapShot
-                    return delayForStuns;
-                    break;
-                case 1776: // Gouge
-                case 2094: // Blind
-                case 6770: // Sap
-                    return delayForDisorients;
-                    break;
-            }
-            break;
-        }
-        case SPELLFAMILY_SHAMAN:
-        {
-            // Hex
-            if (_spell->Id == 51514)
-                return delayForDisorients;
-            break;
-        }
-        case SPELLFAMILY_WARLOCK: // TODO felguard's intercept(27826?), seduction
-        {
-            switch (_spell->Id)
-            {
-                case 710: // Banish
-                case 5484: // Howl of Terror
-                case 5782: // Fear
-                case 27223: // DeathCoil
-                    return delayForFears;
-                    break;
-                case 30283: // Shadowfury
-                case 60995: // Demon charge
-                    return delayForStuns;
-                    break;
-                case 24259: // Spell Lock - Debuff
-                    return NOdelayForInstantSpells;
-                    break;
-            }
-            break;
-        }
-        case SPELLFAMILY_WARRIOR:
-        {
-            switch (_spell->Id)
-            {
-                case 7922: // Charge
-                case 12809: // Concussion Blow
-                case 20253: // Intercept
-                case 46968: // Shockwave
-                case 65929: // Charge trig.
-                    return delayForStuns;
-                    break;
-                case 20511: // Intimidating Shout
-                    return delayForFears;
-                    break;
-            }
-            break;
-        }
-        case SPELLFAMILY_GENERIC: // is that ok?!
-        {
-            // War Stomp - Tauren's racial
-            if (_spell->Id == 46026)
-                return delayForStuns;
-            break;
-        }
-    }
+    uint32 delayForStuns = urand(130, 225);
+    uint32 delayForFears = urand(100, 225);
+    uint32 NOdelayForInstantSpells = 0;       
     
     for (uint8 i = 0; i < sizeof(auraWithCCD); ++i)
         if (_spell->HasAura(auraWithCCD[i]))
-            return NOdelayForInstantSpells;
+        {
+            switch (i)
+            {
+                case 0:
+                    return delayForStuns;
+                    break;
+                case 1:
+                case 2:
+                    return delayForFears;
+                    break;
+                case 3:                
+                case 4:
+                    return NOdelayForInstantSpells;
+                    break;
+                case 5:
+                    return delayForFears;
+                    break;
+            }
+        }
     
     return 0;
 }
