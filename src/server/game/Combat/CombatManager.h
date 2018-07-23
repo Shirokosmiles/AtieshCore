@@ -58,7 +58,7 @@ struct TC_GAME_API CombatReference
     bool const _isPvP;
     Unit* GetOther(Unit const* me) const { return (first == me) ? second : first; }
 
-    void EndCombat();
+    void EndCombat(bool force = false);
 
     CombatReference(CombatReference const&) = delete;
     CombatReference& operator=(CombatReference const&) = delete;
@@ -121,7 +121,7 @@ class TC_GAME_API CombatManager
         // flags any pvp refs for suppression on owner's side - these refs will not generate combat until refreshed
         void SuppressPvPCombat();
         void EndAllPvECombat();
-        void EndAllPvPCombat();
+        void EndAllPvPCombat(bool force = false);
         void EndAllCombat() { EndAllPvECombat(); EndAllPvPCombat(); }
 
         CombatManager(CombatManager const&) = delete;
@@ -131,7 +131,7 @@ class TC_GAME_API CombatManager
         static void NotifyAICombat(Unit* me, Unit* other);
         void PutReference(ObjectGuid const& guid, CombatReference* ref);
         void PurgeReference(ObjectGuid const& guid, bool pvp);
-        bool UpdateOwnerCombatState() const;
+        bool UpdateOwnerCombatState(bool force = false) const;
         Unit* const _owner;
         std::unordered_map<ObjectGuid, CombatReference*> _pveRefs;
         std::unordered_map<ObjectGuid, PvPCombatReference*> _pvpRefs;

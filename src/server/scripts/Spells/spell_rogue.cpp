@@ -1144,15 +1144,7 @@ class spell_rog_vanish : public AuraScript
             unitTarget->GetSpellHistory()->ResetCooldown(SPELL_ROGUE_STEALTH);
 
         unitTarget->CastSpell(nullptr, SPELL_ROGUE_STEALTH, true);
-
-        if (Unit* victim = unitTarget->GetVictim())
-        {
-            if (victim->ToPlayer())
-            {
-                unitTarget->GetCombatManager().EndAllPvPCombat(); // remove refs from rogue at victim
-                victim->GetCombatManager().EndAllPvPCombat();     // remove refs from victim at rogue, and if no others target, victim should break combat
-            }
-        }
+        unitTarget->GetCombatManager().EndAllPvPCombat(true); // remove refs from rogue at victim, and if no others target, victim should break combat
     }
 
     void Register() override

@@ -54,7 +54,7 @@
     return true;
 }
 
-void CombatReference::EndCombat()
+void CombatReference::EndCombat(bool force)
 {
     // sequencing matters here - AI might do nasty stuff, so make sure refs are in a consistent state before you hand off!
 
@@ -67,8 +67,8 @@ void CombatReference::EndCombat()
     second->GetCombatManager().PurgeReference(first->GetGUID(), _isPvP);
 
     // ...update the combat state, which will potentially remove IN_COMBAT...
-    bool const needFirstAI = first->GetCombatManager().UpdateOwnerCombatState();
-    bool const needSecondAI = second->GetCombatManager().UpdateOwnerCombatState();
+    bool const needFirstAI = first->GetCombatManager().UpdateOwnerCombatState(force);
+    bool const needSecondAI = second->GetCombatManager().UpdateOwnerCombatState(force);
 
     // ...and if that happened, also notify the AI of it...
     if (needFirstAI && first->IsAIEnabled)
@@ -284,10 +284,10 @@ void CombatManager::EndAllPvECombat()
         _pveRefs.begin()->second->EndCombat();
 }
 
-void CombatManager::EndAllPvPCombat()
+void CombatManager::EndAllPvPCombat(bool force)
 {
     while (!_pvpRefs.empty())
-        _pvpRefs.begin()->second->EndCombat();
+        _pvpRefs.begin()->second->EndCombat(force);
 }
 
 /*static*/ void CombatManager::NotifyAICombat(Unit* me, Unit* other)
@@ -325,10 +325,10 @@ void CombatManager::PurgeReference(ObjectGuid const& guid, bool pvp)
         _pveRefs.erase(guid);
 }
 
-bool CombatManager::UpdateOwnerCombatState() const
+bool CombatManager::UpdateOwnerCombatState(bool force) const
 {
     bool const combatState = HasCombat();
-    if (combatState == _owner->IsInCombat())
+    if (!force && combatState == _owner->IsInCombat())
         return false;
 
     if (combatState)
