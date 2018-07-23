@@ -2365,9 +2365,14 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     }
     else
     {
-        targetInfo.TimeDelay = GetCCDelay(m_spellInfo);
-        if (m_delayMoment == 0 || m_delayMoment > targetInfo.TimeDelay)
-            m_delayMoment = targetInfo.TimeDelay;
+        if (target && target->ToPlayer() && target->ToPlayer()->UnderVisibleVanish()) // set CC Delay = 0 if target is rogue under vanish
+            targetInfo.TimeDelay = 0ULL;
+        else
+        {
+            targetInfo.TimeDelay = GetCCDelay(m_spellInfo);
+            if (m_delayMoment == 0 || m_delayMoment > targetInfo.TimeDelay)
+                m_delayMoment = targetInfo.TimeDelay;
+        }
     }
 
     // If target reflect spell back to caster
