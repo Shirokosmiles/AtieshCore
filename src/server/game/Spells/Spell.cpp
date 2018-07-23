@@ -3356,16 +3356,17 @@ void Spell::prepare(SpellCastTargets const& targets, AuraEffect const* triggered
             // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
             if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth())
             {
-                if (Unit* targetspell = m_targets.GetUnitTarget())
+                Unit* targetforremoveauras = unitCaster;
+                if (m_targets.GetUnitTarget() && m_spellInfo->Id == 2094) // [HACK] blind should break stealth for victim, not for rogue
+                    targetforremoveauras = m_targets.GetUnitTarget();
+
+                targetforremoveauras->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+                for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
-                    targetspell->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
-                    for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                    if (m_spellInfo->Effects[i].GetUsedTargetObjectType() == TARGET_OBJECT_TYPE_UNIT)
                     {
-                        if (m_spellInfo->Effects[i].GetUsedTargetObjectType() == TARGET_OBJECT_TYPE_UNIT)
-                        {
-                            targetspell->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);//
-                            break;
-                        }
+                        targetforremoveauras->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);
+                        break;
                     }
                 }
             }
