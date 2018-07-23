@@ -1148,7 +1148,10 @@ class spell_rog_vanish : public AuraScript
         if (Unit* victim = unitTarget->GetVictim())
         {
             if (victim->ToPlayer())
-                victim->GetCombatManager().EndAllPvPCombat();
+            {
+                unitTarget->GetCombatManager().EndAllPvPCombat(); // remove refs from rogue at victim
+                victim->GetCombatManager().EndAllPvPCombat();     // remove refs from victim at rogue, and if no others target, victim should break combat
+            }
         }
     }
 
