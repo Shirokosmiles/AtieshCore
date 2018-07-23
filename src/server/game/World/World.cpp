@@ -1439,8 +1439,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS]   = sConfigMgr->GetIntDefault("FLAB.Script.MaxChars", 0);
     m_int_configs[CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS] = sConfigMgr->GetIntDefault("FLAB.Script.BonusMoney", 1);
     // Vanish Fade Delay
-    m_int_configs[CONFIG_VANISH_VISION_TIMER]                   = sConfigMgr->GetIntDefault("VanishVisionTimer", 500);
-    m_int_configs[CONFIG_VANISH_CC_BREAK_TIMER]                 = sConfigMgr->GetIntDefault("VanishCCbreakTimer", 150);
+    m_int_configs[CONFIG_VANISH_VISION_TIMER]                   = sConfigMgr->GetIntDefault("VanishVisionTimer", 600);
+    m_int_configs[CONFIG_VANISH_CC_BREAK_TIMER]                 = sConfigMgr->GetIntDefault("VanishCCbreakTimer", 300);
     // Allowed LFG channel without LFG state
     m_bool_configs[CONFIG_ALLOWED_LFG_CHANNEL]                  = sConfigMgr->GetBoolDefault("Channel.AllowedLfg", false);
     // CrossFaction BG

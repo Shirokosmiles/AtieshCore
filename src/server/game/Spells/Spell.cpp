@@ -2364,7 +2364,11 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
             m_delayMoment = targetInfo.TimeDelay;
     }
     else
-        targetInfo.TimeDelay = 0ULL;
+    {
+        targetInfo.TimeDelay = GetCCDelay(m_spellInfo);
+        if (m_delayMoment == 0 || m_delayMoment > targetInfo.TimeDelay)
+            m_delayMoment = targetInfo.TimeDelay;
+    }
 
     // If target reflect spell back to caster
     if (targetInfo.MissCondition == SPELL_MISS_REFLECT)
@@ -2882,13 +2886,13 @@ SpellMissInfo Spell::PreprocessSpellHit(Unit* unit, bool scaleAura, TargetInfo& 
                 if (playerTarget->UnderVisibleVanish())
                 {
                     if (!m_spellInfo->HasAttribute(SPELL_ATTR0_CU_AURA_CC))
-                        return SPELL_MISS_EVADE;
+                        return SPELL_MISS_NONE;
                     else if (playerTarget->UnderBreakbleVanish())
                     {
                         playerTarget->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
                         playerTarget->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
                         playerTarget->StopVanish();
-                        return SPELL_MISS_EVADE;
+                        return SPELL_MISS_NONE;
                     }
                 }
             }
@@ -3643,7 +3647,7 @@ void Spell::_cast(bool skipCheck)
             creatureCaster->ReleaseFocus(this);
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
-    if ((m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled()) || m_spellInfo->HasAttribute(SPELL_ATTR4_UNK4))
+    if (((m_spellInfo->Speed > 0.0f || GetCCDelay(m_spellInfo) > 0) && !m_spellInfo->IsChanneled()) || m_spellInfo->HasAttribute(SPELL_ATTR4_UNK4))
     {
         // Remove used for cast item if need (it can be already NULL after TakeReagents call
         // in case delayed spell remove item at cast delay start
@@ -6298,6 +6302,196 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
             return SPELL_FAILED_NOT_READY;
 
     return CheckCast(true);
+}
+
+uint32 Spell::GetCCDelay(SpellInfo const* _spell)
+{
+    // CCD for spell with auras
+    AuraType auraWithCCD[] = {
+        SPELL_AURA_MOD_STUN,
+        SPELL_AURA_MOD_CONFUSE,
+        SPELL_AURA_MOD_FEAR,
+        SPELL_AURA_MOD_SILENCE,
+        SPELL_AURA_MOD_DISARM,
+        SPELL_AURA_MOD_POSSESS
+    };
+    
+    uint32 delayForStuns = urand(130, 200);
+    uint32 delayForDisorients = urand(130, 225);
+    uint32 delayForFears = urand(80, 225);
+    uint32 NOdelayForInstantSpells = 0;
+    
+    switch (_spell->SpellFamilyName)
+    {
+        case SPELLFAMILY_HUNTER:
+        {
+            // Traps
+            if (_spell->SpellFamilyFlags[0] & 0x8 ||      // Frozen trap
+                _spell->Id == 57879 ||                    // Snake Trap
+                _spell->SpellFamilyFlags[2] & 0x00024000) // Explosive and Immolation Trap
+                return 0;
+            // Entrapment
+            if (_spell->SpellIconID == 20)
+                return 0;
+            // Scatter Shot
+            if (_spell->Id == 19503)
+                return delayForDisorients;
+            // Wyvern Sting
+            if (_spell->Id == 19386)
+                return delayForDisorients;
+            break;
+        }
+        case SPELLFAMILY_MAGE:
+        {
+            switch (_spell->Id)
+            {
+                case 12826: // Polymorph
+                case 42950: // Dragon Breath
+                    return delayForDisorients;
+                    break;
+                case 44572: // Deep Freeze
+                case 64343: // Impact
+                    return delayForStuns;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            switch (_spell->Id)
+            {
+                case 47481: // Gnaw (ghoul's stun)
+                    return delayForStuns;
+                    break;
+                case 49203: // Hungering Cold
+                case 49576: // Death Grip
+                    return delayForDisorients;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_DRUID:
+        {
+            switch (_spell->Id)
+            {
+                case 5211: // Bash
+                case 9005: // Pounce
+                case 22570: // Maim
+                case 33786: // Cyclone
+                    return delayForStuns;
+                    break;
+                case 2637: // Hibernate
+                case 45334: // Feral charge
+                    return delayForDisorients;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_PALADIN:
+        {
+            switch (_spell->Id)
+            {
+                case 853: // Hammer of Justice
+                    return delayForStuns;
+                    break;
+                case 10326: // Turn Evil
+                    return delayForFears;
+                    break;
+                case 20066: // Repentance
+                    return delayForDisorients;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_PRIEST:
+        {
+            switch (_spell->Id)
+            {
+                case 605: // Mind Control
+                case 10890: // Psychic Scream
+                case 64044: // Psychic Horror
+                    return delayForFears;
+                    break;
+                case 9484: // Shackle Undead
+                    return delayForDisorients;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_ROGUE:
+        {
+            switch (_spell->Id)
+            {
+                case 408: // Kidney Shot
+                case 1833: // CheapShot
+                    return delayForStuns;
+                    break;
+                case 1776: // Gouge
+                case 2094: // Blind
+                case 6770: // Sap
+                    return delayForDisorients;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_SHAMAN:
+        {
+            // Hex
+            if (_spell->Id == 51514)
+                return delayForDisorients;
+            break;
+        }
+        case SPELLFAMILY_WARLOCK: // TODO felguard's intercept(27826?), seduction
+        {
+            switch (_spell->Id)
+            {
+                case 710: // Banish
+                case 5484: // Howl of Terror
+                case 5782: // Fear
+                case 27223: // DeathCoil
+                    return delayForFears;
+                    break;
+                case 30283: // Shadowfury
+                case 60995: // Demon charge
+                    return delayForStuns;
+                    break;
+                case 24259: // Spell Lock - Debuff
+                    return NOdelayForInstantSpells;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_WARRIOR:
+        {
+            switch (_spell->Id)
+            {
+                case 7922: // Charge
+                case 12809: // Concussion Blow
+                case 20253: // Intercept
+                case 46968: // Shockwave
+                case 65929: // Charge trig.
+                    return delayForStuns;
+                    break;
+                case 20511: // Intimidating Shout
+                    return delayForFears;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_GENERIC: // is that ok?!
+        {
+            // War Stomp - Tauren's racial
+            if (_spell->Id == 46026)
+                return delayForStuns;
+            break;
+        }
+    }
+    
+    for (uint8 i = 0; i < sizeof(auraWithCCD); ++i)
+        if (_spell->HasAura(auraWithCCD[i]))
+            return NOdelayForInstantSpells;
+    
+    return 0;
 }
 
 SpellCastResult Spell::CheckCasterAuras(uint32* param1) const

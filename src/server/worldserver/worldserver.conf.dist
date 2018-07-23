@@ -4034,14 +4034,14 @@ CheckM2ObjectLoS = 1
 #        Default:     500 - (0.5 sec)
 #
 
-VanishVisionTimer = 500
+VanishVisionTimer = 600
 
 #   VanishCCbreakTimer
 #        Description: Vanish Should evade CC spells too, when casted, but it's a little lime.
 #        Default:     150 - (0.15 sec)
 #
 
-VanishCCbreakTimer = 150
+VanishCCbreakTimer = 300
 
 #
 ###################################################################################################
