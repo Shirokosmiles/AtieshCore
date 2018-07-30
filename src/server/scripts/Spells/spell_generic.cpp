@@ -1635,36 +1635,91 @@ class spell_gen_elune_candle : public SpellScript
 // 50051 - Ethereal Pet Aura
 enum EtherealPet
 {
-    SAY_STEAL_ESSENCE = 1,
-    SAY_CREATE_TOKEN = 2,
+    NPC_ETHEREAL_SOUL_TRADER        = 27914,
 
-    SPELL_STEAL_ESSENCE_VISUAL = 50101,
-    SPELL_CREATE_TOKEN = 50063
+    SAY_STEAL_ESSENCE               = 1,
+    SAY_CREATE_TOKEN                = 2,
+
+    SPELL_PROC_TRIGGER_ON_KILL_AURA = 50051,
+    SPELL_ETHEREAL_PET_AURA         = 50055,
+    SPELL_CREATE_TOKEN              = 50063,
+    SPELL_STEAL_ESSENCE_VISUAL      = 50101
 };
 
+// 50051 - Ethereal Pet Aura
 class spell_ethereal_pet_aura : public AuraScript
 {
     PrepareAuraScript(spell_ethereal_pet_aura);
 
-    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        uint32 levelDiff = std::abs(GetTarget()->getLevel() - eventInfo.GetProcTarget()->getLevel());
+        return levelDiff <= 9;
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        Player* owner = GetTarget()->ToPlayer();
-        Unit* target = eventInfo.GetActionTarget();
-        if (!owner || !target)
-            return;
-
-        if (Creature* pet = owner->GetMap()->GetCreature(owner->m_SummonSlot[SUMMON_TYPE_MINIPET]))
+        std::list<Creature*> minionList;
+        GetUnitOwner()->GetAllMinionsByEntry(minionList, NPC_ETHEREAL_SOUL_TRADER);
+        for (Creature* minion : minionList)
         {
-            pet->CastSpell(target, SPELL_STEAL_ESSENCE_VISUAL);
-            pet->AI()->Talk(SAY_STEAL_ESSENCE);
+            if (minion->IsAIEnabled) 
+            {
+                minion->AI()->Talk(SAY_STEAL_ESSENCE);
+                minion->CastSpell(eventInfo.GetProcTarget(), SPELL_STEAL_ESSENCE_VISUAL);
+            }
         }
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_ethereal_pet_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        DoCheckProc += AuraCheckProcFn(spell_ethereal_pet_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_ethereal_pet_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 50052 - Ethereal Pet onSummon
+class spell_ethereal_pet_onsummon : public SpellScript
+{
+    PrepareSpellScript(spell_ethereal_pet_onsummon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PROC_TRIGGER_ON_KILL_AURA });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetHitUnit();
+        target->CastSpell(target, SPELL_PROC_TRIGGER_ON_KILL_AURA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ethereal_pet_onsummon::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 50055 - Ethereal Pet Aura Remove
+class spell_ethereal_pet_aura_remove : public SpellScript
+{
+    PrepareSpellScript(spell_ethereal_pet_aura_remove);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ETHEREAL_PET_AURA });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->RemoveAurasDueToSpell(SPELL_ETHEREAL_PET_AURA);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ethereal_pet_aura_remove::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1675,13 +1730,12 @@ class spell_steal_essence_visual : public AuraScript
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        Creature* pet = GetCaster()->ToCreature();
-        Unit* owner = GetCaster()->GetOwner();
-        if (!pet || !owner)
-            return;
-
-        pet->CastSpell(owner, SPELL_CREATE_TOKEN);
-        pet->AI()->Talk(SAY_CREATE_TOKEN);
+        if (Unit* caster = GetCaster())
+        {
+            caster->CastSpell(caster, SPELL_CREATE_TOKEN, true);
+            if (Creature* soulTrader = caster->ToCreature())
+                soulTrader->AI()->Talk(SAY_CREATE_TOKEN);
+        }
     }
 
     void Register() override
@@ -1689,7 +1743,6 @@ class spell_steal_essence_visual : public AuraScript
         AfterEffectRemove += AuraEffectRemoveFn(spell_steal_essence_visual::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
-
 
 enum TransporterBackfires
 {
@@ -4128,6 +4181,8 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_dungeon_credit);
     RegisterSpellScript(spell_gen_elune_candle);
     RegisterAuraScript(spell_ethereal_pet_aura);
+    RegisterSpellScript(spell_ethereal_pet_onsummon);
+    RegisterSpellScript(spell_ethereal_pet_aura_remove);
     RegisterAuraScript(spell_steal_essence_visual);
     RegisterSpellScript(spell_gen_gadgetzan_transporter_backfire);
     RegisterAuraScript(spell_gen_gift_of_naaru);
