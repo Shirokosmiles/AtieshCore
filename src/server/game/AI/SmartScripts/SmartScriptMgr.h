@@ -532,7 +532,7 @@ enum SMART_ACTION
     SMART_ACTION_ADD_NPC_FLAG                       = 82,     // Flags
     SMART_ACTION_REMOVE_NPC_FLAG                    = 83,     // Flags
     SMART_ACTION_SIMPLE_TALK                        = 84,     // groupID, can be used to make players say groupID, Text_over event is not triggered, whisper can not be used (Target units will say the text)
-    SMART_ACTION_INVOKER_CAST                       = 85,     // spellID, castFlags,   if avaliable, last used invoker will cast spellId with castFlags on targets
+    SMART_ACTION_SELF_CAST                          = 85,     // spellID, castFlags
     SMART_ACTION_CROSS_CAST                         = 86,     // spellID, castFlags, CasterTargetType, CasterTarget param1, CasterTarget param2, CasterTarget param3, ( + the origonal target fields as Destination target),   CasterTargets will cast spellID on all Targets (use with caution if targeting multiple * multiple units)
     SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST       = 87,     // script9 ids 1-9
     SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST = 88,     // script9 id min, max
@@ -581,28 +581,8 @@ enum SMART_ACTION
     SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    // Group ID, min secs, max secs, spawnflags
     SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // Group ID, min secs, max secs, spawnflags
     SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    // spawnType, spawnId
-
-    // From SunWell Core SMART_ACTIONs
-    SMART_ACTION_SET_COMBAT_DISTANCE				= 134,    // combatDistance
-    SMART_ACTION_SET_CASTER_COMBAT_DIST				= 135,    // followDistance, resetToMax
-	//SMART_ACTION_SET_SIGHT_DIST						= 136,    // sightDistance
-	//SMART_ACTION_FLEE								= 137,    // fleeTime
-	//SMART_ACTION_ADD_THREAT							= 138,    // +threat, -threat
-	//SMART_ACTION_LOAD_EQUIPMENT						= 139,    // id
-	//SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT			= 140,    // id min range, id max range
-	//SMART_ACTION_SET_HOVER							= 141,    // 0/1
-	//SMART_ACTION_ADD_IMMUNITY						= 142,    // type, id, value
-	//SMART_ACTION_REMOVE_IMMUNITY					= 143,    // type, id, value
-	//SMART_ACTION_FALL								= 144,    // 
-	//SMART_ACTION_SET_EVENT_FLAG_RESET				= 145,    // 0/1
-	//SMART_ACTION_REMOVE_ALL_GAMEOBJECTS				= 146,
-	//SMART_ACTION_STOP_MOTION						= 147,	  // stopMoving, movementExpired
-	//SMART_ACTION_NO_ENVIRONMENT_UPDATE				= 148,
-	//SMART_ACTION_ZONE_UNDER_ATTACK					= 149,
-	//SMART_ACTION_LOAD_GRID							= 150,
-
-    // From SunWell Core SMART_ACTIONs
-    SMART_ACTION_END                                = 151
+    SMART_ACTION_INVOKER_CAST                       = 134,    // spellID, castFlags
+    SMART_ACTION_END                                = 135
 };
 
 struct SmartAction
@@ -1093,17 +1073,6 @@ struct SmartAction
         {
             uint32 wps[SMART_ACTION_PARAM_COUNT];
         } closestWaypointFromList;
-
-        struct
-        {
-            uint32 dist;
-        } combatDistance;
-
-        struct
-        {
-            uint32 dist;
-            uint32 reset;
-        } casterDistance;
 
         struct
         {

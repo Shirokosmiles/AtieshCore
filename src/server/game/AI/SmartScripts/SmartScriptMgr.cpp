@@ -1190,6 +1190,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 // return false;
             }
             // no break
+        case SMART_ACTION_SELF_CAST:
         case SMART_ACTION_ADD_AURA:
             if (!IsSpellValid(e, e.action.cast.spell))
                 return false;
@@ -1567,8 +1568,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SUMMON_CREATURE_GROUP:
         case SMART_ACTION_MOVE_OFFSET:
         case SMART_ACTION_SET_CORPSE_DELAY:
-        case SMART_ACTION_SET_COMBAT_DISTANCE:
-        case SMART_ACTION_SET_CASTER_COMBAT_DIST:
         case SMART_ACTION_DISABLE_EVADE:
         case SMART_ACTION_SET_SIGHT_DIST:
         case SMART_ACTION_FLEE:

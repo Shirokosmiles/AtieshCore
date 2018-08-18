@@ -767,8 +767,9 @@ enum TrinityStrings
     LANG_PINFO_CHR_PLAYEDTIME             = 853,
     LANG_PINFO_CHR_MAILS                  = 854,
     LANG_PINFO_CHR_LEVEL_HIGH             = 871,
-    LANG_PINFO_CHR_FLY_MODE               = 882,
+    LANG_PINFO_CHR_MAP_WITH_AREA          = 882,
     LANG_PINFO_CHR_VIP_MODE               = 883,
+    LANG_PINFO_CHR_FLY_MODE               = 884,
 
     LANG_CHARACTER_GENDER_MALE            = 855,
     LANG_CHARACTER_GENDER_FEMALE          = 856,
@@ -798,7 +799,10 @@ enum TrinityStrings
     //                                    = 879, see LANG_PINFO_CHR_REGMAILS
     LANG_ACCOUNT_SEC_TYPE                 = 880,
     LANG_RBAC_EMAIL_REQUIRED              = 881,
-    // Room for in-game strings             884-999 not used
+    //                                    = 882, LANG_PINFO_CHR_MAP_WITH_AREA
+    //                                    = 883, LANG_PINFO_CHR_VIP_MODE
+    //                                    = 884, LANG_PINFO_CHR_FLY_MODE
+    // Room for in-game strings             885-999 not used
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                     = 1000,
