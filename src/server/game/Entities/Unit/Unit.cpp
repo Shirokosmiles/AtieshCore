@@ -5830,45 +5830,6 @@ Player* Unit::GetControllingPlayer() const
         return const_cast<Player*>(ToPlayer());
 }
 
-
-Unit* Unit::GetCharmerController() const
-{
-    if (CharmerGUID_controller)
-        return ObjectAccessor::GetUnit(*this, CharmerGUID_controller);
-
-    return nullptr;
-}
-
-Unit* Unit::GetCharmerControlledByThis() const
-{
-    if (CharmerGUID_controlled)
-        return ObjectAccessor::GetUnit(*this, CharmerGUID_controlled);
-
-    return nullptr;
-}
-
-void Unit::SetCharmerController(Unit* charmer)
-{
-    if (charmer)
-        CharmerGUID_controller = charmer->GetGUID();
-}
-
-void Unit::SetCharmerControlled(Unit* charmer)
-{
-    if (charmer)
-        CharmerGUID_controlled = charmer->GetGUID();
-}
-
-void Unit::RemoveCharmerController()
-{
-    CharmerGUID_controller = ObjectGuid::Empty;
-}
-
-void Unit::RemoveCharmerControlled()
-{
-    CharmerGUID_controlled = ObjectGuid::Empty;
-}
-
 Minion* Unit::GetFirstMinion() const
 {
     if (ObjectGuid pet_guid = GetMinionGUID())
@@ -11536,8 +11497,6 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     // Set charmed
     charmer->SetCharm(this, true);
-    this->SetCharmerController(charmer);
-    charmer->SetCharmerControlled(this);
 
     if (GetTypeId() == TYPEID_UNIT)
     {
@@ -11653,10 +11612,6 @@ void Unit::RemoveCharmedBy(Unit* charmer)
 
     CastStop();
     CombatStop(); /// @todo CombatStop(true) may cause crash (interrupt spells)
-
-    RemoveCharmerControlled();
-    if (charmer)
-        charmer->RemoveCharmerController();
 
     if (_oldFactionId)
     {

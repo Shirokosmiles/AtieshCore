@@ -795,8 +795,6 @@ void Creature::Update(uint32 diff)
                     else
                         GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, GetFollowAngle());
 
-                    NeedChangeAI = true;
-
                     m_masterCallDelay = 0;
                     m_masterCallTime = m_masterCallDelay * IN_MILLISECONDS;
                 }
@@ -1229,7 +1227,7 @@ Unit* Creature::SelectVictim()
 
     if (!target)
     {
-        target = GetCharmerControlledByThis();
+        target = GetCharmed();
         if (target)
             return target;
     }

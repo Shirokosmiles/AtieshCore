@@ -201,7 +201,7 @@ public:
                 if (player->GetTeam() == ALLIANCE)
                     pPosition = WorldLocation(571, 3687.91f, 3577.28f, 473.342f);
                 else
-                    pPosition = WorldLocation(571, 3744.8f, 3570.65f, 341.66, 0.6f);
+                    pPosition = WorldLocation(571, 3744.8f, 3570.65f, 341.66f, 0.6f);
                 break;
             default:
                 return false;

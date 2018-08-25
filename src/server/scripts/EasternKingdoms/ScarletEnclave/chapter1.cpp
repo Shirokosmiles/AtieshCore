@@ -973,12 +973,12 @@ public:
             }
         }
 
-        void JustEngagedWith(Unit* /*target*/) override
+        void JustEngagedWith(Unit* target) override
         {
             me->SetHomePosition(*me);
             if (_follow)
                 _follow = false;
-            DoZoneInCombat(nullptr, 10.f);
+            AttackStart(target);
         }
 
         void JustExitedCombat() override
