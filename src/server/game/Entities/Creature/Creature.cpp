@@ -879,11 +879,12 @@ void Creature::Update(uint32 diff)
 
             if (m_regenTimer == 0)
             {
+                bool MindControlerEbaniy = GetCharmerController() || GetCharmerControlledByThis();
                 bool bInCombat = IsInCombat() && (!GetVictim() ||                                                            // if IsInCombat() is true and this has no victim
                                                   !EnsureVictim()->GetCharmerOrOwnerPlayerOrPlayerItself() ||                // or the victim/owner/charmer is not a player
                                                   !EnsureVictim()->GetCharmerOrOwnerPlayerOrPlayerItself()->IsGameMaster()); // or the victim/owner/charmer is not a GameMaster
 
-                if (!isCreatureIgnoreEvade() && !IsInEvadeMode() && (!bInCombat || IsPolymorphed() || CanNotReachTarget())) // regenerate health if not in combat or if polymorphed
+                if (!isCreatureIgnoreEvade() && !IsInEvadeMode() && (!bInCombat || IsPolymorphed() || CanNotReachTarget()) && !MindControlerEbaniy) // regenerate health if not in combat or if polymorphed
                     RegenerateHealth();
 
                 if (GetPowerType() == POWER_ENERGY)
@@ -1227,7 +1228,7 @@ Unit* Creature::SelectVictim()
 
     if (!target)
     {
-        target = GetCharmed();
+        target = GetCharmerControlledByThis();
         if (target)
             return target;
     }

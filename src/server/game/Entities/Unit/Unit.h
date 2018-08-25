@@ -1210,6 +1210,13 @@ class TC_GAME_API Unit : public WorldObject
         Minion* GetFirstMinion() const;
         Unit* GetCharmerOrOwner() const { return IsCharmed() ? GetCharmer() : GetOwner(); }
 
+        Unit* GetCharmerController() const;
+        Unit* GetCharmerControlledByThis() const;
+        void SetCharmerController(Unit* charmer);
+        void SetCharmerControlled(Unit* charmer);
+        void RemoveCharmerController();
+        void RemoveCharmerControlled();
+
         void SetMinion(Minion *minion, bool apply);
         void GetAllMinionsByEntry(std::list<Creature*>& Minions, uint32 entry);
         void RemoveAllMinionsByEntry(uint32 entry);
@@ -1649,6 +1656,8 @@ class TC_GAME_API Unit : public WorldObject
 
         friend class VehicleJoinEvent;
         ObjectGuid LastCharmerGUID;
+        ObjectGuid CharmerGUID_controller;
+        ObjectGuid CharmerGUID_controlled;
         bool CreateVehicleKit(uint32 id, uint32 creatureEntry);
         void RemoveVehicleKit();
         Vehicle* GetVehicleKit()const { return m_vehicleKit; }
