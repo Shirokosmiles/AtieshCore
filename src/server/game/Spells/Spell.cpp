@@ -2767,18 +2767,16 @@ void Spell::TargetInfo::DoDamageAndTriggers(Spell* spell)
     if (_spellHitTarget)
     {
         //AI functions
-        if (_spellHitTarget->GetTypeId() == TYPEID_UNIT)
-        {
-            if (_spellHitTarget->ToCreature()->IsAIEnabled)
+        if (Creature* cHitTarget = _spellHitTarget->ToCreature())
+            if (CreatureAI* hitTargetAI = cHitTarget->AI())
             {
                 if (spell->m_caster->GetTypeId() == TYPEID_GAMEOBJECT)
-                    _spellHitTarget->ToCreature()->AI()->SpellHit(spell->m_caster->ToGameObject(), spell->m_spellInfo);
+                    hitTargetAI->SpellHit(spell->m_caster->ToGameObject(), spell->m_spellInfo);
                 else
-                    _spellHitTarget->ToCreature()->AI()->SpellHit(spell->m_caster->ToUnit(), spell->m_spellInfo);
+                    hitTargetAI->SpellHit(spell->m_caster->ToUnit(), spell->m_spellInfo);
             }
-        }
 
-        if (spell->m_caster->GetTypeId() == TYPEID_UNIT && spell->m_caster->ToCreature()->IsAIEnabled)
+        if (spell->m_caster->GetTypeId() == TYPEID_UNIT && spell->m_caster->ToCreature()->IsAIEnabled())
             spell->m_caster->ToCreature()->AI()->SpellHitTarget(_spellHitTarget, spell->m_spellInfo);
         else if (spell->m_caster->GetTypeId() == TYPEID_GAMEOBJECT && spell->m_caster->ToGameObject()->AI())
             spell->m_caster->ToGameObject()->AI()->SpellHitTarget(_spellHitTarget, spell->m_spellInfo);
@@ -2827,7 +2825,7 @@ void Spell::GOTargetInfo::DoTargetSpellHit(Spell* spell, uint8 effIndex)
             go->AI()->SpellHit(spell->m_caster->ToUnit(), spell->m_spellInfo);
     }
 
-    if (spell->m_caster->GetTypeId() == TYPEID_UNIT && spell->m_caster->ToCreature()->IsAIEnabled)
+    if (spell->m_caster->GetTypeId() == TYPEID_UNIT && spell->m_caster->ToCreature()->IsAIEnabled())
         spell->m_caster->ToCreature()->AI()->SpellHitTarget(go, spell->m_spellInfo);
     else if (spell->m_caster->GetTypeId() == TYPEID_GAMEOBJECT && spell->m_caster->ToGameObject()->AI())
         spell->m_caster->ToGameObject()->AI()->SpellHitTarget(go, spell->m_spellInfo);
@@ -3488,8 +3486,8 @@ void Spell::_cast(bool skipCheck)
             if (Unit* target = m_targets.GetUnitTarget())
                 for (Unit* controlled : playerCaster->m_Controlled)
                     if (Creature* cControlled = controlled->ToCreature())
-                        if (cControlled->IsAIEnabled)
-                            cControlled->AI()->OwnerAttacked(target);
+                        if (CreatureAI* controlledAI = cControlled->AI())
+                                controlledAI->OwnerAttacked(target);
     }
 
     SetExecutedCurrently(true);
