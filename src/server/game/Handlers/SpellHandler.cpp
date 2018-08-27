@@ -455,7 +455,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     }
 
     // prevent dismount from fly mounts under roots ( will freeze for all observers )
-    if (_player->IsMounted() && spellInfo->HasAura(SPELL_AURA_MOUNTED) && _player->ToUnit()->isInRoots() && _player->IsFlying())
+    if (_player->IsMounted() && spellInfo->HasAura(SPELL_AURA_MOUNTED) && _player->ToUnit()->IsRooted() && _player->IsFlying())
     {
         _player->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
         _player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT);

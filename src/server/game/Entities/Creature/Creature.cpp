@@ -646,7 +646,7 @@ bool Creature::UpdateEntry(uint32 entry, CreatureData const* data /*= nullptr*/,
     LoadCreaturesAddon();
     LoadTemplateImmunities();
 
-    GetThreatManager().UpdateOnlineStates(true, true);
+    GetThreatManager().EvaluateSuppressed();
     return true;
 }
 
@@ -823,7 +823,6 @@ void Creature::Update(uint32 diff)
                 if (diff >= m_boundaryCheckTime)
                 {
                     AI()->CheckInRoom();
-                    GetThreatManager().UpdateOnlineStates(false, true);
                     m_boundaryCheckTime = 2500;
                 }
                 else
@@ -1172,7 +1171,7 @@ Unit* Creature::SelectVictim()
     Unit* target = nullptr;
 
     if (CanHaveThreatList())
-        target = GetThreatManager().SelectVictim();
+        target = GetThreatManager().GetCurrentVictim();
     else if (!HasReactState(REACT_PASSIVE))
     {
         // We're a player pet, probably
