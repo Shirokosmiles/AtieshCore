@@ -20338,7 +20338,7 @@ void Player::_SaveStats(SQLTransaction& trans) const
     stmt->setFloat(index++, GetFloatValue(PLAYER_PARRY_PERCENTAGE));
     stmt->setFloat(index++, GetFloatValue(PLAYER_CRIT_PERCENTAGE));
     stmt->setFloat(index++, GetFloatValue(PLAYER_RANGED_CRIT_PERCENTAGE));
-    stmt->setFloat(index++, GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1));
+    stmt->setFloat(index++, GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1+1));
     stmt->setUInt32(index++, GetUInt32Value(UNIT_FIELD_ATTACK_POWER));
     stmt->setUInt32(index++, GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER));
     stmt->setUInt32(index++, GetBaseSpellPowerBonus());
@@ -20352,6 +20352,8 @@ void Player::_SaveStats(SQLTransaction& trans) const
     stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_RANGED));
     stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_SPELL));
     stmt->setFloat(index++, GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER));
+    stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + 1));             // spellDamage bonus
+    stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS));                // spellHealing bonus
 
     trans->Append(stmt);
 }
