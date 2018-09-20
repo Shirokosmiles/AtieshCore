@@ -2902,7 +2902,8 @@ SpellMissInfo Spell::PreprocessSpellHit(Unit* unit, bool scaleAura, TargetInfo& 
 
             if (unit->IsTotem() && unit->IsMagnet())
             {
-                if (m_spellInfo->HasAttribute(SPELL_ATTR1_UNK18) && m_damage <= 0)
+                bool AttributeForMagnet = m_spellInfo->HasAttribute(SPELL_ATTR1_UNK18) || m_spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT);
+                if (AttributeForMagnet || m_damage > 0)
                 {
                     unit->KillSelf();
                     return SPELL_MISS_IMMUNE;                    
