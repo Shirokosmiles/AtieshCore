@@ -287,7 +287,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
         if (!table[i].ChildCommands.empty())
         {
             // add in parameter new subcommand name if command right
-            if (!table[i].Handler && BaseCMD != table[i].Name)
+            if (!table[i].HasHandler() && BaseCMD != table[i].Name)
                 additionalsubnames += table[i].Name + std::string(" ");
 
             if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd, BaseCMD, additionalsubnames, fullvalue))
