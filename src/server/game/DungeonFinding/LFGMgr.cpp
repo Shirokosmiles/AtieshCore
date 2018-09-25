@@ -1832,7 +1832,7 @@ void LFGMgr::SetLeader(ObjectGuid gguid, ObjectGuid leader)
 
 void LFGMgr::SetTeam(ObjectGuid guid, uint8 team)
 {
-    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP))
         team = 0;
 
     PlayersStore[guid].SetTeam(team);

@@ -4056,12 +4056,28 @@ External.Mail.Interval = 1
 ###################################################################################################
 
 ###################################################################################################
+#
 #    Channel.AllowedLfg
 #        Description: Allow access at LookupForGroup channel to characters without condition of LFG state.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
-Channel.AllowedLfg = 0
+LFG.Channel.Everywhere = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+#
+# CrossFaction LFG System
+#
+#    LFG.CrossFaction.Groups
+#        Description: Enable/Disable custom system for crossfaction DungeonFinder groups
+#        Default:     0 - disable
+#             	      1 - enabled
+#
+
+LFG.CrossFaction.Groups = 0
 
 #
 ###################################################################################################

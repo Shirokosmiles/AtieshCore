@@ -1441,8 +1441,13 @@ void World::LoadConfigSettings(bool reload)
     // Vanish Fade Delay
     m_int_configs[CONFIG_VANISH_VISION_TIMER]                   = sConfigMgr->GetIntDefault("VanishVisionTimer", 600);
     m_int_configs[CONFIG_VANISH_CC_BREAK_TIMER]                 = sConfigMgr->GetIntDefault("VanishCCbreakTimer", 300);
+
+    // LFG
     // Allowed LFG channel without LFG state
-    m_bool_configs[CONFIG_ALLOWED_LFG_CHANNEL]                  = sConfigMgr->GetBoolDefault("Channel.AllowedLfg", false);
+    m_bool_configs[CONFIG_ALLOWED_LFG_CHANNEL]                  = sConfigMgr->GetBoolDefault("LFG.Channel.Everywhere", false);
+    // LFG crossfaction
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP] = sConfigMgr->GetBoolDefault("LFG.CrossFaction.Groups", false);
+
     // CrossFaction BG
     m_bool_configs[CROSSFACTION_SYSTEM_BATTLEGROUNDS]           = sConfigMgr->GetBoolDefault("CrossfactionBG.enable", true);
     // Mail External 
@@ -1463,7 +1468,7 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_WEEKEND_XP_DAYS] = 0;
     }
 
-    rate_values[RATE_XP_WEEKEND] = sConfigMgr->GetFloatDefault("Weekend.XP.Rate", 1.0f);
+    rate_values[RATE_XP_WEEKEND] = sConfigMgr->GetFloatDefault("Weekend.XP.Rate", 1.0f);    
     //End of Custom Systems
 
     // Dungeon finder
