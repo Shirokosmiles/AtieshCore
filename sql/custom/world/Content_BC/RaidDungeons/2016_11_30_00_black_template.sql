@@ -1,7 +1,3 @@
--- SPELL Curse of Agony (39672)
-DELETE FROM spell_script_names WHERE spell_id=39672;
-INSERT INTO spell_script_names VALUES(39672, 'spell_gen_select_target_count_15_1');
-
 -- SPELL L1 Arcane Charge (41357)
 DELETE FROM spell_script_names WHERE spell_id=41357;
 INSERT INTO spell_script_names VALUES(41357, 'spell_gen_select_target_count_15_1');
