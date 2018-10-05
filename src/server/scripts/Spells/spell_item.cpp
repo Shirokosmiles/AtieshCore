@@ -715,21 +715,24 @@ enum GoblinGumbo
 class spell_item_goblin_gumbo : public AuraScript
 {
     PrepareAuraScript(spell_item_goblin_gumbo);
-     bool Validate(SpellInfo const* /*spellInfo*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_GOBLIN_GUMBO_VISUAL });
     }
-     void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
+
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
     {
         amplitude = urandms(10, 45);
     }
-     void Update(AuraEffect* effect)
+
+    void Update(AuraEffect* effect)
     {
         effect->SetPeriodicTimer(urandms(10, 45));
         if (Unit* owner = GetUnitOwner())
             owner->CastSpell(owner, SPELL_GOBLIN_GUMBO_VISUAL, false);
     }
-     void Register() override
+
+    void Register() override
     {
         DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_item_goblin_gumbo::CalcPeriodic, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
         OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_item_goblin_gumbo::Update, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
