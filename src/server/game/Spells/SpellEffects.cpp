@@ -968,16 +968,36 @@ void Spell::EffectTriggerRitualOfSummoning(SpellEffIndex effIndex)
     m_caster->CastSpell(nullptr, spellInfo->Id, false);
 }
 
-inline void CalculateJumpSpeeds(SpellInfo const* spellInfo, uint8 i, float dist, float& speedXY, float& speedZ)
+inline void CalculateJumpSpeeds(SpellInfo const* spellInfo, uint8 i, float runspeed, float unitcasterGetSpeed, float dist, float& speedXY, float& speedZ)
 {
-    if (spellInfo->Effects[i].MiscValue)
+    float multiplier = spellInfo->Effects[i].ValueMultiplier;
+    if (multiplier <= 0.0f)
+        multiplier = 1.0f;
+
+    speedXY = std::min(runspeed * 3.0f * multiplier, std::max(28.0f, unitcasterGetSpeed * 4.0f));
+
+    /*if (spellInfo->Effects[i].MiscValue)
         speedZ = spellInfo->Effects[i].MiscValue / 10.f;
     else if (spellInfo->Effects[i].MiscValueB)
         speedZ = spellInfo->Effects[i].MiscValueB / 10.f;
     else
         speedZ = 10.0f;
 
-    speedXY = speedZ + sqrt(dist) * 3.0f;
+    speedXY = speedZ + sqrt(dist) * 3.0f;*/
+
+    float duration = dist / speedXY;
+    float durationSqr = duration * duration;
+    float minHeight = spellInfo->Effects[i].MiscValue ? spellInfo->Effects[i].MiscValue / 10.0f : 0.5f; // Lower bound is blizzlike
+    float maxHeight = spellInfo->Effects[i].MiscValueB ? spellInfo->Effects[i].MiscValueB / 10.0f : 1000.0f; // Upper bound is unknown
+    float height;
+    if (durationSqr < minHeight * 8 / Movement::gravity)
+        height = minHeight;
+    else if (durationSqr > maxHeight * 8 / Movement::gravity)
+        height = maxHeight;
+    else
+        height = Movement::gravity * durationSqr / 8;
+
+    speedZ = std::sqrt(2 * Movement::gravity * height);
 }
 
 void Spell::EffectJump(SpellEffIndex effIndex)
@@ -997,7 +1017,13 @@ void Spell::EffectJump(SpellEffIndex effIndex)
     float speedXY, speedZ;
     if (unitTarget->ToPlayer())
         unitTarget->ToPlayer()->SetUnderACKmount();
-    CalculateJumpSpeeds(m_spellInfo, effIndex, unitCaster->GetExactDist2d(unitTarget), speedXY, speedZ);
+
+    float runSpeed = unitCaster->IsControlledByPlayer() ? playerBaseMoveSpeed[MOVE_RUN] : baseMoveSpeed[MOVE_RUN];
+    float unitcasterGetSpeed = unitCaster->GetSpeed(MOVE_RUN);
+    if (Creature* creature = unitCaster->ToCreature())
+        runSpeed *= creature->GetCreatureTemplate()->speed_run;
+
+    CalculateJumpSpeeds(m_spellInfo, effIndex, runSpeed, unitcasterGetSpeed, unitCaster->GetExactDist2d(unitTarget), speedXY, speedZ);
     unitCaster->GetMotionMaster()->MoveJump(*unitTarget, speedXY, speedZ, EVENT_JUMP, false);
 }
 
@@ -1017,14 +1043,19 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
 
     float speedXY, speedZ;
     float dist = unitCaster->GetExactDist2d(destTarget);
+
+    float runSpeed = unitCaster->IsControlledByPlayer() ? playerBaseMoveSpeed[MOVE_RUN] : baseMoveSpeed[MOVE_RUN];
+    float unitcasterGetSpeed = unitCaster->GetSpeed(MOVE_RUN);
+    if (Creature* creature = unitCaster->ToCreature())
+        runSpeed *= creature->GetCreatureTemplate()->speed_run;
     //49376: Feral Charge - Cat
-    if (m_spellInfo->Id == 49376)
+    /*if (m_spellInfo->Id == 49376)
     {
         speedXY = (float(m_spellInfo->Effects[effIndex].MiscValueB) * 0.1f + sqrt(dist)) * 1.5f;
         speedZ = float(m_spellInfo->Effects[effIndex].MiscValue) + dist * 0.2f;
     }
-    else
-        CalculateJumpSpeeds(m_spellInfo, effIndex, dist, speedXY, speedZ);
+    else*/
+        CalculateJumpSpeeds(m_spellInfo, effIndex, runSpeed, unitcasterGetSpeed, dist, speedXY, speedZ);
 
     if (unitCaster->ToPlayer())
         unitCaster->ToPlayer()->SetUnderACKmount();

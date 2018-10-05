@@ -361,15 +361,18 @@ enum EyeOfAcherus
     SPELL_EYE_FLIGHT            = 51890,
 
     EVENT_MOVE_START            = 1,
+    EVENT_MOVE_CONTINUE         = 2,
 
     TALK_MOVE_START             = 0,
     TALK_CONTROL                = 1,
 
     POINT_EYE_FALL              = 1,
+    POINT_EYE_FREE              = 2,
     POINT_EYE_MOVE_END          = 3
 };
 
-Position const EyeOFAcherusFallPoint = { 2361.21f, -5660.45f, 496.7444f, 0.0f };
+Position const EyeOFAcherusFallPoint = { 2312.70f, -5689.60f, 473.4946f, 0.0f };
+Position const EyeOFAcherusFreePoint = { 1895.68f, -5906.67f, 188.4815f, 0.0f };
 
 class npc_eye_of_acherus : public CreatureScript
 {
@@ -381,18 +384,10 @@ class npc_eye_of_acherus : public CreatureScript
             npc_eye_of_acherusAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetDisplayId(me->GetCreatureTemplate()->Modelid1);
-                if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
-                    owner->SendAutoRepeatCancel(me);
-
+                DoCastSelf(SPELL_EYE_VISUAL);
                 me->SetReactState(REACT_PASSIVE);
-
                 me->SetDisableGravity(true);
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                me->StopMoving();
-
-                me->GetMotionMaster()->MovePoint(POINT_EYE_FALL, EyeOFAcherusFallPoint, false);
-
-                _events.ScheduleEvent(EVENT_MOVE_START, 3500);
+                _events.ScheduleEvent(EVENT_MOVE_START, 3s);
             }
 
             void OnCharmed(bool /*apply*/) override { }
@@ -407,15 +402,28 @@ class npc_eye_of_acherus : public CreatureScript
                     {
                         case EVENT_MOVE_START:
                         {
+                            me->StopMoving();
+                            if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
+                                Talk(TALK_MOVE_START, owner);
+                            Movement::MoveSplineInit init(me);
+                            init.MoveTo(EyeOFAcherusFallPoint.GetPositionX(), EyeOFAcherusFallPoint.GetPositionY(), EyeOFAcherusFallPoint.GetPositionZ(), false);
+                            init.SetFall();
+                            me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_EYE_FALL, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);                            
+                            break;
+                        }
+                        case EVENT_MOVE_CONTINUE:
+                        {
+                            me->StopMoving();
                             DoCast(me, SPELL_EYE_FLIGHT_BOOST);
-
                             if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
                             {
                                 for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
                                     me->SetSpeedRate(UnitMoveType(i), owner->GetSpeedRate(UnitMoveType(i)));
-                                Talk(TALK_MOVE_START, owner);
                             }
-                            me->GetMotionMaster()->MovePath(me->GetEntry() * 100, false);
+                            Movement::MoveSplineInit init(me);
+                            init.MoveTo(EyeOFAcherusFreePoint.GetPositionX(), EyeOFAcherusFreePoint.GetPositionY(), EyeOFAcherusFreePoint.GetPositionZ(), false);
+                            init.SetFly();
+                            me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_EYE_FREE, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
                             break;
                         }
                         default:
@@ -426,21 +434,28 @@ class npc_eye_of_acherus : public CreatureScript
 
             void MovementInform(uint32 movementType, uint32 pointId) override
             {
-                if (movementType == WAYPOINT_MOTION_TYPE && pointId == POINT_EYE_MOVE_END - 1)
+                if (movementType == POINT_MOTION_TYPE)                    
                 {
-                    me->SetSheath(SHEATH_STATE_MELEE);
-                    me->RemoveAllAuras();
-                    //me->SetControlled(false, UNIT_STATE_ROOT);
-                    if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
+                    if (pointId == POINT_EYE_FALL)
                     {
-                        owner->RemoveAura(SPELL_EYE_FLIGHT_BOOST);
-                        for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
-                            me->SetSpeedRate(UnitMoveType(i), owner->GetSpeedRate(UnitMoveType(i)));
-
-                        Talk(TALK_CONTROL, owner);
+                        _events.ScheduleEvent(EVENT_MOVE_CONTINUE, 500);
                     }
+                    else if (pointId == POINT_EYE_FREE)
+                    {
+                        me->SetSheath(SHEATH_STATE_MELEE);
+                        me->RemoveAllAuras();
+                        //me->SetControlled(false, UNIT_STATE_ROOT);
+                        if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
+                        {
+                            owner->RemoveAura(SPELL_EYE_FLIGHT_BOOST);
+                            for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
+                                me->SetSpeedRate(UnitMoveType(i), owner->GetSpeedRate(UnitMoveType(i)));
 
-                    DoCast(me, SPELL_EYE_FLIGHT);
+                            Talk(TALK_CONTROL, owner);
+                        }
+
+                        DoCast(me, SPELL_EYE_FLIGHT);
+                    }
                 }
             }
 
