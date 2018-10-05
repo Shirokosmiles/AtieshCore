@@ -22,12 +22,30 @@
 
 #define GNOScriptName "instance_gnomeregan"
 #define DataHeader "GNO"
+#define MAX_GNOME_FACES 6
 
 enum GNOGameObjectIds
 {
     GO_CAVE_IN_LEFT     = 146085,
     GO_CAVE_IN_RIGHT    = 146086,
-    GO_RED_ROCKET       = 103820
+    GO_RED_ROCKET       = 103820,
+
+    //Mekgineer Thermaplugg
+    GO_GNOME_FACE_01    = 142211,
+    GO_GNOME_FACE_02    = 142210,
+    GO_GNOME_FACE_03    = 142209,
+    GO_GNOME_FACE_04    = 142208,
+    GO_GNOME_FACE_05    = 142213,
+    GO_GNOME_FACE_06    = 142212,
+
+    GO_BUTTON_01        = 142214,
+    GO_BUTTON_02        = 142215,
+    GO_BUTTON_03        = 142216,
+    GO_BUTTON_04        = 142217,
+    GO_BUTTON_05        = 142218,
+    GO_BUTTON_06        = 142219,
+
+    GO_THE_FINAL_CHAMBER = 142207
 };
 
 enum GNOCreatureIds
@@ -39,7 +57,8 @@ enum GNOCreatureIds
     NPC_CHOMPER                     = 6215,
     NPC_ELECTROCUTIONER             = 6235,
     NPC_CROWD_PUMMELER              = 6229,
-    NPC_MEKGINEER                   = 7800,
+    NPC_MEKGINEER_THERMAPLUGG       = 7800,
+    NPC_WALKING_BOMB                = 7915
 };
 
 enum GNOData
@@ -49,15 +68,19 @@ enum GNOData
     DATA_ELECTROCUTIONER   = 2,
     DATA_CROWD_PUMMELER    = 3,
     DATA_THERMAPLUGG       = 4,
+    MAX_ENCOUNTER,
 
-    MAX_ENCOUNTER
-};
-
-enum GNOData64
-{
+    // Extra
     DATA_GO_CAVE_IN_LEFT,
     DATA_GO_CAVE_IN_RIGHT,
-    DATA_NPC_BASTMASTER_EMI_SHORTFUSE
+    DATA_NPC_BLASTMASTER_EMI_SHORTFUSE,
+    DATA_THE_FINAL_CHAMBER,
+    DATA_FACE_01,
+    DATA_FACE_02,
+    DATA_FACE_03,
+    DATA_FACE_04,
+    DATA_FACE_05,
+    DATA_FACE_06
 };
 
 template <class AI, class T>

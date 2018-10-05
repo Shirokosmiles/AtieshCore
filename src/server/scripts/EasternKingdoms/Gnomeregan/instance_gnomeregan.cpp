@@ -24,6 +24,24 @@
 #include "Map.h"
 #include "Player.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_MEKGINEER_THERMAPLUGG, DATA_THERMAPLUGG },
+    { 0,                         0                }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { GO_GNOME_FACE_01,     DATA_FACE_01           },
+    { GO_GNOME_FACE_02,     DATA_FACE_02           },
+    { GO_GNOME_FACE_03,     DATA_FACE_03           },
+    { GO_GNOME_FACE_04,     DATA_FACE_04           },
+    { GO_GNOME_FACE_05,     DATA_FACE_05           },
+    { GO_GNOME_FACE_06,     DATA_FACE_06           },
+    { GO_THE_FINAL_CHAMBER, DATA_THE_FINAL_CHAMBER },
+    { 0,                    0                      }
+};
+ 
 class instance_gnomeregan : public InstanceMapScript
 {
 public:
@@ -40,15 +58,17 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            LoadObjectData(creatureData, gameObjectData);
         }
 
         ObjectGuid uiCaveInLeftGUID;
         ObjectGuid uiCaveInRightGUID;
-
         ObjectGuid uiBlastmasterEmiShortfuseGUID;
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
                 case NPC_BLASTMASTER_EMI_SHORTFUSE:
@@ -59,6 +79,8 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
+            InstanceScript::OnGameObjectCreate(go);
+
             switch (go->GetEntry())
             {
                 case GO_CAVE_IN_LEFT:
@@ -85,9 +107,6 @@ public:
                     case NPC_CROWD_PUMMELER:
                         SetBossState(DATA_CROWD_PUMMELER, DONE);
                         break;
-                    case NPC_MEKGINEER:
-                        SetBossState(DATA_THERMAPLUGG, DONE);
-                        break;
                 }
         }
 
@@ -95,15 +114,20 @@ public:
         {
             switch (uiType)
             {
-                case DATA_GO_CAVE_IN_LEFT:              return uiCaveInLeftGUID;
-                case DATA_GO_CAVE_IN_RIGHT:             return uiCaveInRightGUID;
-                case DATA_NPC_BASTMASTER_EMI_SHORTFUSE: return uiBlastmasterEmiShortfuseGUID;
+                case DATA_GO_CAVE_IN_LEFT:               return uiCaveInLeftGUID;
+                case DATA_GO_CAVE_IN_RIGHT:              return uiCaveInRightGUID;
+                case DATA_NPC_BLASTMASTER_EMI_SHORTFUSE: return uiBlastmasterEmiShortfuseGUID;
             }
 
             return ObjectGuid::Empty;
         }
-    };
 
+        /*void ProcessEvent(WorldObject* obj, uint32 eventId) override
+        {
+            //Event 2721 sent by spell 11518 'Serverside - Activate Bomb 01'
+        }
+        */
+    };
 };
 
 void AddSC_instance_gnomeregan()
