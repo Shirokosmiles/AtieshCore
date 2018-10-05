@@ -15,59 +15,56 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "ScriptedCreature.h"
-#include "ScriptMgr.h"
+#include "SpellInfo.h"
 #include "stratholme.h"
 
 enum Texts
 {
-    EMOTE_RAISE_DEAD            = 0,    // %s raises an undead servant back to life!
-    EMOTE_DEATH_PACT            = 1     // %s attempts to cast Death Pact on his servants!     
-};
-
-enum BaronRun
-{
-    YELL_BARON_RUN_START        = 0,    // Intruders! More pawns of the Argent Dawn, no doubt. I already count one of their number among my prisoners. Withdraw from my domain before she is executed!
-    YELL_BARON_RUN_BOSS_KILL    = 1,    // The Ash'ari Crystals have been destroyed! The Slaughterhouse is vulnerable!
-    YELL_BARON_RUN_FAIL         = 2,    // Unknown
-    YELL_EVENT_RAMSTEIN         = 3,    // So you see fit to toy with the Lich King's creations? Ramstein, be sure to give the intruders a proper greeting.
-    YELL_EVENT_BARON            = 4,    // Time to take matters into my own hands. Come. Enter my domain and challenge the might of the Scourge!
+    EMOTE_RAISE_DEAD    = 0,    // %s raises an undead servant back to life!
+    EMOTE_DEATH_PACT    = 1     // %s attempts to cast Death Pact on his servants!     
 };
 
 enum Spells
 {
-    SPELL_SHADOWBOLT            = 17393,
-    SPELL_CLEAVE                = 15284,
-    SPELL_MORTALSTRIKE          = 15708,
-    SPELL_DEATH_PACT            = 17471,
-    SPELL_RAISE_DEAD            = 17473,
-    SPELL_UNHOLY_AURA           = 17467
+    SPELL_SHADOWBOLT    = 17393,
+    SPELL_CLEAVE        = 15284,
+    SPELL_MORTALSTRIKE  = 15708,
+    SPELL_DEATH_PACT_1  = 17698, // Heal Rivendare and damage skeleton
+    SPELL_DEATH_PACT_2  = 17471, // Visual effect
+    SPELL_DEATH_PACT_3  = 17472, // Instant kill self only
+    SPELL_RAISE_DEAD    = 17473, // Inits. 17698 and 17471
+    SPELL_UNHOLY_AURA   = 17467
 };
 
-// Raise Dead (1-6) - Summon Skeletons (positions defined in database)
+enum BaronRivendareEvents
+{
+    EVENT_SHADOWBOLT    = 1,
+    EVENT_CLEAVE        = 2,
+    EVENT_MORTALSTRIKE  = 3,
+    EVENT_RAISE_DEAD    = 4
+};
+
+// Raise Dead
 uint32 const RaiseDeadSpells[6] =
 {
     17475, 17476, 17477,
     17478, 17479, 17480
 };
 
-enum BaronRivendareEvents
-{
-    EVENT_SHADOWBOLT            = 1,
-    EVENT_CLEAVE                = 2,
-    EVENT_MORTALSTRIKE          = 3,
-    EVENT_RAISE_DEAD            = 4
-};
-
 struct boss_baron_rivendare : public BossAI
 {
+public:
     boss_baron_rivendare(Creature* creature) : BossAI(creature, TYPE_BARON), RaiseDead(false) { }
 
     void Reset() override
     {
-        DoCastSelf(SPELL_UNHOLY_AURA);
+        // DoCastSelf doesn't add aura after reset
+        me->AddAura(SPELL_UNHOLY_AURA, me);
 
+        // needed until re-write of instance scripts is done
         if (instance->GetData(TYPE_RAMSTEIN) == DONE)
             instance->SetData(TYPE_BARON, NOT_STARTED);
 
@@ -76,6 +73,7 @@ struct boss_baron_rivendare : public BossAI
 
     void JustEngagedWith(Unit* who) override
     {
+        // needed until re-write of instance scripts is done
         if (instance->GetData(TYPE_BARON) == NOT_STARTED)
             instance->SetData(TYPE_BARON, IN_PROGRESS);
 
@@ -89,6 +87,7 @@ struct boss_baron_rivendare : public BossAI
 
     void JustDied(Unit* killer) override
     {
+        // needed until re-write of instance scripts is done
         instance->SetData(TYPE_BARON, DONE);
 
         BossAI::JustDied(killer);
@@ -140,10 +139,10 @@ struct boss_baron_rivendare : public BossAI
                     }
                     events.Repeat(12s);
                     break;
-            }
+                }
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
         }
 
         DoMeleeAttackIfReady();
@@ -153,7 +152,20 @@ private:
     bool RaiseDead;
 };
 
+// Death Pact 3 (17472) needs to be casted by the skeletons
+struct npc_summoned_skeleton : public ScriptedAI
+{
+    npc_summoned_skeleton(Creature* creature) : ScriptedAI(creature) { }
+
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_DEATH_PACT_2)
+            DoCastSelf(SPELL_DEATH_PACT_3, true);
+    }
+};
+
 void AddSC_boss_baron_rivendare()
 {
     RegisterStratholmeCreatureAI(boss_baron_rivendare);
+    RegisterStratholmeCreatureAI(npc_summoned_skeleton);
 }
