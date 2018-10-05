@@ -62,7 +62,6 @@ struct ScriptAction;
 struct ScriptInfo;
 struct SummonPropertiesEntry;
 enum Difficulty : uint8;
-namespace Trinity { struct ObjectUpdater; }
 namespace VMAP { enum class ModelIgnoreFlags : uint32; }
 
 struct ScriptAction
@@ -336,7 +335,6 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         template<class T> bool AddToMap(T *);
         template<class T> void RemoveFromMap(T *, bool);
 
-        void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor, TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor);
         virtual void Update(uint32);
 
         float GetVisibilityRange() const { return m_VisibleDistance; }
@@ -457,10 +455,6 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         void AddObjectToSwitchList(WorldObject* obj, bool on);
         virtual void DelayedUpdate(uint32 diff);
 
-        void resetMarkedCells() { marked_cells.reset(); }
-        bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
-        void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
-
         bool HavePlayers() const { return !m_mapRefManager.isEmpty(); }
         uint32 GetPlayersCountExceptGMs() const;
         bool ActiveObjectsNearGrid(NGridType const& ngrid) const;
@@ -477,18 +471,11 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo>> const& scripts, uint32 id, Object* source, Object* target);
         void ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target);
 
-        // must called with AddToWorld
-        template<class T>
-        void AddToActive(T* obj);
-
-        // must called with RemoveFromWorld
-        template<class T>
-        void RemoveFromActive(T* obj);
+        void AddToActive(WorldObject* obj);
+        void RemoveFromActive(WorldObject* obj);
 
         template<class T> void SwitchGridContainers(T* obj, bool on);
         std::unordered_map<ObjectGuid::LowType /*leaderSpawnId*/, CreatureGroup*> CreatureGroupHolder;
-
-        void UpdateIteratorBack(Player* player);
 
         TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, Unit* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0);
         void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
@@ -694,18 +681,15 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         DynamicMapTree _dynamicTree;
 
         MapRefManager m_mapRefManager;
-        MapRefManager::iterator m_mapRefIter;
 
         int32 m_VisibilityNotifyPeriod;
 
         typedef std::set<WorldObject*> ActiveNonPlayers;
         ActiveNonPlayers m_activeNonPlayers;
-        ActiveNonPlayers::iterator m_activeNonPlayersIter;
 
         // Objects that must update even in inactive grids without activating them
         typedef std::set<Transport*> TransportsContainer;
         TransportsContainer _transports;
-        TransportsContainer::iterator _transportsUpdateIter;
 
     private:
         Player* _GetScriptPlayerSourceOrTarget(Object* source, Object* target, ScriptInfo const* scriptInfo) const;
@@ -725,7 +709,6 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 
         NGridType* i_grids[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
         GridMap* GridMaps[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
-        std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP*TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
 
         //these functions used to process player/mob aggro reactions and
         //visibility calculations. Highly optimized for massive calculations
@@ -820,28 +803,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         void AddToGrid(T* object, Cell const& cell);
 
         template<class T>
-        void DeleteFromWorld(T*);
-
-        void AddToActiveHelper(WorldObject* obj)
-        {
-            m_activeNonPlayers.insert(obj);
-        }
-
-        void RemoveFromActiveHelper(WorldObject* obj)
-        {
-            // Map::Update for active object in proccess
-            if (m_activeNonPlayersIter != m_activeNonPlayers.end())
-            {
-                ActiveNonPlayers::iterator itr = m_activeNonPlayers.find(obj);
-                if (itr == m_activeNonPlayers.end())
-                    return;
-                if (itr == m_activeNonPlayersIter)
-                    ++m_activeNonPlayersIter;
-                m_activeNonPlayers.erase(itr);
-            }
-            else
-                m_activeNonPlayers.erase(obj);
-        }
+        void DeleteFromWorld(T*);        
 
         RespawnListContainer _respawnTimes;
         RespawnInfoMap       _creatureRespawnTimesBySpawnId;
