@@ -775,7 +775,30 @@ class npc_announcer_toc5 : public CreatureScript
                                         if (plr && !plr->IsGameMaster() && plr->IsAlive())
                                         {
                                             // 50% chance for race cheering at you or faction cheering at you
-                                            uint32 spectatorEntry = urand(SpectatorData[plr->getRace()], uint32(instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE ? NPC_SPECTATOR_ALLIANCE : NPC_SPECTATOR_HORDE));
+                                            uint32 spectatorEntry;
+                                            uint32 specId = urand(0, 4);
+                                            if (plr->GetTeam() == ALLIANCE)
+                                            {                                                
+                                                switch (specId)
+                                                {
+                                                    case 0: spectatorEntry = SpectatorData[RACE_HUMAN]; break;
+                                                    case 1: spectatorEntry = SpectatorData[RACE_GNOME]; break;
+                                                    case 2: spectatorEntry = SpectatorData[RACE_DRAENEI]; break;
+                                                    case 3: spectatorEntry = SpectatorData[RACE_NIGHTELF]; break;
+                                                    case 4: spectatorEntry = SpectatorData[RACE_DWARF]; break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                switch (specId)
+                                                {
+                                                    case 0: spectatorEntry = SpectatorData[RACE_ORC]; break;
+                                                    case 1: spectatorEntry = SpectatorData[RACE_BLOODELF]; break;
+                                                    case 2: spectatorEntry = SpectatorData[RACE_TAUREN]; break;
+                                                    case 3: spectatorEntry = SpectatorData[RACE_TROLL]; break;
+                                                    case 4: spectatorEntry = SpectatorData[RACE_UNDEAD_PLAYER]; break;
+                                                }
+                                            }                                            
 
                                             if (Creature* spectator = me->FindNearestCreature(spectatorEntry, 200.0f))
                                                 spectator->AI()->Talk(EMOTE_SPECTATOR_CHEER, plr);
