@@ -1,8 +1,3 @@
--- SPELL Find Target (41081)
-DELETE FROM spell_linked_spell WHERE spell_trigger IN(41081, -41081);
-DELETE FROM spell_script_names WHERE spell_id=41081;
-INSERT INTO spell_script_names VALUES(41081, 'spell_gen_select_target_count_15_1');
-
 -- SPELL Curse of Agony (39672)
 DELETE FROM spell_script_names WHERE spell_id=39672;
 INSERT INTO spell_script_names VALUES(39672, 'spell_gen_select_target_count_15_1');
