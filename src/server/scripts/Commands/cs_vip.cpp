@@ -66,12 +66,12 @@ public:
         {
             { "add",              rbac::RBAC_PERM_COMMAND_ADDCOIN,          true, &HandleCoinAddCommand,           "" },
             { "del",              rbac::RBAC_PERM_COMMAND_ADDCOIN,          true, &HandleCoinDelCommand,           "" },
-            { "",                 rbac::RBAC_PERM_COMMAND_ADDCOIN,          false, &HandleCoinCommand,             "" },
+            { "",                 rbac::RBAC_PERM_COMMAND_ACCOUNT,          false, &HandleCoinCommand,             "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
             { "vip",              rbac::RBAC_PERM_COMMAND_VIP,              true,  nullptr,       "", vipCommandTable },
-            { "coin",             rbac::RBAC_PERM_COMMAND_MODIFY,           true,  nullptr,      "", coinCommandTable },
+            { "coin",             rbac::RBAC_PERM_COMMAND_ACCOUNT,           true,  nullptr,      "", coinCommandTable },
         };
         return commandTable;
     }
