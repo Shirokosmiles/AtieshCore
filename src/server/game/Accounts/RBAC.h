@@ -789,6 +789,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_VIP_ARPPEAR                            = 1111,
     RBAC_PERM_COMMAND_VIP_SET                                = 1112,
     RBAC_PERM_COMMAND_VIP_REMOVE                             = 1113,
+    RBAC_PERM_COMMAND_ADDCOIN                                = 1114,
     RBAC_PERM_MAX
 };
 

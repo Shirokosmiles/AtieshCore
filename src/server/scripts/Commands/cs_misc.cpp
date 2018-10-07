@@ -116,6 +116,7 @@ public:
             { "unstuck",          rbac::RBAC_PERM_COMMAND_UNSTUCK,           true, &HandleUnstuckCommand,          "" },
             { "wchange",          rbac::RBAC_PERM_COMMAND_WCHANGE,          false, &HandleChangeWeather,           "" },
             { "mailbox",          rbac::RBAC_PERM_COMMAND_MAILBOX,          false, &HandleMailBoxCommand,          "" },
+            { "addcoin",          rbac::RBAC_PERM_COMMAND_ADDCOIN,          false, &HandleAddCoinCommand,          "" },
         };
         return commandTable;
     }
@@ -2727,6 +2728,27 @@ public:
         handler->GetSession()->SendShowMailBox(player->GetGUID());
         return true;
     }
+
+	static bool HandleAddCoinCommand(ChatHandler* handler, char const* args)
+	{
+		if (!*args)
+			return false;
+
+		Player* plTarget = handler->getSelectedPlayer();
+		if (!plTarget)
+		{
+			handler->PSendSysMessage(LANG_NO_CHAR_SELECTED);
+			handler->SetSentErrorMessage(true);
+			return false;
+		}
+		float coin = (float)atof((char*)args);
+		uint32 acc = plTarget->GetSession()->GetAccountId();
+		QueryResult result = LoginDatabase.PQuery("SELECT coins FROM account WHERE id = '%u'", acc);
+		coin += result->Fetch()->GetFloat();
+		LoginDatabase.PExecute("UPDATE account set coins = %f WHERE id = '%u'", coin, acc);
+		handler->PSendSysMessage("Player Coins = %f", coin);
+		return true;
+	}
 };
 
 void AddSC_misc_commandscript()
