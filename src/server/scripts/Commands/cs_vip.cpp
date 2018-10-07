@@ -58,14 +58,20 @@ public:
             { "changerace",       rbac::RBAC_PERM_COMMAND_VIP_CHANGERACE,   false, &HandleChangeRaceCommand,       "" },
             { "customize",        rbac::RBAC_PERM_COMMAND_VIP_CUSTOMIZE,    false, &HandleCustomizeCommand,        "" },
             { "app",              rbac::RBAC_PERM_COMMAND_VIP_ARPPEAR,      false, &HandleVipAppearCommand,        "" },
-            { "set",              rbac::RBAC_PERM_COMMAND_VIP_SET,          true, &HandleSetVipCommand,           "" },
-            { "del",              rbac::RBAC_PERM_COMMAND_VIP_REMOVE,       true, &HandleDelVipCommand,           "" },
-            { "",                 rbac::RBAC_PERM_COMMAND_VIP,              false, &HandleVipCommand,              "" },
-            
+            { "set",              rbac::RBAC_PERM_COMMAND_VIP_SET,          true, &HandleSetVipCommand,            "" },
+            { "del",              rbac::RBAC_PERM_COMMAND_VIP_REMOVE,       true, &HandleDelVipCommand,            "" },
+            { "",                 rbac::RBAC_PERM_COMMAND_VIP,              false, &HandleVipCommand,              "" },            
+        };
+        static std::vector<ChatCommand> coinCommandTable =
+        {
+            { "add",              rbac::RBAC_PERM_COMMAND_ADDCOIN,          true, &HandleCoinAddCommand,           "" },
+            { "del",              rbac::RBAC_PERM_COMMAND_ADDCOIN,          true, &HandleCoinDelCommand,           "" },
+            { "",                 rbac::RBAC_PERM_COMMAND_ADDCOIN,          false, &HandleCoinCommand,             "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "vip", rbac::RBAC_PERM_COMMAND_VIP, true,  nullptr, "", vipCommandTable },
+            { "vip",              rbac::RBAC_PERM_COMMAND_VIP,              true,  nullptr,       "", vipCommandTable },
+            { "coin",             rbac::RBAC_PERM_COMMAND_MODIFY,           true,  nullptr,      "", coinCommandTable },
         };
         return commandTable;
     }
@@ -1021,6 +1027,140 @@ public:
 		}
 		return true;
 	}
+
+    static bool HandleCoinCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* _player = handler->GetSession()->GetPlayer();
+        if (!_player)
+            return false;
+
+        Player* target = handler->getSelectedPlayerOrSelf();
+        uint32 coins;
+
+        if (handler->HasPermission(rbac::RBAC_PERM_COMMAND_ADDCOIN) && _player != target)
+        {
+            // GM should can to see the coins of target-player by .coin too
+            coins = target->GetCoins();
+            handler->PSendSysMessage("The AccountID %u [player : %s ] have %u coins", target->GetSession()->GetAccountId(), target->GetName().c_str(), coins);
+        }
+        else
+        {
+            coins = _player->GetCoins();
+            handler->PSendSysMessage("You have the %u coins", coins);
+        }
+
+        return true;
+    }
+
+    static bool HandleCoinAddCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        Player* target = handler->getSelectedPlayerOrSelf();
+
+        char* coins = strtok((char*)args, " ");
+        char* accID = strtok(nullptr, " ");
+
+        bool accidExist = false;
+        // .coin add count accountID , where accid not required (if target exist)
+        if (!coins)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 accountID;
+        if (accID)
+        {
+            accountID = atoul(accID);
+            accidExist = true;
+        }
+        else
+            accountID = target->GetSession()->GetAccountId();
+
+        uint32 coinAdded = atoul(coins);
+        uint32 coinCount = coinAdded;
+        if (!accidExist)
+        {
+            coinCount += target->GetCoins();
+            target->SetCoins(coinCount);
+        }
+        else
+        {
+            coinCount += AccountMgr::GetCoins(accountID);
+            ObjectGuid::LowType guid;
+            guid = AccountMgr::GetGuidOfOnlineCharacter(accountID);
+            if (guid)
+            {
+                if (Player* p = ObjectAccessor::FindPlayerByLowGUID(guid))
+                    p->SetCoins(coinCount);
+            }
+        }
+        
+        AccountMgr::SetCoins(accountID, coinCount);
+        handler->PSendSysMessage("The AccountID %u has received %u coins, and now have a %u coins", accountID, coinAdded, coinCount);
+        return true;
+    }
+
+    static bool HandleCoinDelCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        Player* target = handler->getSelectedPlayerOrSelf();
+
+        char* coins = strtok((char*)args, " ");
+        char* accID = strtok(nullptr, " ");
+
+        bool accidExist = false;
+        // .coin dell count accountID , where accid not required (if target exist)
+        if (!coins)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 accountID;
+        if (accID)
+        {
+            accountID = atoul(accID);
+            accidExist = true;
+        }
+        else
+            accountID = target->GetSession()->GetAccountId();
+
+        uint32 coinRemoved = atoul(coins);
+        uint32 coinCount;
+        if (!accidExist)
+            coinCount = target->GetCoins();
+        else
+            coinCount = AccountMgr::GetCoins(accountID);
+
+        if (coinCount < coinRemoved)
+            coinCount = 0;
+        else
+            coinCount -= coinRemoved;
+
+        if (!accidExist)
+            target->SetCoins(coinCount);
+        else
+        {
+            ObjectGuid::LowType guid;
+            guid = AccountMgr::GetGuidOfOnlineCharacter(accountID);
+            if (guid)
+            {
+                if (Player* p = ObjectAccessor::FindPlayerByLowGUID(guid))
+                    p->SetCoins(coinCount);
+            }
+        }
+
+        AccountMgr::SetCoins(accountID, coinCount);
+        handler->PSendSysMessage("The AccountID %u has removed %u coins, and now have a %u coins", accountID, coinRemoved, coinCount);
+        return true;
+    }
 };
 
 void AddSC_vip_commandscript()
