@@ -418,7 +418,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
                 if (Mem_Result != 0)
                 {
-                    TC_LOG_DEBUG("warden", "RESULT MEM_CHECK not 0x00, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    TC_LOG_WARN("warden", "RESULT MEM_CHECK not 0x00, CheckId %u account Id %u", *itr, _session->GetAccountId());
                     //checkFailed = *itr;
                     continue;
                 }
@@ -429,7 +429,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
                     {
                         buff >> Hoffset;
                         _session->SetHoffset(Hoffset);
-                        TC_LOG_DEBUG("warden", "RESULT MEM_CHECK 3rd Party Offset = %u for AccID = %u",_session->GetHoffset(), _session->GetAccountId());
+                        TC_LOG_DEBUG("warden", "RESULT MEM_CHECK (Ptr on 3rd Party Address) Offset = %u for AccID = %u",_session->GetHoffset(), _session->GetAccountId());
                         //buff.rpos(buff.rpos() + rd->Length - 4);
                         justCheck = true;
                         continue;
@@ -452,7 +452,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
                         //uint8 abca = *(buff.contents() + buff.rpos());
                         //uint8 abcb = *(buff.contents() + buff.rpos() + 1);
                         //sLog->outDebug(LOG_FILTER_WARDEN, "Buffer : %u %u // Compare = %u // Length = %u",abca,abcb,memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false), rd->Length),rd->Length);
-                        TC_LOG_DEBUG("warden", "RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        TC_LOG_WARN("warden", "RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
                         checkFailed = *itr;
                         buff.rpos(buff.rpos() + rd->Length);
                         continue;
@@ -460,7 +460,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
                 }
                 else if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), rd->Length) != 0)
                 {
-                    TC_LOG_DEBUG("warden", "RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    TC_LOG_WARN("warden", "RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
                     checkFailed = *itr;
                     buff.rpos(buff.rpos() + rd->Length);
                     continue;
@@ -477,7 +477,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
                 if (Mem_Result != 0)
                 {
-                    TC_LOG_DEBUG("warden", "RESULT MEM2_CHECK region not allocated, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    TC_LOG_WARN("warden", "RESULT MEM2_CHECK region not allocated, CheckId %u account Id %u", *itr, _session->GetAccountId());
                     //checkFailed = *itr;
                     continue;
                 }
@@ -490,7 +490,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
                 }
 
                 buff.rpos(buff.rpos() + rd->Length);
-                TC_LOG_DEBUG("warden", "RESULT MEM2_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
+                TC_LOG_WARN("warden", "RESULT MEM2_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
                 checkFailed = *itr;
                 break;
             }
@@ -503,11 +503,11 @@ void WardenWin::HandleData(ByteBuffer &buff)
                 if (memcmp(buff.contents() + buff.rpos(), &byte, sizeof(uint8)) != 0)
                 {
                     if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
-                        TC_LOG_DEBUG("warden", "RESULT PAGE_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        TC_LOG_WARN("warden", "RESULT PAGE_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
                     if (type == MODULE_CHECK)
-                        TC_LOG_DEBUG("warden", "RESULT MODULE_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        TC_LOG_WARN("warden", "RESULT MODULE_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
                     if (type == DRIVER_CHECK)
-                        TC_LOG_DEBUG("warden", "RESULT DRIVER_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        TC_LOG_WARN("warden", "RESULT DRIVER_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
                     checkFailed = *itr;
                     buff.rpos(buff.rpos() + 1);
                     continue;
@@ -529,7 +529,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
                 if (Lua_Result != 0)
                 {
-                    TC_LOG_DEBUG("warden", "RESULT LUA_STR_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    TC_LOG_WARN("warden", "RESULT LUA_STR_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
                     checkFailed = *itr;
                     continue;
                 }
@@ -542,8 +542,10 @@ void WardenWin::HandleData(ByteBuffer &buff)
                     char *str = new char[luaStrLen + 1];
                     memcpy(str, buff.contents() + buff.rpos(), luaStrLen);
                     str[luaStrLen] = '\0'; // null terminator
-                    TC_LOG_DEBUG("warden", "Lua string: %s", str);
+                    TC_LOG_WARN("warden", "Lua string: %s", str);
+                    checkFailed = *itr;
                     delete[] str;
+                    continue;
                 }
 
                 buff.rpos(buff.rpos() + luaStrLen);         // Skip string
@@ -557,14 +559,14 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
                 if (Mpq_Result != 0)
                 {
-                    TC_LOG_DEBUG("warden", "RESULT MPQ_CHECK not 0x00 account id %u", _session->GetAccountId());
+                    TC_LOG_WARN("warden", "RESULT MPQ_CHECK not 0x00 account id %u", _session->GetAccountId());
                     checkFailed = *itr;
                     continue;
                 }
 
                 if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), 20) != 0) // SHA1
                 {
-                    TC_LOG_DEBUG("warden", "RESULT MPQ_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    TC_LOG_WARN("warden", "RESULT MPQ_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
                     checkFailed = *itr;
                     buff.rpos(buff.rpos() + 20);            // 20 bytes SHA1
                     continue;
