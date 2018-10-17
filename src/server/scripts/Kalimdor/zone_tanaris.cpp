@@ -304,6 +304,7 @@ public:
             PhasePostEvent = 0;
 
             TortaGUID.Clear();
+            inCombat = false;
         }
 
         uint32 CheckSpeechTimer;
@@ -311,6 +312,7 @@ public:
         uint32 PhasePostEvent;
 
         ObjectGuid TortaGUID;
+        bool inCombat;
 
         void Reset() override
         {
@@ -318,7 +320,6 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             FollowerAI::MoveInLineOfSight(who);
 
@@ -349,69 +350,82 @@ public:
 
         void UpdateFollowerAI(uint32 Diff) override
         {
-            if (!UpdateVictim())
-            {
-                //we are doing the post-event, or...
-                if (HasFollowState(STATE_FOLLOW_POSTEVENT))
-                {
-                    if (PostEventTimer <= Diff)
-                    {
-                        PostEventTimer = 5000;
-
-                        Creature* torta = ObjectAccessor::GetCreature(*me, TortaGUID);
-                        if (!torta || !torta->IsAlive())
-                        {
-                            //something happened, so just complete
-                            SetFollowComplete();
-                            return;
-                        }
-
-                        switch (PhasePostEvent)
-                        {
-                            case 1:
-                                Talk(SAY_TOOG_POST_1);
-                                break;
-                            case 2:
-                                torta->AI()->Talk(SAY_TORT_POST_2);
-                                break;
-                            case 3:
-                                Talk(SAY_TOOG_POST_3);
-                                break;
-                            case 4:
-                                torta->AI()->Talk(SAY_TORT_POST_4);
-                                break;
-                            case 5:
-                                Talk(SAY_TOOG_POST_5);
-                                break;
-                            case 6:
-                                torta->AI()->Talk(SAY_TORT_POST_6);
-                                me->GetMotionMaster()->MovePoint(POINT_ID_TO_WATER, ToWaterLoc);
-                                break;
-                        }
-
-                        ++PhasePostEvent;
-                    }
-                    else
-                        PostEventTimer -= Diff;
-                }
-                //...we are doing regular speech check
-                else if (HasFollowState(STATE_FOLLOW_INPROGRESS))
-                {
-                    if (CheckSpeechTimer <= Diff)
-                    {
-                        CheckSpeechTimer = 5000;
-
-                        if (urand(0, 9) > 8)
-                            Talk(SAY_TOOG_WORRIED);
-                    }
-                    else
-                        CheckSpeechTimer -= Diff;
-                }
-
+            if (!me)
                 return;
+            //we are doing the post-event, or...
+            if (HasFollowState(STATE_FOLLOW_POSTEVENT))
+            {
+                if (PostEventTimer <= Diff)
+                {
+                    PostEventTimer = 5000;
+
+                    Creature* torta = ObjectAccessor::GetCreature(*me, TortaGUID);
+                    if (!torta || !torta->IsAlive())
+                    {
+                        //something happened, so just complete
+                        SetFollowComplete();
+                        return;
+                    }
+
+                    switch (PhasePostEvent)
+                    {
+                        case 1:
+                            Talk(SAY_TOOG_POST_1);
+                            break;
+                        case 2:
+                            torta->AI()->Talk(SAY_TORT_POST_2);
+                            break;
+                        case 3:
+                            Talk(SAY_TOOG_POST_3);
+                            break;
+                        case 4:
+                            torta->AI()->Talk(SAY_TORT_POST_4);
+                            break;
+                        case 5:
+                            Talk(SAY_TOOG_POST_5);
+                            break;
+                        case 6:
+                            torta->AI()->Talk(SAY_TORT_POST_6);
+                            me->GetMotionMaster()->MovePoint(POINT_ID_TO_WATER, ToWaterLoc);
+                            break;
+                    }
+
+                    ++PhasePostEvent;
+                }
+                else
+                    PostEventTimer -= Diff;
+            }
+            //...we are doing regular speech check
+            else if (HasFollowState(STATE_FOLLOW_INPROGRESS))
+            {
+                if (CheckSpeechTimer <= Diff)
+                {
+                    CheckSpeechTimer = 5000;
+
+                    if (urand(0, 9) > 8)
+                        Talk(SAY_TOOG_WORRIED);
+                }
+                else
+                    CheckSpeechTimer -= Diff;
             }
 
-            DoMeleeAttackIfReady();
+            if (UpdateVictim())
+            {
+                if (!inCombat)
+                {
+                    inCombat = true;
+                    SetFollowPaused(true);
+                }
+                DoMeleeAttackIfReady();
+            }
+            else
+            {
+                if (inCombat)
+                {
+                    inCombat = false;
+                    SetFollowPaused(false);
+                }
+            }
         }
 
         void QuestAccept(Player* player, Quest const* quest) override
