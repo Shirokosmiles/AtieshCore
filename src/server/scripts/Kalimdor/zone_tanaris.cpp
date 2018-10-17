@@ -280,6 +280,7 @@ enum Tooga
     NPC_TORTA                   = 6015,
 
     POINT_ID_TO_WATER           = 1,
+    EVENT_ID_RETURN_FOLLOW      = 1,
     FACTION_TOOG_ESCORTEE       = 113
 };
 
@@ -305,6 +306,7 @@ public:
 
             TortaGUID.Clear();
             inCombat = false;
+            _events.Reset();
         }
 
         uint32 CheckSpeechTimer;
@@ -313,6 +315,7 @@ public:
 
         ObjectGuid TortaGUID;
         bool inCombat;
+        EventMap _events;
 
         void Reset() override
         {
@@ -348,10 +351,25 @@ public:
                 SetFollowComplete();
         }
 
-        void UpdateFollowerAI(uint32 Diff) override
+        void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_NO_HOSTILES) override
+        {}
+
+        void UpdateAI(uint32 Diff) override
         {
             if (!me)
                 return;
+
+            _events.Update(Diff);
+
+            switch (_events.ExecuteEvent())
+            {
+                case EVENT_ID_RETURN_FOLLOW:
+                    SetFollowPaused(false);
+                    break;
+                default:
+                    break;
+            }
+
             //we are doing the post-event, or...
             if (HasFollowState(STATE_FOLLOW_POSTEVENT))
             {
@@ -423,7 +441,7 @@ public:
                 if (inCombat)
                 {
                     inCombat = false;
-                    SetFollowPaused(false);
+                    _events.ScheduleEvent(EVENT_ID_RETURN_FOLLOW, 2s);                    
                 }
             }
         }
