@@ -1,0 +1,2 @@
+UPDATE `creature_template` SET `ScriptName`='npc_impaled_vardarde_scout' WHERE (`entry`='24077');
+UPDATE `gameobject_template` SET `ScriptName`='go_ceremonial_dragonflare_harpoon' WHERE (`entry`='186565');

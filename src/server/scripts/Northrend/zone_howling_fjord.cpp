@@ -27,6 +27,8 @@ npc_plaguehound_tracker
 npc_apothecary_hanes
 EndContentData */
 
+#include "GameObjectAI.h"
+#include "GridNotifiers.h"
 #include "ScriptMgr.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
@@ -661,6 +663,138 @@ public:
     }
 };
 
+enum gofeatures
+{
+    QUEST_RESCUING_THE_RESCUERS = 11244,
+    IMPALED_VALDARDE_SCOUT      = 24077,
+
+    ACTION_WAKE_UP              = 1,
+};
+
+//go_ceremonial_dragonflare_harpoon
+class go_ceremonial_dragonflare_harpoon: public GameObjectScript
+{
+public:
+    go_ceremonial_dragonflare_harpoon() : GameObjectScript("go_ceremonial_dragonflare_harpoon") { }
+
+    struct go_ceremonial_dragonflare_harpoonAI : public GameObjectAI
+    {
+        go_ceremonial_dragonflare_harpoonAI(GameObject* go) : GameObjectAI(go)
+        {
+            me->SetFaction(35);
+        }
+
+        bool OnReportUse(Player* player) override
+        {
+            if (player && player->GetQuestStatus(QUEST_RESCUING_THE_RESCUERS) == QUEST_STATUS_INCOMPLETE)
+            {
+                Creature* scout = nullptr;
+                std::list<Creature*> list;
+                me->GetCreatureListWithEntryInGrid(list, IMPALED_VALDARDE_SCOUT, 2.5f);
+
+                if (!list.empty())
+                    scout = list.front();
+
+                if (scout)
+                {
+                    scout->AI()->DoAction(ACTION_WAKE_UP);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_ceremonial_dragonflare_harpoonAI(go);
+    }
+};
+
+enum scoutfeatures
+{
+    EVENT_KNEEL_STAND = 2,
+    EVENT_JUST_STAND  = 3,
+    EVENT_SUICIDE     = 4
+};
+
+class npc_impaled_vardarde_scout : public CreatureScript
+{
+public:
+    npc_impaled_vardarde_scout() : CreatureScript("npc_impaled_vardarde_scout") { }
+
+    struct npc_impaled_vardarde_scoutAI : public ScriptedAI
+    {
+        npc_impaled_vardarde_scoutAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
+
+        EventMap _events;
+
+        void Initialize()
+        {
+            //me->setDeathState(JUST_DIED);
+            //me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            //me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD);
+
+            _events.Reset();
+        }
+
+        void Reset() override { Initialize(); }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!me)
+                return;
+
+            _events.Update(diff);
+
+            switch (_events.ExecuteEvent())
+            {
+            case EVENT_KNEEL_STAND:                
+                me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
+                _events.ScheduleEvent(EVENT_JUST_STAND, 3s);
+                break;
+            case EVENT_JUST_STAND:
+                me->HandleEmoteCommand(EMOTE_STATE_STAND);
+                _events.ScheduleEvent(EVENT_SUICIDE, 4s);
+                break;
+            case EVENT_SUICIDE:
+                me->DespawnOrUnsummon();
+                //_events.ScheduleEvent(EVENT_SUICIDE, 4s);
+                break;
+            default:
+                break;
+            }
+        }
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+            case ACTION_WAKE_UP:
+                me->setDeathState(ALIVE);
+                //me->SetHealth(me->GetMaxHealth()/10);
+                //me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                //me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                //me->HandleEmoteCommand(EMOTE_ONESHOT_WOUND);
+                //me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                _events.ScheduleEvent(EVENT_KNEEL_STAND, 1s);
+                break;
+            default:
+                break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_impaled_vardarde_scoutAI(creature);
+    }
+};
+
 void AddSC_howling_fjord()
 {
     new npc_apothecary_hanes();
@@ -670,4 +804,6 @@ void AddSC_howling_fjord()
     new npc_mindless_abomination();
     new spell_mindless_abomination_explosion_fx_master();
     new npc_riven_widow_cocoon();
+    new go_ceremonial_dragonflare_harpoon();
+    new npc_impaled_vardarde_scout();
  }
