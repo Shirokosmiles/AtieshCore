@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -17,23 +17,135 @@
  */
 
 #include "BattlegroundEY.h"
-#include "WorldPacket.h"
 #include "BattlegroundMgr.h"
 #include "Creature.h"
-#include "DBCStores.h"
-#include "GameObject.h"
+#include "Language.h"
 #include "Log.h"
 #include "Map.h"
 #include "Player.h"
-#include "Random.h"
 #include "Util.h"
 #include "ObjectAccessor.h"
+#include "WorldPacket.h"
+
+BattlegroundGOSpawnPoint const BG_EY_GameObjects[BG_EY_OBJECT_MAX] =
+{
+    // doors
+    { BG_OBJECT_A_DOOR_EY_ENTRY,           { 2527.600000f, 1596.910000f, 1262.130000f, -3.124140f }, { -0.173642f, -0.001515f,  0.9847700f, -0.008594f }, RESPAWN_IMMEDIATELY },
+    { BG_OBJECT_H_DOOR_EY_ENTRY,           { 1803.210000f, 1539.490000f, 1261.090000f,  3.141590f }, {  0.173648f,  0.000000f,  0.9848080f,  0.000000f }, RESPAWN_IMMEDIATELY },
+    // banners (alliance)
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2057.460000f, 1735.070000f, 1187.910000f, -0.925024f }, {  0.000000f,  0.000000f,  0.4461980f, -0.894934f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2032.250000f, 1729.530000f, 1190.330000f,  1.867500f }, {  0.000000f,  0.000000f,  0.8038570f,  0.594823f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2092.350000f, 1775.460000f, 1187.080000f, -0.401426f }, {  0.000000f,  0.000000f,  0.1993680f, -0.979925f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2047.190000f, 1349.190000f, 1189.000000f, -1.623160f }, {  0.000000f,  0.000000f,  0.7253740f, -0.688354f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2074.320000f, 1385.780000f, 1194.720000f,  0.488692f }, {  0.000000f,  0.000000f,  0.2419220f,  0.970296f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2025.130000f, 1386.120000f, 1192.740000f,  2.391100f }, {  0.000000f,  0.000000f,  0.9304180f,  0.366501f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2276.800000f, 1400.410000f, 1196.330000f,  2.443460f }, {  0.000000f,  0.000000f,  0.9396930f,  0.342020f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2305.780000f, 1404.560000f, 1199.380000f,  1.745330f }, {  0.000000f,  0.000000f,  0.7660440f,  0.642788f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2245.400000f, 1366.410000f, 1195.280000f,  2.216570f }, {  0.000000f,  0.000000f,  0.8949340f,  0.446198f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2270.840000f, 1784.080000f, 1186.760000f,  2.426010f }, {  0.000000f,  0.000000f,  0.9366720f,  0.350207f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2269.130000f, 1737.700000f, 1186.660000f,  0.994838f }, {  0.000000f,  0.000000f,  0.4771590f,  0.878817f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_A_BANNER_EY_ENTRY,         { 2300.860000f, 1741.250000f, 1187.700000f, -0.785398f }, {  0.000000f,  0.000000f,  0.3826830f, -0.923880f }, RESPAWN_ONE_DAY     },
+    // banners (horde)
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2057.460000f, 1735.070000f, 1187.910000f, -0.925024f }, {  0.000000f,  0.000000f,  0.4461980f, -0.894934f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2032.250000f, 1729.530000f, 1190.330000f,  1.867500f }, {  0.000000f,  0.000000f,  0.8038570f,  0.594823f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2092.350000f, 1775.460000f, 1187.080000f, -0.401426f }, {  0.000000f,  0.000000f,  0.1993680f, -0.979925f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2047.190000f, 1349.190000f, 1189.000000f, -1.623160f }, {  0.000000f,  0.000000f,  0.7253740f, -0.688354f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2074.320000f, 1385.780000f, 1194.720000f,  0.488692f }, {  0.000000f,  0.000000f,  0.2419220f,  0.970296f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2025.130000f, 1386.120000f, 1192.740000f,  2.391100f }, {  0.000000f,  0.000000f,  0.9304180f,  0.366501f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2276.800000f, 1400.410000f, 1196.330000f,  2.443460f }, {  0.000000f,  0.000000f,  0.9396930f,  0.342020f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2305.780000f, 1404.560000f, 1199.380000f,  1.745330f }, {  0.000000f,  0.000000f,  0.7660440f,  0.642788f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2245.400000f, 1366.410000f, 1195.280000f,  2.216570f }, {  0.000000f,  0.000000f,  0.8949340f,  0.446198f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2270.840000f, 1784.080000f, 1186.760000f,  2.426010f }, {  0.000000f,  0.000000f,  0.9366720f,  0.350207f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2269.130000f, 1737.700000f, 1186.660000f,  0.994838f }, {  0.000000f,  0.000000f,  0.4771590f,  0.878817f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_H_BANNER_EY_ENTRY,         { 2300.860000f, 1741.250000f, 1187.700000f, -0.785398f }, {  0.000000f,  0.000000f,  0.3826830f, -0.923880f }, RESPAWN_ONE_DAY     },
+    // banners (natural)
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2057.460000f, 1735.070000f, 1187.910000f, -0.925024f }, {  0.000000f,  0.000000f,  0.4461980f, -0.894934f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2032.250000f, 1729.530000f, 1190.330000f,  1.867500f }, {  0.000000f,  0.000000f,  0.8038570f,  0.594823f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2092.350000f, 1775.460000f, 1187.080000f, -0.401426f }, {  0.000000f,  0.000000f,  0.1993680f, -0.979925f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2047.190000f, 1349.190000f, 1189.000000f, -1.623160f }, {  0.000000f,  0.000000f,  0.7253740f, -0.688354f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2074.320000f, 1385.780000f, 1194.720000f,  0.488692f }, {  0.000000f,  0.000000f,  0.2419220f,  0.970296f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2025.130000f, 1386.120000f, 1192.740000f,  2.391100f }, {  0.000000f,  0.000000f,  0.9304180f,  0.366501f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2276.800000f, 1400.410000f, 1196.330000f,  2.443460f }, {  0.000000f,  0.000000f,  0.9396930f,  0.342020f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2305.780000f, 1404.560000f, 1199.380000f,  1.745330f }, {  0.000000f,  0.000000f,  0.7660440f,  0.642788f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2245.400000f, 1366.410000f, 1195.280000f,  2.216570f }, {  0.000000f,  0.000000f,  0.8949340f,  0.446198f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2270.840000f, 1784.080000f, 1186.760000f,  2.426010f }, {  0.000000f,  0.000000f,  0.9366720f,  0.350207f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2269.130000f, 1737.700000f, 1186.660000f,  0.994838f }, {  0.000000f,  0.000000f,  0.4771590f,  0.878817f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_N_BANNER_EY_ENTRY,         { 2300.860000f, 1741.250000f, 1187.700000f, -0.785398f }, {  0.000000f,  0.000000f,  0.3826830f, -0.923880f }, RESPAWN_ONE_DAY     },
+    // tower cap
+    { BG_OBJECT_FR_TOWER_CAP_EY_ENTRY,     { 2024.600708f, 1742.819580f, 1195.157715f,  2.443461f }, {  0.000000f,  0.000000f,  0.9396930f,  0.342020f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_BE_TOWER_CAP_EY_ENTRY,     { 2050.493164f, 1372.235962f, 1194.563477f,  1.710423f }, {  0.000000f,  0.000000f,  0.7547100f,  0.656059f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_DR_TOWER_CAP_EY_ENTRY,     { 2301.010498f, 1386.931641f, 1197.183472f,  1.570796f }, {  0.000000f,  0.000000f,  0.7071070f,  0.707107f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_HU_TOWER_CAP_EY_ENTRY,     { 2282.121582f, 1760.006958f, 1189.707153f,  1.919862f }, {  0.000000f,  0.000000f,  0.8191520f,  0.573576f }, RESPAWN_ONE_DAY     },
+    // flags
+    { BG_OBJECT_FLAG2_EY_ENTRY,            { 2174.782227f, 1569.054688f, 1160.361938f, -1.448624f }, {  0.000000f,  0.000000f,  0.6626200f, -0.748956f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_FLAG1_EY_ENTRY,            { 2044.280000f, 1729.680000f, 1189.960000f, -0.017453f }, {  0.000000f,  0.000000f,  0.0087270f, -0.999962f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_FLAG1_EY_ENTRY,            { 2048.830000f, 1393.650000f, 1194.490000f,  0.209440f }, {  0.000000f,  0.000000f,  0.1045280f,  0.994522f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_FLAG1_EY_ENTRY,            { 2286.560000f, 1402.360000f, 1197.110000f,  3.723810f }, {  0.000000f,  0.000000f,  0.9579260f, -0.287016f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_FLAG1_EY_ENTRY,            { 2284.480000f, 1731.230000f, 1189.990000f,  2.897250f }, {  0.000000f,  0.000000f,  0.9925460f,  0.121869f }, RESPAWN_ONE_DAY     },
+    // buffs
+    { BG_OBJECT_SPEED_BUFF_BLOOD_ELF,      { 2050.468000f, 1372.202000f, 1194.563000f,  1.675514f }, {  0.000000f,  0.000000f,  0.7431440f, 0.6691315f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_RESTORATION_BLOOD_ELF,     { 2050.468000f, 1372.202000f, 1194.563000f,  1.675514f }, {  0.000000f,  0.000000f,  0.7431440f, 0.6691315f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_BERSERK_BLOOD_ELF,         { 2050.468000f, 1372.202000f, 1194.563000f,  1.675514f }, {  0.000000f,  0.000000f,  0.7431440f, 0.6691315f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_SPEED_BUFF_FEL_REAVER,     { 2046.463000f, 1749.167000f, 1190.010000f,  5.410522f }, {  0.000000f,  0.000000f, -0.4226179f, 0.9063079f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_RESTORATION_FEL_REAVER,    { 2046.463000f, 1749.167000f, 1190.010000f,  5.410522f }, {  0.000000f,  0.000000f, -0.4226179f, 0.9063079f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_BERSERK_FEL_REAVER,        { 2046.463000f, 1749.167000f, 1190.010000f,  5.410522f }, {  0.000000f,  0.000000f, -0.4226179f, 0.9063079f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_SPEED_BUFF_MAGE_TOWER,     { 2283.710000f, 1748.870000f, 1189.707000f, -1.500983f }, {  0.000000f,  0.000000f, -0.6819983f, 0.7313538f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_RESTORATION_MAGE_TOWER,    { 2283.710000f, 1748.870000f, 1189.707000f, -1.500983f }, {  0.000000f,  0.000000f, -0.6819983f, 0.7313538f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_BERSERK_MAGE_TOWER,        { 2283.710000f, 1748.870000f, 1189.707000f, -1.500983f }, {  0.000000f,  0.000000f, -0.6819983f, 0.7313538f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_SPEED_BUFF_DRAENEI_RUINS,  { 2302.477000f, 1391.245000f, 1197.736000f,  1.762782f }, {  0.000000f,  0.000000f,  0.7716246f, 0.6360782f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_RESTORATION_DRAENEI_RUINS, { 2302.477000f, 1391.245000f, 1197.736000f,  1.762782f }, {  0.000000f,  0.000000f,  0.7716246f, 0.6360782f }, RESPAWN_ONE_DAY     },
+    { BG_OBJECT_BERSERK_DRAENEI_RUINS,     { 2302.477000f, 1391.245000f, 1197.736000f,  1.762782f }, {  0.000000f,  0.000000f,  0.7716246f, 0.6360782f }, RESPAWN_ONE_DAY     }
+};
+
+BattlegroundBuffData const buffEntries =
+{
+    { BG_OBJECT_SPEED_BUFF_BLOOD_ELF,     BG_OBJECT_RESTORATION_BLOOD_ELF,     BG_OBJECT_BERSERK_BLOOD_ELF     },
+    { BG_OBJECT_SPEED_BUFF_FEL_REAVER,    BG_OBJECT_RESTORATION_FEL_REAVER,    BG_OBJECT_BERSERK_FEL_REAVER    },
+    { BG_OBJECT_SPEED_BUFF_MAGE_TOWER,    BG_OBJECT_RESTORATION_MAGE_TOWER,    BG_OBJECT_BERSERK_MAGE_TOWER    },
+    { BG_OBJECT_SPEED_BUFF_DRAENEI_RUINS, BG_OBJECT_RESTORATION_DRAENEI_RUINS, BG_OBJECT_BERSERK_DRAENEI_RUINS }
+};
 
 // these variables aren't used outside of this file, so declare them only here
 uint32 BG_EY_HonorScoreTicks[BG_HONOR_MODE_NUM] =
 {
     260, // normal honor
     160  // holiday
+};
+
+Position const BG_EY_TriggerPositions[EY_POINTS_MAX] =
+{
+    { 2044.28f, 1729.68f, 1189.96f, 0.017453f },  // FEL_REAVER center
+    { 2048.83f, 1393.65f, 1194.49f, 0.20944f },   // BLOOD_ELF center
+    { 2286.56f, 1402.36f, 1197.11f, 3.72381f },   // DRAENEI_RUINS center
+    { 2284.48f, 1731.23f, 1189.99f, 2.89725f }    // MAGE_TOWER center
+};
+
+uint8  const BG_EY_TickPoints[EY_POINTS_MAX] = { 1, 2, 5, 10 };
+uint32 const BG_EY_FlagPoints[EY_POINTS_MAX] = { 75, 85, 100, 500 };
+
+//constant arrays:
+BattlegroundEYPointIconsStruct const m_PointsIconStruct[EY_POINTS_MAX] =
+{
+    { FEL_REAVER_UNCONTROL,    FEL_REAVER_ALLIANCE_CONTROL,    FEL_REAVER_HORDE_CONTROL    },
+    { BLOOD_ELF_UNCONTROL,     BLOOD_ELF_ALLIANCE_CONTROL,     BLOOD_ELF_HORDE_CONTROL     },
+    { DRAENEI_RUINS_UNCONTROL, DRAENEI_RUINS_ALLIANCE_CONTROL, DRAENEI_RUINS_HORDE_CONTROL },
+    { MAGE_TOWER_UNCONTROL,    MAGE_TOWER_ALLIANCE_CONTROL,    MAGE_TOWER_HORDE_CONTROL    }
+};
+
+BattlegroundEYLosingPointStruct const m_LosingPointTypes[EY_POINTS_MAX] =
+{
+    { BG_EY_OBJECT_N_BANNER_FEL_REAVER_CENTER,    BG_EY_OBJECT_A_BANNER_FEL_REAVER_CENTER,    LANG_BG_EY_HAS_LOST_A_F_RUINS, BG_EY_OBJECT_H_BANNER_FEL_REAVER_CENTER,    LANG_BG_EY_HAS_LOST_H_F_RUINS },
+    { BG_EY_OBJECT_N_BANNER_BLOOD_ELF_CENTER,     BG_EY_OBJECT_A_BANNER_BLOOD_ELF_CENTER,     LANG_BG_EY_HAS_LOST_A_B_TOWER, BG_EY_OBJECT_H_BANNER_BLOOD_ELF_CENTER,     LANG_BG_EY_HAS_LOST_H_B_TOWER },
+    { BG_EY_OBJECT_N_BANNER_DRAENEI_RUINS_CENTER, BG_EY_OBJECT_A_BANNER_DRAENEI_RUINS_CENTER, LANG_BG_EY_HAS_LOST_A_D_RUINS, BG_EY_OBJECT_H_BANNER_DRAENEI_RUINS_CENTER, LANG_BG_EY_HAS_LOST_H_D_RUINS },
+    { BG_EY_OBJECT_N_BANNER_MAGE_TOWER_CENTER,    BG_EY_OBJECT_A_BANNER_MAGE_TOWER_CENTER,    LANG_BG_EY_HAS_LOST_A_M_TOWER, BG_EY_OBJECT_H_BANNER_MAGE_TOWER_CENTER,    LANG_BG_EY_HAS_LOST_H_M_TOWER }
+};
+
+BattlegroundEYCapturingPointStruct const m_CapturingPointTypes[EY_POINTS_MAX] =
+{
+    { BG_EY_OBJECT_N_BANNER_FEL_REAVER_CENTER,    BG_EY_OBJECT_A_BANNER_FEL_REAVER_CENTER,    LANG_BG_EY_HAS_TAKEN_A_F_RUINS, BG_EY_OBJECT_H_BANNER_FEL_REAVER_CENTER,    LANG_BG_EY_HAS_TAKEN_H_F_RUINS, EY_GRAVEYARD_FEL_REAVER    },
+    { BG_EY_OBJECT_N_BANNER_BLOOD_ELF_CENTER,     BG_EY_OBJECT_A_BANNER_BLOOD_ELF_CENTER,     LANG_BG_EY_HAS_TAKEN_A_B_TOWER, BG_EY_OBJECT_H_BANNER_BLOOD_ELF_CENTER,     LANG_BG_EY_HAS_TAKEN_H_B_TOWER, EY_GRAVEYARD_BLOOD_ELF     },
+    { BG_EY_OBJECT_N_BANNER_DRAENEI_RUINS_CENTER, BG_EY_OBJECT_A_BANNER_DRAENEI_RUINS_CENTER, LANG_BG_EY_HAS_TAKEN_A_D_RUINS, BG_EY_OBJECT_H_BANNER_DRAENEI_RUINS_CENTER, LANG_BG_EY_HAS_TAKEN_H_D_RUINS, EY_GRAVEYARD_DRAENEI_RUINS },
+    { BG_EY_OBJECT_N_BANNER_MAGE_TOWER_CENTER,    BG_EY_OBJECT_A_BANNER_MAGE_TOWER_CENTER,    LANG_BG_EY_HAS_TAKEN_A_M_TOWER, BG_EY_OBJECT_H_BANNER_MAGE_TOWER_CENTER,    LANG_BG_EY_HAS_TAKEN_H_M_TOWER, EY_GRAVEYARD_MAGE_TOWER    }
 };
 
 void BattlegroundEYScore::BuildObjectivesBlock(WorldPacket& data)
@@ -44,9 +156,11 @@ void BattlegroundEYScore::BuildObjectivesBlock(WorldPacket& data)
 
 BattlegroundEY::BattlegroundEY()
 {
-    m_BuffChange = true;
-    BgObjects.resize(BG_EY_OBJECT_MAX);
-    BgCreatures.resize(BG_EY_CREATURES_MAX);
+    SetChangeBuffs(true, &buffEntries);
+
+    SetGameObjectsNumber(BG_EY_OBJECT_MAX);
+    SetCreaturesNumber(BG_EY_CREATURES_MAX);
+
     m_Points_Trigger[FEL_REAVER] = TR_FEL_REAVER_BUFF;
     m_Points_Trigger[BLOOD_ELF] = TR_BLOOD_ELF_BUFF;
     m_Points_Trigger[DRAENEI_RUINS] = TR_DRAENEI_RUINS_BUFF;
@@ -71,8 +185,13 @@ BattlegroundEY::BattlegroundEY()
         m_PointBarStatus[i] = BG_EY_PROGRESS_BAR_STATE_MIDDLE;
     }
 
-    for (uint8 i = 0; i < 2 * EY_POINTS_MAX; ++i)
+    for (uint8 i = 0; i < PVP_TEAMS_COUNT * EY_POINTS_MAX; ++i)
         m_CurrentPointPlayersCount[i] = 0;
+
+    /*StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_EY_START_TWO_MINUTES;
+    StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_EY_START_ONE_MINUTE;
+    StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_EY_START_HALF_MINUTE;
+    StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_EY_HAS_BEGUN;*/
 }
 
 BattlegroundEY::~BattlegroundEY() { }
@@ -137,11 +256,12 @@ void BattlegroundEY::StartingEventOpenDoors()
 
     for (uint32 i = BG_EY_OBJECT_N_BANNER_FEL_REAVER_CENTER; i <= BG_EY_OBJECT_FLAG_NETHERSTORM; ++i)
         SpawnBGObject(i, RESPAWN_IMMEDIATELY);
+
     for (uint32 i = 0; i < EY_POINTS_MAX; ++i)
     {
         //randomly spawn buff
-        uint8 buff = urand(0, 2);
-        SpawnBGObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + buff + i * 3, RESPAWN_IMMEDIATELY);
+        uint8 buff = urand(0, BG_MAX_BUFFS - 1);
+        SpawnBGObject(BG_EY_OBJECT_SPEEDBUFF_BLOOD_ELF + i * BG_MAX_BUFFS + buff, RESPAWN_IMMEDIATELY);
     }
 
     // Achievement: Flurry
@@ -163,20 +283,17 @@ void BattlegroundEY::AddPoints(uint32 Team, uint32 Points)
 
 void BattlegroundEY::CheckSomeoneJoinedPoint()
 {
-    GameObject* obj = nullptr;
     for (uint8 i = 0; i < EY_POINTS_MAX; ++i)
     {
-        obj = GetBgMap()->GetGameObject(BgObjects[BG_EY_OBJECT_TOWER_CAP_FEL_REAVER + i]);
-
-        if (obj)
+        if (GameObject* obj = GetBGObject(BG_EY_OBJECT_TOWER_CAP_FEL_REAVER + i))
         {
             uint8 j = 0;
-            while (j < m_PlayersNearPoint[EY_POINTS_MAX].size())
+            while (j < m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS].size())
             {
-                Player* player = ObjectAccessor::FindPlayer(m_PlayersNearPoint[EY_POINTS_MAX][j]);
+                Player* player = ObjectAccessor::FindPlayer(m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS][j]);
                 if (!player)
                 {
-                    TC_LOG_ERROR("bg.battleground", "BattlegroundEY:CheckSomeoneJoinedPoint: Player (%s) could not be found!", m_PlayersNearPoint[EY_POINTS_MAX][j].ToString().c_str());
+                    TC_LOG_ERROR("bg.battleground", "BattlegroundEY:CheckSomeoneJoinedPoint: Player (%s) could not be found!", m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS][j].ToString().c_str());
                     ++j;
                     continue;
                 }
@@ -188,9 +305,9 @@ void BattlegroundEY::CheckSomeoneJoinedPoint()
                     UpdateWorldStateForPlayer(PROGRESS_BAR_STATUS, m_PointBarStatus[i], player);
                     UpdateWorldStateForPlayer(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_SHOW, player);
                     //add player to point
-                    m_PlayersNearPoint[i].push_back(m_PlayersNearPoint[EY_POINTS_MAX][j]);
+                    m_PlayersNearPoint[i].push_back(m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS][j]);
                     //remove player from "free space"
-                    m_PlayersNearPoint[EY_POINTS_MAX].erase(m_PlayersNearPoint[EY_POINTS_MAX].begin() + j);
+                    m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS].erase(m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS].begin() + j);
                 }
                 else
                     ++j;
@@ -202,14 +319,12 @@ void BattlegroundEY::CheckSomeoneJoinedPoint()
 void BattlegroundEY::CheckSomeoneLeftPoint()
 {
     //reset current point counts
-    for (uint8 i = 0; i < 2*EY_POINTS_MAX; ++i)
+    for (uint8 i = 0; i < PVP_TEAMS_COUNT * EY_POINTS_MAX; ++i)
         m_CurrentPointPlayersCount[i] = 0;
-    GameObject* obj = nullptr;
+
     for (uint8 i = 0; i < EY_POINTS_MAX; ++i)
     {
-        obj = GetBgMap()->GetGameObject(BgObjects[BG_EY_OBJECT_TOWER_CAP_FEL_REAVER + i]);
-
-        if (obj)
+        if (GameObject* obj = GetBGObject(BG_EY_OBJECT_TOWER_CAP_FEL_REAVER + i))
         {
             uint8 j = 0;
             while (j < m_PlayersNearPoint[i].size())
@@ -217,23 +332,24 @@ void BattlegroundEY::CheckSomeoneLeftPoint()
                 Player* player = ObjectAccessor::FindPlayer(m_PlayersNearPoint[i][j]);
                 if (!player)
                 {
-                    TC_LOG_ERROR("bg.battleground", "BattlegroundEY:CheckSomeoneLeftPoint Player (%s) could not be found!", m_PlayersNearPoint[i][j].ToString().c_str());
                     //move non-existing players to "free space" - this will cause many errors showing in log, but it is a very important bug
-                    m_PlayersNearPoint[EY_POINTS_MAX].push_back(m_PlayersNearPoint[i][j]);
+                    TC_LOG_ERROR("bg.battleground", "BattlegroundEY:CheckSomeoneLeftPoint Player (%s) could not be found!", m_PlayersNearPoint[i][j].ToString().c_str());
+                    m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS].push_back(m_PlayersNearPoint[i][j]);
                     m_PlayersNearPoint[i].erase(m_PlayersNearPoint[i].begin() + j);
                     continue;
                 }
+
                 if (!player->CanCaptureTowerPoint() || !player->IsWithinDistInMap(obj, BG_EY_POINT_RADIUS))
-                    //move player out of point (add him to players that are out of points
                 {
-                    m_PlayersNearPoint[EY_POINTS_MAX].push_back(m_PlayersNearPoint[i][j]);
+                    //move player out of point (add him to players that are out of points
+                    m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS].push_back(m_PlayersNearPoint[i][j]);
                     m_PlayersNearPoint[i].erase(m_PlayersNearPoint[i].begin() + j);
                     UpdateWorldStateForPlayer(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_DONT_SHOW, player);
                 }
                 else
                 {
-                    //player is neat flag, so update count:
-                    m_CurrentPointPlayersCount[2 * i + GetTeamIndexByTeamId(player->GetTeam())]++;
+                    //player is near flag, so update count
+                    ++m_CurrentPointPlayersCount[PVP_TEAMS_COUNT * i + GetTeamIndexByTeamId(player->GetTeam())];
                     ++j;
                 }
             }
@@ -247,8 +363,12 @@ void BattlegroundEY::UpdatePointStatuses()
     {
         if (m_PlayersNearPoint[point].empty())
             continue;
+
+        int32 allianceCount = m_CurrentPointPlayersCount[PVP_TEAMS_COUNT * point + TEAM_ALLIANCE];
+        int32 hordeCount = m_CurrentPointPlayersCount[PVP_TEAMS_COUNT * point + TEAM_HORDE];
+
         //count new point bar status:
-        m_PointBarStatus[point] += (m_CurrentPointPlayersCount[2 * point] - m_CurrentPointPlayersCount[2 * point + 1] < BG_EY_POINT_MAX_CAPTURERS_COUNT) ? m_CurrentPointPlayersCount[2 * point] - m_CurrentPointPlayersCount[2 * point + 1] : BG_EY_POINT_MAX_CAPTURERS_COUNT;
+        m_PointBarStatus[point] += std::min<int32>(allianceCount - hordeCount, BG_EY_POINT_MAX_CAPTURERS_COUNT);
 
         if (m_PointBarStatus[point] > BG_EY_PROGRESS_BAR_ALI_CONTROLLED)
             //point is fully alliance's
@@ -277,11 +397,11 @@ void BattlegroundEY::UpdatePointStatuses()
                 {
                     //point was uncontrolled and player is from team which captured point
                     if (m_PointState[point] == EY_POINT_STATE_UNCONTROLLED && player->GetTeam() == pointOwnerTeamId)
-                        EventTeamCapturedPoint(player, point);
+                        EventTeamCapturedPoint(player, EYBattlegroundPoints(point));
 
                     //point was under control and player isn't from team which controlled it
                     if (m_PointState[point] == EY_POINT_UNDER_CONTROL && player->GetTeam() != m_PointOwnedByTeam[point])
-                        EventTeamLostPoint(player, point);
+                        EventTeamLostPoint(player, EYBattlegroundPoints(point));
                 }
 
                 /// @workaround The original AreaTrigger is covered by a bigger one and not triggered on client side.
@@ -297,6 +417,16 @@ void BattlegroundEY::UpdatePointStatuses()
 void BattlegroundEY::UpdateTeamScore(uint32 Team)
 {
     uint32 score = GetTeamScore(Team);
+    /// @todo there should be some sound played when one team is near victory!! - and define variables
+    /*if (!m_IsInformedNearVictory && score >= BG_EY_WARNING_NEAR_VICTORY_SCORE)
+    {
+        if (Team == ALLIANCE)
+            SendBroadcastText(LANG_BG_EY_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        else
+            SendBroadcastText(LANG_BG_EY_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        PlaySoundToAll(BG_EY_SOUND_NEAR_VICTORY);
+        m_IsInformedNearVictory = true;
+    }*/
 
     if (score >= BG_EY_MAX_TEAM_SCORE)
     {
@@ -335,7 +465,7 @@ void BattlegroundEY::UpdatePointsCount(uint32 Team)
         UpdateWorldState(EY_HORDE_BASE, m_TeamPointsCount[TEAM_HORDE]);
 }
 
-void BattlegroundEY::UpdatePointsIcons(uint32 Team, uint32 Point)
+void BattlegroundEY::UpdatePointsIcons(uint32 Team, EYBattlegroundPoints Point)
 {
     //we MUST firstly send 0, after that we can send 1!!!
     if (m_PointState[Point] == EY_POINT_UNDER_CONTROL)
@@ -361,18 +491,19 @@ void BattlegroundEY::AddPlayer(Player* player)
     Battleground::AddPlayer(player);
     PlayerScores[player->GetGUID().GetCounter()] = new BattlegroundEYScore(player->GetGUID());
 
-    m_PlayersNearPoint[EY_POINTS_MAX].push_back(player->GetGUID());
+    m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS].push_back(player->GetGUID());
 }
 
 void BattlegroundEY::RemovePlayer(Player* player, ObjectGuid guid, uint32 /*team*/)
 {
     // sometimes flag aura not removed :(
-    for (int j = EY_POINTS_MAX; j >= 0; --j)
+    for (int32 j = EY_PLAYERS_OUT_OF_POINTS; j >= 0; --j)
     {
         for (size_t i = 0; i < m_PlayersNearPoint[j].size(); ++i)
             if (m_PlayersNearPoint[j][i] == guid)
                 m_PlayersNearPoint[j].erase(m_PlayersNearPoint[j].begin() + i);
     }
+
     if (IsFlagPickedup())
     {
         if (m_FlagKeeper == guid)
@@ -438,92 +569,27 @@ void BattlegroundEY::HandleAreaTrigger(Player* player, uint32 trigger)
 
 bool BattlegroundEY::SetupBattleground()
 {
-        // doors
-    if (!AddObject(BG_EY_OBJECT_DOOR_A, BG_OBJECT_A_DOOR_EY_ENTRY, 2527.6f, 1596.91f, 1262.13f, -3.12414f, -0.173642f, -0.001515f, 0.98477f, -0.008594f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_EY_OBJECT_DOOR_H, BG_OBJECT_H_DOOR_EY_ENTRY, 1803.21f, 1539.49f, 1261.09f, 3.14159f, 0.173648f, 0, 0.984808f, 0, RESPAWN_IMMEDIATELY)
-        // banners (alliance)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_FEL_REAVER_CENTER, BG_OBJECT_A_BANNER_EY_ENTRY, 2057.46f, 1735.07f, 1187.91f, -0.925024f, 0, 0, 0.446198f, -0.894934f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_FEL_REAVER_LEFT, BG_OBJECT_A_BANNER_EY_ENTRY, 2032.25f, 1729.53f, 1190.33f, 1.8675f, 0, 0, 0.803857f, 0.594823f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_FEL_REAVER_RIGHT, BG_OBJECT_A_BANNER_EY_ENTRY, 2092.35f, 1775.46f, 1187.08f, -0.401426f, 0, 0, 0.199368f, -0.979925f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_BLOOD_ELF_CENTER, BG_OBJECT_A_BANNER_EY_ENTRY, 2047.19f, 1349.19f, 1189.0f, -1.62316f, 0, 0, 0.725374f, -0.688354f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_BLOOD_ELF_LEFT, BG_OBJECT_A_BANNER_EY_ENTRY, 2074.32f, 1385.78f, 1194.72f, 0.488692f, 0, 0, 0.241922f, 0.970296f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_BLOOD_ELF_RIGHT, BG_OBJECT_A_BANNER_EY_ENTRY, 2025.13f, 1386.12f, 1192.74f, 2.3911f, 0, 0, 0.930418f, 0.366501f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_DRAENEI_RUINS_CENTER, BG_OBJECT_A_BANNER_EY_ENTRY, 2276.8f, 1400.41f, 1196.33f, 2.44346f, 0, 0, 0.939693f, 0.34202f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_DRAENEI_RUINS_LEFT, BG_OBJECT_A_BANNER_EY_ENTRY, 2305.78f, 1404.56f, 1199.38f, 1.74533f, 0, 0, 0.766044f, 0.642788f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_DRAENEI_RUINS_RIGHT, BG_OBJECT_A_BANNER_EY_ENTRY, 2245.4f, 1366.41f, 1195.28f, 2.21657f, 0, 0, 0.894934f, 0.446198f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_MAGE_TOWER_CENTER, BG_OBJECT_A_BANNER_EY_ENTRY, 2270.84f, 1784.08f, 1186.76f, 2.42601f, 0, 0, 0.936672f, 0.350207f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_MAGE_TOWER_LEFT, BG_OBJECT_A_BANNER_EY_ENTRY, 2269.13f, 1737.7f, 1186.66f, 0.994838f, 0, 0, 0.477159f, 0.878817f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_A_BANNER_MAGE_TOWER_RIGHT, BG_OBJECT_A_BANNER_EY_ENTRY, 2300.86f, 1741.25f, 1187.7f, -0.785398f, 0, 0, 0.382683f, -0.92388f, RESPAWN_ONE_DAY)
-        // banners (horde)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_FEL_REAVER_CENTER, BG_OBJECT_H_BANNER_EY_ENTRY, 2057.46f, 1735.07f, 1187.91f, -0.925024f, 0, 0, 0.446198f, -0.894934f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_FEL_REAVER_LEFT, BG_OBJECT_H_BANNER_EY_ENTRY, 2032.25f, 1729.53f, 1190.33f, 1.8675f, 0, 0, 0.803857f, 0.594823f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_FEL_REAVER_RIGHT, BG_OBJECT_H_BANNER_EY_ENTRY, 2092.35f, 1775.46f, 1187.08f, -0.401426f, 0, 0, 0.199368f, -0.979925f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_BLOOD_ELF_CENTER, BG_OBJECT_H_BANNER_EY_ENTRY, 2047.19f, 1349.19f, 1189.0f, -1.62316f, 0, 0, 0.725374f, -0.688354f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_BLOOD_ELF_LEFT, BG_OBJECT_H_BANNER_EY_ENTRY, 2074.32f, 1385.78f, 1194.72f, 0.488692f, 0, 0, 0.241922f, 0.970296f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_BLOOD_ELF_RIGHT, BG_OBJECT_H_BANNER_EY_ENTRY, 2025.13f, 1386.12f, 1192.74f, 2.3911f, 0, 0, 0.930418f, 0.366501f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_DRAENEI_RUINS_CENTER, BG_OBJECT_H_BANNER_EY_ENTRY, 2276.8f, 1400.41f, 1196.33f, 2.44346f, 0, 0, 0.939693f, 0.34202f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_DRAENEI_RUINS_LEFT, BG_OBJECT_H_BANNER_EY_ENTRY, 2305.78f, 1404.56f, 1199.38f, 1.74533f, 0, 0, 0.766044f, 0.642788f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_DRAENEI_RUINS_RIGHT, BG_OBJECT_H_BANNER_EY_ENTRY, 2245.4f, 1366.41f, 1195.28f, 2.21657f, 0, 0, 0.894934f, 0.446198f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_MAGE_TOWER_CENTER, BG_OBJECT_H_BANNER_EY_ENTRY, 2270.84f, 1784.08f, 1186.76f, 2.42601f, 0, 0, 0.936672f, 0.350207f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_MAGE_TOWER_LEFT, BG_OBJECT_H_BANNER_EY_ENTRY, 2269.13f, 1737.7f, 1186.66f, 0.994838f, 0, 0, 0.477159f, 0.878817f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_H_BANNER_MAGE_TOWER_RIGHT, BG_OBJECT_H_BANNER_EY_ENTRY, 2300.86f, 1741.25f, 1187.7f, -0.785398f, 0, 0, 0.382683f, -0.92388f, RESPAWN_ONE_DAY)
-        // banners (natural)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_FEL_REAVER_CENTER, BG_OBJECT_N_BANNER_EY_ENTRY, 2057.46f, 1735.07f, 1187.91f, -0.925024f, 0, 0, 0.446198f, -0.894934f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_FEL_REAVER_LEFT, BG_OBJECT_N_BANNER_EY_ENTRY, 2032.25f, 1729.53f, 1190.33f, 1.8675f, 0, 0, 0.803857f, 0.594823f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_FEL_REAVER_RIGHT, BG_OBJECT_N_BANNER_EY_ENTRY, 2092.35f, 1775.46f, 1187.08f, -0.401426f, 0, 0, 0.199368f, -0.979925f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_BLOOD_ELF_CENTER, BG_OBJECT_N_BANNER_EY_ENTRY, 2047.19f, 1349.19f, 1189.0f, -1.62316f, 0, 0, 0.725374f, -0.688354f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_BLOOD_ELF_LEFT, BG_OBJECT_N_BANNER_EY_ENTRY, 2074.32f, 1385.78f, 1194.72f, 0.488692f, 0, 0, 0.241922f, 0.970296f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_BLOOD_ELF_RIGHT, BG_OBJECT_N_BANNER_EY_ENTRY, 2025.13f, 1386.12f, 1192.74f, 2.3911f, 0, 0, 0.930418f, 0.366501f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_DRAENEI_RUINS_CENTER, BG_OBJECT_N_BANNER_EY_ENTRY, 2276.8f, 1400.41f, 1196.33f, 2.44346f, 0, 0, 0.939693f, 0.34202f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_DRAENEI_RUINS_LEFT, BG_OBJECT_N_BANNER_EY_ENTRY, 2305.78f, 1404.56f, 1199.38f, 1.74533f, 0, 0, 0.766044f, 0.642788f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_DRAENEI_RUINS_RIGHT, BG_OBJECT_N_BANNER_EY_ENTRY, 2245.4f, 1366.41f, 1195.28f, 2.21657f, 0, 0, 0.894934f, 0.446198f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_MAGE_TOWER_CENTER, BG_OBJECT_N_BANNER_EY_ENTRY, 2270.84f, 1784.08f, 1186.76f, 2.42601f, 0, 0, 0.936672f, 0.350207f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_MAGE_TOWER_LEFT, BG_OBJECT_N_BANNER_EY_ENTRY, 2269.13f, 1737.7f, 1186.66f, 0.994838f, 0, 0, 0.477159f, 0.878817f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_N_BANNER_MAGE_TOWER_RIGHT, BG_OBJECT_N_BANNER_EY_ENTRY, 2300.86f, 1741.25f, 1187.7f, -0.785398f, 0, 0, 0.382683f, -0.92388f, RESPAWN_ONE_DAY)
-        // flags
-        || !AddObject(BG_EY_OBJECT_FLAG_NETHERSTORM, BG_OBJECT_FLAG2_EY_ENTRY, 2174.782227f, 1569.054688f, 1160.361938f, -1.448624f, 0, 0, 0.662620f, -0.748956f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_FLAG_FEL_REAVER, BG_OBJECT_FLAG1_EY_ENTRY, 2044.28f, 1729.68f, 1189.96f, -0.017453f, 0, 0, 0.008727f, -0.999962f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_FLAG_BLOOD_ELF, BG_OBJECT_FLAG1_EY_ENTRY, 2048.83f, 1393.65f, 1194.49f, 0.20944f, 0, 0, 0.104528f, 0.994522f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_FLAG_DRAENEI_RUINS, BG_OBJECT_FLAG1_EY_ENTRY, 2286.56f, 1402.36f, 1197.11f, 3.72381f, 0, 0, 0.957926f, -0.287016f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_FLAG_MAGE_TOWER, BG_OBJECT_FLAG1_EY_ENTRY, 2284.48f, 1731.23f, 1189.99f, 2.89725f, 0, 0, 0.992546f, 0.121869f, RESPAWN_ONE_DAY)
-        // tower cap
-        || !AddObject(BG_EY_OBJECT_TOWER_CAP_FEL_REAVER, BG_OBJECT_FR_TOWER_CAP_EY_ENTRY, 2024.600708f, 1742.819580f, 1195.157715f, 2.443461f, 0, 0, 0.939693f, 0.342020f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_TOWER_CAP_BLOOD_ELF, BG_OBJECT_BE_TOWER_CAP_EY_ENTRY, 2050.493164f, 1372.235962f, 1194.563477f, 1.710423f, 0, 0, 0.754710f, 0.656059f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_TOWER_CAP_DRAENEI_RUINS, BG_OBJECT_DR_TOWER_CAP_EY_ENTRY, 2301.010498f, 1386.931641f, 1197.183472f, 1.570796f, 0, 0, 0.707107f, 0.707107f, RESPAWN_ONE_DAY)
-        || !AddObject(BG_EY_OBJECT_TOWER_CAP_MAGE_TOWER, BG_OBJECT_HU_TOWER_CAP_EY_ENTRY, 2282.121582f, 1760.006958f, 1189.707153f, 1.919862f, 0, 0, 0.819152f, 0.573576f, RESPAWN_ONE_DAY)
-)
+    for (uint32 i = 0; i < BG_EY_OBJECT_MAX; ++i)
     {
-        TC_LOG_ERROR("sql.sql", "BatteGroundEY: Failed to spawn some objects. The battleground was not created.");
-        return false;
-    }
-
-    //buffs
-    for (int i = 0; i < EY_POINTS_MAX; ++i)
-    {
-        AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(m_Points_Trigger[i]);
-        if (!at)
+        BattlegroundGOSpawnPoint const& object = BG_EY_GameObjects[i];
+        if (!AddObject(i, object.Entry, object.Pos, object.Rot, object.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "BattlegroundEY: Unknown trigger: %u", m_Points_Trigger[i]);
-            continue;
+            TC_LOG_ERROR("bg.battleground", "BattleGroundEY: Failed to spawn GameObject! (Entry: %u). Battleground not created!", object.Entry);
+            return false;
         }
-        if (!AddObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3, Buff_Entries[0], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY)
-            || !AddObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3 + 1, Buff_Entries[1], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY)
-            || !AddObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3 + 2, Buff_Entries[2], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY)
-)
-            TC_LOG_ERROR("bg.battleground", "BattlegroundEY: Could not spawn Speedbuff Fel Reaver.");
     }
 
     WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(EY_GRAVEYARD_MAIN_ALLIANCE);
-    if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 3.124139f, TEAM_ALLIANCE))
+    if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_ALLIANCE, Position(sg->x, sg->y, sg->z, 3.124139f), TEAM_ALLIANCE))
     {
-        TC_LOG_ERROR("sql.sql", "BatteGroundEY: Failed to spawn spirit guide. The battleground was not created.");
+        TC_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. The battleground was not created.");
         return false;
     }
 
     sg = sWorldSafeLocsStore.LookupEntry(EY_GRAVEYARD_MAIN_HORDE);
-    if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 3.193953f, TEAM_HORDE))
+    if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_HORDE, Position(sg->x, sg->y, sg->z, 3.193953f), TEAM_HORDE))
     {
-        TC_LOG_ERROR("sql.sql", "BatteGroundEY: Failed to spawn spirit guide. The battleground was not created.");
+        TC_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. The battleground was not created.");
         return false;
     }
 
@@ -671,7 +737,7 @@ void BattlegroundEY::EventPlayerClickedOnFlag(Player* player, GameObject* target
         SendBroadcastText(BG_EY_TEXT_TAKEN_FLAG, CHAT_MSG_BG_SYSTEM_HORDE, player);
 }
 
-void BattlegroundEY::EventTeamLostPoint(Player* player, uint32 Point)
+void BattlegroundEY::EventTeamLostPoint(Player* player, EYBattlegroundPoints Point)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -684,22 +750,19 @@ void BattlegroundEY::EventTeamLostPoint(Player* player, uint32 Point)
 
     if (Team == ALLIANCE)
     {
-        m_TeamPointsCount[TEAM_ALLIANCE]--;
-        SpawnBGObject(m_LosingPointTypes[Point].DespawnObjectTypeAlliance, RESPAWN_ONE_DAY);
-        SpawnBGObject(m_LosingPointTypes[Point].DespawnObjectTypeAlliance + 1, RESPAWN_ONE_DAY);
-        SpawnBGObject(m_LosingPointTypes[Point].DespawnObjectTypeAlliance + 2, RESPAWN_ONE_DAY);
+        --m_TeamPointsCount[TEAM_ALLIANCE];
+        for (uint32 i = 0; i < BG_EY_POINT_BANNERS; ++i)
+            SpawnBGObject(m_LosingPointTypes[Point].DespawnObjectTypeAlliance + i, RESPAWN_ONE_DAY);
     }
     else
     {
-        m_TeamPointsCount[TEAM_HORDE]--;
-        SpawnBGObject(m_LosingPointTypes[Point].DespawnObjectTypeHorde, RESPAWN_ONE_DAY);
-        SpawnBGObject(m_LosingPointTypes[Point].DespawnObjectTypeHorde + 1, RESPAWN_ONE_DAY);
-        SpawnBGObject(m_LosingPointTypes[Point].DespawnObjectTypeHorde + 2, RESPAWN_ONE_DAY);
+        --m_TeamPointsCount[TEAM_HORDE];
+        for (uint32 i = 0; i < BG_EY_POINT_BANNERS; ++i)
+            SpawnBGObject(m_LosingPointTypes[Point].DespawnObjectTypeHorde + i, RESPAWN_ONE_DAY);
     }
 
-    SpawnBGObject(m_LosingPointTypes[Point].SpawnNeutralObjectType, RESPAWN_IMMEDIATELY);
-    SpawnBGObject(m_LosingPointTypes[Point].SpawnNeutralObjectType + 1, RESPAWN_IMMEDIATELY);
-    SpawnBGObject(m_LosingPointTypes[Point].SpawnNeutralObjectType + 2, RESPAWN_IMMEDIATELY);
+    for (uint32 i = 0; i < BG_EY_POINT_BANNERS; ++i)
+        SpawnBGObject(m_LosingPointTypes[Point].SpawnNeutralObjectType + i, RESPAWN_IMMEDIATELY);
 
     //buff isn't despawned
 
@@ -715,33 +778,34 @@ void BattlegroundEY::EventTeamLostPoint(Player* player, uint32 Point)
     UpdatePointsCount(Team);
 
     //remove bonus honor aura trigger creature when node is lost
-    DelCreature(Point + 6);//NULL checks are in DelCreature! 0-5 spirit guides
+     if (Point < EY_POINTS_MAX)
+         DelCreature(Point + 6); //NULL checks are in DelCreature! 0-5 spirit guides
 }
 
-void BattlegroundEY::EventTeamCapturedPoint(Player* player, uint32 Point)
+void BattlegroundEY::EventTeamCapturedPoint(Player* player, EYBattlegroundPoints Point)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
+    if (Point >= EY_POINTS_MAX)
+        return;
+
     uint32 Team = player->GetTeam();
 
-    SpawnBGObject(m_CapturingPointTypes[Point].DespawnNeutralObjectType, RESPAWN_ONE_DAY);
-    SpawnBGObject(m_CapturingPointTypes[Point].DespawnNeutralObjectType + 1, RESPAWN_ONE_DAY);
-    SpawnBGObject(m_CapturingPointTypes[Point].DespawnNeutralObjectType + 2, RESPAWN_ONE_DAY);
+    for (uint32 i = 0; i < BG_EY_POINT_BANNERS; ++i)
+        SpawnBGObject(m_CapturingPointTypes[Point].DespawnNeutralObjectType + i, RESPAWN_ONE_DAY);
 
     if (Team == ALLIANCE)
     {
-        m_TeamPointsCount[TEAM_ALLIANCE]++;
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeAlliance, RESPAWN_IMMEDIATELY);
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeAlliance + 1, RESPAWN_IMMEDIATELY);
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeAlliance + 2, RESPAWN_IMMEDIATELY);
+        ++m_TeamPointsCount[TEAM_ALLIANCE];
+        for (uint32 i = 0; i < BG_EY_POINT_BANNERS; ++i)
+            SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeAlliance + i, RESPAWN_IMMEDIATELY);
     }
     else
     {
-        m_TeamPointsCount[TEAM_HORDE]++;
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeHorde, RESPAWN_IMMEDIATELY);
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeHorde + 1, RESPAWN_IMMEDIATELY);
-        SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeHorde + 2, RESPAWN_IMMEDIATELY);
+        ++m_TeamPointsCount[TEAM_HORDE];
+        for (uint32 i = 0; i < BG_EY_POINT_BANNERS; ++i)
+            SpawnBGObject(m_CapturingPointTypes[Point].SpawnObjectTypeHorde + i, RESPAWN_IMMEDIATELY);
     }
 
     //buff isn't respawned
@@ -754,29 +818,29 @@ void BattlegroundEY::EventTeamCapturedPoint(Player* player, uint32 Point)
     else
         SendBroadcastText(m_CapturingPointTypes[Point].MessageIdHorde, CHAT_MSG_BG_SYSTEM_HORDE, player);
 
-    if (BgCreatures[Point])
-        DelCreature(Point);
+    DelCreature(Point);
 
-    WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(m_CapturingPointTypes[Point].GraveyardId);
-    if (!sg || !AddSpiritGuide(Point, sg->x, sg->y, sg->z, 3.124139f, GetTeamIndexByTeamId(Team)))
+    WorldSafeLocsEntry const* sg = nullptr;
+    sg = sWorldSafeLocsStore.LookupEntry(m_CapturingPointTypes[Point].GraveYardId);
+    if (!sg || !AddSpiritGuide(Point, Position(sg->x, sg->y, sg->z, 3.124139f), GetTeamIndexByTeamId(Team)))
         TC_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. point: %u, team: %u, graveyard_id: %u",
-            Point, Team, m_CapturingPointTypes[Point].GraveyardId);
+            Point, Team, m_CapturingPointTypes[Point].GraveYardId);
 
-//    SpawnBGCreature(Point, RESPAWN_IMMEDIATELY);
+    // SpawnBGCreature(Point, RESPAWN_IMMEDIATELY);
 
     UpdatePointsIcons(Team, Point);
     UpdatePointsCount(Team);
 
-    Creature* trigger = GetBGCreature(Point + 6, false);//0-5 spirit guides
+    Creature* trigger = GetBGCreature(Point - EY_SPIRIT_FEL_REAVER + EY_TRIGGER_FEL_REAVER, false);
     if (!trigger)
-        trigger = AddCreature(WORLD_TRIGGER, Point+6, BG_EY_TriggerPositions[Point], GetTeamIndexByTeamId(Team));
+        trigger = AddCreature(WORLD_TRIGGER, Point - EY_SPIRIT_FEL_REAVER + EY_TRIGGER_FEL_REAVER, BG_EY_TriggerPositions[Point]);
 
     //add bonus honor aura trigger creature when node is accupied
     //cast bonus aura (+50% honor in 25yards)
     //aura should only apply to players who have accupied the node, set correct faction for trigger
     if (trigger)
     {
-        trigger->SetFaction(Team == ALLIANCE ? FACTION_ALLIANCE_GENERIC : FACTION_HORDE_GENERIC);
+        trigger->SetFaction(Team == ALLIANCE ? 84 : 83);
         trigger->CastSpell(trigger, SPELL_HONORABLE_DEFENDER_25Y, false);
     }
 }
@@ -809,6 +873,7 @@ void BattlegroundEY::EventPlayerCapturedFlag(Player* player, uint32 BgObjectType
     m_FlagCapturedBgObjectType = BgObjectType;
 
     uint8 team_id = player->GetTeam() == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE;
+
     if (m_TeamPointsCount[team_id] > 0)
         AddPoints(player->GetTeam(), BG_EY_FlagPoints[m_TeamPointsCount[team_id] - 1]);
 
@@ -916,9 +981,9 @@ WorldSafeLocsEntry const* BattlegroundEY::GetClosestGraveyard(Player* player)
     {
         if (m_PointOwnedByTeam[i] == player->GetTeam() && m_PointState[i] == EY_POINT_UNDER_CONTROL)
         {
-            entry = sWorldSafeLocsStore.LookupEntry(m_CapturingPointTypes[i].GraveyardId);
+            entry = sWorldSafeLocsStore.LookupEntry(m_CapturingPointTypes[i].GraveYardId);
             if (!entry)
-                TC_LOG_ERROR("bg.battleground", "BattlegroundEY: Graveyard %u could not be found.", m_CapturingPointTypes[i].GraveyardId);
+                TC_LOG_ERROR("bg.battleground", "BattlegroundEY: Graveyard %u could not be found.", m_CapturingPointTypes[i].GraveYardId);
             else
             {
                 distance = (entry->x - plr_x)*(entry->x - plr_x) + (entry->y - plr_y)*(entry->y - plr_y) + (entry->z - plr_z)*(entry->z - plr_z);
@@ -937,7 +1002,7 @@ WorldSafeLocsEntry const* BattlegroundEY::GetClosestGraveyard(Player* player)
 bool BattlegroundEY::IsAllNodesControlledByTeam(uint32 team) const
 {
     uint32 count = 0;
-    for (int i = 0; i < EY_POINTS_MAX; ++i)
+    for (uint32 i = 0; i < EY_POINTS_MAX; ++i)
         if (m_PointOwnedByTeam[i] == team && m_PointState[i] == EY_POINT_UNDER_CONTROL)
             ++count;
 

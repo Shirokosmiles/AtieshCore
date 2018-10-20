@@ -21,11 +21,13 @@
 
 #include "ArenaScore.h"
 #include "DBCEnums.h"
+#include "GameObjectData.h"
 #include "ObjectGuid.h"
 #include "Position.h"
 #include "SharedDefines.h"
 #include <map>
 
+class Battleground;
 class BattlegroundMap;
 class Creature;
 class GameObject;
@@ -36,6 +38,7 @@ class Unit;
 class WorldObject;
 class WorldPacket;
 
+struct QuaternionData;
 struct BattlegroundScore;
 struct PvPDifficultyEntry;
 struct WorldSafeLocsEntry;
@@ -157,15 +160,6 @@ enum BattlegroundStartTimeIntervals
     BG_START_DELAY_NONE             = 0                     // ms
 };
 
-enum BattlegroundBuffObjects
-{
-    BG_OBJECTID_SPEEDBUFF_ENTRY     = 179871,
-    BG_OBJECTID_REGENBUFF_ENTRY     = 179904,
-    BG_OBJECTID_BERSERKERBUFF_ENTRY = 179905
-};
-
-const uint32 Buff_Entries[3] = { BG_OBJECTID_SPEEDBUFF_ENTRY, BG_OBJECTID_REGENBUFF_ENTRY, BG_OBJECTID_BERSERKERBUFF_ENTRY };
-
 enum BattlegroundStatus
 {
     STATUS_NONE         = 0,                                // first status, should mean bg is not instance
@@ -213,7 +207,6 @@ enum BattlegroundStartingEventsIds
     BG_STARTING_EVENT_THIRD     = 2,
     BG_STARTING_EVENT_FOURTH    = 3
 };
-#define BG_STARTING_EVENT_COUNT 4
 
 enum BGHonorMode
 {
@@ -222,8 +215,52 @@ enum BGHonorMode
     BG_HONOR_MODE_NUM
 };
 
-#define BG_AWARD_ARENA_POINTS_MIN_LEVEL 71
-#define ARENA_TIMELIMIT_POINTS_LOSS    -16
+enum BattlegroudMisc
+ {
+     BG_MAX_BUFFS                    =   3,
+     BG_STARTING_EVENT_COUNT         =   4,
+     BG_AWARD_ARENA_POINTS_MIN_LEVEL =  71,
+     ARENA_TIMELIMIT_POINTS_LOSS     = -16
+ };
+
+ // because hardcoding values is bad
+ struct BattlegroundBuffEntries
+ {
+     friend class Battleground;
+
+     BattlegroundBuffEntries(uint32 speedBuffEntry, uint32 regenBuffEntry, uint32 berserkBuffEntry) :
+         _speedBuffEntry(speedBuffEntry), _regenBuffEntry(regenBuffEntry), _berserkBuffEntry(berserkBuffEntry) { }
+
+     private:
+         union
+         {
+             struct
+             {
+                 uint32 _speedBuffEntry;
+                 uint32 _regenBuffEntry;
+                 uint32 _berserkBuffEntry;
+             };
+             uint32 _buffEntry[BG_MAX_BUFFS];
+         };
+ };
+
+ typedef std::vector<BattlegroundBuffEntries> BattlegroundBuffData;
+
+ // data helpers
+ struct BattlegroundSpawnPoint
+ {
+     uint32 Entry;
+     Position Pos;
+     uint32 SpawnTime;
+ };
+
+ struct BattlegroundGOSpawnPoint
+ {
+     uint32 Entry;
+     Position Pos;
+     QuaternionData Rot;
+     uint32 SpawnTime;
+ };
 
 /*
 This class is used to:
@@ -446,17 +483,11 @@ class TC_GAME_API Battleground
         void HandleTriggerBuff(ObjectGuid go_guid);
         void SetHoliday(bool is_holiday);
 
-        /// @todo make this protected:
-        GuidVector BgObjects;
-        GuidVector BgCreatures;
         void SpawnBGObject(uint32 type, uint32 respawntime);
-        virtual bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0, GOState goState = GO_STATE_READY);
-        bool AddObject(uint32 type, uint32 entry, Position const& pos, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0, GOState goState = GO_STATE_READY);
-        virtual Creature* AddCreature(uint32 entry, uint32 type, float x, float y, float z, float o, TeamId teamId = TEAM_NEUTRAL, uint32 respawntime = 0, Transport* transport = nullptr);
-        Creature* AddCreature(uint32 entry, uint32 type, Position const& pos, TeamId teamId = TEAM_NEUTRAL, uint32 respawntime = 0, Transport* transport = nullptr);
+        GameObject* AddObject(uint32 type, uint32 entry, Position const& pos, QuaternionData const& rot, uint32 respawnTime = 0, GOState goState = GO_STATE_READY);
+        Creature* AddCreature(uint32 entry, uint32 type, Position const& pos, uint32 respawntime = 0, Transport* transport = nullptr);
         bool DelCreature(uint32 type);
         bool DelObject(uint32 type);
-        virtual bool AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId = TEAM_NEUTRAL);
         bool AddSpiritGuide(uint32 type, Position const& pos, TeamId teamId = TEAM_NEUTRAL);
         int32 GetObjectType(ObjectGuid guid);
 
@@ -489,6 +520,10 @@ class TC_GAME_API Battleground
         uint8 GetUniqueBracketId() const;
 
     protected:
+        void SetCreaturesNumber(size_t count);
+        void SetGameObjectsNumber(size_t count);
+        void SetChangeBuffs(bool change, BattlegroundBuffData const* buffEntries);
+
         // this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends Battleground
         void EndNow();
         void PlayerAddedToBGCheckIfBGIsRunning(Player* player);
@@ -521,7 +556,6 @@ class TC_GAME_API Battleground
         // this must be filled in constructors!
         uint32 StartMessageIds[BG_STARTING_EVENT_COUNT];
 
-        bool   m_BuffChange;
         bool   m_IsRandom;
 
         BGHonorMode m_HonorMode;
@@ -552,6 +586,7 @@ class TC_GAME_API Battleground
         bool   m_PrematureCountDown;
         uint32 m_PrematureCountDownTimer;
         std::string m_Name;
+        bool   m_BuffChange;
 
         /* Pre- and post-update hooks */
 
@@ -583,9 +618,13 @@ class TC_GAME_API Battleground
          */
         virtual void PostUpdateImpl(uint32 /* diff */) { }
 
-        // Player lists
+        // Player containers
         GuidVector m_ResurrectQueue;                        // Player GUID
         GuidDeque m_OfflineQueue;                           // Player GUID
+
+        // Spawn containers
+        GuidVector BgObjects;
+        GuidVector BgCreatures;
 
         // Invited counters are useful for player invitation to BG - do not allow, if BG is started to one faction to have 2 more players than another faction
         // Invited counters will be changed only when removing already invited player from queue, removing player from battleground and inviting player to BG
@@ -618,5 +657,6 @@ class TC_GAME_API Battleground
         Position StartPosition[PVP_TEAMS_COUNT];
         float m_StartMaxDist;
         uint32 ScriptId;
+        BattlegroundBuffData const* m_BuffEntries;
 };
 #endif

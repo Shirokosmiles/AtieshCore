@@ -1203,6 +1203,39 @@ enum TrinityStrings
     LANG_GROUP_TEXT_ANNOUNCE_2            = 789,
     LANG_GROUP_TEXT_ANNOUNCE_3            = 790,
 
+    // BG
+    // AB
+    LANG_BG_AB_NODE_STABLES             = 652,
+    LANG_BG_AB_NODE_BLACKSMITH          = 653,
+    LANG_BG_AB_NODE_FARM                = 654,
+    LANG_BG_AB_NODE_LUMBER_MILL         = 655,
+    LANG_BG_AB_NODE_GOLD_MINE           = 656,
+    // EYE
+    LANG_BG_EY_HAS_TAKEN_A_M_TOWER      = 667,
+    LANG_BG_EY_HAS_TAKEN_H_M_TOWER      = 668,
+    LANG_BG_EY_HAS_TAKEN_A_D_RUINS      = 669,
+    LANG_BG_EY_HAS_TAKEN_H_D_RUINS      = 670,
+    LANG_BG_EY_HAS_TAKEN_A_B_TOWER      = 671,
+    LANG_BG_EY_HAS_TAKEN_H_B_TOWER      = 672,
+    LANG_BG_EY_HAS_TAKEN_A_F_RUINS      = 673,
+    LANG_BG_EY_HAS_TAKEN_H_F_RUINS      = 674,
+    LANG_BG_EY_HAS_LOST_A_M_TOWER       = 675,
+    LANG_BG_EY_HAS_LOST_H_M_TOWER       = 676,
+    LANG_BG_EY_HAS_LOST_A_D_RUINS       = 677,
+    LANG_BG_EY_HAS_LOST_H_D_RUINS       = 678,
+    LANG_BG_EY_HAS_LOST_A_B_TOWER       = 679,
+    LANG_BG_EY_HAS_LOST_H_B_TOWER       = 680,
+    LANG_BG_EY_HAS_LOST_A_F_RUINS       = 681,
+    LANG_BG_EY_HAS_LOST_H_F_RUINS       = 682,
+    // Isle of Conquest
+    LANG_BG_IC_ALLIANCE_KEEP            = 1209,
+    LANG_BG_IC_HORDE_KEEP               = 1210,
+
+    LANG_BG_IC_WORKSHOP                 = 1220,
+    LANG_BG_IC_DOCKS                    = 1221,
+    LANG_BG_IC_REFINERY                 = 1222,
+    LANG_BG_IC_QUARRY                   = 1223,
+    LANG_BG_IC_HANGAR                   = 1224,
     // 11022 - 11109 free 
     // Vip Commands
     LANG_PLAYER_NOT_VIP                   = 11110,
