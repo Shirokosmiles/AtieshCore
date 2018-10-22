@@ -3080,7 +3080,8 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
         }
     }
 
-    HandleEffects(unit, nullptr, nullptr, effIndex, SPELL_EFFECT_HANDLE_HIT_TARGET);
+    if (unit)
+        HandleEffects(unit, nullptr, nullptr, effIndex, SPELL_EFFECT_HANDLE_HIT_TARGET);
 }
 
 void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
