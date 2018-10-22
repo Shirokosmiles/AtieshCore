@@ -3308,10 +3308,8 @@ AuraApplication* Unit::_CreateAuraApplication(Aura* aura, uint8 effMask)
 {
     // can't apply aura on unit which is going to be deleted - to not create a memory leak
     ASSERT(!m_cleanupDone);
-    if (!aura || !aura->IsRemoved())
-        return nullptr;
     // aura musn't be removed
-    //ASSERT(!aura->IsRemoved());
+    ASSERT(!aura->IsRemoved());
 
     // aura mustn't be already applied on target
     ASSERT (!aura->IsAppliedOnTarget(GetGUID()) && "Unit::_CreateAuraApplication: aura musn't be applied on target");
