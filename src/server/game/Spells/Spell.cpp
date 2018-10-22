@@ -3007,6 +3007,7 @@ SpellMissInfo Spell::PreprocessSpellHit(Unit* unit, bool scaleAura, TargetInfo& 
 
 void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
 {
+    bool unitcheck = false;
     if (uint8 aura_effmask = Aura::BuildEffectMaskForOwner(m_spellInfo, 1 << effIndex, unit))
     {
         WorldObject* caster = m_caster;
@@ -3016,7 +3017,7 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
         if (caster)
         {
             bool refresh = false;
-
+            unitcheck = true;
             // delayed spells with multiple targets need to create a new aura object, otherwise we'll access a deleted aura
             if (m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled())
             {
@@ -3080,7 +3081,7 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
         }
     }
 
-    if (unit)
+    if (unitcheck || (!unitcheck && unit))
         HandleEffects(unit, nullptr, nullptr, effIndex, SPELL_EFFECT_HANDLE_HIT_TARGET);
 }
 
