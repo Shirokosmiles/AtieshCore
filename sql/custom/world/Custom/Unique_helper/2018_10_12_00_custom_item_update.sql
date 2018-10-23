@@ -48,7 +48,7 @@ INSERT INTO `trinity_string` VALUES
 -- LANG_ITEM_SERVER_MENU
 (11516,'|TInterface\\icons\\Inv_inscription_weaponscroll01:25:25:-15:0|t|cffD80000Server information|r',NULL,'|TInterface\\icons\\Inv_inscription_weaponscroll01:25:25:-15:0|t|cffD80000Informations sur le serveur|r',NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Inv_inscription_weaponscroll01:25:25:-15:0|t|cffD80000Информация о сервере|r'),
 -- LANG_ITEM_VIP_BUY
-(11517,'|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|tAccount: [|cffE80000buy VIP time|r]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|Аккаунт: [|cffE80000купить VIP время|r]'),
+(11517,'|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|tAccount: [|cffE80000buy VIP time|r]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|tАккаунт: [|cffE80000купить VIP время|r]'),
 -- LANG_ITEM_VIP_INCREASE
 (11518,'VIP account: [|cffE80000increase VIP time|r]',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'VIP Аккаунт: [|cffE80000Увеличить время действий привилегий|r]'),
 -- LANG_ITEM_CLOSE
