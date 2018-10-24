@@ -2365,7 +2365,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     }
     else
     {
-        if (target && target->ToPlayer() && target->ToPlayer()->UnderVisibleVanish()) // set CC Delay = 0 if target is rogue under vanish
+        if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_AURA_CC) && target && target->ToPlayer() && target->ToPlayer()->UnderVisibleVanish()) // set CC Delay = 0 if target is rogue under vanish
             targetInfo.TimeDelay = 0ULL;
         else
         {
