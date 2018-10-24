@@ -217,7 +217,30 @@ public:
             }
             case 3:
             {
-                CloseGossipMenuFor(player);
+                // магазин
+                AddGossipItemFor(player, 0, GTS(LANG_ITEM_MENU_TRADE), GOSSIP_SENDER_MAIN, 2);
+                // trainer
+                AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GTS(LANG_ITEM_CLASS_SKILLS), GOSSIP_SENDER_MAIN, 4);
+                if (player->GetCFSTeam() == ALLIANCE)
+                    AddGossipItemFor(player, GOSSIP_ICON_TAXI, GTS(LANG_ITEM_STORMWIND), GOSSIP_SENDER_MAIN, 5, GTS(LANG_ITEM_STORMWIND_SURE), 0, false);
+                else
+                    AddGossipItemFor(player, GOSSIP_ICON_TAXI, GTS(LANG_ITEM_ORGRIMMAR), GOSSIP_SENDER_MAIN, 6, GTS(LANG_ITEM_ORGRIMMAR_SURE), 0, false);
+
+                if (player->IsGameMaster())
+                {
+                    if (player->GetSession()->HasPermission(rbac::RBAC_PERM_COMMAND_SERVER_RESTART))
+                        AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r", GOSSIP_SENDER_MAIN, 7);
+                    AddGossipItemFor(player, 0, "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Delivery of bags", GOSSIP_SENDER_MAIN, 8);
+
+                    if (player->getLevel() < 80)
+                        AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|t Level up at 80", GOSSIP_SENDER_MAIN, 9);
+                }
+
+                if (player->IsPremium())
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_VIP_MENU), GOSSIP_SENDER_MAIN, 10);
+
+                AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                 break;
             }
             case 4: // Тренер классов
@@ -1600,6 +1623,7 @@ public:
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                     break;
                 }
+                break;
             }
             case 73: // Улучшить навыки защиты и владения оружием до максимума
             {
