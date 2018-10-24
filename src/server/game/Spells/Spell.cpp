@@ -2889,13 +2889,13 @@ SpellMissInfo Spell::PreprocessSpellHit(Unit* unit, bool scaleAura, TargetInfo& 
                 if (playerTarget->UnderVisibleVanish())
                 {
                     if (!m_spellInfo->HasAttribute(SPELL_ATTR0_CU_AURA_CC))
-                        return SPELL_MISS_NONE;
+                        return SPELL_MISS_EVADE;
                     else if (playerTarget->UnderBreakbleVanish())
                     {
                         playerTarget->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
                         playerTarget->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
                         playerTarget->StopVanish();
-                        return SPELL_MISS_NONE;
+                        return SPELL_MISS_EVADE;
                     }
                 }
             }
