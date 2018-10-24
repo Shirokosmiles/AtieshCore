@@ -217,6 +217,23 @@ public:
             }
             case 3:
             {
+                player->PlayerTalkClass->ClearMenus();
+
+                // показатель бонусов с системой определение кол.бонусов (бонус, бонуса, бонусов)
+                AddGossipItemFor(player, 0, getString(GTS(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 1);
+                if (sWorld->getBoolConfig(CONFIG_PVP_REWARD))
+                {
+                    std::string flag = GTS(LANG_ITEM_PVP_CAP_ALIANCE);
+                    if (player->GetCFSTeam() == HORDE)
+                        flag = GTS(LANG_ITEM_PVP_CAP_HORDE);
+
+                    uint32 pvpcap = player->GetPVPCapPoints();
+                    uint32 maxcap = sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP);
+                    flag += getString(" ", pvpcap).c_str();
+                    flag += getString(" / ", maxcap).c_str();
+                    // pvp weekly bonus cap
+                    AddGossipItemFor(player, 0, flag + " )", GOSSIP_SENDER_MAIN, 3);
+                }
                 // магазин
                 AddGossipItemFor(player, 0, GTS(LANG_ITEM_MENU_TRADE), GOSSIP_SENDER_MAIN, 2);
                 // trainer
@@ -1092,12 +1109,13 @@ public:
             }
             case 17:
             {
-                if (player->HasAura(58712))
+                /*if (player->HasAura(58712))
                 {
                     player->GetSession()->SendAreaTriggerMessage("%s", GTS(LANG_ITEM_MSG_COOLDOWN));
                     CloseGossipMenuFor(player);
                 }
-                else if (!player->HasAura(26013))
+                else */
+                if (!player->HasAura(26013))
                 {
                     player->PlayerTalkClass->SendCloseGossip();
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_DESERTER_NOT_FOUND);
@@ -1106,8 +1124,8 @@ public:
                 {
                     player->PlayerTalkClass->SendCloseGossip();
                     player->RemoveAurasDueToSpell(26013);
-                    player->CastSpell(player, 34461, true);
-                    player->CastSpell(player, 58712, true);
+                    //player->CastSpell(player, 34461, true);
+                    //player->CastSpell(player, 58712, true);
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_DESERTER_REMOVED);
                 }
                 break;
