@@ -307,6 +307,8 @@ public:
             TortaGUID.Clear();
             inCombat = false;
             _events.Reset();
+            _player = nullptr;
+            startedFollow = false;
         }
 
         uint32 CheckSpeechTimer;
@@ -316,6 +318,8 @@ public:
         ObjectGuid TortaGUID;
         bool inCombat;
         EventMap _events;
+        Player* _player;
+        bool startedFollow;
 
         void Reset() override
         {
@@ -358,6 +362,16 @@ public:
         {
             if (!me)
                 return;
+
+            if (startedFollow)
+            {
+                if (!_player || !_player->IsAlive() || !_player->IsInWorld())
+                {
+                    SetFollowComplete();
+                    me->Respawn();
+                    return;
+                }
+            }
 
             _events.Update(Diff);
 
@@ -449,7 +463,11 @@ public:
         void QuestAccept(Player* player, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_TOOGA)
+            {
                 StartFollow(player, FACTION_TOOG_ESCORTEE, quest);
+                _player = player;
+                startedFollow = true;
+            }
         }
     };
 
