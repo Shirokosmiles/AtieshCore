@@ -718,6 +718,139 @@ class condition_is_wintergrasp_alliance : public ConditionScript
         }
 };
 
+enum Action
+{
+    ACTION_SPAWN = 2,
+};
+
+class npc_wg_assault_cannon : public CreatureScript
+{
+public:
+    npc_wg_assault_cannon() : CreatureScript("npc_wg_assault_cannon") { }
+
+    struct npc_wg_assault_cannonAI : public ScriptedAI
+    {
+        npc_wg_assault_cannonAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void Reset() override
+        {
+            Initialize();
+        }
+
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_SPAWN)
+            {
+                BattlefieldWintergrasp* wintergrasp = static_cast<BattlefieldWintergrasp*>(sBattlefieldMgr->GetBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP));
+                if (!wintergrasp || !wintergrasp->IsEnabled())
+                    return;
+
+                uint32 newattackfaction = wintergrasp->GetAttackerTeam() == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC_WG : FACTION_HORDE_GENERIC_WG;
+                me->SetFaction(newattackfaction);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_wg_assault_cannonAI(creature);
+    }
+};
+
+class npc_wg_defender_cannon : public CreatureScript
+{
+public:
+    npc_wg_defender_cannon() : CreatureScript("npc_wg_defender_cannon") { }
+
+    struct npc_wg_defender_cannonAI : public ScriptedAI
+    {
+        npc_wg_defender_cannonAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void Reset() override
+        {
+            Initialize();
+        }
+
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_SPAWN)
+            {
+                BattlefieldWintergrasp* wintergrasp = static_cast<BattlefieldWintergrasp*>(sBattlefieldMgr->GetBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP));
+                if (!wintergrasp || !wintergrasp->IsEnabled())
+                    return;
+
+                uint32 newattackfaction = wintergrasp->GetDefenderTeam() == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC_WG : FACTION_HORDE_GENERIC_WG;
+                me->SetFaction(newattackfaction);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_wg_defender_cannonAI(creature);
+    }
+};
+
+class npc_wg_guard_horde : public CreatureScript
+{
+public:
+    npc_wg_guard_horde() : CreatureScript("npc_wg_guard_horde") { }
+
+    struct npc_wg_guard_hordeAI : public ScriptedAI
+    {
+        npc_wg_guard_hordeAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_SPAWN)
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_wg_guard_hordeAI(creature);
+    }
+};
+
+class npc_wg_guard_alliance : public CreatureScript
+{
+public:
+    npc_wg_guard_alliance() : CreatureScript("npc_wg_guard_alliance") { }
+
+    struct npc_wg_guard_allianceAI : public ScriptedAI
+    {
+        npc_wg_guard_allianceAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_SPAWN)
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_wg_guard_allianceAI(creature);
+    }
+};
+
 void AddSC_wintergrasp()
 {
     new npc_wg_queue();
@@ -733,4 +866,8 @@ void AddSC_wintergrasp()
     RegisterAuraScript(spell_wintergrasp_tenacity_refresh);
     new condition_is_wintergrasp_horde();
     new condition_is_wintergrasp_alliance();
+    new npc_wg_assault_cannon();
+    new npc_wg_defender_cannon();
+    new npc_wg_guard_horde();
+    new npc_wg_guard_alliance();
 }

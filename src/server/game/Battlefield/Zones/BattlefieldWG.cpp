@@ -713,50 +713,15 @@ void BattlefieldWintergrasp::OnCreatureCreate(Creature* creature)
             break;
         case NPC_WINTERGRASP_TOWER_CANNON:
         {
-            bool attackcannon = false;
-            // try to get first already prepared link at GO
-            if (GameObject* GOwest = GetGameObject(_westtowerGUID)) // if link are empty -> try to found a GO and set link again
+            if (creature->GetScriptName() == "npc_wg_assault_cannon")
             {
-                if (creature && creature->GetDistance2d(GOwest) <= 120.0f)
-                {
-                    attackcannon = true;
-                    uint32 newattackfaction = GetAttackerTeam() == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC_WG : FACTION_HORDE_GENERIC_WG;
-                    creature->SetFaction(newattackfaction);
-                    _attackCannonList.insert(creature->GetGUID()); // register cannon as attacker
-                    //TC_LOG_ERROR("server", "WG attackCannon :  added");
-                }
+                _attackCannonList.insert(creature->GetGUID()); // register cannon as attacker
+                creature->AI()->DoAction(2);
             }
-
-            if (GameObject* GOsouth = GetGameObject(_southtowerGUID))
-            {
-                if (creature && creature->GetDistance2d(GOsouth) <= 120.0f)
-                {
-                    attackcannon = true;
-                    uint32 newattackfaction = GetAttackerTeam() == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC_WG : FACTION_HORDE_GENERIC_WG;
-                    creature->SetFaction(newattackfaction);
-                    _attackCannonList.insert(creature->GetGUID()); // register cannon as attacker
-                    //TC_LOG_ERROR("server", "WG attackCannon :  added");
-                }
-            }
-
-            if (GameObject* GOeast = GetGameObject(_easttowerGUID))
-            {
-                if (creature && creature->GetDistance2d(GOeast) <= 120.0f)
-                {
-                    attackcannon = true;
-                    uint32 newattackfaction = GetAttackerTeam() == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC_WG : FACTION_HORDE_GENERIC_WG;
-                    creature->SetFaction(newattackfaction);
-                    _attackCannonList.insert(creature->GetGUID()); // register cannon as attacker
-                    //TC_LOG_ERROR("server", "WG attackCannon :  added");
-                }
-            }
-
-            if (!attackcannon)
+            else if (creature->GetScriptName() == "npc_wg_defender_cannon")
             {
                 _keepCannonList.insert(creature->GetGUID()); // register cannon as defender
-                uint32 newdefensefaction = GetDefenderTeam() == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC_WG : FACTION_HORDE_GENERIC_WG;
-                creature->SetFaction(newdefensefaction);
-                //TC_LOG_ERROR("server", "WG keepCannon :  added npc guid : %u, entry : %u, name %s", creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str());
+                creature->AI()->DoAction(2);
             }
 
             creature->SetVisible(true);
@@ -855,61 +820,20 @@ void BattlefieldWintergrasp::OnCreatureCreate(Creature* creature)
             }
             break;
         case NPC_WINTERGRASP_GUARD_HORDE:
+        {
+            if (creature->GetScriptName() == "npc_wg_guard_horde")
+            {
+                _creatureList[TEAM_HORDE].insert(creature->GetGUID());
+                creature->AI()->DoAction(2);
+            }
+            break;
+        }
         case NPC_WINTERGRASP_GUARD_ALLIANCE:
         {
-            // try to get first already prepared link at GO
-            if (GameObject* GOwest = GetGameObject(_westtowerGUID)) // if link are empty -> try to found a GO and set link again
+            if (creature->GetScriptName() == "npc_wg_guard_alliance")
             {
-                if (creature && creature->GetDistance2d(GOwest) <= 120.0f)
-                {
-                    TeamId team = creature->GetEntry() == NPC_WINTERGRASP_GUARD_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE;
-                    if (team == TEAM_ALLIANCE)
-                    {
-                        _creatureList[TEAM_ALLIANCE].insert(creature->GetGUID());
-                        //TC_LOG_ERROR("server", "WG Guards :  added ALLIANCE npc guid : %u, entry : %u, name %s", creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str());
-                    }
-                    else if (team == TEAM_HORDE)
-                    {
-                        _creatureList[TEAM_HORDE].insert(creature->GetGUID());
-                        //TC_LOG_ERROR("server", "WG Guards :  added HORDE npc guid : %u, entry : %u, name %s", creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str());
-                    }
-                }
-            }
-
-            if (GameObject* GOsouth = GetGameObject(_southtowerGUID))
-            {
-                if (creature && creature->GetDistance2d(GOsouth) <= 120.0f)
-                {
-                    TeamId team = creature->GetEntry() == NPC_WINTERGRASP_GUARD_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE;
-                    if (team == TEAM_ALLIANCE)
-                    {
-                        _creatureList[TEAM_ALLIANCE].insert(creature->GetGUID());
-                        //TC_LOG_ERROR("server", "WG Guards :  added ALLIANCE npc guid : %u, entry : %u, name %s", creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str());
-                    }
-                    else if (team == TEAM_HORDE)
-                    {
-                        _creatureList[TEAM_HORDE].insert(creature->GetGUID());
-                        //TC_LOG_ERROR("server", "WG Guards :  added HORDE npc guid : %u, entry : %u, name %s", creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str());
-                    }
-                }
-            }
-            
-            if (GameObject* GOeast = GetGameObject(_easttowerGUID))
-            {
-                if (creature && creature->GetDistance2d(GOeast) <= 120.0f)
-                {
-                    TeamId team = creature->GetEntry() == NPC_WINTERGRASP_GUARD_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE;
-                    if (team == TEAM_ALLIANCE)
-                    {
-                        _creatureList[TEAM_ALLIANCE].insert(creature->GetGUID());
-                        //TC_LOG_ERROR("server", "WG Guards :  added ALLIANCE npc guid : %u, entry : %u, name %s", creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str());
-                    }
-                    else if (team == TEAM_HORDE)
-                    {
-                        _creatureList[TEAM_HORDE].insert(creature->GetGUID());
-                        //TC_LOG_ERROR("server", "WG Guards :  added HORDE npc guid : %u, entry : %u, name %s", creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str());
-                    }
-                }
+                _creatureList[TEAM_ALLIANCE].insert(creature->GetGUID());
+                creature->AI()->DoAction(2);
             }
             break;
         }            
