@@ -2369,7 +2369,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
             targetInfo.TimeDelay = 0ULL;
         else
         {
-            targetInfo.TimeDelay = GetCCDelay(m_spellInfo);
+            targetInfo.TimeDelay = GetCCDelay(m_spellInfo, m_caster);
             if (m_delayMoment == 0 || m_delayMoment > targetInfo.TimeDelay)
                 m_delayMoment = targetInfo.TimeDelay;
         }
@@ -3654,7 +3654,7 @@ void Spell::_cast(bool skipCheck)
             creatureCaster->ReleaseFocus(this);
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
-    if (((m_spellInfo->Speed > 0.0f || GetCCDelay(m_spellInfo) > 0) && !m_spellInfo->IsChanneled()) || m_spellInfo->HasAttribute(SPELL_ATTR4_UNK4))
+    if (((m_spellInfo->Speed > 0.0f || GetCCDelay(m_spellInfo, m_caster) > 0) && !m_spellInfo->IsChanneled()) || m_spellInfo->HasAttribute(SPELL_ATTR4_UNK4))
     {
         // Remove used for cast item if need (it can be already NULL after TakeReagents call
         // in case delayed spell remove item at cast delay start
@@ -6317,9 +6317,12 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
     return CheckCast(true);
 }
 
-uint32 Spell::GetCCDelay(SpellInfo const* _spell)
+uint32 Spell::GetCCDelay(SpellInfo const* _spell, WorldObject* _caster)
 {
     if (!_spell->HasAttribute(SPELL_ATTR0_CU_AURA_CC))
+        return 0;
+
+    if (_caster->ToGameObject())
         return 0;
 
     // CCD for spell with auras

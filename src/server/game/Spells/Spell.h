@@ -430,7 +430,7 @@ class TC_GAME_API Spell
         SpellCastResult CheckCast(bool strict, uint32* param1 = nullptr, uint32* param2 = nullptr);
         SpellCastResult CheckPetCast(Unit* target);
 
-        static uint32 GetCCDelay(SpellInfo const* _spell);
+        static uint32 GetCCDelay(SpellInfo const* _spell, WorldObject* _caster);
 
         // handlers
         void handle_immediate();
