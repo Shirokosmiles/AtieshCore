@@ -30,6 +30,7 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "CombatAI.h"
 #include "MotionMaster.h"
+#include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -686,6 +687,151 @@ class npc_torturer_lecraft : public CreatureScript
         }
 };
 
+Position const SkyCaptainCryOfLight1Point = { 3720.85f, -755.389f, 239.45f, 0.0f };
+Position const SkyCaptainCryOfLight2Point = { 3713.73f, -1289.81f, 155.37f, 0.0f };
+Position const SkyCaptainCryOfLight3Point = { 3828.08f, -1401.45f, 183.12f, 0.0f };
+
+enum SkyCaptainCryOfLight
+{
+    EVENT_FLY_AT_NPC              = 1,
+    EVENT_FLY_AT_2                = 2,
+    EVENT_FLY_AT_3                = 3,    
+    EVENT_DROPPLAYER              = 4,
+    EVENT_RETURN_RESPAWN          = 5,
+
+    POINT_1              = 1,
+    POINT_2              = 2,
+    POINT_3              = 3
+};
+
+class npc_sky_captain_cryoflight : public CreatureScript
+{
+public: npc_sky_captain_cryoflight() : CreatureScript("npc_sky_captain_cryoflight") {}
+
+        struct npc_sky_captain_cryoflightAI : public ScriptedAI
+        {
+            npc_sky_captain_cryoflightAI(Creature* creature) : ScriptedAI(creature)
+            {
+                Initialize();
+            }
+
+            void Initialize()
+            {
+                _events.Reset();
+                _player = nullptr;
+            }
+
+            void PassengerBoarded(Unit* passenger, int8 /*seatId*/, bool apply) override
+            {
+                if (Player* player = passenger->ToPlayer())
+                {
+                    if (me->GetVehicleKit())
+                    {
+                        Unit* npcpassenger = me->GetVehicleKit()->GetPassenger(1);
+                        if (apply)
+                        {
+                            if (npcpassenger)
+                                if (Creature* creature = npcpassenger->ToCreature())
+                                    creature->AI()->Talk(0, player);
+                            //Talk(27272); // Hang on to your hat, $n! To Scalawag we go!
+                            _events.ScheduleEvent(EVENT_FLY_AT_NPC, 1s);
+                            _player = player;
+                        }
+                        else
+                        {
+                            if (npcpassenger)
+                                if (Creature* creature = npcpassenger->ToCreature())
+                                    creature->AI()->Talk(1, player);
+                            //Talk(26924); // This is your stop, pal. Safe landing!                            
+                            _events.ScheduleEvent(EVENT_RETURN_RESPAWN, 5s);
+                        }
+                    }
+                }
+            }
+
+            void MovementInform(uint32 movementType, uint32 pointId) override
+            {
+                if (movementType == POINT_MOTION_TYPE)
+                {
+                    if (pointId == POINT_3)
+                        _events.ScheduleEvent(EVENT_DROPPLAYER, 100);
+                    else if (pointId == POINT_1)
+                        _events.ScheduleEvent(EVENT_FLY_AT_2, 100);
+                    else if (pointId == POINT_2)
+                        _events.ScheduleEvent(EVENT_FLY_AT_3, 100);
+                }
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (!me || !me->IsAlive())
+                    return;
+
+                _events.Update(diff);
+
+                while (uint32 eventId = _events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                    case EVENT_DROPPLAYER:
+                    {
+                        if (_player)
+                        {
+                            _player->ExitVehicle();
+                            me->CastSpell(_player, 45472, true); //parachute
+                        }
+
+                        _events.ScheduleEvent(EVENT_FLY_AT_2, 100);
+                        break;
+                    }
+                    case EVENT_FLY_AT_NPC:
+                    {
+                        Movement::MoveSplineInit init(me);
+                        init.MoveTo(SkyCaptainCryOfLight1Point.GetPositionX(), SkyCaptainCryOfLight1Point.GetPositionY(), SkyCaptainCryOfLight1Point.GetPositionZ(), false);
+                        init.SetFly();
+                        me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_1, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                        break;
+                    }
+                    case EVENT_FLY_AT_2:
+                    {
+                        Movement::MoveSplineInit init(me);
+                        init.MoveTo(SkyCaptainCryOfLight2Point.GetPositionX(), SkyCaptainCryOfLight2Point.GetPositionY(), SkyCaptainCryOfLight2Point.GetPositionZ(), false);
+                        init.SetFly();
+                        me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_2, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                        break;
+                    }
+                    case EVENT_FLY_AT_3:
+                    {
+                        Movement::MoveSplineInit init(me);
+                        init.MoveTo(SkyCaptainCryOfLight3Point.GetPositionX(), SkyCaptainCryOfLight3Point.GetPositionY(), SkyCaptainCryOfLight3Point.GetPositionZ(), false);
+                        init.SetFly();
+                        me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_3, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                        break;
+                    }
+                    case EVENT_RETURN_RESPAWN:
+                    {
+                        me->SetVisible(false);
+                        if (Unit* npcpassenger = me->GetVehicleKit()->GetPassenger(0))
+                            npcpassenger->SetVisible(false);
+                        me->Respawn(true);
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                }
+            }
+        private:
+            EventMap _events;
+            Player* _player;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return new npc_sky_captain_cryoflightAI(creature);
+        }
+};
+
 enum MessengerTorvus
 {
     NPC_MESSENGER_TORVUS        = 26649,
@@ -719,4 +865,5 @@ void AddSC_dragonblight()
     new npc_wyrmrest_defender();
     new npc_torturer_lecraft();
     new at_nearby_messenger_torvus();
+    new npc_sky_captain_cryoflight();
 }
