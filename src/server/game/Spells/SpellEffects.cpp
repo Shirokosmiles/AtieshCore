@@ -2249,6 +2249,21 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                     break;
                 }
                 case SUMMON_TYPE_LIGHTWELL:
+                {
+                    if (!unitCaster)
+                        return;
+
+                    summon = unitCaster->GetMap()->SummonCreature(entry, *destTarget, properties, duration, unitCaster, m_spellInfo->Id);
+                    if (!summon || !summon->IsTotem())
+                        return;
+
+                    uint32 hp = unitCaster->CountPctFromMaxHealth(30);
+                    summon->SetMaxHealth(hp);
+                    summon->SetHealth(hp);
+
+                    summon->SetArmor(unitCaster->GetArmor());
+                    break;
+                }
                 case SUMMON_TYPE_TOTEM:
                 {
                     if (!unitCaster)

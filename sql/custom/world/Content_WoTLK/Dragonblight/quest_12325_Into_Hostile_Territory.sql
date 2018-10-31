@@ -4,3 +4,5 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (27662,1,0,'This is your stop, pal. Safe landing!',12,0,100,0,0,0,26924,0,'end fly');
 
 UPDATE `creature_template` SET `ScriptName` = 'npc_sky_captain_cryoflight' WHERE (entry = 27661);
+
+UPDATE `vehicle_template_accessory` SET `seat_id` = 1 WHERE (entry = 27661);
