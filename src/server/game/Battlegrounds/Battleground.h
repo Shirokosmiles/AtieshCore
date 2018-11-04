@@ -315,7 +315,7 @@ class TC_GAME_API Battleground
 
         int32 GetStartDelayTime() const     { return m_StartDelayTime; }
         uint8 GetArenaType() const          { return m_ArenaType; }
-        BattlegroundTeamId GetWinner() const { return _winnerTeamId; }
+        PvPTeamId GetWinner() const { return _winnerTeamId; }
         uint32 GetScriptId() const          { return ScriptId; }
         uint32 GetBonusHonorFromKill(uint32 kills) const;
         bool IsRandom() const { return m_IsRandom; }
@@ -338,7 +338,7 @@ class TC_GAME_API Battleground
         void SetRated(bool state)           { m_IsRated = state; }
         void SetArenaType(uint8 type)       { m_ArenaType = type; }
         void SetArenaorBGType(bool _isArena) { m_IsArena = _isArena; }
-        void SetWinner(BattlegroundTeamId winnerTeamId) { _winnerTeamId = winnerTeamId; }
+        void SetWinner(PvPTeamId winnerTeamId) { _winnerTeamId = winnerTeamId; }
         void SetScriptId(uint32 scriptId)   { ScriptId = scriptId; }
 
         void ModifyStartDelayTime(int diff) { m_StartDelayTime -= diff; }
@@ -580,7 +580,7 @@ class TC_GAME_API Battleground
         bool   m_InBGFreeSlotQueue;                         // used to make sure that BG is only once inserted into the BattlegroundMgr.BGFreeSlotQueue[bgTypeId] deque
         bool   m_SetDeleteThis;                             // used for safe deletion of the bg after end / all players leave
         bool   m_IsArena;
-        BattlegroundTeamId _winnerTeamId;
+        PvPTeamId _winnerTeamId;
         int32  m_StartDelayTime;
         bool   m_IsRated;                                   // is this battle rated?
         bool   m_PrematureCountDown;
