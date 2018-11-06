@@ -1084,7 +1084,7 @@ public:
         uint32 coinCount = coinAdded;
         if (!accidExist)
         {
-            coinCount += target->GetCoins();
+            coinCount += target->GetVerifiedCoins();
             target->SetCoins(coinCount);
         }
         else
@@ -1135,7 +1135,7 @@ public:
         uint32 coinRemoved = atoul(coins);
         uint32 coinCount;
         if (!accidExist)
-            coinCount = target->GetCoins();
+            coinCount = target->GetVerifiedCoins();
         else
             coinCount = AccountMgr::GetCoins(accountID);
 

@@ -24125,6 +24125,24 @@ void Player::SetPremiumStatus(bool vipstatus)
         m_premiumTimer = 0;
 }
 
+uint32 Player::GetVerifiedCoins()
+{
+    uint32 coinsCount = GetCoins();
+    if (GetSession())
+    {
+        uint32 coinsFromDB;
+        // it's nessesary, if we will change coins count through web-site or some another way, and player will in-game in this time
+        coinsFromDB = AccountMgr::GetCoins(GetSession()->GetAccountId());
+        if (coinsCount != coinsFromDB)
+        {
+            coinsCount = coinsFromDB;
+            SetCoins(coinsCount);
+        }
+    }
+
+    return coinsCount;
+}
+
 void Player::SetPVPCapPoints(uint32 cap, bool weeklyupdate)
 {
     if (!sWorld->getBoolConfig(CONFIG_PVP_REWARD))

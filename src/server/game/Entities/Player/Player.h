@@ -1765,6 +1765,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetPremiumUnsetdate(time_t unsetdate) { m_unsetdate = unsetdate; }
         void SetCoins(uint32 coins) { m_coins = coins; }
         uint32 GetCoins() const { return m_coins; }
+        // should be call ONLY when coin count will changed (add/del)
+        uint32 GetVerifiedCoins();
         time_t GetPremiumUnsetdate() const { return m_unsetdate; }
 
         // PVP Weekly cap

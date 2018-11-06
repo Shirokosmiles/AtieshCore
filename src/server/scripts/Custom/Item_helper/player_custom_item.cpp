@@ -156,7 +156,7 @@ public:
         if (!player)
             return;
 
-        uint32 coins = player->GetCoins();
+        uint32 coins = player->GetVerifiedCoins();
         uint32 ostatok = coast - coins;
 
         if (coins < coast)
@@ -1730,7 +1730,7 @@ public:
             }
             case 80:
             {
-                uint32 coins = player->GetCoins();
+                uint32 coins = player->GetVerifiedCoins();
                 uint32 ostatok = coast7 - coins; // 7 дней                        
 
                 if (coins >= coast7)
@@ -1765,7 +1765,7 @@ public:
             }
             case 81:
             {
-                uint32 coins = player->GetCoins();
+                uint32 coins = player->GetVerifiedCoins();
                 uint32 ostatok = coast14 - coins; // 14 дней				
 
                 if (coins >= coast14)
@@ -1800,7 +1800,7 @@ public:
             }
             case 82:
             {
-                uint32 coins = player->GetCoins();
+                uint32 coins = player->GetVerifiedCoins();
                 uint32 ostatok = coast31 - coins; // 31 день					
 
                 if (coins >= coast31)
