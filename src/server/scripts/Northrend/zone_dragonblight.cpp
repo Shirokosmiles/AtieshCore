@@ -832,6 +832,133 @@ public: npc_sky_captain_cryoflight() : CreatureScript("npc_sky_captain_cryofligh
         }
 };
 
+/*#####
+# npc_destructive_ward_kill
+#####*/
+
+enum DestructiveWard
+{
+    SPELL_SUMMON_SKELETON             = 48715,
+    SPELL_SUMMON_SMOLDERING_CONSTRUCT = 48718,    
+    SPELL_DESTRUCTIVE_PULSE           = 48733,
+    SPELL_DESTRUCTIVE_BARRAGE         = 48734,
+    SPELL_POWERUP                     = 48735,
+
+    SPELL_KILL_REWARD                 = 52409,
+
+    EVENT_SUMMON_SKELETON               = 1,
+    EVENT_SUMMON_SKELETON_2             = 2,
+    EVENT_POWERUP_1                     = 3,
+    EVENT_POWERUP_2                     = 4,
+    EVENT_SUMMON_SMOLDERING_CONSTRUCT   = 5,
+    EVENT_SUMMON_SMOLDERING_CONSTRUCT_2 = 6,
+    EVENT_SUMMON_DOUBLE_SPAWN           = 7,
+    EVENT_SUMMON_LAST_SKELET            = 8,
+    EVENT_FINAL_POWERUP                 = 9,
+    EVENT_DESTRUCTIVE_BARRAGE           = 10,
+    EVENT_DESTRUCTIVE_BARRAGE_2         = 11,
+    EVENT_FDESPAWN                      = 12
+};
+
+class npc_destructive_ward_kill : public CreatureScript
+{
+public: npc_destructive_ward_kill() : CreatureScript("npc_destructive_ward_kill") {}
+
+        struct npc_destructive_ward_killAI : public ScriptedAI
+        {
+            npc_destructive_ward_killAI(Creature* creature) : ScriptedAI(creature)
+            {
+                Initialize();
+            }
+
+            void Initialize()
+            {
+                _events.Reset();
+                _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 2s, 3s);
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (!me || !me->IsAlive())
+                    return;
+
+                _events.Update(diff);
+
+                while (uint32 eventId = _events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                    case EVENT_SUMMON_SKELETON:
+                        DoCastSelf(SPELL_SUMMON_SKELETON);
+                        _events.ScheduleEvent(EVENT_SUMMON_SKELETON_2, 15s);
+                        break;
+                    case EVENT_SUMMON_SKELETON_2:
+                        DoCastSelf(SPELL_SUMMON_SKELETON);
+                        _events.ScheduleEvent(EVENT_POWERUP_1, 1s);
+                        break;
+                    case EVENT_POWERUP_1:
+                        DoCastSelf(SPELL_POWERUP);
+                        Talk(0);
+                        DoCastSelf(SPELL_DESTRUCTIVE_PULSE);
+                        _events.ScheduleEvent(EVENT_SUMMON_SMOLDERING_CONSTRUCT, 15s);
+                        break;
+                    case EVENT_SUMMON_SMOLDERING_CONSTRUCT:
+                        DoCastSelf(48718);
+                        _events.ScheduleEvent(EVENT_SUMMON_SMOLDERING_CONSTRUCT_2, 15s);
+                        break;
+                    case EVENT_SUMMON_SMOLDERING_CONSTRUCT_2:
+                        DoCastSelf(48718);
+                        _events.ScheduleEvent(EVENT_POWERUP_2, 1s);
+                        break;
+                    case EVENT_POWERUP_2:
+                        DoCastSelf(SPELL_POWERUP);
+                        Talk(0);
+                        DoCastSelf(SPELL_DESTRUCTIVE_PULSE);
+                        _events.ScheduleEvent(EVENT_SUMMON_DOUBLE_SPAWN, 1s);
+                        break;
+                    case EVENT_SUMMON_DOUBLE_SPAWN:
+                        DoCastSelf(SPELL_SUMMON_SKELETON);
+                        DoCastSelf(SPELL_SUMMON_SMOLDERING_CONSTRUCT);
+                        _events.ScheduleEvent(EVENT_SUMMON_LAST_SKELET, 3s);
+                        break;
+                    case EVENT_SUMMON_LAST_SKELET:
+                        DoCastSelf(SPELL_SUMMON_SKELETON);
+                        _events.ScheduleEvent(EVENT_FINAL_POWERUP, 2s);
+                        break;
+                    case EVENT_FINAL_POWERUP:
+                        DoCastSelf(SPELL_POWERUP);
+                        Talk(1);
+                        DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
+                        _events.ScheduleEvent(EVENT_DESTRUCTIVE_BARRAGE, 1s);                        
+                        break;
+                    case EVENT_DESTRUCTIVE_BARRAGE:
+                        DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
+                        _events.ScheduleEvent(EVENT_DESTRUCTIVE_BARRAGE_2, 1s);
+                        break;
+                    case EVENT_DESTRUCTIVE_BARRAGE_2:
+                        DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
+                        if (Unit* summoner = me->GetCharmerOrOwner())
+                            me->CastSpell(summoner, SPELL_KILL_REWARD);
+                        _events.ScheduleEvent(EVENT_FDESPAWN, 1s);
+                        break;
+                    case EVENT_FDESPAWN:
+                        me->DespawnOrUnsummon();
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+        private:
+            EventMap _events;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return new npc_destructive_ward_killAI(creature);
+        }
+};
+
 enum MessengerTorvus
 {
     NPC_MESSENGER_TORVUS        = 26649,
@@ -866,4 +993,5 @@ void AddSC_dragonblight()
     new npc_torturer_lecraft();
     new at_nearby_messenger_torvus();
     new npc_sky_captain_cryoflight();
+    new npc_destructive_ward_kill();
 }
