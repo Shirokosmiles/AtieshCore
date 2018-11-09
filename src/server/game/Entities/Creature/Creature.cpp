@@ -385,12 +385,12 @@ bool Creature::IsFormationLeaderMoveAllowed() const
     return m_formation->CanLeaderStartMoving();
 }
 
-void Creature::RemoveCorpse(bool setSpawnTime, bool destroyForNearbyPlayers)
+void Creature::RemoveCorpse(bool setSpawnTime, bool destroyForNearbyPlayers, bool forcerespawn)
 {
     if (getDeathState() != CORPSE)
         return;
 
-    if (m_respawnCompatibilityMode)
+    if (m_respawnCompatibilityMode || forcerespawn)
     {
         m_corpseRemoveTime = GameTime::GetGameTime();
         setDeathState(DEAD);
@@ -1678,13 +1678,24 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, 
     if (!m_respawnTime && !map->IsSpawnGroupActive(data->spawnGroupData->groupId))
     {
         // @todo pools need fixing! this is just a temporary crashfix, but they violate dynspawn principles
-        ASSERT(m_respawnCompatibilityMode || sPoolMgr->IsPartOfAPool<Creature>(spawnId), "Creature (SpawnID %u) trying to load in inactive spawn group %s.", spawnId, data->spawnGroupData->name.c_str());
+        //ASSERT(m_respawnCompatibilityMode || sPoolMgr->IsPartOfAPool<Creature>(spawnId), "Creature (SpawnID %u) trying to load in inactive spawn group %s.", spawnId, data->spawnGroupData->name.c_str());
+        if (m_respawnCompatibilityMode || sPoolMgr->IsPartOfAPool<Creature>(spawnId))
+        {
+            TC_LOG_ERROR("server", "Creature (SpawnID %u) trying to load in inactive spawn group %s.", spawnId, data->spawnGroupData->name.c_str());
+            return false;
+        }
         m_respawnTime = GameTime::GetGameTime() + urand(4, 7);
     }
 
     if (m_respawnTime)                          // respawn on Update
     {
-        ASSERT(m_respawnCompatibilityMode || sPoolMgr->IsPartOfAPool<Creature>(spawnId), "Creature (SpawnID %u) trying to load despite a respawn timer in progress.", spawnId);
+        //ASSERT(m_respawnCompatibilityMode || sPoolMgr->IsPartOfAPool<Creature>(spawnId), "Creature (SpawnID %u) trying to load despite a respawn timer in progress.", spawnId);
+        if (m_respawnCompatibilityMode || sPoolMgr->IsPartOfAPool<Creature>(spawnId))
+        {
+            TC_LOG_ERROR("server", "Creature (SpawnID %u) trying to load despite a respawn timer in progress.", spawnId);
+            return false;
+        }
+
         m_deathState = DEAD;
         if (CanFly())
         {
@@ -2069,10 +2080,10 @@ void Creature::Respawn(bool force)
             setDeathState(CORPSE);
     }
 
-    if (m_respawnCompatibilityMode)
+    if (m_respawnCompatibilityMode || force)
     {
         DestroyForNearbyPlayers();
-        RemoveCorpse(false, false);
+        RemoveCorpse(false, false, force);
 
         if (getDeathState() == DEAD)
         {

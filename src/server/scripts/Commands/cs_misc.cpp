@@ -1950,7 +1950,7 @@ public:
             }
 
             if (target->isDead())
-                target->Respawn();
+                target->Respawn(true);
             return true;
         }
 

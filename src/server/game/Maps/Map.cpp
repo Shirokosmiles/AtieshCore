@@ -3033,7 +3033,7 @@ void Map::DoRespawn(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 gr
         case SPAWN_TYPE_CREATURE:
         {
             Creature* obj = new Creature();
-            if (!obj->LoadFromDB(spawnId, this, true, true))
+            if (!obj->LoadFromDB(spawnId, this, true, false))
                 delete obj;
             break;
         }
