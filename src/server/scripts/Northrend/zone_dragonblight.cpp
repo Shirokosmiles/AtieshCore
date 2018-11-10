@@ -966,6 +966,7 @@ public: npc_destructive_ward_kill() : CreatureScript("npc_destructive_ward_kill"
 enum magehunterbody
 {
     SPELL_RIFLE_THE_BODIES           = 61832,
+    SPELL_RIFLE_THE_BODIES_LOOT      = 47096,
     ITEM_MAIL_MOONREST_GARDENS_PLANS = 35783
 };
 
@@ -984,14 +985,12 @@ public: npc_body_magehunter() : CreatureScript("npc_body_magehunter") {}
 
             Player* player = caster->ToPlayer();
 
-            if (player->HasItemCount(ITEM_MAIL_MOONREST_GARDENS_PLANS, 1))
-                return;
-
             if  (spell->Id == SPELL_RIFLE_THE_BODIES)
             {
-                uint32 rand = urand(0, 10);
+                player->CastSpell(player, SPELL_RIFLE_THE_BODIES_LOOT);
+                /*uint32 rand = urand(0, 10);
                 if (rand == 7)
-                    player->AddItem(ITEM_MAIL_MOONREST_GARDENS_PLANS, 1);
+                    player->AddItem(ITEM_MAIL_MOONREST_GARDENS_PLANS, 1);*/
             }
 
             me->DespawnOrUnsummon();
