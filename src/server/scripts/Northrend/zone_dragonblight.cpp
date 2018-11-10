@@ -833,7 +833,7 @@ public: npc_sky_captain_cryoflight() : CreatureScript("npc_sky_captain_cryofligh
 };
 
 /*#####
-# npc_destructive_ward_kill
+# npc_destructive_ward_kill, quest No Place to Run 12261
 #####*/
 
 enum DestructiveWard
@@ -864,99 +864,144 @@ class npc_destructive_ward_kill : public CreatureScript
 {
 public: npc_destructive_ward_kill() : CreatureScript("npc_destructive_ward_kill") {}
 
-        struct npc_destructive_ward_killAI : public ScriptedAI
+    struct npc_destructive_ward_killAI : public ScriptedAI
+    {
+        npc_destructive_ward_killAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_destructive_ward_killAI(Creature* creature) : ScriptedAI(creature)
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _events.Reset();
+            _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 2s, 3s);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!me || !me->IsAlive())
+                return;
+
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
             {
-                Initialize();
-            }
-
-            void Initialize()
-            {
-                _events.Reset();
-                _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 2s, 3s);
-            }
-
-            void UpdateAI(uint32 diff) override
-            {
-                if (!me || !me->IsAlive())
-                    return;
-
-                _events.Update(diff);
-
-                while (uint32 eventId = _events.ExecuteEvent())
+                switch (eventId)
                 {
-                    switch (eventId)
-                    {
-                    case EVENT_SUMMON_SKELETON:
-                        DoCastSelf(SPELL_SUMMON_SKELETON);
-                        _events.ScheduleEvent(EVENT_SUMMON_SKELETON_2, 15s);
-                        break;
-                    case EVENT_SUMMON_SKELETON_2:
-                        DoCastSelf(SPELL_SUMMON_SKELETON);
-                        _events.ScheduleEvent(EVENT_POWERUP_1, 1s);
-                        break;
-                    case EVENT_POWERUP_1:
-                        DoCastSelf(SPELL_POWERUP);
-                        Talk(0);
-                        DoCastSelf(SPELL_DESTRUCTIVE_PULSE);
-                        _events.ScheduleEvent(EVENT_SUMMON_SMOLDERING_CONSTRUCT, 15s);
-                        break;
-                    case EVENT_SUMMON_SMOLDERING_CONSTRUCT:
-                        DoCastSelf(48718);
-                        _events.ScheduleEvent(EVENT_SUMMON_SMOLDERING_CONSTRUCT_2, 15s);
-                        break;
-                    case EVENT_SUMMON_SMOLDERING_CONSTRUCT_2:
-                        DoCastSelf(48718);
-                        _events.ScheduleEvent(EVENT_POWERUP_2, 1s);
-                        break;
-                    case EVENT_POWERUP_2:
-                        DoCastSelf(SPELL_POWERUP);
-                        Talk(0);
-                        DoCastSelf(SPELL_DESTRUCTIVE_PULSE);
-                        _events.ScheduleEvent(EVENT_SUMMON_DOUBLE_SPAWN, 1s);
-                        break;
-                    case EVENT_SUMMON_DOUBLE_SPAWN:
-                        DoCastSelf(SPELL_SUMMON_SKELETON);
-                        DoCastSelf(SPELL_SUMMON_SMOLDERING_CONSTRUCT);
-                        _events.ScheduleEvent(EVENT_SUMMON_LAST_SKELET, 3s);
-                        break;
-                    case EVENT_SUMMON_LAST_SKELET:
-                        DoCastSelf(SPELL_SUMMON_SKELETON);
-                        _events.ScheduleEvent(EVENT_FINAL_POWERUP, 2s);
-                        break;
-                    case EVENT_FINAL_POWERUP:
-                        DoCastSelf(SPELL_POWERUP);
-                        Talk(1);
-                        DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
-                        _events.ScheduleEvent(EVENT_DESTRUCTIVE_BARRAGE, 1s);                        
-                        break;
-                    case EVENT_DESTRUCTIVE_BARRAGE:
-                        DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
-                        _events.ScheduleEvent(EVENT_DESTRUCTIVE_BARRAGE_2, 1s);
-                        break;
-                    case EVENT_DESTRUCTIVE_BARRAGE_2:
-                        DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
-                        if (Unit* summoner = me->GetCharmerOrOwner())
-                            me->CastSpell(summoner, SPELL_KILL_REWARD);
-                        _events.ScheduleEvent(EVENT_FDESPAWN, 1s);
-                        break;
-                    case EVENT_FDESPAWN:
-                        me->DespawnOrUnsummon();
-                        break;
-                    default:
-                        break;
-                    }
+                case EVENT_SUMMON_SKELETON:
+                    DoCastSelf(SPELL_SUMMON_SKELETON);
+                    _events.ScheduleEvent(EVENT_SUMMON_SKELETON_2, 15s);
+                    break;
+                case EVENT_SUMMON_SKELETON_2:
+                    DoCastSelf(SPELL_SUMMON_SKELETON);
+                    _events.ScheduleEvent(EVENT_POWERUP_1, 1s);
+                    break;
+                case EVENT_POWERUP_1:
+                    DoCastSelf(SPELL_POWERUP);
+                    Talk(0);
+                    DoCastSelf(SPELL_DESTRUCTIVE_PULSE);
+                    _events.ScheduleEvent(EVENT_SUMMON_SMOLDERING_CONSTRUCT, 15s);
+                    break;
+                case EVENT_SUMMON_SMOLDERING_CONSTRUCT:
+                    DoCastSelf(48718);
+                    _events.ScheduleEvent(EVENT_SUMMON_SMOLDERING_CONSTRUCT_2, 15s);
+                    break;
+                case EVENT_SUMMON_SMOLDERING_CONSTRUCT_2:
+                    DoCastSelf(48718);
+                    _events.ScheduleEvent(EVENT_POWERUP_2, 1s);
+                    break;
+                case EVENT_POWERUP_2:
+                    DoCastSelf(SPELL_POWERUP);
+                    Talk(0);
+                    DoCastSelf(SPELL_DESTRUCTIVE_PULSE);
+                    _events.ScheduleEvent(EVENT_SUMMON_DOUBLE_SPAWN, 1s);
+                    break;
+                case EVENT_SUMMON_DOUBLE_SPAWN:
+                    DoCastSelf(SPELL_SUMMON_SKELETON);
+                    DoCastSelf(SPELL_SUMMON_SMOLDERING_CONSTRUCT);
+                    _events.ScheduleEvent(EVENT_SUMMON_LAST_SKELET, 3s);
+                    break;
+                case EVENT_SUMMON_LAST_SKELET:
+                    DoCastSelf(SPELL_SUMMON_SKELETON);
+                    _events.ScheduleEvent(EVENT_FINAL_POWERUP, 2s);
+                    break;
+                case EVENT_FINAL_POWERUP:
+                    DoCastSelf(SPELL_POWERUP);
+                    Talk(1);
+                    DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
+                    _events.ScheduleEvent(EVENT_DESTRUCTIVE_BARRAGE, 1s);                        
+                    break;
+                case EVENT_DESTRUCTIVE_BARRAGE:
+                    DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
+                    _events.ScheduleEvent(EVENT_DESTRUCTIVE_BARRAGE_2, 1s);
+                    break;
+                case EVENT_DESTRUCTIVE_BARRAGE_2:
+                    DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
+                    if (Unit* summoner = me->GetCharmerOrOwner())
+                        me->CastSpell(summoner, SPELL_KILL_REWARD);
+                    _events.ScheduleEvent(EVENT_FDESPAWN, 1s);
+                    break;
+                case EVENT_FDESPAWN:
+                    me->DespawnOrUnsummon();
+                    break;
+                default:
+                    break;
                 }
             }
-        private:
-            EventMap _events;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const override
-        {
-            return new npc_destructive_ward_killAI(creature);
         }
+    private:
+        EventMap _events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_destructive_ward_killAI(creature);
+    }
+};
+
+/*#####
+# npc_body_magehunter, quest Rifle the Bodies 12000
+#####*/
+
+enum magehunterbody
+{
+    SPELL_RIFLE_THE_BODIES           = 61832,
+    ITEM_MAIL_MOONREST_GARDENS_PLANS = 35783
+};
+
+class npc_body_magehunter : public CreatureScript
+{
+public: npc_body_magehunter() : CreatureScript("npc_body_magehunter") {}
+
+    struct npc_body_magehunterAI : public ScriptedAI
+    {
+        npc_body_magehunterAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (!caster->ToPlayer())
+                return;
+
+            Player* player = caster->ToPlayer();
+
+            if (player->HasItemCount(ITEM_MAIL_MOONREST_GARDENS_PLANS, 1))
+                return;
+
+            if  (spell->Id == SPELL_RIFLE_THE_BODIES)
+            {
+                uint32 rand = urand(0, 10);
+                if (rand == 7)
+                    player->AddItem(ITEM_MAIL_MOONREST_GARDENS_PLANS, 1);
+            }
+
+            me->DespawnOrUnsummon();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_body_magehunterAI(creature);
+    }
 };
 
 enum MessengerTorvus
@@ -994,4 +1039,5 @@ void AddSC_dragonblight()
     new at_nearby_messenger_torvus();
     new npc_sky_captain_cryoflight();
     new npc_destructive_ward_kill();
+    new npc_body_magehunter();
 }
