@@ -949,6 +949,80 @@ public:
     }
 };
 
+enum rabbit
+{
+    SPELL_CREATE_ZULDRAK_RAT_COVER   = 50926,
+    SPELL_CREATE_LOOT_RAT            = 50927
+};
+
+class npc_body_rabbit : public CreatureScript
+{
+public: npc_body_rabbit() : CreatureScript("npc_body_rabbit") {}
+
+    struct npc_body_rabbitAI : public ScriptedAI
+    {
+        npc_body_rabbitAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (!caster->ToPlayer())
+                return;
+
+            Player* player = caster->ToPlayer();
+
+            if (spell->Id == SPELL_CREATE_ZULDRAK_RAT_COVER)
+                player->CastSpell(player, SPELL_CREATE_LOOT_RAT);
+
+            me->DespawnOrUnsummon();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_body_rabbitAI(creature);
+    }
+};
+
+enum bigbasilisk
+{
+    SPELL_CLICK_BASILISK       = 50918,
+    SPELL_CREATE_LOOT_BASILISK = 50919,
+    SPELL_COSMETIC_SLEEP_ZZZ   = 55474
+};
+
+class npc_body_basilisk : public CreatureScript
+{
+public: npc_body_basilisk() : CreatureScript("npc_body_basilisk") {}
+
+        struct npc_body_basiliskAI : public ScriptedAI
+        {
+            npc_body_basiliskAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset() override
+            {
+                DoCastSelf(SPELL_COSMETIC_SLEEP_ZZZ);
+            }
+
+            void SpellHit(Unit* caster, SpellInfo const* spell) override
+            {
+                if (!caster->ToPlayer())
+                    return;
+
+                Player* player = caster->ToPlayer();
+
+                if (spell->Id == SPELL_CLICK_BASILISK)
+                    player->CastSpell(player, SPELL_CREATE_LOOT_BASILISK);
+
+                me->DespawnOrUnsummon();
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return new npc_body_basiliskAI(creature);
+        }
+};
+
 void AddSC_zuldrak()
 {
     new npc_drakuru_shackles();
@@ -963,4 +1037,6 @@ void AddSC_zuldrak()
     new spell_pot_check();
     new spell_fetch_ingredient_aura();
     new npc_storm_cloud();
+    new npc_body_rabbit();
+    new npc_body_basilisk();
 }
