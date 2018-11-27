@@ -3018,7 +3018,8 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
         {
             bool refresh = false;
             unitcheck = true;
-            if (!_spellAura)
+            // delayed spells with multiple targets need to create a new aura object, otherwise we'll access a deleted aura
+            if (!_spellAura || (m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled()))
             {
                 bool const resetPeriodicTimer = !(_triggeredCastFlags & TRIGGERED_DONT_RESET_PERIODIC_TIMER);
                 uint8 const allAuraEffectMask = Aura::BuildEffectMaskForOwner(hitInfo.AuraSpellInfo, MAX_EFFECT_MASK, unit);
@@ -3717,18 +3718,16 @@ void Spell::_cast(bool skipCheck)
 template <class Container>
 void Spell::DoProcessTargetContainer(Container& targetContainer)
 {
-    _spellAura = nullptr;
     for (TargetInfoBase& target : targetContainer)
-    {
         target.PreprocessTarget(this);
 
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        for (TargetInfoBase& target : targetContainer)
             if (target.EffectMask & (1 << i))
                 target.DoTargetSpellHit(this, i);
 
+    for (TargetInfoBase& target : targetContainer)
         target.DoDamageAndTriggers(this);
-        _spellAura = nullptr;
-    }
 }
 
 void Spell::handle_immediate()

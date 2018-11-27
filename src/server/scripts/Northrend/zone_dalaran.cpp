@@ -25,13 +25,18 @@ Script Data End */
 
 #include "ScriptMgr.h"
 #include "DatabaseEnv.h"
+#include "GameObject.h"
 #include "Mail.h"
 #include "Map.h"
 #include "MotionMaster.h"
+#include "MoveSplineInit.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "SpellInfo.h"
+#include "Vehicle.h"
 #include "WorldSession.h"
+#include <G3D/Quat.h>
 
 /*******************************************************
  * npc_mageguard_dalaran
@@ -280,8 +285,211 @@ class npc_minigob_manabonk : public CreatureScript
     }
 };
 
+//28192
+enum flyingmachine
+{
+    SPELL_SUMMON_MACHINE    = 50860,
+    SPELL_PASSENGER_BOARDED = 46598,
+    SPELL_TELEPORT          = 50987,
+    SPELL_GO_FLY_TRIGGER    = 51076,
+    SPELL_SUMMON_PATROL     = 51036,
+
+    EVENT_GO_FLY            = 1,
+    EVENT_CAST_TELEPORT     = 2,
+    EVENT_GO_FLY_POINT_1    = 3,
+    EVENT_GO_FLY_POINT_2    = 4,
+    EVENT_GO_FLY_POINT_3    = 5,
+    EVENT_DESPAWN_ME        = 6,
+
+    POINT_TELEPORT          = 1,
+    POINT_PATH_1            = 2,
+    POINT_PATH_2            = 3,
+    POINT_PATH_3            = 4
+};
+
+Position const flyAtPortal = { 5832.7f, 436.761f, 669.141f, 0.612513f };
+Position const flyAt1point = { 5647.75f, 5229.6f, -72.69f, 0 };
+Position const flyAt2point = { 5593.69f, 5187.79f, -72.69f, 0 };
+Position const flyAt3point = { 5478.14f, 4971.84f, -22.4317f, 0 };
+//X: 5183.344727 Y: 4788.114258 Z: 11.416546
+// air 28229
+class npc_archimage_flying_machine : public CreatureScript
+{
+public:
+    npc_archimage_flying_machine() : CreatureScript("npc_archimage_flying_machine") {}
+
+    struct npc_archimage_flying_machineAI : public ScriptedAI
+    {
+        npc_archimage_flying_machineAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void Reset() override
+        {
+            playerGuid = ObjectGuid();
+            me->SetCanFly(true);
+            events.Reset();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {                
+                case EVENT_GO_FLY:
+                {
+                    DoCastSelf(SPELL_GO_FLY_TRIGGER);
+                    Movement::MoveSplineInit init(me);
+                    init.MoveTo(flyAtPortal.GetPositionX(), flyAtPortal.GetPositionY(), flyAtPortal.GetPositionZ(), false);
+                    init.SetFly();
+                    me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_TELEPORT, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                    break;
+                }
+                case EVENT_CAST_TELEPORT:
+                {
+                    DoCast(SPELL_TELEPORT);
+                    events.ScheduleEvent(EVENT_GO_FLY_POINT_1, 100);
+                    break;
+                }
+                case EVENT_GO_FLY_POINT_1:
+                {
+                    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
+                        me->SetSpeedRate(UnitMoveType(i), (me->GetSpeedRate(UnitMoveType(i)) * 2));
+
+                    Movement::MoveSplineInit init(me);
+                    init.MoveTo(flyAt1point.GetPositionX(), flyAt1point.GetPositionY(), flyAt1point.GetPositionZ(), false);
+                    init.SetFly();
+                    init.SetWalk(false);
+                    me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_PATH_1, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                    break;
+                }
+                case EVENT_GO_FLY_POINT_2:
+                {
+                    Movement::MoveSplineInit init(me);
+                    init.MoveTo(flyAt2point.GetPositionX(), flyAt2point.GetPositionY(), flyAt2point.GetPositionZ(), false);
+                    init.SetFly();
+                    init.SetWalk(false);
+                    me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_PATH_2, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                    break;
+                }
+                case EVENT_GO_FLY_POINT_3:
+                {
+                    Movement::MoveSplineInit init(me);
+                    init.MoveTo(flyAt3point.GetPositionX(), flyAt3point.GetPositionY(), flyAt3point.GetPositionZ(), false);
+                    init.SetFly();
+                    init.SetWalk(false);
+                    me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_PATH_3, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                    break;
+                }
+                case EVENT_DESPAWN_ME:
+                {
+                    me->SetVisible(false);
+                    me->DespawnOrUnsummon();
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (!caster->ToPlayer())
+                return;
+
+            Player* player = caster->ToPlayer();
+
+            if (spell->Id == SPELL_PASSENGER_BOARDED)
+                events.ScheduleEvent(EVENT_GO_FLY, 100);
+
+            playerGuid = player->GetGUID();
+        }
+
+        void MovementInform(uint32 movementType, uint32 pointId) override
+        {
+            if (movementType == POINT_MOTION_TYPE)
+            {
+                switch (pointId)
+                {
+                    case POINT_TELEPORT:
+                    {
+                        events.ScheduleEvent(EVENT_CAST_TELEPORT, 100);
+                        break;
+                    }
+                    case POINT_PATH_1:
+                    {
+                        DoCast(SPELL_SUMMON_PATROL);
+                        events.ScheduleEvent(EVENT_GO_FLY_POINT_2, 100);
+                        break;
+                    }
+                    case POINT_PATH_2:
+                    {
+                        if (Player* player = me->GetMap()->GetPlayer(playerGuid))
+                            player->_ExitVehicle();
+                        events.ScheduleEvent(EVENT_GO_FLY_POINT_3, 100);
+                        break;
+                    }
+                    case POINT_PATH_3:
+                    {
+                        events.ScheduleEvent(EVENT_DESPAWN_ME, 3000);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+
+    private:
+        EventMap events;
+        ObjectGuid playerGuid;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_archimage_flying_machineAI(creature);
+    }
+};
+
+// 28160
+class npc_archimage_Pentarus : public CreatureScript
+{
+public:
+    npc_archimage_Pentarus() : CreatureScript("npc_archimage_Pentarus") {}
+
+    struct npc_archimage_PentarusAI : public ScriptedAI
+    {
+        npc_archimage_PentarusAI(Creature* creature) : ScriptedAI(creature) {}
+
+        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 /*gossipListId*/) override
+        {
+            CloseGossipMenuFor(player);
+            player->CastSpell(player, 50860);
+            Talk(0);
+            QuaternionData rot = QuaternionData::fromEulerAnglesZYX(1.61251f, 0.f, 0.f);
+            WorldObject* obj = nullptr;
+            if (me)
+                obj = me;
+            obj->SummonGameObject(190488, Position(5832.7f, 436.761f, 669.141f, 1.61251f), rot, 1000*60*2, GOSummonType(GO_SUMMON_TIMED_OR_CORPSE_DESPAWN));
+            return true;
+        }
+
+    private:
+        EventMap _events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_archimage_PentarusAI(creature);
+    }
+};
+
 void AddSC_dalaran()
 {
     new npc_mageguard_dalaran();
     new npc_minigob_manabonk();
+    new npc_archimage_flying_machine();
+    new npc_archimage_Pentarus();
 }
