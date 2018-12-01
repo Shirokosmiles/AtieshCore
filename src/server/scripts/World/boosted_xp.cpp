@@ -23,30 +23,29 @@
 
 namespace
 {
-    bool IsWeekendActive()
+    bool IsXPBoostActive()
     {
-        int32 const weekendXPDays = static_cast<int32>(sWorld->getIntConfig(CONFIG_WEEKEND_XP_DAYS));
-
-        tm const now = boost::posix_time::to_tm(boost::posix_time::from_time_t(GameTime::GetGameTime()));
-        int32 const days = 7 - ((now.tm_wday + 6) % 7);
-
-        return days <= weekendXPDays;
+        auto now = boost::posix_time::to_tm(boost::posix_time::from_time_t(GameTime::GetGameTime()));
+        uint32 weekdayMaskBoosted = sWorld->getIntConfig(CONFIG_XP_BOOST_DAYMASK);
+        uint32 weekdayMask = (1 << now.tm_wday);
+        bool currentDayBoosted = (weekdayMask & weekdayMaskBoosted) != 0;
+        return currentDayBoosted;
     }
 }
 
-class weekend_xp_FormulaScript : public FormulaScript
+class xp_boost_PlayerScript : public PlayerScript
 {
-    public:
-        weekend_xp_FormulaScript() : FormulaScript("weekend_xp_FormulaScript") { }
+public:
+    xp_boost_PlayerScript() : PlayerScript("xp_boost_PlayerScript") { }
 
-        void OnGainCalculation(uint32& gain, Player* /*player*/, Unit* /*unit*/) override
-        {
-            if (IsWeekendActive())
-                gain *= sWorld->getRate(RATE_XP_WEEKEND);
-        }
+    void OnGiveXP(Player* /*player*/, uint32& amount, Unit* /*unit*/) override
+    {
+        if (IsXPBoostActive())
+            amount *= sWorld->getRate(RATE_XP_BOOST);
+    }
 };
 
-void AddSC_weekend_xp()
+void AddSC_xp_boost()
 {
-    new weekend_xp_FormulaScript();
+    new xp_boost_PlayerScript();
 }
