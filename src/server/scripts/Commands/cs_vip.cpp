@@ -1080,7 +1080,14 @@ public:
         else
             accountID = target->GetSession()->GetAccountId();
 
-        uint32 coinAdded = atoul(coins);
+        int32 coinAdded = atoul(coins);
+        if (coinAdded < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         uint32 coinCount = coinAdded;
         if (!accidExist)
         {
@@ -1100,7 +1107,7 @@ public:
         }
         
         AccountMgr::SetCoins(accountID, coinCount);
-        handler->PSendSysMessage("The AccountID %u has received %u coins, and now have a %u coins", accountID, coinAdded, coinCount);
+        handler->PSendSysMessage("The AccountID %u has received %i coins, and now have a %u coins", accountID, coinAdded, coinCount);
         return true;
     }
 
@@ -1132,7 +1139,13 @@ public:
         else
             accountID = target->GetSession()->GetAccountId();
 
-        uint32 coinRemoved = atoul(coins);
+        int32 coinRemoved = atoul(coins);
+        if (coinRemoved < 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
         uint32 coinCount;
         if (!accidExist)
             coinCount = target->GetVerifiedCoins();
@@ -1158,7 +1171,7 @@ public:
         }
 
         AccountMgr::SetCoins(accountID, coinCount);
-        handler->PSendSysMessage("The AccountID %u has removed %u coins, and now have a %u coins", accountID, coinRemoved, coinCount);
+        handler->PSendSysMessage("The AccountID %u has removed %i coins, and now have a %u coins", accountID, coinRemoved, coinCount);
         return true;
     }
 };
