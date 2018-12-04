@@ -27099,8 +27099,6 @@ bool Player::IsInWhisperWhiteList(ObjectGuid guid)
 
 bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/)
 {
-    SetCanFlybyServer(disable);
-
     if (!packetOnly && !Unit::SetDisableGravity(disable))
         return false;
 
@@ -27449,11 +27447,11 @@ void Player::RemoveSocial()
 
 bool Player::CheckOnFlyHack()
 {
-    if (ToUnit()->IsFalling() || IsFalling())
-        return true;
-
     if (IsCanFlybyServer())
         return true;
+
+    if (ToUnit()->IsFalling() || IsFalling())
+        return true;    
 
     if (IsFlying() && !CanFly()) // kick flyhacks
     {

@@ -498,7 +498,7 @@ class spell_gen_blood_reserve : public AuraScript
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(aurEff->GetAmount());
         caster->CastSpell(caster, SPELL_GEN_BLOOD_RESERVE_HEAL, args);
-        caster->RemoveAura(SPELL_GEN_BLOOD_RESERVE_AURA);
+        //caster->RemoveAura(SPELL_GEN_BLOOD_RESERVE_AURA);
     }
 
     void Register() override

@@ -38,6 +38,7 @@ EndContentData */
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
+#include "Log.h"
 #include "Player.h"
 #include "ScriptedEscortAI.h"
 #include "SpellAuras.h"
@@ -617,6 +618,41 @@ public:
 };
 
 /*######
+## Quest: A Mammoth Undertaking (12607)
+######*/
+enum Mammoth
+{
+    SPELL_RIDE_SHATTERTUSK_MAMMOTH = 51658,
+    SPELL_HAND_OVER_MAMMOTH        = 51660
+};
+
+class npc_mammoth : public CreatureScript
+{
+public:
+    npc_mammoth() : CreatureScript("npc_mammoth") { }
+
+    struct npc_mammothAI : public ScriptedAI
+    {
+        npc_mammothAI(Creature* creature) : ScriptedAI(creature) { }        
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_RIDE_SHATTERTUSK_MAMMOTH)
+            {
+                me->StopMoving();
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+            }            
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_mammothAI(creature);
+    }
+};
+
+/*######
 ## Quest: Reconnaissance Flight (12671)
 ######*/
 enum ReconnaissanceFlight
@@ -778,6 +814,7 @@ void AddSC_sholazar_basin()
     new spell_q12620_the_lifewarden_wrath();
     new spell_q12589_shoot_rjr();
     new npc_haiphoon();
+    new npc_mammoth();
     new npc_vics_flying_machine();
     new spell_shango_tracks();
 }

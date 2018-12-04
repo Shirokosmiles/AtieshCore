@@ -3834,6 +3834,13 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         m_caster->CastSpell(unitTarget, 51855, true);
                     break;
                 }
+                // Hand Over Mammoth
+                case 51660: 
+                {
+                    if (Creature* caster = m_caster->ToCreature())
+                        caster->DespawnOrUnsummon();
+                    break;
+                }
                 // Summon Ghouls On Scarlet Crusade
                 case 51904:
                 {
