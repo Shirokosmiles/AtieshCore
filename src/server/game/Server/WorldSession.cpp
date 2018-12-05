@@ -284,17 +284,17 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     std::vector<WorldPacket*> requeuePackets;
     uint32 processedPackets = 0;
     time_t currentTime = GameTime::GetGameTime();
-
+    bool packetnormal = false;
     while (m_Socket && _recvQueue.next(packet, updater))
     {
-        if (!packet || packet->empty() || !packet->GetOpcode() || packet->GetOpcode() >= NUM_MSG_TYPES)
-            continue;
-
         ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
         try
         {
-            switch (opHandle->Status)
+            if (packet && !packet->empty() && packet->GetOpcode() && packet->GetOpcode() <= NUM_MSG_TYPES)
             {
+                packetnormal = true;
+                switch (opHandle->Status)
+                {
                 case STATUS_LOGGEDIN:
                     if (!_player)
                     {
@@ -369,6 +369,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     TC_LOG_DEBUG("network.opcode", "Received not handled opcode %s from %s", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str()
                         , GetPlayerInfo().c_str());
                     break;
+                }
             }
         }
         catch (WorldPackets::PacketArrayMaxCapacityException const& pamce)
@@ -383,10 +384,13 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             packet->hexlike();
         }
 
-        if (deletePacket)
-            delete packet;
+        if (packetnormal)
+        {
+            if (deletePacket)
+                delete packet;
 
-        deletePacket = true;
+            deletePacket = true;
+        }
 
 #define MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE 100
         processedPackets++;
