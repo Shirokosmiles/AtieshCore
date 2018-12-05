@@ -55,20 +55,25 @@ inline bool isNasty(uint8 c)
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
+    if (recvData.empty())
+    {
+        recvData.rfinish();
+        return;
+    }
     uint32 type;
     uint32 lang;
 
     recvData >> type;
     recvData >> lang;    
 
-    if (type >= MAX_CHAT_MSG_TYPE)
+    if (!type || type >= MAX_CHAT_MSG_TYPE)
     {
         TC_LOG_ERROR("network", "CHAT: Wrong message type received: %u", type);
         recvData.rfinish();
         return;
     }
 
-    if (lang == LANG_UNIVERSAL && type != CHAT_MSG_AFK && type != CHAT_MSG_WHISPER && type != CHAT_MSG_BATTLEGROUND && type != CHAT_MSG_BATTLEGROUND_LEADER && type != CHAT_MSG_DND)
+    if (!lang || (lang == LANG_UNIVERSAL && type != CHAT_MSG_AFK && type != CHAT_MSG_WHISPER && type != CHAT_MSG_BATTLEGROUND && type != CHAT_MSG_BATTLEGROUND_LEADER && type != CHAT_MSG_DND))
     {
         TC_LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: %s tried to send a message in universal language", GetPlayerInfo().c_str());
         SendNotification(LANG_UNKNOWN_LANGUAGE);

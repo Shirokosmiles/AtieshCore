@@ -22,6 +22,10 @@
 #include "Player.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "Util.h"
+#include "ObjectMgr.h"
+
+#define MAX_INTERNAL_PLAYER_NAME 15                         // max server internal player name length (> MAX_PLAYER_NAME for support declined names)
 
 ChannelMgr::~ChannelMgr()
 {
@@ -96,6 +100,44 @@ Channel* ChannelMgr::GetJoinChannel(uint32 channelId, std::string const& name, A
         std::wstring channelName;
         if (!Utf8toWStr(name, channelName))
             return nullptr;
+
+        if (name.empty())
+            return nullptr;
+
+        wchar_t wstr_buf[MAX_INTERNAL_PLAYER_NAME + 1];
+        size_t wstr_len = MAX_INTERNAL_PLAYER_NAME;
+        if (name.size() > wstr_len)
+            return nullptr;
+
+        if (!Utf8toWStr(name, &wstr_buf[0], wstr_len))
+            return nullptr;
+
+        wstr_buf[0] = wcharToUpper(wstr_buf[0]);
+        for (size_t i = 1; i < wstr_len; ++i)
+            wstr_buf[i] = wcharToLower(wstr_buf[i]);
+        std::string nameCheck = name;
+        if (!WStrToUtf8(wstr_buf, wstr_len, nameCheck))
+            return nullptr;
+        // second check name (strong)
+        std::wstring wname;
+        if (!Utf8toWStr(name, wname))
+            return nullptr;
+
+        if (wname.size() > MAX_INTERNAL_PLAYER_NAME)
+            return nullptr;
+
+        uint32 minName = sWorld->getIntConfig(CONFIG_MIN_PLAYER_NAME);
+        if (wname.size() < minName)
+            return nullptr;
+
+        uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_PLAYER_NAMES);
+        if (!ObjectMgr::isValidStringName(wname, strictMask))
+            return nullptr;
+
+        wstrToLower(wname);
+        for (size_t i = 2; i < wname.size(); ++i)
+            if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
+                return nullptr;
 
         wstrToLower(channelName);
         auto itr = _customChannels.find(channelName);
