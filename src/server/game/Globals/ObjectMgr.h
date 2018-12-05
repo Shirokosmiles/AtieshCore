@@ -1436,7 +1436,7 @@ class TC_GAME_API ObjectMgr
         // reserved names
         void LoadReservedPlayersNames();
         bool IsReservedName(std::string const& name) const;
-        static bool isValidStringName(const std::wstring& wstr, uint32 strictMask, bool numericOrSpace, bool create = false);
+        static bool isValidStringName(const std::wstring& wstr, uint32 strictMask);
         // name with valid structure and symbols
         static ResponseCodes CheckPlayerName(std::string const& name, LocaleConstant locale, bool create = false);
         static PetNameInvalidReason CheckPetName(std::string const& name, LocaleConstant locale);

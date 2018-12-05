@@ -171,7 +171,7 @@ bool normalizePlayerName(std::string& name)
         return false;
 
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_PLAYER_NAMES);
-    if (!ObjectMgr::isValidStringName(wname, strictMask, false, false))
+    if (!ObjectMgr::isValidStringName(wname, strictMask))
         return false;
 
     wstrToLower(wname);
@@ -8217,36 +8217,36 @@ bool isValidString(const std::wstring& wstr, uint32 strictMask, bool numericOrSp
     return false;
 }
 
-bool ObjectMgr::isValidStringName(const std::wstring& wstr, uint32 strictMask, bool numericOrSpace, bool create = false)
+bool ObjectMgr::isValidStringName(const std::wstring& wstr, uint32 strictMask)
 {
     if (strictMask == 0)                                       // any language, ignore realm
     {
-        if (isExtendedLatinString(wstr, numericOrSpace))
+        if (isExtendedLatinString(wstr, false))
             return true;
-        if (isCyrillicString(wstr, numericOrSpace))
+        if (isCyrillicString(wstr, false))
             return true;
-        if (isEastAsianString(wstr, numericOrSpace))
+        if (isEastAsianString(wstr, false))
             return true;
         return false;
     }
 
     if (strictMask & 0x2)                                    // realm zone specific
     {
-        LanguageType lt = GetRealmLanguageType(create);
+        LanguageType lt = GetRealmLanguageType(false);
         if (lt & LT_EXTENDEN_LATIN)
-            if (isExtendedLatinString(wstr, numericOrSpace))
+            if (isExtendedLatinString(wstr, false))
                 return true;
         if (lt & LT_CYRILLIC)
-            if (isCyrillicString(wstr, numericOrSpace))
+            if (isCyrillicString(wstr, false))
                 return true;
         if (lt & LT_EAST_ASIA)
-            if (isEastAsianString(wstr, numericOrSpace))
+            if (isEastAsianString(wstr, false))
                 return true;
     }
 
     if (strictMask & 0x1)                                    // basic Latin
     {
-        if (isBasicLatinString(wstr, numericOrSpace))
+        if (isBasicLatinString(wstr, false))
             return true;
     }
 
