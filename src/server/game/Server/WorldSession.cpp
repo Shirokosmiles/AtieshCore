@@ -290,7 +290,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
         try
         {
-            if (packet && !packet->empty() && packet->GetOpcode() && packet->GetOpcode() <= NUM_MSG_TYPES)
+            if (packet && /*!packet->empty() && */packet->GetOpcode() && packet->GetOpcode() <= NUM_MSG_TYPES)
             {
                 packetnormal = true;
                 switch (opHandle->Status)
