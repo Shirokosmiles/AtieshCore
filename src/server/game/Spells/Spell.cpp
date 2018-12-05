@@ -126,6 +126,9 @@ SpellCastTargets::~SpellCastTargets() { }
 
 void SpellCastTargets::Read(ByteBuffer& data, Unit* caster)
 {
+    if (data.empty())
+        return;
+
     data >> m_targetMask;
 
     if (m_targetMask == TARGET_FLAG_NONE)

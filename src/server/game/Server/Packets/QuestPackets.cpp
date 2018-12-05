@@ -19,6 +19,8 @@
 
 void WorldPackets::Quest::QueryQuestInfo::Read()
 {
+    if (_worldPacket.empty())
+        return;
     _worldPacket >> QuestID;
 }
 

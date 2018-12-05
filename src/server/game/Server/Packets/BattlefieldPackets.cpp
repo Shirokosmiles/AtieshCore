@@ -27,6 +27,8 @@ WorldPacket const* WorldPackets::Battlefield::BattlefieldMgrEntryInvite::Write()
 
 void WorldPackets::Battlefield::BattlefieldMgrEntryInviteResponse::Read()
 {
+    if (_worldPacket.empty())
+        return;
     _worldPacket >> BattleID;
     AcceptedInvite = _worldPacket.read<uint8>() != 0;
 }
@@ -40,6 +42,8 @@ WorldPacket const* WorldPackets::Battlefield::BattlefieldMgrQueueInvite::Write()
 
 void WorldPackets::Battlefield::BattlefieldMgrQueueInviteResponse::Read()
 {
+    if (_worldPacket.empty())
+        return;
     _worldPacket >> BattleID;
     AcceptedInvite = _worldPacket.read<uint8>() != 0;
 }
@@ -56,6 +60,8 @@ WorldPacket const* WorldPackets::Battlefield::BattlefieldMgrQueueRequestResponse
 
 void WorldPackets::Battlefield::BattlefieldMgrExitRequest::Read()
 {
+    if (_worldPacket.empty())
+        return;
     _worldPacket >> BattleID;
 }
 

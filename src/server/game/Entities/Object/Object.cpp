@@ -457,7 +457,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
 void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
 {
-    if (!target)
+    if (!target || !data)
         return;
 
     ByteBuffer fieldBuffer;
