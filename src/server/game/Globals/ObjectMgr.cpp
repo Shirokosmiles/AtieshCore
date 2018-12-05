@@ -141,10 +141,12 @@ std::string ScriptInfo::GetDebugInfo() const
 bool normalizePlayerName(std::string& name)
 {
     if (name.empty())
-        return false;
+        return false;    
 
-    wchar_t wstr_buf[MAX_INTERNAL_PLAYER_NAME+1];
+    wchar_t wstr_buf[MAX_INTERNAL_PLAYER_NAME+1];    
     size_t wstr_len = MAX_INTERNAL_PLAYER_NAME;
+    if (name.size() > wstr_len)
+        return false;
 
     if (!Utf8toWStr(name, &wstr_buf[0], wstr_len))
         return false;
@@ -155,6 +157,27 @@ bool normalizePlayerName(std::string& name)
 
     if (!WStrToUtf8(wstr_buf, wstr_len, name))
         return false;
+
+    // second check name (strong)
+    std::wstring wname;
+    if (!Utf8toWStr(name, wname))
+        return false;
+
+    if (wname.size() > MAX_INTERNAL_PLAYER_NAME)
+        return false;
+
+    uint32 minName = sWorld->getIntConfig(CONFIG_MIN_PLAYER_NAME);
+    if (wname.size() < minName)
+        return false;
+
+    uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_PLAYER_NAMES);
+    if (!isValidString(wname, strictMask, false, false))
+        return false;
+
+    wstrToLower(wname);
+    for (size_t i = 2; i < wname.size(); ++i)
+        if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
+            return false;
 
     return true;
 }
