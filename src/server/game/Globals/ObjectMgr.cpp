@@ -171,7 +171,7 @@ bool normalizePlayerName(std::string& name)
         return false;
 
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_PLAYER_NAMES);
-    if (!isValidString(wname, strictMask, false, false))
+    if (!ObjectMgr::isValidStringName(wname, strictMask, false, false))
         return false;
 
     wstrToLower(wname);
@@ -8182,6 +8182,42 @@ static LanguageType GetRealmLanguageType(bool create)
 }
 
 bool isValidString(const std::wstring& wstr, uint32 strictMask, bool numericOrSpace, bool create = false)
+{
+    if (strictMask == 0)                                       // any language, ignore realm
+    {
+        if (isExtendedLatinString(wstr, numericOrSpace))
+            return true;
+        if (isCyrillicString(wstr, numericOrSpace))
+            return true;
+        if (isEastAsianString(wstr, numericOrSpace))
+            return true;
+        return false;
+    }
+
+    if (strictMask & 0x2)                                    // realm zone specific
+    {
+        LanguageType lt = GetRealmLanguageType(create);
+        if (lt & LT_EXTENDEN_LATIN)
+            if (isExtendedLatinString(wstr, numericOrSpace))
+                return true;
+        if (lt & LT_CYRILLIC)
+            if (isCyrillicString(wstr, numericOrSpace))
+                return true;
+        if (lt & LT_EAST_ASIA)
+            if (isEastAsianString(wstr, numericOrSpace))
+                return true;
+    }
+
+    if (strictMask & 0x1)                                    // basic Latin
+    {
+        if (isBasicLatinString(wstr, numericOrSpace))
+            return true;
+    }
+
+    return false;
+}
+
+bool ObjectMgr::isValidStringName(const std::wstring& wstr, uint32 strictMask, bool numericOrSpace, bool create = false)
 {
     if (strictMask == 0)                                       // any language, ignore realm
     {
