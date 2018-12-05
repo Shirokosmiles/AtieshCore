@@ -287,6 +287,9 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     while (m_Socket && _recvQueue.next(packet, updater))
     {
+        if (!packet || packet->empty() || !packet->GetOpcode() || packet->GetOpcode() >= NUM_MSG_TYPES)
+            continue;
+
         ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
         try
         {
