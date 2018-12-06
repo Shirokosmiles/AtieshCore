@@ -71,16 +71,6 @@ inline bool isNormalChannelName(Player* player, std::string& name)
         msg.erase(end, msg.end());
     }    
 
-    if (!isSecondChannelName(name))
-        return false;
-
-    // validate hyperlinks
-    if (Trinity::Hyperlinks::CheckAllLinks(name))
-        return true;
-}
-
-inline bool isSecondChannelName(std::string& name)
-{
     // second check - strong way
     if (name.empty())
         return false;
@@ -99,7 +89,7 @@ inline bool isSecondChannelName(std::string& name)
     std::string nameCheck = name;
     if (!WStrToUtf8(wstr_buf, wstr_len, nameCheck))
         return false;
-    // second check name (strong)
+
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
         return false;
@@ -118,6 +108,10 @@ inline bool isSecondChannelName(std::string& name)
     for (size_t i = 2; i < wname.size(); ++i)
         if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
             return false;
+
+    // validate hyperlinks
+    if (Trinity::Hyperlinks::CheckAllLinks(name))
+        return true;
 }
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
