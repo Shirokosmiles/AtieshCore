@@ -633,36 +633,38 @@ void AuctionHouseObject::Update()
     for (AuctionEntryMap::iterator it = AuctionsMap.begin(); it != AuctionsMap.end();)
     {
         // from auctionhousehandler.cpp, creates auction pointer & player pointer
-        AuctionEntry* auction = it->second;
-        // Increment iterator due to AuctionEntry deletion
-        ++it;
-
-        ///- filter auctions expired on next update
-        if (auction->expire_time > curTime + 60)
-            continue;
-
-        ///- Either cancel the auction if there was no bidder
-        if (auction->bidder == 0 && auction->bid == 0)
+        if (AuctionEntry* auction = it->second)
         {
-            sAuctionMgr->SendAuctionExpiredMail(auction, trans);
-            sScriptMgr->OnAuctionExpire(this, auction);
-        }
-        ///- Or perform the transaction
-        else
-        {
-            //we should send an "item sold" message if the seller is online
-            //we send the item to the winner
-            //we send the money to the seller
-            sAuctionMgr->SendAuctionSuccessfulMail(auction, trans);
-            sAuctionMgr->SendAuctionWonMail(auction, trans);
-            sScriptMgr->OnAuctionSuccessful(this, auction);
-        }
+            // Increment iterator due to AuctionEntry deletion
+            ++it;
 
-        ///- In any case clear the auction
-        auction->DeleteFromDB(trans);
+            ///- filter auctions expired on next update
+            if (auction->expire_time > curTime + 60)
+                continue;
 
-        sAuctionMgr->RemoveAItem(auction->itemGUIDLow);
-        RemoveAuction(auction);
+            ///- Either cancel the auction if there was no bidder
+            if (auction->bidder == 0 && auction->bid == 0)
+            {
+                sAuctionMgr->SendAuctionExpiredMail(auction, trans);
+                sScriptMgr->OnAuctionExpire(this, auction);
+            }
+            ///- Or perform the transaction
+            else
+            {
+                //we should send an "item sold" message if the seller is online
+                //we send the item to the winner
+                //we send the money to the seller
+                sAuctionMgr->SendAuctionSuccessfulMail(auction, trans);
+                sAuctionMgr->SendAuctionWonMail(auction, trans);
+                sScriptMgr->OnAuctionSuccessful(this, auction);
+            }
+
+            ///- In any case clear the auction
+            auction->DeleteFromDB(trans);
+
+            sAuctionMgr->RemoveAItem(auction->itemGUIDLow);
+            RemoveAuction(auction);
+        }
     }
 
     // Run DB changes
