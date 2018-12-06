@@ -227,6 +227,31 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     if (msg.size() > 255)
         return;
 
+    switch (type)
+    {
+        case CHAT_MSG_CHANNEL:
+        case CHAT_MSG_CHANNEL_JOIN:
+        case CHAT_MSG_CHANNEL_LEAVE:
+        case CHAT_MSG_CHANNEL_LIST:
+        case CHAT_MSG_CHANNEL_NOTICE:
+        case CHAT_MSG_CHANNEL_NOTICE_USER:
+        {
+            bool normalFounded = false;
+            if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
+            {
+                if (Channel* cn = cMgr->GetChannel(0, channel, GetPlayer(), false, 0))
+                    normalFounded = true;
+            }
+
+            if (!normalFounded)
+            {
+                SendNotification(GetTrinityString(LANG_GM_SILENCE), sender->GetName().c_str());
+                recvData.rfinish();
+                return;
+            }
+            break;
+        }
+    }
 
     // no chat commands in AFK/DND autoreply, and it can be empty
     if (!(type == CHAT_MSG_AFK || type == CHAT_MSG_DND))
