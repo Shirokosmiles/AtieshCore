@@ -22508,6 +22508,8 @@ inline void BeforeVisibilityDestroy<Creature>(Creature* t, Player* p)
 
 void Player::UpdateVisibilityOf(WorldObject* target)
 {
+    if (!target)
+        return;
     if (HaveAtClient(target))
     {
         if (!CanSeeOrDetect(target, false, true))
@@ -22597,6 +22599,8 @@ void Player::SendInitialVisiblePackets(Unit* target) const
 template<class T>
 void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& visibleNow)
 {
+    if (!target)
+        return;
     if (HaveAtClient(target))
     {
         if (!CanSeeOrDetect(target, false, true))
@@ -24735,6 +24739,8 @@ void Player::StopCastingBindSight() const
 
 void Player::SetViewpoint(WorldObject* target, bool apply)
 {
+    if (!target)
+        return;
     if (apply)
     {
         TC_LOG_DEBUG("maps", "Player::CreateViewpoint: Player '%s' (%s) creates seer (Entry: %u, TypeId: %u).",
