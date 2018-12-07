@@ -31,7 +31,8 @@ void WorldSession::HandleContactListOpcode(WorldPacket& recvData)
 {
     uint32 flags;
     recvData >> flags;
-    _player->GetSocial()->SendSocialList(_player, flags);
+    if (flags)
+        _player->GetSocial()->SendSocialList(_player, flags);
 }
 
 void WorldSession::HandleAddFriendOpcode(WorldPacket& recvData)
@@ -79,9 +80,9 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recvData)
                 }
             }
         }
-    }
 
-    sSocialMgr->SendFriendStatus(GetPlayer(), friendResult, friendGuid);
+        sSocialMgr->SendFriendStatus(GetPlayer(), friendResult, friendGuid);
+    }
 }
 
 void WorldSession::HandleDelFriendOpcode(WorldPacket& recvData)
@@ -90,9 +91,12 @@ void WorldSession::HandleDelFriendOpcode(WorldPacket& recvData)
     recvData >> friendGuid;
     TC_LOG_DEBUG("network", "WorldSession::HandleDelFriendOpcode: %s", friendGuid.ToString().c_str());
 
-    _player->GetSocial()->RemoveFromSocialList(friendGuid, SOCIAL_FLAG_FRIEND);
+    if (Player* pFriend = ObjectAccessor::FindPlayer(friendGuid))
+    {
+        _player->GetSocial()->RemoveFromSocialList(friendGuid, SOCIAL_FLAG_FRIEND);
 
-    sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_REMOVED, friendGuid);
+        sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_REMOVED, friendGuid);
+    }
 }
 
 void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recvData)
@@ -122,9 +126,9 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recvData)
             if (!GetPlayer()->GetSocial()->AddToSocialList(ignoreGuid, SOCIAL_FLAG_IGNORED))
                 ignoreResult = FRIEND_IGNORE_FULL;
         }
-    }
 
-    sSocialMgr->SendFriendStatus(GetPlayer(), ignoreResult, ignoreGuid);
+        sSocialMgr->SendFriendStatus(GetPlayer(), ignoreResult, ignoreGuid);
+    }
 }
 
 void WorldSession::HandleDelIgnoreOpcode(WorldPacket& recvData)
@@ -134,9 +138,12 @@ void WorldSession::HandleDelIgnoreOpcode(WorldPacket& recvData)
 
     TC_LOG_DEBUG("network", "WorldSession::HandleDelIgnoreOpcode: %s", ignoreGuid.ToString().c_str());
 
-    _player->GetSocial()->RemoveFromSocialList(ignoreGuid, SOCIAL_FLAG_IGNORED);
+    if (Player* pFriend = ObjectAccessor::FindPlayer(ignoreGuid))
+    {
+        _player->GetSocial()->RemoveFromSocialList(ignoreGuid, SOCIAL_FLAG_IGNORED);
 
-    sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_IGNORE_REMOVED, ignoreGuid);
+        sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_IGNORE_REMOVED, ignoreGuid);
+    }
 }
 
 void WorldSession::HandleSetContactNotesOpcode(WorldPacket& recvData)
@@ -147,5 +154,6 @@ void WorldSession::HandleSetContactNotesOpcode(WorldPacket& recvData)
 
     TC_LOG_DEBUG("network", "WorldSession::HandleSetContactNotesOpcode: Contact: %s, Notes: %s", guid.ToString().c_str(), note.c_str());
 
-    _player->GetSocial()->SetFriendNote(guid, note);
+    if (Player* pFriend = ObjectAccessor::FindPlayer(guid))
+        _player->GetSocial()->SetFriendNote(guid, note);
 }

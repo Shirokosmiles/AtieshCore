@@ -34,35 +34,39 @@
 
 void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 {
-    Player* player = ObjectAccessor::FindConnectedPlayer(guid);
-    CharacterCacheEntry const* nameData = sCharacterCache->GetCharacterCacheByGuid(guid);
-
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+10));
-    data << guid.WriteAsPacked();
-    if (!nameData)
+    if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
     {
-        data << uint8(1);                           // name unknown
-        SendPacket(&data);
-        return;
+        CharacterCacheEntry const* nameData = sCharacterCache->GetCharacterCacheByGuid(guid);
+        if (nameData)
+        {
+            WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
+            data << guid.WriteAsPacked();
+            if (!nameData)
+            {
+                data << uint8(1);                           // name unknown
+                SendPacket(&data);
+                return;
+            }
+
+            data << uint8(0);                               // name known
+            data << nameData->Name;                         // played name
+            data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
+            data << uint8(player ? player->getRace() : nameData->Race);
+            data << uint8(nameData->Sex);
+            data << uint8(nameData->Class);
+
+            if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
+            {
+                data << uint8(1);                           // Name is declined
+                for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
+                    data << names->name[i];
+            }
+            else
+                data << uint8(0);                           // Name is not declined
+
+            SendPacket(&data);
+        }
     }
-
-    data << uint8(0);                               // name known
-    data << nameData->Name;                         // played name
-    data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
-    data << uint8(player ? player->getRace() : nameData->Race);
-    data << uint8(nameData->Sex);
-    data << uint8(nameData->Class);
-
-    if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
-    {
-        data << uint8(1);                           // Name is declined
-        for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
-            data << names->name[i];
-    }
-    else
-        data << uint8(0);                           // Name is not declined
-
-    SendPacket(&data);
 }
 
 void WorldSession::HandleNameQueryOpcode(WorldPacket& recvData)
@@ -92,6 +96,8 @@ void WorldSession::SendQueryTimeResponse()
 /// Only _static_ data is sent in this packet !!!
 void WorldSession::HandleCreatureQueryOpcode(WorldPackets::Query::QueryCreature& query)
 {
+    if (!query.CreatureID)
+        return;
     if (CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(query.CreatureID))
     {
         TC_LOG_DEBUG("network", "WORLD: CMSG_CREATURE_QUERY '%s' - Entry: %u.", ci->Name.c_str(), query.CreatureID);
@@ -119,6 +125,8 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPackets::Query::QueryCreature&
 /// Only _static_ data is sent in this packet !!!
 void WorldSession::HandleGameObjectQueryOpcode(WorldPackets::Query::QueryGameObject& query)
 {
+    if (!query.GameObjectID)
+        return;
     if (GameObjectTemplate const* info = sObjectMgr->GetGameObjectTemplate(query.GameObjectID))
     {
         if (sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
