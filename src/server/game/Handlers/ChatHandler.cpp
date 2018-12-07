@@ -241,6 +241,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             {
                 if (Channel* cn = cMgr->GetChannel(0, channel, GetPlayer(), false, 0))
                     normalFounded = true;
+                else if (Channel* chn = ChannelMgr::GetChannelForPlayerByNamePart(channel, sender))
+                    normalFounded = true;
             }
 
             if (!normalFounded)
