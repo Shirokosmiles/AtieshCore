@@ -110,8 +110,10 @@ inline bool isNormalChannelName(Player* player, std::string& name)
             return false;
 
     // validate hyperlinks
-    if (Trinity::Hyperlinks::CheckAllLinks(name))
-        return true;
+    if (!Trinity::Hyperlinks::CheckAllLinks(name))
+        return false;
+
+    return true;
 }
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
