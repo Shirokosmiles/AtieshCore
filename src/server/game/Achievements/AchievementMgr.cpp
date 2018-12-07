@@ -555,21 +555,24 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
     {
         for (CompletedAchievementMap::iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
         {
-            if (!iter->second.changed)
-                continue;
+            if (iter->first)
+            {
+                if (!iter->second.changed)
+                    continue;
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_BY_ACHIEVEMENT);
-            stmt->setUInt16(0, iter->first);
-            stmt->setUInt32(1, GetPlayer()->GetGUID().GetCounter());
-            trans->Append(stmt);
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_BY_ACHIEVEMENT);
+                stmt->setUInt16(0, iter->first);
+                stmt->setUInt32(1, GetPlayer()->GetGUID().GetCounter());
+                trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT);
-            stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
-            stmt->setUInt16(1, iter->first);
-            stmt->setUInt32(2, uint32(iter->second.date));
-            trans->Append(stmt);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT);
+                stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
+                stmt->setUInt16(1, iter->first);
+                stmt->setUInt32(2, uint32(iter->second.date));
+                trans->Append(stmt);
 
-            iter->second.changed = false;
+                iter->second.changed = false;
+            }
         }
     }
 
@@ -577,25 +580,28 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
     {
         for (CriteriaProgressMap::iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
         {
-            if (!iter->second.changed)
-                continue;
-
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_PROGRESS_BY_CRITERIA);
-            stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
-            stmt->setUInt16(1, iter->first);
-            trans->Append(stmt);
-
-            if (iter->second.counter)
+            if (iter->first)
             {
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT_PROGRESS);
+                if (!iter->second.changed)
+                    continue;
+
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_PROGRESS_BY_CRITERIA);
                 stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
                 stmt->setUInt16(1, iter->first);
-                stmt->setUInt32(2, iter->second.counter);
-                stmt->setUInt32(3, uint32(iter->second.date));
                 trans->Append(stmt);
-            }
 
-            iter->second.changed = false;
+                if (iter->second.counter)
+                {
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT_PROGRESS);
+                    stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
+                    stmt->setUInt16(1, iter->first);
+                    stmt->setUInt32(2, iter->second.counter);
+                    stmt->setUInt32(3, uint32(iter->second.date));
+                    trans->Append(stmt);
+                }
+
+                iter->second.changed = false;
+            }
         }
     }
 }
