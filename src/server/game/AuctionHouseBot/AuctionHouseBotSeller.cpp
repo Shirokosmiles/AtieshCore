@@ -529,14 +529,16 @@ uint32 AuctionBotSeller::SetStat(SellerConfiguration& config)
     AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(config.GetHouseType());
     for (AuctionHouseObject::AuctionEntryMap::const_iterator itr = auctionHouse->GetAuctionsBegin(); itr != auctionHouse->GetAuctionsEnd(); ++itr)
     {
-        AuctionEntry* auctionEntry = itr->second;
-        Item* item = sAuctionMgr->GetAItem(auctionEntry->itemGUIDLow);
-        if (item)
+        if (AuctionEntry* auctionEntry = itr->second)
         {
-            ItemTemplate const* prototype = item->GetTemplate();
-            if (prototype)
-                if (!auctionEntry->owner || sAuctionBotConfig->IsBotChar(auctionEntry->owner)) // Add only ahbot items
-                    ++itemsSaved[prototype->Quality][prototype->Class];
+            Item* item = sAuctionMgr->GetAItem(auctionEntry->itemGUIDLow);
+            if (item)
+            {
+                ItemTemplate const* prototype = item->GetTemplate();
+                if (prototype)
+                    if (!auctionEntry->owner || sAuctionBotConfig->IsBotChar(auctionEntry->owner)) // Add only ahbot items
+                        ++itemsSaved[prototype->Quality][prototype->Class];
+            }
         }
     }
 

@@ -54,6 +54,8 @@ void IdleState::Update(Map& map, NGridType& grid, GridInfo&, uint32) const
 
 void RemovalState::Update(Map& map, NGridType& grid, GridInfo& info, uint32 diff) const
 {
+    if (!grid.GetGridId())
+        return;
     if (!info.getUnloadLock())
     {
         info.UpdateTimeTracker(diff);
