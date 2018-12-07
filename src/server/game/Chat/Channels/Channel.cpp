@@ -714,11 +714,13 @@ void Channel::Announce(Player const* player)
     UpdateChannelInDB();
 }
 
-void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
+void Channel::Say(ObjectGuid guid, std::string const& checkchannelname, std::string const& what, uint32 lang) const
 {
     if (what.empty())
         return;
 
+    if (checkchannelname.empty())
+        return;
     // TODO: Add proper RBAC check
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
         lang = LANG_UNIVERSAL;
@@ -744,10 +746,13 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
     {
         LocaleConstant localeIdx = sWorld->GetAvailableDbcLocale(locale);
 
+        std::string localname = GetName(localeIdx);
+        if (localname != checkchannelname)
+            localname = checkchannelname;
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), player, player, what, 0, GetName(localeIdx));
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), player, player, what, 0, localname);
         else
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, GetName(localeIdx));
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, localname);
     };
 
     SendToAll(builder, !info.IsModerator() ? guid : ObjectGuid::Empty);

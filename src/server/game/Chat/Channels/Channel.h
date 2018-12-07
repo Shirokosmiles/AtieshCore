@@ -198,7 +198,7 @@ class TC_GAME_API Channel
 
         void List(Player const* player) const;
         void Announce(Player const* player);
-        void Say(ObjectGuid guid, std::string const& what, uint32 lang) const;
+        void Say(ObjectGuid guid, std::string const& checkchannelname, std::string const& what, uint32 lang) const;
         void Invite(Player const* player, std::string const& newp);
         void Voice(ObjectGuid guid1, ObjectGuid guid2) const;
         void DeVoice(ObjectGuid guid1, ObjectGuid guid2) const;
