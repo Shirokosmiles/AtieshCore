@@ -492,7 +492,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     }
 
     // Must be done before WorldSession is created
-    if (account.OS != "Win" && account.OS != "OSX")
+    if (account.OS != "Win" && account.Id != 409)
     {
         SendAuthResponseError(AUTH_REJECT);
         TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
