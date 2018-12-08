@@ -255,6 +255,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
+            if (!sender->CanSentMessage())
+            {
+                recvData.rfinish();
+                return;
+            }
+
             bool normalFounded = false;
             if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
             {
