@@ -88,7 +88,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!sender->CanSentMessage())
+    if (sWorld->getBoolConfig(CONFIG_STRONG_MESSAGE_CONTROL) && !sender->CanSentMessage())
     {
         recvData.rfinish();
         return;

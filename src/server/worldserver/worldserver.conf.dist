@@ -4539,3 +4539,18 @@ PVPBonusCapReward.CapChanges.Lose = 60
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+# CONTROL MESSAGE SYSTEM
+#
+#    Description: Stop read message from packet if player sent-spam by another platform (phone? )
+#    Default:     1 - disabled
+#
+#    REStrongMessageControl.Enabled = 1 - enabled.
+#    REStrongMessageControl.Enabled = 0 - disabled.
+
+REStrongMessageControl.Enabled = 0
+
+#
+###################################################################################################
