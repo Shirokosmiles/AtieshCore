@@ -728,6 +728,7 @@ void Channel::Say(ObjectGuid guid, std::string const& checkchannelname, std::str
     if (!player || !player->GetSession())
         return;
 
+    player->SetMessageControl();
     // TODO: Add proper RBAC check
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
         lang = LANG_UNIVERSAL;
