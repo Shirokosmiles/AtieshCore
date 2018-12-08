@@ -313,7 +313,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     bool senderinbattleground = sender->InBattleground() && !sender->InArena();   
 
-    TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received : sender = %s, type = %u, lang = %u, to = %s, channel = %s, text : %s", sender->GetName().c_str(), type, lang, to, channel, msg );
+    TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received : sender = %s, type = %u, lang = %u, to = %s, channel = %s, text : %s", sender->GetName().c_str(), type, lang, to.c_str(), channel.c_str(), msg.c_str());
     switch (type)
     {
         case CHAT_MSG_SAY:
