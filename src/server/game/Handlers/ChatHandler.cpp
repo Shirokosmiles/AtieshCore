@@ -82,7 +82,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
 
     Player* sender = GetPlayer();
-
+    if (!sender || !sender->IsInWorld())
+    {
+        recvData.rfinish();
+        return;
+    }
     //TC_LOG_DEBUG("CHAT: packet received. type %u, lang %u", type, lang);
 
     // prevent talking at unknown language (cheating)
@@ -219,12 +223,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             recvData >> msg;
             break;
         case CHAT_MSG_CHANNEL:
+        {
             recvData >> channel;
             recvData >> msg;
             break;
+        }
     }
 
-    if (msg.empty() || msg.size() > 255)
+    if (msg.size() > 255)
         return;
 
     switch (type)
@@ -236,13 +242,26 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_CHANNEL_NOTICE:
         case CHAT_MSG_CHANNEL_NOTICE_USER:
         {
+            if (channel == "")
+            {
+                TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received CHAT_MSG_CHANNEL from %s, with : channel = NULL", sender->GetName().c_str());
+                recvData.rfinish();
+                return;
+            }
+
             bool normalFounded = false;
             if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
             {
-                if (Channel* cn = cMgr->GetChannel(0, channel, GetPlayer(), false, 0))
-                    normalFounded = true;
-                else if (Channel* chn = ChannelMgr::GetChannelForPlayerByNamePart(channel, sender))
-                    normalFounded = true;
+                if (Channel* chn = ChannelMgr::GetChannelForPlayerByNamePart(channel, sender))
+                {
+                    if (chn->GetPlayerbyGuid(GetPlayer()->GetGUID()))
+                        normalFounded = true;
+                }
+                else if (Channel* cn = cMgr->GetChannel(0, channel, GetPlayer(), false, 0))
+                {
+                    if (cn->GetPlayerbyGuid(GetPlayer()->GetGUID()))
+                        normalFounded = true;
+                }
             }
 
             if (!normalFounded)
@@ -571,8 +590,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
             if (Channel* chn = ChannelMgr::GetChannelForPlayerByNamePart(channel, sender))
             {
-                sScriptMgr->OnPlayerChat(sender, type, lang, msg, chn);
-                chn->Say(sender->GetGUID(), channel, msg, lang);
+                if (chn->GetPlayerbyGuid(GetPlayer()->GetGUID()))
+                {
+                    sScriptMgr->OnPlayerChat(sender, type, lang, msg, chn);
+                    chn->Say(sender->GetGUID(), channel, msg, lang);
+                }
             }
             break;
         }
@@ -624,6 +646,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             break;
         }
         default:
+            if (channel != "")
+            {
+                TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received unhandled type of message from %s", sender->GetName().c_str());
+                recvData.rfinish();
+                return;
+            }
             TC_LOG_ERROR("network", "CHAT: unknown message type %u, lang: %u", type, lang);
             break;
     }

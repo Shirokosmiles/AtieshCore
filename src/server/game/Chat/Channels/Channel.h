@@ -207,6 +207,12 @@ class TC_GAME_API Channel
         void SetOwnership(bool ownership) { _ownershipEnabled = ownership; }
         static void CleanOldChannelsInDB();
 
+        bool GetPlayerbyGuid(ObjectGuid guid) const
+        {
+            PlayerContainer::const_iterator itr = _playersStore.find(guid);
+            return itr != _playersStore.end();
+        }
+
     private:
 
         template<class Builder>
