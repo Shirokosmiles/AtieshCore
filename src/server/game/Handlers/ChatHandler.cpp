@@ -224,7 +224,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             break;
     }
 
-    if (msg.size() > 255)
+    if (msg.empty() || msg.size() > 255)
         return;
 
     switch (type)
@@ -255,6 +255,45 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
     }
 
+    // do message validity checks
+    //if (lang != LANG_ADDON)
+    //{
+        // cut at the first newline or carriage return
+    std::string::size_type pos = msg.find_first_of("\n\r");
+    if (pos == 0)
+        return;
+    else if (pos != std::string::npos)
+        msg.erase(pos);
+
+    // abort on any sort of nasty character
+    for (uint8 c : msg)
+        if (isNasty(c))
+        {
+            TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", GetPlayer()->GetName().c_str(),
+                GetPlayer()->GetGUID().GetCounter(), uint8(c));
+            return;
+        }
+
+    // validate utf8
+    if (!utf8::is_valid(msg.begin(), msg.end()))
+    {
+        TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing an invalid UTF8 sequence - blocked", GetPlayer()->GetName().c_str(),
+            GetPlayer()->GetGUID().GetCounter());
+        return;
+    }
+
+    // collapse multiple spaces into one
+    if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
+    {
+        auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
+        msg.erase(end, msg.end());
+    }
+
+    // validate hyperlinks
+    if (!ValidateHyperlinksAndMaybeKick(msg))
+        return;
+    //}
+
     // no chat commands in AFK/DND autoreply, and it can be empty
     if (!(type == CHAT_MSG_AFK || type == CHAT_MSG_DND))
     {
@@ -272,47 +311,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
     }
 
-    // do message validity checks
-    if (lang != LANG_ADDON)
-    {
-        // cut at the first newline or carriage return
-        std::string::size_type pos = msg.find_first_of("\n\r");
-        if (pos == 0)
-            return;
-        else if (pos != std::string::npos)
-            msg.erase(pos);
-
-        // abort on any sort of nasty character
-        for (uint8 c : msg)
-            if (isNasty(c))
-            {
-                TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", GetPlayer()->GetName().c_str(),
-                    GetPlayer()->GetGUID().GetCounter(), uint8(c));
-                return;
-            }
-
-        // validate utf8
-        if (!utf8::is_valid(msg.begin(), msg.end()))
-        {
-            TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing an invalid UTF8 sequence - blocked", GetPlayer()->GetName().c_str(),
-                GetPlayer()->GetGUID().GetCounter());
-            return;
-        }
-        
-        // collapse multiple spaces into one
-        if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
-        {
-            auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
-            msg.erase(end, msg.end());
-        }
-
-        // validate hyperlinks
-        if (!ValidateHyperlinksAndMaybeKick(msg))
-            return;
-    }
-    
     bool senderinbattleground = sender->InBattleground() && !sender->InArena();   
 
+    TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received : sender = %s, type = %u, lang = %u, to = %s, channel = %s, text : %s", sender->GetName().c_str(), type, lang, to, channel, msg );
     switch (type)
     {
         case CHAT_MSG_SAY:
