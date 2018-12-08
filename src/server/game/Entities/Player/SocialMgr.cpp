@@ -271,10 +271,6 @@ void SocialMgr::SendFriendStatus(Player* player, FriendsResult result, ObjectGui
             break;
     }
 
-    if (Player* target = ObjectAccessor::FindPlayer(friendGuid))
-        if (!target)
-            return;
-
     if (broadcast)
         BroadcastToFriendListers(player, &data);
     else
@@ -283,8 +279,6 @@ void SocialMgr::SendFriendStatus(Player* player, FriendsResult result, ObjectGui
 
 void SocialMgr::BroadcastToFriendListers(Player* player, WorldPacket const* packet)
 {
-    if (!player || packet->empty())
-        return;
     ASSERT(player);
 
     AccountTypes gmSecLevel = AccountTypes(sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST));

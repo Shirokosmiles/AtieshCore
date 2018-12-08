@@ -87,6 +87,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         recvData.rfinish();
         return;
     }
+
+    if (!sender->CanSentMessage())
+    {
+        recvData.rfinish();
+        return;
+    }
     //TC_LOG_DEBUG("CHAT: packet received. type %u, lang %u", type, lang);
 
     // prevent talking at unknown language (cheating)

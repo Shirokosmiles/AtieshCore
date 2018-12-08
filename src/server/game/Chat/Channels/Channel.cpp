@@ -183,6 +183,8 @@ void Channel::CleanOldChannelsInDB()
 
 void Channel::JoinChannel(Player* player, std::string const& pass)
 {
+    if (!player || !player->IsInWorld())
+        return;
     ObjectGuid guid = player->GetGUID();
     if (IsOn(guid))
     {
@@ -720,6 +722,13 @@ void Channel::Say(ObjectGuid guid, std::string const& checkchannelname, std::str
         return;
 
     if (checkchannelname.empty())
+        return;
+
+    Player* player = ObjectAccessor::FindConnectedPlayer(guid);
+    if (!player || !player->GetSession())
+        return;
+
+    if (!player->CanSentMessage())
         return;
     // TODO: Add proper RBAC check
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
