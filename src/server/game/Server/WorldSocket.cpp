@@ -491,8 +491,10 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
+    // TODO inspect nessesary it in future? Or only for discordbot
+    bool accountInWhiteMessageControlList = account.Id == 409;
     // Must be done before WorldSession is created
-    if (account.OS != "Win" && account.Id != 409)
+    if (account.OS != "Win" && !accountInWhiteMessageControlList)
     {
         SendAuthResponseError(AUTH_REJECT);
         TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
@@ -596,7 +598,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     _authed = true;
     _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
-        account.Expansion, mutetime, account.Locale, account.Recruiter, account.IsRectuiter);
+        account.Expansion, mutetime, account.Locale, account.Recruiter, account.IsRectuiter, accountInWhiteMessageControlList);
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);
 
     // Initialize Warden system only if it is enabled by config

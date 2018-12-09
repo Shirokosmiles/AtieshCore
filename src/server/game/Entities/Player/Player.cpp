@@ -24138,8 +24138,11 @@ void Player::StopVanish()
 
 void Player::SetMessageControl()
 {
-    m_messagecontrol = 1000;
-    m_cansentmessage = false;
+    if (!m_session->PlayerIsInWhiteMessageControlList())
+    {
+        m_messagecontrol = 1000;
+        m_cansentmessage = false;
+    }
 }
 
 void Player::SetPremiumStatus(bool vipstatus)
