@@ -1297,10 +1297,10 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
     //TC_LOG_ERROR("network", "CLIENT COUNTER: %u - player %s sent us timesync counter ", counter, _player->GetName().c_str());
     //TC_LOG_ERROR("network", "SERVER COUNTER: %u - player->m_timeSyncCounter timesync counter : ", _player->m_timeSyncCounter);
     uint32 servercounter = _player->m_timeSyncCounter;
-    uint32 countercheck = fabs(servercounter - counter);
-    if (countercheck != 1)
+    int32 countercheck = _player->m_timeSyncCounter - 1;
+    if (counter != countercheck)
     {
-        TC_LOG_ERROR("network", "player %s sent us wrong timesync counter : counter from player = %u, nessesary counter = %u, for avoid diff and crash, kicked", _player->GetName().c_str(), counter, servercounter - 1);
+        TC_LOG_ERROR("network", "player %s sent us wrong timesync counter : counter from player = %u, nessesary counter = %i, for avoid diff and crash, kicked", _player->GetName().c_str(), counter, countercheck);
         KickPlayer();        
         return;
     }

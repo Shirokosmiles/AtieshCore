@@ -139,15 +139,8 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
     {
         recvData >> itemGUIDs[i];
         recvData >> count[i];
-        
-        if (!itemGUIDs[i] || !count[i] || count[i] > 1000)
-        {
-            recvData.rfinish();
-            return;
-        }
 
-        Item* itemCheck = _player->GetItemByGuid(itemGUIDs[i]);
-        if (itemCheck)
+        if (!itemGUIDs[i] || !count[i] || count[i] > 1000)
         {
             recvData.rfinish();
             return;
