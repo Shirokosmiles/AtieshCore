@@ -61,7 +61,7 @@ inline bool isValidText(Player* _player, std::string msg)
         // cut at the first newline or carriage return
     std::string::size_type pos = msg.find_first_of("\n\r");
     if (pos == 0)
-        return;
+        return false;
     else if (pos != std::string::npos)
         msg.erase(pos);
 
@@ -71,7 +71,7 @@ inline bool isValidText(Player* _player, std::string msg)
         {
             TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", _player->GetName().c_str(),
                 _player->GetGUID().GetCounter(), uint8(c));
-            return;
+            return false;
         }
 
     // validate utf8
@@ -79,7 +79,7 @@ inline bool isValidText(Player* _player, std::string msg)
     {
         TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing an invalid UTF8 sequence - blocked", _player->GetName().c_str(),
             _player->GetGUID().GetCounter());
-        return;
+        return false;
     }
 
     // collapse multiple spaces into one
@@ -91,7 +91,9 @@ inline bool isValidText(Player* _player, std::string msg)
     
     //}
     if (msg.size() > 255) // second check after utf8 filter, maybe double symbols from utf16
-        return;
+        return false;
+
+    return true;
 }
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
