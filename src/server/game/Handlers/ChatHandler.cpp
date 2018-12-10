@@ -53,6 +53,47 @@ inline bool isNasty(uint8 c)
     return false;
 }
 
+inline bool isValidText(Player* _player, std::string msg)
+{
+    // do message validity checks
+    //if (lang != LANG_ADDON)
+    //{
+        // cut at the first newline or carriage return
+    std::string::size_type pos = msg.find_first_of("\n\r");
+    if (pos == 0)
+        return;
+    else if (pos != std::string::npos)
+        msg.erase(pos);
+
+    // abort on any sort of nasty character
+    for (uint8 c : msg)
+        if (isNasty(c))
+        {
+            TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", _player->GetName().c_str(),
+                _player->GetGUID().GetCounter(), uint8(c));
+            return;
+        }
+
+    // validate utf8
+    if (!utf8::is_valid(msg.begin(), msg.end()))
+    {
+        TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing an invalid UTF8 sequence - blocked", _player->GetName().c_str(),
+            _player->GetGUID().GetCounter());
+        return;
+    }
+
+    // collapse multiple spaces into one
+    if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
+    {
+        auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
+        msg.erase(end, msg.end());
+    }
+    
+    //}
+    if (msg.size() > 255) // second check after utf8 filter, maybe double symbols from utf16
+        return;
+}
+
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
     if (recvData.empty())
@@ -236,6 +277,25 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
     }
 
+    //before filter
+    if (msg.size() > 255)
+        return;
+
+    // Filter for message
+    if (!isValidText(sender, msg))
+    {
+        recvData.rfinish();
+        return;
+    }
+
+    // validate hyperlinks
+    if (!ValidateHyperlinksAndMaybeKick(msg))
+    {
+        recvData.rfinish();
+        return;
+    }
+
+    //after filter
     if (msg.size() > 255)
         return;
 
@@ -253,6 +313,28 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received CHAT_MSG_CHANNEL from %s, with : channel = NULL", sender->GetName().c_str());
                 recvData.rfinish();
                 return;
+            }
+            else
+            {
+                //before filter
+                if (channel.size() > 255)
+                    return;
+                // Filter for channel-name
+                if (!isValidText(sender, channel))
+                {
+                    recvData.rfinish();
+                    return;
+                }
+
+                // validate hyperlinks
+                if (!ValidateHyperlinksAndMaybeKick(channel))
+                {
+                    recvData.rfinish();
+                    return;
+                }
+                //after filter
+                if (channel.size() > 255)
+                    return;
             }
 
             if (!sender->CanSentMessage())
@@ -285,45 +367,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             break;
         }
     }
-
-    // do message validity checks
-    //if (lang != LANG_ADDON)
-    //{
-        // cut at the first newline or carriage return
-    std::string::size_type pos = msg.find_first_of("\n\r");
-    if (pos == 0)
-        return;
-    else if (pos != std::string::npos)
-        msg.erase(pos);
-
-    // abort on any sort of nasty character
-    for (uint8 c : msg)
-        if (isNasty(c))
-        {
-            TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", GetPlayer()->GetName().c_str(),
-                GetPlayer()->GetGUID().GetCounter(), uint8(c));
-            return;
-        }
-
-    // validate utf8
-    if (!utf8::is_valid(msg.begin(), msg.end()))
-    {
-        TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing an invalid UTF8 sequence - blocked", GetPlayer()->GetName().c_str(),
-            GetPlayer()->GetGUID().GetCounter());
-        return;
-    }
-
-    // collapse multiple spaces into one
-    if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
-    {
-        auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
-        msg.erase(end, msg.end());
-    }
-
-    // validate hyperlinks
-    if (!ValidateHyperlinksAndMaybeKick(msg))
-        return;
-    //}
 
     // no chat commands in AFK/DND autoreply, and it can be empty
     if (!(type == CHAT_MSG_AFK || type == CHAT_MSG_DND))
