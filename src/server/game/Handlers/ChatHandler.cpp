@@ -248,6 +248,24 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     if (msg.size() > 255)
         return;
 
+    // GS Reguest
+    if (lang == LANG_ADDON)
+    {
+        size_t foundGS;
+        std::string msgGs = msg.substr(0, 10);
+
+        foundGS = msgGs.find("GSY");
+        if (foundGS != std::string::npos)
+        {
+            time_t pNow = GameTime::GetGameTime();
+
+            if (pNow - timerGsSpam < 6)
+                return;
+            else
+                timerGsSpam = pNow;
+        }
+    }
+
     switch (type)
     {
         case CHAT_MSG_CHANNEL:

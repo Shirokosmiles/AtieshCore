@@ -459,6 +459,30 @@ class TC_GAME_API WorldSession
         uint32 GetRecruiterId() const { return recruiterId; }
         bool IsARecruiter() const { return isRecruiter; }
 
+        // Antispam Functions
+        void UpdateAntispamTimer(uint32 diff)
+        {
+            if (m_uiAntispamMailSentTimer <= diff)
+            {
+                m_uiAntispamMailSentTimer = sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_TIMER);
+                m_uiAntispamMailSentCount = 0;
+            }
+            else
+                m_uiAntispamMailSentTimer -= diff;
+        }
+
+        bool UpdateAntispamCount()
+        {
+            if (!sWorld->getBoolConfig(CONFIG_ANTISPAM_ENABLED))
+                return true;
+
+            m_uiAntispamMailSentCount++;
+            if (m_uiAntispamMailSentCount > sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_COUNT))
+                return false;
+            return true;
+        }
+
+
     public:                                                 // opcodes handlers
 
         void Handle_NULL(WorldPacket& recvPacket);          // not used
@@ -1090,7 +1114,11 @@ class TC_GAME_API WorldSession
         uint32 expireTime;
         bool forceExit;
         ObjectGuid m_currentBankerGUID;
-
+        uint32 m_uiAntispamMailSentCount;
+        uint32 m_uiAntispamMailSentTimer;
+        time_t timerGsSpam;
+        time_t timerWhoOpcode;
+        uint32 countWhoOpcode;
         WorldSession(WorldSession const& right) = delete;
         WorldSession& operator=(WorldSession const& right) = delete;
 };

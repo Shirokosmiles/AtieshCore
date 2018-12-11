@@ -134,6 +134,9 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     _RBACData(nullptr),
     expireTime(60000), // 1 min after socket loss, session is deleted
     forceExit(false),
+    m_uiAntispamMailSentTimer(0),
+    timerGsSpam(0),
+    timerWhoOpcode(0),
     m_currentBankerGUID()
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
@@ -276,6 +279,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     /// (or they've been idling in character select)
     if (IsConnectionIdle() && !HasPermission(rbac::RBAC_PERM_IGNORE_IDLE_CONNECTION))
         m_Socket->CloseSocket();
+
+    /// Antispam Timer update
+    if (sWorld->getBoolConfig(CONFIG_ANTISPAM_ENABLED))
+        UpdateAntispamTimer(diff);
 
     ///- Retrieve packets from the receive queue and call the appropriate handlers
     /// not process packets if socket already closed

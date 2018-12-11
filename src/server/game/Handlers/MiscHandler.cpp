@@ -208,6 +208,19 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: Recvd CMSG_WHO Message");
 
+    time_t pNow = GameTime::GetGameTime();
+    if (pNow - timerWhoOpcode < 7)
+    {
+        ++countWhoOpcode;
+        if (countWhoOpcode >= 3)
+            return;
+    }
+    else
+    {
+        timerWhoOpcode = pNow;
+        countWhoOpcode = 1;
+    }
+
     uint32 matchCount = 0;
 
     uint32 levelMin, levelMax, racemask, classmask, zonesCount, strCount;
