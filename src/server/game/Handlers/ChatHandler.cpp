@@ -275,6 +275,23 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_CHANNEL_NOTICE:
         case CHAT_MSG_CHANNEL_NOTICE_USER:
         {
+            time_t pNow = GameTime::GetGameTime();
+            if (pNow - timerWhoOpcode < 7)
+            {
+                ++countWhoOpcode;
+                if (countWhoOpcode >= 2)
+                {
+                    TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received many packets CHAT_MSG_CHANNEL from %s", sender->GetName().c_str());
+                    recvData.rfinish();
+                    return;
+                }
+            }
+            else
+            {
+                timerWhoOpcode = pNow;
+                countWhoOpcode = 1;
+            }
+
             if (channel == "")
             {
                 TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received CHAT_MSG_CHANNEL from %s, with : channel = NULL", sender->GetName().c_str());
