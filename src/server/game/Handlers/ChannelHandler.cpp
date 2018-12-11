@@ -17,7 +17,6 @@
  */
 
 #include "WorldSession.h"
-#include "Chat.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
 #include "DBCStores.h"
@@ -48,11 +47,22 @@ inline bool isNormalChannelName(Player* player, std::string& name)
     else if (pos != std::string::npos)
         msg.erase(pos);
 
-    if (player->GetSession())
-        return false;
+    // abort on any sort of nasty character
+    for (uint8 c : msg)
+        if (isNasty(c))
+        {
+            TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", player->GetName().c_str(),
+                player->GetGUID().GetCounter(), uint8(c));
+            return false;
+        }
 
-    if (!ChatHandler(player->GetSession()).isValidText(player, name))
+    // validate utf8
+    if (!utf8::is_valid(msg.begin(), msg.end()))
+    {
+        TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing an invalid UTF8 sequence - blocked", player->GetName().c_str(),
+            player->GetGUID().GetCounter());
         return false;
+    }
 
     // collapse multiple spaces into one
     if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
