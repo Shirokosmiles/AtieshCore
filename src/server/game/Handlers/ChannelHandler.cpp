@@ -49,7 +49,7 @@ inline bool isNormalChannelName(Player* player, std::string& name)
         msg.erase(pos);
 
     if (player->GetSession())
-        return;
+        return false;
 
     if (!ChatHandler(player->GetSession()).isValidText(player, msg))
         return false;
