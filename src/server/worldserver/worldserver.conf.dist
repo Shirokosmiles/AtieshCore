@@ -4550,7 +4550,7 @@ PVPBonusCapReward.CapChanges.Lose = 60
 #    REStrongMessageControl.Enabled = 1 - enabled.
 #    REStrongMessageControl.Enabled = 0 - disabled.
 
-REStrongMessageControl.Enabled = 0
+RE.StrongMessageControl.Enabled = 0
 
 #
 ###################################################################################################
