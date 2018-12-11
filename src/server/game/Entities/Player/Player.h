@@ -1769,11 +1769,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetVerifiedCoins();
         time_t GetPremiumUnsetdate() const { return m_unsetdate; }
 
-        // ChatMessage Control
-        void SetMessageControl();
-        bool CanSentMessage() const { return m_cansentmessage; }
-        uint32 GetTimerMessageControl() const { return m_messagecontrol; }
-
         // PVP Weekly cap
         void SetPVPCapPoints(uint32 cap, bool weeklyupdate = false);
         void RewardPVPCapPoints(uint32 reward);
@@ -2464,7 +2459,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_areaUpdateId;
 
         uint32 m_vanishTimer;
-        uint32 m_messagecontrol;
         uint32 m_breakblevanishTimer;
         uint32 m_premiumTimer;
         uint32 m_flyhackTimer;
@@ -2598,7 +2592,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_pvpcap;            // PVP Cap for weekly reward
         bool m_pvpcapReceived;      // PVP Cap for weekly reward was received
         bool m_walking;             // Player walking
-        bool m_cansentmessage;      // FloodControl
 
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;

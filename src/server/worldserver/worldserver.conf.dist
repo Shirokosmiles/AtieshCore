@@ -4542,21 +4542,6 @@ PVPBonusCapReward.CapChanges.Lose = 60
 
 ###################################################################################################
 #
-# CONTROL MESSAGE SYSTEM
-#
-#    Description: Stop read message from packet if player sent-spam by another platform (phone? )
-#    Default:     1 - disabled
-#
-#    REStrongMessageControl.Enabled = 1 - enabled.
-#    REStrongMessageControl.Enabled = 0 - disabled.
-
-RE.StrongMessageControl.Enabled = 0
-
-#
-###################################################################################################
-
-###################################################################################################
-#
 # OSX PLAYERS CONNECTION
 #
 #    Description: We can not allowed to connect for players from OSX OS system

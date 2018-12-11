@@ -264,7 +264,6 @@ Player::Player(WorldSession* session): Unit(true)
     m_hostileReferenceCheckTimer = 0;
     m_drunkTimer = 0;
     m_vanishTimer = 0;
-    m_messagecontrol = 0;
     m_breakblevanishTimer = 0;
     m_premiumTimer = 0;
     m_flyhackTimer = 0;
@@ -280,7 +279,6 @@ Player::Player(WorldSession* session): Unit(true)
     m_isjumping = false;
     m_canfly = false;
     m_vip = false;
-    m_cansentmessage = true;
     m_unsetdate = 0;
     m_coins = 0;
     m_pvpcap = 0;
@@ -1334,17 +1332,6 @@ void Player::Update(uint32 p_time)
         }
         else
             m_premiumTimer -= p_time;
-    }
-
-    if (!m_cansentmessage && m_messagecontrol > 0)
-    {
-        if (p_time >= m_messagecontrol)
-        {
-            m_cansentmessage = true;
-            m_messagecontrol = 0;
-        }
-        else
-            m_messagecontrol -= p_time;
     }
 
     if (m_flyhackTimer > 0)
@@ -24134,15 +24121,6 @@ void Player::SetVanishTimer()
 void Player::StopVanish()
 {
     m_vanishTimer = m_breakblevanishTimer;
-}
-
-void Player::SetMessageControl()
-{
-    if (!m_session->PlayerIsInWhiteMessageControlList())
-    {
-        m_messagecontrol = 1000;
-        m_cansentmessage = false;
-    }
 }
 
 void Player::SetPremiumStatus(bool vipstatus)
