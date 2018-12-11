@@ -31,6 +31,7 @@
 #include "QueryCallbackProcessor.h"
 #include "SharedDefines.h"
 #include <string>
+#include "World.h"
 #include <unordered_map>
 
 class BigNumber;
