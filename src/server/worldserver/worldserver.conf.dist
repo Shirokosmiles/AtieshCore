@@ -4554,3 +4554,18 @@ REStrongMessageControl.Enabled = 0
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+# OSX PLAYERS CONNECTION
+#
+#    Description: We can not allowed to connect for players from OSX OS system
+#    Default:     1 - disabled
+#
+#    RE.OSXPlayers.Enabled = 1 - enabled.
+#    RE.OSXPlayers.Enabled = 0 - disabled.
+
+RE.OSXPlayers.Enabled = 0
+
+#
+###################################################################################################

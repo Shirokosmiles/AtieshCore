@@ -1466,6 +1466,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_PVP_REWARD_CAP_FOR_LOSE]               = sConfigMgr->GetIntDefault("PVPBonusCapReward.CapChanges.Lose", 60);
     // Chat Flood-exploit control
     m_bool_configs[CONFIG_STRONG_MESSAGE_CONTROL]               = sConfigMgr->GetBoolDefault("REStrongMessageControl.Enabled", false);
+    // OSX connection allow
+    m_bool_configs[CONFIG_ALLOW_OSX_CONNECT]                    = sConfigMgr->GetBoolDefault("RE.OSXPlayers.Enabled", false);    
     //End of Custom Systems
 
     // Dungeon finder

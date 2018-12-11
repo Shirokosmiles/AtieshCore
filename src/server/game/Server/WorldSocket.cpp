@@ -492,9 +492,10 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     }
 
     // TODO inspect nessesary it in future? Or only for discordbot
-    bool accountInWhiteMessageControlList = account.OS == "OSX";
+    bool accountInWhiteMessageControlList = account.Id == 409;
+    bool allowOSXplayers = sWorld->getBoolConfig(CONFIG_ALLOW_OSX_CONNECT);
     // Must be done before WorldSession is created
-    if (account.OS != "Win" && !accountInWhiteMessageControlList)
+    if (account.OS != "Win" && (allowOSXplayers && account.OS != "OSX") && !accountInWhiteMessageControlList)
     {
         SendAuthResponseError(AUTH_REJECT);
         TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
