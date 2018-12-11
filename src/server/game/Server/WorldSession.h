@@ -1119,7 +1119,9 @@ class TC_GAME_API WorldSession
         uint32 m_uiAntispamMailSentTimer;
         time_t timerGsSpam;
         time_t timerWhoOpcode;
+        time_t timerMessageChannelOpcode;
         uint32 countWhoOpcode;
+        uint32 countMessageChannelOpcode;
         WorldSession(WorldSession const& right) = delete;
         WorldSession& operator=(WorldSession const& right) = delete;
 };

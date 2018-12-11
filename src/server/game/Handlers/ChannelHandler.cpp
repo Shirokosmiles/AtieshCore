@@ -51,7 +51,7 @@ inline bool isNormalChannelName(Player* player, std::string& name)
     if (player->GetSession())
         return false;
 
-    if (!ChatHandler(player->GetSession()).isValidText(player, msg))
+    if (!ChatHandler(player->GetSession()).isValidText(player, name))
         return false;
 
     // collapse multiple spaces into one
