@@ -41,60 +41,7 @@
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include <utf8.h>
 #include <algorithm>
-
-inline bool isNasty(uint8 c)
-{
-    if (c == '\t')
-        return false;
-    if (c <= '\037') // ASCII control block
-        return true;
-    return false;
-}
-
-inline bool isValidText(Player* _player, std::string msg)
-{
-    // do message validity checks
-    //if (lang != LANG_ADDON)
-    //{
-        // cut at the first newline or carriage return
-    std::string::size_type pos = msg.find_first_of("\n\r");
-    if (pos == 0)
-        return false;
-    else if (pos != std::string::npos)
-        msg.erase(pos);
-
-    // abort on any sort of nasty character
-    for (uint8 c : msg)
-        if (isNasty(c))
-        {
-            TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", _player->GetName().c_str(),
-                _player->GetGUID().GetCounter(), uint8(c));
-            return false;
-        }
-
-    // validate utf8
-    if (!utf8::is_valid(msg.begin(), msg.end()))
-    {
-        TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing an invalid UTF8 sequence - blocked", _player->GetName().c_str(),
-            _player->GetGUID().GetCounter());
-        return false;
-    }
-
-    // collapse multiple spaces into one
-    if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
-    {
-        auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
-        msg.erase(end, msg.end());
-    }
-    
-    //}
-    if (msg.size() > 255) // second check after utf8 filter, maybe double symbols from utf16
-        return false;
-
-    return true;
-}
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
@@ -284,7 +231,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         return;
 
     // Filter for message
-    if (!isValidText(sender, msg))
+    if (!ChatHandler(sender->GetSession()).isValidText(sender, msg))
     {
         recvData.rfinish();
         return;
@@ -322,7 +269,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (channel.size() > 255)
                     return;
                 // Filter for channel-name
-                if (!isValidText(sender, channel))
+                if (!ChatHandler(sender->GetSession()).isValidText(sender, channel))
                 {
                     recvData.rfinish();
                     return;

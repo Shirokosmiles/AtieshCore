@@ -31,8 +31,10 @@
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
+#include "Hyperlinks.h"
 #include "World.h"
 #include <boost/algorithm/string/replace.hpp>
+#include <utf8.h>
 
 // Lazy loading of the command table cache from commands and the
 // ScriptMgr should be thread safe since the player commands,
@@ -162,6 +164,68 @@ bool ChatHandler::hasStringAbbr(char const* name, char const* part)
         }
     }
     // allow with any for ""
+
+    return true;
+}
+
+inline bool isNasty(uint8 c)
+{
+    if (c == '\t')
+        return false;
+    if (c <= '\037') // ASCII control block
+        return true;
+    return false;
+}
+
+bool ChatHandler::isValidText(Player* _player, std::string msg)
+{
+    // do message validity checks
+    //if (lang != LANG_ADDON)
+    //{
+        // cut at the first newline or carriage return
+    std::string::size_type pos = msg.find_first_of("\n\r");
+    if (pos == 0)
+        return false;
+    else if (pos != std::string::npos)
+        msg.erase(pos);
+
+    // abort on any sort of nasty character
+    for (uint8 c : msg)
+        if (isNasty(c))
+        {
+            if (_player)
+            {
+                TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", _player->GetName().c_str(),
+                    _player->GetGUID().GetCounter(), uint8(c));
+            }
+            return false;
+        }
+
+    // validate utf8
+    if (!utf8::is_valid(msg.begin(), msg.end()))
+    {
+        if (_player)
+        {
+            TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing an invalid UTF8 sequence - blocked", _player->GetName().c_str(),
+                _player->GetGUID().GetCounter());
+        }
+        return false;
+    }
+
+    // collapse multiple spaces into one
+    if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
+    {
+        auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
+        msg.erase(end, msg.end());
+    }
+
+    // validate hyperlinks
+    if (!Trinity::Hyperlinks::CheckAllLinks(msg))
+        return false;
+
+    //}
+    if (msg.size() > 255) // second check after utf8 filter, maybe double symbols from utf16
+        return false;
 
     return true;
 }

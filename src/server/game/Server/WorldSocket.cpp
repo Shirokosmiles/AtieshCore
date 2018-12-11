@@ -495,6 +495,14 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     bool accountInWhiteMessageControlList = account.Id == 409;
     bool allowOSXplayers = sWorld->getBoolConfig(CONFIG_ALLOW_OSX_CONNECT);
     // Must be done before WorldSession is created
+    if (authSession->RealmID == 1 && account.OS == "OSX")
+    {
+        SendAuthResponseError(AUTH_REJECT);
+        TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
+        DelayedCloseSocket();
+        return;
+    }
+
     if (account.OS != "Win" && (allowOSXplayers && account.OS != "OSX") && !accountInWhiteMessageControlList)
     {
         SendAuthResponseError(AUTH_REJECT);
