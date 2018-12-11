@@ -492,7 +492,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     }
 
     // TODO inspect nessesary it in future? Or only for discordbot
-    bool accountInWhiteMessageControlList = account.Id == 409;
+    bool accountInWhiteMessageControlList = account.OS == "OSX";
     // Must be done before WorldSession is created
     if (account.OS != "Win" && !accountInWhiteMessageControlList)
     {
