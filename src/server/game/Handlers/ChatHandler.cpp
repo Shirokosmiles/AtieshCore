@@ -276,7 +276,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_CHANNEL_NOTICE_USER:
         {
             time_t pNow = GameTime::GetGameTime();
-            if (pNow - timerMessageChannelOpcode < 7)
+            if (pNow - timerMessageChannelOpcode < 100)
             {
                 ++countMessageChannelOpcode;
                 if (countMessageChannelOpcode >= 2)
