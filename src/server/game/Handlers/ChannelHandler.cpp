@@ -75,6 +75,8 @@ inline bool isNormalChannelName(Player* player, std::string& name)
     if (name.empty())
         return false;
 
+    if (msg.size() > 255) // second check after utf8 filter, maybe double symbols from utf16
+        return false;
     wchar_t wstr_buf[MAX_INTERNAL_PLAYER_NAME + 1];
     size_t wstr_len = MAX_INTERNAL_PLAYER_NAME;
     if (name.size() > wstr_len)
@@ -94,6 +96,10 @@ inline bool isNormalChannelName(Player* player, std::string& name)
     if (!Utf8toWStr(name, wname))
         return false;
 
+    // second check - strong way
+    if (wname.empty())
+        return false;
+
     if (wname.size() > MAX_INTERNAL_PLAYER_NAME)
         return false;
 
@@ -111,6 +117,9 @@ inline bool isNormalChannelName(Player* player, std::string& name)
 
     // validate hyperlinks
     if (!Trinity::Hyperlinks::CheckAllLinks(name))
+        return false;
+
+    if (msg.size() > MAX_INTERNAL_PLAYER_NAME) // second check after utf8 filter, maybe double symbols from utf16
         return false;
 
     return true;
