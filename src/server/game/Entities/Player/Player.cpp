@@ -271,6 +271,7 @@ Player::Player(WorldSession* session): Unit(true)
         m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
     m_mountTimer = 0;
     m_rootUpdTimer = 0;
+    m_muteTimer = 0;
     m_ACKmounted = false;
     m_rootUpd = false;
     m_deathTimer = 0;
@@ -279,6 +280,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_isjumping = false;
     m_canfly = false;
     m_vip = false;
+    m_muted = false;
     m_unsetdate = 0;
     m_coins = 0;
     m_pvpcap = 0;
@@ -1271,6 +1273,17 @@ void Player::Update(uint32 p_time)
         }
         else
             m_zoneUpdateTimer -= p_time;
+    }
+
+    if (m_muted && m_muteTimer > 0)
+    {
+        if (p_time >= m_muteTimer)
+        {
+            m_muted = false;
+            m_muteTimer = 0;
+        }
+        else
+            m_muteTimer -= p_time;
     }
 
     if (m_visiblevanish && m_vanishTimer > 0)
@@ -24108,6 +24121,13 @@ void Player::UpdateAreaDependentAuras(uint32 newArea)
         if (itr->second->autocast && itr->second->IsFitToRequirements(this, m_zoneUpdateId, newArea))
             if (!HasAura(itr->second->spellId))
                 CastSpell(this, itr->second->spellId, true);
+}
+
+void Player::SetMuteTimer(uint32 timer)
+{
+    m_muteTimer = timer;
+    if (m_muteTimer)
+        m_muted = true;
 }
 
 void Player::SetVanishTimer()

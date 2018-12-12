@@ -69,6 +69,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         return;
     }
 
+    Player* sender = GetPlayer();
+    if (!sender || !sender->IsInWorld() || sender->UnderMuteTimer() || sender->IsBeingTeleported())
+    {
+        recvData.rfinish();
+        return;
+    }
+
     uint32 type;
     uint32 lang;
 
@@ -86,13 +93,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     {
         TC_LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: %s tried to send a message in universal language", GetPlayerInfo().c_str());
         SendNotification(LANG_UNKNOWN_LANGUAGE);
-        recvData.rfinish();
-        return;
-    }
-
-    Player* sender = GetPlayer();
-    if (!sender || !sender->IsInWorld())
-    {
         recvData.rfinish();
         return;
     }
@@ -341,7 +341,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     if (chn->GetPlayerbyGuid(GetPlayer()->GetGUID()))
                         normalFounded = true;
                 }
-                else if (Channel* cn = cMgr->GetChannel(0, channel, GetPlayer(), false, 0))
+                else if (Channel* cn = cMgr->GetChannel(0, channel, GetPlayer(), true, 0))
                 {
                     if (cn->GetPlayerbyGuid(GetPlayer()->GetGUID()))
                         normalFounded = true;

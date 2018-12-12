@@ -173,7 +173,7 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     std::string channelName;
     recvPacket >> channelId >> channelName;
 
-    if (!isNormalChannelName(GetPlayer(), channelName))
+    if (!channelId && !isNormalChannelName(GetPlayer(), channelName))
     {
         recvPacket.rfinish();
         return;
