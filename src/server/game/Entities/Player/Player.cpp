@@ -5194,19 +5194,25 @@ void Player::LeftChannel(Channel* c)
 
 void Player::CleanupChannels()
 {
-    while (!m_channels.empty())
+    for (JoinedChannelsList::iterator i = m_channels.begin(); i != m_channels.end(); ++i)
     {
-        Channel* ch = *m_channels.begin();
-        m_channels.erase(m_channels.begin());               // remove from player's channel list
-        ch->LeaveChannel(this, false);                     // not send to client, not remove from player's channel list
-
-        // delete channel if empty
-        if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeam()))
+        if ((*i))
         {
-            if (ch->IsConstant())
-                cMgr->LeftChannel(ch->GetChannelId(), ch->GetZoneEntry());
-            else
-                cMgr->LeftChannel(ch->GetName());
+            m_channels.erase(i);
+            (*i)->LeaveChannel(this, false);                     // not send to client, not remove from player's channel list
+
+            // delete channel if empty
+            if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeam()))
+            {
+                if ((*i)->IsConstant())
+                    cMgr->LeftChannel((*i)->GetChannelId(), (*i)->GetZoneEntry());
+                else
+                {
+                    if ((*i)->GetPlayerbyGuid(GetGUID()))
+                        cMgr->LeftChannel((*i)->GetName());
+                }
+            }
+            break;
         }
     }
     TC_LOG_DEBUG("chat.system", "Player::CleanupChannels: Channels of player '%s' (%s) cleaned up.", GetName().c_str(), GetGUID().ToString().c_str());
