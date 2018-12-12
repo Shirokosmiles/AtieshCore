@@ -45,11 +45,30 @@
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
+    // packet control
+    time_t pNow = GameTime::GetGameTime();
+    if (pNow - timerMessageChannelOpcode < 1)
+    {
+        ++countMessageChannelOpcode;
+        if (countMessageChannelOpcode > 1)
+        {
+            TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received many packets from %s", GetPlayer()->GetName().c_str());
+            recvData.rfinish();
+            return;
+        }
+    }
+    else
+    {
+        timerMessageChannelOpcode = pNow;
+        countMessageChannelOpcode = 1;
+    }
+
     if (recvData.empty())
     {
         recvData.rfinish();
         return;
     }
+
     uint32 type;
     uint32 lang;
 
@@ -77,6 +96,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         recvData.rfinish();
         return;
     }
+    
     //TC_LOG_DEBUG("CHAT: packet received. type %u, lang %u", type, lang);
 
     // prevent talking at unknown language (cheating)
@@ -278,23 +298,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_CHANNEL_NOTICE:
         case CHAT_MSG_CHANNEL_NOTICE_USER:
         {
-            time_t pNow = GameTime::GetGameTime();
-            if (pNow - timerMessageChannelOpcode < 1)
-            {
-                ++countMessageChannelOpcode;
-                if (countMessageChannelOpcode > 1)
-                {
-                    TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received many packets CHAT_MSG_CHANNEL from %s", sender->GetName().c_str());
-                    recvData.rfinish();
-                    return;
-                }
-            }
-            else
-            {
-                timerMessageChannelOpcode = pNow;
-                countMessageChannelOpcode = 1;
-            }
-
             if (channel == "")
             {
                 TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received CHAT_MSG_CHANNEL from %s, with : channel = NULL", sender->GetName().c_str());
@@ -740,8 +743,29 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleEmoteOpcode(WorldPacket& recvData)
 {
+    // packet control
+    time_t pNow = GameTime::GetGameTime();
+    if (pNow - timerMessageChannelOpcode < 1)
+    {
+        ++countMessageChannelOpcode;
+        if (countMessageChannelOpcode > 1)
+        {
+            TC_LOG_DEBUG("chatmessage", "CHAT: HandleEmoteOpcode received many packets from %s", GetPlayer()->GetName().c_str());
+            recvData.rfinish();
+            return;
+        }
+    }
+    else
+    {
+        timerMessageChannelOpcode = pNow;
+        countMessageChannelOpcode = 1;
+    }
+
     if (!GetPlayer()->IsAlive() || GetPlayer()->HasUnitState(UNIT_STATE_DIED))
+    {
+        recvData.rfinish();
         return;
+    }
 
     uint32 emote;
     recvData >> emote;
@@ -783,13 +807,35 @@ namespace Trinity
 
 void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 {
+    // packet control
+    time_t pNow = GameTime::GetGameTime();
+    if (pNow - timerMessageChannelOpcode < 1)
+    {
+        ++countMessageChannelOpcode;
+        if (countMessageChannelOpcode > 1)
+        {
+            TC_LOG_DEBUG("chatmessage", "CHAT: HandleTextEmoteOpcode received many packets from %s", GetPlayer()->GetName().c_str());
+            recvData.rfinish();
+            return;
+        }
+    }
+    else
+    {
+        timerMessageChannelOpcode = pNow;
+        countMessageChannelOpcode = 1;
+    }
+
     if (!GetPlayer()->IsAlive())
+    {
+        recvData.rfinish();
         return;
+    }
 
     if (!GetPlayer()->CanSpeak())
     {
         std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime());
         SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+        recvData.rfinish();
         return;
     }
 
@@ -804,7 +850,10 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 
     EmotesTextEntry const* em = sEmotesTextStore.LookupEntry(text_emote);
     if (!em)
+    {
+        recvData.rfinish();
         return;
+    }
 
     uint32 emote_anim = em->textid;
 
@@ -823,28 +872,47 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
             break;
     }
 
-    Unit* unit = ObjectAccessor::GetUnit(*_player, guid);
+    if (Unit* unit = ObjectAccessor::GetUnit(*_player, guid))
+    {
+        CellCoord p = Trinity::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
-    CellCoord p = Trinity::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
+        Cell cell(p);
+        cell.SetNoCreate();
 
-    Cell cell(p);
-    cell.SetNoCreate();
+        Trinity::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
+        Trinity::LocalizedPacketDo<Trinity::EmoteChatBuilder > emote_do(emote_builder);
+        Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::EmoteChatBuilder > > emote_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), emote_do);
+        TypeContainerVisitor<Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::EmoteChatBuilder> >, WorldTypeMapContainer> message(emote_worker);
+        cell.Visit(p, message, *GetPlayer()->GetMap(), *GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 
-    Trinity::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
-    Trinity::LocalizedPacketDo<Trinity::EmoteChatBuilder > emote_do(emote_builder);
-    Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::EmoteChatBuilder > > emote_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), emote_do);
-    TypeContainerVisitor<Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::EmoteChatBuilder> >, WorldTypeMapContainer> message(emote_worker);
-    cell.Visit(p, message, *GetPlayer()->GetMap(), *GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
+        GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE, text_emote, 0, unit);
 
-    GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE, text_emote, 0, unit);
-
-    //Send scripted event call
-    if (unit && unit->GetTypeId() == TYPEID_UNIT && ((Creature*)unit)->AI())
-        ((Creature*)unit)->AI()->ReceiveEmote(GetPlayer(), text_emote);
+        //Send scripted event call
+        if (unit && unit->GetTypeId() == TYPEID_UNIT && ((Creature*)unit)->AI())
+            ((Creature*)unit)->AI()->ReceiveEmote(GetPlayer(), text_emote);
+    }
 }
 
 void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 {
+    // packet control
+    time_t pNow = GameTime::GetGameTime();
+    if (pNow - timerMessageChannelOpcode < 7)
+    {
+        ++countMessageChannelOpcode;
+        if (countMessageChannelOpcode > 1)
+        {
+            TC_LOG_DEBUG("chatmessage", "CHAT: HandleChatIgnoredOpcode received many packets from %s", GetPlayer()->GetName().c_str());
+            recvData.rfinish();
+            return;
+        }
+    }
+    else
+    {
+        timerMessageChannelOpcode = pNow;
+        countMessageChannelOpcode = 1;
+    }
+
     ObjectGuid iguid;
     uint8 unk;
     //TC_LOG_DEBUG("network", "WORLD: Received CMSG_CHAT_IGNORED");
@@ -854,7 +922,10 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 
     Player* player = ObjectAccessor::FindConnectedPlayer(iguid);
     if (!player || !player->GetSession())
+    {
+        recvData.rfinish();
         return;
+    }
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_IGNORED, LANG_UNIVERSAL, _player, _player, GetPlayer()->GetName());
@@ -863,7 +934,25 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleChannelDeclineInvite(WorldPacket &recvPacket)
 {
-    TC_LOG_DEBUG("network", "Opcode %u", recvPacket.GetOpcode());
+    // packet control
+    time_t pNow = GameTime::GetGameTime();
+    if (pNow - timerMessageChannelOpcode < 7)
+    {
+        ++countMessageChannelOpcode;
+        if (countMessageChannelOpcode > 1)
+        {
+            TC_LOG_DEBUG("chatmessage", "CHAT: HandleChatIgnoredOpcode received many packets from %s", GetPlayer()->GetName().c_str());
+            recvPacket.rfinish();
+            return;
+        }
+    }
+    else
+    {
+        timerMessageChannelOpcode = pNow;
+        countMessageChannelOpcode = 1;
+    }
+
+    TC_LOG_DEBUG("chatmessage", "Opcode %u", recvPacket.GetOpcode());
 }
 
 void WorldSession::SendPlayerNotFoundNotice(std::string const& name)
