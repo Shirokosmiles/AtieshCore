@@ -5197,8 +5197,7 @@ void Player::CleanupChannels()
     for (JoinedChannelsList::iterator i = m_channels.begin(); i != m_channels.end(); ++i)
     {
         if ((*i))
-        {
-            m_channels.erase(i);
+        {            
             (*i)->LeaveChannel(this, false);                     // not send to client, not remove from player's channel list
 
             // delete channel if empty
@@ -5212,6 +5211,7 @@ void Player::CleanupChannels()
                         cMgr->LeftChannel((*i)->GetName());
                 }
             }
+            m_channels.erase(i);
         }
     }
     TC_LOG_DEBUG("chat.system", "Player::CleanupChannels: Channels of player '%s' (%s) cleaned up.", GetName().c_str(), GetGUID().ToString().c_str());
