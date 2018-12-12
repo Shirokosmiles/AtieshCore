@@ -97,11 +97,6 @@ Channel* ChannelMgr::GetJoinChannel(uint32 channelId, std::string const& name, A
     }
     else // custom
     {
-        std::wstring channelName;
-        if (!Utf8toWStr(name, channelName))
-            return nullptr;
-
-        //wstrToLower(channelName);
         auto itr = _customChannels.find(name);
         if (itr != _customChannels.end())
             return itr->second;
@@ -134,11 +129,6 @@ Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Playe
     }
     else // custom
     {
-        std::wstring channelName;
-        if (!Utf8toWStr(name, channelName))
-            return nullptr;
-
-        //wstrToLower(channelName);
         auto itr = _customChannels.find(name);
         if (itr != _customChannels.end())
             ret = itr->second;
@@ -161,10 +151,6 @@ Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Playe
 
 void ChannelMgr::LeftChannel(std::string const& name)
 {
-    std::wstring channelName;
-    if (!Utf8toWStr(name, channelName))
-        return;
-
     //wstrToLower(channelName);
     auto itr = _customChannels.find(name);
     if (itr == _customChannels.end())

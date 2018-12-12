@@ -159,7 +159,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         }
     }
 
-    if (channelName.empty() || isdigit(channelName[0]) || (!channelId && !isNormalChannelName(GetPlayer(), channelName)))
+    if (channelName.empty() || isdigit(channelName[0]))
     {
         WorldPacket data(SMSG_CHANNEL_NOTIFY, 1 + channelName.size());
         data << uint8(CHAT_INVALID_NAME_NOTICE) << channelName;
