@@ -230,6 +230,94 @@ bool ChatHandler::isValidText(Player* _player, std::string msg)
     return true;
 }
 
+bool ChatHandler::isValidChannelName(Player* player, std::string name)
+{
+    std::string msg = name;
+    // cut at the first newline or carriage return
+    std::string::size_type pos = msg.find_first_of("\n\r");
+    if (pos == 0)
+        return false;
+    else if (pos != std::string::npos)
+        msg.erase(pos);
+
+    // abort on any sort of nasty character
+    for (uint8 c : msg)
+        if (isNasty(c))
+        {
+            TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", player->GetName().c_str(),
+                player->GetGUID().GetCounter(), uint8(c));
+            return false;
+        }
+
+    // validate utf8
+    if (!utf8::is_valid(msg.begin(), msg.end()))
+    {
+        TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing an invalid UTF8 sequence - blocked", player->GetName().c_str(),
+            player->GetGUID().GetCounter());
+        return false;
+    }
+
+    // collapse multiple spaces into one
+    if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
+    {
+        auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
+        msg.erase(end, msg.end());
+    }
+
+    // second check - strong way
+    if (name.empty())
+        return false;
+
+    if (msg.size() > 255) // second check after utf8 filter, maybe double symbols from utf16
+        return false;
+    wchar_t wstr_buf[MAX_INTERNAL_PLAYER_NAME + 1];
+    size_t wstr_len = MAX_INTERNAL_PLAYER_NAME;
+    if (name.size() > wstr_len)
+        return false;
+
+    if (!Utf8toWStr(name, &wstr_buf[0], wstr_len))
+        return false;
+
+    wstr_buf[0] = wcharToUpper(wstr_buf[0]);
+    for (size_t i = 1; i < wstr_len; ++i)
+        wstr_buf[i] = wcharToLower(wstr_buf[i]);
+    std::string nameCheck = name;
+    if (!WStrToUtf8(wstr_buf, wstr_len, nameCheck))
+        return false;
+
+    std::wstring wname;
+    if (!Utf8toWStr(name, wname))
+        return false;
+
+    // second check - strong way
+    if (wname.empty())
+        return false;
+
+    if (wname.size() > MAX_INTERNAL_PLAYER_NAME)
+        return false;
+
+    uint32 minName = sWorld->getIntConfig(CONFIG_MIN_PLAYER_NAME);
+    if (wname.size() < minName)
+        return false;
+
+    if (!ObjectMgr::isValidStringName(wname, 0))
+        return false;
+
+    wstrToLower(wname);
+    for (size_t i = 2; i < wname.size(); ++i)
+        if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
+            return false;
+
+    // validate hyperlinks
+    if (!Trinity::Hyperlinks::CheckAllLinks(name))
+        return false;
+
+    if (msg.size() > MAX_INTERNAL_PLAYER_NAME) // second check after utf8 filter, maybe double symbols from utf16
+        return false;
+
+    return true;
+}
+
 void ChatHandler::SendSysMessage(const char *str, bool escapeCharacters)
 {
     WorldPacket data;

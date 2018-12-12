@@ -298,7 +298,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_CHANNEL_NOTICE:
         case CHAT_MSG_CHANNEL_NOTICE_USER:
         {
-            if (channel == "")
+            if (channel.empty())
             {
                 TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received CHAT_MSG_CHANNEL from %s, with : channel = NULL", sender->GetName().c_str());
                 recvData.rfinish();
