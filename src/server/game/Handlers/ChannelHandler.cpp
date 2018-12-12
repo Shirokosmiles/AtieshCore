@@ -208,7 +208,10 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
     {
         if (Channel* channel = cMgr->GetChannel(channelId, channelName, GetPlayer(), true, zone))
-            channel->LeaveChannel(GetPlayer(), true);
+        {
+            if (channel->GetPlayerbyGuid(GetPlayer()->GetGUID()))
+                channel->LeaveChannel(GetPlayer(), true);
+        }
 
         if (channelId)
             cMgr->LeftChannel(channelId, zone);
