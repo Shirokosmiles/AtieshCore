@@ -183,8 +183,12 @@ void Channel::CleanOldChannelsInDB()
 
 void Channel::JoinChannel(Player* player, std::string const& pass)
 {
-    if (!player || !player->IsInWorld())
+    if (!player)
+    {
+        TC_LOG_DEBUG("chat.system", "JoinChannel but player = nullptr");
         return;
+    }        
+
     ObjectGuid guid = player->GetGUID();
     if (IsOn(guid))
     {
