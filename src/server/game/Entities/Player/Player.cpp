@@ -5212,7 +5212,6 @@ void Player::CleanupChannels()
                         cMgr->LeftChannel((*i)->GetName());
                 }
             }
-            break;
         }
     }
     TC_LOG_DEBUG("chat.system", "Player::CleanupChannels: Channels of player '%s' (%s) cleaned up.", GetName().c_str(), GetGUID().ToString().c_str());
