@@ -87,6 +87,7 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
 
     if (!channelId && (!channelName.empty() && !ChatHandler(GetPlayer()->GetSession()).isValidChannelName(GetPlayer(), channelName)))
     {
+        TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler 1 return");
         recvPacket.rfinish();
         return;
     }
@@ -96,6 +97,7 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
 
     if (channelName.empty() && !channelId)
     {
+        TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler 2 return");
         recvPacket.rfinish();
         return;
     }
@@ -103,15 +105,18 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetPlayer()->GetZoneId());
     if (channelId)
     {
+        TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler AreaTableEntry");
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(channelId);
         if (!channel)
         {
+            TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler 3 return");
             recvPacket.rfinish();
             return;
         }
 
         if (!zone || !GetPlayer()->CanJoinConstantChannelInZone(channel, zone))
         {
+            TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler 4 return");
             recvPacket.rfinish();
             return;
         }
@@ -121,14 +126,27 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     {
         if (Channel* channel = cMgr->GetChannel(channelId, channelName, GetPlayer(), true, zone))
         {
+            TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler GetChannel");
             if (channel->GetPlayerbyGuid(GetPlayer()->GetGUID()))
+            {
+                TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler GetPlayerbyGuid");
                 channel->LeaveChannel(GetPlayer(), true);
+                TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler LeaveChannel");
+            }
         }
 
         if (channelId)
+        {
+            TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler LeftChannel 1 channelId, zone");
             cMgr->LeftChannel(channelId, zone);
+            TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler LeftChannel 2 channelId, zone");
+        }
         else
+        {
+            TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler LeftChannel 1");
             cMgr->LeftChannel(channelName);
+            TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler LeftChannel 2");
+        }
     }
 
     TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL finished handler all is OK");
