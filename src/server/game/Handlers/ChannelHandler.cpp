@@ -133,6 +133,12 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
     recvPacket >> channelId >> unknown1 >> unknown2 >> channelName >> password;
 
+    if ((!channelId && !isNormalChannelName(GetPlayer(), channelName)) || (password != "" && !isNormalChannelName(GetPlayer(), password)))
+    {
+        recvPacket.rfinish();
+        return;
+    }
+
     TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s",
         GetPlayerInfo().c_str(), channelId, unknown1, unknown2, channelName.c_str(), password.c_str());
 
@@ -247,6 +253,12 @@ void WorldSession::HandleChannelPassword(WorldPacket& recvPacket)
         recvPacket.rfinish();
         return;
     }
+    if (!isNormalChannelName(GetPlayer(), password))
+    {
+        recvPacket.rfinish();
+        return;
+    }
+
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_PASSWORD %s Channel: %s, Password: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), password.c_str());
 
