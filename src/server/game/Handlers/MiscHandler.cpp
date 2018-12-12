@@ -213,7 +213,10 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     {
         ++countWhoOpcode;
         if (countWhoOpcode >= 3)
+        {
+            recvData.rfinish();
             return;
+        }
     }
     else
     {
@@ -238,7 +241,10 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     recvData >> zonesCount;                                 // zones count, client limit = 10 (2.0.10)
 
     if (zonesCount > 10)
-        return;                                             // can't be received from real client or broken packet
+    {
+        recvData.rfinish();
+        return;
+    }                                            // can't be received from real client or broken packet
 
     for (uint32 i = 0; i < zonesCount; ++i)
     {
@@ -251,7 +257,10 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     recvData >> strCount;                                   // user entered strings count, client limit=4 (checked on 2.0.10)
 
     if (strCount > 4)
-        return;                                             // can't be received from real client or broken packet
+    {
+        recvData.rfinish();
+        return;
+    }                                           // can't be received from real client or broken packet
 
     TC_LOG_DEBUG("network", "Minlvl %u, maxlvl %u, name %s, guild %s, racemask %u, classmask %u, zones %u, strings %u", levelMin, levelMax, packetPlayerName.c_str(), packetGuildName.c_str(), racemask, classmask, zonesCount, strCount);
 
@@ -262,7 +271,10 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
         recvData >> temp;                                   // user entered string, it used as universal search pattern(guild+player name)?
 
         if (!Utf8toWStr(temp, str[i]))
-            continue;
+        {
+            recvData.rfinish();
+            return;
+        }
 
         wstrToLower(str[i]);
 
@@ -272,7 +284,10 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     std::wstring wpacketPlayerName;
     std::wstring wpacketGuildName;
     if (!(Utf8toWStr(packetPlayerName, wpacketPlayerName) && Utf8toWStr(packetGuildName, wpacketGuildName)))
+    {
+        recvData.rfinish();
         return;
+    }
 
     wstrToLower(wpacketPlayerName);
     wstrToLower(wpacketGuildName);
