@@ -219,12 +219,24 @@ bool ChatHandler::isValidText(Player* _player, std::string msg)
         msg.erase(end, msg.end());
     }
 
-    // validate hyperlinks
-    if (!Trinity::Hyperlinks::CheckAllLinks(msg))
-        return false;
-
     //}
     if (msg.size() > 255) // second check after utf8 filter, maybe double symbols from utf16
+        return false;
+
+    std::wstring wmsg;
+    if (!Utf8toWStr(msg, wmsg))
+        return false;
+    for (size_t i = 0; i < wmsg.size(); ++i)
+        if (wmsg[i] >= 0x80 && wmsg[i] < 0xC0)
+            return false;
+
+    wstrToLower(wmsg);
+    for (size_t i = 2; i < wmsg.size(); ++i)
+        if (wmsg[i] == wmsg[i - 1] && wmsg[i] == wmsg[i - 2])
+            return false;
+
+    // validate hyperlinks
+    if (!Trinity::Hyperlinks::CheckAllLinks(msg))
         return false;
 
     return true;
@@ -302,6 +314,10 @@ bool ChatHandler::isValidChannelName(Player* player, std::string name)
 
     if (!ObjectMgr::isValidStringName(wname, 0))
         return false;
+
+    for (size_t i = 0; i < wname.size(); ++i)
+        if (wname[i] >= 0x80 && wname[i] < 0xC0)
+            return false;
 
     wstrToLower(wname);
     for (size_t i = 2; i < wname.size(); ++i)
