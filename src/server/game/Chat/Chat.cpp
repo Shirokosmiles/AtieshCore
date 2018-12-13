@@ -227,7 +227,7 @@ bool ChatHandler::isValidText(Player* _player, std::string msg)
     if (!Utf8toWStr(msg, wmsg))
         return false;
     for (size_t i = 0; i < wmsg.size(); ++i)
-        if (wmsg[i] >= 0x80 && wmsg[i] < 0xC0)
+        if (wmsg[i] >= 0x80)
             return false;
 
     wstrToLower(wmsg);
@@ -316,7 +316,7 @@ bool ChatHandler::isValidChannelName(Player* player, std::string name)
         return false;
 
     for (size_t i = 0; i < wname.size(); ++i)
-        if (wname[i] >= 0x80 && wname[i] < 0xC0)
+        if (wname[i] >= 0x80)
         {
             TC_LOG_DEBUG("chat.system", "isValidChannelName : not restricted symbol");
             return false;
