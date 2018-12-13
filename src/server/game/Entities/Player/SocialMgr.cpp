@@ -240,6 +240,8 @@ void SocialMgr::GetFriendInfo(Player* player, ObjectGuid const& friendGUID, Frie
 
 void SocialMgr::SendFriendStatus(Player* player, FriendsResult result, ObjectGuid const& friendGuid, bool broadcast /*= false*/)
 {
+    if (!player)
+        return;
     FriendInfo fi;
     GetFriendInfo(player, friendGuid, fi);
 
