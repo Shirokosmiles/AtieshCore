@@ -137,6 +137,8 @@ inline bool isExtendedLatinCharacter(wchar_t wchar)
         return true;
     if (wchar == 0x1E9E)                                     // LATIN CAPITAL LETTER SHARP S
         return true;
+    if (wchar >= 0x80 && wchar < 0xC0)
+        return false;
     return false;
 }
 
