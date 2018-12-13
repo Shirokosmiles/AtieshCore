@@ -179,6 +179,13 @@ bool normalizePlayerName(std::string& name)
         if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
             return false;
 
+    for (size_t i = 0; i < wname.size(); ++i)
+        if (wname[i] >= 0x80 && wname[i] < 0xC0)
+        {
+            TC_LOG_DEBUG("chat.system", "normalizePlayerName : not restricted symbol");
+            return false;
+        }
+
     return true;
 }
 
