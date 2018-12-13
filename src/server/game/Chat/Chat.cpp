@@ -228,7 +228,10 @@ bool ChatHandler::isValidText(Player* _player, std::string msg)
         return false;
     for (size_t i = 0; i < wmsg.size(); ++i)
         if (wmsg[i] >= 0x80)
+        {
+            TC_LOG_DEBUG("chat.system", "isValidText : not restricted symbol");
             return false;
+        }
 
     wstrToLower(wmsg);
     for (size_t i = 2; i < wmsg.size(); ++i)

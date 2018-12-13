@@ -44,6 +44,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
     if ((!channelId && !ChatHandler(GetPlayer()->GetSession()).isValidChannelName(GetPlayer(), channelName)) || (!password.empty() && !ChatHandler(GetPlayer()->GetSession()).isValidText(GetPlayer(), password)))
     {
+        TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message");
         recvPacket.rfinish();
         return;
     }
