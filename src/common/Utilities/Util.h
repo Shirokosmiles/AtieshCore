@@ -198,7 +198,7 @@ inline bool isNumericOrSpace(wchar_t wchar)
 
 inline bool isNormalSymbol(wchar_t wchar)
 {
-    if (wchar == 0xB9)
+    if (wchar == 0xE2)
         return true;
 
     switch (wchar)
