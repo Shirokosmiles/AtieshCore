@@ -196,12 +196,13 @@ inline bool isNumericOrSpace(wchar_t wchar)
 
 inline bool isNormalSymbol(wchar_t wchar)
 {
-    if (wchar == 0xE2)
+    if (wchar == 0x2116) // ¹
         return true;
 
     switch (wchar)
     {
     case L'!':
+    case L'?':
     case L'.':
     case L'-':
     case L'_':
