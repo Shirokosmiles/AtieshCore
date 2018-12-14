@@ -183,12 +183,6 @@ void Channel::CleanOldChannelsInDB()
 
 void Channel::JoinChannel(Player* player, std::string const& pass)
 {
-    if (!player)
-    {
-        TC_LOG_DEBUG("chat.system", "JoinChannel but player = nullptr");
-        return;
-    }        
-
     ObjectGuid guid = player->GetGUID();
     if (IsOn(guid))
     {
@@ -720,16 +714,9 @@ void Channel::Announce(Player const* player)
     UpdateChannelInDB();
 }
 
-void Channel::Say(ObjectGuid guid, std::string const& checkchannelname, std::string const& what, uint32 lang) const
+void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
 {
     if (what.empty())
-        return;
-
-    if (checkchannelname.empty())
-        return;
-
-    Player* player = ObjectAccessor::FindConnectedPlayer(guid);
-    if (!player || !player->GetSession())
         return;
 
     // TODO: Add proper RBAC check
@@ -757,13 +744,10 @@ void Channel::Say(ObjectGuid guid, std::string const& checkchannelname, std::str
     {
         LocaleConstant localeIdx = sWorld->GetAvailableDbcLocale(locale);
 
-        std::string localname = GetName(localeIdx);
-        if (localname != checkchannelname)
-            localname = checkchannelname;
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), player, player, what, 0, localname);
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), player, player, what, 0, GetName(localeIdx));
         else
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, localname);
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, GetName(localeIdx));
     };
 
     SendToAll(builder, !info.IsModerator() ? guid : ObjectGuid::Empty);

@@ -71,13 +71,13 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
              >> package                                    // 0x00000000
              >> items_count;                               // attached items count
 
-    if (!ChatHandler(GetPlayer()->GetSession()).isValidText(GetPlayer(), receiverName))
+    if (!ObjectMgr::IsValidChannelName(receiverName))
         return;
 
-    if (!ChatHandler(GetPlayer()->GetSession()).isValidText(GetPlayer(), subject))
+    if (!ObjectMgr::IsValidChannelName(subject))
         return;
 
-    if (!ChatHandler(GetPlayer()->GetSession()).isValidText(GetPlayer(), body))
+    if (!ObjectMgr::IsValidChannelText(body))
         return;
 
     if (items_count > MAX_MAIL_ITEMS)                      // client limit

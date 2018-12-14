@@ -198,7 +198,7 @@ class TC_GAME_API Channel
 
         void List(Player const* player) const;
         void Announce(Player const* player);
-        void Say(ObjectGuid guid, std::string const& checkchannelname, std::string const& what, uint32 lang) const;
+        void Say(ObjectGuid guid, std::string const& what, uint32 lang) const;
         void Invite(Player const* player, std::string const& newp);
         void Voice(ObjectGuid guid1, ObjectGuid guid2) const;
         void DeVoice(ObjectGuid guid1, ObjectGuid guid2) const;
@@ -206,12 +206,6 @@ class TC_GAME_API Channel
         void LeaveNotify(ObjectGuid guid) const;                                      // invisible notify
         void SetOwnership(bool ownership) { _ownershipEnabled = ownership; }
         static void CleanOldChannelsInDB();
-
-        bool GetPlayerbyGuid(ObjectGuid guid) const
-        {
-            PlayerContainer::const_iterator itr = _playersStore.find(guid);
-            return itr != _playersStore.end();
-        }
 
     private:
 

@@ -97,12 +97,17 @@ Channel* ChannelMgr::GetJoinChannel(uint32 channelId, std::string const& name, A
     }
     else // custom
     {
-        auto itr = _customChannels.find(name);
+        std::wstring channelName;
+        if (!Utf8toWStr(name, channelName))
+            return nullptr;
+
+        wstrToLower(channelName);
+        auto itr = _customChannels.find(channelName);
         if (itr != _customChannels.end())
             return itr->second;
 
         Channel* newChannel = new Channel(name, _team);
-        _customChannels[name] = newChannel;
+        _customChannels[channelName] = newChannel;
         return newChannel;
     }
 }
@@ -129,7 +134,12 @@ Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Playe
     }
     else // custom
     {
-        auto itr = _customChannels.find(name);
+        std::wstring channelName;
+        if (!Utf8toWStr(name, channelName))
+            return nullptr;
+
+        wstrToLower(channelName);
+        auto itr = _customChannels.find(channelName);
         if (itr != _customChannels.end())
             ret = itr->second;
         else
@@ -151,8 +161,12 @@ Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Playe
 
 void ChannelMgr::LeftChannel(std::string const& name)
 {
-    //wstrToLower(channelName);
-    auto itr = _customChannels.find(name);
+    std::wstring channelName;
+    if (!Utf8toWStr(name, channelName))
+        return;
+
+    wstrToLower(channelName);
+    auto itr = _customChannels.find(channelName);
     if (itr == _customChannels.end())
         return;
 

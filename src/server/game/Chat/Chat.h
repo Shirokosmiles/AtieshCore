@@ -89,8 +89,6 @@ class TC_GAME_API ChatHandler
         void SendGlobalSysMessage(const char *str);
 
         bool hasStringAbbr(char const* name, char const* part);
-        bool isValidText(Player* _player, std::string msg);
-        bool isValidChannelName(Player* _player, std::string msg);
         // function with different implementation for chat/console
         virtual bool isAvailable(ChatCommand const& cmd) const;
         virtual bool IsHumanReadable() const { return true; }

@@ -110,7 +110,7 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!ChatHandler(player->GetSession()).isValidText(player, invitedName))
+    if (!ObjectMgr::IsValidChannelName(invitedName))
         return;
 
     if (player->getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))

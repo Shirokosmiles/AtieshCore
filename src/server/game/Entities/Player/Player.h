@@ -1779,11 +1779,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // Walking data from move packets
         void SetWalkingFlag(bool walkstatus) { m_walking = walkstatus; }
         bool HasWalkingFlag() const { return m_walking; }
-
-        // MuteTime
-        uint32 GetMuteTimer() const { return m_muteTimer; }
-        bool UnderMuteTimer() { return m_muted; }
-        void SetMuteTimer(uint32 timer);
         //End of Custom Systems
 
         void RemoveGhoul();
@@ -2469,7 +2464,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_flyhackTimer;
         uint32 m_mountTimer;
         uint32 m_rootUpdTimer;
-        uint32 m_muteTimer;
         bool   m_ACKmounted;
         bool   m_rootUpd;
         
@@ -2598,7 +2592,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_pvpcap;            // PVP Cap for weekly reward
         bool m_pvpcapReceived;      // PVP Cap for weekly reward was received
         bool m_walking;             // Player walking
-        bool m_muted;
 
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;
