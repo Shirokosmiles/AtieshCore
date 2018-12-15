@@ -491,15 +491,25 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
+    // TODO inspect nessesary it in future? Or only for discordbot
+    bool accountInWhiteMessageControlList = account.Id == 409;
+    bool allowOSXplayers = sWorld->getBoolConfig(CONFIG_ALLOW_OSX_CONNECT);
     // Must be done before WorldSession is created
-    bool wardenActive = sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED);
-    if (wardenActive && account.OS != "Win" && account.OS != "OSX")
+    if (authSession->RealmID == 1 && account.OS == "OSX")
     {
         SendAuthResponseError(AUTH_REJECT);
         TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
         DelayedCloseSocket();
         return;
     }
+
+    if (account.OS != "Win" && (!allowOSXplayers && account.OS == "OSX") && !accountInWhiteMessageControlList)
+    {
+        SendAuthResponseError(AUTH_REJECT);
+        TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
+        DelayedCloseSocket();
+        return;
+    }   
 
     // Check that Key and account name are the same on client and server
     uint32 t = 0;
@@ -597,10 +607,11 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     _authed = true;
     _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
-        account.Expansion, mutetime, account.Locale, account.Recruiter, account.IsRectuiter);
+        account.Expansion, mutetime, account.Locale, account.Recruiter, account.IsRectuiter, accountInWhiteMessageControlList);
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);
 
     // Initialize Warden system only if it is enabled by config
+    bool wardenActive = sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED);
     if (wardenActive)
         _worldSession->InitWarden(&account.SessionKey, account.OS);
 

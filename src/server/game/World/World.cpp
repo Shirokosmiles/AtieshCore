@@ -1464,6 +1464,14 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_PVP_REWARD_MAXCAP]                     = sConfigMgr->GetIntDefault("PVPBonusCapReward.MaxCap", 1500);
     m_int_configs[CONFIG_PVP_REWARD_CAP_FOR_WIN]                = sConfigMgr->GetIntDefault("PVPBonusCapReward.CapChanges.Win", 180);
     m_int_configs[CONFIG_PVP_REWARD_CAP_FOR_LOSE]               = sConfigMgr->GetIntDefault("PVPBonusCapReward.CapChanges.Lose", 60);
+    // OSX connection allow
+    m_bool_configs[CONFIG_ALLOW_OSX_CONNECT]                    = sConfigMgr->GetBoolDefault("RE.OSXPlayers.Enabled", false);
+
+    // Antispam config
+    m_bool_configs[CONFIG_ANTISPAM_ENABLED] = sConfigMgr->GetBoolDefault("Antispam.Mail.Enabled", false);
+    m_int_configs[CONFIG_ANTISPAM_MAIL_TIMER] = sConfigMgr->GetIntDefault("Antispam.Mail.Timer", 3600) * IN_MILLISECONDS;
+    m_int_configs[CONFIG_ANTISPAM_MAIL_COUNT] = sConfigMgr->GetIntDefault("Antispam.Mail.Count", 10);
+
     //End of Custom Systems
 
     // Dungeon finder

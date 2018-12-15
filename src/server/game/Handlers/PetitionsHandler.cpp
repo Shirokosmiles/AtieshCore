@@ -243,6 +243,8 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 
 void WorldSession::SendPetitionSigns(Petition const* petition, Player* sendTo)
 {
+    if (!sendTo || sendTo->GetGuildIdInvited())
+        return;
     SignaturesVector const& signatures = petition->Signatures;
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signatures.size() * 12));
     data << uint64(petition->PetitionGuid);                 // petition guid
@@ -257,6 +259,7 @@ void WorldSession::SendPetitionSigns(Petition const* petition, Player* sendTo)
     }
 
     sendTo->SendDirectMessage(&data);
+    sendTo->SetGuildIdInvited(petition->PetitionGuid.GetCounter());
 }
 
 void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recvData)
@@ -472,6 +475,8 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
         // update for owner if online
         if (Player* owner = ObjectAccessor::FindConnectedPlayer(ownerGuid))
             owner->SendDirectMessage(&data);
+
+        _player->SetGuildIdInvited(0);
         return;
     }
 
@@ -489,6 +494,8 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     // update for owner if online
     if (Player* owner = ObjectAccessor::FindConnectedPlayer(ownerGuid))
         owner->SendDirectMessage(&data);
+
+    _player->SetGuildIdInvited(0);
 }
 
 void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
@@ -510,6 +517,8 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
         data << uint64(_player->GetGUID());
         owner->SendDirectMessage(&data);
     }
+
+    _player->SetGuildIdInvited(0);
 }
 
 void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
