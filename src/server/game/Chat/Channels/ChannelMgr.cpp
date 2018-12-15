@@ -22,10 +22,6 @@
 #include "Player.h"
 #include "World.h"
 #include "WorldSession.h"
-#include "Util.h"
-#include "ObjectMgr.h"
-
-#define MAX_INTERNAL_PLAYER_NAME 15                         // max server internal player name length (> MAX_PLAYER_NAME for support declined names)
 
 ChannelMgr::~ChannelMgr()
 {

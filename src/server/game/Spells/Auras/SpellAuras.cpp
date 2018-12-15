@@ -2624,15 +2624,12 @@ void UnitAura::FillTargetMap(std::unordered_map<Unit*, uint8>& targets, Unit* ca
     // static applications go through spell system first, so we assume they meet conditions
     for (auto const& targetPair : _staticApplications)
     {
-        if (targetPair.first)
-        {
-            Unit* target = ObjectAccessor::GetUnit(*GetUnitOwner(), targetPair.first);
-            if (!target && targetPair.first == GetUnitOwner()->GetGUID())
-                target = GetUnitOwner();
+        Unit* target = ObjectAccessor::GetUnit(*GetUnitOwner(), targetPair.first);
+        if (!target && targetPair.first == GetUnitOwner()->GetGUID())
+            target = GetUnitOwner();
 
-            if (target)
-                targets.emplace(target, targetPair.second);
-        }
+        if (target)
+            targets.emplace(target, targetPair.second);
     }
 
     for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)

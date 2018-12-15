@@ -5181,24 +5181,19 @@ void Player::LeftChannel(Channel* c)
 
 void Player::CleanupChannels()
 {
-    if (!m_channels.empty())
+    while (!m_channels.empty())
     {
-        for (JoinedChannelsList::iterator i = m_channels.begin(); i != m_channels.end(); ++i)
-        {
-            if ((*i))
-            {
-                (*i)->LeaveChannel(this, false);                     // not send to client, not remove from player's channel list
+        Channel* ch = *m_channels.begin();
+        m_channels.erase(m_channels.begin());               // remove from player's channel list
+        ch->LeaveChannel(this, false);                     // not send to client, not remove from player's channel list
 
-                // delete channel if empty
-                if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeam()))
-                {
-                    if ((*i)->IsConstant())
-                        cMgr->LeftChannel((*i)->GetChannelId(), (*i)->GetZoneEntry());
-                    else
-                        cMgr->LeftChannel((*i)->GetName());
-                }
-                m_channels.erase(i);
-            }
+        // delete channel if empty
+        if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeam()))
+        {
+            if (ch->IsConstant())
+                cMgr->LeftChannel(ch->GetChannelId(), ch->GetZoneEntry());
+            else
+                cMgr->LeftChannel(ch->GetName());
         }
     }
     TC_LOG_DEBUG("chat.system", "Player::CleanupChannels: Channels of player '%s' (%s) cleaned up.", GetName().c_str(), GetGUID().ToString().c_str());
@@ -22513,8 +22508,6 @@ inline void BeforeVisibilityDestroy<Creature>(Creature* t, Player* p)
 
 void Player::UpdateVisibilityOf(WorldObject* target)
 {
-    if (!target)
-        return;
     if (HaveAtClient(target))
     {
         if (!CanSeeOrDetect(target, false, true))
@@ -22604,8 +22597,6 @@ void Player::SendInitialVisiblePackets(Unit* target) const
 template<class T>
 void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& visibleNow)
 {
-    if (!target)
-        return;
     if (HaveAtClient(target))
     {
         if (!CanSeeOrDetect(target, false, true))
@@ -24744,8 +24735,6 @@ void Player::StopCastingBindSight() const
 
 void Player::SetViewpoint(WorldObject* target, bool apply)
 {
-    if (!target)
-        return;
     if (apply)
     {
         TC_LOG_DEBUG("maps", "Player::CreateViewpoint: Player '%s' (%s) creates seer (Entry: %u, TypeId: %u).",

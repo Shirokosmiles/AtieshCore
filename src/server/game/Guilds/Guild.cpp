@@ -1584,9 +1584,6 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
     }
 
     Player* player = session->GetPlayer();
-
-    if (!ObjectMgr::IsValidChannelName(name))
-        return;
     // Do not show invitations from ignored players
     if (pInvitee->GetSocial()->HasIgnore(player->GetGUID()))
         return;

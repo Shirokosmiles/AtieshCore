@@ -21,7 +21,6 @@
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "CharacterCache.h"
-#include "Chat.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -104,14 +103,11 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
         player = ObjectAccessor::FindPlayerByName(invitedName);
     }
 
-    if (!player || !player->GetSession())
+    if (!player)
     {
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", invitedName, ERR_ARENA_TEAM_PLAYER_NOT_FOUND_S);
         return;
     }
-
-    if (!ObjectMgr::IsValidChannelName(invitedName))
-        return;
 
     if (player->getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {

@@ -1213,8 +1213,7 @@ void MotionMaster::ClearBaseUnitStates()
 {
     uint32 unitState = 0;
     for (auto itr = _baseUnitStatesMap.begin(); itr != _baseUnitStatesMap.end(); ++itr)
-        if (itr->first)
-            unitState |= itr->first;
+        unitState |= itr->first;
 
     _owner->ClearUnitState(unitState);
     _baseUnitStatesMap.clear();

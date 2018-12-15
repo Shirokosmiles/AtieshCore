@@ -208,22 +208,6 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: Recvd CMSG_WHO Message");
 
-    time_t pNow = GameTime::GetGameTime();
-    if (pNow - timerWhoOpcode < 7)
-    {
-        ++countWhoOpcode;
-        if (countWhoOpcode >= 3)
-        {
-            recvData.rfinish();
-            return;
-        }
-    }
-    else
-    {
-        timerWhoOpcode = pNow;
-        countWhoOpcode = 1;
-    }
-
     uint32 matchCount = 0;
 
     uint32 levelMin, levelMax, racemask, classmask, zonesCount, strCount;
@@ -241,10 +225,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     recvData >> zonesCount;                                 // zones count, client limit = 10 (2.0.10)
 
     if (zonesCount > 10)
-    {
-        recvData.rfinish();
-        return;
-    }                                            // can't be received from real client or broken packet
+        return;                                             // can't be received from real client or broken packet
 
     for (uint32 i = 0; i < zonesCount; ++i)
     {
@@ -257,10 +238,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     recvData >> strCount;                                   // user entered strings count, client limit=4 (checked on 2.0.10)
 
     if (strCount > 4)
-    {
-        recvData.rfinish();
-        return;
-    }                                           // can't be received from real client or broken packet
+        return;                                             // can't be received from real client or broken packet
 
     TC_LOG_DEBUG("network", "Minlvl %u, maxlvl %u, name %s, guild %s, racemask %u, classmask %u, zones %u, strings %u", levelMin, levelMax, packetPlayerName.c_str(), packetGuildName.c_str(), racemask, classmask, zonesCount, strCount);
 
@@ -271,10 +249,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
         recvData >> temp;                                   // user entered string, it used as universal search pattern(guild+player name)?
 
         if (!Utf8toWStr(temp, str[i]))
-        {
-            recvData.rfinish();
-            return;
-        }
+            continue;
 
         wstrToLower(str[i]);
 
@@ -284,10 +259,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     std::wstring wpacketPlayerName;
     std::wstring wpacketGuildName;
     if (!(Utf8toWStr(packetPlayerName, wpacketPlayerName) && Utf8toWStr(packetGuildName, wpacketGuildName)))
-    {
-        recvData.rfinish();
         return;
-    }
 
     wstrToLower(wpacketPlayerName);
     wstrToLower(wpacketGuildName);
@@ -1322,18 +1294,8 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
     uint32 counter, clientTicks;
     recvData >> counter >> clientTicks;
 
-    //TC_LOG_ERROR("network", "CLIENT COUNTER: %u - player %s sent us timesync counter ", counter, _player->GetName().c_str());
-    //TC_LOG_ERROR("network", "SERVER COUNTER: %u - player->m_timeSyncCounter timesync counter : ", _player->m_timeSyncCounter);
-    uint32 servercounter = _player->m_timeSyncCounter;
-    int32 countercheck = _player->m_timeSyncCounter - 1;
-    if (counter != countercheck)
-    {
-        TC_LOG_ERROR("network", "player %s sent us wrong timesync counter : counter from player = %u, nessesary counter = %i, for avoid diff and crash, kicked", _player->GetName().c_str(), counter, countercheck);
-        KickPlayer();        
-        return;
-    }
-    //if (counter != _player->m_timeSyncCounter - 1)
-    //    TC_LOG_DEBUG("network", "Wrong time sync counter from player %s (cheater?)", _player->GetName().c_str());
+    if (counter != _player->m_timeSyncCounter - 1)
+        TC_LOG_DEBUG("network", "Wrong time sync counter from player %s (cheater?)", _player->GetName().c_str());
 
     TC_LOG_DEBUG("network", "Time sync received: counter %u, client ticks %u, time since last sync %u", counter, clientTicks, clientTicks - _player->m_timeSyncClient);
 
@@ -1503,9 +1465,6 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recvData)
     recvData >> guid.ReadAsPacked();
 
     recvData.read_skip<uint32>();                          // unk
-
-    if (_player->GetGUID() != guid)
-        return;
 
     MovementInfo movementInfo;
     movementInfo.guid = guid;

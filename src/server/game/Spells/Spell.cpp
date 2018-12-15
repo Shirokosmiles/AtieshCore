@@ -2534,8 +2534,6 @@ void Spell::TargetInfo::PreprocessTarget(Spell* spell)
 
 void Spell::TargetInfo::DoTargetSpellHit(Spell* spell, uint8 effIndex)
 {
-    if (!TargetGUID)
-        return;
     Unit* unit = spell->m_caster->GetGUID() == TargetGUID ? spell->m_caster->ToUnit() : ObjectAccessor::GetUnit(*spell->m_caster, TargetGUID);
     if (!unit)
         return;

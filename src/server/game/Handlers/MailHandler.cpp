@@ -18,7 +18,6 @@
 #include "WorldSession.h"
 #include "AccountMgr.h"
 #include "CharacterCache.h"
-#include "Chat.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "GameTime.h"
@@ -70,15 +69,6 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
              >> stationery                                 // stationery?
              >> package                                    // 0x00000000
              >> items_count;                               // attached items count
-
-    if (!ObjectMgr::IsValidChannelName(receiverName))
-        return;
-
-    if (!ObjectMgr::IsValidChannelName(subject))
-        return;
-
-    if (!ObjectMgr::IsValidChannelText(body))
-        return;
 
     if (items_count > MAX_MAIL_ITEMS)                      // client limit
     {

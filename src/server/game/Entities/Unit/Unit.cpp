@@ -2862,27 +2862,22 @@ void Unit::_UpdateSpells(uint32 time)
     // m_auraUpdateIterator can be updated in indirect called code at aura remove to skip next planned to update but removed auras
     for (m_auraUpdateIterator = m_ownedAuras.begin(); m_auraUpdateIterator != m_ownedAuras.end();)
     {
-        if (Aura* i_aura = m_auraUpdateIterator->second)
-        {
-            ++m_auraUpdateIterator;                            // need shift to next for allow update if need into aura update
-            i_aura->UpdateOwner(time, this);
-        }
+        Aura* i_aura = m_auraUpdateIterator->second;
+        ++m_auraUpdateIterator;                            // need shift to next for allow update if need into aura update
+        i_aura->UpdateOwner(time, this);
     }
 
     // remove expired auras - do that after updates(used in scripts?)
     for (AuraMap::iterator i = m_ownedAuras.begin(); i != m_ownedAuras.end();)
     {
-        if (i->second)
-        {
-            if (i->second->IsExpired())
-                RemoveOwnedAura(i, AURA_REMOVE_BY_EXPIRE);
-            else
-                ++i;
-        }
+        if (i->second->IsExpired())
+            RemoveOwnedAura(i, AURA_REMOVE_BY_EXPIRE);
+        else
+            ++i;
     }
 
     for (VisibleAuraMap::iterator itr = m_visibleAuras.begin(); itr != m_visibleAuras.end(); ++itr)
-        if (itr->second && itr->second->IsNeedClientUpdate())
+        if (itr->second->IsNeedClientUpdate())
             itr->second->ClientUpdate();
 
     _DeleteRemovedAuras();

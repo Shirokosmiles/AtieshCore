@@ -773,7 +773,7 @@ class spell_warl_haunt : public SpellScriptLoader
             {
                 if (Aura* aura = GetHitAura())
                     if (AuraEffect* aurEff = aura->GetEffect(EFFECT_1))
-                        aurEff->SetAmount(CalculatePct(GetHitDamage(), aurEff->GetAmount()));
+                        aurEff->SetAmount(CalculatePct(aurEff->GetAmount(), GetHitDamage()));
             }
 
             void Register() override
@@ -895,9 +895,6 @@ class spell_warl_life_tap : public SpellScriptLoader
                     AddPct(fmana, aurEff->GetAmount());
                 int32 mana = round(fmana);
 
-                int32 hp = caster->GetHealth();
-                if (base >= hp)
-                    base = hp - 1; // we shouldn't kill warlock)
                 // Shouldn't Appear in Combat Log
                 caster->ModifyHealth(-base);
 

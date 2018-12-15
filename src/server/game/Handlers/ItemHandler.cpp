@@ -312,8 +312,6 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
 // Only _static_ data send in this packet !!!
 void WorldSession::HandleItemQuerySingleOpcode(WorldPackets::Query::QueryItemSingle& query)
 {
-    if (!query.ItemID)
-        return;
     TC_LOG_INFO("network", "STORAGE: Item Query = %u", query.ItemID);
 
     if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(query.ItemID))

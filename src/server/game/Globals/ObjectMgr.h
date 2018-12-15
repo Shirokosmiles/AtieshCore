@@ -845,7 +845,6 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 #define MAX_INTERNAL_PLAYER_NAME 15                         // max server internal player name length (> MAX_PLAYER_NAME for support declined names)
 #define MAX_PET_NAME             12                         // max allowed by client name length
 #define MAX_CHARTER_NAME         24                         // max allowed by client name length
-#define MAX_CHANNEL_NAME         99                         // max allowed by client name length
 
 TC_GAME_API bool normalizePlayerName(std::string& name);
 #define SPAWNGROUP_MAP_UNSET            0xFFFFFFFF
@@ -1442,9 +1441,7 @@ class TC_GAME_API ObjectMgr
         static ResponseCodes CheckPlayerName(std::string const& name, LocaleConstant locale, bool create = false);
         static PetNameInvalidReason CheckPetName(std::string const& name, LocaleConstant locale);
         static bool IsValidCharterName(std::string const& name);
-        static bool IsValidChannelName(std::string const& name);
-        static bool IsValidChannelText(std::string const& name);
-        static bool IsValidityChecks(Player* player, std::string& name);
+
         static bool CheckDeclinedNames(const std::wstring& w_ownname, DeclinedName const& names);
 
         GameTele const* GetGameTele(uint32 id) const

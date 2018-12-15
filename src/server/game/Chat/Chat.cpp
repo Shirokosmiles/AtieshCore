@@ -31,7 +31,6 @@
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
-#include "Hyperlinks.h"
 #include "World.h"
 #include <boost/algorithm/string/replace.hpp>
 

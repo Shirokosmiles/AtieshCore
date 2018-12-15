@@ -2466,14 +2466,14 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_rootUpdTimer;
         bool   m_ACKmounted;
         bool   m_rootUpd;
-        
+
         uint32 m_deathTimer;
         time_t m_deathExpireTime;
 
         uint32 m_WeaponProficiency;
         uint32 m_ArmorProficiency;
         bool m_visiblevanish;
-        bool m_breakablevanish;        
+        bool m_breakablevanish;
         bool m_canParry;
         bool m_canBlock;
         bool m_canTitanGrip;

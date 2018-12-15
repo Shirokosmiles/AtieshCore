@@ -150,8 +150,6 @@ namespace VMAP
 
     void VMapManager2::unloadMap(unsigned int mapId, int x, int y)
     {
-        if (!mapId)
-            return;
         InstanceTreeMap::iterator instanceTree = iInstanceMapTrees.find(mapId);
         if (instanceTree != iInstanceMapTrees.end() && instanceTree->second)
         {

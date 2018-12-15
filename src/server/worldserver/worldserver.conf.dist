@@ -4539,22 +4539,3 @@ PVPBonusCapReward.CapChanges.Lose = 60
 
 #
 ###################################################################################################
-
-###################################################################################################
-#
-# OSX PLAYERS CONNECTION
-#
-#    Description: We can not allowed to connect for players from OSX OS system
-#    Default:     1 - disabled
-#
-#    RE.OSXPlayers.Enabled = 1 - enabled.
-#    RE.OSXPlayers.Enabled = 0 - disabled.
-
-RE.OSXPlayers.Enabled = 0
-
-#
-###################################################################################################
-
-Antispam.Mail.Enabled = 1
-Antispam.Mail.Timer = 3600
-Antispam.Mail.Count = 10
