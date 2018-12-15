@@ -19,8 +19,6 @@
 
 void WorldPackets::Query::QueryCreature::Read()
 {
-    if (_worldPacket.empty())
-        return;
     _worldPacket >> CreatureID;
     _worldPacket >> Guid;
 }
@@ -53,8 +51,6 @@ WorldPacket const* WorldPackets::Query::QueryCreatureResponse::Write()
 
 void WorldPackets::Query::QueryGameObject::Read()
 {
-    if (_worldPacket.empty())
-        return;
     _worldPacket >> GameObjectID;
     _worldPacket >> Guid;
 }
@@ -82,8 +78,6 @@ WorldPacket const* WorldPackets::Query::QueryGameObjectResponse::Write()
 
 void WorldPackets::Query::QueryItemSingle::Read()
 {
-    if (_worldPacket.empty())
-        return;
     _worldPacket >> ItemID;
 }
 
@@ -203,9 +197,6 @@ WorldPacket const* WorldPackets::Query::QueryItemSingleResponse::Write()
 
 void WorldPackets::Query::QuestPOIQuery::Read()
 {
-    if (_worldPacket.empty())
-        return;
-
     _worldPacket >> MissingQuestCount; // quest count, max=25
 
     if (MissingQuestCount <= MAX_QUEST_LOG_SIZE)

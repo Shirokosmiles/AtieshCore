@@ -71,8 +71,6 @@ class TC_SHARED_API ByteBuffer
 
         ByteBuffer(size_t reserve) : _rpos(0), _wpos(0)
         {
-            if (reserve < DEFAULT_SIZE)
-                reserve = DEFAULT_SIZE;
             _storage.reserve(reserve);
         }
 
