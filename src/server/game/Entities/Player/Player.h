@@ -1422,7 +1422,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         /*** MAILED ITEMS SYSTEM ***/
         /*********************************************************/
 
-        uint8 unReadMails;
+        uint32 unReadMails;
         time_t m_nextMailDelivereTime;
 
         typedef std::unordered_map<uint32, Item*> ItemMap;

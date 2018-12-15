@@ -119,6 +119,14 @@ void WorldSession::SendAuctionOwnerNotification(AuctionEntry* auction)
 //this void creates new auction and adds auction to some auctionhouse
 void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 {
+    if (GetPlayer())
+    {
+        if (GetPlayer()->GetMailSize() > 100 )
+            GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
+        recvData.rfinish();
+        return;
+    }
+
     ObjectGuid auctioneer;
     uint32 itemsCount, etime, bid, buyout;
     recvData >> auctioneer;
@@ -427,6 +435,14 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_PLACE_BID");
 
+    if (GetPlayer())
+    {
+        if (GetPlayer()->GetMailSize() > 100)
+            GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
+        recvData.rfinish();
+        return;
+    }
+
     ObjectGuid auctioneer;
     uint32 auctionId;
     uint32 price;
@@ -563,6 +579,14 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_REMOVE_ITEM");
+
+    if (GetPlayer())
+    {
+        if (GetPlayer()->GetMailSize() > 100)
+            GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
+        recvData.rfinish();
+        return;
+    }
 
     ObjectGuid auctioneer;
     uint32 auctionId;
