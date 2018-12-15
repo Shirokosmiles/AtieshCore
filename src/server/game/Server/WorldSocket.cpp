@@ -493,23 +493,17 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     // TODO inspect nessesary it in future? Or only for discordbot
     bool accountInWhiteMessageControlList = account.Id == 409;
-    bool allowOSXplayers = sWorld->getBoolConfig(CONFIG_ALLOW_OSX_CONNECT);
-    // Must be done before WorldSession is created
-    if (authSession->RealmID == 1 && account.OS == "OSX")
+    if (!accountInWhiteMessageControlList)
     {
-        SendAuthResponseError(AUTH_REJECT);
-        TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
-        DelayedCloseSocket();
-        return;
+        bool allowOSXplayers = sWorld->getBoolConfig(CONFIG_ALLOW_OSX_CONNECT);
+        if (account.OS != "Win" && !allowOSXplayers && account.OS == "OSX")
+        {
+            SendAuthResponseError(AUTH_REJECT);
+            TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
+            DelayedCloseSocket();
+            return;
+        }
     }
-
-    if (account.OS != "Win" && (!allowOSXplayers && account.OS == "OSX") && !accountInWhiteMessageControlList)
-    {
-        SendAuthResponseError(AUTH_REJECT);
-        TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
-        DelayedCloseSocket();
-        return;
-    }   
 
     // Check that Key and account name are the same on client and server
     uint32 t = 0;
