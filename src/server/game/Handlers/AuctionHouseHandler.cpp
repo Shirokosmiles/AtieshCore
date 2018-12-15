@@ -119,10 +119,9 @@ void WorldSession::SendAuctionOwnerNotification(AuctionEntry* auction)
 //this void creates new auction and adds auction to some auctionhouse
 void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 {
-    if (GetPlayer())
+    if (GetPlayer() && GetPlayer()->GetMailSize() > 100)
     {
-        if (GetPlayer()->GetMailSize() > 100 )
-            GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
+        GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
         recvData.rfinish();
         return;
     }
@@ -435,10 +434,9 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_PLACE_BID");
 
-    if (GetPlayer())
+    if (GetPlayer() && GetPlayer()->GetMailSize() > 100)
     {
-        if (GetPlayer()->GetMailSize() > 100)
-            GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
+        GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
         recvData.rfinish();
         return;
     }
@@ -580,10 +578,9 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_REMOVE_ITEM");
 
-    if (GetPlayer())
+    if (GetPlayer() && GetPlayer()->GetMailSize() > 100)
     {
-        if (GetPlayer()->GetMailSize() > 100)
-            GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
+        GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
         recvData.rfinish();
         return;
     }
