@@ -1469,7 +1469,7 @@ void World::LoadConfigSettings(bool reload)
 
     // Antispam config
     m_bool_configs[CONFIG_ANTISPAM_ENABLED] = sConfigMgr->GetBoolDefault("Antispam.Mail.Enabled", false);
-    m_int_configs[CONFIG_ANTISPAM_MAIL_TIMER] = sConfigMgr->GetIntDefault("Antispam.Mail.Timer", 3600) * IN_MILLISECONDS;
+    m_int_configs[CONFIG_ANTISPAM_MAIL_TIMER] = sConfigMgr->GetIntDefault("Antispam.Mail.Timer", 3600);
     m_int_configs[CONFIG_ANTISPAM_MAIL_COUNT] = sConfigMgr->GetIntDefault("Antispam.Mail.Count", 10);
 
     //End of Custom Systems
