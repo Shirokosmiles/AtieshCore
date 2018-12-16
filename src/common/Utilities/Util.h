@@ -199,6 +199,9 @@ inline bool isNormalSymbol(wchar_t wchar)
     if (wchar == 0x2116) // ¹
         return true;
 
+    if (wchar == 0x2F) // "/"
+        return true;
+
     switch (wchar)
     {
     case L'!':

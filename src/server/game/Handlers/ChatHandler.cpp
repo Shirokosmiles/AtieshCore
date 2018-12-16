@@ -243,25 +243,28 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
     }
 
-    // Filter for message
-    if (!ObjectMgr::IsValidChannelText(msg))
+    if (!msg.empty())
     {
-        recvData.rfinish();
-        return;
-    }
+        // Filter for message
+        if (!ObjectMgr::IsValidChannelText(msg))
+        {
+            recvData.rfinish();
+            return;
+        }
 
-    // Filter for message
-    if (!ObjectMgr::IsValidityChecks(sender, msg))
-    {
-        recvData.rfinish();
-        return;
-    }
+        // Filter for message
+        if (!ObjectMgr::IsValidityChecks(sender, msg))
+        {
+            recvData.rfinish();
+            return;
+        }
 
-    // validate hyperlinks
-    if (!sender->GetSession()->ValidateHyperlinksAndMaybeKick(msg))
-    {
-        recvData.rfinish();
-        return;
+        // validate hyperlinks
+        if (!sender->GetSession()->ValidateHyperlinksAndMaybeKick(msg))
+        {
+            recvData.rfinish();
+            return;
+        }
     }
 
     // GS Reguest
