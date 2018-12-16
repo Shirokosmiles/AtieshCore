@@ -423,6 +423,19 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
         player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
+
+    if (m->sender) // new receiver
+    {
+        ObjectGuid receiverGuid(HighGuid::Player, m->sender);
+        if (Player* receiver = ObjectAccessor::FindConnectedPlayer(receiverGuid))
+        {
+            if (receiver->GetMailSize() + receiver->GetAuctionLotsCount() > 100)
+            {
+                GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
+                return;
+            }
+        }
+    }
     //we can return mail now
     //so firstly delete the old one
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
