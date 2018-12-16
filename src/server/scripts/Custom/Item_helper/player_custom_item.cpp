@@ -209,7 +209,7 @@ public:
             }
             case 2:
             {
-                AddGossipItemFor(player, 0, "|TInterface\\icons\\spell_frost_wizardmark:25:25:-15:0|tBuy Honor Token - 74 Honor points", GOSSIP_SENDER_MAIN, 24);
+                AddGossipItemFor(player, 0, "|TInterface\\icons\\spell_frost_wizardmark:25:25:-15:0|tBuy Honor Token - 2000 Honor points", GOSSIP_SENDER_MAIN, 24);
                 AddGossipItemFor(player, 0, "|TInterface\\icons\\Inv_chest_chain_07:25:25:-15:0|tBuy Heirloom items", GOSSIP_SENDER_MAIN, 25);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GTS(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 3);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
@@ -1523,7 +1523,7 @@ public:
             }
             case 65:
             {
-                BuyItem(player, 42992, 10);
+                BuyItem(player, 42992, 5);
                 break;
             }
             case 66:
