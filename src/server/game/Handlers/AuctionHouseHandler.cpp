@@ -152,6 +152,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             recvData.rfinish();
             return;
         }
+        TC_LOG_DEBUG("chatmessage", "WORLD: HandleAuctionSellItem : player %s count[i] = %u", _player->GetName().c_str(), count[i]);
     }
 
     recvData >> bid;
@@ -233,6 +234,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         return;
     }
 
+    TC_LOG_DEBUG("chatmessage", "WORLD: HandleAuctionSellItem : player %s finalCount = %u", _player->GetName().c_str(), finalCount);
     // check if there are 2 identical guids, in this case user is most likely cheating
     for (uint32 i = 0; i < itemsCount - 1; ++i)
     {
