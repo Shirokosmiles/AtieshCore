@@ -134,6 +134,7 @@ class TC_GAME_API AuctionHouseObject
 
     void Update();
 
+    void BuildListAllLots(Player* player, uint32& totalcount);
     void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
     void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
     void BuildListAuctionItems(WorldPacket& data, Player* player,

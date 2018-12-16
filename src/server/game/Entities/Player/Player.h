@@ -1779,6 +1779,12 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // Walking data from move packets
         void SetWalkingFlag(bool walkstatus) { m_walking = walkstatus; }
         bool HasWalkingFlag() const { return m_walking; }
+
+        // Auction info
+        void CalculateAuctionLotsCounter();
+        uint32 GetAuctionLotsCount() const { return m_auctionlots; }
+        void AddLotsCount() { ++m_auctionlots; }
+        void RemoveLotsCount() { m_auctionlots - 1 > 0 ? --m_auctionlots : m_auctionlots = 0; }
         //End of Custom Systems
 
         void RemoveGhoul();
@@ -2590,6 +2596,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         time_t m_unsetdate;         // time (unixtime) of unsetdate vip previlegies
         uint32 m_coins;             // Coins for ingame store
         uint32 m_pvpcap;            // PVP Cap for weekly reward
+        uint32 m_auctionlots;       // Auction lots count for all auctions
         bool m_pvpcapReceived;      // PVP Cap for weekly reward was received
         bool m_walking;             // Player walking
 

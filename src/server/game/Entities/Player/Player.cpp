@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "AuctionHouseMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Bag.h"
@@ -283,6 +284,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_coins = 0;
     m_pvpcap = 0;
     m_pvpcapReceived = false;
+    m_auctionlots = 0;
     m_walking = false;
 
     m_swingErrorMsg = 0;
@@ -17948,6 +17950,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
 
     _LoadEquipmentSets(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
 
+    CalculateAuctionLotsCounter();
+
     return true;
 }
 
@@ -24403,6 +24407,22 @@ void Player::RewardPVPCap()
         if (!AddItem(entryreward, count))
             SendItemRetrievalMail(entryreward, count);
     }
+}
+
+void Player::CalculateAuctionLotsCounter()
+{
+    uint32 count = 0;
+    if (AuctionHouseObject* AllianceauctionHouse = sAuctionMgr->GetAuctionsMapByHouseId(AUCTIONHOUSE_ALLIANCE))
+        AllianceauctionHouse->BuildListAllLots(this, count);
+
+    if (AuctionHouseObject* AllianceauctionHouse = sAuctionMgr->GetAuctionsMapByHouseId(AUCTIONHOUSE_HORDE))
+        AllianceauctionHouse->BuildListAllLots(this, count);
+
+    if (AuctionHouseObject* AllianceauctionHouse = sAuctionMgr->GetAuctionsMapByHouseId(AUCTIONHOUSE_NEUTRAL))
+        AllianceauctionHouse->BuildListAllLots(this, count);
+
+    TC_LOG_DEBUG("chatmessage", "Player: CalculateAuctionLotsCounter - Player (%s) has %u lots in all auctions", GetName().c_str(), count);
+    m_auctionlots = count;
 }
 
 void Player::SetUnderACKmount()

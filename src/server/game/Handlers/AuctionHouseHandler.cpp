@@ -119,7 +119,7 @@ void WorldSession::SendAuctionOwnerNotification(AuctionEntry* auction)
 //this void creates new auction and adds auction to some auctionhouse
 void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 {
-    if (GetPlayer() && GetPlayer()->GetMailSize() > 100)
+    if (GetPlayer() && (GetPlayer()->GetMailSize() + GetPlayer()->GetAuctionLotsCount()) > 100)
     {
         GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
         recvData.rfinish();
@@ -130,7 +130,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
     uint32 itemsCount, etime, bid, buyout;
     recvData >> auctioneer;
     recvData >> itemsCount;
-    TC_LOG_DEBUG("chatmessage", "WORLD: HandleAuctionSellItem : player %s itemsCount = %u", _player->GetName().c_str(), itemsCount);
+
     ObjectGuid itemGUIDs[MAX_AUCTION_ITEMS]; // 160 slot = 4x 36 slot bag + backpack 16 slot
     uint32 count[MAX_AUCTION_ITEMS];
     memset(count, 0, sizeof(count));
@@ -152,7 +152,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             recvData.rfinish();
             return;
         }
-        TC_LOG_DEBUG("chatmessage", "WORLD: HandleAuctionSellItem : player %s count[i] = %u", _player->GetName().c_str(), count[i]);
     }
 
     recvData >> bid;
@@ -234,7 +233,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         return;
     }
 
-    TC_LOG_DEBUG("chatmessage", "WORLD: HandleAuctionSellItem : player %s finalCount = %u", _player->GetName().c_str(), finalCount);
     // check if there are 2 identical guids, in this case user is most likely cheating
     for (uint32 i = 0; i < itemsCount - 1; ++i)
     {
@@ -347,6 +345,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         SendAuctionCommandResult(AH->Id, AUCTION_SELL_ITEM, ERR_AUCTION_OK);
 
         GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION, 1);
+        GetPlayer()->AddLotsCount();
     }
     else // Required stack size of auction does not match to current item stack size, clone item and set correct stack size
     {
@@ -428,6 +427,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         SendAuctionCommandResult(AH->Id, AUCTION_SELL_ITEM, ERR_AUCTION_OK);
 
         GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION, 1);
+        GetPlayer()->AddLotsCount();
     }
 }
 
@@ -436,7 +436,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_PLACE_BID");
 
-    if (GetPlayer() && GetPlayer()->GetMailSize() > 100)
+    if (GetPlayer() && (GetPlayer()->GetMailSize() + GetPlayer()->GetAuctionLotsCount()) > 100)
     {
         GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
         recvData.rfinish();
@@ -540,9 +540,11 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
             stmt->setUInt32(0, auction->Id);
             stmt->setUInt32(1, auction->bidder);
             trans->Append(stmt);
+
+            GetPlayer()->AddLotsCount();
         }
 
-        SendAuctionCommandResult(auction->Id, AUCTION_PLACE_BID, ERR_AUCTION_OK, 0);
+        SendAuctionCommandResult(auction->Id, AUCTION_PLACE_BID, ERR_AUCTION_OK, 0);        
     }
     else
     {
@@ -580,7 +582,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_REMOVE_ITEM");
 
-    if (GetPlayer() && GetPlayer()->GetMailSize() > 100)
+    if (GetPlayer() && (GetPlayer()->GetMailSize() + GetPlayer()->GetAuctionLotsCount()) > 100)
     {
         GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
         recvData.rfinish();
@@ -647,7 +649,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 
     //inform player, that auction is removed
     SendAuctionCommandResult(auction->Id, AUCTION_CANCEL, ERR_AUCTION_OK);
-
+    player->RemoveLotsCount();
     // Now remove the auction
 
     player->SaveInventoryAndGoldToDB(trans);
