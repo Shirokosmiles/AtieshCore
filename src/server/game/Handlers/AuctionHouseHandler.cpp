@@ -130,7 +130,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
     uint32 itemsCount, etime, bid, buyout;
     recvData >> auctioneer;
     recvData >> itemsCount;
-
+    TC_LOG_DEBUG("chatmessage", "WORLD: HandleAuctionSellItem : player %s itemsCount = %u", _player->GetName().c_str(), itemsCount);
     ObjectGuid itemGUIDs[MAX_AUCTION_ITEMS]; // 160 slot = 4x 36 slot bag + backpack 16 slot
     uint32 count[MAX_AUCTION_ITEMS];
     memset(count, 0, sizeof(count));
