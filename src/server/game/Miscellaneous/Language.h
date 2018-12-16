@@ -1228,6 +1228,8 @@ enum TrinityStrings
     LANG_PLAYER_VIP_TIME_NEAR_END         = 11121,
     LANG_PLAYER_VIP_TIME_EXPIRED          = 11122,
     LANG_TARGETPLAYER_VIP_TIME_EXIST      = 11123,
+    // Mail antispam
+    LANG_ANTISPAM_ERROR                   = 11124,
 
     // Custom Item
     LANG_ITEM_MSG_ALREADY_ITEM            = 11500,
