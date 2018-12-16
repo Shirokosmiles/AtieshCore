@@ -283,7 +283,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     if (!UpdateAntispamCount())
     {
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
-        SendNotification(GetTrinityString(LANG_ANTISPAM_ERROR));
+        SendNotification(GetTrinityString(LANG_ANTISPAM_ERROR), sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_COUNT));
         return;
     }
 
