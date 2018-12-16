@@ -190,7 +190,13 @@ void CalendarMgr::RemoveEvent(uint64 eventId, ObjectGuid remover)
         // guild events only? check invite status here?
         // When an event is deleted, all invited (accepted/declined? - verify) guildies are notified via in-game mail. (wowwiki)
         if (remover && invite->GetInviteeGUID() != remover)
-            mail.SendMailTo(trans, MailReceiver(invite->GetInviteeGUID().GetCounter()), calendarEvent, MAIL_CHECK_MASK_COPIED);
+        {
+            if (Player* premover = ObjectAccessor::FindConnectedPlayer(invite->GetInviteeGUID()))
+            {
+                if (premover->GetMailSize() + premover->GetAuctionLotsCount() < 100)
+                    mail.SendMailTo(trans, MailReceiver(invite->GetInviteeGUID().GetCounter()), calendarEvent, MAIL_CHECK_MASK_COPIED);
+            }
+        }
 
         delete invite;
     }
