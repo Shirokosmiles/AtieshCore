@@ -1017,6 +1017,35 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         return;
     }
 
+    bool healthstone = false;
+    switch (item->GetEntry())
+    {
+        case 19004:
+        case 19005:
+        case 19006:
+        case 19007:
+        case 19008:
+        case 19009:
+        case 19010:
+        case 19011:
+        case 19012:
+        case 19013:
+        case 22104:
+        case 22105:
+        case 36890:
+        case 36891:
+        case 36893:
+        case 36894:
+            healthstone = true;
+            break;
+    }
+
+    if (healthstone)
+    {
+        _player->SendEquipError(EQUIP_ERR_UNIQUE_CANT_BE_WRAPPED, item, nullptr);
+        return;
+    }
+
     if (item->GetMaxStackCount() != 1)
     {
         _player->SendEquipError(EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED, item, nullptr);
