@@ -27685,3 +27685,10 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 
     return false;
 }
+
+std::string Player::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << Unit::GetDebugInfo();
+    return sstr.str();
+}

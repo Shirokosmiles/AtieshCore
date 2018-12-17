@@ -895,7 +895,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
         {
             Player* he = duel_wasMounted ? victim->GetCharmer()->ToPlayer() : victim->ToPlayer();
 
-            ASSERT(he && he->duel);
+            ASSERT_NODEBUGINFO(he && he->duel);
 
             if (duel_wasMounted) // In this case victim == mount
                 victim->SetHealth(1);
@@ -9516,7 +9516,6 @@ void Unit::SetAI(UnitAI* newAI)
 
 void Unit::ScheduleAIChange()
 {
-    ASSERT(!m_aiLocked, "Attempt to schedule AI change during AI update tick");
     bool const charmed = IsCharmed();
     // if charm is applied, we can't have disabled AI already, and vice versa
     if (charmed)
@@ -9526,15 +9525,20 @@ void Unit::ScheduleAIChange()
 
     if (charmed)
         i_disabledAI = std::move(i_AI);
+    else if (m_aiLocked)
+    {
+        ASSERT(!i_lockedAILifetimeExtension, "Attempt to schedule multiple charm AI changes during one update");
+        i_lockedAILifetimeExtension = std::move(i_AI); // AI needs to live just a bit longer to finish its UpdateAI
+    }
     else
         i_AI.reset();
 }
 
 void Unit::RestoreDisabledAI()
 {
-    ASSERT(!m_aiLocked, "Attempt to restore AI during UpdateAI tick");
     ASSERT((GetTypeId() == TYPEID_PLAYER) || i_disabledAI, "Attempt to restore disabled AI on creature without disabled AI");
     i_AI = std::move(i_disabledAI);
+    i_lockedAILifetimeExtension.reset();
 }
 
 void Unit::AddToWorld()
@@ -13785,4 +13789,15 @@ void Unit::RaidInfoByMe(Unit* victim)
     if (pInstance)
         sWorld->SendWorldText(LANG_GROUP_TEXT_ANNOUNCE_3, Encounters, allEncounters);
     //'|cffff0000Status:|r |cffe6cc80(%u / %u) boss completed|r'
+}
+
+std::string Unit::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << WorldObject::GetDebugInfo() << "\n"
+        << std::boolalpha
+        << "IsAIEnabled: " << IsAIEnabled() << " DeathState: " << std::to_string(getDeathState())
+        << " UnitMovementFlags: " << GetUnitMovementFlags() << " ExtraUnitMovementFlags: " << GetExtraUnitMovementFlags()
+        << " Class: " << std::to_string(getClass());
+    return sstr.str();
 }

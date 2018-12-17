@@ -849,3 +849,10 @@ void Transport::BuildUpdate(UpdateDataMapType& data_map)
 
     ClearUpdateMask(true);
 }
+
+std::string Transport::GetDebugInfo() const
+{
+    std::stringstream sstr;
+    sstr << GameObject::GetDebugInfo();
+    return sstr.str();
+}

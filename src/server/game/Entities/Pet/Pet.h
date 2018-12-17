@@ -150,6 +150,8 @@ class TC_GAME_API Pet : public Guardian
 
         Player* GetOwner() const;
 
+        std::string GetDebugInfo() const override;
+
     protected:
         uint32  m_happinessTimer;
         PetType m_petType;
