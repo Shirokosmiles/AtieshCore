@@ -838,6 +838,13 @@ public:
             return false;
         }
 
+        if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+        {
+            handler->PSendSysMessage("* The specified displayId '%u' doesn't exist", displayId);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         creature->SetDisplayId(displayId);
         creature->SetNativeDisplayId(displayId);
 
