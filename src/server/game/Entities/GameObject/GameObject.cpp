@@ -135,6 +135,7 @@ GameObject::GameObject() : WorldObject(false), MapObject(),
 
     ResetLootMode(); // restore default loot mode
     m_stationaryPosition.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
+    ClearTempSummonsList();
 }
 
 GameObject::~GameObject()
@@ -1547,6 +1548,15 @@ void GameObject::Use(Unit* user)
 
             if (Player* player = user->ToPlayer())
             {
+                if (player->GetMap() != GetMap())
+                    break;
+
+                if (player->GetAreaId() != GetAreaId())
+                    break;
+
+                if (!IsEmptyTempSummonsList())
+                    break;
+
                 if (info->goober.pageId)                    // show page...
                 {
                     WorldPacket data(SMSG_GAMEOBJECT_PAGETEXT, 8);

@@ -20,6 +20,7 @@
 #define TRINITYCORE_TEMPSUMMON_H
 
 #include "Creature.h"
+#include "GameObject.h"
 
 enum PetEntry : uint32
 {
@@ -47,8 +48,12 @@ class TC_GAME_API TempSummon : public Creature
         void SetTempSummonType(TempSummonType type);
         void SaveToDB(uint32 /*mapid*/, uint8 /*spawnMask*/, uint32 /*phaseMask*/) override { }
         Unit* GetSummoner() const;
+        GameObject* GetSummonerGO() const;
+        void AddGOSummonerPointer(GameObject* GOsummoner);
+        void Killed(); // function for instant clear unit from GO tempSummon List (wihout waiting of removing from world)
         Creature* GetSummonerCreatureBase() const;
         ObjectGuid GetSummonerGUID() const { return m_summonerGUID; }
+        ObjectGuid GetSummonerGOGUID() const { return m_summonerGOGUID; }
         TempSummonType GetSummonType() const { return m_type; }
         uint32 GetTimer() const { return m_timer; }
 
@@ -60,6 +65,7 @@ class TC_GAME_API TempSummon : public Creature
         uint32 m_timer;
         uint32 m_lifetime;
         ObjectGuid m_summonerGUID;
+        ObjectGuid m_summonerGOGUID;
 };
 
 class TC_GAME_API Minion : public TempSummon

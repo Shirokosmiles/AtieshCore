@@ -196,6 +196,19 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         }
         void ClearSkillupList() { m_SkillupList.clear(); }
 
+        void AddInTempSummonsList(Unit* unit) { tempSummons.push_back(unit); }
+        void RemoveFromTempSummonsList(Unit* unit) { tempSummons.remove(unit); }
+        bool IsEmptyTempSummonsList() const { return tempSummons.empty(); }
+        bool HasUnitInTempSummonsList(Unit* unit) const
+        {
+            for (std::list<Unit*>::const_iterator i = tempSummons.begin(); i != tempSummons.end(); ++i)
+                if (*i == unit)
+                    return true;
+
+            return false;
+        }
+        void ClearTempSummonsList() { tempSummons.clear(); }
+
         void AddUniqueUse(Player* player);
         void AddUse() { ++m_usetimes; }
 
@@ -303,6 +316,7 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         GOState     m_prevGoState;                          // What state to set whenever resetting
 
         std::list<ObjectGuid::LowType> m_SkillupList;
+        std::list<Unit*> tempSummons;
 
         ObjectGuid m_ritualOwnerGUID;                       // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
         GuidSet m_unique_users;

@@ -40,6 +40,11 @@ Unit* TempSummon::GetSummoner() const
     return m_summonerGUID ? ObjectAccessor::GetUnit(*this, m_summonerGUID) : nullptr;
 }
 
+GameObject* TempSummon::GetSummonerGO() const
+{
+    return m_summonerGOGUID ? ObjectAccessor::GetGameObject(*this, m_summonerGOGUID) : nullptr;
+}
+
 Creature* TempSummon::GetSummonerCreatureBase() const
 {
     return m_summonerGUID ? ObjectAccessor::GetCreature(*this, m_summonerGUID) : nullptr;
@@ -265,10 +270,38 @@ void TempSummon::RemoveFromWorld()
                 if (owner->m_SummonSlot[slot] == GetGUID())
                     owner->m_SummonSlot[slot].Clear();
 
+    if (m_summonerGOGUID)
+        if (GameObject* GO = GetSummonerGO())
+        {
+            GO->RemoveFromTempSummonsList(this);
+            //TC_LOG_ERROR("server", "Unit TempSummon, summoned by GO %s, removed from world", GO->GetName().c_str());
+        }
     //if (GetOwnerGUID())
     //    TC_LOG_ERROR("entities.unit", "Unit %u has owner guid when removed from world", GetEntry());
 
     Creature::RemoveFromWorld();
+}
+
+void TempSummon::AddGOSummonerPointer(GameObject* GOsummoner)
+{
+    if (!GOsummoner)
+        return;
+
+    m_summonerGOGUID = GOsummoner->GetGUID();
+
+    GOsummoner->AddInTempSummonsList(this);
+}
+
+void TempSummon::Killed()
+{
+    if (m_summonerGOGUID)
+        if (GameObject* GO = GetSummonerGO())
+        {
+            GO->RemoveFromTempSummonsList(this);
+            //TC_LOG_ERROR("server", "Unit TempSummon, summoned by GO %s, removed from world", GO->GetName().c_str());
+        }
+
+    m_summonerGOGUID = ObjectGuid::Empty;
 }
 
 std::string TempSummon::GetDebugInfo() const

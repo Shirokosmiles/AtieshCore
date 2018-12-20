@@ -11184,6 +11184,12 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
                 sScriptMgr->OnPlayerKilledByCreature(killerCre, killed);
         }
     }
+
+    if (victim)
+    {
+        if (victim->ToTempSummon())
+            victim->ToTempSummon()->Killed();
+    }
 }
 
 void Unit::SetControlled(bool apply, UnitState state)
