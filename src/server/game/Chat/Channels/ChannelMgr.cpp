@@ -78,7 +78,7 @@ Channel* ChannelMgr::GetJoinChannel(uint32 channelId, std::string const& name, A
     {
         ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
         if (!channelEntry)
-            return;
+            return nullptr;
         uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
         if (channelEntry->flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
             zoneId = 0;
@@ -119,7 +119,7 @@ Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Playe
     {
         ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
         if (!channelEntry)
-            return;
+            return nullptr;
         uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
         if (channelEntry->flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
             zoneId = 0;
