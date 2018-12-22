@@ -1274,10 +1274,15 @@ bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) co
         return true;
 
     PacketCounter& packetCounter = _PacketThrottlingMap[p.GetOpcode()];
-    if (packetCounter.lastReceiveTime != time)
+    if (packetCounter.lastReceiveTime < time)
     {
         packetCounter.lastReceiveTime = time;
         packetCounter.amountCounter = 0;
+    }
+    else if (packetCounter.lastReceiveTime >= time)
+    {
+        TC_LOG_WARN("network", "AntiDOS: packetCounter.lastReceiveTime >= time WTF?!");
+        return false;
     }
 
     // Check if player is flooding some packets
@@ -1328,6 +1333,12 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         // CPU usage sending 2000 packets/second on a 3.70 GHz 4 cores on Win x64
         //                                              [% CPU mysqld]   [%CPU worldserver RelWithDebInfo]
         case CMSG_PLAYER_LOGIN:                         //   0               0.5
+        case CMSG_PLAYER_LOGOUT:
+        case CMSG_LOGOUT_REQUEST:
+        {
+            maxPacketCounterAllowed = 1;
+            break;
+        }
         case CMSG_NAME_QUERY:                           //   0               1
         case CMSG_PET_NAME_QUERY:                       //   0               1
         case CMSG_NPC_TEXT_QUERY:                       //   0               1
@@ -1339,8 +1350,6 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         case MSG_QUERY_NEXT_MAIL_TIME:                  //   0               1
         case CMSG_SETSHEATHED:                          //   0               1
         case MSG_RAID_TARGET_UPDATE:                    //   0               1
-        case CMSG_PLAYER_LOGOUT:                        //   0               1
-        case CMSG_LOGOUT_REQUEST:                       //   0               1
         case CMSG_PET_RENAME:                           //   0               1
         case CMSG_QUESTGIVER_CANCEL:                    //   0               1
         case CMSG_QUESTGIVER_REQUEST_REWARD:            //   0               1
