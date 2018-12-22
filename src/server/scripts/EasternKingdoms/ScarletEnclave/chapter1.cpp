@@ -250,7 +250,7 @@ public:
                 }
                 break;
             case PHASE_ATTACKING:
-                if (!UpdateVictim())
+                if (!UpdateVictim() || !me->GetVictim())
                     return;
 
                 events.Update(diff);
@@ -561,7 +561,7 @@ public:
 
         void UpdateAI(uint32 uiDiff) override
         {
-            if (!UpdateVictim())
+            if (!UpdateVictim() || !me->GetVictim())
             {
                 if (m_bIsDuelInProgress)
                 {

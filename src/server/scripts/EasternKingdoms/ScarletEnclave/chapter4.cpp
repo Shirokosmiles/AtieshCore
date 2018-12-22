@@ -88,7 +88,7 @@ public:
             else
                 uiStage_timer -= diff;            
 
-            if (!UpdateVictim())
+            if (!UpdateVictim() || !me->GetVictim())
                 return;
 
             DoSpellAttackIfReady(SPELL_BALLISTA_ASSAULT);

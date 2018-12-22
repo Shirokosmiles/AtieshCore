@@ -219,7 +219,7 @@ public:
                     DoCastSelf(SPELL_HOLY_FURY);
             }
 
-            if (!UpdateVictim())
+            if (!UpdateVictim() || !me->GetVictim())
                 return;
 
             if (isMarksman)
@@ -652,7 +652,7 @@ public:
                 } else uiStage_timer -= diff;
             }
 
-            if (!UpdateVictim())
+            if (!UpdateVictim() || !me->GetVictim())
                 return;
 
             DoMeleeAttackIfReady();
