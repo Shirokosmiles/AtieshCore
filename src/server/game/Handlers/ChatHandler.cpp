@@ -55,7 +55,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             if (countMessageChannelOpcode > 1)
             {
                 TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received many packets from %s", GetPlayer()->GetName().c_str());
-                recvData.rfinish();
+                //recvData.rfinish();
                 return;
             }
         }
@@ -73,11 +73,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
 
     Player* sender = GetPlayer();
-    if (!sender || !sender->IsInWorld() || sender->IsBeingTeleported())
-    {
-        recvData.rfinish();
+    if (!sender || sender->IsBeingTeleported() || sender->IsLoading())
         return;
-    }
 
     uint32 type;
     uint32 lang;
