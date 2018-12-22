@@ -1415,7 +1415,7 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         case CMSG_JOIN_CHANNEL:
         case CMSG_LEAVE_CHANNEL:
         {
-            maxPacketCounterAllowed = 2;
+            maxPacketCounterAllowed = 20;
             break;
         }
 
