@@ -117,7 +117,9 @@ void Channel::GetChannelName(std::string& channelName, uint32 channelId, LocaleC
 {
     if (channelId)
     {
-        ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId);
+        ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
+        if (!channelEntry)
+            return;
         if (!(channelEntry->flags & CHANNEL_DBC_FLAG_GLOBAL))
         {
             if (channelEntry->flags & CHANNEL_DBC_FLAG_CITY_ONLY)

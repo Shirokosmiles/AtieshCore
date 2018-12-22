@@ -76,7 +76,9 @@ Channel* ChannelMgr::GetJoinChannel(uint32 channelId, std::string const& name, A
 {
     if (channelId) // builtin
     {
-        ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId);
+        ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
+        if (!channelEntry)
+            return;
         uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
         if (channelEntry->flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
             zoneId = 0;
@@ -115,7 +117,9 @@ Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Playe
 
     if (channelId) // builtin
     {
-        ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId);
+        ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
+        if (!channelEntry)
+            return;
         uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
         if (channelEntry->flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
             zoneId = 0;
@@ -176,7 +180,9 @@ void ChannelMgr::LeftChannel(std::string const& name)
 
 void ChannelMgr::LeftChannel(uint32 channelId, AreaTableEntry const* zoneEntry)
 {
-    ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId);
+    ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
+    if (!channelEntry)
+        return;
     uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
     if (channelEntry->flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
         zoneId = 0;
