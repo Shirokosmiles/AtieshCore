@@ -1396,8 +1396,7 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         case CMSG_READY_FOR_ACCOUNT_DATA_TIMES:         //   0               2.5
         case CMSG_QUESTGIVER_STATUS_MULTIPLE_QUERY:     //   0               2.5
         case CMSG_BEGIN_TRADE:                          //   0               2.5
-        case CMSG_INITIATE_TRADE:                       //   0               3
-        case CMSG_MESSAGECHAT:                          //   0               3.5
+        case CMSG_INITIATE_TRADE:                       //   0               3        
         case CMSG_INSPECT:                              //   0               3.5
         case CMSG_AREA_SPIRIT_HEALER_QUERY:             // not profiled
         case CMSG_STANDSTATECHANGE:                     // not profiled
@@ -1409,6 +1408,14 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
             // "0" is a magic number meaning there's no limit for the opcode.
             // All the opcodes above must cause little CPU usage and no sync/async database queries at all
             maxPacketCounterAllowed = 0;
+            break;
+        }
+
+        case CMSG_MESSAGECHAT:                          //   0               3.5
+        case CMSG_JOIN_CHANNEL:
+        case CMSG_LEAVE_CHANNEL:
+        {
+            maxPacketCounterAllowed = 2;
             break;
         }
 
