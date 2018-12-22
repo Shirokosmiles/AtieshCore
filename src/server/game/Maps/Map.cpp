@@ -1606,7 +1606,7 @@ bool Map::GameObjectRespawnRelocation(GameObject* go, bool diffGridOnly)
 
 bool Map::UnloadGrid(NGridType& ngrid, bool unloadAll)
 {
-    if (!ngrid.GetGridId())
+    if (!ngrid.GetGridId() || !ngrid.isGridObjectDataLoaded())
         return true; // true?
 
     const uint32 x = ngrid.getX();
