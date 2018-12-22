@@ -94,6 +94,9 @@ void CinematicMgr::EndCinematic()
 
 void CinematicMgr::UpdateCinematicLocation(uint32 /*diff*/)
 {
+    if (!player || !player->GetSession())
+        return;
+
     if (m_activeCinematicCameraId == 0 || !m_cinematicCamera || m_cinematicCamera->size() == 0)
         return;
 
