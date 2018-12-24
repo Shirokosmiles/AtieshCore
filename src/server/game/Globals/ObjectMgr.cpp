@@ -8302,7 +8302,7 @@ bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg)
         {
             TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing control character %u - blocked", player->GetName().c_str(),
                 player->GetGUID().GetCounter(), uint32(c));
-            return;
+            return false;
         }
 
     // validate utf8
