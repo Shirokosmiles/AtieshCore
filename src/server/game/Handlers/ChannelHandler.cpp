@@ -36,7 +36,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
     recvPacket >> channelId >> unknown1 >> unknown2 >> channelName >> password;
 
-    if (!channelId)
+    if (!channelName.empty())
     {
         // Filter for message
         if (!ObjectMgr::IsValidityChecks(GetPlayer(), channelName))
@@ -114,7 +114,10 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     }
 
     if (channelName.empty() && !channelId)
+    {
+        recvPacket.rfinish();
         return;
+    }
 
     TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL %s Channel: %s, channelId: %u",
         GetPlayerInfo().c_str(), channelName.c_str(), channelId);
@@ -158,6 +161,22 @@ void WorldSession::HandleChannelList(WorldPacket& recvPacket)
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_LIST started handler");
     std::string channelName;
     recvPacket >> channelName;
+
+    // Filter for message
+    if (!ObjectMgr::IsValidityChecks(GetPlayer(), channelName))
+    {
+        TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_LIST handler bad message from IsValidityChecks");
+        recvPacket.rfinish();
+        return;
+    }
+
+    // Filter for message
+    if (!ObjectMgr::IsValidChannelName(channelName))
+    {
+        TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_LIST handler bad message from IsValidChannelName");
+        recvPacket.rfinish();
+        return;
+    }
 
     TC_LOG_DEBUG("chat.system", "%s %s Channel: %s",
         recvPacket.GetOpcode() == CMSG_CHANNEL_DISPLAY_LIST ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
