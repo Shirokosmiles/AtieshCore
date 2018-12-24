@@ -43,6 +43,37 @@
 #include "WorldPacket.h"
 #include <algorithm>
 
+static void StripInvisibleChars(std::string& str)
+{
+    static std::string const invChars = " \t\7\n";
+
+    size_t wpos = 0;
+
+    bool space = false;
+    for (size_t pos = 0; pos < str.size(); ++pos)
+    {
+        if (invChars.find(str[pos]) != std::string::npos)
+        {
+            if (!space)
+            {
+                str[wpos++] = ' ';
+                space = true;
+            }
+        }
+        else
+        {
+            if (wpos != pos)
+                str[wpos++] = str[pos];
+            else
+                ++wpos;
+            space = false;
+        }
+    }
+
+    if (wpos < str.size())
+        str.erase(wpos, str.size());
+}
+
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
     //recvData.rfinish();
@@ -253,6 +284,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (!msg.empty())
     {
+        // Strip invisible characters for non-addon messages
+        if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING) && lang != LANG_ADDON)
+            StripInvisibleChars(msg);
+
         // Filter for message
         if (!ObjectMgr::IsValidChannelText(msg))
         {
