@@ -289,14 +289,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             StripInvisibleChars(msg);
 
         // Filter for message
-        if (!ObjectMgr::IsValidChannelText(msg))
+        if (!ObjectMgr::IsValidityChecks(sender, msg))
         {
             recvData.rfinish();
             return;
         }
 
         // Filter for message
-        if (!ObjectMgr::IsValidityChecks(sender, msg))
+        if (!ObjectMgr::IsValidChannelText(msg))
         {
             recvData.rfinish();
             return;
@@ -334,14 +334,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     if (!channel.empty() && channel != "")
     {
         // Filter for message
-        if (!ObjectMgr::IsValidChannelName(channel))
+        if (!ObjectMgr::IsValidityChecks(sender, channel))
         {
             recvData.rfinish();
             return;
         }
 
         // Filter for message
-        if (!ObjectMgr::IsValidityChecks(sender, channel))
+        if (!ObjectMgr::IsValidChannelName(channel))
         {
             recvData.rfinish();
             return;
@@ -455,13 +455,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         } 
         case CHAT_MSG_WHISPER:
         {
-            if (!ObjectMgr::IsValidChannelText(to))
-            {
-                SendPlayerNotFoundNotice(to);
-                recvData.rfinish();
-                return;
-            }
-
             if (!normalizePlayerName(to))
             {
                 SendPlayerNotFoundNotice(to);

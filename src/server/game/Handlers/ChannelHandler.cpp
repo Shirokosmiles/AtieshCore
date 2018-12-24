@@ -53,32 +53,25 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     if (!channelName.empty())
     {
         // Filter for message
-        if (!ObjectMgr::IsValidChannelName(channelName))
-        {
-            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from IsValidChannelName");
-            recvPacket.rfinish();
-            return;
-        }
-
-        // Filter for message
         if (!ObjectMgr::IsValidityChecks(GetPlayer(), channelName))
         {
             TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from IsValidityChecks");
             recvPacket.rfinish();
             return;
         }
+
+        // Filter for message
+        if (!ObjectMgr::IsValidChannelName(channelName))
+        {
+            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from IsValidChannelName");
+            recvPacket.rfinish();
+            return;
+        }
+        
     }
 
     if (!password.empty())
     {
-        // Filter for message
-        if (!ObjectMgr::IsValidChannelName(password))
-        {
-            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from password IsValidChannelName");
-            recvPacket.rfinish();
-            return;
-        }
-
         // Filter for message
         if (!ObjectMgr::IsValidityChecks(GetPlayer(), password))
         {
@@ -86,6 +79,14 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
             recvPacket.rfinish();
             return;
         }
+
+        // Filter for message
+        if (!ObjectMgr::IsValidChannelName(password))
+        {
+            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from password IsValidChannelName");
+            recvPacket.rfinish();
+            return;
+        }        
     }
 
     TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s",
