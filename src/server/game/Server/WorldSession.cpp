@@ -1279,9 +1279,9 @@ bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) co
         packetCounter.lastReceiveTime = time;
         packetCounter.amountCounter = 0;
     }
-    else if (packetCounter.lastReceiveTime >= time)
+    else if (packetCounter.lastReceiveTime > time)
     {
-        TC_LOG_WARN("network", "AntiDOS: packetCounter.lastReceiveTime >= time WTF?! Kick!");
+        TC_LOG_WARN("network", "AntiDOS: packetCounter.lastReceiveTime > time WTF?! Kick!");
         Session->KickPlayer();
         return false;
     }
