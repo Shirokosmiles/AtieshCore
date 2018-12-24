@@ -53,17 +53,17 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     if (!channelName.empty())
     {
         // Filter for message
-        if (!ObjectMgr::IsValidityChecks(GetPlayer(), channelName))
+        if (!ObjectMgr::IsValidChannelName(channelName))
         {
-            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from IsValidityChecks");
+            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from IsValidChannelName");
             recvPacket.rfinish();
             return;
         }
 
         // Filter for message
-        if (!ObjectMgr::IsValidChannelName(channelName))
+        if (!ObjectMgr::IsValidityChecks(GetPlayer(), channelName))
         {
-            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from IsValidChannelName");
+            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from IsValidityChecks");
             recvPacket.rfinish();
             return;
         }
@@ -72,17 +72,17 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     if (!password.empty())
     {
         // Filter for message
-        if (!ObjectMgr::IsValidityChecks(GetPlayer(), password))
+        if (!ObjectMgr::IsValidChannelName(password))
         {
-            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from password IsValidityChecks");
+            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from password IsValidChannelName");
             recvPacket.rfinish();
             return;
         }
 
         // Filter for message
-        if (!ObjectMgr::IsValidChannelName(password))
+        if (!ObjectMgr::IsValidityChecks(GetPlayer(), password))
         {
-            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from password IsValidChannelName");
+            TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from password IsValidityChecks");
             recvPacket.rfinish();
             return;
         }
