@@ -45,6 +45,8 @@
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
+    recvData.rfinish();
+    return;
     // packet control
     if (!GetPlayer()->GetSession()->PlayerIsInWhiteMessageControlList())
     {
