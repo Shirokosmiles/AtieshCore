@@ -30,6 +30,13 @@ static size_t const MAX_CHANNEL_PASS_STR = 31;
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 {
     TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL started handler");
+    if (!GetPlayer() || !GetPlayer()->IsInWorld() || GetPlayer()->IsLoading() || GetPlayer()->GetSession()->PlayerLogout())
+    {
+        TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler not in world return");
+        recvPacket.rfinish();
+        return;
+    }
+
     uint32 channelId;
     uint8 unknown1, unknown2;
     std::string channelName, password;
