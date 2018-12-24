@@ -8284,13 +8284,11 @@ bool ObjectMgr::IsValidChannelText(const std::string& name)
     return isValidChatString(wname);
 }
 
-inline bool isNasty(char c)
+inline bool isNasty(uint8 c)
 {
-    if (c < 32) // all of these are control characters
-        return true;
-    if (c == 127) // ascii delete
-        return true;
-    if (c == 255) // non-breaking whitespace
+    if (c == '\t')
+        return false;
+    if (c <= '\037') // ASCII control block
         return true;
     return false;
 }
@@ -8305,13 +8303,13 @@ bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg)
         msg.erase(pos);
 
     // abort on any sort of nasty character
-    for (char c : msg)
+    for (uint8 c : msg)
         if (isNasty(c))
         {
             if (player)
             {
-                TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing control character %u - blocked", player->GetName().c_str(),
-                    player->GetGUID().GetCounter(), uint32(c));
+                TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", player->GetName().c_str(),
+                    player->GetGUID().GetCounter(), uint8(c));
             }
             return false;
         }
