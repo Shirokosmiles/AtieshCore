@@ -144,6 +144,14 @@ bool normalizePlayerName(std::string& name)
     if (name.empty())
         return false;
 
+    // Filter for message
+    if (!ObjectMgr::IsValidityChecks(nullptr, name))
+        return false;
+
+    // Filter for message
+    if (!ObjectMgr::IsValidChannelText(name))
+        return false;    
+
     wchar_t wstr_buf[MAX_INTERNAL_PLAYER_NAME + 1];
     size_t wstr_len = MAX_INTERNAL_PLAYER_NAME;
 
@@ -8300,8 +8308,11 @@ bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg)
     for (char c : msg)
         if (isNasty(c))
         {
-            TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing control character %u - blocked", player->GetName().c_str(),
-                player->GetGUID().GetCounter(), uint32(c));
+            if (player)
+            {
+                TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing control character %u - blocked", player->GetName().c_str(),
+                    player->GetGUID().GetCounter(), uint32(c));
+            }
             return false;
         }
 
