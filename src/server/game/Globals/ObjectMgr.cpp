@@ -8267,7 +8267,7 @@ bool ObjectMgr::IsValidChannelText(const std::string& name)
     if (!Utf8toWStr(name, wname))
         return false;
 
-    if (wname.size() > 255)
+    if (wname.size() > 254)
         return false;
 
     if (wname.size() < 1)
