@@ -8256,6 +8256,9 @@ bool ObjectMgr::IsValidCharterName(const std::string& name)
 
 bool ObjectMgr::IsValidChannelName(const std::string& name)
 {
+    if (name.size() > MAX_CHANNEL_NAME)
+        return false;
+
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
         return false;
@@ -8271,6 +8274,9 @@ bool ObjectMgr::IsValidChannelName(const std::string& name)
 
 bool ObjectMgr::IsValidChannelText(const std::string& name)
 {
+    if (name.size() > 254)
+        return false;
+
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
         return false;
