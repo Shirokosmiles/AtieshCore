@@ -710,6 +710,8 @@ class TC_GAME_API World
         void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = nullptr, uint32 team = 0);
         bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = nullptr, uint32 team = 0);
         void SendZoneText(uint32 zone, const char *text, WorldSession* self = nullptr, uint32 team = 0);
+        bool SendAutoBroadcastMessage(WorldPacket* packet, WorldSession* self = nullptr);
+        void SendAutoBroadcastText(const char *text, WorldSession* self = nullptr);
 
         /// Reset PVP Reward Cap for Online Characters
         void ResetPVPRewardWeeklyCap();

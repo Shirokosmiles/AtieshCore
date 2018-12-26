@@ -2739,6 +2739,33 @@ void World::SendZoneText(uint32 zone, char const* text, WorldSession* self, uint
     SendZoneMessage(zone, &data, self, team);
 }
 
+bool World::SendAutoBroadcastMessage(WorldPacket* packet, WorldSession* self)
+{
+    bool foundPlayerToSend = false;
+    SessionMap::const_iterator itr;
+
+    for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    {
+        if (itr->second &&
+            itr->second->GetPlayer() &&
+            itr->second->GetPlayer()->IsInWorld() &&
+            itr->second != self)
+        {
+            itr->second->SendPacket(packet);
+            foundPlayerToSend = true;
+        }
+    }
+
+    return foundPlayerToSend;
+}
+
+void World::SendAutoBroadcastText(char const* text, WorldSession* self)
+{
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, LANG_UNIVERSAL, nullptr, nullptr, text);
+    SendAutoBroadcastMessage(&data, self);
+}
+
 void World::ResetPVPRewardWeeklyCap()
 {
     SessionMap::const_iterator itr;
@@ -3164,7 +3191,7 @@ void World::SendAutoBroadcast()
     {
         std::ostringstream ss;
         ss << "|cffffff00[|c00077766Autobroadcast|cffffff00]: |cFFF222FF" << msg.c_str() << "|r";
-        sWorld->SendGlobalText(ss.str().c_str(), NULL);
+        sWorld->SendAutoBroadcastText(ss.str().c_str(), NULL);
     }
     else if (abcenter == 1)
     {
