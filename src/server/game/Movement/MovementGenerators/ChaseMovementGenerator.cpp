@@ -226,7 +226,7 @@ bool ChaseMovementGenerator::Update(Unit* owner, uint32 diff)
                 // check dynamic collision
                 bool dcol = owner->GetMap()->getObjectHitPos(owner->GetPhaseMask(), owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 0.5f, x, y, z + 0.5f, x, y, z, -0.5f);
                 // collision occured
-                if (dcol && (z < owner->GetOwner()->GetPositionZ()))
+                if (dcol && owner->GetOwner() && (z < owner->GetOwner()->GetPositionZ()))
                 {
                     // move back a bit
                     x -= CONTACT_DISTANCE * std::cos(owner->GetOrientation());
