@@ -1022,9 +1022,19 @@ void WorldObject::setActive(bool on)
         return;
 
     if (on)
-        map->AddToActive(this);
+    {
+        if (GetTypeId() == TYPEID_UNIT)
+            map->AddToActive(ToCreature());
+        else if (GetTypeId() == TYPEID_DYNAMICOBJECT)
+            map->AddToActive((DynamicObject*)this);
+    }
     else
-        map->RemoveFromActive(this);
+    {
+        if (GetTypeId() == TYPEID_UNIT)
+            map->RemoveFromActive(ToCreature());
+        else if (GetTypeId() == TYPEID_DYNAMICOBJECT)
+            map->RemoveFromActive((DynamicObject*)this);
+    }
 }
 
 void WorldObject::SetFarVisible(bool on)
