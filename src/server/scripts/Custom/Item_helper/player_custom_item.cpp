@@ -188,7 +188,6 @@ public:
         std::string rep   = GTS(LANG_ITEM_RATES_REP);
         std::string gold  = GTS(LANG_ITEM_RATES_GOLD);
         std::string honor = GTS(LANG_ITEM_RATES_HONOR);
-        uint32 trainerentry;
         player->PlayerTalkClass->ClearMenus();
 
         if (sender == GOSSIP_SENDER_MAIN)
@@ -263,43 +262,9 @@ public:
             case 4: // Тренер классов
             {
                 CloseGossipMenuFor(player);
-                switch (player->getClass())
-                {
-                case CLASS_WARRIOR:
-                    trainerentry = 985;
-                    break;
-                case CLASS_PALADIN:
-                    trainerentry = 927;
-                    break;
-                case CLASS_HUNTER:
-                    trainerentry = 987;
-                    break;
-                case CLASS_ROGUE:
-                    trainerentry = 917;
-                    break;
-                case CLASS_PRIEST:
-                    trainerentry = 376;
-                    break;
-                case CLASS_DEATH_KNIGHT:
-                    trainerentry = 28472;
-                    break;
-                case CLASS_SHAMAN:
-                    trainerentry = 986;
-                    break;
-                case CLASS_MAGE:
-                    trainerentry = 328;
-                    break;
-                case CLASS_WARLOCK:
-                    trainerentry = 906;
-                    break;
-                case CLASS_DRUID:
-                    trainerentry = 3033;
-                    break;
-                }
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                 player->PlayerTalkClass->SendCloseGossip();
-                if (trainerentry)
-                    player->GetSession()->SendTrainerList(ObjectGuid::Empty, trainerentry);
+                player->GetSession()->SendTrainerList(nullptr);
                 break;
             }
             case 5:
