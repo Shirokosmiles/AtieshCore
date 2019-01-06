@@ -495,7 +495,6 @@ void Unit::UpdateSplinePosition()
     static uint32 const positionUpdateDelay = 400;
 
     m_movesplineTimer.Reset(positionUpdateDelay);
-
     Movement::Location loc = movespline->ComputePosition();
 
     if (movespline->onTransport)
@@ -1025,7 +1024,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
     }
 
     // Script Hook For CalculateSpellDamageTaken -- Allow scripts to change the Damage post class mitigation calculations
-    sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);   
+    sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);
 
     if (damageInfo->target->UnderCheatDeath())
     {
@@ -10259,9 +10258,8 @@ void Unit::StopMoving()
     if (!IsInWorld() || movespline->Finalized())
         return;
 
-    // Update position now since Stop does not start a new movement that can be updated later    
+    // Update position now since Stop does not start a new movement that can be updated later
     UpdateSplinePosition();
-
     Movement::MoveSplineInit init(this);
     init.Stop();
 }
@@ -11201,36 +11199,36 @@ void Unit::SetControlled(bool apply, UnitState state)
         AddUnitState(state);
         switch (state)
         {
-        case UNIT_STATE_STUNNED:
-            SetStunned(true);
-            CastStop();
-            break;
-        case UNIT_STATE_ROOT:
-            if (!HasUnitState(UNIT_STATE_STUNNED))
-                SetRooted(true);
-            break;
-        case UNIT_STATE_CONFUSED:
-            if (!HasUnitState(UNIT_STATE_STUNNED))
-            {
-                ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-                SendMeleeAttackStop();
-                // SendAutoRepeatCancel ?
-                SetConfused(true);
+            case UNIT_STATE_STUNNED:
+                SetStunned(true);
                 CastStop();
-            }
-            break;
-        case UNIT_STATE_FLEEING:
-            if (!HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_CONFUSED))
-            {
-                ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-                SendMeleeAttackStop();
-                // SendAutoRepeatCancel ?
-                SetFeared(true);
-                CastStop();
-            }
-            break;
-        default:
-            break;
+                break;
+            case UNIT_STATE_ROOT:
+                if (!HasUnitState(UNIT_STATE_STUNNED))
+                    SetRooted(true);
+                break;
+            case UNIT_STATE_CONFUSED:
+                if (!HasUnitState(UNIT_STATE_STUNNED))
+                {
+                    ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
+                    SendMeleeAttackStop();
+                    // SendAutoRepeatCancel ?
+                    SetConfused(true);
+                    CastStop();
+                }
+                break;
+            case UNIT_STATE_FLEEING:
+                if (!HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_CONFUSED))
+                {
+                    ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
+                    SendMeleeAttackStop();
+                    // SendAutoRepeatCancel ?
+                    SetFeared(true);
+                    CastStop();
+                }
+                break;
+            default:
+                break;
         }
 
         if (GetTypeId() == TYPEID_PLAYER)
@@ -11407,7 +11405,6 @@ void Unit::SetFeared(bool apply)
     if (apply)
     {
         StopMoving();
-        //GetMotionMaster()->MovementExpired();
         SetTarget(ObjectGuid::Empty);
 
         Unit* caster = nullptr;
@@ -11444,7 +11441,6 @@ void Unit::SetConfused(bool apply)
     {
         SetTarget(ObjectGuid::Empty);
         StopMoving();
-        //GetMotionMaster()->MovementExpired();
         GetMotionMaster()->MoveConfused();
         if (Player* player = ToPlayer())
             player->SetSkipOnePacketForASH(true);
@@ -12678,12 +12674,6 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
 
     ASSERT(!m_vehicle);
     (void)vehicle->AddPassenger(this, seatId);
-
-    if (Unit* unitv = vehicle->GetBase())
-    {
-        unitv->GetMotionMaster()->Clear();
-        unitv->StopMoving();
-    }
 }
 
 void Unit::ChangeSeat(int8 seatId, bool next)
@@ -12807,13 +12797,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         else
             ToTempSummon()->UnSummon(2000); // Approximation
     }
-
-    if (vehicle)
-        if (Unit* unitv = vehicle->GetBase())
-        {
-            unitv->GetMotionMaster()->Clear();
-            unitv->StopMoving();
-        }
 }
 
 void Unit::BuildMovementPacket(ByteBuffer *data) const

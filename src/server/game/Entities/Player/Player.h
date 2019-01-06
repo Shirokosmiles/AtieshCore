@@ -2458,22 +2458,11 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_zoneUpdateTimer;
         uint32 m_areaUpdateId;
 
-        uint32 m_vanishTimer;
-        uint32 m_breakblevanishTimer;
-        uint32 m_premiumTimer;
-        uint32 m_flyhackTimer;
-        uint32 m_mountTimer;
-        uint32 m_rootUpdTimer;
-        bool   m_ACKmounted;
-        bool   m_rootUpd;
-
         uint32 m_deathTimer;
         time_t m_deathExpireTime;
 
         uint32 m_WeaponProficiency;
         uint32 m_ArmorProficiency;
-        bool m_visiblevanish;
-        bool m_breakablevanish;
         bool m_canParry;
         bool m_canBlock;
         bool m_canTitanGrip;
@@ -2582,17 +2571,42 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool m_bCanDelayTeleport;
         bool m_bHasDelayedTeleport;
 
-        // RE features        
+        /*********************************************************/
+        /***                  RE FEATURES                      ***/
+        /*********************************************************///
+        // Anticheat
         bool m_skipOnePacketForASH; // Used for skip 1 movement packet after charge or blink
         bool m_isjumping;           // Used for jump-opcode in movementhandler
         bool m_canfly;              // Used for access at fly flag - handled restricted access
+        bool m_ACKmounted;
+        bool m_rootUpd;
+        uint32 m_mountTimer;
+        uint32 m_rootUpdTimer;
+        uint32 m_flyhackTimer;
+
+        // Timestamp on client clock of the moment the most recently processed movement packet was SENT by the client
+        uint32 lastMoveClientTimestamp;
+        // Timestamp on server clock of the moment the most recently processed movement packet was RECEIVED from the client
+        uint32 lastMoveServerTimestamp;
+
+        // Vanish
+        uint32 m_vanishTimer;
+        uint32 m_breakblevanishTimer;
+        bool m_visiblevanish;
+        bool m_breakablevanish;
+
+        // VIP
         bool m_vip;                 // Used for VIP func
+        uint32 m_premiumTimer;
+        uint32 m_coins;             // Coins for ingame store        
         time_t m_unsetdate;         // time (unixtime) of unsetdate vip previlegies
-        uint32 m_coins;             // Coins for ingame store
+
+        // others
         uint32 m_pvpcap;            // PVP Cap for weekly reward
         uint32 m_auctionlots;       // Auction lots count for all auctions
         bool m_pvpcapReceived;      // PVP Cap for weekly reward was received
         bool m_walking;             // Player walking
+        //End of RE features
 
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;
@@ -2624,12 +2638,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 m_FakeRace;
         uint8 m_RealRace;
         uint32 m_FakeMorph;
-
-        /* Player Movement fields START*/
-        // Timestamp on client clock of the moment the most recently processed movement packet was SENT by the client
-        uint32 lastMoveClientTimestamp;
-        // Timestamp on server clock of the moment the most recently processed movement packet was RECEIVED from the client
-        uint32 lastMoveServerTimestamp;
 
         WorldLocation _corpseLocation;
 };
