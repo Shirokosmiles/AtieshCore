@@ -4446,7 +4446,7 @@ FLAB.Script.Enabled = 1
 FLAB.Script.MaxChars = 0
 
 #    Description: a count of money ( 500 gold )
-FLAB.Script.BonusMoney = 5000000
+FLAB.Script.BonusMoney = 10000000
 
 #
 ###################################################################################################

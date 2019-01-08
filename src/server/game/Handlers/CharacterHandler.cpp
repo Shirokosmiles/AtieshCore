@@ -978,6 +978,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         }
     }
 
+    uint32 coins = AccountMgr::GetCoins(GetAccountId());
+    pCurrChar->SetCoins(coins);
+
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_START_MONEY)) // moved from firstLogin - now we can set this Flag (512) from DB - characters.at_login
     {
         if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS)) // if enabled plr will take a bonus
@@ -989,6 +992,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
             chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus / GOLD, (moneybonus%GOLD) / SILVER, moneybonus%SILVER);
 
             pCurrChar->ModifyMoney(moneybonus);
+            coins += 40;
+            pCurrChar->SetCoins(coins);
+            AccountMgr::SetCoins(GetAccountId(), coins);
         }
 
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_START_MONEY);
@@ -1003,9 +1009,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
     if (pCurrChar->IsGameMaster())
         SendNotification(LANG_GM_ON);
-
-    uint32 coins = AccountMgr::GetCoins(GetAccountId());
-    pCurrChar->SetCoins(coins);
 
     bool vip = AccountMgr::GetVipStatus(GetAccountId());
     if (vip)
