@@ -4583,7 +4583,9 @@ bool Unit::HasAuraFaireFire() const
         {
             if (spellInfo->Attributes & SPELL_ATTR0_NOT_SHAPESHIFT &&
                 spellInfo->AttributesEx & SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY &&
-                spellInfo->AttributesEx & SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE)
+                spellInfo->AttributesEx & SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE &&
+                spellInfo->AttributesEx2 & SPELL_ATTR2_NOT_NEED_SHAPESHIFT &&
+                spellInfo->AttributesEx6 & SPELL_ATTR6_UNK23)
                 return true;
         }
     }

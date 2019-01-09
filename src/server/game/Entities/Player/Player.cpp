@@ -27067,24 +27067,6 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
             return true;
 
-        Position npos = movementInfo.pos;
-        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_IGNORE_CONTROL_MOVEMENT_ENABLED))
-        {
-            if (HasUnitState(UNIT_STATE_NOT_MOVE) && !UnderACKRootUpd())
-            {
-                bool unrestricted = npos.GetPositionX() != GetPositionX() || npos.GetPositionY() != GetPositionY();
-                if (unrestricted)
-                {
-                    TC_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore controll Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
-                    sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, GetSession()->GetAccountId(), GetName().c_str());
-                    return false;
-                }
-            }
-        }
-
-        if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
-            return true;
-
         if (!IsControlledByPlayer())
             return true;
 
@@ -27101,6 +27083,24 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         }
         else
             return true;
+
+        Position npos = movementInfo.pos;
+        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_IGNORE_CONTROL_MOVEMENT_ENABLED))
+        {
+            if (HasUnitState(UNIT_STATE_NOT_MOVE) && !UnderACKRootUpd())
+            {
+                bool unrestricted = npos.GetPositionX() != GetPositionX() || npos.GetPositionY() != GetPositionY();
+                if (unrestricted)
+                {
+                    TC_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore controll Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+                    sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, GetSession()->GetAccountId(), GetName().c_str());
+                    return false;
+                }
+            }
+        }
+
+        if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
+            return true;        
 
         float distance, movetime, speed, difftime, normaldistance, delay, delaysentrecieve, x, y;
         distance = GetExactDist2d(npos);

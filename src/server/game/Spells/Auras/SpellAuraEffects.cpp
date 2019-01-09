@@ -2243,6 +2243,12 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         if (Creature* creature = target->ToCreature())
             creature->InitializeReactState();
     }
+
+    if (Player* targetPlayer = target->ToPlayer())
+    {
+        targetPlayer->SetUnderACKmount();
+        targetPlayer->SetSkipOnePacketForASH(true);
+    }
 }
 
 void AuraEffect::HandleModUnattackable(AuraApplication const* aurApp, uint8 mode, bool apply) const
