@@ -54,8 +54,7 @@ class instance_pit_of_saron : public InstanceMapScript
 
             void OnPlayerEnter(Player* player) override
             {
-                if (!_teamInInstance)
-                    _teamInInstance = player->GetTeam();
+                _teamInInstance = player->GetTeam();
             }
 
             void OnCreatureCreate(Creature* creature) override

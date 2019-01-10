@@ -47,8 +47,7 @@ class instance_forge_of_souls : public InstanceMapScript
 
             void OnPlayerEnter(Player* player) override
             {
-                if (!teamInInstance)
-                    teamInInstance = player->GetTeam();
+                teamInInstance = player->GetTeam();
             }
 
             void OnCreatureCreate(Creature* creature) override
@@ -63,24 +62,24 @@ class instance_forge_of_souls : public InstanceMapScript
 
                 switch (creature->GetEntry())
                 {
-                case NPC_BRONJAHM:
-                    bronjahm = creature->GetGUID();
-                    break;
-                case NPC_DEVOURER:
-                    devourerOfSouls = creature->GetGUID();
-                    break;
-                case NPC_SYLVANAS_PART1:
-                    if (teamInInstance == ALLIANCE)
-                        creature->UpdateEntry(NPC_JAINA_PART1);
-                    break;
-                case NPC_LORALEN:
-                    if (teamInInstance == ALLIANCE)
-                        creature->UpdateEntry(NPC_ELANDRA);
-                    break;
-                case NPC_KALIRA:
-                    if (teamInInstance == ALLIANCE)
-                        creature->UpdateEntry(NPC_KORELN);
-                    break;
+                    case NPC_BRONJAHM:
+                        bronjahm = creature->GetGUID();
+                        break;
+                    case NPC_DEVOURER:
+                        devourerOfSouls = creature->GetGUID();
+                        break;
+                    case NPC_SYLVANAS_PART1:
+                        if (teamInInstance == ALLIANCE)
+                            creature->UpdateEntry(NPC_JAINA_PART1);
+                        break;
+                    case NPC_LORALEN:
+                        if (teamInInstance == ALLIANCE)
+                            creature->UpdateEntry(NPC_ELANDRA);
+                        break;
+                    case NPC_KALIRA:
+                        if (teamInInstance == ALLIANCE)
+                            creature->UpdateEntry(NPC_KORELN);
+                        break;
                 }
             }
 
