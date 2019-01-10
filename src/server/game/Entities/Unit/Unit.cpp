@@ -11091,6 +11091,11 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
             else
                 creature->AllLootRemovedFromCorpse();
         }
+        else if (Pet* pet = creature->ToPet())
+        {
+            if (pet->HasSpell(55709))
+                pet->CastSpell(pet, 55709);
+        }
 
         // Call KilledUnit for creatures, this needs to be called after the lootable flag is set
         if (attacker && attacker->GetTypeId() == TYPEID_UNIT && attacker->IsAIEnabled())
