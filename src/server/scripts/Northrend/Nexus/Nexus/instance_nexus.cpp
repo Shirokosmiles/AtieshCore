@@ -19,6 +19,7 @@
 #include "ScriptMgr.h"
 #include "Creature.h"
 #include "GameObject.h"
+#include "Group.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "nexus.h"
@@ -40,7 +41,16 @@ class instance_nexus : public InstanceMapScript
 
             void OnPlayerEnter(Player* player) override
             {
-                _teamInInstance = player->GetTeam();
+                if (Group* group = player->GetGroup())
+                {
+                    Player* gleader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
+                    if (gleader)
+                        _teamInInstance = gleader->GetCFSTeam();
+                    else
+                        _teamInInstance = player->GetCFSTeam();
+                }
+                else
+                    _teamInInstance = player->GetCFSTeam();
             }
 
             void OnCreatureCreate(Creature* creature) override

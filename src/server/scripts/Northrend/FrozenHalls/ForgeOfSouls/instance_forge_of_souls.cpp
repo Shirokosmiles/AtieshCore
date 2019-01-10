@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "AreaBoundary.h"
 #include "Creature.h"
+#include "Group.h"
 #include "forge_of_souls.h"
 #include "InstanceScript.h"
 #include "Map.h"
@@ -47,7 +48,16 @@ class instance_forge_of_souls : public InstanceMapScript
 
             void OnPlayerEnter(Player* player) override
             {
-                teamInInstance = player->GetTeam();
+                if (Group* group = player->GetGroup())
+                {
+                    Player* gleader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
+                    if (gleader)
+                        teamInInstance = gleader->GetCFSTeam();
+                    else
+                        teamInInstance = player->GetCFSTeam();
+                }
+                else
+                    teamInInstance = player->GetCFSTeam();
             }
 
             void OnCreatureCreate(Creature* creature) override
@@ -57,7 +67,7 @@ class instance_forge_of_souls : public InstanceMapScript
                     Map::PlayerList const& players = instance->GetPlayers();
                     if (!players.isEmpty())
                         if (Player* player = players.begin()->GetSource())
-                            teamInInstance = player->GetTeam();
+                            teamInInstance = player->GetCFSTeam();
                 }
 
                 switch (creature->GetEntry())

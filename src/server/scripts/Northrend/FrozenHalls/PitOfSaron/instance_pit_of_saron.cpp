@@ -17,7 +17,9 @@
 
 #include "ScriptMgr.h"
 #include "Creature.h"
+#include "Group.h"
 #include "InstanceScript.h"
+#include "Log.h"
 #include "Map.h"
 #include "pit_of_saron.h"
 #include "Player.h"
@@ -54,7 +56,20 @@ class instance_pit_of_saron : public InstanceMapScript
 
             void OnPlayerEnter(Player* player) override
             {
-                _teamInInstance = player->GetTeam();
+                if (Group* group = player->GetGroup())
+                {
+                    Player* gleader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
+                    if (gleader)
+                        _teamInInstance = gleader->GetCFSTeam();
+                    else
+                        _teamInInstance = player->GetCFSTeam();
+                }
+                else
+                    _teamInInstance = player->GetCFSTeam();
+
+                //TC_LOG_ERROR("server", "Pit Of Saron: _teamInInstance = %u", _teamInInstance);
+                //TC_LOG_ERROR("server", "Pit Of Saron: player->GetCFSTeam() = %u", player->GetCFSTeam());
+                //TC_LOG_ERROR("server", "Pit Of Saron: player->GetTeam() = %u", player->GetTeam());
             }
 
             void OnCreatureCreate(Creature* creature) override
@@ -64,7 +79,7 @@ class instance_pit_of_saron : public InstanceMapScript
                     Map::PlayerList const& players = instance->GetPlayers();
                     if (!players.isEmpty())
                         if (Player* player = players.begin()->GetSource())
-                            _teamInInstance = player->GetTeam();
+                            _teamInInstance = player->GetCFSTeam();
                 }
 
                 switch (creature->GetEntry())
@@ -172,7 +187,7 @@ class instance_pit_of_saron : public InstanceMapScript
                     Map::PlayerList const& players = instance->GetPlayers();
                     if (!players.isEmpty())
                         if (Player* player = players.begin()->GetSource())
-                            _teamInInstance = player->GetTeam();
+                            _teamInInstance = player->GetCFSTeam();
                 }
 
                 uint32 entry = data->id;

@@ -23,6 +23,7 @@
 #include "Map.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Group.h"
 #include "PoolMgr.h"
 #include "TemporarySummon.h"
 #include "Transport.h"
@@ -178,7 +179,16 @@ class instance_icecrown_citadel : public InstanceMapScript
 
             void OnPlayerEnter(Player* player) override
             {
-                TeamInInstance = player->GetTeam();
+                if (Group* group = player->GetGroup())
+                {
+                    Player* gleader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
+                    if (gleader)
+                        TeamInInstance = gleader->GetCFSTeam();
+                    else
+                        TeamInInstance = player->GetCFSTeam();
+                }
+                else
+                    TeamInInstance = player->GetCFSTeam();
 
                 if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                     SpawnGunship();
