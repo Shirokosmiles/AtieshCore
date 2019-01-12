@@ -92,11 +92,7 @@ bool ChaseMovementGenerator::Update(Unit* owner, uint32 diff)
 
     // our target might have gone away
     Unit* const target = GetTarget();
-    if (!target)
-        return false;
-
-    // the owner might've selected a different target (feels like we shouldn't check this here...)
-    if (owner->GetVictim() != target)
+    if (!target || !target->IsInWorld())
         return false;
 
     if (owner->IsJumping())

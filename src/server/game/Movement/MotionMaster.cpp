@@ -67,7 +67,7 @@ inline void MovementGeneratorPointerDeleter(MovementGenerator* a)
         delete a;
 }
 
-void MovementGeneratorDeleter::operator()(MovementGenerator * a)
+void MovementGeneratorDeleter::operator()(MovementGenerator* a)
 {
     MovementGeneratorPointerDeleter(a);
 }
