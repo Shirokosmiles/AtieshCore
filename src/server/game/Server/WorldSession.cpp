@@ -309,8 +309,6 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
                         if (!m_playerRecentlyLogout)
                         {
-                            if (packet->GetOpcode() == CMSG_MESSAGECHAT)
-                                break;
                             requeuePackets.push_back(packet);
                             deletePacket = false;
                             TC_LOG_DEBUG("network", "Re-enqueueing packet with opcode %s with with status STATUS_LOGGEDIN. "
@@ -1274,7 +1272,7 @@ bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) co
         return true;
 
     PacketCounter& packetCounter = _PacketThrottlingMap[p.GetOpcode()];
-    if (packetCounter.lastReceiveTime < time)
+    if (packetCounter.lastReceiveTime <= time)
     {
         packetCounter.lastReceiveTime = time;
         packetCounter.amountCounter = 0;
@@ -1334,12 +1332,6 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         // CPU usage sending 2000 packets/second on a 3.70 GHz 4 cores on Win x64
         //                                              [% CPU mysqld]   [%CPU worldserver RelWithDebInfo]
         case CMSG_PLAYER_LOGIN:                         //   0               0.5
-        case CMSG_PLAYER_LOGOUT:
-        case CMSG_LOGOUT_REQUEST:
-        {
-            maxPacketCounterAllowed = 1;
-            break;
-        }
         case CMSG_NAME_QUERY:                           //   0               1
         case CMSG_PET_NAME_QUERY:                       //   0               1
         case CMSG_NPC_TEXT_QUERY:                       //   0               1
@@ -1351,6 +1343,8 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         case MSG_QUERY_NEXT_MAIL_TIME:                  //   0               1
         case CMSG_SETSHEATHED:                          //   0               1
         case MSG_RAID_TARGET_UPDATE:                    //   0               1
+        case CMSG_PLAYER_LOGOUT:                        //   0               1
+        case CMSG_LOGOUT_REQUEST:                       //   0               1
         case CMSG_PET_RENAME:                           //   0               1
         case CMSG_QUESTGIVER_CANCEL:                    //   0               1
         case CMSG_QUESTGIVER_REQUEST_REWARD:            //   0               1
@@ -1408,7 +1402,7 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         case CMSG_READY_FOR_ACCOUNT_DATA_TIMES:         //   0               2.5
         case CMSG_QUESTGIVER_STATUS_MULTIPLE_QUERY:     //   0               2.5
         case CMSG_BEGIN_TRADE:                          //   0               2.5
-        case CMSG_INITIATE_TRADE:                       //   0               3        
+        case CMSG_INITIATE_TRADE:                       //   0               3
         case CMSG_INSPECT:                              //   0               3.5
         case CMSG_AREA_SPIRIT_HEALER_QUERY:             // not profiled
         case CMSG_STANDSTATECHANGE:                     // not profiled
@@ -1425,7 +1419,7 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
 
         case CMSG_MESSAGECHAT:                          //   0               3.5
         {
-            maxPacketCounterAllowed = 2;
+            maxPacketCounterAllowed = 10;
             break;
         }
         case CMSG_JOIN_CHANNEL:

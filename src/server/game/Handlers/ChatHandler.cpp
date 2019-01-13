@@ -45,35 +45,6 @@
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
-    //recvData.rfinish();
-    //return;
-    // packet control
-    if (!GetPlayer()->GetSession()->PlayerIsInWhiteMessageControlList())
-    {
-        time_t pNow = GameTime::GetGameTime();
-        if (pNow - timerMessageChannelOpcode < 1)
-        {
-            ++countMessageChannelOpcode;
-            if (countMessageChannelOpcode > 1)
-            {
-                TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received many packets from %s", GetPlayer()->GetName().c_str());
-                recvData.rfinish();
-
-                if (countMessageChannelOpcode > 3)
-                {
-                    TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received many packets (more then 3) from %s - Kick", GetPlayer()->GetName().c_str());
-                    GetPlayer()->GetSession()->KickPlayer();
-                }
-                return;
-            }
-        }
-        else
-        {
-            timerMessageChannelOpcode = pNow;
-            countMessageChannelOpcode = 1;
-        }
-    }
-
     if (recvData.empty())
     {
         recvData.rfinish();

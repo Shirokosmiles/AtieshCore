@@ -992,9 +992,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
             chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus / GOLD, (moneybonus%GOLD) / SILVER, moneybonus%SILVER);
 
             pCurrChar->ModifyMoney(moneybonus);
-            coins += 40;
-            pCurrChar->SetCoins(coins);
-            AccountMgr::SetCoins(GetAccountId(), coins);
+            //coins += 40;
+            //pCurrChar->SetCoins(coins);
+            //AccountMgr::SetCoins(GetAccountId(), coins);
         }
 
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_START_MONEY);

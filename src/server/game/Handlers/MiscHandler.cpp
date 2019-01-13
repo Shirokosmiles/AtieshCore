@@ -1328,9 +1328,13 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
     int32 countercheck = _player->m_timeSyncCounter - 1;
     if (counter != countercheck)
     {
-        TC_LOG_ERROR("network", "player %s sent us wrong timesync counter : counter from player = %u, nessesary counter = %i, for avoid diff and crash, kicked", _player->GetName().c_str(), counter, countercheck);
-        KickPlayer();        
-        return;
+        TC_LOG_DEBUG("network", "player %s sent us wrong timesync counter : counter from player = %u, nessesary counter = %i, for avoid diff and crash, kicked", _player->GetName().c_str(), counter, countercheck);
+        if (!sWorld->getBoolConfig(CONFIG_TIME_SYNC_COUNTER_CHECK_KICK))
+        {
+            TC_LOG_ERROR("network", "player %s sent us wrong timesync counter : counter from player = %u, nessesary counter = %i, for avoid diff and crash, kicked", _player->GetName().c_str(), counter, countercheck);
+            KickPlayer();
+            return;
+        }
     }
     //if (counter != _player->m_timeSyncCounter - 1)
     //    TC_LOG_DEBUG("network", "Wrong time sync counter from player %s (cheater?)", _player->GetName().c_str());

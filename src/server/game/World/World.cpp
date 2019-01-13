@@ -1403,8 +1403,10 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ASH_KICK_ENABLED]            = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Kick.Enabled", false);
     m_bool_configs[CONFIG_FAKEJUMPER_KICK_ENABLED]     = sConfigMgr->GetBoolDefault("AntiCheats.FakeJumper.Kick.Enabled", false);
     m_bool_configs[CONFIG_FAKEFLYINGMODE_KICK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FakeFlyingmode.Kick.Enabled", false);
+    m_bool_configs[CONFIG_TIME_SYNC_COUNTER_CHECK_KICK] = sConfigMgr->GetBoolDefault("AntiCheats.WrongTimeSyncCounter.Kick.Enabled", false);
     // Anticheat AFH timer
     m_int_configs[CONFIG_ANTICHEAT_FLYHACK_TIMER] = sConfigMgr->GetIntDefault("AntiCheats.FlyHackTimer", 1000);
+
     // VIP system
     m_bool_configs[CONFIG_VIP_DEBUFF]        = sConfigMgr->GetBoolDefault("Config.Vip.Debuff.Command", false);
     m_bool_configs[CONFIG_VIP_BANK]          = sConfigMgr->GetBoolDefault("Config.Vip.Bank.Command", false);

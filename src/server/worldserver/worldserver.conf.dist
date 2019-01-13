@@ -4187,6 +4187,13 @@ AntiCheats.FakeJumper.Kick.Enabled = 1
 
 AntiCheats.FakeFlyingmode.Kick.Enabled = 1
 
+#    AntiCheats.WrongTimeSyncCounter.Kick.Enabled
+#        Description: Enable AntiCheats.WrongTimeSyncCounter Kick when detected
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+AntiCheats.WrongTimeSyncCounter.Kick.Enabled = 0
+
 ###################################################################################################
 #    AntiCheats.FlyHackTimer
 #        Description: Timer for AntiCheat FlyHack check
