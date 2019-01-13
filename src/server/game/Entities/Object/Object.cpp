@@ -3102,7 +3102,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
         return;
 
     // return if the point is already in LoS
-    if (IsWithinLOS(x, y, z))
+    if (!controlZ && IsWithinLOS(x, y, z))
         return;
 
     // remember first point
