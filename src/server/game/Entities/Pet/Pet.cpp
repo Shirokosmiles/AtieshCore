@@ -242,7 +242,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
                                                             // this enables popup window (pet abandon, cancel)
-            SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
+            SetMaxPower(POWER_HAPPINESS, GetCreatePowerValue(POWER_HAPPINESS));
             SetPower(POWER_HAPPINESS, fields[12].GetUInt32());
             break;
         default:
@@ -649,7 +649,7 @@ void Pet::Update(uint32 diff)
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tempspell);
                     float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
 
-                    if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)
+                    if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) <= max_range)
                     {
                         if (tempspellTarget && !GetSpellHistory()->HasGlobalCooldown(spellInfo) && !GetSpellHistory()->HasCooldown(tempspell))
                         {
@@ -882,7 +882,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     if (!Create(guid, map, phaseMask, cinfo->Entry, petId))
         return false;
 
-    SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
+    SetMaxPower(POWER_HAPPINESS, GetCreatePowerValue(POWER_HAPPINESS));
     SetPower(POWER_HAPPINESS, 166500);
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);

@@ -4694,8 +4694,6 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         else
             unitCaster->GetMotionMaster()->MoveCharge(*m_preGeneratedPath, speed);
 
-        unitCaster->AddUnitState(UNIT_STATE_CHARGING);
-
         if (unitCaster->ToPlayer())
             unitCaster->ToPlayer()->SetUnderACKmount();
     }
@@ -4706,7 +4704,6 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER)
             unitCaster->Attack(unitTarget, true);
 
-        unitCaster->ClearUnitState(UNIT_STATE_CHARGING);
         if (unitCaster->ToPlayer())
             unitCaster->ToPlayer()->SetSkipOnePacketForASH(true);
     }

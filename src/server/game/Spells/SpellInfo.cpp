@@ -1269,6 +1269,11 @@ bool SpellInfo::HasInitialAggro() const
     return !(HasAttribute(SPELL_ATTR1_NO_THREAT) || HasAttribute(SPELL_ATTR3_NO_INITIAL_AGGRO));
 }
 
+bool SpellInfo::HasChargeEffect() const
+{
+    return HasAttribute(SPELL_ATTR7_HAS_CHARGE_EFFECT);
+}
+
 WeaponAttackType SpellInfo::GetAttackType() const
 {
     WeaponAttackType result;

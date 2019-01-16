@@ -37,6 +37,7 @@
 #include <iterator>
 
 #include "ChaseMovementGenerator.h"
+#include "ChargeMovementGenerator.h"
 #include "ConfusedMovementGenerator.h"
 #include "FleeingMovementGenerator.h"
 #include "FlightPathMovementGenerator.h"
@@ -695,32 +696,35 @@ void MotionMaster::MoveCharge(float x, float y, float z, float speed /*= SPEED_C
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
         TC_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveCharge: '%s', charging point Id: %u (X: %f, Y: %f, Z: %f)", _owner->GetGUID().ToString().c_str(), id, x, y, z);
-        PointMovementGenerator<Player>* movement = new PointMovementGenerator<Player>(id, x, y, z, generatePath, speed);
-        movement->Priority = MOTION_PRIORITY_HIGHEST;
-        movement->BaseUnitState = UNIT_STATE_CHARGING;
-        Add(movement);
+        Add(new ChargeMovementGenerator<Player>(id, x, y, z, generatePath, speed));
     }
     else
     {
         TC_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveCharge: '%s', charging point Id: %u (X: %f, Y: %f, Z: %f)", _owner->GetGUID().ToString().c_str(), id, x, y, z);
-        PointMovementGenerator<Creature>* movement = new PointMovementGenerator<Creature>(id, x, y, z, generatePath, speed);
-        movement->Priority = MOTION_PRIORITY_HIGHEST;
-        movement->BaseUnitState = UNIT_STATE_CHARGING;
-        Add(movement);
+        Add(new ChargeMovementGenerator<Creature>(id, x, y, z, generatePath, speed));
     }
 }
 
 void MotionMaster::MoveCharge(PathGenerator const& path, float speed /*= SPEED_CHARGE*/)
 {
     G3D::Vector3 dest = path.GetActualEndPosition();
-
-    MoveCharge(dest.x, dest.y, dest.z, speed, EVENT_CHARGE_PREPATH);
+    float x, y, z;
+    x = dest.x;
+    y = dest.y;
+    z = dest.z;
+    uint32 id = EVENT_CHARGE;
 
     // Charge movement is not started when using EVENT_CHARGE_PREPATH
-    Movement::MoveSplineInit init(_owner);
-    init.MovebyPath(path.GetPath());
-    init.SetVelocity(speed);
-    init.Launch();
+    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    {
+        TC_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveCharge: '%s', charging point Id: %u (X: %f, Y: %f, Z: %f) BY PATH", _owner->GetGUID().ToString().c_str(), id, x, y, z);
+        Add(new ChargePathMovementGenerator<Player>(id, x, y, z, path, speed));
+    }
+    else
+    {
+        TC_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveCharge: '%s', charging point Id: %u (X: %f, Y: %f, Z: %f) BY PATH", _owner->GetGUID().ToString().c_str(), id, x, y, z);
+        Add(new ChargePathMovementGenerator<Creature>(id, x, y, z, path, speed));
+    }
 }
 
 void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ)

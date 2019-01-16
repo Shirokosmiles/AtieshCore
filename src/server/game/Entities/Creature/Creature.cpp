@@ -1025,7 +1025,8 @@ void Creature::DoFleeToGetAssistance()
 
 bool Creature::AIM_Destroy()
 {
-    SetAI(nullptr);
+    PopAI();
+    RefreshAI();
     return true;
 }
 
