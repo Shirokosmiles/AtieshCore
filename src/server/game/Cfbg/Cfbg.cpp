@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2016 RustEmuCore <http://rustemu.org/>
+* Copyright (C) 2016 AtieshCore <https://at-wow.org/>
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 *

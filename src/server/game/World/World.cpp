@@ -1467,7 +1467,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_PVP_REWARD_CAP_FOR_WIN]                = sConfigMgr->GetIntDefault("PVPBonusCapReward.CapChanges.Win", 180);
     m_int_configs[CONFIG_PVP_REWARD_CAP_FOR_LOSE]               = sConfigMgr->GetIntDefault("PVPBonusCapReward.CapChanges.Lose", 60);
     // OSX connection allow
-    m_bool_configs[CONFIG_ALLOW_OSX_CONNECT]                    = sConfigMgr->GetBoolDefault("RE.OSXPlayers.Enabled", false);
+    m_bool_configs[CONFIG_ALLOW_OSX_CONNECT]                    = sConfigMgr->GetBoolDefault("OSXPlayers.Enabled", false);
 
     // Antispam config
     m_bool_configs[CONFIG_ANTISPAM_ENABLED] = sConfigMgr->GetBoolDefault("Antispam.Mail.Enabled", false);

@@ -36,7 +36,7 @@
 #    LOGGING SYSTEM SETTINGS
 #    PACKET SPOOF PROTECTION SETTINGS
 #    METRIC SETTINGS
-#    RUSTEMU CORE FEATURES CONFIG :
+#    ATIESH CORE FEATURES CONFIG :
 #    CheckGameObjectLoS
 #    Vanish
 #    Mail External
@@ -4033,7 +4033,7 @@ Metric.OverallStatusInterval = 1
 
 ###################################################################################################
 #
-# RUSTEMU CORE FEATURES CONFIG
+# ATIESH CORE FEATURES CONFIG
 #
 ###################################################################################################
 
@@ -4557,7 +4557,7 @@ PVPBonusCapReward.CapChanges.Lose = 60
 #    RE.OSXPlayers.Enabled = 1 - enabled.
 #    RE.OSXPlayers.Enabled = 0 - disabled.
 
-RE.OSXPlayers.Enabled = 0
+OSXPlayers.Enabled = 0
 
 #
 ###################################################################################################

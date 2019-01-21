@@ -2572,7 +2572,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool m_bHasDelayedTeleport;
 
         /*********************************************************/
-        /***                  RE FEATURES                      ***/
+        /***                  Atiesh FEATURES                  ***/
         /*********************************************************///
         // Anticheat
         bool m_skipOnePacketForASH; // Used for skip 1 movement packet after charge or blink
@@ -2606,7 +2606,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_auctionlots;       // Auction lots count for all auctions
         bool m_pvpcapReceived;      // PVP Cap for weekly reward was received
         bool m_walking;             // Player walking
-        //End of RE features
+        //End of Atiesh features
 
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;

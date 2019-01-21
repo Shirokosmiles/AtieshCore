@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018+ RustEmu Core <http://www.rustemu.org/>
+ * Copyright (C) 2018+ AtieshCore <https://at-wow.org/>
  * Copyright (C) 2008-2018 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
