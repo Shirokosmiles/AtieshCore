@@ -1139,7 +1139,7 @@ public:
         else
             accountID = target->GetSession()->GetAccountId();
 
-        int32 coinRemoved = atoul(coins);
+        uint32 coinRemoved = atoul(coins);
         if (coinRemoved < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
@@ -1171,7 +1171,7 @@ public:
         }
 
         AccountMgr::SetCoins(accountID, coinCount);
-        handler->PSendSysMessage("The AccountID %u has removed %i coins, and now have a %u coins", accountID, coinRemoved, coinCount);
+        handler->PSendSysMessage("The AccountID %u has removed %u coins, and now have a %u coins", accountID, coinRemoved, coinCount);
         return true;
     }
 };
