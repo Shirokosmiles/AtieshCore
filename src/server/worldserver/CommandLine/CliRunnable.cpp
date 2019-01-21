@@ -103,7 +103,7 @@ void utf8print(void* /*arg*/, char const* str)
 
 void commandFinished(void*, bool /*success*/)
 {
-    printf("RE> ");
+    printf("AtC> ");
     fflush(stdout);
 }
 
@@ -137,7 +137,7 @@ void CliThread()
 
     // print this here the first time
     // later it will be printed after command queue updates
-    printf("RE>");
+    printf("AtC>");
 
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
@@ -152,12 +152,12 @@ void CliThread()
         {
             if (!WStrToUtf8(commandbuf, wcslen(commandbuf), command))
             {
-                printf("RE>");
+                printf("AtC>");
                 continue;
             }
         }
 #else
-        char* command_str = readline("RE>");
+        char* command_str = readline("AtC>");
         rl_bind_key('\t', rl_complete);
         if (command_str != nullptr)
         {
@@ -174,7 +174,7 @@ void CliThread()
                 if (nextLineIndex == 0)
                 {
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
-                    printf("RE>");
+                    printf("AtC>");
 #endif
                     continue;
                 }
