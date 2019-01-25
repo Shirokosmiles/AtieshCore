@@ -1,0 +1,94 @@
+/*
+ * Copyright (C) 2019+ ATieshCore <https://at-wow.org/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "ObjectAccessor.h"
+#include "Player.h"
+#include "Mail.h"
+#include "MailExternalMgr.h"
+#include "Item.h"
+#include "Log.h"
+
+MailExternalMgr* MailExternalMgr::instance()
+{
+    static MailExternalMgr instance;
+    return &instance;
+}
+
+void MailExternalMgr::Update()
+{
+    TC_LOG_INFO("mailexternal", "External Mail> Sending mails in queue...");
+
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_GET_EXTERNAL_MAIL);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    if (!result)
+    {
+        TC_LOG_INFO("mailexternal", "External Mail> No mails in queue...");
+        return;
+    }
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+    do
+    {
+        Field *fields = result->Fetch();
+        uint32 id = fields[0].GetUInt32();
+        ObjectGuid receiver_guid = ObjectGuid(HighGuid::Player, fields[1].GetUInt32());
+        std::string subject = fields[2].GetString();
+        std::string body = fields[3].GetString();
+        uint32 money = fields[4].GetUInt32();
+        uint32 itemId = fields[5].GetUInt32();
+        uint32 itemCount = fields[6].GetUInt32();
+
+        Player *receiver = ObjectAccessor::FindConnectedPlayer(receiver_guid);
+
+        MailDraft mail(subject, body);
+
+        if (money)
+        {
+            TC_LOG_INFO("mailexternal", "External Mail> Adding money");
+            mail.AddMoney(money);
+        }
+
+        if (itemId)
+        {
+            if (!sObjectMgr->GetItemTemplate(itemId))
+            {
+                TC_LOG_INFO("mailexternal", "External Mail> Item entry %u from `mail_external` doesn't exist in DB, skipped.", itemId);
+            }
+            else
+            {
+                TC_LOG_INFO("mailexternal", "External Mail> Adding %u of item with id %u", itemCount, itemId);
+                if (Item* mailItem = Item::CreateItem(itemId, itemCount))
+                {
+                    mailItem->SaveToDB(trans);
+                    mail.AddItem(mailItem);
+                }
+            }
+        }
+
+        mail.SendMailTo(trans, receiver ? receiver : MailReceiver(receiver_guid), MailSender(MAIL_NORMAL, 0, MAIL_STATIONERY_GM), MAIL_CHECK_MASK_RETURNED);
+
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXTERNAL_MAIL);
+        stmt->setUInt32(0, id);
+        trans->Append(stmt);
+
+        TC_LOG_INFO("mailexternal", "External Mail> Mail sent");
+    } while (result->NextRow());
+
+    CharacterDatabase.CommitTransaction(trans);
+    TC_LOG_INFO("mailexternal", "External Mail> All Mails Sent...");
+}

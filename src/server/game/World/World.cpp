@@ -54,6 +54,7 @@
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
+#include "MailExternalMgr.h"
 #include "M2Stores.h"
 #include "MapManager.h"
 #include "Memory.h"
@@ -2146,6 +2147,8 @@ void World::SetInitialWorldSettings()
 
     m_timers[WUPDATE_WHO_LIST].SetInterval(5 * IN_MILLISECONDS); // update who list cache every 5 seconds
 
+    m_timers[WUPDATE_MAIL_EXTERNAL].SetInterval(getIntConfig(CONFIG_EXTERNAL_MAIL_INTERVAL) * IN_MILLISECONDS * MINUTE); // update mail list external every 5 minutes
+
     //to set mailtimer to return mails every day between 4 and 5 am
     //mailtimer is increased when updating auctions
     //one second is 1000 -(tested on win system)
@@ -2157,7 +2160,6 @@ void World::SetInitialWorldSettings()
     mail_timer = ((((localTm.tm_hour + (24 - CleanOldMailsTime)) % 24)* HOUR * IN_MILLISECONDS) / m_timers[WUPDATE_AUCTIONS].GetInterval());
     //1440
     mail_timer_expires = ((DAY * IN_MILLISECONDS) / (m_timers[WUPDATE_AUCTIONS].GetInterval()));
-    extmail_timer.SetInterval(m_int_configs[CONFIG_EXTERNAL_MAIL_INTERVAL] * MINUTE * IN_MILLISECONDS);
     TC_LOG_INFO("server.loading", "Mail timer set to: " UI64FMTD ", mail return is called every " UI64FMTD " minutes", uint64(mail_timer), uint64(mail_timer_expires));
 
     ///- Initialize MapManager
@@ -2374,15 +2376,13 @@ void World::Update(uint32 diff)
 
     if (currentGameTime > m_NextGuildReset)
         ResetGuildCap();
-     // Handle external mail
-    if (sWorld->getBoolConfig(CONFIG_EXTERNAL_MAIL_ENABLE))
+
+    ///- Handle external mail
+    if (m_timers[WUPDATE_MAIL_EXTERNAL].Passed())
     {
-        extmail_timer.Update(diff);
-        if (extmail_timer.Passed())
-        {
-            WorldSession::SendExternalMails();
-            extmail_timer.Reset();
-        }
+        m_timers[WUPDATE_MAIL_EXTERNAL].Reset();
+        if (sWorld->getBoolConfig(CONFIG_EXTERNAL_MAIL_ENABLE))
+            sMailExternalMgr->Update();
     }
 
     /// <ul><li> Handle auctions when the timer has passed
