@@ -30,13 +30,13 @@ MailExternalMgr* MailExternalMgr::instance()
 
 void MailExternalMgr::Update()
 {
-    TC_LOG_INFO("mailexternal", "External Mail> Sending mails in queue...");
+    TC_LOG_DEBUG("mailexternal", "External Mail> Sending mails in queue...");
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_GET_EXTERNAL_MAIL);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
-        TC_LOG_INFO("mailexternal", "External Mail> No mails in queue...");
+        TC_LOG_DEBUG("mailexternal", "External Mail> No mails in queue...");
         return;
     }
 
@@ -59,7 +59,7 @@ void MailExternalMgr::Update()
 
         if (money)
         {
-            TC_LOG_INFO("mailexternal", "External Mail> Adding money");
+            TC_LOG_DEBUG("mailexternal", "External Mail> Adding money");
             mail.AddMoney(money);
         }
 
@@ -67,11 +67,11 @@ void MailExternalMgr::Update()
         {
             if (!sObjectMgr->GetItemTemplate(itemId))
             {
-                TC_LOG_INFO("mailexternal", "External Mail> Item entry %u from `mail_external` doesn't exist in DB, skipped.", itemId);
+                TC_LOG_DEBUG("mailexternal", "External Mail> Item entry %u from `mail_external` doesn't exist in DB, skipped.", itemId);
             }
             else
             {
-                TC_LOG_INFO("mailexternal", "External Mail> Adding %u of item with id %u", itemCount, itemId);
+                TC_LOG_DEBUG("mailexternal", "External Mail> Adding %u of item with id %u", itemCount, itemId);
                 if (Item* mailItem = Item::CreateItem(itemId, itemCount))
                 {
                     mailItem->SaveToDB(trans);
@@ -86,9 +86,9 @@ void MailExternalMgr::Update()
         stmt->setUInt32(0, id);
         trans->Append(stmt);
 
-        TC_LOG_INFO("mailexternal", "External Mail> Mail sent");
+        TC_LOG_DEBUG("mailexternal", "External Mail> Mail sent");
     } while (result->NextRow());
 
     CharacterDatabase.CommitTransaction(trans);
-    TC_LOG_INFO("mailexternal", "External Mail> All Mails Sent...");
+    TC_LOG_DEBUG("mailexternal", "External Mail> All Mails Sent...");
 }

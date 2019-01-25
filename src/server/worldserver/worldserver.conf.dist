@@ -3936,6 +3936,7 @@ Logger.mmaps=3,Server
 #Logger.sql.dev=3,Console Server
 #Logger.sql.driver=3,Console Server
 #Logger.warden=3,Console Server
+#Logger.mailexternal=3,Console Server
 
 #
 #    Log.Async.Enable
