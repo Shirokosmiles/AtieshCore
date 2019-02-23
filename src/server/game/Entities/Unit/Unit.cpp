@@ -13374,7 +13374,7 @@ bool Unit::SetHover(bool enable, bool /*packetOnly = false*/)
     {
         //! No need to check height on ascent
         AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
-        if (hoverHeight)
+        if (hoverHeight && GetPositionZ() - GetFloorZ() < hoverHeight)
             UpdateHeight(GetPositionZ() + hoverHeight);
     }
     else
