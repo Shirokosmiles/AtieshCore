@@ -58,7 +58,9 @@ static void DoMovementInform(Unit* owner, Unit* target)
         AI->MovementInform(CHASE_MOTION_TYPE, target->GetGUID().GetCounter());
 }
 
-ChaseMovementGenerator::ChaseMovementGenerator(Unit* target, Optional<ChaseRange> range, Optional<ChaseAngle> angle) : AbstractFollower(ASSERT_NOTNULL(target)), _range(range), _angle(angle)
+ChaseMovementGenerator::ChaseMovementGenerator(Unit *target, Optional<ChaseRange> range, Optional<ChaseAngle> angle,
+                                               bool walk) : AbstractFollower(ASSERT_NOTNULL(target)), _range(range),
+                                                           _angle(angle), _walk(walk)
 {
     Mode = MOTION_MODE_DEFAULT;
     Priority = MOTION_PRIORITY_NORMAL;
@@ -72,7 +74,7 @@ void ChaseMovementGenerator::Initialize(Unit* owner)
     RemoveFlag(MOVEMENTGENERATOR_FLAG_INITIALIZATION_PENDING | MOVEMENTGENERATOR_FLAG_DEACTIVATED);
     AddFlag(MOVEMENTGENERATOR_FLAG_INITIALIZED);
 
-    owner->SetWalk(false);
+    owner->SetWalk(_walk);
     _path = nullptr;
     _lastTargetPosition.reset();
 }
@@ -245,7 +247,7 @@ bool ChaseMovementGenerator::Update(Unit* owner, uint32 diff)
                 init.MovebyPath(_path->GetPath());
             else
                 init.MoveTo(x, y, z, false, true);
-            init.SetWalk(false);
+            init.SetWalk(_walk);
             init.SetFacing(target);
 
             init.Launch();
