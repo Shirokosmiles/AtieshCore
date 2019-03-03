@@ -58,9 +58,8 @@ static void DoMovementInform(Unit* owner, Unit* target)
         AI->MovementInform(CHASE_MOTION_TYPE, target->GetGUID().GetCounter());
 }
 
-ChaseMovementGenerator::ChaseMovementGenerator(Unit *target, Optional<ChaseRange> range, Optional<ChaseAngle> angle,
-                                               bool walk) : AbstractFollower(ASSERT_NOTNULL(target)), _range(range),
-                                                           _angle(angle), _walk(walk)
+ChaseMovementGenerator::ChaseMovementGenerator(Unit *target, Optional<ChaseRange> range, Optional<ChaseAngle> angle)
+        : AbstractFollower(ASSERT_NOTNULL(target)), _range(range), _angle(angle)
 {
     Mode = MOTION_MODE_DEFAULT;
     Priority = MOTION_PRIORITY_NORMAL;
@@ -69,12 +68,11 @@ ChaseMovementGenerator::ChaseMovementGenerator(Unit *target, Optional<ChaseRange
 }
 ChaseMovementGenerator::~ChaseMovementGenerator() = default;
 
-void ChaseMovementGenerator::Initialize(Unit* owner)
+void ChaseMovementGenerator::Initialize(Unit* /*owner*/)
 {
     RemoveFlag(MOVEMENTGENERATOR_FLAG_INITIALIZATION_PENDING | MOVEMENTGENERATOR_FLAG_DEACTIVATED);
     AddFlag(MOVEMENTGENERATOR_FLAG_INITIALIZED);
 
-    owner->SetWalk(_walk);
     _path = nullptr;
     _lastTargetPosition.reset();
 }
@@ -242,12 +240,29 @@ bool ChaseMovementGenerator::Update(Unit* owner, uint32 diff)
 
             owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
 
+            bool walk = false;
+            if (cOwner && !cOwner->IsPet())
+            {
+                switch (cOwner->GetMovementTemplate().GetChase())
+                {
+                    case CreatureChaseMovementType::CanWalk:
+                        if (owner->IsWalking())
+                            walk = true;
+                        break;
+                    case CreatureChaseMovementType::AlwaysWalk:
+                        walk = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             Movement::MoveSplineInit init(owner);
             if (!forcedestination)
                 init.MovebyPath(_path->GetPath());
             else
                 init.MoveTo(x, y, z, false, true);
-            init.SetWalk(_walk);
+            init.SetWalk(walk);
             init.SetFacing(target);
 
             init.Launch();
