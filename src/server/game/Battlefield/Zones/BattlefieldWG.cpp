@@ -35,6 +35,7 @@
 #include "Unit.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldStatePackets.h"
 
 uint32 const ClockWorldState[]    = { 3781, 4354 };
 uint32 const WintergraspFaction[] = { FACTION_ALLIANCE_GENERIC_WG, FACTION_HORDE_GENERIC_WG, FACTION_FRIENDLY };
@@ -1040,30 +1041,32 @@ void BattlefieldWintergrasp::DoCompleteOrIncrementAchievement(uint32 achievement
     }
 }
 
-void BattlefieldWintergrasp::FillInitialWorldStates(WorldPacket& data)
+void BattlefieldWintergrasp::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << uint32(WORLDSTATE_WINTERGRASP_DEFENDED_ALLIANCE) << uint32(GetData(DATA_WINTERGRASP_DEF_ALLIANCE));
-    data << uint32(WORLDSTATE_WINTERGRASP_DEFENDED_HORDE) << uint32(GetData(DATA_WINTERGRASP_DEF_HORDE));
-    data << uint32(WORLDSTATE_WINTERGRASP_ATTACKED_ALLIANCE) << uint32(GetData(DATA_WINTERGRASP_WON_ALLIANCE));
-    data << uint32(WORLDSTATE_WINTERGRASP_ATTACKED_HORDE) << uint32(GetData(DATA_WINTERGRASP_WON_HORDE));
-    data << uint32(WORLDSTATE_WINTERGRASP_ATTACKER) << uint32(GetAttackerTeam());
-    data << uint32(WORLDSTATE_WINTERGRASP_DEFENDER) << uint32(GetDefenderTeam());
-    data << uint32(WORLDSTATE_WINTERGRASP_ACTIVE) << uint32(IsWarTime() ? 0 : 1); // Note: cleanup these two, their names look awkward
-    data << uint32(WORLDSTATE_WINTERGRASP_SHOW_WORLDSTATE) << uint32(IsWarTime() ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_DEFENDED_ALLIANCE, GetData(DATA_WINTERGRASP_DEF_ALLIANCE));
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_DEFENDED_HORDE, GetData(DATA_WINTERGRASP_DEF_HORDE));
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_ATTACKED_ALLIANCE, GetData(DATA_WINTERGRASP_WON_ALLIANCE));
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_ATTACKED_HORDE, GetData(DATA_WINTERGRASP_WON_HORDE));
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_ATTACKER, GetAttackerTeam());
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_DEFENDER, GetDefenderTeam());
 
-    for (uint32 i = 0; i < 2; ++i)
-        data << ClockWorldState[i] << uint32(GameTime::GetGameTime() + (GetTimer() / 1000));
+    // Note: cleanup these two, their names look awkward
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_ACTIVE, IsWarTime() ? 0 : 1);
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_SHOW_WORLDSTATE, IsWarTime() ? 1 : 0);
 
-    data << uint32(WORLDSTATE_WINTERGRASP_VEHICLE_HORDE) << uint32(GetData(DATA_WINTERGRASP_VEHICLE_HORDE));
-    data << uint32(WORLDSTATE_WINTERGRASP_MAX_VEHICLE_HORDE) << uint32(GetData(DATA_WINTERGRASP_MAX_VEHICLE_HORDE));
-    data << uint32(WORLDSTATE_WINTERGRASP_VEHICLE_ALLIANCE) << uint32(GetData(DATA_WINTERGRASP_VEHICLE_ALLIANCE));
-    data << uint32(WORLDSTATE_WINTERGRASP_MAX_VEHICLE_ALLIANCE) << uint32(GetData(DATA_WINTERGRASP_MAX_VEHICLE_ALLIANCE));
+    for (uint32 itr = 0; itr < 2; ++itr)
+        packet.Worldstates.emplace_back(ClockWorldState[itr], int32(GameTime::GetGameTime()) + int32(GetTimer()) / int32(1000));
+
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_VEHICLE_HORDE, GetData(DATA_WINTERGRASP_VEHICLE_HORDE));
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_MAX_VEHICLE_HORDE, GetData(DATA_WINTERGRASP_MAX_VEHICLE_HORDE));
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_VEHICLE_ALLIANCE, GetData(DATA_WINTERGRASP_VEHICLE_ALLIANCE));
+    packet.Worldstates.emplace_back(WORLDSTATE_WINTERGRASP_MAX_VEHICLE_ALLIANCE, GetData(DATA_WINTERGRASP_MAX_VEHICLE_ALLIANCE));
 
     for (WintergraspBuilding* building : _buildingSet)
-        building->FillInitialWorldStates(data);
+        building->FillInitialWorldStates(packet);
 
     for (WintergraspWorkshop* workshop : _workshopSet)
-        workshop->FillInitialWorldStates(data);
+        workshop->FillInitialWorldStates(packet);
 }
 
 void BattlefieldWintergrasp::SendInitWorldStatesToAll()
@@ -1268,16 +1271,13 @@ void BattlefieldWintergrasp::UpdateVehicleCounter(bool initialize)
 
 void BattlefieldWintergrasp::SendInitWorldStatesTo(Player const* player)
 {
-    WorldPacket data(SMSG_INIT_WORLD_STATES, 4 + 4 + 4 + 2 + (14 + _buildingSet.size() + _workshopSet.size()) * 8);
+    WorldPackets::WorldState::InitWorldStates packet;
+    packet.MapID = _mapId;
+    packet.ZoneID = _zoneId;
+    packet.AreaID = player->GetAreaId();
+    FillInitialWorldStates(packet);
 
-    data << uint32(_mapId);
-    data << uint32(_zoneId);
-    data << uint32(0);                                              // AreaId
-    data << uint16(14 + _buildingSet.size() + _workshopSet.size()); // Number of fields
-
-    FillInitialWorldStates(data);
-
-    player->SendDirectMessage(&data);
+    player->SendDirectMessage(packet.Write());
 }
 
 void BattlefieldWintergrasp::HandlePromotion(Player* killer, Unit* killed)
@@ -1804,9 +1804,9 @@ void WintergraspBuilding::UpdateForNoBattle(bool initialize)
     }
 }
 
-void WintergraspBuilding::FillInitialWorldStates(WorldPacket& data)
+void WintergraspBuilding::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << uint32(_worldState) << uint32(_state);
+    packet.Worldstates.emplace_back(_worldState, _state);
 }
 
 void WintergraspBuilding::Save()
@@ -1916,9 +1916,9 @@ void WintergraspWorkshop::UpdateForNoBattle()
     GiveControlTo(_battlefield->GetDefenderTeam(), true);
 }
 
-void WintergraspWorkshop::FillInitialWorldStates(WorldPacket& data)
+void WintergraspWorkshop::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << uint32(_info->WorldStateId) << uint32(_state);
+    packet.Worldstates.emplace_back(_info->WorldStateId, _state);
 }
 
 void WintergraspWorkshop::Save()

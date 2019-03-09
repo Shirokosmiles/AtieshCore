@@ -22,6 +22,14 @@
 #include "Battlefield.h"
 #include "GameObjectData.h"
 
+namespace WorldPackets
+{
+    namespace WorldState
+    {
+        class InitWorldStates;
+    }
+}
+
 class WintergraspCapturePoint;
 class WintergraspBuilding;
 class WintergraspWorkshop;
@@ -432,7 +440,7 @@ class TC_GAME_API BattlefieldWintergrasp : public Battlefield
         void OnGameObjectRemove(GameObject* gameObject) override;
         void OnUnitDeath(Unit* unit) override;
         void DoCompleteOrIncrementAchievement(uint32 achievement, Player* player, uint8 incrementNumber = 1) override;
-        void FillInitialWorldStates(WorldPacket& data) override;
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
         void SendInitWorldStatesToAll() override;
         void HandleKill(Player* killer, Unit* victim) override;
         void ProcessEvent(WorldObject* object, uint32 eventId) override;
@@ -536,7 +544,7 @@ class TC_GAME_API WintergraspBuilding
         void CleanRelatedObject(ObjectGuid guid);
         void UpdateCreatureAndGo();
         void UpdateForNoBattle(bool initialize = false);
-        void FillInitialWorldStates(WorldPacket& data);
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet);
         void Save();
         //TeamId GetController() const { return _teamControl; }
 
@@ -567,7 +575,7 @@ class TC_GAME_API WintergraspWorkshop
         void GiveControlTo(TeamId teamId, bool initialize = false);
         void UpdateForBattle();
         void UpdateForNoBattle();
-        void FillInitialWorldStates(WorldPacket& data);
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet);
         void Save();
 
         WintergraspCapturePoint* GetCapturePoint() const { return _capturePoint; }

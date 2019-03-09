@@ -27,6 +27,14 @@
 #include "SharedDefines.h"
 #include <map>
 
+namespace WorldPackets
+{
+    namespace WorldState
+    {
+        class InitWorldStates;
+    }
+}
+
 class Battleground;
 class BattlegroundMap;
 class Creature;
@@ -399,7 +407,7 @@ class TC_GAME_API Battleground
 
         // Packet Transfer
         // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
-        virtual void FillInitialWorldStates(WorldPacket& /*data*/) { }
+        virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
         void SendPacketToTeam(uint32 TeamID, WorldPacket const* packet, Player* sender = nullptr, bool self = true);
         void SendPacketToAll(WorldPacket const* packet);
 

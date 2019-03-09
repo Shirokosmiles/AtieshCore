@@ -3282,14 +3282,13 @@ void Unit::_AddAura(UnitAura* aura, Unit* caster)
     if (aura->IsRemoved())
         return;
 
-    aura->SetIsSingleTarget(caster && (aura->GetSpellInfo()->IsSingleTarget() || aura->HasEffectType(SPELL_AURA_CONTROL_VEHICLE)));
+    aura->SetIsSingleTarget(caster && aura->GetSpellInfo()->IsSingleTarget());
     if (aura->IsSingleTarget())
     {
-        ASSERT((IsInWorld() && !IsDuringRemoveFromWorld()) || (aura->GetCasterGUID() == GetGUID()) ||
-                (IsLoading() && aura->HasEffectType(SPELL_AURA_CONTROL_VEHICLE)));
+        ASSERT((IsInWorld() && !IsDuringRemoveFromWorld()) || aura->GetCasterGUID() == GetGUID());
                 /* @HACK: Player is not in world during loading auras.
                  *        Single target auras are not saved or loaded from database
-                 *        but may be created as a result of aura links (player mounts with passengers)
+                 *        but may be created as a result of aura links.
                  */
 
         // register single target aura
@@ -11351,6 +11350,9 @@ void Unit::SetStunned(bool apply)
 {
     if (apply)
     {
+        if (m_rootTimes > 0) // blizzard internal check?
+            m_rootTimes++;
+
         SetTarget(ObjectGuid::Empty);
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
@@ -11367,10 +11369,19 @@ void Unit::SetStunned(bool apply)
             SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8);
-        data << GetPackGUID();
-        data << uint32(0);
-        SendMessageToSet(&data, true);
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            WorldPacket data(SMSG_FORCE_MOVE_ROOT, 10);
+            data << GetPackGUID();
+            data << m_rootTimes;
+            SendMessageToSet(&data, true);
+        }
+        else
+        {
+            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
+            data << GetPackGUID();
+            SendMessageToSet(&data, true);
+        }
 
         CastStop();
     }
@@ -11386,10 +11397,19 @@ void Unit::SetStunned(bool apply)
 
         if (!HasUnitState(UNIT_STATE_ROOT))         // prevent moving if it also has root effect
         {
-            WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 8 + 4);
-            data << GetPackGUID();
-            data << uint32(0);
-            SendMessageToSet(&data, true);
+            if (GetTypeId() == TYPEID_PLAYER)
+            {
+                WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 10);
+                data << GetPackGUID();
+                data << ++m_rootTimes;
+                SendMessageToSet(&data, true);
+            }
+            else
+            {
+                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
+                data << GetPackGUID();
+                SendMessageToSet(&data, true);
+            }
 
             RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
@@ -12702,6 +12722,11 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
         }
         else if (seatId >= 0 && seatId == GetTransSeat())
             return;
+        else
+        {
+            //Exit the current vehicle because unit will reenter in a new seat.
+            m_vehicle->GetBase()->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, GetGUID(), aurApp->GetBase());
+        }
     }
 
     if (aurApp->GetRemoveMode())

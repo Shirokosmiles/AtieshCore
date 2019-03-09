@@ -25,6 +25,14 @@
 #include "ZoneScript.h"
 #include <map>
 
+namespace WorldPackets
+{
+    namespace WorldState
+    {
+        class InitWorldStates;
+    }
+}
+
 class Creature;
 class GameObject;
 class Group;
@@ -105,7 +113,7 @@ class TC_GAME_API Battlefield : public ZoneScript
         virtual void OnPlayerEnterZone(Player* /*player*/) { }
         virtual void DoCompleteOrIncrementAchievement(uint32 /*achievement*/, Player* /*player*/, uint8 /*incrementNumber = 1*/) { }
         virtual void SendInitWorldStatesToAll() = 0;
-        virtual void FillInitialWorldStates(WorldPacket& /*data*/) = 0;
+        virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) = 0;
         virtual void AddPlayerToResurrectQueue(ObjectGuid creatureGUID, ObjectGuid playerGUID);
 
         // enables or disables the battlefield
@@ -222,7 +230,7 @@ class TC_GAME_API BattlefieldCapturePoint
         virtual void Update(uint32 diff);
         virtual void ChangeTeam(TeamId /*oldTeam*/) { }
         virtual void SendChangePhase();
-        virtual void FillInitialWorldStates(WorldPacket& /*data*/) { }
+        virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
         // Used when player is activated/inactivated in the area
         virtual bool HandlePlayerEnter(Player* player);
         virtual GuidUnorderedSet::iterator HandlePlayerLeave(Player* player);

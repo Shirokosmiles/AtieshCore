@@ -20,6 +20,7 @@
 #include "Log.h"
 #include "Player.h"
 #include "WorldPacket.h"
+#include "WorldStatePackets.h"
 
 BattlegroundGOSpawnPoint const BG_RL_GameObjects[BG_RL_OBJECT_MAX] =
 {
@@ -66,10 +67,11 @@ void BattlegroundRL::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
-void BattlegroundRL::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundRL::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << uint32(0xbba) << uint32(1);     // 9 show
-    Arena::FillInitialWorldStates(data);
+    packet.Worldstates.emplace_back(3002, 1); // BATTELGROUND_RUINS_OF_LORDAERNON_SHOW
+
+    Arena::FillInitialWorldStates(packet);
 }
 
 bool BattlegroundRL::SetupBattleground()

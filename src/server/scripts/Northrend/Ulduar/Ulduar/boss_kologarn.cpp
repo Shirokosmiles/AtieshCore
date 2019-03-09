@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "Map.h"
 #include "MotionMaster.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -546,9 +547,18 @@ class spell_kologarn_stone_shout : public SpellScript
 {
     PrepareSpellScript(spell_kologarn_stone_shout);
 
-    void FilterTargets(std::list<WorldObject*>& unitList)
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        unitList.remove_if(PlayerOrPetCheck());
+        targets.remove_if([](WorldObject* object) -> bool
+        {
+            if (object->GetTypeId() == TYPEID_PLAYER)
+                return false;
+
+            if (Creature* creature = object->ToCreature())
+                return !creature->IsPet();
+
+            return true;
+        });
     }
 
     void Register() override

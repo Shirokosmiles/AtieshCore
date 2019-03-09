@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "AreaBoundary.h"
 #include "CreatureAI.h"
+#include "CombatAI.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
@@ -30,7 +31,7 @@
 #include "ulduar.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "CombatAI.h"
+#include "WorldStatePackets.h"
 
 static BossBoundaryData const boundaries =
 {
@@ -147,6 +148,17 @@ ObjectData const objectData[] =
     { 0,                               0                         }
 };
 
+UlduarKeeperDespawnEvent::UlduarKeeperDespawnEvent(Creature* owner, uint32 despawnTimerOffset) : _owner(owner), _despawnTimer(despawnTimerOffset)
+{
+}
+
+bool UlduarKeeperDespawnEvent::Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+{
+    _owner->CastSpell(_owner, SPELL_TELEPORT_KEEPER_VISUAL);
+    _owner->DespawnOrUnsummon(1000 + _despawnTimer);
+    return true;
+}
+
 class instance_ulduar : public InstanceMapScript
 {
     public:
@@ -220,10 +232,10 @@ class instance_ulduar : public InstanceMapScript
             bool Unbroken;
             bool IsDriveMeCrazyEligible;
 
-            void FillInitialWorldStates(WorldPacket& packet) override
+            void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
             {
-                packet << uint32(WORLD_STATE_ALGALON_TIMER_ENABLED) << uint32(_algalonTimer && _algalonTimer <= 60);
-                packet << uint32(WORLD_STATE_ALGALON_DESPAWN_TIMER) << uint32(std::min<uint32>(_algalonTimer, 60));
+                packet.Worldstates.emplace_back(WORLD_STATE_ALGALON_TIMER_ENABLED, (_algalonTimer && _algalonTimer <= 60) ? 1 : 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_ALGALON_DESPAWN_TIMER, std::min<int32>(_algalonTimer, 60));
             }
 
             void OnPlayerEnter(Player* player) override
