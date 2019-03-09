@@ -101,6 +101,8 @@ Battleground::Battleground()
     m_StartMaxDist      = 0.0f;
     ScriptId            = 0;
 
+    m_BuffEntries       = nullptr;
+
     m_ArenaTeamIds[TEAM_ALLIANCE]   = 0;
     m_ArenaTeamIds[TEAM_HORDE]      = 0;
 
@@ -339,6 +341,22 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
         }
         m_ResurrectQueue.clear();
     }
+}
+
+void Battleground::SetCreaturesNumber(size_t count)
+{
+    BgCreatures.resize(count);
+}
+
+void Battleground::SetGameObjectsNumber(size_t count)
+{
+    BgObjects.resize(count);
+}
+
+void Battleground::SetChangeBuffs(bool change, BattlegroundBuffData const* buffEntries)
+{
+    m_BuffChange = change;
+    m_BuffEntries = buffEntries;
 }
 
 uint32 Battleground::GetPrematureWinner()
@@ -1286,7 +1304,11 @@ void Battleground::RemovePlayerFromResurrectQueue(ObjectGuid player_guid)
 void Battleground::RelocateDeadPlayers(ObjectGuid guideGuid)
 {
     // Those who are waiting to resurrect at this node are taken to the closest own node's graveyard
-    GuidVector& ghostList = m_ReviveQueue[guideGuid];
+    auto itr = m_ReviveQueue.find(guideGuid);
+    if (itr == m_ReviveQueue.end())
+        return;
+
+    GuidVector& ghostList = itr->second;
     if (!ghostList.empty())
     {
         WorldSafeLocsEntry const* closestGrave = nullptr;
@@ -1306,71 +1328,38 @@ void Battleground::RelocateDeadPlayers(ObjectGuid guideGuid)
     }
 }
 
-bool Battleground::AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 /*respawnTime*/, GOState goState)
+GameObject* Battleground::AddObject(uint32 type, uint32 entry, Position const& pos, QuaternionData const& rot, uint32 respawnTime /*= 0*/, GOState goState /*= GO_STATE_READY*/)
 {
     // If the assert is called, means that BgObjects must be resized!
     ASSERT(type < BgObjects.size());
 
     Map* map = FindBgMap();
     if (!map)
-        return false;
-
-    QuaternionData rot(rotation0, rotation1, rotation2, rotation3);
-    // Temporally add safety check for bad spawns and send log (object rotations need to be rechecked in sniff)
-    if (!rotation0 && !rotation1 && !rotation2 && !rotation3)
-    {
-        TC_LOG_DEBUG("bg.battleground", "Battleground::AddObject: gameoobject [entry: %u, object type: %u] for BG (map: %u) has zeroed rotation fields, "
-            "orientation used temporally, but please fix the spawn", entry, type, m_MapId);
-
-        rot = QuaternionData::fromEulerAnglesZYX(o, 0.f, 0.f);
-    }
+        return nullptr;
 
     // Must be created this way, adding to godatamap would add it to the base map of the instance
     // and when loading it (in go::LoadFromDB()), a new guid would be assigned to the object, and a new object would be created
     // So we must create it specific for this instance
-    GameObject* go = new GameObject;
-    if (!go->Create(GetBgMap()->GenerateLowGuid<HighGuid::GameObject>(), entry, GetBgMap(), PHASEMASK_NORMAL, Position(x, y, z, o), rot, 255, goState))
+    GameObject* go = new GameObject();
+    if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, PHASEMASK_NORMAL, pos, rot, 255, goState))
     {
         TC_LOG_ERROR("bg.battleground", "Battleground::AddObject: cannot create gameobject (entry: %u) for BG (map: %u, instance id: %u)!",
                 entry, m_MapId, m_InstanceID);
         delete go;
-        return false;
+        return nullptr;
     }
-/*
-    uint32 guid = go->GetGUID().GetCounter();
 
-    // without this, UseButtonOrDoor caused the crash, since it tried to get go info from godata
-    // iirc that was changed, so adding to go data map is no longer required if that was the only function using godata from GameObject without checking if it existed
-    GameObjectData& data = sObjectMgr->NewGOData(guid);
-
-    data.id             = entry;
-    data.mapid          = GetMapId();
-    data.posX           = x;
-    data.posY           = y;
-    data.posZ           = z;
-    data.orientation    = o;
-    data.rotation0      = rotation0;
-    data.rotation1      = rotation1;
-    data.rotation2      = rotation2;
-    data.rotation3      = rotation3;
-    data.spawntimesecs  = respawnTime;
-    data.spawnMask      = 1;
-    data.animprogress   = 100;
-    data.go_state       = 1;
-*/
     // Add to world, so it can be later looked up from HashMapHolder
     if (!map->AddToMap(go))
     {
         delete go;
-        return false;
+        return nullptr;
     }
-    BgObjects[type] = go->GetGUID();
-    return true;
-}
+    if (respawnTime)
+        go->SetRespawnTime(respawnTime);
 
-bool Battleground::AddObject(uint32 type, uint32 entry, Position const& pos, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime /*= 0*/, GOState goState /*= GO_STATE_READY*/)
-{
-    return AddObject(type, entry, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), rotation0, rotation1, rotation2, rotation3, respawnTime, goState);
+    BgObjects[type] = go->GetGUID();
+    return go;
 }
 
 // Some doors aren't despawned so we cannot handle their closing in gameobject::update()
@@ -1449,7 +1438,7 @@ void Battleground::SpawnBGObject(uint32 type, uint32 respawntime)
         }
 }
 
-Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y, float z, float o, TeamId /*teamId = TEAM_NEUTRAL*/, uint32 respawntime /*= 0*/, Transport* transport)
+Creature* Battleground::AddCreature(uint32 entry, uint32 type, Position const& pos, uint32 respawntime /*= 0*/, Transport* transport /*= nullptr*/)
 {
     // If the assert is called, means that BgCreatures must be resized!
     ASSERT(type < BgCreatures.size());
@@ -1460,7 +1449,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
 
     if (transport)
     {
-        if (Creature* creature = transport->SummonPassenger(entry, { x, y, z, o }, TEMPSUMMON_MANUAL_DESPAWN))
+        if (Creature* creature = transport->SummonPassenger(entry, pos, TEMPSUMMON_MANUAL_DESPAWN))
         {
             BgCreatures[type] = creature->GetGUID();
             return creature;
@@ -1469,8 +1458,9 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
         return nullptr;
     }
 
+    float x, y, z, o;
+    pos.GetPosition(x, y, z, o);
     Creature* creature = new Creature();
-
     if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, { x, y, z, o }))
     {
         TC_LOG_ERROR("bg.battleground", "Battleground::AddCreature: cannot create creature (entry: %u) for BG (map: %u, instance id: %u)!",
@@ -1502,11 +1492,6 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
         creature->SetRespawnDelay(respawntime);
 
     return creature;
-}
-
-Creature* Battleground::AddCreature(uint32 entry, uint32 type, Position const& pos, TeamId teamId /*= TEAM_NEUTRAL*/, uint32 respawntime /*= 0*/, Transport* transport)
-{
-    return AddCreature(entry, type, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), teamId, respawntime, transport);
 }
 
 bool Battleground::DelCreature(uint32 type)
@@ -1545,11 +1530,11 @@ bool Battleground::DelObject(uint32 type)
     return false;
 }
 
-bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId /*= TEAM_NEUTRAL*/)
+bool Battleground::AddSpiritGuide(uint32 type, Position const& pos, TeamId teamId /*= TEAM_NEUTRAL*/)
 {
     uint32 entry = (teamId == TEAM_ALLIANCE) ? BG_CREATURE_ENTRY_A_SPIRITGUIDE : BG_CREATURE_ENTRY_H_SPIRITGUIDE;
 
-    if (Creature* creature = AddCreature(entry, type, x, y, z, o, teamId))
+    if (Creature* creature = AddCreature(entry, type, pos))
     {
         creature->setDeathState(DEAD);
         creature->SetChannelObjectGuid(creature->GetGUID());
@@ -1567,11 +1552,6 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
         type, entry, m_MapId, m_InstanceID);
     EndNow();
     return false;
-}
-
-bool Battleground::AddSpiritGuide(uint32 type, Position const& pos, TeamId teamId /*= TEAM_NEUTRAL*/)
-{
-    return AddSpiritGuide(type, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), teamId);
 }
 
 void Battleground::SendMessageToAll(uint32 entry, ChatMsg msgType, Player const* source)
@@ -1618,7 +1598,8 @@ void Battleground::HandleTriggerBuff(ObjectGuid go_guid)
     // Change buff type, when buff is used:
     int32 index = BgObjects.size() - 1;
     while (index >= 0 && BgObjects[index] != go_guid)
-        index--;
+        --index;
+
     if (index < 0)
     {
         TC_LOG_ERROR("bg.battleground", "Battleground::HandleTriggerBuff: cannot find buff gameobject (%s, entry: %u, type: %u) in internal data for BG (map: %u, instance id: %u)!",
@@ -1627,19 +1608,32 @@ void Battleground::HandleTriggerBuff(ObjectGuid go_guid)
     }
 
     // Randomly select new buff
-    uint8 buff = urand(0, 2);
-    uint32 entry = obj->GetEntry();
-    if (m_BuffChange && entry != Buff_Entries[buff])
+    if (m_BuffChange)
     {
-        // Despawn current buff
-        SpawnBGObject(index, RESPAWN_ONE_DAY);
-        // Set index for new one
-        for (uint8 currBuffTypeIndex = 0; currBuffTypeIndex < 3; ++currBuffTypeIndex)
-            if (entry == Buff_Entries[currBuffTypeIndex])
-            {
-                index -= currBuffTypeIndex;
-                index += buff;
-            }
+        ASSERT(m_BuffEntries);
+
+        uint32 entry = obj->GetEntry();
+        uint8 currBuffTypeIndex = 0;
+        auto buffItr = std::find_if(m_BuffEntries->cbegin(), m_BuffEntries->cend(), [entry, &currBuffTypeIndex](BattlegroundBuffEntries const& entries) -> bool
+        {
+            for (currBuffTypeIndex = 0; currBuffTypeIndex < BG_MAX_BUFFS; ++currBuffTypeIndex)
+                if (entries._buffEntry[currBuffTypeIndex] == entry)
+                    return true;
+
+            return false;
+        });
+
+        ASSERT(buffItr != m_BuffEntries->cend());
+
+        uint8 buff = urand(0, 2);
+        if (currBuffTypeIndex != buff)
+        {
+            // Despawn current buff
+            SpawnBGObject(index, RESPAWN_ONE_DAY);
+            // Set index for new one
+            index -= currBuffTypeIndex;
+            index += buff;
+        }
     }
 
     SpawnBGObject(index, BUFF_RESPAWN_TIME);

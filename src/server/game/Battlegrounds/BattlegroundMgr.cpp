@@ -124,7 +124,7 @@ void BattlegroundMgr::Update(uint32 diff)
     }
 
     // update events timer
-    for (int qtype = BATTLEGROUND_QUEUE_NONE; qtype < MAX_BATTLEGROUND_QUEUE_TYPES; ++qtype)
+    for (uint32 qtype = BATTLEGROUND_QUEUE_NONE; qtype < MAX_BATTLEGROUND_QUEUE_TYPES; ++qtype)
         m_BattlegroundQueues[qtype].UpdateEvents(diff);
 
     // update scheduled queues
@@ -133,7 +133,7 @@ void BattlegroundMgr::Update(uint32 diff)
         std::vector<uint64> scheduled;
         std::swap(scheduled, m_QueueUpdateScheduler);
 
-        for (uint8 i = 0; i < scheduled.size(); i++)
+        for (uint32 i = 0; i < scheduled.size(); ++i)
         {
             uint32 arenaMMRating = scheduled[i] >> 32;
             uint8 arenaType = scheduled[i] >> 24 & 255;
