@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -17,25 +17,13 @@
  */
 
 #include "BattlegroundBE.h"
-#include "Player.h"
 #include "Log.h"
+#include "Player.h"
 #include "WorldPacket.h"
-
-BattlegroundGOSpawnPoint const BG_BE_GameObjects[BG_BE_OBJECT_MAX] =
-{
-    // gates
-    { BG_BE_OBJECT_TYPE_DOOR_1, { 6287.277f, 282.1877f, 3.810925f, -2.26019700f }, { 0.f, 0.f, -0.90445420f, 0.4265707f }, RESPAWN_IMMEDIATELY },
-    { BG_BE_OBJECT_TYPE_DOOR_2, { 6189.546f, 241.7099f, 3.101481f,  0.88139170f }, { 0.f, 0.f,  0.42656890f, 0.9044551f }, RESPAWN_IMMEDIATELY },
-    { BG_BE_OBJECT_TYPE_DOOR_3, { 6299.116f, 296.5494f, 3.308032f,  0.88139180f }, { 0.f, 0.f,  0.42656900f, 0.9044550f }, RESPAWN_IMMEDIATELY },
-    { BG_BE_OBJECT_TYPE_DOOR_4, { 6177.708f, 227.3481f, 3.604374f, -2.26019700f }, { 0.f, 0.f, -0.90445420f, 0.4265707f }, RESPAWN_IMMEDIATELY },
-    // buffs
-    { BG_BE_OBJECT_TYPE_BUFF_1, { 6249.042f, 275.3239f, 11.22033f, -1.44862200f }, { 0.f, 0.f, -0.66261960f, 0.7489561f }, 2 * MINUTE          },
-    { BG_BE_OBJECT_TYPE_BUFF_2, { 6228.260f, 249.5660f, 11.21812f, -0.06981307f }, { 0.f, 0.f, -0.03489876f, 0.9993908f }, 2 * MINUTE          }
-};
 
 BattlegroundBE::BattlegroundBE()
 {
-    SetGameObjectsNumber(BG_BE_OBJECT_MAX);
+    BgObjects.resize(BG_BE_OBJECT_MAX);
 }
 
 void BattlegroundBE::StartingEventCloseDoors()
@@ -49,11 +37,11 @@ void BattlegroundBE::StartingEventCloseDoors()
 
 void BattlegroundBE::StartingEventOpenDoors()
 {
+    for (uint32 i = BG_BE_OBJECT_DOOR_1; i <= BG_BE_OBJECT_DOOR_2; ++i)
+        DoorOpen(i);
+
     for (uint32 i = BG_BE_OBJECT_BUFF_1; i <= BG_BE_OBJECT_BUFF_2; ++i)
         SpawnBGObject(i, 60);
-
-    for (uint32 i = BG_BE_OBJECT_DOOR_1; i <= BG_BE_OBJECT_DOOR_2; ++i)
-        DoorOpen(i);    
 }
 
 void BattlegroundBE::HandleAreaTrigger(Player* player, uint32 trigger)
@@ -80,14 +68,17 @@ void BattlegroundBE::FillInitialWorldStates(WorldPacket& data)
 
 bool BattlegroundBE::SetupBattleground()
 {
-    for (uint32 i = 0; i < BG_BE_OBJECT_MAX; ++i)
+    // gates
+    if (!AddObject(BG_BE_OBJECT_DOOR_1, BG_BE_OBJECT_TYPE_DOOR_1, 6287.277f, 282.1877f, 3.810925f, -2.260201f, 0, 0, 0.9044551f, -0.4265689f, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_BE_OBJECT_DOOR_2, BG_BE_OBJECT_TYPE_DOOR_2, 6189.546f, 241.7099f, 3.101481f, 0.8813917f, 0, 0, 0.4265689f, 0.9044551f, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_BE_OBJECT_DOOR_3, BG_BE_OBJECT_TYPE_DOOR_3, 6299.116f, 296.5494f, 3.308032f, 0.8813917f, 0, 0, 0.4265689f, 0.9044551f, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_BE_OBJECT_DOOR_4, BG_BE_OBJECT_TYPE_DOOR_4, 6177.708f, 227.3481f, 3.604374f, -2.260201f, 0, 0, 0.9044551f, -0.4265689f, RESPAWN_IMMEDIATELY)
+        // buffs
+        || !AddObject(BG_BE_OBJECT_BUFF_1, BG_BE_OBJECT_TYPE_BUFF_1, 6249.042f, 275.3239f, 11.22033f, -1.448624f, 0, 0, 0.6626201f, -0.7489557f, 120)
+        || !AddObject(BG_BE_OBJECT_BUFF_2, BG_BE_OBJECT_TYPE_BUFF_2, 6228.26f, 249.566f, 11.21812f, -0.06981307f, 0, 0, 0.03489945f, -0.9993908f, 120))
     {
-        BattlegroundGOSpawnPoint const& object = BG_BE_GameObjects[i];
-        if (!AddObject(i, object.Entry, object.Pos, object.Rot, object.SpawnTime))
-        {
-            TC_LOG_ERROR("bg.battleground", "BattleGroundBE: Failed to spawn some object (Entry %u). Battleground not created!", object.Entry);
-            return false;
-        }
+        TC_LOG_ERROR("sql.sql", "BatteGroundBE: Failed to spawn some object!");
+        return false;
     }
 
     return true;

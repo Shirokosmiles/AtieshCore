@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,10 +24,8 @@ enum BattlegroundRVObjectTypes
 {
     BG_RV_OBJECT_BUFF_1,
     BG_RV_OBJECT_BUFF_2,
-
     BG_RV_OBJECT_FIRE_1,
     BG_RV_OBJECT_FIRE_2,
-
     BG_RV_OBJECT_FIREDOOR_1,
     BG_RV_OBJECT_FIREDOOR_2,
 
