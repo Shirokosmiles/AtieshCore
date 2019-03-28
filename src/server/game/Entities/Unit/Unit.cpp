@@ -5035,9 +5035,11 @@ DynamicObject* Unit::GetDynObject(uint32 spellId)
         return nullptr;
     for (DynObjectList::const_iterator i = m_dynObj.begin(); i != m_dynObj.end();++i)
     {
-        DynamicObject* dynObj = *i;
-        if (dynObj->GetSpellId() == spellId)
-            return dynObj;
+        if (DynamicObject* dynObj = *i)
+        {
+            if (dynObj->GetSpellId() == spellId)
+                return dynObj;
+        }
     }
     return nullptr;
 }
@@ -5048,14 +5050,16 @@ void Unit::RemoveDynObject(uint32 spellId)
         return;
     for (DynObjectList::iterator i = m_dynObj.begin(); i != m_dynObj.end();)
     {
-        DynamicObject* dynObj = *i;
-        if (dynObj->GetSpellId() == spellId)
+        if (DynamicObject* dynObj = *i)
         {
-            dynObj->Remove();
-            i = m_dynObj.begin();
+            if (dynObj->GetSpellId() == spellId)
+            {
+                dynObj->Remove();
+                i = m_dynObj.begin();
+            }
+            else
+                ++i;
         }
-        else
-            ++i;
     }
 }
 
