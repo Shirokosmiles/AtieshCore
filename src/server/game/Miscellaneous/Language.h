@@ -1178,6 +1178,7 @@ enum TrinityStrings
     LANG_GROUP_TEXT_ANNOUNCE_1            = 788,
     LANG_GROUP_TEXT_ANNOUNCE_2            = 789,
     LANG_GROUP_TEXT_ANNOUNCE_3            = 790,
+    LANG_GROUP_TEXT_ANNOUNCE_4            = 791,
 
     // BG
     // AB

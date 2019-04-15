@@ -480,6 +480,7 @@ void BossAI::_Reset()
     scheduler.CancelAll();
     if (instance && instance->GetBossState(_bossId) != DONE)
         instance->SetBossState(_bossId, NOT_STARTED);
+    me->ResetCombatTime();
 }
 
 void BossAI::_JustDied()
@@ -508,7 +509,7 @@ void BossAI::_JustEngagedWith()
         }
         instance->SetBossState(_bossId, IN_PROGRESS);
     }
-
+    me->StartCombatTime();
     me->SetCombatPulseDelay(5);
     me->setActive(true);
     DoZoneInCombat();

@@ -24,6 +24,7 @@
 #include "CreatureData.h"
 #include "DatabaseEnvFwd.h"
 #include "Duration.h"
+#include "GameTime.h"
 #include "Loot.h"
 #include "MapObject.h"
 #include <list>
@@ -372,6 +373,10 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         // Part of Evade mechanics
         time_t GetLastDamagedTime() const { return _lastDamagedTime; }
         void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
+        // Part of Raid Info
+        void StartCombatTime() { m_startEngageTime = GameTime::GetGameTime(); }
+        void ResetCombatTime() { m_startEngageTime = 0; }
+        uint32 GetCombatTime() { return uint32(GameTime::GetGameTime() - m_startEngageTime); }
 
         CreatureTextRepeatIds GetTextRepeatGroup(uint8 textGroup);
         void SetTextRepeatId(uint8 textGroup, uint8 id);
@@ -462,6 +467,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         float m_suppressedOrientation; // Stores the creature's "real" orientation while casting
 
         time_t _lastDamagedTime; // Part of Evade mechanics
+        time_t m_startEngageTime;
         CreatureTextRepeatGroup m_textRepeat;
 
         // Regenerate health

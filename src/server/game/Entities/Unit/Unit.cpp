@@ -13854,6 +13854,15 @@ void Unit::RaidInfoByMe(Unit* victim)
     sWorld->SendWorldText(LANG_GROUP_TEXT_ANNOUNCE_2, tanks, healers, damagers, AvgGS);
     if (pInstance)
         sWorld->SendWorldText(LANG_GROUP_TEXT_ANNOUNCE_3, Encounters, allEncounters);
+
+    if (victim->ToCreature())
+    {
+        if (victim->ToCreature()->GetCombatTime())
+        {
+            std::string combattimeSec = secsToTimeString(victim->ToCreature()->GetCombatTime());
+            sWorld->SendWorldText(LANG_GROUP_TEXT_ANNOUNCE_4, combattimeSec.c_str());
+        }        
+    }
     //'|cffff0000Status:|r |cffe6cc80(%u / %u) boss completed|r'
 }
 
