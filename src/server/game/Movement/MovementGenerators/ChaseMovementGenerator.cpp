@@ -193,10 +193,10 @@ bool ChaseMovementGenerator::Update(Unit* owner, uint32 diff)
                 owner->UpdateAllowedPositionZ(x, y, z);
 
             bool forcedestination = owner->GetTransport();
-            bool success = _path->CalculatePath(x, y, z);
+            bool success = _path->CalculatePath(x, y, z, owner->CanFly());
             if (!forcedestination)
             {
-                if (!success || (_path->GetPathType() & PATHFIND_NOPATH))
+                if (!success || (_path->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE)))
                 {
                     if (owner->GetOwner() && owner->GetOwner()->ToPlayer() && owner->GetOwner()->ToPlayer()->InArena()) // arena force destination for pet (arena nagrand)
                     {
