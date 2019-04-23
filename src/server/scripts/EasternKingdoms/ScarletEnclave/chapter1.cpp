@@ -241,6 +241,7 @@ public:
                     {
                         me->SetFaction(FACTION_MONSTER);
                         me->SetImmuneToPC(false);
+                        me->SetReactState(REACT_AGGRESSIVE);
                         phase = PHASE_ATTACKING;
 
                         me->SetReactState(REACT_AGGRESSIVE);
