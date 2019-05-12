@@ -29,7 +29,8 @@
 #include "Log.h"
 #include "MapManager.h"
 #include "MotionMaster.h"
-#include "MovementDefines.h"
+#include "MovementGenerator.h"
+#include "MoveSpline.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -313,6 +314,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             plrMover->SetSkipOnePacketForASH(true);
             plrMover->UpdateMovementInfo(movementInfo);
         }
+        recvData.rfinish();                     // prevent warnings spam
+        return;
+    }
+
+    if (!mover->movespline->Finalized())
+    {
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
