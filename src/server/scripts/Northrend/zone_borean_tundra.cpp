@@ -38,6 +38,7 @@ EndContentData */
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "QuestDef.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 #include "ScriptedGossip.h"
@@ -1252,21 +1253,24 @@ public:
                     DoCastVictim(SPELL_SHADOW_BOLT);
                     shadowBoltTimer = urand(5000, 12000);
                 }
-                else shadowBoltTimer -= diff;
+                else
+                    shadowBoltTimer -= diff;
 
                 if (deflectionTimer <= diff)
                 {
                     DoCastVictim(SPELL_DEFLECTION);
                     deflectionTimer = urand(20000, 25000);
                 }
-                else deflectionTimer -= diff;
+                else
+                    deflectionTimer -= diff;
 
                 if (soulBlastTimer <= diff)
                 {
                     DoCastVictim(SPELL_SOUL_BLAST);
                     soulBlastTimer = urand(12000, 18000);
                 }
-                else soulBlastTimer -= diff;
+                else
+                    soulBlastTimer -= diff;
             }
 
             DoMeleeAttackIfReady();
@@ -1760,7 +1764,7 @@ public:
 
         void Initialize()
         {
-            _events.ScheduleEvent(EVENT_OOC_TALK, urand(10000, 20000));
+            _events.ScheduleEvent(EVENT_OOC_TALK, 10s, 20s);
         }
 
         void Reset() override
@@ -1777,41 +1781,42 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
+            {
                 if (roll_chance_i(20))
                     Talk(SAY_BONKER_5);
+            }
         }
 
         void UpdateEscortAI(uint32 diff) override
         {
-            if (!me || !me->IsAlive())
-                return;
-
             _events.Update(diff);
 
             if (uint32 eventId = _events.ExecuteEvent())
             {
                 switch (eventId)
                 {
-                case EVENT_OOC_TALK:
-                    Talk(SAY_BONKER_0);
-                    _events.ScheduleEvent(EVENT_OOC_TALK, urand(5 * MINUTE * IN_MILLISECONDS, 10 * MINUTE * IN_MILLISECONDS));
-                    break;
-                case EVENT_TALK_1:
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
-                        Talk(SAY_BONKER_1, player);
-                    if (GameObject* go = me->FindNearestGameObject(GO_BALL_AND_CHAIN, 20.0f))
-                        go->SetLootState(GO_JUST_DEACTIVATED);
-                    _events.ScheduleEvent(EVENT_TALK_2, Seconds(11));
-                    break;
-                case EVENT_TALK_2:
-                    Talk(SAY_BONKER_2);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    break;
+                    case EVENT_OOC_TALK:
+                        Talk(SAY_BONKER_0);
+                        _events.ScheduleEvent(EVENT_OOC_TALK, 5min, 10min);
+                        break;
+                    case EVENT_TALK_1:
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
+                            Talk(SAY_BONKER_1, player);
+                        if (GameObject* go = me->FindNearestGameObject(GO_BALL_AND_CHAIN, 20.0f))
+                            go->SetLootState(GO_JUST_DEACTIVATED);
+                        _events.ScheduleEvent(EVENT_TALK_2, 11s);
+                        break;
+                    case EVENT_TALK_2:
+                        Talk(SAY_BONKER_2);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        break;
                 }
             }
 
-            if (IsActiveAttacker() && UpdateVictim())
-                DoMeleeAttackIfReady();
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
         }
 
         void WaypointReached(uint32 waypointId, uint32 /*pathId*/) override
@@ -1822,25 +1827,25 @@ public:
 
             switch (waypointId)
             {
-            case 1:
-                Talk(SAY_BONKER_3);
-                break;
-            case 29:
-                player->GroupEventHappens(QUEST_GET_ME_OUTA_HERE, me);
-                Talk(SAY_BONKER_4, player);
-                break;
+                case 1:
+                    Talk(SAY_BONKER_3);
+                    break;
+                case 29:
+                    player->GroupEventHappens(QUEST_GET_ME_OUTA_HERE, me);
+                    Talk(SAY_BONKER_4, player);
+                    break;
             }
         }
 
         void QuestAccept(Player* player, Quest const* quest) override
         {
-            if (player && quest && quest->GetQuestId() == QUEST_GET_ME_OUTA_HERE)
+            if (quest->GetQuestId() == QUEST_GET_ME_OUTA_HERE)
             {
                 _player = player->GetGUID();
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 _events.ScheduleEvent(EVENT_TALK_1, Seconds(2));
                 _events.CancelEvent(EVENT_OOC_TALK);
-                Start(true, true, _player);
+                Start(true, true, player->GetGUID());
                 SetPauseTimer(12 * IN_MILLISECONDS);
             }
         }
