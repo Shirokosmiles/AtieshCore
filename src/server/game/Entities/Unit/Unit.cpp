@@ -31,6 +31,7 @@
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
 #include "Formulas.h"
+#include "GameObjectAI.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -810,7 +811,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
         if (!victim->ToCreature()->hasLootRecipient())
             victim->ToCreature()->SetLootRecipient(attacker);
 
-        if (!attacker || attacker->IsControlledByPlayer() || (attacker->ToTempSummon() && attacker->ToTempSummon()->GetSummoner() && attacker->ToTempSummon()->GetSummoner()->GetTypeId() == TYPEID_PLAYER))
+        if (!attacker || attacker->IsControlledByPlayer() || (attacker->ToTempSummon() && attacker->ToTempSummon()->GetSummonerUnit() && attacker->ToTempSummon()->GetSummonerUnit()->GetTypeId() == TYPEID_PLAYER))
             victim->ToCreature()->LowerPlayerDamageReq(health < damage ?  health : damage);
     }
 
@@ -11108,10 +11109,16 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
         if (CreatureAI* ai = creature->AI())
             ai->JustDied(attacker);
 
-        if (TempSummon* summon = creature->ToTempSummon())
-            if (Unit* summoner = summon->GetSummoner())
-                if (summoner->ToCreature() && summoner->IsAIEnabled())
+        if (TempSummon * summon = creature->ToTempSummon())
+        {
+            if (WorldObject * summoner = summon->GetSummoner())
+            {
+                if (summoner->ToCreature() && summoner->ToCreature()->IsAIEnabled())
                     summoner->ToCreature()->AI()->SummonedCreatureDies(creature, attacker);
+                else if (summoner->ToGameObject() && summoner->ToGameObject()->AI())
+                    summoner->ToGameObject()->AI()->SummonedCreatureDies(creature, attacker);
+            }
+        }
 
         // Dungeon specific stuff, only applies to players killing creatures
         if (creature->GetInstanceId())
@@ -12782,13 +12789,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
     SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEMENTFLAG_ROOT
 
-    Position pos;
-    if (!exitPosition)                          // Exit position not specified
-        pos = vehicle->GetBase()->GetPosition();  // This should use passenger's current position, leaving it as it is now
-                                                // because we calculate positions incorrect (sometimes under map)
-    else
-        pos = *exitPosition;
-
     AddUnitState(UNIT_STATE_MOVE);
 
     if (player)
@@ -12804,6 +12804,18 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         SendMessageToSet(&data, false);
     }
 
+    Position pos;
+    // If we ask for a specific exit position, use that one. Otherwise allow scripts to modify it
+    if (exitPosition)
+        pos = *exitPosition;
+    else
+    {
+        // Set exit position to vehicle position and use the current orientation
+        pos = vehicle->GetBase()->GetPosition();
+        pos.SetOrientation(GetOrientation());
+        sScriptMgr->ModifyVehiclePassengerExitPos(this, vehicle, pos);
+    }
+
     float height = pos.GetPositionZ() + vehicle->GetBase()->GetCollisionHeight();
 
     Movement::MoveSplineInit init(this);
@@ -12813,7 +12825,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         init.SetFall();
 
     init.MoveTo(pos.GetPositionX(), pos.GetPositionY(), height, false);
-    init.SetFacing(GetOrientation());
+    init.SetFacing(pos.GetOrientation());
     init.SetTransportExit();
     GetMotionMaster()->LaunchMoveSpline(std::move(init), EVENT_VEHICLE_EXIT, MOTION_PRIORITY_HIGHEST);
 

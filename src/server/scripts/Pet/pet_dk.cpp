@@ -96,7 +96,7 @@ public:
             _events.Reset();
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 100);
         }
@@ -288,10 +288,13 @@ class npc_pet_dk_rune_weapon : public CreatureScript
                 _engageTimer = 0;
             }
 
-            void IsSummonedBy(Unit* summoner) override
+            void IsSummonedBy(WorldObject* summoner) override
             {
-                DoCast(summoner, SPELL_COPY_WEAPON, true);
-                DoCast(summoner, SPELL_DK_RUNE_WEAPON_MARK, true);
+                if (Unit * ownercaster = summoner->ToUnit())
+                {
+                    DoCast(ownercaster, SPELL_COPY_WEAPON, true);
+                    DoCast(ownercaster, SPELL_DK_RUNE_WEAPON_MARK, true);
+                }
                 //DoCast(me, SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
                 DoCast(me, SPELL_FAKE_AGGRO_RADIUS_8_YARD, true);
                 //DoCast(me, SPELL_DK_RUNE_WEAPON_SCALING_01, true);

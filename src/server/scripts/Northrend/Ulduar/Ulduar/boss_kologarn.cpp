@@ -304,7 +304,7 @@ struct npc_focused_eyebeam : public ScriptedAI
         _scheduler.Schedule(1s, [this](TaskContext /*context*/)
         {
             if (me->IsSummon())
-                if (Unit* target = me->ToTempSummon()->GetSummoner())
+                if (Unit* target = me->ToTempSummon()->GetSummonerUnit())
                 {
                     me->GetThreatManager().AddThreat(target, 50000000.0f);
                     me->Attack(target, false);

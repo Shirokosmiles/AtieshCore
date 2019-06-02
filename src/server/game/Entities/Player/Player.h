@@ -2516,6 +2516,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         bool m_needsZoneUpdate;
 
+        TimeTrackerSmall m_groupUpdateTimer;
+
         //custom quests in instance or in raid zone by solo
         bool m_customAccessInZone;
 

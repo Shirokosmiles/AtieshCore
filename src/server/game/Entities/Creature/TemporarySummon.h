@@ -37,7 +37,7 @@ struct SummonPropertiesEntry;
 class TC_GAME_API TempSummon : public Creature
 {
     public:
-        explicit TempSummon(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject);
+        explicit TempSummon(SummonPropertiesEntry const* properties, WorldObject* owner, bool isWorldObject);
         virtual ~TempSummon() { }
         void Update(uint32 time) override;
         virtual void InitStats(uint32 lifetime);
@@ -47,11 +47,12 @@ class TC_GAME_API TempSummon : public Creature
         void RemoveFromWorld() override;
         void SetTempSummonType(TempSummonType type);
         void SaveToDB(uint32 /*mapid*/, uint8 /*spawnMask*/, uint32 /*phaseMask*/) override { }
-        Unit* GetSummoner() const;
-        GameObject* GetSummonerGO() const;
+        WorldObject* GetSummoner() const;
+        Unit* GetSummonerUnit() const;
+        Creature* GetSummonerCreatureBase() const;
+        GameObject* GetSummonerGameObject() const;
         void AddGOSummonerPointer(GameObject* GOsummoner);
         void Killed(); // function for instant clear unit from GO tempSummon List (wihout waiting of removing from world)
-        Creature* GetSummonerCreatureBase() const;
         ObjectGuid GetSummonerGUID() const { return m_summonerGUID; }
         ObjectGuid GetSummonerGOGUID() const { return m_summonerGOGUID; }
         TempSummonType GetSummonType() const { return m_type; }

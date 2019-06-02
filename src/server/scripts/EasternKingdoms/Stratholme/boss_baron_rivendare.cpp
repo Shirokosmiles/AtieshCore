@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -25,7 +24,7 @@
 enum Texts
 {
     EMOTE_RAISE_DEAD    = 0,    // %s raises an undead servant back to life!
-    EMOTE_DEATH_PACT    = 1     // %s attempts to cast Death Pact on his servants!     
+    EMOTE_DEATH_PACT    = 1     // %s attempts to cast Death Pact on his servants!
 };
 
 enum Spells
@@ -37,6 +36,12 @@ enum Spells
     SPELL_DEATH_PACT_2  = 17471, // Visual effect
     SPELL_DEATH_PACT_3  = 17472, // Instant kill self only
     SPELL_RAISE_DEAD    = 17473, // Inits. 17698 and 17471
+    SPELL_RAISE_DEAD_1  = 17475,
+    SPELL_RAISE_DEAD_2  = 17476,
+    SPELL_RAISE_DEAD_3  = 17477,
+    SPELL_RAISE_DEAD_4  = 17478,
+    SPELL_RAISE_DEAD_5  = 17479,
+    SPELL_RAISE_DEAD_6  = 17480,
     SPELL_UNHOLY_AURA   = 17467
 };
 
@@ -48,11 +53,10 @@ enum BaronRivendareEvents
     EVENT_RAISE_DEAD    = 4
 };
 
-// Raise Dead
 uint32 const RaiseDeadSpells[6] =
 {
-    17475, 17476, 17477,
-    17478, 17479, 17480
+    SPELL_RAISE_DEAD_1, SPELL_RAISE_DEAD_2, SPELL_RAISE_DEAD_3,
+    SPELL_RAISE_DEAD_4, SPELL_RAISE_DEAD_5, SPELL_RAISE_DEAD_6
 };
 
 struct boss_baron_rivendare : public BossAI
@@ -62,9 +66,6 @@ public:
 
     void Reset() override
     {
-        // DoCastSelf doesn't add aura after reset
-        me->AddAura(SPELL_UNHOLY_AURA, me);
-
         // needed until re-write of instance scripts is done
         if (instance->GetData(TYPE_RAMSTEIN) == DONE)
             instance->SetData(TYPE_BARON, NOT_STARTED);
@@ -111,7 +112,6 @@ public:
                 case EVENT_SHADOWBOLT:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                         DoCast(target, SPELL_SHADOWBOLT);
-
                     events.Repeat(10s);
                     break;
                 case EVENT_CLEAVE:
@@ -125,11 +125,9 @@ public:
                 case EVENT_RAISE_DEAD:
                     if (!RaiseDead)
                     {
-                        DoCast(SPELL_RAISE_DEAD);
-
+                        DoCastSelf(SPELL_RAISE_DEAD);
                         for (uint32 const& summonSkeletons : RaiseDeadSpells)
                             DoCastSelf(summonSkeletons, true);
-
                         RaiseDead = true;
                         Talk(EMOTE_RAISE_DEAD);
                     }
@@ -140,12 +138,12 @@ public:
                     }
                     events.Repeat(12s);
                     break;
-                }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
+                default:
+                    break;
+            }
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
         }
-
         DoMeleeAttackIfReady();
     }
 
