@@ -433,6 +433,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         }
         movementInfo.transport.Reset();
     }
+    else if (plrMover && !plrMover->GetTransport() && plrMover->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))                // if we were on a elevator, leave
+    {
+        plrMover->SetUnderACKmount(); // just for safe
+        plrMover->SetFallInformation(0, plrMover->GetPositionZ());
+    }
 
     // So the PetAI will function properly
     if (crMover && crMover->ToPet())
