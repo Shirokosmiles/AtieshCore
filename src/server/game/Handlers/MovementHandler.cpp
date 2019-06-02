@@ -313,6 +313,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         {
             plrMover->SetSkipOnePacketForASH(true);
             plrMover->UpdateMovementInfo(movementInfo);
+            //TC_LOG_INFO("anticheat", "MovementHandler:: 1 IsPositionValid");
         }
         recvData.rfinish();                     // prevent warnings spam
         return;
@@ -334,12 +335,13 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             {
                 plrMover->SetSkipOnePacketForASH(true);
                 plrMover->UpdateMovementInfo(movementInfo);
+                //TC_LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
             }
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
 
-        // transports size limited
+        /* // transports size limited
         // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
         if (fabs(movementInfo.transport.pos.GetPositionX()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionY()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionZ()) > 75.0f)
         {
@@ -347,10 +349,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             {
                 plrMover->SetSkipOnePacketForASH(true);
                 plrMover->UpdateMovementInfo(movementInfo);
+                TC_LOG_INFO("anticheat", "MovementHandler:: 3 transports size limited");
             }
             recvData.rfinish();                 // prevent warnings spam
             return;
-        }
+        } */
 
         if (!Trinity::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
             movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
@@ -359,6 +362,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             {
                 plrMover->SetSkipOnePacketForASH(true);
                 plrMover->UpdateMovementInfo(movementInfo);
+                //TC_LOG_INFO("anticheat", "MovementHandler:: 4 Trinity::IsValidMapCoord");
             }
             recvData.rfinish();                 // prevent warnings spam
             return;
@@ -432,11 +436,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                 crMover->GetTransport()->RemovePassenger(crMover);
         }
         movementInfo.transport.Reset();
-    }
-    else if (plrMover && !plrMover->GetTransport() && plrMover->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))                // if we were on a elevator, leave
-    {
-        plrMover->SetUnderACKmount(); // just for safe
-        plrMover->SetFallInformation(0, plrMover->GetPositionZ());
     }
 
     // So the PetAI will function properly
