@@ -1448,14 +1448,9 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z, float* grou
                 else if (z < ground_z)
                     z = ground_z;
             }
-            else
-            {
-                z = GetMapHeight(x, y, z + (3 * unit->GetCollisionHeight()));
-                if (z < INVALID_HEIGHT)
-                    z = GetMapHeight(x, y, z + 10.0f);
-                if (groundZ)
-                    *groundZ = ground_z;
-            }
+
+            if (groundZ)
+                *groundZ = ground_z;
         }
         else
         {
