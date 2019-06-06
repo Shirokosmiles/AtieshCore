@@ -164,8 +164,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 lang = LANG_UNIVERSAL;
             else
             {
+                bool lfgininstance = sender->isUsingLfg() && sender->inRandomLfgDungeon();
                 switch (type)
                 {
+                    case CHAT_MSG_SAY:
+                    case CHAT_MSG_EMOTE:
+                    case CHAT_MSG_YELL:
                     case CHAT_MSG_PARTY:
                     case CHAT_MSG_PARTY_LEADER:
                     case CHAT_MSG_RAID:
@@ -173,6 +177,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     case CHAT_MSG_RAID_WARNING:
                         // allow two side chat at group channel if two side group allowed
                         if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                            lang = LANG_UNIVERSAL;
+                        else if (lfgininstance && sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP))
                             lang = LANG_UNIVERSAL;
                         break;
                     case CHAT_MSG_GUILD:
