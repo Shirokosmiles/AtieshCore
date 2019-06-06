@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
  * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -1474,6 +1475,9 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ANTISPAM_ENABLED] = sConfigMgr->GetBoolDefault("Antispam.Mail.Enabled", false);
     m_int_configs[CONFIG_ANTISPAM_MAIL_TIMER] = sConfigMgr->GetIntDefault("Antispam.Mail.Timer", 3600);
     m_int_configs[CONFIG_ANTISPAM_MAIL_COUNT] = sConfigMgr->GetIntDefault("Antispam.Mail.Count", 10);
+
+    // Strong Chat.System control
+    m_bool_configs[CONFIG_CHATRESTRICTSYMBOLS_ENABLED] = sConfigMgr->GetBoolDefault("chat.system.restrictsymbols.Enabled", false);
 
     //End of Custom Systems
 

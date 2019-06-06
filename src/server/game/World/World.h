@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
  * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -215,6 +216,7 @@ enum WorldBoolConfigs
     CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP,
     CONFIG_ALLOW_OSX_CONNECT,
     CONFIG_ANTISPAM_ENABLED,
+    CONFIG_CHATRESTRICTSYMBOLS_ENABLED,
     BOOL_CONFIG_VALUE_COUNT
 };
 

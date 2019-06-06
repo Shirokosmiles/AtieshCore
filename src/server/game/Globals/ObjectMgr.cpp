@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
  * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -8479,14 +8480,14 @@ bool ObjectMgr::IsValidChannelName(const std::string& name)
 
 bool ObjectMgr::IsValidChannelText(const std::string& name)
 {
-    if (name.size() > 254)
+    if (name.size() > 255)
         return false;
 
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
         return false;
 
-    if (wname.size() > 254)
+    if (wname.size() > 255)
         return false;
 
     if (wname.size() < 1)
@@ -8504,27 +8505,8 @@ inline bool isNasty(uint8 c)
     return false;
 }
 
-bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg)
+bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg, bool withNasty)
 {
-    // cut at the first newline or carriage return
-    std::string::size_type pos = msg.find_first_of("\n\r");
-    if (pos == 0)
-        return false;
-    else if (pos != std::string::npos)
-        msg.erase(pos);
-
-    // abort on any sort of nasty character
-    for (uint8 c : msg)
-        if (isNasty(c))
-        {
-            if (player)
-            {
-                TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", player->GetName().c_str(),
-                    player->GetGUID().GetCounter(), uint8(c));
-            }
-            return false;
-        }
-
     // validate utf8
     if (!utf8::is_valid(msg.begin(), msg.end()))
     {
@@ -8536,12 +8518,34 @@ bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg)
         return false;
     }
 
-    // collapse multiple spaces into one
-    if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
+    if (withNasty)
     {
-        auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
-        msg.erase(end, msg.end());
-    }
+        // cut at the first newline or carriage return
+        std::string::size_type pos = msg.find_first_of("\n\r");
+        if (pos == 0)
+            return false;
+        else if (pos != std::string::npos)
+            msg.erase(pos);
+
+        // abort on any sort of nasty character
+        for (uint8 c : msg)
+            if (isNasty(c))
+            {
+                if (player)
+                {
+                    TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", player->GetName().c_str(),
+                        player->GetGUID().GetCounter(), uint8(c));
+                }
+                return false;
+            }
+
+        // collapse multiple spaces into one
+        if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
+        {
+            auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
+            msg.erase(end, msg.end());
+        }
+    }    
 
     return true;
 }

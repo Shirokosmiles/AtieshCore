@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
+ * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -62,7 +63,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     uint32 lang;
 
     recvData >> type;
-    recvData >> lang;    
+    recvData >> lang;
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
@@ -71,14 +72,26 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (lang == LANG_UNIVERSAL && type != CHAT_MSG_AFK && type != CHAT_MSG_WHISPER && type != CHAT_MSG_BATTLEGROUND && type != CHAT_MSG_BATTLEGROUND_LEADER && type != CHAT_MSG_DND)
+    bool correcttype = false;
+    switch (type)
+    {
+        case CHAT_MSG_AFK:
+        case CHAT_MSG_WHISPER:
+        case CHAT_MSG_BATTLEGROUND:
+        case CHAT_MSG_BATTLEGROUND_LEADER:
+        case CHAT_MSG_DND:
+            correcttype = true;
+            break;
+    }
+
+    if (lang == LANG_UNIVERSAL && !correcttype)
     {
         TC_LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: %s tried to send a message in universal language", GetPlayerInfo().c_str());
         SendNotification(LANG_UNKNOWN_LANGUAGE);
         recvData.rfinish();
         return;
     }
-    
+
     //TC_LOG_DEBUG("CHAT: packet received. type %u, lang %u", type, lang);
 
     // prevent talking at unknown language (cheating)
@@ -222,33 +235,46 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
     }
 
+    bool addonmessage = false;
+    if (lang == LANG_ADDON)
+        addonmessage = true;
+
+    if (msg.size() > 255)
+    {
+        recvData.rfinish();
+        return;
+    }
+
     if (!msg.empty())
     {
         // Filter for message
-        if (!ObjectMgr::IsValidityChecks(sender, msg))
+        if (!ObjectMgr::IsValidityChecks(sender, msg, addonmessage))
         {
             recvData.rfinish();
             return;
         }
 
-        // Filter for message
-        if (!ObjectMgr::IsValidChannelText(msg))
+        if (sWorld->getBoolConfig(CONFIG_CHATRESTRICTSYMBOLS_ENABLED))
         {
-            recvData.rfinish();
-            return;
+            // Filter for message
+            if (!ObjectMgr::IsValidChannelText(msg))
+            {
+                recvData.rfinish();
+                return;
+            }
         }
 
         // validate hyperlinks
-        if (!sender->GetSession()->ValidateHyperlinksAndMaybeKick(msg))
+        if (!ValidateHyperlinksAndMaybeKick(msg))
         {
             recvData.rfinish();
             return;
         }
     }
-
-    // GS Reguest
+        
     if (lang == LANG_ADDON)
     {
+        // GS Reguest
         size_t foundGS;
         std::string msgGs = msg.substr(0, 10);
 
@@ -270,7 +296,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     if (!channel.empty() && channel != "")
     {
         // Filter for message
-        if (!ObjectMgr::IsValidityChecks(sender, channel))
+        if (!ObjectMgr::IsValidityChecks(sender, channel, addonmessage))
         {
             recvData.rfinish();
             return;
@@ -284,7 +310,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
 
         // validate hyperlinks
-        if (!sender->GetSession()->ValidateHyperlinksAndMaybeKick(channel))
+        if (!ValidateHyperlinksAndMaybeKick(channel))
         {
             recvData.rfinish();
             return;
@@ -338,13 +364,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
-            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground && !sender->IsGameMaster())
+            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground)
                 sender->SendBattleGroundChat(type, msg);
             else
                 sender->Say(msg, Language(lang));
 
             break;
-        } 
+        }
         case CHAT_MSG_EMOTE:
         {
             // Prevent cheating
@@ -361,7 +387,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
-            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground && !sender->IsGameMaster())
+            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground)
                 sender->SendBattleGroundChat(type, msg);
             else
                 sender->TextEmote(msg);
@@ -383,7 +409,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
-            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground && !sender->IsGameMaster())
+            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground)
                 sender->SendBattleGroundChat(type, msg);
             else
                 sender->Yell(msg, Language(lang));

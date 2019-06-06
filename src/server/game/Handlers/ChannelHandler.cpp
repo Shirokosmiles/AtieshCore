@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
  * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -90,6 +91,9 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         }        
     }
 
+    if (!ValidateHyperlinksAndMaybeKick(channelName))
+        return;
+
     TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s",
         GetPlayerInfo().c_str(), channelId, unknown1, unknown2, channelName.c_str(), password.c_str());
 
@@ -118,15 +122,6 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         recvPacket.rfinish();
         return;
     }
-
-    if (!utf8::is_valid(channelName.begin(), channelName.end()))
-    {
-        TC_LOG_ERROR("network", "Player %s tried to create a channel with an invalid UTF8 sequence - blocked", GetPlayer()->GetGUID().ToString().c_str());
-        return;
-    }
-
-    if (!ValidateHyperlinksAndMaybeKick(channelName))
-        return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
         if (Channel* channel = cMgr->GetJoinChannel(channelId, channelName, zone))

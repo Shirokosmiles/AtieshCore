@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
  * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -1441,7 +1442,7 @@ class TC_GAME_API ObjectMgr
         static bool IsValidCharterName(std::string const& name);
         static bool IsValidChannelName(std::string const& name);
         static bool IsValidChannelText(std::string const& name);
-        static bool IsValidityChecks(Player* player, std::string& name);
+        static bool IsValidityChecks(Player* player, std::string& name, bool withNasty = false);
         static bool CheckDeclinedNames(const std::wstring& w_ownname, DeclinedName const& names);
 
         GameTele const* GetGameTele(uint32 id) const

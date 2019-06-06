@@ -4574,3 +4574,5 @@ OSXPlayers.Enabled = 0
 Antispam.Mail.Enabled = 1
 Antispam.Mail.Timer = 3600
 Antispam.Mail.Count = 10
+
+chat.system.restrictsymbols.Enabled = 0
