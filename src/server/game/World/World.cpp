@@ -1475,9 +1475,10 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ANTISPAM_ENABLED] = sConfigMgr->GetBoolDefault("Antispam.Mail.Enabled", false);
     m_int_configs[CONFIG_ANTISPAM_MAIL_TIMER] = sConfigMgr->GetIntDefault("Antispam.Mail.Timer", 3600);
     m_int_configs[CONFIG_ANTISPAM_MAIL_COUNT] = sConfigMgr->GetIntDefault("Antispam.Mail.Count", 10);
+    m_int_configs[CONFIG_ANTISPAM_MAIL_COUNT_CONTROLLER] = sConfigMgr->GetIntDefault("Antispam.Mail.Controller", 100);
 
     // Strong Chat.System control
-    m_bool_configs[CONFIG_CHATRESTRICTSYMBOLS_ENABLED] = sConfigMgr->GetBoolDefault("chat.system.restrictsymbols.Enabled", false);
+    m_bool_configs[CONFIG_CHATRESTRICTSYMBOLS_ENABLED] = sConfigMgr->GetBoolDefault("Chat.StrictMessages.Enabled", false);
 
     //End of Custom Systems
 

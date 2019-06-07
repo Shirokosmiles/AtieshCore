@@ -429,7 +429,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
         ObjectGuid receiverGuid(HighGuid::Player, m->sender);
         if (Player* receiver = ObjectAccessor::FindConnectedPlayer(receiverGuid))
         {
-            if (receiver->GetMailSize() + receiver->GetAuctionLotsCount() > 100)
+            if (receiver->GetMailSize() + receiver->GetAuctionLotsCount() > sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_COUNT_CONTROLLER))
             {
                 GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
                 return;

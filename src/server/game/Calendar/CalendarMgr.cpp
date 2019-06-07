@@ -27,6 +27,7 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "WorldPacket.h"
+#include "World.h"
 
 CalendarInvite::CalendarInvite() : _inviteId(1), _eventId(0), _invitee(), _senderGUID(), _statusTime(GameTime::GetGameTime()),
 _status(CALENDAR_STATUS_INVITED), _rank(CALENDAR_RANK_PLAYER), _text("") { }
@@ -193,7 +194,7 @@ void CalendarMgr::RemoveEvent(uint64 eventId, ObjectGuid remover)
         {
             if (Player* premover = ObjectAccessor::FindConnectedPlayer(invite->GetInviteeGUID()))
             {
-                if (premover->GetMailSize() + premover->GetAuctionLotsCount() < 100)
+                if (premover->GetMailSize() + premover->GetAuctionLotsCount() < sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_COUNT_CONTROLLER))
                     mail.SendMailTo(trans, MailReceiver(invite->GetInviteeGUID().GetCounter()), calendarEvent, MAIL_CHECK_MASK_COPIED);
             }
         }

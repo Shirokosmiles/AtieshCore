@@ -4569,7 +4569,7 @@ PVPBonusCapReward.CapChanges.Lose = 60
 #    RE.OSXPlayers.Enabled = 1 - enabled.
 #    RE.OSXPlayers.Enabled = 0 - disabled.
 
-OSXPlayers.Enabled = 0
+OSXPlayers.Enabled = 1
 
 #
 ###################################################################################################
@@ -4578,4 +4578,16 @@ Antispam.Mail.Enabled = 1
 Antispam.Mail.Timer = 3600
 Antispam.Mail.Count = 10
 
-chat.system.restrictsymbols.Enabled = 0
+#    Antispam.Mail.Controller = 100 - how many mails player can hold in mailbox, include mail in future (from auctionhouse and calendar).
+#        Description: When player will receive this limit, he just can't bid or bidout from auction. Calendar will not sent mail him. 
+#                     And another player can't sent mail to him, just will see error overloaded mailbox of receiver.
+
+Antispam.Mail.Controller = 100
+
+#    Chat.StrictMessages
+#        Description: Limit player message to language specific symbol set. Prevents character
+#                     messages and ignore request if not allowed symbols are used
+#        Default:     0 - (Disable, Limited server timezone dependent client check)
+#                     1 - (Enabled, Strictly all locales specific + some basic symbols)
+
+Chat.StrictMessages.Enabled = 0
