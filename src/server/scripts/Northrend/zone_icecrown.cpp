@@ -778,6 +778,25 @@ class npc_frostbrood_skytalon : public CreatureScript
         }
 };
 
+class npc_frostbrood_Destroyer : public CreatureScript
+{
+public:
+    npc_frostbrood_Destroyer() : CreatureScript("npc_nrostbrood_Destroyer") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_frostbrood_DestroyerAI(creature);
+    }
+
+    struct npc_frostbrood_DestroyerAI : public ScriptedAI
+    {
+        npc_frostbrood_DestroyerAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetIgnoreEvade(true);
+        }
+    };
+};
+
 void AddSC_icecrown()
 {
     new npc_argent_valiant;
@@ -785,4 +804,5 @@ void AddSC_icecrown()
     new npc_tournament_training_dummy;
     new npc_blessed_banner();
     new npc_frostbrood_skytalon();
+    new npc_frostbrood_Destroyer();
 }
