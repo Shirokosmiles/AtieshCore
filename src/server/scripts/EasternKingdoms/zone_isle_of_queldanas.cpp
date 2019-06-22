@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
+ * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,31 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Isle_of_Queldanas
-SD%Complete: 100
-SDComment: Quest support: 24535,24563,24553,24564
-SDCategory: Isle Of Quel'Danas
-EndScriptData */
-
-/* ContentData
-npc_greengill_slave
-npc_thalorien_dawnseeker
-EndContentData */
-
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "MotionMaster.h"
+#include "ObjectAccessor.h"
 #include "Player.h"
-#include "SpellInfo.h"
+#include "TemporarySummon.h"
 
-/*######
-## npc_thalorien_dawnseeker
-######*/
-
-enum ThalorienDawnseekerSays
+enum ThalorienDawnseekerTexts
 {
     SAY_THALORIEN_1 = 0,
     SAY_THALORIEN_2 = 1,
@@ -51,11 +37,8 @@ enum ThalorienDawnseekerSays
     SAY_THALORIEN_7 = 6,
     SAY_THALORIEN_8 = 7,
     SAY_THALORIEN_9 = 8,
-    SAY_THALORIEN_10 = 9
-};
+    SAY_THALORIEN_10 = 9,
 
-enum MorlenSays
-{
     SAY_MORLEN_1 = 0,
     SAY_MORLEN_2 = 1,
     SAY_MORLEN_3 = 2,
@@ -63,15 +46,12 @@ enum MorlenSays
     SAY_MORLEN_5 = 4
 };
 
-enum ThalorienDawnseekerCreatures
+enum ThalorienDawnseekerSummons
 {
-    NPC_THALORIEN_DAWNSEEKER    = 37205,
-    NPC_MORLEN_GOLDGRIP         = 37542,
-    NPC_QUEST_CREDIT            = 37601,
-    NPC_SUNWELL_DEFENDER        = 37211,
-    NPC_SCOURGE_ZOMBIE          = 37538,
-    NPC_GHOUL_INVADER           = 37539,
-    NPC_CRYPT_RAIDER            = 37541
+    SUMMON_SUNWELL_DEFENDER = 1,
+    SUMMON_SCOURGE_ZOMBIE   = 2,
+    SUMMON_GHOUL_INVADER    = 3,
+    SUMMON_CRYPT_RAIDER     = 4
 };
 
 enum ThalorienDawnseekerActions
@@ -81,298 +61,360 @@ enum ThalorienDawnseekerActions
 
 enum ThalorienDawnseekerEvents
 {
-    EVENT_STEP_1    = 1,
-    EVENT_STEP_2    = 2,
-    EVENT_STEP_3    = 3,
-    EVENT_STEP_4    = 4,
-    EVENT_STEP_5    = 5,
-    EVENT_STEP_6    = 6,
-    EVENT_STEP_7    = 7,
-    EVENT_STEP_8    = 8,
-    EVENT_STEP_9    = 9,
-    EVENT_STEP_10   = 10,
-    EVENT_STEP_11   = 11,
-    EVENT_STEP_12   = 12,
-    EVENT_STEP_13   = 13,
-    EVENT_STEP_14   = 14,
-    EVENT_STEP_15   = 15,
-    EVENT_STEP_16   = 16,
-    EVENT_STEP_17   = 17,
-    EVENT_STEP_18   = 18,
-    EVENT_STEP_19   = 19
+    EVENT_INTRO_0           = 1,
+    EVENT_INTRO_1           = 2,
+    EVENT_INTRO_2           = 3,
+    EVENT_INTRO_3           = 4,
+    EVENT_SALUTE            = 5,
+    EVENT_DEFENDERS_RUN     = 6,
+    EVENT_DEFENDERS_RUN_2   = 7,
+    EVENT_THALORIEN_GO      = 8,
+    EVENT_INTRO_4           = 9,
+    EVENT_SUMMON_MORLEN     = 10,
+    EVENT_INTRO_5           = 11,
+    EVENT_MORLEN_1          = 12,
+    EVENT_SPAWN_WAVE_1      = 13,
+    EVENT_SPAWN_WAVE_2      = 14,
+    EVENT_SPAWN_WAVE_3      = 15,
+    EVENT_WAVE_ATTACK       = 16,
+    EVENT_MORLEN_2          = 17,
+    EVENT_MORLEN_ATTACK     = 18,
+    EVENT_OUTRO_1           = 19,
+    EVENT_OUTRO_2           = 20,
+    EVENT_OUTRO_3           = 21,
+    EVENT_OUTRO_4           = 22,
+    EVENT_KNEEL             = 23
 };
 
-enum ThalorienDawnseekerMisc
+enum ThalorienDawnseeker
 {
-    OPTION_ID_REMAINS       = 0,
-    DISPLAY_MOUNT           = 25678,
-    QUEST_THALORIEN_A       = 24535,
-    QUEST_THALORIEN_H       = 24563,
-    GOSSIP_MENU_ID_REMAINS  = 37552,
-    SPELL_BLOOD_PRESENCE    = 50689
+    MENU_EXAMINE_REMAINS        = 10908,
+
+    NPC_THALORIEN_DAWNSEEKER    = 37205,
+    NPC_SUNWELL_DEFENDER        = 37211,
+    NPC_MORLEN_GOLDGRIP         = 37542,
+    NPC_SCOURGE_ZOMBIE          = 37538,
+    NPC_GHOUL_INVADER           = 37539,
+    NPC_CRYPT_RAIDER            = 37541,
+
+    SPELL_BLOOD_PRESENCE        = 50689,
+    SPELL_KILL_CREDIT           = 70265,
+    SPELL_POLYMORPH_VISUAL      = 27123
 };
 
-Position const ZombieLoc[5] =
+uint8 const defenders = 10;
+float const defendersOrientation = 5.67232f;
+Position const defendersRun[] =
 {
-    { 11768.7f, -7065.83f, 24.0971f, 0.125877f },
-    { 11769.5f, -7063.83f, 24.1399f, 6.06035f },
-    { 11769.8f, -7061.41f, 24.2536f, 6.06035f },
-    { 11769.4f, -7057.86f, 24.4624f, 0.00335493f },
-    { 11769.4f, -7054.56f, 24.6869f, 0.00335493f }
+        { 11934.78f, -7064.424f, 33.38046f },
+        { 11927.9f,  -7061.303f, 32.00986f },
+        { 11927.81f, -7067.289f, 31.81058f },
+        { 11927.89f, -7058.299f, 32.13486f },
+        { 11927.9f,  -7061.303f, 32.00986f },
+
+        { 11934.78f, -7064.424f, 33.38046f },
+        { 11920.69f, -7061.134f, 30.40684f },
+        { 11920.56f, -7067.133f, 30.41605f },
+        { 11920.76f, -7058.135f, 30.61656f },
+        { 11920.5f,  -7070.132f, 30.40836f }
 };
 
-Position const GuardLoc[4] =
-{
-    { 11807.0f, -7070.37f, 25.372f, 3.218f },
-    { 11805.7f, -7073.64f, 25.5694f, 3.218f },
-    { 11805.6f, -7077.0f, 25.9643f, 3.218f },
-    { 11806.0f, -7079.71f, 26.2067f, 3.218f }
-};
+Position const thalorienSummon = { 11795.32f, -7070.476f, 26.27511f, 5.67232f  };
+Position const thalorienFight = { 11788.46f, -7063.375f, 25.79677f, 3.054326f };
+Position const morlenSummon = { 11766.46f, -7050.078f, 26.19846f, 5.637414f  };
 
-class npc_thalorien_dawnseeker : public CreatureScript
+struct npc_thalorien_dawnseeker : public ScriptedAI
 {
-public:
-    npc_thalorien_dawnseeker() : CreatureScript("npc_thalorien_dawnseeker") { }
-
-    struct npc_thalorien_dawnseekerAI : public ScriptedAI
+    npc_thalorien_dawnseeker(Creature* creature) : ScriptedAI(creature), _summons(me)
     {
-        npc_thalorien_dawnseekerAI(Creature* creature) : ScriptedAI(creature) { }
-
-        bool GossipHello(Player* player) override
-        {
-            player->PrepareGossipMenu(me, 0);
-
-            if ((player->GetQuestStatus(QUEST_THALORIEN_A) == QUEST_STATUS_INCOMPLETE) || (player->GetQuestStatus(QUEST_THALORIEN_H) == QUEST_STATUS_INCOMPLETE))
-                AddGossipItemFor(player, GOSSIP_MENU_ID_REMAINS, OPTION_ID_REMAINS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            player->SendPreparedGossip(me);
-            return true;
-        }
-
-        bool GossipSelect(Player* player, uint32 /*uiSender*/, uint32 gossipListId) override
-        {
-            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            ClearGossipMenuFor(player);
-
-            switch (action)
-            {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                CloseGossipMenuFor(player);
-                me->AI()->SetGUID(player->GetGUID());
-                me->SetPhaseMask(2, true);
-                player->SetPhaseMask(2, true); // Better handling if we find the correct Phasing-Spell
-                me->AI()->DoAction(ACTION_START_QUEST);
-                break;
-            default:
-                return false;
-            }
-            return true;
-        }
-
-        void Reset() override
-        {
-            if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayer))
-                player->SetPhaseMask(1, true);
-            if (Creature* Morlen = ObjectAccessor::GetCreature(*me, uiMorlen))
-                Morlen->DisappearAndDie();
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            me->SetPhaseMask(1, true);
-            events.Reset();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            events.Update(diff);
-
-            switch (events.ExecuteEvent())
-            {
-            case EVENT_STEP_1:
-                if (Creature* Thalorien = me->SummonCreature(NPC_THALORIEN_DAWNSEEKER, 11797.0f, -7074.06f, 26.379f, 0.242908f, TEMPSUMMON_CORPSE_DESPAWN, 0))
-                {
-                    Thalorien->SetPhaseMask(2, true);
-                    uiThalorien = Thalorien->GetGUID();
-                }
-
-                for (int i = 0; i < 4; ++i)
-                    if (Creature* Guard = me->SummonCreature(NPC_SUNWELL_DEFENDER, GuardLoc[i], TEMPSUMMON_TIMED_DESPAWN, 30000))
-                        Guard->SetPhaseMask(2, true);
-
-                if (Creature* Morlen = me->SummonCreature(NPC_MORLEN_GOLDGRIP, 11776.8f, -7050.72f, 25.2394f, 5.13752f, TEMPSUMMON_CORPSE_DESPAWN, 0))
-                {
-                    Morlen->Mount(DISPLAY_MOUNT);
-                    Morlen->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    Morlen->SetPhaseMask(2, true);
-                    Morlen->SetReactState(REACT_PASSIVE);
-                    uiMorlen = Morlen->GetGUID();
-                }
-                events.ScheduleEvent(EVENT_STEP_2, 0.1 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_2:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->AI()->Talk(SAY_THALORIEN_1);
-                events.ScheduleEvent(EVENT_STEP_3, 5 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_3:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->AI()->Talk(SAY_THALORIEN_2);
-                events.ScheduleEvent(EVENT_STEP_4, 5 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_4:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->AI()->Talk(SAY_THALORIEN_3);
-                events.ScheduleEvent(EVENT_STEP_5, 10 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_5:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->AI()->Talk(SAY_THALORIEN_4);
-                events.ScheduleEvent(EVENT_STEP_6, 6 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_6:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->GetMotionMaster()->MovePoint(0, 11787.3f, -7064.11f, 25.8395f);
-                events.ScheduleEvent(EVENT_STEP_7, 6 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_7:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->AI()->Talk(SAY_THALORIEN_5);
-                events.ScheduleEvent(EVENT_STEP_8, 9 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_8:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->AI()->Talk(SAY_THALORIEN_6);
-                if (Creature* Morlen = ObjectAccessor::GetCreature(*me, uiMorlen))
-                    Morlen->CastSpell(Morlen, SPELL_BLOOD_PRESENCE, true);
-                events.ScheduleEvent(EVENT_STEP_9, 9 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_9:
-                if (Creature* Morlen = ObjectAccessor::GetCreature(*me, uiMorlen))
-                    Morlen->AI()->Talk(SAY_MORLEN_1);
-                events.ScheduleEvent(EVENT_STEP_10, 9 * IN_MILLISECONDS);
-                break;
-                // Intro 
-            case EVENT_STEP_10:
-                if (Creature* Morlen = ObjectAccessor::GetCreature(*me, uiMorlen))
-                    Morlen->AI()->Talk(SAY_MORLEN_2);
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->SetHomePosition(Thalorien->GetPositionX(), Thalorien->GetPositionY(), Thalorien->GetPositionZ(), Thalorien->GetOrientation());
-                SummonWave(NPC_SCOURGE_ZOMBIE);
-                events.ScheduleEvent(EVENT_STEP_11, 30 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_11:
-                if (Creature* Morlen = ObjectAccessor::GetCreature(*me, uiMorlen))
-                    Morlen->AI()->Talk(SAY_MORLEN_3);
-                SummonWave(NPC_GHOUL_INVADER);
-                events.ScheduleEvent(EVENT_STEP_12, 30 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_12:
-                if (Creature* Morlen = ObjectAccessor::GetCreature(*me, uiMorlen))
-                    Morlen->AI()->Talk(SAY_MORLEN_4);
-                SummonWave(NPC_CRYPT_RAIDER);
-                events.ScheduleEvent(EVENT_STEP_13, 30 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_13:
-                if (Creature* Morlen = ObjectAccessor::GetCreature(*me, uiMorlen))
-                    Morlen->AI()->Talk(SAY_MORLEN_5);
-                events.ScheduleEvent(EVENT_STEP_14, 1 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_14:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                {
-                    if (Creature* Morlen = ObjectAccessor::GetCreature(*me, uiMorlen))
-                    {
-                        Morlen->SetReactState(REACT_AGGRESSIVE);
-                        AddThreat(Thalorien, 100, Morlen);
-                        Morlen->AI()->AttackStart(Thalorien);
-                        Morlen->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    }
-                }
-                break;
-                // Outro
-            case EVENT_STEP_15:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->AI()->Talk(SAY_THALORIEN_7);
-                events.ScheduleEvent(EVENT_STEP_16, 5 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_16:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->AI()->Talk(SAY_THALORIEN_8);
-                events.ScheduleEvent(EVENT_STEP_17, 5 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_17:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->AI()->Talk(SAY_THALORIEN_9);
-                events.ScheduleEvent(EVENT_STEP_18, 6 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_18:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->AI()->Talk(SAY_THALORIEN_10);
-                events.ScheduleEvent(EVENT_STEP_19, 12 * IN_MILLISECONDS);
-                break;
-            case EVENT_STEP_19:
-                if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-                    Thalorien->DisappearAndDie();
-                if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayer))
-                    player->KilledMonsterCredit(NPC_QUEST_CREDIT, player->GetGUID());
-                Reset();
-                break;
-            default:
-                break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-        void SummonWave(uint32 entry)
-        {
-            if (Creature* Thalorien = ObjectAccessor::GetCreature(*me, uiThalorien))
-            {
-                for (int i = 0; i < 5; ++i)
-                    if (Creature* Zombie = me->SummonCreature(entry, ZombieLoc[i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                    {
-                        Zombie->SetPhaseMask(2, true);
-                        AddThreat(Thalorien, 100.0f, Zombie);
-                        Zombie->AI()->AttackStart(Thalorien);
-                    }
-            }
-        }
-
-        void SummonedCreatureDespawn(Creature* summon) override
-        {
-            if (summon->GetEntry() == NPC_THALORIEN_DAWNSEEKER)
-            {
-                Reset();
-                return;
-            }
-
-            if (summon->GetEntry() == NPC_MORLEN_GOLDGRIP)
-                events.ScheduleEvent(EVENT_STEP_15, 3 * IN_MILLISECONDS);
-        }
-
-        void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
-        {
-            uiPlayer = guid;
-        }
-
-        void DoAction(int32 action) override
-        {
-            switch (action)
-            {
-            case ACTION_START_QUEST:
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                events.ScheduleEvent(EVENT_STEP_1, 0);
-                break;
-            }
-        }
-    private:
-        EventMap events;
-        ObjectGuid uiThalorien;
-        ObjectGuid uiPlayer;
-        ObjectGuid uiMorlen;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_thalorien_dawnseekerAI(creature);
     }
+
+    bool GossipSelect(Player* player, uint32 menuId, uint32 /*gossipListId*/) override
+    {
+        if (menuId == MENU_EXAMINE_REMAINS)
+        {
+            CloseGossipMenuFor(player);
+            DoAction(ACTION_START_QUEST);
+            _playerGUID = player->GetGUID();
+        }
+        return false;
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_START_QUEST)
+        {
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+            if (Creature* thalorien = me->SummonCreature(NPC_THALORIEN_DAWNSEEKER, thalorienSummon, TEMPSUMMON_CORPSE_DESPAWN, 0))
+                _thalorienGUID = thalorien->GetGUID();
+            me->SummonCreatureGroup(SUMMON_SUNWELL_DEFENDER);
+
+            _events.ScheduleEvent(EVENT_INTRO_0, 3s);
+        }
+    }
+
+    void Reset() override
+    {
+        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        _summons.DespawnAll();
+        _playerGUID.Clear();
+        _morlenGUID.Clear();
+        _thalorienGUID.Clear();
+        _events.Reset();
+    }
+
+    void ThalorienTalk(uint32 id)
+    {
+        if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+            thalorien->AI()->Talk(id);
+    }
+
+    void MorlenTalk(uint32 id)
+    {
+        if (Creature* morlen = ObjectAccessor::GetCreature(*me, _morlenGUID))
+            morlen->AI()->Talk(id);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_INTRO_0:
+                    ThalorienTalk(SAY_THALORIEN_1);
+
+                    _events.ScheduleEvent(EVENT_INTRO_1, 5s);
+                    break;
+                case EVENT_INTRO_1:
+                    ThalorienTalk(SAY_THALORIEN_2);
+
+                    _events.ScheduleEvent(EVENT_INTRO_2, 6s);
+                    break;
+                case EVENT_INTRO_2:
+                    ThalorienTalk(SAY_THALORIEN_3);
+
+                    _events.ScheduleEvent(EVENT_INTRO_3, 7s);
+                    break;
+
+                case EVENT_INTRO_3:
+                    ThalorienTalk(SAY_THALORIEN_4);
+
+                    _events.ScheduleEvent(EVENT_SALUTE, 4s);
+                    break;
+                case EVENT_SALUTE:
+                    for (auto& summon : _summons)
+                        if (Creature* creature = ObjectAccessor::GetCreature(*me, summon))
+                            creature->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+
+                    _events.ScheduleEvent(EVENT_DEFENDERS_RUN, 3s);
+                    break;
+                case EVENT_DEFENDERS_RUN:
+                {
+                    _events.ScheduleEvent(EVENT_DEFENDERS_RUN_2, 3s);
+                    _events.ScheduleEvent(EVENT_THALORIEN_GO, 2s);
+
+                    uint8 defendersCount = 0;
+                    for (auto& summon : _summons)
+                    {
+                        Creature* creature = ObjectAccessor::GetCreature(*me, summon);
+                        if (!creature)
+                            continue;
+
+                        if (creature->GetEntry() != NPC_SUNWELL_DEFENDER)
+                            continue;
+
+                        defendersCount++;
+                        if (defendersCount <= 5)
+                            creature->SetFacingTo(defendersOrientation);
+                        else
+                            if (defendersCount - 1 < defenders)
+                                creature->GetMotionMaster()->MovePoint(0, defendersRun[defendersCount - 1]);
+                    }
+
+                    break;
+                }
+                case EVENT_DEFENDERS_RUN_2:
+                {
+                    uint8 defendersCount = 0;
+                    for (auto& summon : _summons)
+                    {
+                        Creature* creature = ObjectAccessor::GetCreature(*me, summon);
+                        if (!creature)
+                            continue;
+
+                        if (creature->GetEntry() != NPC_SUNWELL_DEFENDER)
+                            continue;
+
+                        ++defendersCount;
+                        if (defendersCount < defenders)
+                            creature->GetMotionMaster()->MovePoint(0, defendersRun[defendersCount]);
+                    }
+
+                    break;
+                }
+                case EVENT_THALORIEN_GO:
+                    if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+                    {
+                        thalorien->SetWalk(true);
+                        thalorien->GetMotionMaster()->MovePoint(0, thalorienFight);
+                        thalorien->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                        thalorien->SetHomePosition(thalorienFight);
+                    }
+
+                    _events.ScheduleEvent(EVENT_INTRO_4, 4s);
+                    break;
+                case EVENT_INTRO_4:
+                    ThalorienTalk(SAY_THALORIEN_5);
+
+                    _events.ScheduleEvent(EVENT_SUMMON_MORLEN, 6s);
+                    _events.ScheduleEvent(EVENT_INTRO_5, 9s);
+                    break;
+                case EVENT_INTRO_5:
+                    ThalorienTalk(SAY_THALORIEN_6);
+
+                    _events.ScheduleEvent(EVENT_MORLEN_1, 6s);
+                    break;
+                case EVENT_SUMMON_MORLEN:
+                    if (Creature* morlen = me->SummonCreature(NPC_MORLEN_GOLDGRIP, morlenSummon, TEMPSUMMON_CORPSE_DESPAWN, 0))
+                    {
+                        _morlenGUID = morlen->GetGUID();
+                        morlen->AI()->DoCastSelf(SPELL_BLOOD_PRESENCE);
+                    }
+
+                    break;
+                case EVENT_MORLEN_1:
+                    MorlenTalk(SAY_MORLEN_1);
+
+                    _events.ScheduleEvent(EVENT_SPAWN_WAVE_1, 7s);
+                    break;
+                case EVENT_SPAWN_WAVE_1:
+                    MorlenTalk(SAY_MORLEN_2);
+
+                    me->SummonCreatureGroup(SUMMON_SCOURGE_ZOMBIE);
+
+                    _events.ScheduleEvent(EVENT_WAVE_ATTACK, 3s);
+                    break;
+                case EVENT_SPAWN_WAVE_2:
+                    MorlenTalk(SAY_MORLEN_3);
+
+                    me->SummonCreatureGroup(SUMMON_GHOUL_INVADER);
+
+                    _events.ScheduleEvent(EVENT_WAVE_ATTACK, 3s);
+                    break;
+                case EVENT_SPAWN_WAVE_3:
+                    MorlenTalk(SAY_MORLEN_4);
+
+                    me->SummonCreatureGroup(SUMMON_CRYPT_RAIDER);
+
+                    _events.ScheduleEvent(EVENT_WAVE_ATTACK, 3s);
+                    break;
+                case EVENT_WAVE_ATTACK:
+                    for (auto& summon : _summons)
+                    {
+                        Creature* creature = ObjectAccessor::GetCreature(*me, summon);
+                        if (!creature)
+                            continue;
+
+                        if (creature->GetEntry() == NPC_THALORIEN_DAWNSEEKER ||
+                            creature->GetEntry() == NPC_MORLEN_GOLDGRIP)
+                            continue;
+
+                        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+                            creature->AI()->AttackStart(thalorien);
+                    }
+
+                    break;
+                case EVENT_MORLEN_2:
+                    MorlenTalk(SAY_MORLEN_5);
+
+                    _events.ScheduleEvent(EVENT_MORLEN_ATTACK, 1s);
+                    break;
+                case EVENT_MORLEN_ATTACK:
+                    if (Creature* morlen = ObjectAccessor::GetCreature(*me, _morlenGUID))
+                    {
+                        morlen->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+                            morlen->AI()->AttackStart(thalorien);
+                    }
+
+                    break;
+                case EVENT_OUTRO_1:
+                    if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                            thalorien->AI()->DoCast(player, SPELL_KILL_CREDIT);
+
+                    ThalorienTalk(SAY_THALORIEN_7);
+
+                    _events.ScheduleEvent(EVENT_OUTRO_2, 5s);
+                    break;
+                case EVENT_OUTRO_2:
+                    ThalorienTalk(SAY_THALORIEN_8);
+
+                    _events.ScheduleEvent(EVENT_OUTRO_3, 7s);
+                    break;
+                case EVENT_OUTRO_3:
+                    if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+                        thalorien->AI()->DoCastSelf(SPELL_POLYMORPH_VISUAL);
+
+                    ThalorienTalk(SAY_THALORIEN_9);
+
+                    _events.ScheduleEvent(EVENT_OUTRO_4, 5s);
+                    break;
+                case EVENT_OUTRO_4:
+                    ThalorienTalk(SAY_THALORIEN_10);
+
+                    _events.ScheduleEvent(EVENT_KNEEL, 6s);
+                    break;
+                case EVENT_KNEEL:
+                    if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+                    {
+                        thalorien->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        thalorien->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+                    }
+
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+                    break;
+            }
+        }
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        _summons.Summon(summon);
+    }
+
+    void SummonedCreatureDespawn(Creature* summon) override
+    {
+        _summons.Despawn(summon);
+
+        if (_summons.size() == 2)
+        {
+            if (summon->GetEntry() == NPC_SCOURGE_ZOMBIE)
+                _events.ScheduleEvent(EVENT_SPAWN_WAVE_2, 1s);
+            else if (summon->GetEntry() == NPC_GHOUL_INVADER)
+                _events.ScheduleEvent(EVENT_SPAWN_WAVE_3, 1s);
+            else if (summon->GetEntry() == NPC_CRYPT_RAIDER)
+                _events.ScheduleEvent(EVENT_MORLEN_2, 1s);
+        }
+        else if (_summons.size() == 1)
+        {
+            if (summon->GetEntry() == NPC_MORLEN_GOLDGRIP)
+                _events.ScheduleEvent(EVENT_OUTRO_1, 2s);
+        }
+    }
+
+private:
+    EventMap _events;
+    SummonList _summons;
+    ObjectGuid _playerGUID;
+    ObjectGuid _thalorienGUID;
+    ObjectGuid _morlenGUID;
 };
 
 enum SaysQueldelar
@@ -733,7 +775,7 @@ public:
 
 void AddSC_isle_of_queldanas()
 {
-    new npc_thalorien_dawnseeker();
+    RegisterCreatureAI(npc_thalorien_dawnseeker);
     new go_dalaran_portal_sunwell();
     new npc_sunwell_warder();
     new npc_queldelar_sunwell_plateau();
