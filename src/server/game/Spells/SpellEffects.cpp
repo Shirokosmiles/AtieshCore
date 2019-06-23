@@ -3747,19 +3747,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     m_caster->ToPlayer()->DestroyItemCount(damage, 5, true);
                     break;
                 }
-                case 58418:                                 // Portal to Orgrimmar
-                case 58420:                                 // Portal to Stormwind
-                {
-                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER || effIndex != 0)
-                        return;
-
-                    uint32 spellID = m_spellInfo->Effects[EFFECT_0].CalcValue();
-                    uint32 questID = m_spellInfo->Effects[EFFECT_1].CalcValue();
-
-                    if (unitTarget->ToPlayer()->GetQuestStatus(questID) == QUEST_STATUS_COMPLETE)
-                        unitTarget->CastSpell(unitTarget, spellID, true);
-                    break;
-                }
                 case 52173: // Coyote Spirit Despawn
                 case 60243: // Blood Parrot Despawn
                 {
