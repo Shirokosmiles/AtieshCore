@@ -1445,7 +1445,7 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recvData)
         _player->SetCanFlybyServer(true);
     else
         _player->SetCanFlybyServer(false);
-    _player->m_unitMovedByMe->m_movementInfo.flags = movementInfo.GetMovementFlags();
+    _player->GetUnitBeingMoved()->m_movementInfo.flags = movementInfo.GetMovementFlags();
 }
 
 void WorldSession::HandleRequestPetInfoOpcode(WorldPacket& /*recvData */)
