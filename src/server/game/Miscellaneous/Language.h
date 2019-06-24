@@ -1088,7 +1088,7 @@ enum TrinityStrings
     LANG_GM_ANNOUNCE_COLOR                = 6615,
 
     LANG_GM_SILENCE                       = 6616,  // "Silence is ON for %s" - Spell 1852
-    // 6617-6623 for Anticheat reserved    
+    // 6617-6625 for Anticheat reserved    
 
     LANG_WORLD_CLOSED                     = 7523,
     LANG_WORLD_OPENED                     = 7524,
