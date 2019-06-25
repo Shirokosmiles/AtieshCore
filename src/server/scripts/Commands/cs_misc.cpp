@@ -1905,12 +1905,10 @@ public:
 
         if (target)
         {
-            std::string _canfly = handler->GetTrinityString(LANG_ERROR);
-            _canfly = target->IsCanFlybyServer() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
+            std::string _canfly = target->IsCanFlybyServer() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
             handler->PSendSysMessage(LANG_PINFO_CHR_FLY_MODE, _canfly.c_str());
 
-            std::string _hasvip = handler->GetTrinityString(LANG_ERROR);
-            _hasvip = target->IsPremium() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
+            std::string _hasvip = target->IsPremium() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
             handler->PSendSysMessage(LANG_PINFO_CHR_VIP_MODE, _hasvip.c_str());
             handler->PSendSysMessage("GearScore : %u", target->GetGearScore());
             uint32 ailvl = target->GetAverageItemLevel();

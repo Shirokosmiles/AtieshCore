@@ -6,7 +6,9 @@ variables:
 
 before_script:
   - apt-get -yqq update
-  - apt-get -yqq install libboost1.58-dev libboost-filesystem1.58-dev libboost-iostreams1.58-dev libboost-program-options1.58-dev libboost-regex1.58-dev libboost-system1.58-dev libboost-thread1.58-dev libssl-dev libmysqlclient-dev libreadline6-dev zlib1g-dev libbz2-dev
+  - apt-get -yqq install build-essential libtool make cmake openssl mysql-client
+  - apt-get -yqq install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libzmq3-dev
+  - apt-get -yqq install libboost1.55-dev libboost-thread1.55-dev libboost-filesystem1.55-dev libboost-system1.55-dev libboost-program-options1.55-dev libboost-iostreams1.55-dev
 
 install:
   script:
@@ -27,6 +29,3 @@ install:
     - mysql -uroot < sql/create/drop_mysql.sql
     - cd bin
     - make -j 10 -k
-    - cd check_install/bin
-    - ./authserver --version
-    - ./worldserver --version

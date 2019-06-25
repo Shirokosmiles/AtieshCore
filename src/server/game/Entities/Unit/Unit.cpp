@@ -11251,7 +11251,8 @@ void Unit::SetControlled(bool apply, UnitState state)
 
         if (GetTypeId() == TYPEID_PLAYER)
         {
-            uint32 pinginthismoment = fabs(ToPlayer()->GetLastMoveClientTimestamp() - ToPlayer()->GetLastMoveServerTimestamp()) / 1000000;
+            float fabscount = fabs(float(ToPlayer()->GetLastMoveClientTimestamp()) - float(ToPlayer()->GetLastMoveServerTimestamp()));
+            uint32 pinginthismoment = uint32(fabscount) / 1000000;
             ToPlayer()->SetRootACKUpd(pinginthismoment);
             //TC_LOG_INFO("anticheat", "Latency = %u", pinginthismoment);
         }
