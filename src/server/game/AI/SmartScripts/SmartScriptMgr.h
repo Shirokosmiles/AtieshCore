@@ -961,6 +961,7 @@ struct SmartAction
         {
             uint32 id;
             uint32 timerType;
+            uint32 allowOverride;
         } timedActionList;
 
         struct
