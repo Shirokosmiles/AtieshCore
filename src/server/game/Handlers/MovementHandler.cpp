@@ -490,7 +490,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             plrMover->SetJumpingbyOpcode(true);
             plrMover->SetUnderACKmount();
         }
-        else if (!plrMover->UnderACKmount())
+        else if (!plrMover->UnderACKmount() && !plrMover->IsFlying())
         {
             // fake jumper -> for example gagarin air mode with falling flag (like player jumping), but client can't sent a new coords when falling
             TC_LOG_INFO("anticheat", "MovementHandler::Fake_Jumper by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());

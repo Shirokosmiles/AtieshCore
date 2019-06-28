@@ -27049,7 +27049,8 @@ bool Player::CheckOnFlyHack()
     if (!IsInWater() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
         float waterlevel = GetBaseMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
-        if (waterlevel && (pz - waterlevel) <= GetCollisionHeight())
+        bool hovergaura = HasAuraType(SPELL_AURA_WATER_WALK) || HasAuraType(SPELL_AURA_HOVER);
+        if (waterlevel && (pz - waterlevel) <= (hovergaura ? GetCollisionHeight() + 1.5f + GetHoverOffset() : GetCollisionHeight() + GetHoverOffset()))
             return true;
 
         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
@@ -27145,7 +27146,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
                 bool unrestricted = npos.GetPositionX() != GetPositionX() || npos.GetPositionY() != GetPositionY();
                 if (unrestricted)
                 {
-                    TC_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore controll Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+                    TC_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore control Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
                     sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, GetSession()->GetAccountId(), GetName().c_str());
                     return false;
                 }
@@ -27167,8 +27168,10 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
                 diffz > 1.87f &&
                 tanangle < 0.57735026919f) // 30 degrees
             {
-                TC_LOG_INFO("anticheat", "CheckMovementInfo :  Climb-Hack detected for Account id : %u, Player %s, diffZ = %f, distance = %f, angle = %f ", GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle);
-                sWorld->SendGMText(LANG_GM_ANNOUNCE_WALLCLIMB, GetName().c_str(), diffz, distance, tanangle);
+                std::string mapname = GetMap()->GetMapName();
+                TC_LOG_INFO("anticheat", "Player::CheckMovementInfo :  Climb-Hack detected for Account id : %u, Player %s, diffZ = %f, distance = %f, angle = %f, Map = %s, mapId = %u, X = %f, Y = %f, Z = %f",
+                    GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle, mapname.c_str(), GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ());
+                sWorld->SendGMText(LANG_GM_ANNOUNCE_WALLCLIMB, GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle, mapname.c_str(), GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ());
                 return false;
             }
         }

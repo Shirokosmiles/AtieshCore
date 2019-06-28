@@ -2652,6 +2652,8 @@ void AuraEffect::HandleAuraWaterWalk(AuraApplication const* aurApp, uint8 mode, 
         return;
 
     Unit* target = aurApp->GetTarget();
+    if (target->ToPlayer())
+        target->ToPlayer()->SetUnderACKmount();
 
     if (!apply)
     {
@@ -2669,6 +2671,8 @@ void AuraEffect::HandleAuraFeatherFall(AuraApplication const* aurApp, uint8 mode
         return;
 
     Unit* target = aurApp->GetTarget();
+    if (target->ToPlayer())
+        target->ToPlayer()->SetUnderACKmount();
 
     if (!apply)
     {
@@ -2690,6 +2694,8 @@ void AuraEffect::HandleAuraHover(AuraApplication const* aurApp, uint8 mode, bool
         return;
 
     Unit* target = aurApp->GetTarget();
+    if (target->ToPlayer())
+        target->ToPlayer()->SetUnderACKmount();
 
     if (!apply)
     {
