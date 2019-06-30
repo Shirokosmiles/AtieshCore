@@ -131,7 +131,7 @@ enum ICDataTypes
     DATA_BLOOD_PRINCE_COUNCIL_INTRO    = 43,
     DATA_SINDRAGOSA_INTRO              = 44,
     DATA_PUTRICIDE_TRAP                = 45,
-    DATA_ICC_BUFF                      = 46 // used by conditions
+    DATA_FACTION_BUFF                  = 46 // used by conditions
 };
 
 enum ICCreaturesIds

@@ -1468,6 +1468,32 @@ class spell_player_mount_wyrm : public SpellScriptLoader
         }
 };
 
+enum CollapsingCave
+{
+    SPELL_COLLAPSING_CAVE = 55486
+};
+
+// 55693 - Remove Collapsing Cave Aura
+class spell_q12823_remove_collapsing_cave_aura : public SpellScript
+{
+    PrepareSpellScript(spell_q12823_remove_collapsing_cave_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_COLLAPSING_CAVE });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        GetHitUnit()->RemoveAurasDueToSpell(SPELL_COLLAPSING_CAVE);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12823_remove_collapsing_cave_aura::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_storm_peaks()
 {
     new npc_injured_goblin();
@@ -1493,4 +1519,5 @@ void AddSC_storm_peaks()
     new spell_fatal_strike();
     new spell_falling_dragon_feign_death();
     new spell_player_mount_wyrm();
+    RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
 }
