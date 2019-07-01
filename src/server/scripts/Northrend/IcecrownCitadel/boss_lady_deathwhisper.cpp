@@ -369,20 +369,20 @@ class boss_lady_deathwhisper : public CreatureScript
                         darnavan->m_Events.AddEvent(new DaranavanMoveEvent(*darnavan), darnavan->m_Events.CalculateTime(10000));
                         darnavan->AI()->Talk(SAY_DARNAVAN_RESCUED);
 
-                        if (killer)
+                        if (!killer)
+                            return;
+
+                        if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
                         {
-                            if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+                            if (Group* group = owner->GetGroup())
                             {
-                                if (Group* group = owner->GetGroup())
-                                {
-                                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                                        if (Player* member = itr->GetSource())
-                                            if (member->IsInMap(owner))
-                                                member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT);
-                                }
-                                else
-                                    owner->KilledMonsterCredit(NPC_DARNAVAN_CREDIT);
+                                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                                    if (Player* member = itr->GetSource())
+                                        if (member->IsInMap(owner))
+                                            member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT);
                             }
+                            else
+                                owner->KilledMonsterCredit(NPC_DARNAVAN_CREDIT);
                         }
                     }
                 }
@@ -895,20 +895,20 @@ class npc_darnavan : public CreatureScript
             {
                 _events.Reset();
 
-                if (killer)
+                if (!killer)
+                    return;
+
+                if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
                 {
-                    if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    if (Group* group = owner->GetGroup())
                     {
-                        if (Group* group = owner->GetGroup())
-                        {
-                            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                                if (Player* member = itr->GetSource())
-                                    if (member->IsInMap(owner))
-                                        member->FailQuest(QUEST_DEPROGRAMMING);
-                        }
-                        else
-                            owner->FailQuest(QUEST_DEPROGRAMMING);
+                        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                            if (Player* member = itr->GetSource())
+                                if (member->IsInMap(owner))
+                                    member->FailQuest(QUEST_DEPROGRAMMING);
                     }
+                    else
+                        owner->FailQuest(QUEST_DEPROGRAMMING);
                 }
             }
 
