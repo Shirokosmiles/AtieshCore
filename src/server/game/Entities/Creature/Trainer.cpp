@@ -177,7 +177,7 @@ namespace Trainer
                 return SpellState::Unavailable;
 
         // check level requirement
-        if (player->getLevel() < trainerSpell->ReqLevel)
+        if (player->GetLevel() < trainerSpell->ReqLevel)
             return SpellState::Unavailable;
 
         // check ranks
@@ -225,10 +225,10 @@ namespace Trainer
             case Type::Class:
             case Type::Pet:
                 // check class for class trainers
-                return player->getClass() == GetTrainerRequirement();
+                return player->GetClass() == GetTrainerRequirement();
             case Type::Mount:
                 // check race for mount trainers
-                return player->getRace() == GetTrainerRequirement();
+                return player->GetRace() == GetTrainerRequirement();
             case Type::Tradeskill:
                 // check spell for profession trainers
                 return player->HasSpell(GetTrainerRequirement());

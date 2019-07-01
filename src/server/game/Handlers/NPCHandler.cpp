@@ -122,7 +122,7 @@ void WorldSession::HandleTrainerListOpcode(WorldPackets::NPC::Hello& packet)
     uint32 trainerentry = 0;
     if (!npc)
     {
-        switch (GetPlayer()->getClass())
+        switch (GetPlayer()->GetClass())
         {
         case CLASS_WARRIOR:
             trainerentry = 985;
@@ -174,7 +174,7 @@ void WorldSession::SendTrainerList(Creature* npc)
     uint32 trainerentry = 0;
     if (!npc)
     {
-        switch (GetPlayer()->getClass())
+        switch (GetPlayer()->GetClass())
         {
         case CLASS_WARRIOR:
             trainerentry = 985;
@@ -235,7 +235,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPackets::NPC::TrainerBuySpel
     uint32 trainerentry = 0;
     if (!npc)
     {
-        switch (GetPlayer()->getClass())
+        switch (GetPlayer()->GetClass())
         {
         case CLASS_WARRIOR:
             trainerentry = 985;
@@ -481,7 +481,7 @@ void WorldSession::SendStablePetCallback(ObjectGuid guid, PreparedQueryResult re
     {
         data << uint32(pet->GetCharmInfo()->GetPetNumber());
         data << uint32(pet->GetEntry());
-        data << uint32(pet->getLevel());
+        data << uint32(pet->GetLevel());
         data << pet->GetName();                             // petname
         data << uint8(1);                                   // 1 = current, 2/3 = in stable (any from 4, 5, ... create problems with proper show)
         ++num;

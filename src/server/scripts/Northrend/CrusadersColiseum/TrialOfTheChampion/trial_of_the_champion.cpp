@@ -838,7 +838,7 @@ class npc_announcer_toc5 : public CreatureScript
                             else
                                 continue; // no text found, too many players?
 
-                            if (Creature* spectator = me->FindNearestCreature(SpectatorData[player->getRace()], 200.0f))
+                            if (Creature* spectator = me->FindNearestCreature(SpectatorData[player->GetRace()], 200.0f))
                                 spectator->AI()->Talk(EMOTE_SPECTATOR_CHEER, player);
 
                             foundPlr = true;

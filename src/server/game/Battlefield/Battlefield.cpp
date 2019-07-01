@@ -217,7 +217,7 @@ void Battlefield::InvitePlayersInZoneToWar()
                     continue;
 
                 // level requirement
-                if (player->getLevel() < _minPlayerLevel && _playersToKick[player->GetTeamId()].find(guid) == _playersToKick[player->GetTeamId()].end())
+                if (player->GetLevel() < _minPlayerLevel && _playersToKick[player->GetTeamId()].find(guid) == _playersToKick[player->GetTeamId()].end())
                 {
                     _playersToKick[player->GetTeamId()][guid] = GameTime::GetGameTime() + 1;
                     continue;
@@ -273,7 +273,7 @@ void Battlefield::InvitePlayersInQueueToWar()
             ObjectGuid playerGuid = _playerQueue[team].front();
             if (Player* player = ObjectAccessor::FindConnectedPlayer(playerGuid))
             {
-                if (!player || player->InArena() || player->GetBattleground() || player->getLevel() < _minPlayerLevel ||
+                if (!player || player->InArena() || player->GetBattleground() || player->GetLevel() < _minPlayerLevel ||
                     _playersInWar[player->GetTeamId()].find(player->GetGUID()) != _playersInWar[player->GetTeamId()].end() || // already in war
                     _invitedPlayers[player->GetTeamId()].find(player->GetGUID()) != _invitedPlayers[player->GetTeamId()].end()) // already invited
                 {
@@ -296,7 +296,7 @@ void Battlefield::InvitePlayersInQueueToWar()
 
 bool Battlefield::InvitePlayerToWar(Player* player)
 {
-    if (!player || player->InArena() || player->GetBattleground() || player->getLevel() < _minPlayerLevel)
+    if (!player || player->InArena() || player->GetBattleground() || player->GetLevel() < _minPlayerLevel)
         return false;
 
     // check if player is not already in war
@@ -324,7 +324,7 @@ void Battlefield::InvitePlayerToQueue(Player* player)
         return;
 
     // minimum player level
-    if (player->getLevel() < _minPlayerLevel)
+    if (player->GetLevel() < _minPlayerLevel)
         return;
 
     // check if already in queue
@@ -405,7 +405,7 @@ void Battlefield::KickPlayer(Player* player)
         return;
 
     BFLeaveReason reason = BF_LEAVE_REASON_EXITED;
-    if (player->getLevel() < _minPlayerLevel)
+    if (player->GetLevel() < _minPlayerLevel)
         reason = BF_LEAVE_REASON_LOW_LEVEL;
     player->GetSession()->SendBattlefieldLeaveMessage(_battleId, reason);
 
@@ -762,7 +762,7 @@ void Battlefield::RemovePlayer(ObjectGuid playerGUID)
     if (source)
     {
         BFLeaveReason reason = BF_LEAVE_REASON_EXITED;
-        if (source->getLevel() < _minPlayerLevel)
+        if (source->GetLevel() < _minPlayerLevel)
             reason = BF_LEAVE_REASON_LOW_LEVEL;
         source->GetSession()->SendBattlefieldLeaveMessage(_battleId, reason);
 

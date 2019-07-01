@@ -33,7 +33,7 @@
 /*####################################################################################
 ###############################CROSSFACTION BATTLEGROUNDS#############################
 ####################################################################################*/
-uint8 Unit::getRace(bool forceoriginal) const
+uint8 Unit::GetRace(bool forceoriginal) const
 {
     if (GetTypeId() == TYPEID_PLAYER)
     {
@@ -63,8 +63,8 @@ bool Player::SendRealNameQuery()
     data << GetName();                                   // played name
     data << uint8(0);                                       // realm name for cross realm BG usage
     data << uint8(getCFSRace());
-    data << uint8(getGender());
-    data << uint8(getClass());
+    data << uint8(GetGender());
+    data << uint8(GetClass());
     data << uint8(0);                                   // is not declined
     GetSession()->SendPacket(&data);
 
@@ -74,18 +74,18 @@ bool Player::SendRealNameQuery()
 void Player::SetFakeRaceAndMorph()
 {
     uint8 random;
-    switch (getClass())
+    switch (GetClass())
     {
         case CLASS_DRUID:
         {
             if (GetCFSTeam() == ALLIANCE)
             {
-                m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+                m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
                 m_FakeRace = RACE_TAUREN;
             }
             else
             {
-                m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
                 m_FakeRace = RACE_NIGHTELF;
             }
 
@@ -99,22 +99,22 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
                         m_FakeRace = RACE_TROLL;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
                         m_FakeRace = RACE_TAUREN;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
                         m_FakeRace = RACE_ORC;
                         break;
                 }                
             }
             else
             {
-                m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
                 m_FakeRace = RACE_DRAENEI;
             }
 
@@ -128,15 +128,15 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
                         m_FakeRace = RACE_BLOODELF;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
                         m_FakeRace = RACE_TROLL;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
                         m_FakeRace = RACE_UNDEAD_PLAYER;
                         break;
                 }                
@@ -146,15 +146,15 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
                         m_FakeRace = RACE_DRAENEI;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
                         m_FakeRace = RACE_GNOME;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
                         m_FakeRace = RACE_HUMAN;
                         break;
                 }                
@@ -170,15 +170,15 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
                         m_FakeRace = RACE_BLOODELF;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
                         m_FakeRace = RACE_ORC;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
                         m_FakeRace = RACE_UNDEAD_PLAYER;
                         break;
                 }                
@@ -188,12 +188,12 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
                         m_FakeRace = RACE_HUMAN;
                         break;
                     case 1:
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
                         m_FakeRace = RACE_GNOME;
                         break;
                 }
@@ -209,19 +209,19 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 3:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
                         m_FakeRace = RACE_UNDEAD_PLAYER;
                         break;
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
                         m_FakeRace = RACE_BLOODELF;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
                         m_FakeRace = RACE_ORC;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
                         m_FakeRace = RACE_TROLL;
                         break;
                 }                
@@ -231,19 +231,19 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 3:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
                         m_FakeRace = RACE_NIGHTELF;
                         break;
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
                         m_FakeRace = RACE_GNOME;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
                         m_FakeRace = RACE_HUMAN;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
                         m_FakeRace = RACE_DWARF;
                         break;
                 }                
@@ -256,7 +256,7 @@ void Player::SetFakeRaceAndMorph()
             random = urand(0, 2);
             if (GetCFSTeam() == ALLIANCE) // BLOODELF
             {
-                m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
                 m_FakeRace = RACE_BLOODELF;
             }
             else // HUMAN, DWARF, DRENEI
@@ -264,15 +264,15 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
                         m_FakeRace = RACE_HUMAN;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
                         m_FakeRace = RACE_DWARF;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
                         m_FakeRace = RACE_DRAENEI;
                         break;
                 }                
@@ -289,15 +289,15 @@ void Player::SetFakeRaceAndMorph()
                 {
                     case 3:
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
                         m_FakeRace = RACE_UNDEAD_PLAYER;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
                         m_FakeRace = RACE_BLOODELF;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
                         m_FakeRace = RACE_TROLL;
                         break;
                 }                
@@ -307,19 +307,19 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 3:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
                         m_FakeRace = RACE_NIGHTELF;
                         break;
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
                         m_FakeRace = RACE_GNOME;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
                         m_FakeRace = RACE_HUMAN;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
                         m_FakeRace = RACE_DRAENEI;
                         break;
                 }
@@ -335,19 +335,19 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 3:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
                         m_FakeRace = RACE_TAUREN;
                         break;
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
                         m_FakeRace = RACE_BLOODELF;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
                         m_FakeRace = RACE_ORC;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
                         m_FakeRace = RACE_TROLL;
                         break;
                 }                
@@ -357,16 +357,16 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 3:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
                         m_FakeRace = RACE_NIGHTELF;
                         break;
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
                         m_FakeRace = RACE_DRAENEI;
                         break;
                     case 1:
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
                         m_FakeRace = RACE_DWARF;
                         break;
                 }                
@@ -383,19 +383,19 @@ void Player::SetFakeRaceAndMorph()
                 {
                     case 4:
                     case 3:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
                         m_FakeRace = RACE_ORC;
                         break;
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
                         m_FakeRace = RACE_UNDEAD_PLAYER;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
                         m_FakeRace = RACE_TAUREN;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
                         m_FakeRace = RACE_TROLL;
                         break;
                 }
@@ -405,23 +405,23 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 4:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
                         m_FakeRace = RACE_HUMAN;
                         break;
                     case 3:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
                         m_FakeRace = RACE_DWARF;
                         break;
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
                         m_FakeRace = RACE_NIGHTELF;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
                         m_FakeRace = RACE_GNOME;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
                         m_FakeRace = RACE_DRAENEI;
                         break;
                 }
@@ -437,23 +437,23 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 4:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
                         m_FakeRace = RACE_ORC;
                         break;
                     case 3:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
                         m_FakeRace = RACE_UNDEAD_PLAYER;
                         break;
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
                         m_FakeRace = RACE_TAUREN;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
                         m_FakeRace = RACE_TROLL;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_BLOODELF : FAKE_F_BLOODELF;
                         m_FakeRace = RACE_BLOODELF;
                         break;
                 }
@@ -463,23 +463,23 @@ void Player::SetFakeRaceAndMorph()
                 switch (random)
                 {
                     case 4:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
                         m_FakeRace = RACE_HUMAN;
                         break;
                     case 3:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
                         m_FakeRace = RACE_DWARF;
                         break;
                     case 2:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_NELF : FAKE_F_NELF;
                         m_FakeRace = RACE_NIGHTELF;
                         break;
                     case 1:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_GNOME : FAKE_F_GNOME;
                         m_FakeRace = RACE_GNOME;
                         break;
                     case 0:
-                        m_FakeMorph = getGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
+                        m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
                         m_FakeRace = RACE_DRAENEI;
                         break;
                 }
@@ -551,7 +551,7 @@ void Player::FitPlayerInTeam(bool action, Battleground* pBattleGround)
         return;
 
     if (!IsPlayingNative() && action)
-        setFactionForRace(getRace());
+        setFactionForRace(GetRace());
     else
         setFactionForRace(getCFSRace());
 

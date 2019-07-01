@@ -139,7 +139,7 @@ public:
                 AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r", GOSSIP_SENDER_MAIN, 7);
             AddGossipItemFor(player, 0, "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Delivery of bags", GOSSIP_SENDER_MAIN, 8);
 
-            if (player->getLevel() < 80)
+            if (player->GetLevel() < 80)
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|t Level up at 80", GOSSIP_SENDER_MAIN, 9);
         }
 
@@ -248,7 +248,7 @@ public:
                         AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r", GOSSIP_SENDER_MAIN, 7);
                     AddGossipItemFor(player, 0, "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Delivery of bags", GOSSIP_SENDER_MAIN, 8);
 
-                    if (player->getLevel() < 80)
+                    if (player->GetLevel() < 80)
                         AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|t Level up at 80", GOSSIP_SENDER_MAIN, 9);
                 }
 
@@ -283,7 +283,7 @@ public:
             }
             case 7: // Классовые навыки
             {
-                switch (player->getClass())
+                switch (player->GetClass())
                 {
                 case CLASS_WARRIOR:
                     player->LearnSpell(7384, false);
@@ -1009,7 +1009,7 @@ public:
             }
             case 12: // Двойная специализация
             {
-                if (player->GetSpecsCount() == 1 && !(player->getLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL)))
+                if (player->GetSpecsCount() == 1 && !(player->GetLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL)))
                     player->CastSpell(player, 63680, true);
                 player->CastSpell(player, 63624, true);
                 CloseGossipMenuFor(player);
@@ -1526,7 +1526,7 @@ public:
             }
             case 72: // Оружейные навыки
             {
-                switch (player->getClass())
+                switch (player->GetClass())
                 {
                 case CLASS_WARRIOR:
                     CloseGossipMenuFor(player);
