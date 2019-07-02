@@ -459,7 +459,7 @@ void Unit::Update(uint32 p_time)
     UpdateSplineMovement(p_time);
     i_motionMaster->Update(p_time);
 
-    if (!GetAI() && (GetTypeId() != TYPEID_PLAYER || IsCharmed()))
+    if (!GetAI() && (GetTypeId() != TYPEID_PLAYER || (IsCharmed() && GetCharmerGUID().IsCreature())))
         UpdateCharmAI();
     RefreshAI();
 }
@@ -10348,7 +10348,7 @@ void Unit::SetDisplayId(uint32 modelId)
     SetUInt32Value(UNIT_FIELD_DISPLAYID, modelId);
     // Set Gender by modelId
     if (CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(modelId))
-        SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, minfo->gender);
+        SetGender(minfo->gender);
 }
 
 void Unit::RestoreDisplayId()
@@ -12275,7 +12275,7 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
                 {
                     uint8 skinColor = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID);
                     // Male
-                    if (GetGender() == GENDER_MALE)
+                    if (GetNativeGender() == GENDER_MALE)
                     {
                         switch (skinColor)
                         {
@@ -12354,7 +12354,7 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
                 {
                     uint8 skinColor = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID);
                     // Male
-                    if (GetGender() == GENDER_MALE)
+                    if (GetNativeGender() == GENDER_MALE)
                     {
                         switch (skinColor)
                         {
