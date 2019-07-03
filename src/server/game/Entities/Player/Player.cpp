@@ -15371,21 +15371,16 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     bool rewarded = IsQuestRewarded(quest_id) && !quest->IsDFQuest();
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(this)*(IsPremium() ? sWorld->getRate(RATE_VIP_XP_QUEST) : sWorld->getRate(RATE_XP_QUEST)));
+    uint32 XP = rewarded ? 0 : uint32(quest->GetXPReward(this)*(IsPremium() ? sWorld->getRate(RATE_VIP_XP_QUEST) : sWorld->getRate(RATE_XP_QUEST)));
+
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     XP *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
 
-    int32 moneyRew = 0;
     if (GetLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         GiveXP(XP, nullptr);
-    else
-        moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY));
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
-    if (quest->GetRewOrReqMoney())
-        moneyRew += quest->GetRewOrReqMoney();
-
-    if (moneyRew)
+    if (int32 moneyRew = quest->GetRewOrReqMoney(this))
     {
         ModifyMoney(moneyRew);
 
@@ -16940,16 +16935,11 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP) const
     data << uint32(questid);
 
     if (GetLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-    {
         data << uint32(XP);
-        data << uint32(quest->GetRewOrReqMoney());
-    }
     else
-    {
         data << uint32(0);
-        data << uint32(quest->GetRewOrReqMoney() + int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY)));
-    }
 
+    data << uint32(quest->GetRewOrReqMoney(this));
     data << uint32(10 * quest->CalculateHonorGain(GetQuestLevel(quest)));
     data << uint32(quest->GetBonusTalents());              // bonus talents
     data << uint32(quest->GetRewArenaPoints());
@@ -24166,7 +24156,7 @@ void Player::SetClientControl(Unit* target, bool allowMove)
     }
 
     // still affected by some aura that shouldn't allow control, only allow on last such aura to be removed
-    if (target->HasUnitState(UNIT_STATE_CONTROLLED))
+    if (target->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED))
         allowMove = false;
 
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size()+1);
