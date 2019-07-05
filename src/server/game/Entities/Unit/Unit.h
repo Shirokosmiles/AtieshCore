@@ -856,17 +856,21 @@ class TC_GAME_API Unit : public WorldObject
 
         uint8 GetLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
         uint8 GetLevelForTarget(WorldObject const* /*target*/) const override { return GetLevel(); }
-        void SetLevel(uint8 lvl);
+
+        void SetLevel(uint8 lvl, bool sendUpdate = true);
+        void SetRace(uint8 race) { SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_RACE, race); }
+        void SetClass(uint8 unitClass) { SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS, unitClass); }
 
         uint8 GetRace(bool forceoriginal = false) const;
-        uint8 getCFSRace() { return GetRace(true); }
-
-        uint32 GetRaceMask() const { return 1 << (GetRace() - 1); }
-
-        uint32 getCFSRaceMask() const { return 1 << (GetRace(true) - 1); }
         uint8 GetClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS); }
 
+
+        uint32 GetRaceMask() const { return 1 << (GetRace() - 1); }
         uint32 GetClassMask() const { return 1 << (GetClass()-1); }
+
+        uint8 getCFSRace() { return GetRace(true); }
+        uint32 getCFSRaceMask() const { return 1 << (GetRace(true) - 1); }
+
         uint8 GetGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER); }
         void SetGender(uint8 gender) { SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, gender); }
         virtual uint8 GetNativeGender() const { return GetGender(); }
@@ -901,7 +905,7 @@ class TC_GAME_API Unit : public WorldObject
         int32 GetHealthGain(int32 dVal);
 
         Powers GetPowerType() const { return Powers(GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_POWER_TYPE)); }
-        void SetPowerType(Powers power);
+        void SetPowerType(Powers power, bool sendUpdate = true);
         void UpdateDisplayPower();
         uint32 GetPower(Powers power) const { return GetUInt32Value(UNIT_FIELD_POWER1   +power); }
         uint32 GetMaxPower(Powers power) const { return GetUInt32Value(UNIT_FIELD_MAXPOWER1+power); }

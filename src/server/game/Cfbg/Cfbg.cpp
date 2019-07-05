@@ -551,9 +551,9 @@ void Player::FitPlayerInTeam(bool action, Battleground* pBattleGround)
         return;
 
     if (!IsPlayingNative() && action)
-        setFactionForRace(GetRace());
+        SetFactionForRace(GetRace());
     else
-        setFactionForRace(getCFSRace());
+        SetFactionForRace(getCFSRace());
 
     if (action)
         SetForgetBGPlayers(true);
