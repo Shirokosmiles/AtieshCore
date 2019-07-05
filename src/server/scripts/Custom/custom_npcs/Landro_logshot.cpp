@@ -91,7 +91,7 @@ public:
             return true;
         }
 
-        bool GossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 gossipListId, char const* code) override
+        bool GossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 /*gossipListId*/, char const* code) override
         {
             player->PlayerTalkClass->ClearMenus();
             uint32 codeUINT = (uint32)atol(code);
