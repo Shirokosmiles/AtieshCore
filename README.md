@@ -2,6 +2,8 @@
 
 AtieshCore is a *MMORPG* Framework based mostly in C++.
 
+[![pipeline status](https://gitlab.com/atiesh/AtieshCore/badges/3.3.5/pipeline.svg)](https://gitlab.com/atiesh/AtieshCore/commits/3.3.5)
+
 It is derived from *TrinityCore* and *MaNGOS*, the *Massive Network Game Object Server*, and is
 based on the code of that project with extensive changes over time to optimize,
 improve and cleanup the codebase at the same time as improving the in-game
