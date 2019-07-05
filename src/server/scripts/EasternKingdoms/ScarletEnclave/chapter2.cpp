@@ -224,19 +224,21 @@ public:
 
             if (isMarksman)
             {
-                Unit* tvictim = me->GetVictim();
-                if (me->IsWithinMeleeRange(me->GetVictim()) && isMarksmanRDD)
+                if (Unit* tvictim = me->GetVictim())
                 {
-                    _events.CancelEvent(EVENT_CAST_MULTI_SHOT);
-                    _events.ScheduleEvent(EVENT_CAST_RAPTOR_STRIKE, 0);
-                    isMarksmanRDD = false;
-                }
-                else if (!me->IsWithinMeleeRange(me->GetVictim()) && !isMarksmanRDD)
-                {
-                    _events.CancelEvent(EVENT_CAST_RAPTOR_STRIKE);
-                    _events.ScheduleEvent(EVENT_CAST_MULTI_SHOT, Seconds(4));
-                    _events.ScheduleEvent(EVENT_CAST_MARKSMAN_SHOOT, 0);
-                    isMarksmanRDD = true;
+                    if (me->IsWithinMeleeRange(tvictim) && isMarksmanRDD)
+                    {
+                        _events.CancelEvent(EVENT_CAST_MULTI_SHOT);
+                        _events.ScheduleEvent(EVENT_CAST_RAPTOR_STRIKE, 0);
+                        isMarksmanRDD = false;
+                    }
+                    else if (!me->IsWithinMeleeRange(tvictim) && !isMarksmanRDD)
+                    {
+                        _events.CancelEvent(EVENT_CAST_RAPTOR_STRIKE);
+                        _events.ScheduleEvent(EVENT_CAST_MULTI_SHOT, Seconds(4));
+                        _events.ScheduleEvent(EVENT_CAST_MARKSMAN_SHOOT, 0);
+                        isMarksmanRDD = true;
+                    }
                 }
             }
 

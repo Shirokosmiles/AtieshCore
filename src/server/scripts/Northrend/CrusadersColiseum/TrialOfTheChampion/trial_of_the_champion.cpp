@@ -775,7 +775,7 @@ class npc_announcer_toc5 : public CreatureScript
                                         if (plr && !plr->IsGameMaster() && plr->IsAlive())
                                         {
                                             // 50% chance for race cheering at you or faction cheering at you
-                                            uint32 spectatorEntry;
+                                            uint32 spectatorEntry = SpectatorData[RACE_HUMAN];
                                             uint32 specId = urand(0, 4);
                                             if (plr->GetTeam() == ALLIANCE)
                                             {                                                

@@ -1372,7 +1372,8 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             Map* map = unitCaster->GetMap();
             uint32 mapid = unitCaster->GetMapId();
             uint32 phasemask = unitCaster->GetPhaseMask();
-            float destx, desty, destz, ground;
+            float destx, desty, ground;
+            float destz = unitCaster->GetPositionZ();
        
             Position pos;
             Position lastpos;
@@ -1385,7 +1386,8 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             if (!unitCaster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || (pos.GetPositionZ() - ground < distance))
             {
                 float tstX, tstY, tstZ, prevX, prevY, prevZ;
-                float tstZ1, tstZ2, tstZ3, destz1, destz2, destz3, srange, srange1, srange2, srange3;
+                float tstZ1, tstZ2, tstZ3, destz1, destz2, destz3, srange1, srange2, srange3;
+                float srange = 0.0f;
                 float maxtravelDistZ = 2.65f;
                 float overdistance = 0.0f;
                 float totalpath = 0.0f;
@@ -1607,7 +1609,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 dist = objSize;
 
             Position pos = dest._position;
-            if (Transport* transport = m_caster->GetTransport())
+            if (m_caster->GetTransport())
             {
                 float casterZ = m_caster->GetPositionZ();
                 pos.m_positionZ = m_caster->GetMap()->GetHeight(pos.m_positionX, pos.m_positionY, casterZ + 2 * dist);

@@ -346,7 +346,7 @@ void Transport::RemovePassenger(WorldObject* passenger)
             }
             else if (crt->IsTotem())
             {
-                if (Unit* owner = crt->GetOwner())
+                if (crt->GetOwner())
                 {
                     float x, y, z, o;
                     crt->m_movementInfo.transport.pos.GetPosition(x, y, z, o);

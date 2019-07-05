@@ -256,13 +256,19 @@ struct boss_kologarn : public BossAI
                 Talk(SAY_BERSERK);
                 break;
             case EVENT_RESPAWN_LEFT_ARM:
+            {
                 if (Vehicle* vehicle = me->GetVehicleKit())
                     vehicle->InstallAccessory(NPC_LEFT_ARM, 0, true, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-                    break;
+
+                break;
+            }
             case EVENT_RESPAWN_RIGHT_ARM:
+            {
                 if (Vehicle* vehicle = me->GetVehicleKit())
                     vehicle->InstallAccessory(NPC_RIGHT_ARM, 1, true, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+
                 break;
+            }
             case EVENT_STONE_GRIP:
                 if (_rightArm)
                     DoCastAOE(SPELL_STONE_GRIP);

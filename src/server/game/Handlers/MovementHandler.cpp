@@ -466,7 +466,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     bool jumpopcode = false;
     if (opcode == MSG_MOVE_JUMP)
     {
-        bool jumpopcode = true;
+        jumpopcode = true;
         if (plrMover)
         {
             plrMover->SetUnderACKmount();

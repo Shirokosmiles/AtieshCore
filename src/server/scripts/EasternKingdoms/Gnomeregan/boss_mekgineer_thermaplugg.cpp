@@ -152,7 +152,7 @@ public:
         void JustEnteredCombat(Unit* /*who*/) override
         {
             for (uint32 face_id : GnomeFaces)
-                if (GameObject* face = instance->GetGameObject(face_id))
+                if (instance->GetGameObject(face_id))
                     AddFaceAvailable(face_id);
 
             uint32 face_id = Trinity::Containers::SelectRandomContainerElement(_availableFaces);
@@ -273,7 +273,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (Player* player = me->SelectNearestPlayer(3.0f))
+            if (me->SelectNearestPlayer(3.0f))
                 me->CastSpell(me, SPELL_BOMB_EFFECT, true);
 
             events.Update(diff);

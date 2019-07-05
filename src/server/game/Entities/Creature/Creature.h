@@ -415,8 +415,6 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         uint32 m_boundaryCheckTime;                         // (msecs) remaining time for next evade boundary check
         uint32 m_combatPulseTime;                           // (msecs) remaining time for next zone-in-combat pulse
         uint32 m_combatPulseDelay;                          // (secs) how often the creature puts the entire zone in combat (only works in dungeons)
-        uint32 m_masterCallTime;                            
-        uint32 m_masterCallDelay;
 
         ReactStates m_reactState;                           // for AI, not charmInfo
         void RegenerateHealth();
@@ -429,8 +427,6 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool m_AlreadyCallAssistance;
         bool m_AlreadySearchedAssistance;
         bool m_cannotReachTarget;
-        bool m_isIgnoreEvade;
-        bool m_isNotTargetMove;
         uint32 m_cannotReachTimer;
 
         SpellSchoolMask m_meleeDamageSchoolMask;
@@ -470,12 +466,18 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         float m_suppressedOrientation; // Stores the creature's "real" orientation while casting
 
         time_t _lastDamagedTime; // Part of Evade mechanics
-        time_t m_startEngageTime;
         CreatureTextRepeatGroup m_textRepeat;
 
         // Regenerate health
         bool _regenerateHealth; // Set on creation
         bool _regenerateHealthLock; // Dynamically set
+
+        // custom ATiesh features
+        uint32 m_masterCallTime;
+        uint32 m_masterCallDelay;
+        bool m_isIgnoreEvade;
+        bool m_isNotTargetMove;
+        time_t m_startEngageTime;
 };
 
 class TC_GAME_API AssistDelayEvent : public BasicEvent

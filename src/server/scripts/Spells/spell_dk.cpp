@@ -2677,6 +2677,10 @@ public:
         {
             Unit* caster = GetCaster();
             Unit* victim = GetHitUnit();
+
+            if (!caster || !victim)
+                return;
+
             //Spell reflection : The hit unit will be same as caster and CastSpell will do nothing. Use the original target as caster.
             if (caster == victim)
                 caster = GetExplTargetUnit();

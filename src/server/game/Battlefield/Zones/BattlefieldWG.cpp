@@ -1780,7 +1780,7 @@ void WintergraspBuilding::UpdateForNoBattle(bool initialize)
 
     // Update worldstate
     if (initialize)
-        _state = _state = WintergraspGameObjectState(OBJECTSTATE_ALLIANCE_INTACT - (_teamControl * 3));
+        _state = WintergraspGameObjectState(OBJECTSTATE_ALLIANCE_INTACT - (_teamControl * 3));
     else
     {
         if (_state >= OBJECTSTATE_ALLIANCE_INTACT && _teamControl == TEAM_HORDE)

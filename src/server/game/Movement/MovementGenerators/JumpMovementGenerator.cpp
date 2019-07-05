@@ -92,13 +92,13 @@ bool JumpMovementGenerator<T>::DoUpdate(T* owner, uint32 /*diff*/)
 }
 
 template<class T>
-void JumpMovementGenerator<T>::DoDeactivate(T* owner)
+void JumpMovementGenerator<T>::DoDeactivate(T* /*owner*/)
 {
     MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_DEACTIVATED);
 }
 
 template<class T>
-void JumpMovementGenerator<T>::DoFinalize(T* owner, bool active, bool movementInform)
+void JumpMovementGenerator<T>::DoFinalize(T* owner, bool /*active*/, bool movementInform)
 {
     MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_FINALIZED);
     if (movementInform && MovementGenerator::HasFlag(MOVEMENTGENERATOR_FLAG_INFORM_ENABLED))

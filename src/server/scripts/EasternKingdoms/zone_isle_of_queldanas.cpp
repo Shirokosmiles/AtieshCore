@@ -487,7 +487,7 @@ class item_tainted_queldelar : public ItemScript
 {
 public:
     item_tainted_queldelar() : ItemScript("item_tainted_queldelar") { }
-    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/)
+    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/)
     {
         InstanceScript *instance = player->GetInstanceScript();
         if (instance && player->FindNearestCreature(NPC_CASTER_BUNNY, 20.0f, true))

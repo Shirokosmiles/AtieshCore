@@ -1097,7 +1097,7 @@ public:
                         {
                             std::list<Creature*>::iterator it = nearbyVictims.begin();
                             std::advance(it, urand(0, nearbyVictims.size()-1));
-                            Emote emote;
+                            Emote emote = EMOTE_ONESHOT_TALK;
                             switch (urand(0, 3))
                             {
                                 case 0:

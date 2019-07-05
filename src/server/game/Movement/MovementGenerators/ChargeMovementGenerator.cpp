@@ -120,7 +120,7 @@ void ChargeMovementGenerator<T>::DoDeactivate(T* owner)
 }
 
 template<class T>
-void ChargeMovementGenerator<T>::DoFinalize(T* owner, bool active, bool movementInform)
+void ChargeMovementGenerator<T>::DoFinalize(T* owner, bool active, bool /*movementInform*/)
 {
     MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_FINALIZED);
     if (active)
@@ -146,7 +146,7 @@ template void ChargeMovementGenerator<Creature>::DoFinalize(Creature*, bool, boo
 
 //----- Charge Movement Generator - By Prepared Path
 template<class T>
-ChargePathMovementGenerator<T>::ChargePathMovementGenerator(uint32 id, float x, float y, float z, PathGenerator const& path, float speed, Optional<float> finalOrient) : _movementId(id), _x(x), _y(y), _z(z), _speed(speed), _path(path), _finalOrient(finalOrient)
+ChargePathMovementGenerator<T>::ChargePathMovementGenerator(uint32 id, float x, float y, float z, PathGenerator const& path, float speed, Optional<float> finalOrient) : _movementId(id), _x(x), _y(y), _z(z), _path(path), _speed(speed),  _finalOrient(finalOrient)
 {
     this->Mode = MOTION_MODE_DEFAULT;
     this->Priority = MOTION_PRIORITY_HIGHEST;
@@ -224,7 +224,7 @@ void ChargePathMovementGenerator<T>::DoDeactivate(T* owner)
 }
 
 template<class T>
-void ChargePathMovementGenerator<T>::DoFinalize(T* owner, bool active, bool movementInform)
+void ChargePathMovementGenerator<T>::DoFinalize(T* owner, bool active, bool /*movementInform*/)
 {
     MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_FINALIZED);
     if (active)

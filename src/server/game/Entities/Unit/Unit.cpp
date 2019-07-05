@@ -292,10 +292,10 @@ Unit::Unit(bool isWorldObject) :
     WorldObject(isWorldObject), m_lastSanctuaryTime(0), LastCharmerGUID(), movespline(new Movement::MoveSpline()),
     m_ControlledByPlayer(false), m_AutoRepeatFirstCast(false), m_procDeep(0), m_transformSpell(0),
     m_removedAurasCount(0), m_unitMovedByMe(nullptr), m_playerMovingMe(nullptr), m_charmer(nullptr), m_charmed(nullptr),
-    CharmerGUID_controller(), CharmerGUID_controlled(),
     i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_vehicle(nullptr), m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE), m_Diminishing(), m_isEngaged(false), m_combatManager(this), m_threatManager(this),
-    m_aiLocked(false), m_comboTarget(nullptr), m_comboPoints(0), m_spellHistory(new SpellHistory(this))
+    m_aiLocked(false), m_comboTarget(nullptr), m_comboPoints(0), m_spellHistory(new SpellHistory(this)),
+    CharmerGUID_controller(), CharmerGUID_controlled(), _isJumping(false), _isCharging(false), needtodismount(false)
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
@@ -13781,8 +13781,8 @@ void Unit::RaidInfoByMe(Unit* victim)
 
     std::string guild = "";
     std::string mapmode = "";
-    uint32 Encounters;
-    uint32 allEncounters;
+    uint32 Encounters = 0;
+    uint32 allEncounters = 0;
     if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
     {
         if (gLeader->GetGuild())

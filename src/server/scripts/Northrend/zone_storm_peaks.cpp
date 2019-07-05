@@ -396,7 +396,7 @@ class npc_hyldsmeet_protodrake : public CreatureScript
         public:
             npc_hyldsmeet_protodrakeAI(Creature* creature) : CreatureAI(creature), _accessoryRespawnTimer(0) { }
 
-            void PassengerBoarded(Unit* who, int8 seat, bool apply) override
+            void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply) override
             {
                 if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
                 {

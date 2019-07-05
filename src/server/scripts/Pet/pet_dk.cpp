@@ -96,7 +96,7 @@ public:
             _events.Reset();
         }
 
-        void IsSummonedBy(WorldObject* summoner) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 100);
         }

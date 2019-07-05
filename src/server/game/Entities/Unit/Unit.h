@@ -1639,8 +1639,6 @@ class TC_GAME_API Unit : public WorldObject
 
         friend class VehicleJoinEvent;
         ObjectGuid LastCharmerGUID;
-        ObjectGuid CharmerGUID_controller;
-        ObjectGuid CharmerGUID_controlled;
         bool CreateVehicleKit(uint32 id, uint32 creatureEntry);
         void RemoveVehicleKit();
         Vehicle* GetVehicleKit()const { return m_vehicleKit; }
@@ -1726,6 +1724,9 @@ class TC_GAME_API Unit : public WorldObject
         float GetCollisionHeight() const override;
 
         std::string GetDebugInfo() const override;
+
+        void SetNeedToDismountAfterRoots() { needtodismount = true; }
+        void UpdateSplinePosition();
     protected:
         explicit Unit (bool isWorldObject);
 
@@ -1802,10 +1803,7 @@ class TC_GAME_API Unit : public WorldObject
         bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
         bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 
-    public:
         void DisableSpline();
-        void UpdateSplinePosition();
-        void SetNeedToDismountAfterRoots() { needtodismount = true; }
 
         void ProcessPositionDataChanged(PositionFullTerrainStatus const& data) override;
         virtual void ProcessTerrainStatusUpdate(ZLiquidStatus status, Optional<LiquidData> const& liquidData);
@@ -1861,15 +1859,20 @@ class TC_GAME_API Unit : public WorldObject
 
         bool m_cleanupDone; // lock made to not add stuff after cleanup before delete
         bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
-        bool needtodismount;
         bool _instantCast;
-        bool _isJumping;
-        bool _isCharging;
 
         uint32 _oldFactionId;           ///< faction before charm
         bool _isWalkingBeforeCharm;     ///< Are we walking before we were charmed?
 
         SpellHistory* m_spellHistory;
+
+        // custom ATiesh features
+        ObjectGuid CharmerGUID_controller;
+        ObjectGuid CharmerGUID_controlled;
+
+        bool _isJumping;
+        bool _isCharging;
+        bool needtodismount;
 };
 
 namespace Trinity

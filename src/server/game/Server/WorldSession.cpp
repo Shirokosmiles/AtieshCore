@@ -133,14 +133,17 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     _RBACData(nullptr),
     expireTime(60000), // 1 min after socket loss, session is deleted
     forceExit(false),
+    m_currentBankerGUID(),
+    _timeSyncClockDeltaQueue(6),
+    _timeSyncClockDelta(0),
+    _pendingTimeSyncRequests(),
+    m_uiAntispamMailSentCount(0),
     m_uiAntispamMailSentTimer(0),
     timerGsSpam(0),
     timerWhoOpcode(0),
     timerMessageChannelOpcode(0),
-    m_currentBankerGUID(),
-    _timeSyncClockDeltaQueue(6),
-    _timeSyncClockDelta(0),
-    _pendingTimeSyncRequests()
+    countWhoOpcode(0),
+    countMessageChannelOpcode(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 

@@ -494,7 +494,7 @@ void Player::SendBattleGroundChat(uint32 msgtype, std::string message)
 {
     // Select distance to broadcast to.
     float distance = msgtype == CHAT_MSG_SAY ? sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY) : sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL);
-    uint32 language;
+    uint32 language = LANG_UNIVERSAL;
     if (Battleground* pBattleGround = GetBattleground())
     {
         if (pBattleGround->isArena()) // Only fake chat in BG's. CFBG should not interfere with arenas.

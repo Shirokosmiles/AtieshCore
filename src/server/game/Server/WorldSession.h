@@ -1123,13 +1123,6 @@ class TC_GAME_API WorldSession
         uint32 expireTime;
         bool forceExit;
         ObjectGuid m_currentBankerGUID;
-        uint32 m_uiAntispamMailSentCount;
-        uint32 m_uiAntispamMailSentTimer;
-        time_t timerGsSpam;
-        time_t timerWhoOpcode;
-        time_t timerMessageChannelOpcode;
-        uint32 countWhoOpcode;
-        uint32 countMessageChannelOpcode;
 
         boost::circular_buffer<std::pair<int64, uint32>> _timeSyncClockDeltaQueue; // first member: clockDelta. Second member: latency of the packet exchange that was used to compute that clockDelta.
         int64 _timeSyncClockDelta;
@@ -1138,6 +1131,15 @@ class TC_GAME_API WorldSession
         std::map<uint32, uint32> _pendingTimeSyncRequests; // key: counter. value: server time when packet with that counter was sent.
         uint32 _timeSyncNextCounter;
         uint32 _timeSyncTimer;
+
+        // custom ATiesh features
+        uint32 m_uiAntispamMailSentCount;
+        uint32 m_uiAntispamMailSentTimer;
+        time_t timerGsSpam;
+        time_t timerWhoOpcode;
+        time_t timerMessageChannelOpcode;
+        uint32 countWhoOpcode;
+        uint32 countMessageChannelOpcode;
 
         WorldSession(WorldSession const& right) = delete;
         WorldSession& operator=(WorldSession const& right) = delete;

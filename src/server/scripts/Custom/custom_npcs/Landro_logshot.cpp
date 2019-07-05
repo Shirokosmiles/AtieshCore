@@ -93,8 +93,6 @@ public:
 
         bool GossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 gossipListId, char const* code) override
         {
-            uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
             player->PlayerTalkClass->ClearMenus();
             uint32 codeUINT = (uint32)atol(code);
             if (!codeUINT)

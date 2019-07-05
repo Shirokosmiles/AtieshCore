@@ -1394,7 +1394,7 @@ void BattlegroundAV::EndBattleground(uint32 winner)
         }
     }
 
-    for (uint8 i = 0; i <= PVP_TEAMS_COUNT; ++i)
+    for (uint8 i = 0; i < PVP_TEAM_NEUTRAL; ++i)
     {
         if (m_CaptainAlive[i])
         {
