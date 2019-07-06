@@ -6,7 +6,7 @@ variables:
 
 before_script:
   - apt-get -yqq update
-  - apt-get -yqq install build-essential libtool make cmake openssl mysql-server mysql-client
+  - apt-get -yqq install build-essential libtool make cmake openssl
   - apt-get -yqq install libssl-dev default-libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libzmq3-dev libboost-all-dev
 
 install:
@@ -14,4 +14,5 @@ install:
     - mkdir bin
     - cd bin
     - cmake ../ -DWITH_WARNINGS=1 -DTOOLS=1 -DCMAKE_BUILD_TYPE=Release
-    - make -j 10 -k
+    - make -j 10
+    - make install
