@@ -22,8 +22,20 @@
 #include "Define.h"
 #include "DetourNavMesh.h"
 #include "SmartEnum.h"
+#include <map>
 
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
+
+struct ItemPresent
+{
+    ItemPresent(uint32 entry, uint32 itemId) :
+        ItemPresentSlot(entry), ItemId(itemId) { }
+    uint32 ItemPresentSlot;
+    uint32 ItemId;
+};
+
+typedef std::vector<ItemPresent> ItemPresentList;
+typedef std::map<uint32, ItemPresentList> ItemPresentContainer;
 
 enum SpellEffIndex : uint8
 {

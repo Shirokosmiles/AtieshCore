@@ -10135,6 +10135,15 @@ VehicleAccessoryList const* ObjectMgr::GetVehicleAccessoryList(Vehicle* veh) con
     return nullptr;
 }
 
+ItemPresentList const* ObjectMgr::GetItemPresentList(uint32 presentId) const
+{
+    // Otherwise return entry-based
+    ItemPresentContainer::const_iterator itr = _itemPresentStore.find(presentId);
+    if (itr != _itemPresentStore.end())
+        return &itr->second;
+    return nullptr;
+}
+
 DungeonEncounterList const* ObjectMgr::GetDungeonEncounterList(uint32 mapId, Difficulty difficulty) const
 {
     auto itr = _dungeonEncounterStore.find(MAKE_PAIR32(mapId, difficulty));
@@ -10243,6 +10252,41 @@ void ObjectMgr::LoadCreatureQuestItems()
     while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u creature quest items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadItemPresents()
+{
+    uint32 oldMSTime = getMSTime();
+    _itemPresentStore.clear();                           // needed for reload case
+    uint32 count = 0;
+
+    QueryResult result = WorldDatabase.Query("SELECT PresentSlotID, ItemId from item_present_slot");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 present item present slot records. DB table `item_present_slot` is empty.");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 presentSlotID = fields[0].GetUInt32();
+        uint32 itemId = fields[1].GetUInt32();
+
+        ItemEntry const* dbcItem = sItemStore.LookupEntry(itemId);
+        if (!dbcItem)
+        {
+            TC_LOG_ERROR("sql.sql", "Table `item_present_slot` has nonexistent item (ID: %u) in presentSlot (entry: %u), skipped", itemId, presentSlotID);
+            continue;
+        };
+
+        _itemPresentStore[presentSlotID].push_back(ItemPresent(presentSlotID, itemId));
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u item present slot records in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::InitializeQueriesData(QueryDataGroup mask)

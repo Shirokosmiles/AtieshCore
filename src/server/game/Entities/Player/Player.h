@@ -1799,6 +1799,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetAuctionLotsCount() const { return m_auctionlots; }
         void AddLotsCount() { ++m_auctionlots; }
         void RemoveLotsCount() { m_auctionlots - 1 > 0 ? --m_auctionlots : m_auctionlots = 0; }
+
+        // ItemPresent settings
+        void InstallItemPresentBySlot(uint32 entry);
+        void InstallItemPresent(uint32 entry, uint32 itemId);
         //End of Custom Systems
 
         void RemoveGhoul();

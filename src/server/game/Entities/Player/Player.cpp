@@ -27839,3 +27839,28 @@ void Player::CalculateAuctionLotsCounter()
     TC_LOG_DEBUG("chatmessage", "Player: CalculateAuctionLotsCounter - Player (%s) has %u lots in all auctions", GetName().c_str(), count);
     m_auctionlots = count;
 }
+
+void Player::InstallItemPresentBySlot(uint32 entry)
+{
+    ItemPresentList const* accessories = sObjectMgr->GetItemPresentList(entry);
+    if (!accessories)
+        return;
+
+    for (ItemPresentList::const_iterator itr = accessories->begin(); itr != accessories->end(); ++itr)
+        if (itr->ItemPresentSlot == entry)
+            InstallItemPresent(itr->ItemPresentSlot, itr->ItemId);
+}
+
+void Player::InstallItemPresent(uint32 entry, uint32 itemId)
+{
+    TC_LOG_DEBUG("entities.player", "Player (Guid: %u) %s: installing itempresent (Entry: %u) for item %u",
+        GetGUID().GetCounter(), GetName().c_str(), entry, itemId);
+
+    ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
+    if (!itemTemplate)
+        return;
+
+    if (!AddItem(itemId, 1))
+        TC_LOG_DEBUG("entities.player", "Player (Guid: %u) %s: did not received itempresent (Entry: %u) for item %u",
+            GetGUID().GetCounter(), GetName().c_str(), entry, itemId);
+}

@@ -1072,6 +1072,7 @@ class TC_GAME_API ObjectMgr
         QuestPOIWrapper const* GetQuestPOIWrapper(uint32 questId) const;
 
         VehicleAccessoryList const* GetVehicleAccessoryList(Vehicle* veh) const;
+        ItemPresentList const* GetItemPresentList(uint32 presentId) const;
 
         DungeonEncounterList const* GetDungeonEncounterList(uint32 mapId, Difficulty difficulty) const;
 
@@ -1218,6 +1219,7 @@ class TC_GAME_API ObjectMgr
         void LoadVendors();
         void LoadTrainers();
         void LoadCreatureDefaultTrainers();
+        void LoadItemPresents();
 
         void InitializeQueriesData(QueryDataGroup mask);
 
@@ -1600,6 +1602,8 @@ class TC_GAME_API ObjectMgr
 
         VehicleAccessoryContainer _vehicleTemplateAccessoryStore;
         VehicleAccessoryContainer _vehicleAccessoryStore;
+
+        ItemPresentContainer _itemPresentStore;
 
         LocaleConstant DBCLocaleIndex;
 
