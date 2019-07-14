@@ -72,42 +72,56 @@ Channel* ChannelMgr::GetChannelForPlayerByNamePart(std::string const& namePart, 
     return nullptr;
 }
 
-Channel* ChannelMgr::GetJoinChannel(uint32 channelId, std::string const& name, AreaTableEntry const* zoneEntry /*= nullptr*/)
+Channel* ChannelMgr::GetSystemChannel(uint32 channelId, AreaTableEntry const* zoneEntry)
 {
-    if (channelId) // builtin
-    {
-        ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
-        if (!channelEntry)
-            return nullptr;
-        uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
-        if (channelEntry->flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
-            zoneId = 0;
+    ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
+    if (!channelEntry)
+        return nullptr;
 
-        std::pair<uint32, uint32> key = std::make_pair(channelId, zoneId);
+    uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
+    if (channelEntry->flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
+        zoneId = 0;
 
-        auto itr = _channels.find(key);
-        if (itr != _channels.end())
-            return itr->second;
+    std::pair<uint32, uint32> key = std::make_pair(channelId, zoneId);
 
-        Channel* newChannel = new Channel(channelId, _team, zoneEntry);
-        _channels[key] = newChannel;
-        return newChannel;
-    }
-    else // custom
-    {
-        std::wstring channelName;
-        if (!Utf8toWStr(name, channelName))
-            return nullptr;
+    auto itr = _channels.find(key);
+    if (itr != _channels.end())
+        return itr->second;
 
-        wstrToLower(channelName);
-        auto itr = _customChannels.find(channelName);
-        if (itr != _customChannels.end())
-            return itr->second;
+    Channel* newChannel = new Channel(channelId, _team, zoneEntry);
+    _channels[key] = newChannel;
+    return newChannel;
+}
 
-        Channel* newChannel = new Channel(name, _team);
-        _customChannels[channelName] = newChannel;
-        return newChannel;
-    }
+Channel* ChannelMgr::CreateCustomChannel(std::string const& name)
+{
+    std::wstring channelName;
+    if (!Utf8toWStr(name, channelName))
+        return nullptr;
+
+    wstrToLower(channelName);
+
+    Channel*& c = _customChannels[channelName];
+    if (c)
+        return nullptr;
+
+    Channel* newChannel = new Channel(name, _team);
+    c = newChannel;
+    return newChannel;
+}
+
+Channel* ChannelMgr::GetCustomChannel(std::string const& name) const
+{
+    std::wstring channelName;
+    if (!Utf8toWStr(name, channelName))
+        return nullptr;
+
+    wstrToLower(channelName);
+    auto itr = _customChannels.find(channelName);
+    if (itr != _customChannels.end())
+        return itr->second;
+    else
+        return nullptr;
 }
 
 Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Player* player, bool pkt /*= true*/, AreaTableEntry const* zoneEntry /*= nullptr*/) const
