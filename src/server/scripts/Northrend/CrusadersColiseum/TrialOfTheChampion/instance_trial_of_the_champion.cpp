@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
+ * Copyright (C) 2008-2017 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GameObject.h"
+/* ScriptData
+SDName: Instance Trial of the Champion
+SDComment: missing fireworks when boss encounter is set to done
+SDCategory: Trial Of the Champion
+EndScriptData */
+
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -292,7 +298,7 @@ class instance_trial_of_the_champion : public InstanceMapScript
                         {
                             if (Creature* boss = instance->GetCreature(_argentChampionGUID))
                             {
-                                boss->SetFaction(FACTION_MONSTER_2);
+                                boss->SetFaction(16);
                                 boss->SetHomePosition(747.02f, 637.65f, 411.57f, centerOrientation);
                                 boss->GetMotionMaster()->MovePoint(1, boss->GetHomePosition());
                             }

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
+ * Copyright (C) 2008-2017 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,13 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GameObject.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "trial_of_the_champion.h"
 #include "Vehicle.h"
 #include "Player.h"
+
+#define GOSSIP_START_EVENT1     "I am ready."
+#define GOSSIP_START_EVENT2     "I am ready for the next challenge."
+#define GOSSIP_START_EVENT_SKIP "I am ready. However I'd like to skip the pageantry."
 
 enum Texts
 {
@@ -110,19 +114,6 @@ enum GossipTexts
     GOSSIP_TEXT_FIRST_BOSS      = 14688,
     GOSSIP_TEXT_SECOND_BOSS     = 14737,
     GOSSIP_TEXT_THIRD_BOSS      = 14738
-};
-
-enum GossipMenuOptions
-{
-    GOSSIP_MENU_ID              = 10614,
-    GOSSIP_START_EVENT1         = 0,
-    GOSSIP_START_EVENT2         = 1,
-    GOSSIP_START_EVENT_SKIP     = 3,
-    GOSSIP_GM_START_EVENT1      = 4,
-    GOSSIP_GM_START_EVENT_SKIP1 = 5,
-    GOSSIP_GM_START_EVENT2_V1   = 6,
-    GOSSIP_GM_START_EVENT2_v2   = 7,
-    GOSSIP_GM_START_EVENT4      = 8
 };
 
 enum Events
@@ -279,7 +270,7 @@ GrandChampionInfo const GrandChampionData[5] =
 
 class npc_announcer_toc5 : public CreatureScript
 {
-    public:
+public:
     npc_announcer_toc5() : CreatureScript("npc_announcer_toc5") { }
 
     struct npc_announcer_toc5AI : public ScriptedAI
@@ -623,7 +614,7 @@ class npc_announcer_toc5 : public CreatureScript
 
         void SetArgentChampion()
         {
-           switch (urand(BOSS_EADRIC, BOSS_PALETRESS))
+           switch (RAND(BOSS_EADRIC, BOSS_PALETRESS))
            {
                 case BOSS_EADRIC:
                     uiArgentChampion = NPC_EADRIC;
@@ -798,7 +789,7 @@ class npc_announcer_toc5 : public CreatureScript
                                                     case 3: spectatorEntry = SpectatorData[RACE_TROLL]; break;
                                                     case 4: spectatorEntry = SpectatorData[RACE_UNDEAD_PLAYER]; break;
                                                 }
-                                            }                                            
+                                            }
 
                                             if (Creature* spectator = me->FindNearestCreature(spectatorEntry, 200.0f))
                                                 spectator->AI()->Talk(EMOTE_SPECTATOR_CHEER, plr);
@@ -1279,6 +1270,7 @@ class npc_announcer_toc5 : public CreatureScript
 
         bool GossipHello(Player* player) override
         {
+            // @TODO: MOVE THIS HORRIBLE STUFF TO DB
 
             InstanceScript* instance = me->GetInstanceScript();
             if (instance)
@@ -1293,25 +1285,25 @@ class npc_announcer_toc5 : public CreatureScript
                         (instance->GetBossState(DATA_ARGENT_CHALLENGE) == NOT_STARTED || instance->GetBossState(DATA_ARGENT_CHALLENGE) == TO_BE_DECIDED) &&
                         (instance->GetBossState(DATA_BLACK_KNIGHT) == NOT_STARTED || instance->GetBossState(DATA_BLACK_KNIGHT) == TO_BE_DECIDED))
                     {
-                        AddGossipItemFor(player, GOSSIP_MENU_ID, GOSSIP_GM_START_EVENT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                        AddGossipItemFor(player, GOSSIP_MENU_ID, GOSSIP_GM_START_EVENT_SKIP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[GM] Start Grand Champions encounter, unskipped roleplaying", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[GM] Start Grand Champions encounter, skipped roleplaying", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     }
                     if (instance->GetBossState(DATA_ARGENT_CHALLENGE) == NOT_STARTED || instance->GetBossState(DATA_ARGENT_CHALLENGE) == TO_BE_DECIDED)
                     {
-                        AddGossipItemFor(player, GOSSIP_MENU_ID, GOSSIP_GM_START_EVENT2_V1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                        AddGossipItemFor(player, GOSSIP_MENU_ID, GOSSIP_GM_START_EVENT2_v2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[GM] Start Eadric the Pure encounter", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[GM] Start Argent Confessor Paletress encounter", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                     }
                     if (instance->GetBossState(DATA_BLACK_KNIGHT) == NOT_STARTED || instance->GetBossState(DATA_BLACK_KNIGHT) == TO_BE_DECIDED)
-                        AddGossipItemFor(player, GOSSIP_MENU_ID, GOSSIP_GM_START_EVENT4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[GM] Start The Black Knight encounter", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                     SendGossipMenuFor(player, 1, me->GetGUID());
                 }
                 else if ((instance->GetBossState(DATA_GRAND_CHAMPIONS) == NOT_STARTED || instance->GetBossState(DATA_GRAND_CHAMPIONS) == TO_BE_DECIDED) && player->GetVehicleBase())
                 {
                     // If Grand Champions encounter hasn't been started and the player is mounted
-                    AddGossipItemFor(player, GOSSIP_MENU_ID, GOSSIP_START_EVENT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                     // Patch 3.2.2: "There is now an option in the herald's dialogue to skip the introductory scripted scene if everyone in the party has already seen it."
                     if (HasAllSeenEvent(player))
-                        AddGossipItemFor(player, GOSSIP_MENU_ID, GOSSIP_START_EVENT_SKIP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT_SKIP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     SendGossipMenuFor(player, GOSSIP_TEXT_FIRST_BOSS, me->GetGUID());
                 }
                 else if ((instance->GetBossState(DATA_GRAND_CHAMPIONS) == NOT_STARTED || instance->GetBossState(DATA_GRAND_CHAMPIONS) == TO_BE_DECIDED) && !player->GetVehicleBase())
@@ -1325,48 +1317,47 @@ class npc_announcer_toc5 : public CreatureScript
                 else if (instance->GetBossState(DATA_GRAND_CHAMPIONS) == DONE && (instance->GetBossState(DATA_ARGENT_CHALLENGE) == NOT_STARTED || instance->GetBossState(DATA_ARGENT_CHALLENGE) == TO_BE_DECIDED))
                 {
                     // If Grand Champions encounter is done and Eadric the Pure nor Argent Confessor Paletress encounters have been started
-                    AddGossipItemFor(player, GOSSIP_MENU_ID, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     SendGossipMenuFor(player, GOSSIP_TEXT_SECOND_BOSS, me->GetGUID());
                 }
                 else if (instance->GetBossState(DATA_ARGENT_CHALLENGE) == DONE && (instance->GetBossState(DATA_BLACK_KNIGHT) == NOT_STARTED || instance->GetBossState(DATA_BLACK_KNIGHT) == TO_BE_DECIDED))
                 {
                     // If Grand Champions, Eadric the Pure and Argent Confessor Paletress encounters are all done but Black Knight encounter has not been started
-                    AddGossipItemFor(player, GOSSIP_MENU_ID, GOSSIP_START_EVENT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     SendGossipMenuFor(player, GOSSIP_TEXT_THIRD_BOSS, me->GetGUID());
                 }
             }
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
-            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             ClearGossipMenuFor(player);
             CloseGossipMenuFor(player);
             switch (action)
             {
-                case GOSSIP_ACTION_INFO_DEF + 1:
-                    StartEncounter();
-                    break;
-                case GOSSIP_ACTION_INFO_DEF + 2:
-                    StartEncounter(true);
-                    break;
-                case GOSSIP_ACTION_INFO_DEF + 3:
-                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    uiArgentChampion = NPC_EADRIC;
-                    DoStartArgentChampionEncounter();
-                    break;
-                case GOSSIP_ACTION_INFO_DEF + 4:
-                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    uiArgentChampion = NPC_PALETRESS;
-                    DoStartArgentChampionEncounter();
-                    break;
-                case GOSSIP_ACTION_INFO_DEF + 5:
-                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    DoStartBlackKnight();
-                    break;
-                default:
-                    break;
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                ENSURE_AI(npc_announcer_toc5::npc_announcer_toc5AI, me->AI())->StartEncounter();
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 2:
+                ENSURE_AI(npc_announcer_toc5::npc_announcer_toc5AI, me->AI())->StartEncounter(true);
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 3:
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                ENSURE_AI(npc_announcer_toc5::npc_announcer_toc5AI, me->AI())->uiArgentChampion = NPC_EADRIC;
+                ENSURE_AI(npc_announcer_toc5::npc_announcer_toc5AI, me->AI())->DoStartArgentChampionEncounter();
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 4:
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                ENSURE_AI(npc_announcer_toc5::npc_announcer_toc5AI, me->AI())->uiArgentChampion = NPC_PALETRESS;
+                ENSURE_AI(npc_announcer_toc5::npc_announcer_toc5AI, me->AI())->DoStartArgentChampionEncounter();
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 5:
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                ENSURE_AI(npc_announcer_toc5::npc_announcer_toc5AI, me->AI())->DoStartBlackKnight();
+                break;
+            default:
+                break;
             }
             return true;
         }
@@ -1383,7 +1374,7 @@ class npc_announcer_toc5 : public CreatureScript
             Map::PlayerList const& players = player->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
-                if (Player const *plr = itr->GetSource())
+                if (Player const* plr = itr->GetSource())
                 {
                     // if everyone from your group have completed one of the Trial of the Champion achievements, you have option to skip the event
                     // maybe not the correct way to do it but I couldn't figure out better

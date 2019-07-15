@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
+ * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,15 +17,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CellImpl.h"
-#include "GridNotifiersImpl.h"
+/* ScriptData
+SDName: boss_grand_champions
+SD%Complete: 99%
+SDComment: Cosmetic things missing
+SDCategory: Trial Of the Champion
+EndScriptData */
+
+#include "GridNotifiers.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "SpellMgr.h"
 #include "Vehicle.h"
 #include "trial_of_the_champion.h"
 
@@ -364,7 +370,7 @@ struct boss_grand_championAI : BossAI
         if (spell->Id == SPELL_TRAMPLE_AURA && LookingForMount && uiPhase == 0 && !me->IsImmunedToSpell(spell, caster))
         {
             uiPhase = 3;
-            //me->GetMotionMaster()->MovementExpired();
+            me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveIdle();
             Talk(EMOTE_TRAMPLE, me);
             events.ScheduleEvent(EVENT_TRAMPLE, spell->GetDuration());
@@ -1694,9 +1700,7 @@ class spell_toc5_lightning_arrows : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_LIGHTNING_ARROWS_AURA))
-                    return false;
-                return true;
+                return ValidateSpellInfo({ SPELL_LIGHTNING_ARROWS_AURA });
             }
 
             void HandleScript(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

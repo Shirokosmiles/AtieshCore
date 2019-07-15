@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
+ * Copyright (C) 2008-2017 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -18,12 +19,6 @@
 
 #ifndef TRIAL_OF_CHAMPION_H_
 #define TRIAL_OF_CHAMPION_H_
-
-#include "InstanceScript.h"
-#include "Map.h"
-#include "MotionMaster.h"
-#include "ObjectAccessor.h"
-#include "TemporarySummon.h"
 
 #define ToCScriptName "instance_trial_of_the_champion"
 #define DataHeader "TC"
@@ -300,4 +295,4 @@ AI* GetTrialOfChampionAI(Creature* creature)
     return GetInstanceAI<AI>(creature, ToCScriptName);
 }
 
-#endif
+#endif // TRIAL_OF_CHAMPION_H_
