@@ -1945,7 +1945,7 @@ public:
             }
 
             if (target->isDead())
-                target->Respawn(true);
+                target->Respawn();
             return true;
         }
 

@@ -377,12 +377,12 @@ bool Creature::IsFormationLeaderMoveAllowed() const
     return m_formation->CanLeaderStartMoving();
 }
 
-void Creature::RemoveCorpse(bool setSpawnTime, bool destroyForNearbyPlayers, bool forcerespawn)
+void Creature::RemoveCorpse(bool setSpawnTime, bool destroyForNearbyPlayers)
 {
     if (getDeathState() != CORPSE)
         return;
 
-    if (m_respawnCompatibilityMode || forcerespawn)
+    if (m_respawnCompatibilityMode)
     {
         m_corpseRemoveTime = GameTime::GetGameTime();
         setDeathState(DEAD);
@@ -2104,10 +2104,10 @@ void Creature::Respawn(bool force)
             setDeathState(CORPSE);
     }
 
-    if (m_respawnCompatibilityMode || force)
+    if (m_respawnCompatibilityMode)
     {
         DestroyForNearbyPlayers();
-        RemoveCorpse(false, false, force);
+        RemoveCorpse(false, false);
 
         if (getDeathState() == DEAD)
         {
