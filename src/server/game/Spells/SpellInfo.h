@@ -437,6 +437,8 @@ class TC_GAME_API SpellInfo
         bool IsSelfCast() const;
 
         bool IsVanish() const; // 11327 || 11329 || 26888 vanish ranks
+        bool IsShadowMeld() const;
+        bool IsVanishOrShadowMeld() const { return IsVanish() || IsShadowMeld(); }
         bool IsPassive() const;
         bool IsAutocastable() const;
         bool IsStackableWithRanks() const;

@@ -1439,7 +1439,7 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
     Unit* target = aurApp->GetTarget();
     StealthType type = StealthType(GetMiscValue());
     bool vanishspell = false;
-    if (GetSpellInfo()->IsVanish())
+    if (GetSpellInfo()->IsVanishOrShadowMeld())
         vanishspell = true;
 
     if (apply)
