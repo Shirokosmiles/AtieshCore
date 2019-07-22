@@ -978,6 +978,13 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
             }
             repMgr.SendState(nullptr);
         }
+
+        if (sWorld->getBoolConfig(CONFIG_CREATECHAR_BONUS_BAGS)) // if enabled plr will take a bonus
+        {
+            // here will script for adding bags
+            uint32 bagsid = sWorld->getIntConfig(CONFIG_CREATECHAR_BONUS_BAGS_ID);
+            pCurrChar->StoreNewItemInBestSlots(bagsid, 4);
+        }
     }
 
     uint32 coins = AccountMgr::GetCoins(GetAccountId());
@@ -993,10 +1000,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
             // send bonus announce
             chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus / GOLD, (moneybonus%GOLD) / SILVER, moneybonus%SILVER);
 
-            pCurrChar->ModifyMoney(moneybonus);
-            //coins += 40;
-            //pCurrChar->SetCoins(coins);
-            //AccountMgr::SetCoins(GetAccountId(), coins);
+            pCurrChar->ModifyMoney(moneybonus);            
         }
 
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_START_MONEY);

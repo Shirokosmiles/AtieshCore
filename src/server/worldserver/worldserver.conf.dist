@@ -4473,6 +4473,25 @@ FLAB.Script.BonusMoney = 10000000
 
 ###################################################################################################
 #
+# BAG.Script
+#
+#    Description: Created character will receive a bags bonus
+#    Default:     9 - disabled
+#
+#    BAG.Script.Enabled = 1 - enabled.
+#    BAG.Script.Enabled = 0 - disabled.
+
+BAG.Script.Enabled = 0
+
+#    Description: a itemid of bags ( 51809 )
+
+BAG.Script.BonusBagsID = 51809
+
+#
+###################################################################################################
+
+###################################################################################################
+#
 # VIP SYSTEM CONFIG
 #
 #    Vip.Command

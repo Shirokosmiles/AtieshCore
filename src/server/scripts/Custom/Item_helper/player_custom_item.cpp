@@ -146,6 +146,15 @@ public:
         if (player->IsPremium())
             AddGossipItemFor(player, 0, GTS(LANG_ITEM_VIP_MENU), GOSSIP_SENDER_MAIN, 10);
 
+        // стартовый пакет
+        switch (player->GetClass())
+        {
+        case CLASS_ROGUE:
+            AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 83);
+        default:
+            break;
+        }
+
         AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);
         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
         return false;
@@ -1796,6 +1805,12 @@ public:
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_YOU_NEED_COINS, ostatok);
                     player->PlayerTalkClass->SendCloseGossip();
                 }
+                break;
+            }
+            case 83: // rogue start-pack
+            {
+                player->InstallItemPresentBySlot(4);
+                player->PlayerTalkClass->SendCloseGossip();
                 break;
             }
             }

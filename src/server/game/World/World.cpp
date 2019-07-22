@@ -1458,6 +1458,9 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_FIRST_LOGIN_ACC_BONUS]                = sConfigMgr->GetBoolDefault("FLAB.Script.Enabled", false);
     m_int_configs[CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS]   = sConfigMgr->GetIntDefault("FLAB.Script.MaxChars", 0);
     m_int_configs[CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS] = sConfigMgr->GetIntDefault("FLAB.Script.BonusMoney", 1);
+    // Bags autoequip script
+    m_bool_configs[CONFIG_CREATECHAR_BONUS_BAGS] = sConfigMgr->GetBoolDefault("BAG.Script.Enabled", false);
+    m_int_configs[CONFIG_CREATECHAR_BONUS_BAGS_ID] = sConfigMgr->GetIntDefault("BAG.Script.BonusBagsID", 51809);
     // Vanish Fade Delay
     m_int_configs[CONFIG_VANISH_VISION_TIMER]                   = sConfigMgr->GetIntDefault("VanishVisionTimer", 600);
     m_int_configs[CONFIG_VANISH_CC_BREAK_TIMER]                 = sConfigMgr->GetIntDefault("VanishCCbreakTimer", 300);
