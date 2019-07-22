@@ -149,8 +149,12 @@ public:
         // стартовый пакет
         switch (player->GetClass())
         {
+        case CLASS_WARRIOR:
+            AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 84);
+            break;
         case CLASS_ROGUE:
             AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 83);
+            break;
         default:
             break;
         }
@@ -1810,6 +1814,12 @@ public:
             case 83: // rogue start-pack
             {
                 player->InstallItemPresentBySlot(4);
+                player->PlayerTalkClass->SendCloseGossip();
+                break;
+            }
+            case 84: // warrior start-pack
+            {
+                player->InstallItemPresentBySlot(1);
                 player->PlayerTalkClass->SendCloseGossip();
                 break;
             }

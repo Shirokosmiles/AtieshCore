@@ -12,6 +12,28 @@ CREATE TABLE `item_present_slot`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8;
 
 -- ----------------------------
+-- Records of warrior set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '1';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `description`) VALUES 
+(1, 40816, 'set warrior'),
+(1, 40856, 'set warrior'),
+(1, 40797, 'set warrior'),
+(1, 40836, 'set warrior'),
+(1, 40878, 'set warrior'),
+(1, 40877, 'set warrior'),
+(1, 40887, 'set warrior'),
+(1, 42060, 'set warrior'),
+(1, 42020, 'set warrior'),
+(1, 42112, 'set warrior ring1'),
+(1, 39401, 'set warrior ring1'),
+(1, 42989, 'set warrior ring t1'),
+(1, 42122, 'set warrior ring t2'),
+(1, 42331, 'set warrior w1'),
+(1, 42331, 'set warrior w2'),
+(1, 42449, 'set warrior w3'),
+(1, 42558, 'set warrior shield');
+-- ----------------------------
 -- Records of rogue set
 -- ----------------------------
 DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '4';
