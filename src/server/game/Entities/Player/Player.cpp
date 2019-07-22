@@ -27181,13 +27181,10 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (ToUnit()->IsFalling() ||  IsInFlight())
             return true;
 
-        if (GetTransport() || GetVehicle() || GetVehicleKit())
+        if (GetVehicle() || GetVehicleKit())
             return true;
 
         if (HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
-            return true;
-
-        if (movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
             return true;
 
         if (!IsControlledByPlayer())
@@ -27195,8 +27192,6 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 
         if (GetPlayerMovingMe())
         {
-            if (GetPlayerMovingMe()->UnderACKmount())
-                return true;
 
             if (GetPlayerMovingMe()->IsSkipOnePacketForASH())
             {
@@ -27227,8 +27222,8 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 
         float distance, movetime, speed, difftime, normaldistance, delay, delaysentrecieve, x, y;
         distance = GetExactDist2d(npos);
-
-        if (!jump && !CanFly() && !isSwimming())
+        bool transportflag = GetTransport() || (movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+        if (!jump && !CanFly() && !isSwimming() && !transportflag)
         {
             float diffz = fabs(movementInfo.pos.GetPositionZ() - GetPositionZ());
             float tanangle = distance / diffz;
@@ -27264,7 +27259,8 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         delay = fabsf(movetime - stime) / 10000000000 + delaysentrecieve;
         difftime = (movetime - ctime + ping) * 0.001f + delay;
         normaldistance = speed * difftime; // if movetime faked and lower, difftime should be with "-"
-
+        if (GetPlayerMovingMe()->UnderACKmount())
+            normaldistance *= 3.0f;
         if (distance < normaldistance)
             return true;
 
