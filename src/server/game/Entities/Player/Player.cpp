@@ -447,6 +447,8 @@ Player::Player(WorldSession* session): Unit(true)
     m_reputationMgr = new ReputationMgr(this);
 
     m_groupUpdateTimer.Reset(5000);
+    SetLastMoveClientTimestamp(GameTime::GetGameTimeMS());
+    SetLastMoveServerTimestamp(GameTime::GetGameTimeMS());
 }
 
 Player::~Player()
