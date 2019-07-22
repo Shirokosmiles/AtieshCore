@@ -405,9 +405,10 @@ class spell_death_knight_initiate_visual : public SpellScript
 
 enum EyeOfAcherus
 {
-    SPELL_EYE_VISUAL            = 51892,
-    SPELL_EYE_FLIGHT_BOOST      = 51923,
-    SPELL_EYE_FLIGHT            = 51890,
+    SPELL_THE_EYE_OF_ACHERUS = 51852,
+    SPELL_EYE_VISUAL         = 51892,
+    SPELL_EYE_FLIGHT_BOOST   = 51923,
+    SPELL_EYE_FLIGHT         = 51890,
 
     EVENT_MOVE_START            = 1,
     EVENT_MOVE_CONTINUE         = 2,
@@ -439,7 +440,14 @@ class npc_eye_of_acherus : public CreatureScript
                 _events.ScheduleEvent(EVENT_MOVE_START, 3s);
             }
 
-            void OnCharmed(bool /*apply*/) override { }
+            void OnCharmed(bool /*isNew*/) override
+            {
+                if (!me->IsCharmed())
+                {
+                    me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_THE_EYE_OF_ACHERUS);
+                    me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_EYE_FLIGHT_BOOST);
+                }
+            }
 
             void UpdateAI(uint32 diff) override
             {
