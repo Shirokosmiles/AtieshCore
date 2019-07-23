@@ -27073,6 +27073,9 @@ void Player::SetRootACKUpd(uint32 delay)
 
 bool Player::CheckOnFlyHack()
 {
+    if (sWorld->isMapDisabledForAC(GetMapId()))
+        return true;
+
     if (IsCanFlybyServer())
         return true;
 
@@ -27175,6 +27178,9 @@ void Player::UpdateMovementInfo(MovementInfo const& movementInfo)
 bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 {
     if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_SPEEDHACK_ENABLED))
+        return true;
+
+    if (sWorld->isMapDisabledForAC(GetMapId()))
         return true;
 
     uint32 ctime = GetLastMoveClientTimestamp();

@@ -1420,6 +1420,9 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_FAKEFLYINGMODE_KICK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FakeFlyingmode.Kick.Enabled", false);
     // Anticheat AFH timer
     m_int_configs[CONFIG_ANTICHEAT_FLYHACK_TIMER] = sConfigMgr->GetIntDefault("AntiCheats.FlyHackTimer", 1000);
+    // Exclude some mapIDs for ASH and AFH
+    SetACMapExcludes(sConfigMgr->GetStringDefault("AntiCheats.forceExcludeMapsid", ""));
+    TC_LOG_INFO("server.loading", "AntiCheats disabled for %u maps", (uint32)excludeACMapsId.size());
 
     // VIP system
     m_bool_configs[CONFIG_VIP_DEBUFF]        = sConfigMgr->GetBoolDefault("Config.Vip.Debuff.Command", false);
@@ -3608,6 +3611,16 @@ void World::ReloadRBAC()
 void World::RemoveOldCorpses()
 {
     m_timers[WUPDATE_CORPSES].SetCurrent(m_timers[WUPDATE_CORPSES].GetInterval());
+}
+
+void World::SetACMapExcludes(const std::string& mapIdExcludes)
+{
+    excludeACMapsId.clear();
+
+    std::stringstream excludeStream(mapIdExcludes);
+    std::string temp;
+    while (std::getline(excludeStream, temp, ','))
+        excludeACMapsId.insert(atoi(temp.c_str()));
 }
 
 Realm realm;

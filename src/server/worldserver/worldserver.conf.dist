@@ -4051,7 +4051,8 @@ Metric.OverallStatusInterval = 1
 ###################################################################################################
 
 ###################################################################################################
-#    CheckGameObjectLoS
+#
+# CheckGameObjectLoS
 #        Description: Include M2 objects (trees etc.) in line of sight checks.
 #                     (only if vmaps are enabled)
 #        Default:     1 - (Enabled) - not blizzlike, but game looks really pretty
@@ -4064,7 +4065,7 @@ CheckM2ObjectLoS = 1
 
 ###################################################################################################
 #
-#   VanishVisionTimer
+# VanishVisionTimer
 #        Description: Vanish Fade Delay (vanish evade all spells without CC control in this time)
 #        Default:     500 - (0.5 sec)
 #
@@ -4094,7 +4095,7 @@ External.Mail.Interval = 1
 
 ###################################################################################################
 #
-#    Channel.AllowedLfg
+# Channel.AllowedLfg
 #        Description: Allow access at LookupForGroup channel to characters without condition of LFG state.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
@@ -4120,6 +4121,7 @@ LFG.CrossFaction.Groups = 0
 ###################################################################################################
 
 ###################################################################################################
+#
 # MISC ANTI-CHEAT SETTINGS
 #    AntiCheats.FlyHack
 #        Description: Enable AntiCheat.FlyHack
@@ -4165,11 +4167,21 @@ AntiCheats.FakeFlyingmode.Enabled = 1
 
 AntiCheats.IgnoreControlMovement.Enabled = 0
 
+#
+###################################################################################################
+
+###################################################################################################
+#
 # Logs
+
 Appender.Anticheat=2,3,15,Anticheat.log
 Logger.anticheat=3,Console Anticheat
 
+#
 ###################################################################################################
+
+###################################################################################################
+#
 # Sanctions - Kicks
 #    
 #    AntiCheats.FlyHack.Kick.Enabled
@@ -4207,17 +4219,33 @@ AntiCheats.FakeFlyingmode.Kick.Enabled = 1
 
 AntiCheats.WrongTimeSyncCounter.Kick.Enabled = 0
 
+#
 ###################################################################################################
-#    AntiCheats.FlyHackTimer
+
+###################################################################################################
+#
+# AntiCheats.FlyHackTimer
 #        Description: Timer for AntiCheat FlyHack check
 #        Default:     3000 - 1 check in 1 second
 
 AntiCheats.FlyHackTimer = 3000
 
+#
 ###################################################################################################
 
 ###################################################################################################
-#    Transmogrification config
+#
+# AntiCheats.forceExcludeMapsid disabled maps
+#        Description: disabled mapid for anticheat system
+#        Example:     "616,649"
+
+AntiCheats.forceExcludeMapsid = ""
+
+#
+###################################################################################################
+
+###################################################################################################
+# Transmogrification config
 ###################################################################################################
 #
 #    SETTINGS
@@ -4584,7 +4612,7 @@ PVPBonusCapReward.CapChanges.Lose = 60
 # OSX PLAYERS CONNECTION
 #
 #    Description: We can not allowed to connect for players from OSX OS system
-#    Default:     1 - disabled
+#    Default:     1 - enabled. But should to remember, in OSX doesn't working Warden
 #
 #    RE.OSXPlayers.Enabled = 1 - enabled.
 #    RE.OSXPlayers.Enabled = 0 - disabled.
@@ -4594,9 +4622,24 @@ OSXPlayers.Enabled = 1
 #
 ###################################################################################################
 
+###################################################################################################
+#
+# ANTISPAM.MAIL
+#
+#        Description: When player will receive this limit, he just can't bid or bidout from auction. Calendar will not sent mail him. 
+#                     And another player can't sent mail to him, just will see error overloaded mailbox of receiver.
+
 Antispam.Mail.Enabled = 1
-Antispam.Mail.Timer = 3600
+
+# Antispam.Mail.Count
+#        Description: How many mails you can sent in game in 1 period of timer
+
 Antispam.Mail.Count = 10
+
+# Antispam.Mail.Timer
+#        Description: Timer for possible next sending count of mails by mailbox
+
+Antispam.Mail.Timer = 3600
 
 #    Antispam.Mail.Controller = 100 - how many mails player can hold in mailbox, include mail in future (from auctionhouse and calendar).
 #        Description: When player will receive this limit, he just can't bid or bidout from auction. Calendar will not sent mail him. 
@@ -4604,10 +4647,19 @@ Antispam.Mail.Count = 10
 
 Antispam.Mail.Controller = 100
 
-#    Chat.StrictMessages
+#
+###################################################################################################
+
+###################################################################################################
+#
+# CHAT.STRICTMESSAGES
+#
 #        Description: Limit player message to language specific symbol set. Prevents character
 #                     messages and ignore request if not allowed symbols are used
-#        Default:     0 - (Disable, Limited server timezone dependent client check)
+#        Default:     0 - (Disable, only basic UTF8 checks)
 #                     1 - (Enabled, Strictly all locales specific + some basic symbols)
 
 Chat.StrictMessages.Enabled = 0
+
+#
+###################################################################################################
