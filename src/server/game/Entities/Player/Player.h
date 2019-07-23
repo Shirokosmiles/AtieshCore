@@ -1802,7 +1802,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         // ItemPresent settings
         void InstallItemPresentBySlot(uint32 entry);
-        void InstallItemPresent(uint32 entry, uint32 itemId);
+        void InstallItemPresent(uint32 entry, uint32 itemId, uint32 count);
         //End of Custom Systems
 
         void RemoveGhoul();

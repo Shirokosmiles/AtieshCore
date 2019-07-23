@@ -28,10 +28,11 @@ float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to
 
 struct ItemPresent
 {
-    ItemPresent(uint32 entry, uint32 itemId) :
-        ItemPresentSlot(entry), ItemId(itemId) { }
+    ItemPresent(uint32 entry, uint32 itemId, uint32 count) :
+        ItemPresentSlot(entry), ItemId(itemId), Count(count) { }
     uint32 ItemPresentSlot;
     uint32 ItemId;
+    uint32 Count;
 };
 
 typedef std::vector<ItemPresent> ItemPresentList;

@@ -10258,9 +10258,9 @@ void ObjectMgr::LoadItemPresents()
 {
     uint32 oldMSTime = getMSTime();
     _itemPresentStore.clear();                           // needed for reload case
-    uint32 count = 0;
+    uint32 counter = 0;
 
-    QueryResult result = WorldDatabase.Query("SELECT PresentSlotID, ItemId from item_present_slot");
+    QueryResult result = WorldDatabase.Query("SELECT PresentSlotID, ItemId, Counts from item_present_slot");
 
     if (!result)
     {
@@ -10274,6 +10274,7 @@ void ObjectMgr::LoadItemPresents()
 
         uint32 presentSlotID = fields[0].GetUInt32();
         uint32 itemId = fields[1].GetUInt32();
+        uint32 count = fields[2].GetUInt32();
 
         ItemEntry const* dbcItem = sItemStore.LookupEntry(itemId);
         if (!dbcItem)
@@ -10282,11 +10283,11 @@ void ObjectMgr::LoadItemPresents()
             continue;
         };
 
-        _itemPresentStore[presentSlotID].push_back(ItemPresent(presentSlotID, itemId));
-        ++count;
+        _itemPresentStore[presentSlotID].push_back(ItemPresent(presentSlotID, itemId, count));
+        ++counter;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u item present slot records in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded %u item present slot records in %u ms", counter, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::InitializeQueriesData(QueryDataGroup mask)

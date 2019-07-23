@@ -27864,10 +27864,10 @@ void Player::InstallItemPresentBySlot(uint32 entry)
 
     for (ItemPresentList::const_iterator itr = accessories->begin(); itr != accessories->end(); ++itr)
         if (itr->ItemPresentSlot == entry)
-            InstallItemPresent(itr->ItemPresentSlot, itr->ItemId);
+            InstallItemPresent(itr->ItemPresentSlot, itr->ItemId, itr->Count);
 }
 
-void Player::InstallItemPresent(uint32 entry, uint32 itemId)
+void Player::InstallItemPresent(uint32 entry, uint32 itemId, uint32 count)
 {
     TC_LOG_DEBUG("entities.player", "Player (Guid: %u) %s: installing itempresent (Entry: %u) for item %u",
         GetGUID().GetCounter(), GetName().c_str(), entry, itemId);
@@ -27876,7 +27876,7 @@ void Player::InstallItemPresent(uint32 entry, uint32 itemId)
     if (!itemTemplate)
         return;
 
-    if (!AddItem(itemId, 1))
+    if (!AddItem(itemId, count))
         TC_LOG_DEBUG("entities.player", "Player (Guid: %u) %s: did not received itempresent (Entry: %u) for item %u",
             GetGUID().GetCounter(), GetName().c_str(), entry, itemId);
 }

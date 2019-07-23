@@ -1,0 +1,1 @@
+UPDATE `item_template` SET `ammo_type`=2, `RangedModRange`=100, `VerifiedBuild`=1 WHERE `entry`=42489;
