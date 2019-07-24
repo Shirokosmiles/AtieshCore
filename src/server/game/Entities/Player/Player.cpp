@@ -9002,7 +9002,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     packet.Worldstates.emplace_back(3191, sWorld->getBoolConfig(CONFIG_ARENA_SEASON_IN_PROGRESS) ? sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID) : 0);
 
     // Previous arena season id
-    packet.Worldstates.emplace_back(3901, (sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID) - (sWorld->getBoolConfig(CONFIG_ARENA_SEASON_IN_PROGRESS)) ? 1 : 0));
+    int8 arenaseasonID = sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID);
+    int8 arenaseasonInProgress = sWorld->getBoolConfig(CONFIG_ARENA_SEASON_IN_PROGRESS) ? 1 : 0;
+    packet.Worldstates.emplace_back(3901, (arenaseasonID - arenaseasonInProgress));
 
     if (mapId == 530) // Outland
     {
