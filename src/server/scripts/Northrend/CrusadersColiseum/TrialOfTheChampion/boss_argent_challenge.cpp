@@ -1222,12 +1222,12 @@ class achievement_eadric_faceroller : public AchievementCriteriaScript
     public:
         achievement_eadric_faceroller() : AchievementCriteriaScript("achievement_eadric_faceroller") { }
 
-        bool OnCheck(Player* source, Unit* target) override
+        bool OnCheck(Player* /*source*/, Unit* target) override
         {
             if (!target || !target->IsAIEnabled())
                 return false;
 
-            return !!target->GetAI()->GetData(DATA_FACEROLLER_ACHIEVEMENT);
+            return !target->GetAI()->GetData(DATA_FACEROLLER_ACHIEVEMENT);
         }
 };
 
