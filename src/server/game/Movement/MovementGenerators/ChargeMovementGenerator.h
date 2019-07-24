@@ -46,8 +46,8 @@ class ChargeMovementGenerator : public MovementGeneratorMedium<T, ChargeMovement
     private:
         uint32 _movementId;
         float _x, _y, _z;
-        bool _generatePath;
         float _speed;
+        bool _generatePath;
         //! if set then unit will turn to specified _orient in provided _pos
         Optional<float> _finalOrient;
         std::unique_ptr<PathGenerator> _path;
