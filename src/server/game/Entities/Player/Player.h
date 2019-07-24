@@ -1498,9 +1498,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 GetSpecsCount() const { return m_specsCount; }
         void SetSpecsCount(uint8 count) { m_specsCount = count; }
         void ActivateSpec(uint8 spec);
-        uint8 GetMostPointsTalentTree() const;
-        bool IsHealerTalentSpec() const;
-        bool IsTankTalentSpec() const;
+        
         void LoadActions(PreparedQueryResult result);
 
         void InitGlyphsForLevel();
@@ -1805,6 +1803,12 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // ItemPresent settings
         void InstallItemPresentBySlot(uint32 entry);
         void InstallItemPresent(uint32 entry, uint32 itemId, uint32 count);
+        // GearScore
+        uint32 GetGearScore() const;
+        // Talent spec info
+        uint8 GetMostPointsTalentTree() const;
+        bool IsHealerTalentSpec() const;
+        bool IsTankTalentSpec() const;
         //End of Custom Systems
 
         void RemoveGhoul();
@@ -2262,8 +2266,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
         Spell* m_spellModTakingSpell;
 
-        float GetAverageItemLevel() const;
-        uint32 GetGearScore() const;
+        float GetAverageItemLevel() const;        
         bool isDebugAreaTriggers;
 
         void ClearWhisperWhiteList() { WhisperList.clear(); }
