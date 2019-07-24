@@ -436,7 +436,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 {
                     if (castItem->GetItemSuffixFactor())
                     {
-                        if (ItemRandomSuffixEntry const* item_rand_suffix = sItemRandomSuffixStore.LookupEntry(abs(castItem->GetItemRandomPropertyId())))
+                        if (ItemRandomSuffixEntry const* item_rand_suffix = sItemRandomSuffixStore.LookupEntry(std::abs(castItem->GetItemRandomPropertyId())))
                         {
                             for (uint8 k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
                             {
@@ -3197,7 +3197,7 @@ void AuraEffect::HandleAuraModSchoolImmunity(AuraApplication const* aurApp, uint
         target->GetThreatManager().EvaluateSuppressed();
     }
     else
-    { 
+    {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit
         if (target->HasAuraType(GetAuraType()))
             return;
@@ -3394,7 +3394,7 @@ void AuraEffect::HandleAuraModStat(AuraApplication const* aurApp, uint8 mode, bo
 
     Unit* target = aurApp->GetTarget();
     int32 spellGroupVal = target->GetHighestExclusiveSameEffectSpellGroupValue(this, SPELL_AURA_MOD_STAT, true, GetMiscValue());
-    if (abs(spellGroupVal) >= abs(GetAmount()))
+    if (std::abs(spellGroupVal) >= std::abs(GetAmount()))
         return;
 
     for (int32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
@@ -3930,6 +3930,13 @@ void AuraEffect::HandleModCastingSpeed(AuraApplication const* aurApp, uint8 mode
         return;
     }
 
+    int32 spellGroupVal = target->GetHighestExclusiveSameEffectSpellGroupValue(this, GetAuraType());
+    if (std::abs(spellGroupVal) >= std::abs(GetAmount()))
+        return;
+
+    if (spellGroupVal)
+        target->ApplyCastTimePercentMod(float(spellGroupVal), !apply);
+    
     target->ApplyCastTimePercentMod((float)GetAmount(), apply);
 }
 
@@ -3952,7 +3959,7 @@ void AuraEffect::HandleModCombatSpeedPct(AuraApplication const* aurApp, uint8 mo
 
     Unit* target = aurApp->GetTarget();
     int32 spellGroupVal = target->GetHighestExclusiveSameEffectSpellGroupValue(this, SPELL_AURA_MELEE_SLOW);
-    if (abs(spellGroupVal) >= abs(GetAmount()))
+    if (std::abs(spellGroupVal) >= std::abs(GetAmount()))
         return;
 
     if (spellGroupVal)
@@ -3986,7 +3993,7 @@ void AuraEffect::HandleModMeleeSpeedPct(AuraApplication const* aurApp, uint8 mod
 
     Unit* target = aurApp->GetTarget();
     int32 spellGroupVal = target->GetHighestExclusiveSameEffectSpellGroupValue(this, SPELL_AURA_MOD_MELEE_HASTE);
-    if (abs(spellGroupVal) >= abs(GetAmount()))
+    if (std::abs(spellGroupVal) >= std::abs(GetAmount()))
         return;
 
     if (spellGroupVal)
