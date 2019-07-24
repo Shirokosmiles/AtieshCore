@@ -1761,6 +1761,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 		uint32 GetLastMoveClientTimestamp() const { return lastMoveClientTimestamp; }
 		uint32 GetLastMoveServerTimestamp() const { return lastMoveServerTimestamp; }
 
+        std::string GetDescriptionACForLogs(uint8 type, float param1 = 0.f, float param2 = 0.f) const;
+        std::string GetPositionACForLogs() const;
 		// Ingore group/raid-party for some quests in Instances
 		bool CanEnterInInstanceOrRaidCustom() const { return m_customAccessInZone; }
 		void SetCanEnterInInstanceOrRaidCustom(bool access) { m_customAccessInZone = access; }

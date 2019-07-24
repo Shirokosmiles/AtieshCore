@@ -27089,6 +27089,7 @@ bool Player::CheckOnFlyHack()
         TC_LOG_INFO("anticheat", "Player IsFlying but CanFly is false");
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH_CANFLYWRONG, GetPlayerMovingMe()->GetName().c_str());
+        AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(1), GetPositionACForLogs(), int32(realm.Id.Realm));
         return false;
     }
 
@@ -27132,6 +27133,7 @@ bool Player::CheckOnFlyHack()
         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetPlayerMovingMe()->GetName().c_str());
+        AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(2), GetPositionACForLogs(), int32(realm.Id.Realm));
         return false;
     }
     else
@@ -27160,6 +27162,7 @@ bool Player::CheckOnFlyHack()
                         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
                         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  checkz = %f", cz);
                         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
+                        AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(3, pz, z), GetPositionACForLogs(), int32(realm.Id.Realm));
                         return false;
                     }
                 }
@@ -27218,8 +27221,9 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
                 bool unrestricted = npos.GetPositionX() != GetPositionX() || npos.GetPositionY() != GetPositionY();
                 if (unrestricted)
                 {
-                    TC_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore control Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+                    TC_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore controll Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
                     sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, GetSession()->GetAccountId(), GetName().c_str());
+                    AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(4), GetPositionACForLogs(), int32(realm.Id.Realm));
                     return false;
                 }
             }
@@ -27228,22 +27232,25 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
             return true;        
 
-        float distance, movetime, speed, difftime, normaldistance, delay, delaysentrecieve, x, y;
+        float distance, movetime, speed, difftime, normaldistance, delay, delaysentrecieve, x, y, z;
+        GetPosition(x, y, z);
+        std::string mapname = GetMap()->GetMapName();
         distance = GetExactDist2d(npos);
+
         bool transportflag = GetTransport() || (movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         if (!jump && !CanFly() && !isSwimming() && !transportflag)
         {
-            float diffz = fabs(movementInfo.pos.GetPositionZ() - GetPositionZ());
+            float diffz = fabs(movementInfo.pos.GetPositionZ() - z);
             float tanangle = distance / diffz;
 
-            if (movementInfo.pos.GetPositionZ() > GetPositionZ() &&
+            if (movementInfo.pos.GetPositionZ() > z &&
                 diffz > 1.87f &&
                 tanangle < 0.57735026919f) // 30 degrees
             {
-                std::string mapname = GetMap()->GetMapName();
                 TC_LOG_INFO("anticheat", "Player::CheckMovementInfo :  Climb-Hack detected for Account id : %u, Player %s, diffZ = %f, distance = %f, angle = %f, Map = %s, mapId = %u, X = %f, Y = %f, Z = %f",
-                    GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle, mapname.c_str(), GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ());
-                sWorld->SendGMText(LANG_GM_ANNOUNCE_WALLCLIMB, GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle, mapname.c_str(), GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ());
+                    GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle, mapname.c_str(), GetMapId(), x, y, z);
+                sWorld->SendGMText(LANG_GM_ANNOUNCE_WALLCLIMB, GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle, mapname.c_str(), GetMapId(), x, y, z);
+                AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(5, diffz, distance), GetPositionACForLogs(), int32(realm.Id.Realm));
                 return false;
             }
         }
@@ -27272,8 +27279,6 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (distance < normaldistance)
             return true;
 
-        GetPosition(x, y);
-
         TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  SpeedHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
         TC_LOG_INFO("anticheat", "Unit::========================================================");
         TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldX = %f", x);
@@ -27290,6 +27295,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  Fping = %u", ping);
         
         sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, GetName().c_str(), normaldistance, distance);
+        AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(0, distance, normaldistance), GetPositionACForLogs(), int32(realm.Id.Realm));
     }
     else
         return true;
@@ -27885,4 +27891,79 @@ void Player::InstallItemPresent(uint32 entry, uint32 itemId, uint32 count)
     if (!AddItem(itemId, count))
         TC_LOG_DEBUG("entities.player", "Player (Guid: %u) %s: did not received itempresent (Entry: %u) for item %u",
             GetGUID().GetCounter(), GetName().c_str(), entry, itemId);
+}
+
+std::string Player::GetDescriptionACForLogs(uint8 type, float param1, float param2) const
+{
+    std::ostringstream str;
+
+    switch (type)
+    {
+        case 0: // ASH
+        {
+            str << "AntiSpeedHack: distance from packet = " << param1 << ", available distance = " << param2;
+            break;
+        }
+        case 1: // AFH - IsFlying but CanFly is false
+        {
+            str << "AntiFlyHack: Player IsFlying but CanFly is false";
+            break;
+        }
+        case 2: // AFH - Player has a MOVEMENTFLAG_SWIMMING, but not in water
+        {
+            str << "AntiFlyHack: Player has a MOVEMENTFLAG_SWIMMING, but not in water";
+            break;
+        }
+        case 3: // AFH - just z checks (smaughack)
+        {
+            str << "AntiFlyHack: Player::CheckOnFlyHack : playerZ = " << param1 << ", but normalZ = " << param2;
+            break;
+        }
+        case 4: // Ignore control Hack
+        {
+            str << "Ignore controll Hack detected";
+            break;
+        }
+        case 5: // Climb-Hack
+        {
+            str << "Climb-Hack detected , diffZ = " << param1 << ", distance = " << param2;
+            break;
+        }
+        case 6: // doublejumper
+        {
+            str << "Double-jump detected";
+            break;
+        }
+        case 7: // fakejumper
+        {
+            str << "FakeJumper detected";
+            break;
+        }
+        case 8: // fakeflying
+        {
+            str << "FakeFlying mode detected";
+            break;
+        }
+        default:
+            break;
+    }
+    return str.str();
+}
+
+std::string Player::GetPositionACForLogs() const
+{
+    uint32 areaId = GetAreaId();
+    std::string areaName = "Unknown";
+    std::string zoneName = "Unknown";
+    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId))
+    {
+        int locale = GetSession()->GetSessionDbcLocale();
+        areaName = area->area_name[locale];
+        if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->zone))
+            zoneName = zone->area_name[locale];
+    }
+
+    std::ostringstream str;
+    str << "Map: " << GetMapId() << " (" << (FindMap() ? FindMap()->GetMapName() : "Unknown") << ") Area: " << areaId << " (" << areaName.c_str() << ") Zone: " << zoneName.c_str() << " XYZ: " << GetPositionX() << " " << GetPositionY() << " " << GetPositionZ();
+    return str.str();
 }

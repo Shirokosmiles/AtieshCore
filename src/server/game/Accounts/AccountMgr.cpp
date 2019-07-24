@@ -403,6 +403,17 @@ void AccountMgr::UpdateVipStatus(uint32 accountId, time_t unsetdata)
     LoginDatabase.Execute(stmt);
 }
 
+void AccountMgr::RecordAntiCheatLog(uint32 accountId, std::string const& name, std::string const& description, std::string const& position, uint32 realmid)
+{
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_ANTICHEAT);
+    stmt->setUInt32(0, accountId);
+    stmt->setString(1, name);
+    stmt->setString(2, description);
+    stmt->setString(3, position);
+    stmt->setInt32(4, realmid);
+    LoginDatabase.Execute(stmt);
+}
+
 bool AccountMgr::CheckPassword(uint32 accountId, std::string password)
 {
     std::string username;
