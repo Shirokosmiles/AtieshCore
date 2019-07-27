@@ -360,8 +360,9 @@ class npc_chromie_start : public CreatureScript
                         break;
                     case GOSSIP_OFFSET_SKIP_1:
                         AdvanceDungeonFar();
-                        // intentional missing break
+                        break;
                     case GOSSIP_OFFSET_TELEPORT:
+                        AdvanceDungeonFar();
                         CloseGossipMenuFor(player);
                         me->CastSpell(player, SPELL_TELEPORT_PLAYER);
                         break;

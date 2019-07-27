@@ -2684,9 +2684,9 @@ public:
                 return;
 
             //Spell reflection : The hit unit will be same as caster and CastSpell will do nothing. Use the original target as caster.
-            if (caster == victim)
+            if (caster->GetGUID() == victim->GetGUID())
                 caster = GetExplTargetUnit();
-                caster->CastSpell(victim, SPELL_DK_DEATH_GRIP, true);
+            caster->CastSpell(victim, SPELL_DK_DEATH_GRIP, true);
 
             if (victim && victim->GetTypeId() == TYPEID_UNIT && victim->IsNonMeleeSpellCast(false))
                 victim->InterruptNonMeleeSpells(false);
