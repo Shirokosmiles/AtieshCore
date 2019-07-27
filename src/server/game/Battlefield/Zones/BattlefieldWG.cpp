@@ -928,6 +928,12 @@ void BattlefieldWintergrasp::OnGameObjectCreate(GameObject* gameObject)
         case GO_WINTERGRASP_VAULT_GATE:
             if (!IsEnabled())
                 gameObject->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
+            if (WintergraspBuilding * building = GetBuilding(gameObject->GetEntry()))
+            {
+                building->Initialize(gameObject);
+                TC_LOG_DEBUG("battlefield", "BattlefieldWintergrasp::OnGameObjectCreate: WintergraspBuilding (%u) initialized", gameObject->GetEntry());
+            }
+            break;
         case 190219:
         case 190220:
         case 191795:
