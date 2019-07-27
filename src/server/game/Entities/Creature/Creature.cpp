@@ -513,7 +513,7 @@ bool Creature::InitEntry(uint32 entry, CreatureData const* data /*= nullptr*/)
         LoadEquipment();  // use default equipment (if available) for summons
     else if (data->equipmentId == 0)
         LoadEquipment(0); // 0 means no equipment for creature table
-    else                         
+    else
     {
         m_originalEquipmentId = data->equipmentId;
         LoadEquipment(data->equipmentId);
@@ -1821,7 +1821,7 @@ bool Creature::hasInvolvedQuest(uint32 quest_id) const
     if (!data)
         return false;
 
-    SQLTransaction trans = WorldDatabase.BeginTransaction();
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
     sMapMgr->DoForAllMapsWithMapId(data->spawnPoint.GetMapId(),
         [spawnId, trans](Map* map) -> void
@@ -1838,6 +1838,10 @@ bool Creature::hasInvolvedQuest(uint32 quest_id) const
 
     // delete data from memory ...
     sObjectMgr->DeleteCreatureData(spawnId);
+
+    CharacterDatabase.CommitTransaction(trans);
+
+    trans = WorldDatabase.BeginTransaction();
 
     // ... and the database
     PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
@@ -1984,7 +1988,7 @@ float Creature::GetAttackDistance(Unit const* player) const
     if (float(GetLevel() + 5) <= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
         aggroRadius += GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE);
-        aggroRadius += GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE);
+        aggroRadius += player->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE);
     }
 
     // The aggro range of creatures with higher levels than the total player level for the expansion should get the maxlevel treatment

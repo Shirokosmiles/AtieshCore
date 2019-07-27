@@ -39,6 +39,27 @@ BattlegroundBE::BattlegroundBE()
     SetGameObjectsNumber(BG_BE_OBJECT_MAX);
 }
 
+void BattlegroundBE::PostUpdateImpl(uint32 diff)
+{
+    if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
+    _events.Update(diff);
+
+    while (uint32 eventId = _events.ExecuteEvent())
+    {
+        switch (eventId)
+        {
+            case BG_BE_EVENT_REMOVE_DOORS:
+                for (uint32 i = BG_BE_OBJECT_DOOR_1; i <= BG_BE_OBJECT_DOOR_2; ++i)
+                    DelObject(i);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 void BattlegroundBE::StartingEventCloseDoors()
 {
     for (uint32 i = BG_BE_OBJECT_DOOR_1; i <= BG_BE_OBJECT_DOOR_4; ++i)
@@ -54,7 +75,8 @@ void BattlegroundBE::StartingEventOpenDoors()
         SpawnBGObject(i, 60);
 
     for (uint32 i = BG_BE_OBJECT_DOOR_1; i <= BG_BE_OBJECT_DOOR_2; ++i)
-        DoorOpen(i);    
+        DoorOpen(i);
+    _events.ScheduleEvent(BG_BE_EVENT_REMOVE_DOORS, BG_BE_REMOVE_DOORS_TIMER);
 }
 
 void BattlegroundBE::HandleAreaTrigger(Player* player, uint32 trigger)
