@@ -41,15 +41,9 @@ DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '2';
 INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES
 (2, 42112, 1, 'set paladin'),
 (2, 42110, 1, 'set paladin'),
-
 (2, 42122, 1, 'set paladin'),
-(2, 42123, 1, 'set paladin'),
+(2, 42123, 1, 'set paladin');
 
-(2, 42987, 1, 'set paladin'),
-(2, 42988, 1, 'set paladin'),
-
-(2, 42851, 1, 'set paladin'),
-(2, 42613, 1, 'set paladin');
 -- ----------------------------
 -- Records of retribution paladin set
 -- ----------------------------
@@ -60,13 +54,13 @@ INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `descripti
 (21, 40780, 1, 'set paladin chest'),
 (21, 40798, 1, 'set paladin hands'),
 (21, 40838, 1, 'set paladin legs'),
-
 (21, 40887, 1, 'set paladin wrist'),
 (21, 40877, 1, 'set paladin'),
 (21, 40878, 1, 'set paladin'),
 (21, 42060, 1, 'set paladin'),
 (21, 42020, 1, 'set paladin'),
-
+(21, 42851, 1, 'set paladin'),
+(21, 42987, 1, 'set paladin'),
 (21, 42331, 1, 'set paladin weapon');
 
 -- ----------------------------
@@ -79,15 +73,15 @@ INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `descripti
 (22, 40898, 1, 'set paladin chest'),
 (22, 40918, 1, 'set paladin hands'),
 (22, 40936, 1, 'set paladin legs'),
-
 (22, 40972, 1, 'set paladin wrist'),
 (22, 40966, 1, 'set paladin'),
 (22, 40973, 1, 'set paladin'),
 (22, 42055, 1, 'set paladin'),
 (22, 42022, 1, 'set paladin'),
-
 (22, 42351, 1, 'set paladin'),
-(22, 42563, 1, 'set paladin');
+(22, 42563, 1, 'set paladin'),
+(22, 42988, 1, 'set paladin'),
+(22, 42613, 1, 'set paladin');
 -- ----------------------------
 -- Records of hunter set
 -- ----------------------------
@@ -208,3 +202,195 @@ INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `descripti
 (6, 42060, 1, 'set dk'),
 (6, 42619, 1, 'set dk'),
 (6, 42331, 1, 'set dk');
+
+-- ----------------------------
+-- Records of common shaman set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '7';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES 
+(7, 5178, 1, 'set shamy'),
+(7, 5177, 1, 'set shamy'),
+(7, 5176, 1, 'set shamy'),
+(7, 5175, 1, 'set shamy'),
+(7, 42110, 1, 'set shamy'),
+(7, 42112, 1, 'set shamy'),
+(7, 42122, 1, 'set shamy'),
+(7, 42123, 1, 'set shamy');
+
+-- ----------------------------
+-- Records of elem shaman set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '71';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES 
+(71, 41016, 1, 'set shamy'),
+(71, 41041, 1, 'set shamy'),
+(71, 40987, 1, 'set shamy'),
+(71, 41004, 1, 'set shamy'),
+(71, 41030, 1, 'set shamy'),
+(71, 42988, 1, 'set shamy'),
+(71, 41223, 1, 'set shamy'),
+(71, 41233, 1, 'set shamy'),
+(71, 41228, 1, 'set shamy'),
+(71, 42055, 1, 'set shamy'),
+(71, 42022, 1, 'set shamy'),
+(71, 42601, 1, 'set shamy'),
+(71, 42351, 1, 'set shamy'),
+(71, 42563, 1, 'set shamy');
+
+-- ----------------------------
+-- Records of enx shaman set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '72';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES 
+(72, 41148, 1, 'set shamy'),
+(72, 41208, 1, 'set shamy'),
+(72, 41078, 1, 'set shamy'),
+(72, 41134, 1, 'set shamy'),
+(72, 41160, 1, 'set shamy'),
+(72, 42989, 1, 'set shamy'),
+(72, 41063, 1, 'set shamy'),
+(72, 41068, 1, 'set shamy'),
+(72, 41073, 1, 'set shamy'),
+(72, 42060, 1, 'set shamy'),
+(72, 42020, 1, 'set shamy'),
+(72, 42606, 1, 'set shamy'),
+(72, 42274, 1, 'set shamy'),
+(72, 42279, 1, 'set shamy');
+
+-- ----------------------------
+-- Records of restor shaman set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '73';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES 
+(73, 41010, 1, 'set shamy'),
+(73, 41024, 1, 'set shamy'),
+(73, 40986, 1, 'set shamy'),
+(73, 40998, 1, 'set shamy'),
+(73, 41023, 1, 'set shamy'),
+(73, 41047, 1, 'set shamy'),
+(73, 41050, 1, 'set shamy'),
+(73, 41049, 1, 'set shamy'),
+(73, 42058, 1, 'set shamy'),
+(73, 42025, 1, 'set shamy'),
+(73, 40685, 1, 'set shamy'),
+(73, 42596, 1, 'set shamy'),
+(73, 42351, 1, 'set shamy'),
+(73, 42563, 1, 'set shamy');
+
+-- ----------------------------
+-- Records of mage set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '8';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES 
+(8, 41943, 1, 'set mage'),
+(8, 41962, 1, 'set mage'),
+(8, 41949, 1, 'set mage'),
+(8, 41968, 1, 'set mage'),
+(8, 41956, 1, 'set mage'),
+(8, 41907, 1, 'set mage'),
+(8, 41896, 1, 'set mage'),
+(8, 41901, 1, 'set mage'),
+(8, 42055, 1, 'set mage'),
+(8, 42022, 1, 'set mage'),
+(8, 42110, 1, 'set mage'),
+(8, 42644, 1, 'set mage'),
+(8, 42122, 1, 'set mage'),
+(8, 42123, 1, 'set mage'),
+(8, 44255, 1, 'set mage'),
+(8, 42518, 1, 'set mage'),
+(8, 42359, 1, 'set mage');
+
+-- ----------------------------
+-- Records of warlock set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '9';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES 
+(9, 41990, 1, 'set warlock'),
+(9, 42008, 1, 'set warlock'),
+(9, 41996, 1, 'set warlock'),
+(9, 42014, 1, 'set warlock'),
+(9, 42002, 1, 'set warlock'),
+(9, 42055, 1, 'set warlock'),
+(9, 41907, 1, 'set warlock'),
+(9, 41896, 1, 'set warlock'),
+(9, 41901, 1, 'set warlock'),
+(9, 42022, 1, 'set warlock'),
+(9, 42110, 1, 'set warlock'),
+(9, 39389, 1, 'set warlock'),
+(9, 42122, 1, 'set warlock'),
+(9, 42123, 1, 'set warlock'),
+(9, 44255, 1, 'set warlock'),
+(9, 42359, 1, 'set warlock'),
+(9, 42518, 1, 'set warlock');
+
+-- ----------------------------
+-- Records of common druid set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '10';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES 
+(10, 42122, 1, 'set druid'),
+(10, 42123, 1, 'set druid');
+
+-- ----------------------------
+-- Records of balance druid set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '101';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES 
+(101, 41324, 1, 'set druid'),
+(101, 41278, 1, 'set druid'),
+(101, 41313, 1, 'set druid'),
+(101, 41290, 1, 'set druid'),
+(101, 41301, 1, 'set druid'),
+(101, 42022, 1, 'set druid'),
+(101, 42110, 1, 'set druid'),
+(101, 39389, 1, 'set druid'),
+(101, 42359, 1, 'set druid'),
+(101, 41633, 1, 'set druid'),
+(101, 41628, 1, 'set druid'),
+(101, 41638, 1, 'set druid'),
+(101, 42055, 1, 'set druid'),
+(101, 42582, 1, 'set druid'),
+(101, 44255, 1, 'set druid');
+
+-- ----------------------------
+-- Records of cat druid set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '102';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES 
+(102, 41675, 1, 'set druid'),
+(102, 41712, 1, 'set druid'),
+(102, 41658, 1, 'set druid'),
+(102, 41770, 1, 'set druid'),
+(102, 41664, 1, 'set druid'),
+(102, 42020, 1, 'set druid'),
+(102, 42112, 1, 'set druid'),
+(102, 39277, 1, 'set druid'),
+(102, 42389, 1, 'set druid'),
+(102, 41828, 1, 'set druid'),
+(102, 41827, 1, 'set druid'),
+(102, 41830, 1, 'set druid'),
+(102, 42060, 1, 'set druid'),
+(102, 42587, 1, 'set druid'),
+(102, 42989, 1, 'set druid');
+
+-- ----------------------------
+-- Records of restor druid set
+-- ----------------------------
+DELETE FROM `item_present_slot` WHERE `PresentSlotID` = '103';
+INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `description`) VALUES 
+(103, 41269, 1, 'set druid'),
+(103, 41271, 1, 'set druid'),
+(103, 41272, 1, 'set druid'),
+(103, 41268, 1, 'set druid'),
+(103, 41270, 1, 'set druid'),
+(103, 42025, 1, 'set druid'),
+(103, 42025, 1, 'set druid'),
+(103, 42110, 1, 'set druid'),
+(103, 39407, 1, 'set druid'),
+(103, 42383, 1, 'set druid'),
+(103, 41331, 1, 'set druid'),
+(103, 41330, 1, 'set druid'),
+(103, 41332, 1, 'set druid'),
+(103, 42058, 1, 'set druid'),
+(103, 42577, 1, 'set druid'),
+(103, 44255, 1, 'set druid');

@@ -344,10 +344,11 @@ Player::Player(WorldSession* session): Unit(true)
     m_unsetdate = 0;
     m_coins = 0;
 
-    /////////////////// Other RE features /////////////////////
+    /////////////////// Other AT features /////////////////////
     m_pvpcap = 0;
-    m_pvpcapReceived = false;
+    m_receivedStartPack = 0;
     m_auctionlots = 0;
+    m_pvpcapReceived = false;    
     m_walking = false;
 
     /////////////////// Instance System /////////////////////
@@ -17336,8 +17337,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, instance_mode_mask, "
     // 44           45                46                47                    48          49          50              51           52               53              54
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, "
-    // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69           70          71               72               73
-    //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels, pvpweeklycap, fishing_steps FROM characters WHERE guid = '%u'", guid);
+    // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69           70          71               72             73             74
+    //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels, pvpweeklycap, startpack, fishing_steps FROM characters WHERE guid = '%u'", guid);
     PreparedQueryResult result = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_FROM);
     if (!result)
     {
@@ -17457,7 +17458,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     if (m_pvpcap >= sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP))
         m_pvpcapReceived = true;
 
-    m_fishingSteps = fields[73].GetUInt8();
+    m_receivedStartPack = fields[73].GetUInt32();
+
+    m_fishingSteps = fields[74].GetUInt8();
 
     InitDisplayIds();
 
@@ -19621,6 +19624,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES));
         stmt->setUInt32(index++, m_grantableLevels);
         stmt->setUInt32(index++, m_pvpcap);
+        stmt->setUInt32(index++, m_receivedStartPack);
     }
     else
     {
@@ -19747,6 +19751,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES));
         stmt->setUInt32(index++, m_grantableLevels);
         stmt->setUInt32(index++, m_pvpcap);
+        stmt->setUInt32(index++, m_receivedStartPack);
 
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
         // Index

@@ -1923,6 +1923,8 @@ public:
             std::string _pvpweeklycap = target->IsWeeklyPVPCapComplete() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
             handler->PSendSysMessage("Weekly Bonus PVP Cap completed : %s ( %u / %u )", _pvpweeklycap.c_str(), target->GetPVPCapPoints(), sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP));
 
+            std::string _canreceivestartpack = target->CanReceiveStartPack() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
+            handler->PSendSysMessage("Player can receive start-pack items : %s", _canreceivestartpack);
             if (target->IsPremium())
                 handler->PSendSysMessage(LANG_TARGETPLAYER_VIP_TIME_EXIST, (secsToTimeString(target->GetPremiumUnsetdate() - GameTime::GetGameTime(), false, false)).c_str());
         }

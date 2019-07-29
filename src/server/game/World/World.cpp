@@ -1464,6 +1464,8 @@ void World::LoadConfigSettings(bool reload)
     // Bags autoequip script
     m_bool_configs[CONFIG_CREATECHAR_BONUS_BAGS] = sConfigMgr->GetBoolDefault("BAG.Script.Enabled", false);
     m_int_configs[CONFIG_CREATECHAR_BONUS_BAGS_ID] = sConfigMgr->GetIntDefault("BAG.Script.BonusBagsID", 51809);
+    // Start-Pack script
+    m_bool_configs[CONFIG_CREATECHAR_BONUS_STARTPACK] = sConfigMgr->GetBoolDefault("StartPack.Script.Enabled", false);
     // Vanish Fade Delay
     m_int_configs[CONFIG_VANISH_VISION_TIMER]                   = sConfigMgr->GetIntDefault("VanishVisionTimer", 600);
     m_int_configs[CONFIG_VANISH_CC_BREAK_TIMER]                 = sConfigMgr->GetIntDefault("VanishCCbreakTimer", 300);

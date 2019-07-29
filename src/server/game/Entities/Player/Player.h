@@ -1803,6 +1803,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // ItemPresent settings
         void InstallItemPresentBySlot(uint32 entry);
         void InstallItemPresent(uint32 entry, uint32 itemId, uint32 count);
+        bool CanReceiveStartPack() { return m_receivedStartPack != 0; }
+        void SetCanReceiveStartPack(uint32 val) { m_receivedStartPack = val; }
         // GearScore
         uint32 GetGearScore() const;
         // Talent spec info
@@ -2632,9 +2634,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         // others
         uint32 m_pvpcap;            // PVP Cap for weekly reward
+        uint32 m_receivedStartPack;   // Player has received start-pack
         uint32 m_auctionlots;       // Auction lots count for all auctions
         bool m_pvpcapReceived;      // PVP Cap for weekly reward was received
-        bool m_walking;             // Player walking
+        bool m_walking;             // Player walking        
         //End of Atiesh features
 
         // Temporary removed pet cache

@@ -899,7 +899,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         pCurrChar->ResetTalents(true);
         pCurrChar->SendTalentsInfoData(false);              // original talents send already in to SendInitialPacketsBeforeAddToMap, resend reset state
         SendNotification(LANG_RESET_TALENTS);
-    }
+    }    
 
     bool firstLogin = pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST);
     if (firstLogin)
@@ -985,6 +985,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
             uint32 bagsid = sWorld->getIntConfig(CONFIG_CREATECHAR_BONUS_BAGS_ID);
             pCurrChar->StoreNewItemInBestSlots(bagsid, 4);
         }
+
+        if (sWorld->getBoolConfig(CONFIG_CREATECHAR_BONUS_STARTPACK)) // if enabled plr will take a bonus
+            pCurrChar->SetCanReceiveStartPack(1);
     }
 
     uint32 coins = AccountMgr::GetCoins(GetAccountId());

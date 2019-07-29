@@ -146,39 +146,42 @@ public:
         if (player->IsPremium())
             AddGossipItemFor(player, 0, GTS(LANG_ITEM_VIP_MENU), GOSSIP_SENDER_MAIN, 10);
 
-        // стартовый пакет
-        switch (player->GetClass())
+        if (player->CanReceiveStartPack())
         {
-            case CLASS_WARRIOR:
-                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 83);
-                break;
-            case CLASS_PALADIN:
-                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 84);
-                break;
-            case CLASS_HUNTER:
-                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 85);
-                break;
-            case CLASS_ROGUE:
-                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 86);
-                break;
-            case CLASS_PRIEST:
-                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 87);
-                break;
-            case CLASS_DEATH_KNIGHT:
-                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 88);
-                break;
-            case CLASS_SHAMAN:
-                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 89);
-                break;
-            case CLASS_MAGE:
-                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 90);
-                break;
-            case CLASS_WARLOCK:
-                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 91);
-                break;
-            case CLASS_DRUID:
-                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 92);
-                break;
+            // стартовый пакет
+            switch (player->GetClass())
+            {
+                case CLASS_WARRIOR:
+                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 83);
+                    break;
+                case CLASS_PALADIN:
+                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 84);
+                    break;
+                case CLASS_HUNTER:
+                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 85);
+                    break;
+                case CLASS_ROGUE:
+                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 86);
+                    break;
+                case CLASS_PRIEST:
+                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 87);
+                    break;
+                case CLASS_DEATH_KNIGHT:
+                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 88);
+                    break;
+                case CLASS_SHAMAN:
+                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 89);
+                    break;
+                case CLASS_MAGE:
+                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 90);
+                    break;
+                case CLASS_WARLOCK:
+                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 91);
+                    break;
+                case CLASS_DRUID:
+                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 92);
+                    break;
+                }
         }
 
         AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);
@@ -290,39 +293,42 @@ public:
                     if (player->IsPremium())
                         AddGossipItemFor(player, 0, GTS(LANG_ITEM_VIP_MENU), GOSSIP_SENDER_MAIN, 10);
 
-                    // стартовый пакет
-                    switch (player->GetClass())
+                    if (player->CanReceiveStartPack())
                     {
-                    case CLASS_WARRIOR:
-                        AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 83);
-                        break;
-                    case CLASS_PALADIN:
-                        AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 84);
-                        break;
-                    case CLASS_HUNTER:
-                        AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 85);
-                        break;
-                    case CLASS_ROGUE:
-                        AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 86);
-                        break;
-                    case CLASS_PRIEST:
-                        AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 87);
-                        break;
-                    case CLASS_DEATH_KNIGHT:
-                        AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 88);
-                        break;
-                    case CLASS_SHAMAN:
-                        AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 89);
-                        break;
-                    case CLASS_MAGE:
-                        AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 90);
-                        break;
-                    case CLASS_WARLOCK:
-                        AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 91);
-                        break;
-                    case CLASS_DRUID:
-                        AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 92);
-                        break;
+                        // стартовый пакет
+                        switch (player->GetClass())
+                        {
+                            case CLASS_WARRIOR:
+                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 83);
+                                break;
+                            case CLASS_PALADIN:
+                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 84);
+                                break;
+                            case CLASS_HUNTER:
+                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 85);
+                                break;
+                            case CLASS_ROGUE:
+                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 86);
+                                break;
+                            case CLASS_PRIEST:
+                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 87);
+                                break;
+                            case CLASS_DEATH_KNIGHT:
+                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 88);
+                                break;
+                            case CLASS_SHAMAN:
+                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 89);
+                                break;
+                            case CLASS_MAGE:
+                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 90);
+                                break;
+                            case CLASS_WARLOCK:
+                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 91);
+                                break;
+                            case CLASS_DRUID:
+                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 92);
+                                break;
+                            }
                     }
 
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);
@@ -1871,7 +1877,8 @@ public:
                 case 83: // CLASS_WARRIOR start-pack
                 {
                     player->InstallItemPresentBySlot(1);
-                    player->PlayerTalkClass->SendCloseGossip();
+                    player->SetCanReceiveStartPack(0);
+                    player->PlayerTalkClass->SendCloseGossip();                    
                     break;
                 }
                 case 84: // CLASS_PALADIN start-pack
@@ -1885,12 +1892,14 @@ public:
                 case 85: // CLASS_HUNTER start-pack
                 {
                     player->InstallItemPresentBySlot(3);
+                    player->SetCanReceiveStartPack(0);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
                 case 86: // CLASS_ROGUE start-pack
                 {
                     player->InstallItemPresentBySlot(4);
+                    player->SetCanReceiveStartPack(0);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
@@ -1905,37 +1914,47 @@ public:
                 case 88: // CLASS_DEATH_KNIGHT start-pack
                 {
                     player->InstallItemPresentBySlot(6);
+                    player->SetCanReceiveStartPack(0);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
                 case 89: // CLASS_SHAMAN start-pack
                 {
-                    player->InstallItemPresentBySlot(7);
-                    player->PlayerTalkClass->SendCloseGossip();
+                    AddGossipItemFor(player, 0, "Receive start-pack items For Elemental", GOSSIP_SENDER_MAIN, 97);
+                    AddGossipItemFor(player, 0, "Receive start-pack items For Enhancement", GOSSIP_SENDER_MAIN, 98);
+                    AddGossipItemFor(player, 0, "Receive start-pack items For Restoration", GOSSIP_SENDER_MAIN, 99);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GTS(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 3);
+                    SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                     break;
                 }
                 case 90: // CLASS_MAGE start-pack
                 {
                     player->InstallItemPresentBySlot(8);
+                    player->SetCanReceiveStartPack(0);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
                 case 91: // CLASS_WARLOCK start-pack
                 {
                     player->InstallItemPresentBySlot(9);
+                    player->SetCanReceiveStartPack(0);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
                 case 92: // CLASS_DRUID start-pack
                 {
-                    player->InstallItemPresentBySlot(10);
-                    player->PlayerTalkClass->SendCloseGossip();
+                    AddGossipItemFor(player, 0, "Receive start-pack items For Balance", GOSSIP_SENDER_MAIN, 100);
+                    AddGossipItemFor(player, 0, "Receive start-pack items For Feral", GOSSIP_SENDER_MAIN, 101);
+                    AddGossipItemFor(player, 0, "Receive start-pack items For Restoration", GOSSIP_SENDER_MAIN, 102);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GTS(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 3);
+                    SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                     break;
                 }
                 case 93: // CLASS_PALADIN start-pack retribution
                 {
                     player->InstallItemPresentBySlot(2);
                     player->InstallItemPresentBySlot(21);
+                    player->SetCanReceiveStartPack(0);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
@@ -1943,6 +1962,7 @@ public:
                 {
                     player->InstallItemPresentBySlot(2);
                     player->InstallItemPresentBySlot(22);
+                    player->SetCanReceiveStartPack(0);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
@@ -1950,6 +1970,7 @@ public:
                 {
                     player->InstallItemPresentBySlot(5);
                     player->InstallItemPresentBySlot(51);
+                    player->SetCanReceiveStartPack(0);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
@@ -1957,6 +1978,55 @@ public:
                 {
                     player->InstallItemPresentBySlot(5);
                     player->InstallItemPresentBySlot(52);
+                    player->SetCanReceiveStartPack(0);
+                    player->PlayerTalkClass->SendCloseGossip();
+                    break;
+                }
+                case 97: // CLASS_SHAMAN start-pack elem
+                {
+                    player->InstallItemPresentBySlot(7);
+                    player->InstallItemPresentBySlot(71);
+                    player->SetCanReceiveStartPack(0);
+                    player->PlayerTalkClass->SendCloseGossip();
+                    break;
+                }
+                case 98: // CLASS_SHAMAN start-pack ench
+                {
+                    player->InstallItemPresentBySlot(7);
+                    player->InstallItemPresentBySlot(72);
+                    player->SetCanReceiveStartPack(0);
+                    player->PlayerTalkClass->SendCloseGossip();
+                    break;
+                }
+                case 99: // CLASS_SHAMAN start-pack restor
+                {
+                    player->InstallItemPresentBySlot(7);
+                    player->InstallItemPresentBySlot(73);
+                    player->SetCanReceiveStartPack(0);
+                    player->PlayerTalkClass->SendCloseGossip();
+                    break;
+                }
+                case 100: // CLASS_DRUID start-pack sova
+                {
+                    player->InstallItemPresentBySlot(10);
+                    player->InstallItemPresentBySlot(101);
+                    player->SetCanReceiveStartPack(0);
+                    player->PlayerTalkClass->SendCloseGossip();
+                    break;
+                }
+                case 101: // CLASS_DRUID start-pack cat
+                {
+                    player->InstallItemPresentBySlot(10);
+                    player->InstallItemPresentBySlot(102);
+                    player->SetCanReceiveStartPack(0);
+                    player->PlayerTalkClass->SendCloseGossip();
+                    break;
+                }
+                case 102: // CLASS_DRUID start-pack restor
+                {
+                    player->InstallItemPresentBySlot(10);
+                    player->InstallItemPresentBySlot(103);
+                    player->SetCanReceiveStartPack(0);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
