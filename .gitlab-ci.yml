@@ -6,8 +6,7 @@ variables:
 
 before_script:
   - apt-get -yqq update
-  - apt-get -yqq install build-essential libtool make cmake openssl
-  - apt-get -yqq install libssl-dev default-libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libzmq3-dev libboost-all-dev
+  - apt-get -yqq install git clang cmake make gcc g++ libmariadbclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libboost-all-dev  p7zip default-libmysqlclient-dev
 
 install:
   script:
