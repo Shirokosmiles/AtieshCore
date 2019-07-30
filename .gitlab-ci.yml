@@ -5,6 +5,7 @@ variables:
   MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
 before_script:
+  - apt-get update
   - apt-get install git clang cmake make gcc g++ libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libboost-all-dev mysql-server p7zip
 
 install:
