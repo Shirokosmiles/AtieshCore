@@ -6,7 +6,7 @@ variables:
 
 before_script:
   - apt-get update
-  - apt-get install git clang cmake make gcc g++ libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libboost-all-dev mysql-server p7zip
+  - apt-get install git clang cmake make gcc g++ libmariadbclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libboost-all-dev  p7zip default-libmysqlclient-dev
 
 install:
   script:
