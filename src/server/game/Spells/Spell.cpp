@@ -3345,6 +3345,20 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
 
     TC_LOG_DEBUG("spells", "Spell::prepare: spell id %u source %u caster %d customCastFlags %u mask %u", m_spellInfo->Id, m_caster->GetEntry(), m_originalCaster ? m_originalCaster->GetEntry() : -1, _triggeredCastFlags, m_targets.GetTargetMask());
 
+    if (m_caster && m_spellInfo)
+    {
+        if (Player* tmpPlayer = m_caster->ToPlayer())
+        {
+            if (tmpPlayer->HaveSpectators())
+            {
+                SpectatorAddonMsg msg;
+                msg.SetPlayer(tmpPlayer->GetName());
+                msg.CastSpell(GetSpellInfo()->Id, m_casttime);
+                tmpPlayer->SendSpectatorAddonMsgToBG(msg);
+            }
+        }
+    }
+
     //Containers for channeled spells have to be set
     /// @todoApply this to all cast spells if needed
     // Why check duration? 29350: channelled triggers channelled
@@ -3406,6 +3420,19 @@ void Spell::cancel()
             CancelGlobalCooldown();
             /* fallthrough */
         case SPELL_STATE_DELAYED:
+            if (Player* tmpPlayer = m_caster->ToPlayer())
+            {
+                if (tmpPlayer->HaveSpectators())
+                {
+                    if (!tmpPlayer->IsSpectator())
+                    {
+                        SpectatorAddonMsg msg;
+                        msg.SetPlayer(tmpPlayer->GetName());
+                        msg.CancelSpell(m_spellInfo->Id);
+                        tmpPlayer->SendSpectatorAddonMsgToBG(msg);
+                    }
+                }
+            }
             SendInterrupted(0);
             SendCastResult(SPELL_FAILED_INTERRUPTED);
             break;
@@ -3416,6 +3443,19 @@ void Spell::cancel()
                     if (Unit* unit = m_caster->GetGUID() == targetInfo.TargetGUID ? m_caster->ToUnit() : ObjectAccessor::GetUnit(*m_caster, targetInfo.TargetGUID))
                         unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
 
+            if (Player* tmpPlayer = m_caster->ToPlayer())
+            {
+                if (tmpPlayer->HaveSpectators())
+                {
+                    if (!tmpPlayer->IsSpectator())
+                    {
+                        SpectatorAddonMsg msg;
+                        msg.SetPlayer(tmpPlayer->GetName());
+                        msg.CancelSpell(m_spellInfo->Id);
+                        tmpPlayer->SendSpectatorAddonMsgToBG(msg);
+                    }
+                }
+            }
             SendChannelUpdate(0);
             SendInterrupted(0);
             SendCastResult(SPELL_FAILED_INTERRUPTED);
@@ -5345,6 +5385,10 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                 return SPELL_FAILED_DONT_REPORT;
         }
     }
+
+    if (Player* tmpPlayer = m_caster->ToPlayer())
+        if (tmpPlayer->IsSpectator())
+            return SPELL_FAILED_SPELL_UNAVAILABLE;
 
     // Check global cooldown
     if (strict && !(_triggeredCastFlags & TRIGGERED_IGNORE_GCD) && HasGlobalCooldown())

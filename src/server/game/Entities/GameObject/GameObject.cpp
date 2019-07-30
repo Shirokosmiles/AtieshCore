@@ -1520,6 +1520,21 @@ void GameObject::Use(Unit* user)
         case GAMEOBJECT_TYPE_TRAP:                          //6
         {
             GameObjectTemplate const* goInfo = GetGOInfo();
+
+            // ArenaSpectator
+            if (user && user->ToPlayer() && user->ToPlayer()->IsSpectator())
+                return;
+            // ArenaSpectator end
+
+            if (user->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (user->ToPlayer()->HasAuraType(SPELL_AURA_MOD_STEALTH) || user->ToPlayer()->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
+                {
+                    user->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
+                    user->RemoveAurasByType(SPELL_AURA_MOD_INVISIBILITY);
+                }
+            }
+
             if (goInfo->trap.spellId)
                 CastSpell(user, goInfo->trap.spellId);
 

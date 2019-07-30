@@ -486,6 +486,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                     player->SendDirectMessage(&status);
 
                     player->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
+                    //player->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION_SOLO);
                     player->ResetAllPowers();
                     if (!player->IsGameMaster())
                     {
@@ -1127,13 +1128,26 @@ void Battleground::EventPlayerLoggedOut(Player* player)
     m_Players[guid].OfflineRemoveTime = GameTime::GetGameTime() + MAX_OFFLINE_TIME;
     if (GetStatus() == STATUS_IN_PROGRESS)
     {
-        // drop flag and handle other cleanups
-        RemovePlayer(player, guid, GetPlayerTeam(guid));
+        if (!player->IsSpectator())
+        {
+            // drop flag and handle other cleanups
+            RemovePlayer(player, guid, GetPlayerTeam(guid));
 
-        // 1 player is logging out, if it is the last, then end arena!
-        if (isArena())
-            if (GetAlivePlayersCountByTeam(player->GetTeam()) <= 1 && GetPlayersCountByTeam(GetOtherTeam(player->GetTeam())))
-                 EndBattleground(GetOtherTeam(player->GetTeam()));
+            // 1 player is logging out, if it is the last, then end arena!
+            if (isArena())
+                if (GetAlivePlayersCountByTeam(player->GetTeam()) <= 1 && GetPlayersCountByTeam(GetOtherTeam(player->GetTeam())))
+                    EndBattleground(GetOtherTeam(player->GetTeam()));
+        }
+    }
+    if (player && player->HasAura(29659))
+        player->RemoveAurasDueToSpell(29659);
+    if (!player->IsSpectator())
+        player->LeaveBattleground();
+    else
+    {
+        player->TeleportToBGEntryPoint();
+        /*if (Battleground* bg = player->GetBattleground())
+                bg->*/RemoveSpectator(player->GetGUID());
     }
 }
 
@@ -1281,6 +1295,15 @@ void Battleground::AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid pla
         return;
 
     player->CastSpell(player, SPELL_WAITING_FOR_RESURRECT, true);
+}
+
+void Battleground::SendSpectateAddonsMsg(SpectatorAddonMsg msg)
+{
+    if (!HaveSpectators())
+        return;
+
+    for (SpectatorList::iterator itr = m_Spectators.begin(); itr != m_Spectators.end(); ++itr)
+        msg.SendPacket(ObjectGuid(HighGuid::Player, *itr));
 }
 
 void Battleground::RemovePlayerFromResurrectQueue(ObjectGuid player_guid)

@@ -74,6 +74,7 @@ class PlayerMenu;
 class PlayerSocial;
 class ReputationMgr;
 class SpellCastTargets;
+class SpectatorAddonMsg;
 class TradeData;
 
 enum InventoryType : uint8;
@@ -1412,7 +1413,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         Player* GetSelectedPlayer() const;
 
         void SetTarget(ObjectGuid /*guid*/) override { } /// Used for serverside target changes, does not apply to players
-        void SetSelection(ObjectGuid guid) { SetGuidValue(UNIT_FIELD_TARGET, guid); }
+        //void SetSelection(ObjectGuid guid) { SetGuidValue(UNIT_FIELD_TARGET, guid); }
+        void SetSelection(ObjectGuid guid);
 
         void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, ObjectGuid::LowType item_guid = 0, uint32 item_count = 0) const;
         void SendNewMail() const;
@@ -1811,6 +1813,14 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 GetMostPointsTalentTree() const;
         bool IsHealerTalentSpec() const;
         bool IsTankTalentSpec() const;
+        // Arena Spectator
+        bool HaveSpectators();
+        void SendSpectatorAddonMsgToBG(SpectatorAddonMsg msg);
+        bool isSpectateCanceled() { return spectateCanceled; }
+        void CancelSpectate() { spectateCanceled = true; }
+        Unit* getSpectateFrom() { return spectateFrom; }
+        bool IsSpectator() const { return spectatorFlag; }
+        void SetSpectate(bool on);
         //End of Custom Systems
 
         void RemoveGhoul();
@@ -2637,7 +2647,14 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_receivedStartPack;   // Player has received start-pack
         uint32 m_auctionlots;       // Auction lots count for all auctions
         bool m_pvpcapReceived;      // PVP Cap for weekly reward was received
-        bool m_walking;             // Player walking        
+        bool m_walking;             // Player walking
+
+        // ArenaSpectator
+        bool spectatorFlag;
+        bool spectateCanceled;
+        Unit* spectateFrom;
+
+        ObjectGuid m_curSelection;
         //End of Atiesh features
 
         // Temporary removed pet cache

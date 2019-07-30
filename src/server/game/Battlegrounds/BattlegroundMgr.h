@@ -88,6 +88,28 @@ class TC_GAME_API BattlegroundMgr
         Battleground* GetBattlegroundTemplate(BattlegroundTypeId bgTypeId);
         Battleground* CreateNewBattleground(BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated);
 
+        // ArenaSpectator
+        BattlegroundContainer* GetBattlegroundsByType(BattlegroundTypeId bgTypeId)
+        {
+            BattlegroundDataContainer::iterator it = bgDataStore.find(bgTypeId);
+            if (it == bgDataStore.end())
+                return nullptr;
+
+            return &it->second.m_Battlegrounds;
+        }
+
+        BattlegroundData* GetAllBattlegroundsWithTypeId(BattlegroundTypeId bgTypeId)
+        {
+            BattlegroundDataContainer::iterator it = bgDataStore.find(bgTypeId);
+            if (it == bgDataStore.end())
+                return nullptr;
+
+            return &it->second;
+        }
+
+        static bool IsArenaType(BattlegroundTypeId bgTypeId);
+        // end of arenaspectator
+
         void AddBattleground(Battleground* bg);
         void RemoveBattleground(BattlegroundTypeId bgTypeId, uint32 instanceId);
         void AddToBGFreeSlotQueue(BattlegroundTypeId bgTypeId, Battleground* bg);
@@ -136,7 +158,7 @@ class TC_GAME_API BattlegroundMgr
     private:
         bool CreateBattleground(BattlegroundTemplate const* bgTemplate);
         uint32 CreateClientVisibleInstanceId(BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id);
-        static bool IsArenaType(BattlegroundTypeId bgTypeId);
+        //static bool IsArenaType(BattlegroundTypeId bgTypeId); // for arenaspectator should be in public:
         BattlegroundTypeId GetRandomBG(BattlegroundTypeId id);
 
         typedef std::map<BattlegroundTypeId, BattlegroundData> BattlegroundDataContainer;

@@ -806,6 +806,9 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
         return;
     }
 
+    if (GetPlayer()->IsSpectator())
+        return;
+
     uint32 text_emote, emoteNum;
     ObjectGuid guid;
 

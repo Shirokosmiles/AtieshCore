@@ -166,6 +166,7 @@ enum CharacterCustomizeFlags
 
 static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 
+uint16 ArenaSpectateUpdateTimmer = 0;
 uint32 const MAX_MONEY_AMOUNT = static_cast<uint32>(std::numeric_limits<int32>::max());
 
 Player::Player(WorldSession* session): Unit(true)
@@ -351,6 +352,9 @@ Player::Player(WorldSession* session): Unit(true)
     m_pvpcapReceived = false;    
     m_walking = false;
 
+    spectatorFlag = false;
+    spectateCanceled = false;
+    spectateFrom = nullptr;
     /////////////////// Instance System /////////////////////
 
     m_HomebindTimer = 0;
@@ -1099,6 +1103,8 @@ void Player::Update(uint32 p_time)
     Unit::Update(p_time);
     SetCanDelayTeleport(false);
 
+    ArenaSpectateUpdateTimmer += p_time;
+
     time_t now = GameTime::GetGameTime();
 
     UpdatePvPFlag(now);
@@ -1112,6 +1118,14 @@ void Player::Update(uint32 p_time)
     UpdateAfkReport(now);
 
     Unit::AIUpdateTick(p_time);
+
+    if (ArenaSpectateUpdateTimmer > 5000)
+    {
+        // Fixes in Arena spectate
+        if (!IsGameMaster() && GetMap()->IsBattlegroundOrArena())
+            SetGMVisible(true);
+        ArenaSpectateUpdateTimmer = 0;
+    }
 
     // Update items that have just a limited lifetime
     if (now > m_Last_tick)
@@ -1526,6 +1540,15 @@ void Player::setDeathState(DeathState s)
         {
             TC_LOG_ERROR("entities.player", "Player::setDeathState: Attempt to kill a dead player '%s' (%s)", GetName().c_str(), GetGUID().ToString().c_str());
             return;
+        }
+
+        // send spectate addon message
+        if (HaveSpectators())
+        {
+            SpectatorAddonMsg msg;
+            msg.SetPlayer(GetName());
+            msg.SetStatus(false);
+            SendSpectatorAddonMsgToBG(msg);
         }
 
         // drunken state is cleared on death
@@ -2009,7 +2032,17 @@ bool Player::TeleportToBGEntryPoint()
     ScheduleDelayedOperation(DELAYED_BG_MOUNT_RESTORE);
     ScheduleDelayedOperation(DELAYED_BG_TAXI_RESTORE);
     ScheduleDelayedOperation(DELAYED_BG_GROUP_RESTORE);
-    return TeleportTo(m_bgData.joinPos);
+    Battleground* oldBg = GetBattleground();
+    bool result = TeleportTo(m_bgData.joinPos);
+
+    if (IsSpectator() && result)
+    {
+        SetSpectate(false);
+        if (oldBg)
+            oldBg->RemoveSpectator(GetGUID());
+    }
+
+    return result;
 }
 
 void Player::ProcessDelayedOperations()
@@ -22960,6 +22993,16 @@ void Player::SendInitialPacketsAfterAddToMap()
     SendQuestGiverStatusMultiple();
     SendTaxiNodeStatusMultiple();
 
+    if (IsSpectator())
+    {
+        if (Battleground* bGround = GetBattleground())
+        {
+            WorldPacket data;
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bGround, 0, STATUS_IN_PROGRESS, 1, bGround->GetStartTime(), bGround->GetArenaType(), 2);
+            SendDirectMessage(&data);
+        }
+    }
+
     // raid downscaling - send difficulty to player
     if (GetMap()->IsRaid())
     {
@@ -23362,6 +23405,27 @@ void Player::SendAurasForTarget(Unit* target) const
     {
         AuraApplication * auraApp = itr->second;
         auraApp->BuildUpdatePacket(data, false);
+        if (Player* stream = target->ToPlayer())
+        {
+            if (stream->HaveSpectators() && IsSpectator())
+            {
+                if (Aura* aura = auraApp->GetBase())
+                {
+                    SpectatorAddonMsg msg;
+                    ObjectGuid casterID;
+                    if (aura->GetCaster())
+                        if (aura->GetCaster()->ToPlayer())
+                            casterID = aura->GetCaster()->GetGUID();
+
+                    msg.SetPlayer(stream->GetName());
+                    msg.CreateAura(casterID, aura->GetSpellInfo()->Id,
+                        aura->GetSpellInfo()->IsPositive(), aura->GetSpellInfo()->Dispel,
+                        aura->GetDuration(), aura->GetMaxDuration(),
+                        aura->GetStackAmount(), false);
+                    msg.SendPacket(GetGUID());
+                }
+            }
+        }
     }
 
     SendDirectMessage(&data);
@@ -24546,6 +24610,15 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 {
     if (apply)
     {
+        if (target->ToPlayer() && target->ToPlayer()->GetGUID() == GetGUID())
+            return;
+        //remove Viewpoint if already have
+        if (IsSpectator() && spectateFrom)
+        {
+            SetViewpoint(spectateFrom, false);
+            spectateFrom = nullptr;
+        }
+
         TC_LOG_DEBUG("maps", "Player::CreateViewpoint: Player '%s' (%s) creates seer (Entry: %u, TypeId: %u).",
             GetName().c_str(), GetGUID().ToString().c_str(), target->GetEntry(), target->GetTypeId());
 
@@ -24574,6 +24647,9 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
         if (target->isType(TYPEMASK_UNIT) && target != GetVehicleBase())
             static_cast<Unit*>(target)->RemovePlayerFromVision(this);
+
+        if (IsSpectator())
+            spectateFrom = nullptr;
 
         //must immediately set seer back otherwise may crash
         SetSeer(this);

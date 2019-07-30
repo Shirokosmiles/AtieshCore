@@ -364,6 +364,21 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     uint8 action;                                           // enter battle 0x1, leave queue 0x0
 
     recvData >> type >> unk2 >> bgTypeId_ >> unk >> action;
+
+    if (_player->IsSpectator())
+    {
+        if (Battleground* arena = _player->GetBattleground())
+        {
+            WorldPacket data;
+            uint32 queueSlot = 0;
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, arena, queueSlot, STATUS_NONE, 0, 0, 0, 0);
+            arena->RemoveSpectator(_player->GetGUID());
+            _player->CancelSpectate();
+            _player->TeleportToBGEntryPoint();
+            return;
+        }
+    }
+
     if (!sBattlemasterListStore.LookupEntry(bgTypeId_))
     {
         TC_LOG_DEBUG("bg.battleground", "CMSG_BATTLEFIELD_PORT %s ArenaType: %u, Unk: %u, BgType: %u, Action: %u. Invalid BgType!",
@@ -538,9 +553,15 @@ void WorldSession::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
     // not allow leave battleground in combat
     if (_player->IsInCombat())
         if (Battleground* bg = _player->GetBattleground())
-            if (bg->GetStatus() != STATUS_WAIT_LEAVE)
+            if (bg->GetStatus() != STATUS_WAIT_LEAVE && !bg->isArena())
                 return;
 
+    if (Battleground* bg = _player->GetBattleground())
+        if (bg->GetStatus() != STATUS_WAIT_LEAVE && bg->isArena() && !_player->IsSpectator())
+        {
+            ChatHandler(this).SendSysMessage("Leaving arena is disabled");
+            return;
+        }
     _player->LeaveBattleground();
 }
 

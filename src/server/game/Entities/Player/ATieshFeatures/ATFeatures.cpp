@@ -17,9 +17,12 @@
 
 #include "AccountMgr.h"
 #include "AuctionHouseMgr.h"
+#include "Battleground.h"
 #include "Chat.h"
 #include "Item.h"
 #include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
 
  // Vanish System
 void Player::SetVanishTimer()
@@ -600,4 +603,108 @@ void Player::RewardTitleForKills(uint32 kills)
         if (!HasTitle(titleEntry))
             SetTitle(titleEntry);
     }
+}
+
+// ArenaSpectator
+void Player::SetSelection(ObjectGuid guid)
+{
+    m_curSelection = guid;
+    SetGuidValue(UNIT_FIELD_TARGET, guid);
+    if (Player * target = ObjectAccessor::FindPlayer(guid))
+    {
+        if (HaveSpectators())
+        {
+            SpectatorAddonMsg msg;
+            msg.SetPlayer(GetName());
+            msg.SetTarget(target->GetName());
+            SendSpectatorAddonMsgToBG(msg);
+        }
+    }
+}
+
+void Player::SetSpectate(bool on)
+{
+    if (on)
+    {
+        SetSpeedRate(MOVE_RUN, 3.0f);
+        spectatorFlag = true;
+
+        m_ExtraFlags |= PLAYER_EXTRA_GM_ON;
+        SetFaction(35);
+
+        if (Pet* pet = GetPet())
+            RemovePet(pet, PET_SAVE_NOT_IN_SLOT, true);
+
+        UnsummonPetTemporaryIfAny();
+
+        RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        ResetContestedPvP();
+
+        //getHostileRefManager().setOnlineOfflineState(false);
+        CombatStopWithPets();
+
+        SetDisplayId(22984);
+        m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_ADMINISTRATOR);
+    }
+    else
+    {
+        uint32 newPhase = 0;
+        AuraEffectList const& phases = GetAuraEffectsByType(SPELL_AURA_PHASE);
+        if (!phases.empty())
+            for (AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
+                newPhase |= (*itr)->GetMiscValue();
+
+        if (!newPhase)
+            newPhase = PHASEMASK_NORMAL;
+
+        SetPhaseMask(newPhase, false);
+
+        m_ExtraFlags &= ~PLAYER_EXTRA_GM_ON;
+        SetFactionForRace(GetRace());
+        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
+        RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+
+        if (spectateFrom)
+            SetViewpoint(spectateFrom, false);
+
+        // restore FFA PvP Server state
+        if (sWorld->IsFFAPvPRealm())
+            SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+
+        // restore FFA PvP area state, remove not allowed for GM mounts
+        UpdateArea(m_areaUpdateId);
+
+        //getHostileRefManager().setOnlineOfflineState(true);
+        m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
+        spectateCanceled = false;
+        spectatorFlag = false;
+        RestoreDisplayId();
+        UpdateSpeed(MOVE_RUN);
+    }
+    UpdateObjectVisibility();
+}
+
+bool Player::HaveSpectators()
+{
+    if (IsSpectator())
+        return false;
+
+    if (Battleground* bg = GetBattleground())
+        if (bg->isArena())
+        {
+            if (bg->GetStatus() != STATUS_IN_PROGRESS)
+                return false;
+
+            return bg->HaveSpectators();
+        }
+
+    return false;
+}
+
+void Player::SendSpectatorAddonMsgToBG(SpectatorAddonMsg msg)
+{
+    if (!HaveSpectators())
+        return;
+
+    GetBattleground()->SendSpectateAddonsMsg(msg);
 }

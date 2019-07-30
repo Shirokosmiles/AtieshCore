@@ -796,6 +796,13 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_VIP_SET                                = 1112,
     RBAC_PERM_COMMAND_VIP_REMOVE                             = 1113,
     RBAC_PERM_COMMAND_ADDCOIN                                = 1114,
+
+    // arena spectator
+    RBAC_PERM_COMMAND_SPECTATE                               = 1015,
+    RBAC_PERM_COMMAND_SPECTATE_PLAYER                        = 1016,
+    RBAC_PERM_COMMAND_SPECTATE_VIEW                          = 1017,
+    RBAC_PERM_COMMAND_SPECTATE_RESET                         = 1018,
+    RBAC_PERM_COMMAND_SPECTATE_LEAVE                         = 1019,
     RBAC_PERM_MAX
 };
 
