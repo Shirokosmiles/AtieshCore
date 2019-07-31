@@ -3818,10 +3818,7 @@ void Unit::RemoveAurasDueToSpell(uint32 spellId, ObjectGuid casterGUID, uint8 re
 
                     msg.SetPlayer(player->GetName());
                     if (const AuraApplication * aurApp = aura->GetApplicationOfTarget(casterGUID))
-                        msg.RemoveAura(casterGUID, spellId,
-                            aurApp->IsPositive(), aura->GetSpellInfo()->Dispel,
-                            NULL, NULL,
-                            aura->GetStackAmount(), true);
+                        msg.RemoveAura(casterGUID, spellId, aurApp->IsPositive(), aura->GetSpellInfo()->Dispel, 0, 0, aura->GetStackAmount(), true);
                     player->SendSpectatorAddonMsgToBG(msg);
                 }
             }

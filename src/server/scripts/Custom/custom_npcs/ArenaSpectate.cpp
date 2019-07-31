@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
 * Copyright (C) 2016-2017 RustEmu <https://gitlab.com/healthstone/>
 * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
@@ -108,7 +108,7 @@ void LoadAllArenas()
         return;
 
     std::vector<Battleground*>::iterator itr = ratedArenas.begin();
-    int count = 0;
+    uint32 count = 0;
     for (; itr != ratedArenas.end(); ++itr)
     {
         if (!(*itr))
@@ -122,11 +122,11 @@ void LoadAllArenas()
         if (count >= ratedArenas.size())
             return;
 
-        int size = ratedArenas.size();
+        uint32 size = ratedArenas.size();
         // Bubble sort, oh yeah, that's the stuff..
         for (int i = count; i < size; i++)
         {
-            if (Battleground* tmpBg = ratedArenas[i])
+            if (ratedArenas[i])
             {
                 Battleground* tmp = (*itr);
                 (*itr) = ratedArenas[i];
@@ -138,27 +138,23 @@ void LoadAllArenas()
     return;
 }
 
-uint16 GetSpecificArenasCount(ArenaType type, uint16 count1)
+uint32 GetSpecificArenasCount(ArenaType type)
 {
     if (ratedArenas.empty())
         return 0;
 
-    uint16 count[3] = {0, 0, 0};
+    uint32 count = 0;
 
-    for (std::vector<Battleground*>::const_iterator citr = ratedArenas.begin();
-        citr != ratedArenas.end(); ++citr)
+    for (std::vector<Battleground*>::const_iterator citr = ratedArenas.begin(); citr != ratedArenas.end(); ++citr)
+    {
         if (Battleground* arena = (*citr))
         {
             if (arena->GetArenaType() == type)
-            {
-                if (arena->GetStatus() == STATUS_IN_PROGRESS)
-                    count[1]++;
+                count++;
+        }
+    }
 
-                count[0]++;
-            }
-        }     
-        count1 = count[1];
-        return count[0];
+    return count;
 }
 
 class arena_spectator_commands : public CommandScript
@@ -552,10 +548,9 @@ public:
         {
             LoadAllArenas();
             uint32 arenasQueueTotal[3] = { 0, 0, 0 };
-            uint32 arenasQueuePlaying[3] = { 0, 0, 0 };
-            arenasQueueTotal[0] = GetSpecificArenasCount(ARENA_TYPE_2v2, arenasQueuePlaying[0]);
-            arenasQueueTotal[1] = GetSpecificArenasCount(ARENA_TYPE_3v3, arenasQueuePlaying[1]);
-            arenasQueueTotal[2] = GetSpecificArenasCount(ARENA_TYPE_5v5, arenasQueuePlaying[2]);
+            arenasQueueTotal[0] = GetSpecificArenasCount(ARENA_TYPE_2v2);
+            arenasQueueTotal[1] = GetSpecificArenasCount(ARENA_TYPE_3v3);
+            arenasQueueTotal[2] = GetSpecificArenasCount(ARENA_TYPE_5v5);
             
             std::stringstream Gossip2s;
             Gossip2s << "2vs2 (Текущие игры: " << arenasQueueTotal[0] << ")"/* << arenasQueuePlaying[0] << ")"*/;            
@@ -751,12 +746,12 @@ public:
             return data;
         }
 
-        uint64 GetFirstPlayerGuid(Battleground* team)
+        ObjectGuid GetFirstPlayerGuid(Battleground* team)
         {
             for (Battleground::BattlegroundPlayerMap::const_iterator itr = team->GetPlayers().begin(); itr != team->GetPlayers().end(); ++itr)
-                if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+                if (ObjectAccessor::FindPlayer(itr->first))
                     return itr->first;
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void ShowPage(Player* player, uint16 page, bool IsTop)
@@ -784,7 +779,7 @@ public:
                 for (BattlegroundContainer::const_iterator itr = arenas->begin(); itr != arenas->end(); ++itr)
                 {
                     Battleground* arena = itr->second;
-                    Player* target = ObjectAccessor::FindPlayer(ObjectGuid(GetFirstPlayerGuid(arena)));
+                    Player* target = ObjectAccessor::FindPlayer(GetFirstPlayerGuid(arena));
                     if (!target)
                         continue;
 
