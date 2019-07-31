@@ -124,7 +124,7 @@ void LoadAllArenas()
 
         uint32 size = ratedArenas.size();
         // Bubble sort, oh yeah, that's the stuff..
-        for (int i = count; i < size; i++)
+        for (uint32 i = count; i < size; i++)
         {
             if (ratedArenas[i])
             {
