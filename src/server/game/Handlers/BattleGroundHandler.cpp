@@ -559,7 +559,7 @@ void WorldSession::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
     if (Battleground* bg = _player->GetBattleground())
         if (bg->GetStatus() != STATUS_WAIT_LEAVE && bg->isArena() && !_player->IsSpectator())
         {
-            ChatHandler(this).SendSysMessage("Leaving arena is disabled");
+            ChatHandler(this).SendSysMessage("Leaving arena is disabled for Arena member");
             return;
         }
     _player->LeaveBattleground();

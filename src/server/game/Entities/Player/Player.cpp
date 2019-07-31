@@ -354,7 +354,6 @@ Player::Player(WorldSession* session): Unit(true)
 
     spectatorFlag = false;
     spectateCanceled = false;
-    spectateFrom = nullptr;
     /////////////////// Instance System /////////////////////
 
     m_HomebindTimer = 0;
@@ -24610,15 +24609,6 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 {
     if (apply)
     {
-        if (target->ToPlayer() && target->ToPlayer()->GetGUID() == GetGUID())
-            return;
-        //remove Viewpoint if already have
-        if (IsSpectator() && spectateFrom)
-        {
-            SetViewpoint(spectateFrom, false);
-            spectateFrom = nullptr;
-        }
-
         TC_LOG_DEBUG("maps", "Player::CreateViewpoint: Player '%s' (%s) creates seer (Entry: %u, TypeId: %u).",
             GetName().c_str(), GetGUID().ToString().c_str(), target->GetEntry(), target->GetTypeId());
 
@@ -24647,9 +24637,6 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
         if (target->isType(TYPEMASK_UNIT) && target != GetVehicleBase())
             static_cast<Unit*>(target)->RemovePlayerFromVision(this);
-
-        if (IsSpectator())
-            spectateFrom = nullptr;
 
         //must immediately set seer back otherwise may crash
         SetSeer(this);

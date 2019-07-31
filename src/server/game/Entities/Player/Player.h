@@ -1818,7 +1818,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SendSpectatorAddonMsgToBG(SpectatorAddonMsg msg);
         bool isSpectateCanceled() { return spectateCanceled; }
         void CancelSpectate() { spectateCanceled = true; }
-        Unit* getSpectateFrom() { return spectateFrom; }
         bool IsSpectator() const { return spectatorFlag; }
         void SetSpectate(bool on);
         //End of Custom Systems
@@ -2652,7 +2651,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // ArenaSpectator
         bool spectatorFlag;
         bool spectateCanceled;
-        Unit* spectateFrom;
 
         ObjectGuid m_curSelection;
         //End of Atiesh features

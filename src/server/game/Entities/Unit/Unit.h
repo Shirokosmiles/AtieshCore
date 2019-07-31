@@ -1217,6 +1217,7 @@ class TC_GAME_API Unit : public WorldObject
         void AddPlayerToVision(Player* player);
         void RemovePlayerFromVision(Player* player);
         bool HasSharedVision() const { return !m_sharedVision.empty(); }
+        void RemoveSharedVisionPlayers();
         void RemoveBindSightAuras();
         void RemoveCharmAuras();
 

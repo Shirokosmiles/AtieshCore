@@ -654,11 +654,17 @@ void GameObject::Update(uint32 diff)
                     else
                     {
                         // Environmental trap: Any player
-                        Player* player = nullptr;
+                        std::list<Player*> targets;
                         Trinity::AnyPlayerInObjectRangeCheck checker(this, radius);
-                        Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
+                        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, targets, checker);
                         Cell::VisitWorldObjects(this, searcher, radius);
-                        target = player;
+                        for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                        {
+                            Player* tmpplayer = (*iter);
+                            if (tmpplayer->IsSpectator())
+                                continue;
+                            target = tmpplayer;
+                        }
                     }
 
                     if (target)

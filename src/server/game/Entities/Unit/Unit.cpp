@@ -403,19 +403,6 @@ Unit::~Unit()
 
     _DeleteRemovedAuras();
 
-    // remove veiw point for spectator
-    if (!m_sharedVision.empty())
-    {
-        for (SharedVisionList::iterator itr = m_sharedVision.begin(); itr != m_sharedVision.end(); ++itr)
-            if ((*itr)->IsSpectator() && (*itr)->getSpectateFrom())
-            {
-                (*itr)->SetViewpoint((*itr)->getSpectateFrom(), false);
-                if (m_sharedVision.empty())
-                    break;
-                --itr;
-            }
-    }
-
     delete i_motionMaster;
     delete m_charmInfo;
     delete movespline;
@@ -6434,6 +6421,20 @@ void Unit::RemovePlayerFromVision(Player* player)
     }
 }
 
+void Unit::RemoveSharedVisionPlayers()
+{
+    if (HasSharedVision())
+    {
+        for (SharedVisionList::iterator itr = m_sharedVision.begin(); itr != m_sharedVision.end(); ++itr)
+        {
+            (*itr)->SetViewpoint(this, false);
+            if (m_sharedVision.empty())
+                break;
+            --itr;
+        }
+    }
+}
+
 void Unit::RemoveBindSightAuras()
 {
     RemoveAurasByType(SPELL_AURA_BIND_SIGHT);
@@ -9748,6 +9749,8 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
 
 void Unit::CleanupsBeforeDelete(bool finalCleanup)
 {
+    // remove all view spectators for this Unit
+    RemoveSharedVisionPlayers();
     CleanupBeforeRemoveFromMap(finalCleanup);
 
     WorldObject::CleanupsBeforeDelete(finalCleanup);

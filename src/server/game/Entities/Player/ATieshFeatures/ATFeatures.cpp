@@ -664,8 +664,8 @@ void Player::SetSpectate(bool on)
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
-        if (spectateFrom)
-            SetViewpoint(spectateFrom, false);
+        if (GetViewpoint())
+            SetViewpoint(GetViewpoint(), false);
 
         // restore FFA PvP Server state
         if (sWorld->IsFFAPvPRealm())

@@ -319,8 +319,8 @@ class arena_spectator_commands : public CommandScript
                         {
                             handler->PSendSysMessage("You're entered to rated arena.");
                             handler->PSendSysMessage("Teams:");
-                            handler->PSendSysMessage("%s - %s", firstTeam->GetName().c_str(), secondTeam->GetName().c_str());
-                            handler->PSendSysMessage("%u(%u) - %u(%u)", firstTeam->GetRating(), firstTeam->GetAverageMMR(firstTeamMember->GetGroup()),
+                            handler->PSendSysMessage("Team GOLD : %s vs Team GREEN : %s", firstTeam->GetName().c_str(), secondTeam->GetName().c_str());
+                            handler->PSendSysMessage("Rating %u (MMR %u) - Rating %u (MMR %u)", firstTeam->GetRating(), firstTeam->GetAverageMMR(firstTeamMember->GetGroup()),
                                                                         secondTeam->GetRating(), secondTeam->GetAverageMMR(secondTeamMember->GetGroup()));
                         }
                     }
@@ -431,8 +431,11 @@ class arena_spectator_commands : public CommandScript
                     return false;
                 }
 
-            	(target == player && player->getSpectateFrom()) ? player->SetViewpoint(player->getSpectateFrom(), false) :
-                                                                player->SetViewpoint(target, true);
+                if (player->GetViewpoint())
+                    player->SetViewpoint(player->GetViewpoint(), false);
+
+                player->SetViewpoint(target, true);
+
             	return true;
             } // Prevent Crash if not Exist Player 
             else
@@ -456,6 +459,9 @@ class arena_spectator_commands : public CommandScript
                 handler->SetSentErrorMessage(true);
                 return false;
             }
+
+            if (player->GetViewpoint())
+                player->SetViewpoint(player->GetViewpoint(), false);
 
             Battleground *bGround = player->GetBattleground();
             if (!bGround)
