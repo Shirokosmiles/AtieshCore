@@ -24,13 +24,14 @@
 #include "BattlegroundMgr.h"
 #include "CreatureTextMgr.h"
 #include "Chat.h"
+#include "Language.h"
+#include "Pet.h"
+#include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "ScriptedGossip.h"
-#include "BattlegroundMgr.h"
-#include "WorldSession.h"
-#include "Player.h"
-#include "Pet.h"
-#include "RBAC.h"
+
+#define GTS session->GetTrinityString
 
 enum ClassTalents
 {
@@ -174,42 +175,42 @@ class arena_spectator_commands : public CommandScript
             {
                 if (!target) // Prevent Crash
                 {
-                    handler->PSendSysMessage("ERROR: Target name is wrong, please check if he's online.");
+                    handler->PSendSysMessage(LANG_SPECTATE_WRONG_NAME);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
                 
                 if (target->GetTypeId() != TYPEID_PLAYER)
                 {
-                    handler->PSendSysMessage("ERROR: You can't spectating non-player units.");
+                    handler->PSendSysMessage(LANG_SPECTATE_NON_PLAYER);
                     handler->SetSentErrorMessage(true);
                     return false;
                 } 
                 
                 if (target == player || target_guid == player->GetGUID())
                 {
-                    handler->PSendSysMessage("ERROR: You can't spectating yourself .");
+                    handler->PSendSysMessage(LANG_SPECTATE_YOUSELF);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (player->IsInCombat())
                 {
-                    handler->PSendSysMessage("ERROR: You are in Combat.");
+                    handler->PSendSysMessage(LANG_YOU_IN_COMBAT);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (player->GetPet())
                 {
-                    handler->PSendSysMessage("ERROR: Please dismiss your pet before spectating.");
+                    handler->PSendSysMessage(LANG_SPECTATE_DISMIS_PET);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (player->GetMap()->IsBattlegroundOrArena() && !player->IsSpectator())
                 {
-                    handler->PSendSysMessage("ERROR: You are already in battleground.");
+                    handler->PSendSysMessage(LANG_NOT_USED_BG);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
@@ -217,14 +218,14 @@ class arena_spectator_commands : public CommandScript
                 Map* cMap = target->GetMap();
                 if (!cMap->IsBattleArena())
                 {
-                    handler->PSendSysMessage("ERROR: Player is not in arena.");
+                    handler->PSendSysMessage(LANG_SPECTATE_PLAYER_NOT_ARENA);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (player->GetMap()->IsBattleground())
                 {
-                    handler->PSendSysMessage("ERROR: Cant do that while you are on battleground.");
+                    handler->PSendSysMessage(LANG_NOT_USED_BG);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
@@ -238,35 +239,35 @@ class arena_spectator_commands : public CommandScript
 
                 if (target->IsSpectator())
                 {
-                    handler->PSendSysMessage("ERROR: You can't spectating spectators.");
+                    handler->PSendSysMessage(LANG_SPECTATE_CANT_SPECTATORS);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
                 
                 if (target->HasAura(32728) || target->HasAura(32727))
                 {
-                    handler->PSendSysMessage("ERROR: Wait for arena start");
+                    handler->PSendSysMessage(LANG_SPECTATE_WAIT_START);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (player->HasAura(9454))
                 {
-                    handler->PSendSysMessage("ERROR: You are Frozen");
+                    handler->PSendSysMessage(LANG_YOU_ARE_FROZEN);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (player->IsMounted()) // Prevent Bug with Pets / Minions/ Guardian for Spectators in arenas
                 {
-                    handler->PSendSysMessage("ERROR: You can't spectating when you are on mount");
+                    handler->PSendSysMessage(LANG_SPECTATE_MOUNT);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
                 
                 if (/*player->IsInvitedForBattlegroundQueueType() || */player->InBattlegroundQueue()) // Prevent Crash 
                 {
-                    handler->PSendSysMessage("ERROR: Please leave battleground/arena Queue before spectating");
+                    handler->PSendSysMessage(LANG_SPECTATE_QUEUE);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
@@ -371,42 +372,42 @@ class arena_spectator_commands : public CommandScript
             {
                 if (!target) // Prevent Crash
                 {
-                    handler->PSendSysMessage("ERROR: Target name is wrong, please check if he's online.");
+                    handler->PSendSysMessage(LANG_SPECTATE_WRONG_NAME);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
                 
                 if (target->GetTypeId() != TYPEID_PLAYER)
                 {
-                    handler->PSendSysMessage("ERROR: You can't spectating non-player units.");
+                    handler->PSendSysMessage(LANG_SPECTATE_NON_PLAYER);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }          
                 
                 if (!player->IsSpectator())
                 {
-                    handler->PSendSysMessage("ERROR: You are not spectator.");
+                    handler->PSendSysMessage(LANG_SPECTATE_NOT_SPECTATOR);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (target->IsSpectator() && target != player)
                 {
-                    handler->PSendSysMessage("ERROR: Can`t do that. Your target is spectator.");
+                    handler->PSendSysMessage(LANG_SPECTATE_YOU_TARGET_SPECTATOR);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (player->GetMap() != target->GetMap())
                 {
-                    handler->PSendSysMessage("ERROR: Can't do that. Different arenas?");
+                    handler->PSendSysMessage(LANG_SPECTATE_DIFERENT_ARENAS);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
                 
                 if (target && (target->HasAuraType(SPELL_AURA_MOD_STEALTH) || target->HasAuraType(SPELL_AURA_MOD_INVISIBILITY)))
                 {
-                    handler->PSendSysMessage("ERROR: Can't target invisible players.");
+                    handler->PSendSysMessage(LANG_SPECTATE_TARGET_INVISEBLE);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
@@ -415,14 +416,14 @@ class arena_spectator_commands : public CommandScript
                 // if exists than battle didn`t begin
                 if (target && (target->HasAura(32728) || target->HasAura(32727)))
                 {
-                    handler->PSendSysMessage("ERROR: Wait for arena start.");
+                    handler->PSendSysMessage(LANG_SPECTATE_WAIT_START);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (player->HasAura(9454))
                 {
-                    handler->PSendSysMessage("ERROR: You are Frozen");
+                    handler->PSendSysMessage(LANG_YOU_ARE_FROZEN);
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
@@ -444,14 +445,14 @@ class arena_spectator_commands : public CommandScript
 
             if (!player)
             {
-                handler->PSendSysMessage("Can't find player.");
+                handler->PSendSysMessage(LANG_SPECTATE_CANT_FIND_PLAYER);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
 
             if (!player->IsSpectator())
             {
-                handler->PSendSysMessage("You are not spectator!");
+                handler->PSendSysMessage(LANG_SPECTATE_NOT_SPECTATOR);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -546,6 +547,7 @@ public:
 
         bool GossipHello(Player* player) override
         {
+            WorldSession* session = player->GetSession();
             LoadAllArenas();
             uint32 arenasQueueTotal[3] = { 0, 0, 0 };
             arenasQueueTotal[0] = GetSpecificArenasCount(ARENA_TYPE_2v2);
@@ -553,11 +555,11 @@ public:
             arenasQueueTotal[2] = GetSpecificArenasCount(ARENA_TYPE_5v5);
             
             std::stringstream Gossip2s;
-            Gossip2s << "2vs2 (Текущие игры: " << arenasQueueTotal[0] << ")"/* << arenasQueuePlaying[0] << ")"*/;            
+            Gossip2s << GTS(LANG_SPECTATE_MENU_2VS2) << arenasQueueTotal[0] << ")"/* << arenasQueuePlaying[0] << ")"*/;            
             std::stringstream Gossip3s;
-            Gossip3s << "3vs3 (Текущие игры: " << arenasQueueTotal[1] << ")"/* << arenasQueuePlaying[1] << ")"*/;
+            Gossip3s << GTS(LANG_SPECTATE_MENU_3VS3) << arenasQueueTotal[1] << ")"/* << arenasQueuePlaying[1] << ")"*/;
             std::stringstream Gossip3ss;
-            Gossip3ss << "5vs5 (Текущие игры: " << arenasQueueTotal[2] << ")"/* << arenasQueuePlaying[2] << ")"*/;
+            Gossip3ss << GTS(LANG_SPECTATE_MENU_5VS5) << arenasQueueTotal[2] << ")"/* << arenasQueuePlaying[2] << ")"*/;
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, Gossip2s.str(), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_2V2_GAMES);            
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, Gossip3s.str(), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_3V3_GAMES);
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, Gossip3ss.str(), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_5V5_GAMES);
@@ -568,6 +570,7 @@ public:
 
         bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 uiAction) override
         {
+            WorldSession* session = player->GetSession();
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(uiAction);
             ClearGossipMenuFor(player);
 
@@ -579,19 +582,19 @@ public:
 
             if (action >= NPC_SPECTATOR_ACTION_2V2_GAMES && action < NPC_SPECTATOR_ACTION_3V3_GAMES)
             {
-                AddGossipItemFor(player, GOSSIP_ICON_DOT, "Обновить", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_2V2_GAMES);
+                AddGossipItemFor(player, GOSSIP_ICON_DOT, GTS(LANG_SPECTATE_MENU_UPDATE), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_2V2_GAMES);
                 ShowPage(player, action - NPC_SPECTATOR_ACTION_2V2_GAMES, false);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, me->GetGUID());
             }
             else if (action >= NPC_SPECTATOR_ACTION_3V3_GAMES && action < NPC_SPECTATOR_ACTION_5V5_GAMES)
             {
-                AddGossipItemFor(player, GOSSIP_ICON_DOT, "Обновить", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_3V3_GAMES);
+                AddGossipItemFor(player, GOSSIP_ICON_DOT, GTS(LANG_SPECTATE_MENU_UPDATE), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_3V3_GAMES);
                 ShowPage(player, action - NPC_SPECTATOR_ACTION_3V3_GAMES, true);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, me->GetGUID());
             }
             else if (action >= NPC_SPECTATOR_ACTION_5V5_GAMES && action < NPC_SPECTATOR_ACTION_SELECTED_PLAYER)
             {
-                AddGossipItemFor(player, GOSSIP_ICON_DOT, "Обновить", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_5V5_GAMES);
+                AddGossipItemFor(player, GOSSIP_ICON_DOT, GTS(LANG_SPECTATE_MENU_UPDATE), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_5V5_GAMES);
                 ShowPage(player, action - NPC_SPECTATOR_ACTION_5V5_GAMES, true);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, me->GetGUID());
             }
@@ -756,6 +759,8 @@ public:
 
         void ShowPage(Player* player, uint16 page, bool IsTop)
         {
+            WorldSession* session = player->GetSession();
+
             uint32 firstTeamId = 0;
             uint16 TypeTwo = 0;
             uint16 TypeThree = 0;
@@ -899,7 +904,7 @@ public:
                     AddGossipItemFor(player, GOSSIP_ICON_DOT, "<<", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_5V5_GAMES + page - 1);
             }
             else
-                AddGossipItemFor(player, GOSSIP_ICON_DOT, "Вернутся в главное меню.", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_MAIN_MENU);
+                AddGossipItemFor(player, GOSSIP_ICON_DOT, GTS(LANG_SPECTATE_MAIN_MENU), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_MAIN_MENU);
 
             if (haveNextPage[0] == true)
                 AddGossipItemFor(player, GOSSIP_ICON_DOT, ">>", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_2V2_GAMES + page + 1);

@@ -1,0 +1,23 @@
+DELETE FROM `trinity_string` WHERE `entry` IN (11576, 11577, 11578, 11579, 11580, 11581, 11582, 11583, 11584, 11585, 11586, 11587, 11588, 11589, 11590, 11591, 11592, 11593, 11594, 11595, 11596);
+INSERT INTO `trinity_string` VALUES
+(11576,'Receive start-pack items',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Получить стартовый пакет'),
+(11577,'2vs2 (Current games: ' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2vs2 (Текущие игры: '),
+(11578,'3vs3 (Current games: ' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'3vs3 (Текущие игры: '),
+(11579,'5vs5 (Current games: ' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'5vs5 (Текущие игры: '),
+(11580,'ERROR: Target name is wrong, please check if he`s online.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИбКА: Неверное имя цели, пожалуйста, проверьте, если он онлайн.'),
+(11581,'ERROR: You are Frozen.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИбКА: Вы заморожены.'),
+(11582,'ERROR: Wait for arena start.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИбКА: Ожидайте начала арены.'),
+(11583,'ERROR: You can`t spectating non-player units.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИбКА: Вы не можете наблюдать за неигровыми юнитами.'),
+(11584,'ERROR: You can`t spectating yourself.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИбКА: Вы не можете наблюдать за собой.'),
+(11585,'ERROR: Please dismiss your pet before spectating.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИбКА: Пожалуйста, уберите вашего питомца перед наблюдением.'),
+(11586,'ERROR: Player is not in arena.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИбКА: Игрок не на арене.'),
+(11587,'ERROR: You can`t spectating spectators.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИбКА: Вы не можете наблюдать за зрителями.'),
+(11588,'ERROR: You can`t spectating when you are on mount.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИбКА: Вы не можете наблюдать, когда находитесь на верховом животном.'),
+(11589,'ERROR: Please leave battleground/arena Queue before spectating.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИбКА: Пожалуйста, покиньте очередь на поле битвы/арену перед наблюдением.'),
+(11590,'Update' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Обновить'),
+(11591,'Return main menu' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вернутся в главное меню'),
+(11592,'ERROR: You are not spectator.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИБКА: Вы не зритель.'),
+(11593,'ERROR: Can`t do that. Your target is spectator.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИБКА: Не могу этого сделать. Ваша цель - зритель.'),
+(11594,'ERROR: Can`t do that. Different arenas?' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИБКА: Не могу этого сделать. Разные арены?'),
+(11595,'ERROR: Can`t target invisible players.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИБКА: Не может нацеливаться на невидимых игроков.'),
+(11596,'ERROR: Can`t find player.' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ОШИБКА: Не могу найти игрока.');
