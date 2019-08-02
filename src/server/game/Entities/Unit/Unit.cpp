@@ -408,6 +408,9 @@ Unit::~Unit()
     delete movespline;
     delete m_spellHistory;
 
+    // remove all view spectators for this Unit
+    RemoveSharedVisionPlayers();
+
     ASSERT(!m_duringRemoveFromWorld);
     ASSERT(!m_attacking);
     ASSERT(m_attackers.empty());
@@ -9776,9 +9779,7 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
 }
 
 void Unit::CleanupsBeforeDelete(bool finalCleanup)
-{
-    // remove all view spectators for this Unit
-    RemoveSharedVisionPlayers();
+{    
     CleanupBeforeRemoveFromMap(finalCleanup);
 
     WorldObject::CleanupsBeforeDelete(finalCleanup);
