@@ -2031,16 +2031,8 @@ bool Player::TeleportToBGEntryPoint()
     ScheduleDelayedOperation(DELAYED_BG_TAXI_RESTORE);
     ScheduleDelayedOperation(DELAYED_BG_GROUP_RESTORE);
     Battleground* oldBg = GetBattleground();
-    bool result = TeleportTo(m_bgData.joinPos);
 
-    if (IsSpectator() && result)
-    {
-        SetSpectate(false);
-        if (oldBg)
-            oldBg->RemoveSpectator(GetGUID());
-    }
-
-    return result;
+    return TeleportTo(m_bgData.joinPos);;
 }
 
 void Player::ProcessDelayedOperations()

@@ -329,7 +329,6 @@ class arena_spectator_commands : public CommandScript
 
                 player->SetPhaseMask(target->GetPhaseMask(), true);
                 player->SetSpectate(true);
-                //target->GetBattleground()->AddSpectator(player->GetGUID());
                 player->TeleportTo(target->GetMapId(), x, y, z, player->GetOrientation());
 
                 return true;
@@ -353,7 +352,6 @@ class arena_spectator_commands : public CommandScript
                 return false;
             }
 
-            player->GetBattleground()->RemoveSpectator(player->GetGUID());
             player->SetSpectate(false);
             player->TeleportToBGEntryPoint();
 
