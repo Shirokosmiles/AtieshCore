@@ -708,3 +708,18 @@ void Player::SendSpectatorAddonMsgToBG(SpectatorAddonMsg msg)
 
     GetBattleground()->SendSpectateAddonsMsg(msg);
 }
+
+uint32 Player::GetNormalPhase() const
+{
+    // restore phase
+    uint32 newPhase = 0;
+    AuraEffectList const& phases = GetAuraEffectsByType(SPELL_AURA_PHASE);
+    if (!phases.empty())
+        for (AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
+            newPhase |= (*itr)->GetMiscValue();
+
+    if (!newPhase)
+        newPhase = PHASEMASK_NORMAL;
+
+    return newPhase;
+}

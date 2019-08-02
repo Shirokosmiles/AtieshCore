@@ -20,6 +20,7 @@ void AddSC_Transmogrification();
 void AddSC_custom_item();
 void AddSC_landro_longshot();
 void AddSC_arena_spectator_script();
+void AddSC_PhasedDueling();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -29,4 +30,5 @@ void AddCustomScripts()
     AddSC_custom_item();
     AddSC_landro_longshot();
     AddSC_arena_spectator_script();
+    AddSC_PhasedDueling();
 }

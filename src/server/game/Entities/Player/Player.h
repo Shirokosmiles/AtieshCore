@@ -1820,6 +1820,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void CancelSpectate() { spectateCanceled = true; }
         bool IsSpectator() const { return spectatorFlag; }
         void SetSpectate(bool on);
+        // Duel Phase
+        uint32 GetNormalPhase() const;
         //End of Custom Systems
 
         void RemoveGhoul();

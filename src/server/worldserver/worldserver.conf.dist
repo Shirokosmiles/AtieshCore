@@ -4520,6 +4520,20 @@ BAG.Script.BonusBagsID = 51809
 
 ###################################################################################################
 #
+# DuelPhase Script
+#
+#    Description: Make a special phase for duel members, they will see only oponent, and can't see others units
+#    Default:     0 - disabled
+#
+#    DuelPhase.Enabled = 0 - disabled.
+
+DuelPhase.Enabled = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+#
 # StartPack.Script
 #
 #    Description: Give a possibility to receive start-pack items from item helper

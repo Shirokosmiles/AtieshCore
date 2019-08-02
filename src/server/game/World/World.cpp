@@ -1466,6 +1466,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_CREATECHAR_BONUS_BAGS_ID] = sConfigMgr->GetIntDefault("BAG.Script.BonusBagsID", 51809);
     // Start-Pack script
     m_bool_configs[CONFIG_CREATECHAR_BONUS_STARTPACK] = sConfigMgr->GetBoolDefault("StartPack.Script.Enabled", false);
+    // Duel Phase script
+    m_bool_configs[CONFIG_DUEL_IN_SPECIAL_PHASE] = sConfigMgr->GetBoolDefault("DuelPhase.Enabled", false);
     // Vanish Fade Delay
     m_int_configs[CONFIG_VANISH_VISION_TIMER]                   = sConfigMgr->GetIntDefault("VanishVisionTimer", 600);
     m_int_configs[CONFIG_VANISH_CC_BREAK_TIMER]                 = sConfigMgr->GetIntDefault("VanishCCbreakTimer", 300);

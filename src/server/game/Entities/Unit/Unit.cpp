@@ -6458,6 +6458,32 @@ void Unit::UnsummonAllTotems()
     }
 }
 
+void Unit::UpdPhaseForAllTotemsAndPetAndTraps()
+{
+    for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
+    {
+        if (!m_SummonSlot[i])
+            continue;
+
+        if (Creature* OldTotem = GetMap()->GetCreature(m_SummonSlot[i]))
+            if (OldTotem->IsSummon())
+            {
+                if (Unit* owner = OldTotem->GetCharmerOrOwner())
+                    OldTotem->SetPhaseMask(owner->GetPhaseMask(), false);
+            }
+    }
+
+    for (uint8 i = 0; i < MAX_GAMEOBJECT_SLOT; ++i)
+    {
+        if (!m_ObjectSlot[i])
+            continue;
+
+        if (GameObject* GO = GetMap()->GetGameObject(m_ObjectSlot[i]))
+            if (Unit* owner = GO->GetCharmerOrOwner())
+                GO->SetPhaseMask(owner->GetPhaseMask(), false);
+    }
+}
+
 void Unit::SendHealSpellLog(HealInfo& healInfo, bool critical /*= false*/)
 {
     // we guess size
