@@ -6426,8 +6426,10 @@ void Unit::RemoveSharedVisionPlayers()
         {
             (*itr)->SetViewpoint(this, false);
             if (m_sharedVision.empty())
+            {
+                m_sharedVision.clear();
                 break;
-            --itr;
+            }
         }
     }
 }
