@@ -6429,6 +6429,8 @@ void Unit::RemoveSharedVisionPlayers()
         {
             if ((*itr)->IsInWorld())
                 (*itr)->SetViewpoint(this, false);
+            else
+                --itr;
 
             if (m_sharedVision.empty())
             {
