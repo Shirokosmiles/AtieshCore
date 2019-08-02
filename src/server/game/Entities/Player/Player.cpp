@@ -1899,6 +1899,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     }
     else
     {
+        RemoveSharedVisionPlayers();
         if (GetClass() == CLASS_DEATH_KNIGHT && GetMapId() == 609 && !IsGameMaster() && !HasSpell(50977))
             return false;
 
@@ -24632,7 +24633,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
         //must immediately set seer back otherwise may crash
         SetSeer(this);
 
-        UpdateVisibilityOf(this);
+        //UpdateVisibilityOf(this);
 
         //WorldPacket data(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE, 0);
         //SendDirectMessage(&data);
