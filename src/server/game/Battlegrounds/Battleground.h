@@ -367,11 +367,11 @@ class TC_GAME_API Battleground
         bool HasFreeSlots() const;
         uint32 GetFreeSlotsForTeam(uint32 Team) const;
 
-        typedef std::set<uint32> SpectatorList;
-        void AddSpectator(uint32 playerId) { m_Spectators.insert(playerId); }
-        void RemoveSpectator(uint32 playerId) { m_Spectators.erase(playerId); }
-        bool HaveSpectators() { return (m_Spectators.size() > 0); }
+        void AddSpectator(ObjectGuid playerGUID) { m_Spectators.insert(playerGUID); }
+        void RemoveSpectator(ObjectGuid playerGUID) { m_Spectators.erase(playerGUID); }
+        bool HaveSpectators() { return !m_Spectators.empty(); }
         void SendSpectateAddonsMsg(SpectatorAddonMsg msg);
+        uint32 GetArenaSpectatorSize() { return m_Spectators.size(); }
 
         bool isArena() const        { return m_IsArena; }
         bool isBattleground() const { return !m_IsArena; }
@@ -650,7 +650,7 @@ class TC_GAME_API Battleground
         // Raid Group
         Group* m_BgRaids[PVP_TEAMS_COUNT];                   // 0 - alliance, 1 - horde
 
-        SpectatorList m_Spectators;
+        GuidUnorderedSet m_Spectators;
 
         // Players count by team
         uint32 m_PlayersCount[PVP_TEAMS_COUNT];

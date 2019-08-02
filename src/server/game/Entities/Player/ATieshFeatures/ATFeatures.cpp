@@ -676,7 +676,6 @@ void Player::SetSpectate(bool on)
 
         //getHostileRefManager().setOnlineOfflineState(true);
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
-        spectateCanceled = false;
         spectatorFlag = false;
         RestoreDisplayId();
         UpdateSpeed(MOVE_RUN);

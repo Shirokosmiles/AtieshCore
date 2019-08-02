@@ -4190,13 +4190,18 @@ bool BattlegroundMap::AddPlayerToMap(Player* player)
             //return false;
         // reset instance validity, battleground maps do not homebind
         player->m_InstanceValid = true;
+        if (player && player->IsSpectator())
+        {
+            if (GetBG())
+                GetBG()->AddSpectator(player->GetGUID());
+        }
     }
     return Map::AddPlayerToMap(player);
 }
 
 void BattlegroundMap::RemovePlayerFromMap(Player* player, bool remove)
 {
-    if (player && player->IsSpectator() && !player->isSpectateCanceled())
+    if (player && player->IsSpectator())
     {
         if (GetBG())
             GetBG()->RemoveSpectator(player->GetGUID());

@@ -353,7 +353,6 @@ Player::Player(WorldSession* session): Unit(true)
     m_walking = false;
 
     spectatorFlag = false;
-    spectateCanceled = false;
     /////////////////// Instance System /////////////////////
 
     m_HomebindTimer = 0;
@@ -22660,9 +22659,6 @@ void Player::UpdateVisibilityOf(WorldObject* target)
     }
     else
     {
-        if (target->ToPlayer() && target->ToPlayer()->IsSpectator())
-            return;
-
         if (CanSeeOrDetect(target, false, true))
         {
             target->SendUpdateToPlayer(this);
@@ -24644,11 +24640,13 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
         //must immediately set seer back otherwise may crash
         SetSeer(this);
 
-        UpdateObjectVisibility();
+        UpdateVisibilityOf(this);
 
         //WorldPacket data(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE, 0);
         //SendDirectMessage(&data);
     }
+
+    UpdateObjectVisibility();
 
     // HACK: Make sure update for PLAYER_FARSIGHT is received before SMSG_PET_SPELLS to properly hide "Release spirit" dialog
     if (target->GetTypeId() == TYPEID_UNIT && static_cast<Unit*>(target)->HasUnitTypeMask(UNIT_MASK_MINION) && static_cast<Minion*>(target)->IsRisenAlly())

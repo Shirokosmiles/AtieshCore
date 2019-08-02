@@ -132,6 +132,8 @@ Battleground::Battleground()
     StartMessageIds[BG_STARTING_EVENT_SECOND] = BG_TEXT_START_ONE_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_THIRD]  = BG_TEXT_START_HALF_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = BG_TEXT_BATTLE_HAS_BEGUN;
+
+    m_Spectators.clear();
 }
 
 Battleground::~Battleground()
@@ -154,6 +156,7 @@ Battleground::~Battleground()
         //unlink to prevent crash, always unlink all pointer reference before destruction
         m_Map->SetBG(nullptr);
         m_Map = nullptr;
+        m_Spectators.clear();
     }
     // remove from bg free slot queue
     RemoveFromBGFreeSlotQueue();
@@ -995,6 +998,7 @@ void Battleground::Reset()
         _arenaTeamScores[i].Reset();
 
     ResetBGSubclass();
+    m_Spectators.clear();
 }
 
 void Battleground::StartBattleground()
@@ -1302,8 +1306,8 @@ void Battleground::SendSpectateAddonsMsg(SpectatorAddonMsg msg)
     if (!HaveSpectators())
         return;
 
-    for (SpectatorList::iterator itr = m_Spectators.begin(); itr != m_Spectators.end(); ++itr)
-        msg.SendPacket(ObjectGuid(HighGuid::Player, *itr));
+    for (GuidUnorderedSet::iterator itr = m_Spectators.begin(); itr != m_Spectators.end(); ++itr)
+        msg.SendPacket(*itr);
 }
 
 void Battleground::RemovePlayerFromResurrectQueue(ObjectGuid player_guid)

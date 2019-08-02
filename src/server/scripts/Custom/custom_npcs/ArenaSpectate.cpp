@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
 * Copyright (C) 2016-2017 RustEmu <https://gitlab.com/healthstone/>
 * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
@@ -329,7 +329,7 @@ class arena_spectator_commands : public CommandScript
 
                 player->SetPhaseMask(target->GetPhaseMask(), true);
                 player->SetSpectate(true);
-                target->GetBattleground()->AddSpectator(player->GetGUID());
+                //target->GetBattleground()->AddSpectator(player->GetGUID());
                 player->TeleportTo(target->GetMapId(), x, y, z, player->GetOrientation());
 
                 return true;
@@ -354,7 +354,7 @@ class arena_spectator_commands : public CommandScript
             }
 
             player->GetBattleground()->RemoveSpectator(player->GetGUID());
-            player->CancelSpectate();
+            player->SetSpectate(false);
             player->TeleportToBGEntryPoint();
 
             return true;

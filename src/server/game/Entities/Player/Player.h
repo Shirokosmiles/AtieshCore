@@ -1816,8 +1816,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // Arena Spectator
         bool HaveSpectators();
         void SendSpectatorAddonMsgToBG(SpectatorAddonMsg msg);
-        bool isSpectateCanceled() { return spectateCanceled; }
-        void CancelSpectate() { spectateCanceled = true; }
         bool IsSpectator() const { return spectatorFlag; }
         void SetSpectate(bool on);
         // Duel Phase
@@ -2652,8 +2650,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         // ArenaSpectator
         bool spectatorFlag;
-        bool spectateCanceled;
-
         ObjectGuid m_curSelection;
         //End of Atiesh features
 

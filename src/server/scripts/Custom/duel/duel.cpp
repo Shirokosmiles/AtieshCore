@@ -38,6 +38,9 @@ public:
 
         firstplayer->UpdPhaseForAllTotemsAndPetAndTraps();
         secondplayer->UpdPhaseForAllTotemsAndPetAndTraps();
+
+        firstplayer->UpdateObjectVisibility();
+        secondplayer->UpdateObjectVisibility();
     }
 
     void OnDuelEnd(Player* firstplayer, Player* secondplayer, DuelCompleteType /*type*/) override
@@ -58,6 +61,9 @@ public:
 
         firstplayer->UpdPhaseForAllTotemsAndPetAndTraps();
         secondplayer->UpdPhaseForAllTotemsAndPetAndTraps();
+
+        firstplayer->UpdateObjectVisibility();
+        secondplayer->UpdateObjectVisibility();
     }
 };
 

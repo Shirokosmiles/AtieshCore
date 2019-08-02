@@ -365,19 +365,6 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
 
     recvData >> type >> unk2 >> bgTypeId_ >> unk >> action;
 
-    if (_player->IsSpectator())
-    {
-        if (Battleground* arena = _player->GetBattleground())
-        {
-            WorldPacket data;
-            uint32 queueSlot = 0;
-            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, arena, queueSlot, STATUS_NONE, 0, 0, 0, 0);
-            arena->RemoveSpectator(_player->GetGUID());
-            _player->CancelSpectate();
-            _player->TeleportToBGEntryPoint();
-            return;
-        }
-    }
 
     if (!sBattlemasterListStore.LookupEntry(bgTypeId_))
     {
@@ -557,11 +544,15 @@ void WorldSession::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
                 return;
 
     if (Battleground* bg = _player->GetBattleground())
-        if (bg->GetStatus() != STATUS_WAIT_LEAVE && bg->isArena() && !_player->IsSpectator())
+    {
+        if (_player->IsSpectator())
+            bg->RemoveSpectator(_player->GetGUID());
+        else if (bg->GetStatus() != STATUS_WAIT_LEAVE && bg->isArena())
         {
             ChatHandler(this).SendSysMessage("Leaving arena is disabled for Arena member");
             return;
         }
+    }
     _player->LeaveBattleground();
 }
 

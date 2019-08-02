@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
+#include "Battleground.h"
 #include "CellImpl.h"
 #include "CharacterCache.h"
 #include "Chat.h"
@@ -1927,6 +1928,12 @@ public:
             handler->PSendSysMessage("Player can receive start-pack items : %s", _canreceivestartpack);
             if (target->IsPremium())
                 handler->PSendSysMessage(LANG_TARGETPLAYER_VIP_TIME_EXIST, (secsToTimeString(target->GetPremiumUnsetdate() - GameTime::GetGameTime(), false, false)).c_str());
+
+            if (target->GetBattleground())
+            {
+                uint32 arenaspectrsize = target->GetBattleground()->GetArenaSpectatorSize();
+                handler->PSendSysMessage("This BG has %u arena spectators", arenaspectrsize);
+            }
         }
 
         return true;
