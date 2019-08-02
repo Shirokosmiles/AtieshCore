@@ -6427,7 +6427,9 @@ void Unit::RemoveSharedVisionPlayers()
     {
         for (SharedVisionList::iterator itr = m_sharedVision.begin(); itr != m_sharedVision.end(); ++itr)
         {
-            (*itr)->SetViewpoint(this, false);
+            if ((*itr)->IsInWorld())
+                (*itr)->SetViewpoint(this, false);
+
             if (m_sharedVision.empty())
             {
                 m_sharedVision.clear();
