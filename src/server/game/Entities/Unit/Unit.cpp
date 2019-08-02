@@ -9735,6 +9735,8 @@ void Unit::RemoveFromWorld()
 
         RemoveAllFollowers();
 
+        RemoveSharedVisionPlayers();
+
         if (IsCharmed())
             RemoveCharmedBy(nullptr);
 
@@ -9776,11 +9778,7 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
     m_Events.KillAllEvents(false);                      // non-delatable (currently cast spells) will not deleted now but it will deleted at call in Map::RemoveAllObjectsInRemoveList
     CombatStop();
     ClearComboPoints();
-    ClearComboPointHolders();
-
-    if (ToPlayer() && ToPlayer()->GetViewpoint())
-        ToPlayer()->SetViewpoint(ToPlayer()->GetViewpoint(), false);
-    RemoveSharedVisionPlayers();
+    ClearComboPointHolders();    
 }
 
 void Unit::CleanupsBeforeDelete(bool finalCleanup)
