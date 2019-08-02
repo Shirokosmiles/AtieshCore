@@ -464,7 +464,7 @@ public:
         {
             if (quest->GetQuestId() == QUEST_TOOGA)
             {
-                StartFollow(player, FACTION_TOOG_ESCORTEE, quest);
+                StartFollow(player, FACTION_TOOG_ESCORTEE, QUEST_TOOGA);
                 _player = player;
                 startedFollow = true;
             }

@@ -2512,8 +2512,9 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool /*force*/) const
     if (!victim->isInAccessiblePlaceFor(this))
         return false;
 
-    if (IsAIEnabled() && !AI()->CanAIAttack(victim))
-        return false;
+    if (CreatureAI* ai = AI())
+        if (!ai->CanAIAttack(victim))
+            return false;
 
     // we cannot attack in evade mode
     if (IsInEvadeMode())
@@ -3369,10 +3370,10 @@ void Creature::AtDisengage()
     }
 }
 
-bool Creature::IsEscortNPC(bool onlyIfActive)
+bool Creature::IsEscorted() const
 {
-    if (CreatureAI* ai = AI())
-        return ai->IsEscortNPC(onlyIfActive);
+    if (CreatureAI const* ai = AI())
+        return ai->IsEscorted();
     return false;
 }
 
