@@ -24641,6 +24641,8 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
         //must immediately set seer back otherwise may crash
         SetSeer(this);
 
+        UpdateVisibilityOf(this);
+
         //WorldPacket data(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE, 0);
         //SendDirectMessage(&data);
     }
