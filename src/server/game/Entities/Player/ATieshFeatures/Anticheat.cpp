@@ -164,6 +164,10 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (!IsControlledByPlayer())
             return true;
 
+        bool transportflag = GetTransport() || (movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+        if (transportflag)
+            return true;
+
         if (GetPlayerMovingMe())
         {
 
@@ -199,8 +203,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         GetPosition(x, y, z);
         std::string mapname = GetMap()->GetMapName();
         distance = GetExactDist2d(npos);
-
-        bool transportflag = GetTransport() || (movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+        
         if (!jump && !CanFly() && !isSwimming() && !transportflag)
         {
             float diffz = fabs(movementInfo.pos.GetPositionZ() - z);
