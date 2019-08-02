@@ -22660,6 +22660,9 @@ void Player::UpdateVisibilityOf(WorldObject* target)
     }
     else
     {
+        if (target->ToPlayer() && target->ToPlayer()->IsSpectator())
+            return;
+
         if (CanSeeOrDetect(target, false, true))
         {
             target->SendUpdateToPlayer(this);
