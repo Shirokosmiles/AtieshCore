@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
 * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -77,8 +77,7 @@ public:
 
         if (player->GetMap()->IsBattlegroundOrArena())
         {
-            ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_NOT_USED_BG);
-            ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_NOT_USED_BG);
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_NOT_USED_BG);
             CloseGossipMenuFor(player);
             return false;
         }
@@ -152,34 +151,34 @@ public:
             switch (player->GetClass())
             {
                 case CLASS_WARRIOR:
-                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 83);
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 83);
                     break;
                 case CLASS_PALADIN:
-                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 84);
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 84);
                     break;
                 case CLASS_HUNTER:
-                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 85);
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 85);
                     break;
                 case CLASS_ROGUE:
-                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 86);
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 86);
                     break;
                 case CLASS_PRIEST:
-                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 87);
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 87);
                     break;
                 case CLASS_DEATH_KNIGHT:
-                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 88);
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 88);
                     break;
                 case CLASS_SHAMAN:
-                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 89);
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 89);
                     break;
                 case CLASS_MAGE:
-                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 90);
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 90);
                     break;
                 case CLASS_WARLOCK:
-                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 91);
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 91);
                     break;
                 case CLASS_DRUID:
-                    AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 92);
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 92);
                     break;
                 }
         }
@@ -299,34 +298,34 @@ public:
                         switch (player->GetClass())
                         {
                             case CLASS_WARRIOR:
-                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 83);
+                                AddGossipItemFor(player, 0, LANG_ITEM_START_PACK_ITEM, GOSSIP_SENDER_MAIN, 83);
                                 break;
                             case CLASS_PALADIN:
-                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 84);
+                                AddGossipItemFor(player, 0, LANG_ITEM_START_PACK_ITEM, GOSSIP_SENDER_MAIN, 84);
                                 break;
                             case CLASS_HUNTER:
-                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 85);
+                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 85);
                                 break;
                             case CLASS_ROGUE:
-                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 86);
+                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 86);
                                 break;
                             case CLASS_PRIEST:
-                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 87);
+                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 87);
                                 break;
                             case CLASS_DEATH_KNIGHT:
-                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 88);
+                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 88);
                                 break;
                             case CLASS_SHAMAN:
-                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 89);
+                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 89);
                                 break;
                             case CLASS_MAGE:
-                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 90);
+                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 90);
                                 break;
                             case CLASS_WARLOCK:
-                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 91);
+                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 91);
                                 break;
                             case CLASS_DRUID:
-                                AddGossipItemFor(player, 0, "Receive start-pack items", GOSSIP_SENDER_MAIN, 92);
+                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 92);
                                 break;
                             }
                     }

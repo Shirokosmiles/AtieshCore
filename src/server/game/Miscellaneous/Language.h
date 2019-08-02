@@ -1312,7 +1312,7 @@ enum TrinityStrings
     LANG_ITEM_NOT_ENOUGH_COINS            = 11563,
     LANG_ITEM_YOU_HAVE_COINS              = 11564,
     LANG_ITEM_YOU_NEED_COINS              = 11565,
-    LANG_ITEM_NOT_USED_BG                 = 11566,
+    LANG_NOT_USED_BG                      = 11566,
     LANG_ITEM_NOT_USED_STEALTH            = 11567,
     LANG_ITEM_NOT_USED_DEAD               = 11568,
     LANG_ITEM_SUCCESS_BOUGHT              = 11569,
@@ -1323,6 +1323,30 @@ enum TrinityStrings
     LANG_ITEM_PVP_CAP_HORDE               = 11573,
     LANG_ITEM_VIP_BANK                    = 11574,
 
-    LANG_GOINFO_PHASEMASK                 = 11575
+    LANG_GOINFO_PHASEMASK                 = 11575,
+
+    LANG_ITEM_START_PACK_ITEM             = 11576,
+
+    // ArenaSpectator
+    LANG_SPECTATE_MENU_2VS2               = 11577,
+    LANG_SPECTATE_MENU_3VS3               = 11578,
+    LANG_SPECTATE_MENU_5VS5               = 11579,
+    LANG_SPECTATE_WRONG_NAME              = 11580,
+    LANG_YOU_ARE_FROZEN                   = 11581,
+    LANG_SPECTATE_WAIT_START              = 11582,
+    LANG_SPECTATE_NON_PLAYER              = 11583,
+    LANG_SPECTATE_YOUSELF                 = 11584,
+    LANG_SPECTATE_DISMIS_PET              = 11585,
+    LANG_SPECTATE_PLAYER_NOT_ARENA        = 11586,
+    LANG_SPECTATE_CANT_SPECTATORS         = 11587,
+    LANG_SPECTATE_MOUNT                   = 11588,
+    LANG_SPECTATE_QUEUE                   = 11589,
+    LANG_SPECTATE_MENU_UPDATE             = 11590,
+    LANG_SPECTATE_MAIN_MENU               = 11591,
+    LANG_SPECTATE_NOT_SPECTATOR           = 11592,
+    LANG_SPECTATE_YOU_TARGET_SPECTATOR    = 11593,
+    LANG_SPECTATE_DIFERENT_ARENAS         = 11594,
+    LANG_SPECTATE_TARGET_INVISEBLE        = 11595,
+    LANG_SPECTATE_CANT_FIND_PLAYER        = 11596
 };
 #endif
