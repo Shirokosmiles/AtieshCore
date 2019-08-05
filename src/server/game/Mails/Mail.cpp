@@ -24,6 +24,7 @@
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
+#include "Guild.h"
 #include "Item.h"
 #include "Log.h"
 #include "LootMgr.h"
@@ -194,6 +195,19 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
     if (pReceiver)
         prepareItems(pReceiver, trans);                            // generate mail template items
 
+    // GuildLevel system
+    if (pSender && pReceiver)
+    {
+        if (pSender->GetGuild() && pReceiver->GetGuild())
+        {
+            if (pSender->GetGuildId() == pReceiver->GetGuildId())
+            {
+                if (pSender->GetGuild()->GetGuildLevel() >= 4)
+                    deliver_delay = 0;
+            }
+        }
+    }
+    // GuildLevel system end
     uint32 mailId = sObjectMgr->GenerateMailID();
 
     time_t deliver_time = GameTime::GetGameTime() + deliver_delay;

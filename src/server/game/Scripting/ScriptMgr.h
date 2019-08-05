@@ -791,6 +791,8 @@ class TC_GAME_API GuildScript : public ScriptObject
         virtual void OnEvent(Guild* /*guild*/, uint8 /*eventType*/, ObjectGuid::LowType /*playerGuid1*/, ObjectGuid::LowType /*playerGuid2*/, uint8 /*newRank*/) { }
 
         virtual void OnBankEvent(Guild* /*guild*/, uint8 /*eventType*/, uint8 /*tabId*/, ObjectGuid::LowType /*playerGuid*/, uint32 /*itemOrMoney*/, uint16 /*itemStackCount*/, uint8 /*destTabId*/) { }
+
+        virtual void OnLevelUp(Guild* /*guild*/, uint32 /*receivedLevel*/) { }
 };
 
 class TC_GAME_API GroupScript : public ScriptObject
@@ -1061,6 +1063,7 @@ class TC_GAME_API ScriptMgr
             bool isDestBank, uint8 destContainer, uint8 destSlotId);
         void OnGuildEvent(Guild* guild, uint8 eventType, ObjectGuid::LowType playerGuid1, ObjectGuid::LowType playerGuid2, uint8 newRank);
         void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, ObjectGuid::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
+        void OnGuildLevelUpEvent(Guild* guild, uint32 receivedLevel);
 
     public: /* GroupScript */
 

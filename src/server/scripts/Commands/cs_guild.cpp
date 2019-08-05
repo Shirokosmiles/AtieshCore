@@ -50,17 +50,9 @@ public:
             { "rename",   rbac::RBAC_PERM_COMMAND_GUILD_RENAME,   true, &HandleGuildRenameCommand,           "" },
             { "info",     rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildInfoCommand,             "" },
         };
-        static std::vector<ChatCommand> guildProgressCommandTable =
-        {
-            { "addexperience",  rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildAddExperienceCommand, "" },
-            { "addlevel",       rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildAddLevelCommand,      "" },
-            { "removelevel",    rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildRemoveLevelCommand,   "" },
-            { "",               rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildProgressCommand,      "" },
-        };
         static std::vector<ChatCommand> commandTable =
         {
             { "guild",      rbac::RBAC_PERM_COMMAND_GUILD,  true, nullptr, "", guildCommandTable },
-            { "gprogress",  rbac::RBAC_PERM_COMMAND_GUILD,  true, nullptr, "", guildProgressCommandTable },
         };
         return commandTable;
     }
@@ -314,96 +306,6 @@ public:
         handler->PSendSysMessage(LANG_GUILD_INFO_BANK_GOLD, guild->GetBankMoney() / 100 / 100); // Bank Gold (in gold coins)
         handler->PSendSysMessage(LANG_GUILD_INFO_MOTD, guild->GetMOTD().c_str()); // Message of the Day
         handler->PSendSysMessage(LANG_GUILD_INFO_EXTRA_INFO, guild->GetInfo().c_str()); // Extra Information
-        return true;
-    }
-
-    static bool HandleGuildProgressCommand(ChatHandler* handler, char const* args)
-    {
-        Guild* guild = nullptr;
-
-        if (args && args[0] != '\0')
-        {
-            if (isNumeric(args))
-            {
-                uint32 guildId = uint32(atoi(args));
-                guild = sGuildMgr->GetGuildById(guildId);
-            }
-            else
-            {
-                std::string guildName = args;
-                guild = sGuildMgr->GetGuildByName(guildName);
-            }
-        }
-        else if (Player * target = handler->getSelectedPlayerOrSelf())
-            guild = target->GetGuild();
-
-        if (!guild)
-            return false;
-
-        // Display Guild Information
-        handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
-
-        handler->PSendSysMessage("Guild has %u level, and %u / 1500 experience for next level", guild->GetGuildLevel(), guild->GetGuildExperience()); // Extra Information
-        return true;
-    }
-
-    static bool HandleGuildAddLevelCommand(ChatHandler* handler, char const* args)
-    {
-        Player* target = handler->getSelectedPlayerOrSelf();
-        if (!target)
-            return false;
-
-        Guild* targetGuild = target->GetGuild();
-        if (!targetGuild)
-            return false;
-
-        char* value = strtok((char*)args, " ");
-        uint32 addedlvl = 1;
-        if (value)
-            addedlvl = atoi(value);
-
-        targetGuild->AddGuildLevel(addedlvl);
-        handler->PSendSysMessage("Guild %s has received %u additional levels, and now has %u level", targetGuild->GetName().c_str(), addedlvl, targetGuild->GetGuildLevel()); 
-        return true;
-    }
-
-    static bool HandleGuildRemoveLevelCommand(ChatHandler* handler, char const* args)
-    {
-        Player* target = handler->getSelectedPlayerOrSelf();
-        if (!target)
-            return false;
-
-        Guild* targetGuild = target->GetGuild();
-        if (!targetGuild)
-            return false;
-
-        char* value = strtok((char*)args, " ");
-        uint32 removedlvl = 1;
-        if (value)
-            removedlvl = atoi(value);
-
-        targetGuild->RemoveGuildLevel(removedlvl);
-        handler->PSendSysMessage("Guild %s has lost %u additional levels, and now has %u level", targetGuild->GetName().c_str(), removedlvl, targetGuild->GetGuildLevel());
-        return true;
-    }
-
-    static bool HandleGuildAddExperienceCommand(ChatHandler* handler, char const* args)
-    {
-        Player* target = handler->getSelectedPlayerOrSelf();
-        if (!target)
-            return false;
-
-        Guild* targetGuild = target->GetGuild();
-        if (!targetGuild)
-            return false;
-
-        char* value = strtok((char*)args, " ");
-        uint32 addedExp = 1;
-        if (value)
-            addedExp = atoi(value);
-
-        targetGuild->AddGuildExp(addedExp);
-        handler->PSendSysMessage("Guild %s has received %u additional experience, and now has %u Exp", targetGuild->GetName().c_str(), addedExp, targetGuild->GetGuildExperience());
         return true;
     }
 };

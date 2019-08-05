@@ -2243,6 +2243,15 @@ void Guild::BroadcastToGuild(WorldSession* session, bool officerOnly, std::strin
     }
 }
 
+void Guild::BroadcastToGuildNote(std::string const& msg) const
+{
+    for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        if (Player* player = itr->second->FindConnectedPlayer())
+            ChatHandler(player->GetSession()).PSendSysMessage("%s", msg);
+    }
+}
+
 void Guild::BroadcastPacketToRank(WorldPacket* packet, uint8 rankId) const
 {
     for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
@@ -2322,13 +2331,12 @@ void Guild::AddGuildExp(uint32 value, bool randombonus)
     
     if (newExp >= 1500)
     {
-        uint32 count = 0;
-        while (newExp > 1500)
-        {
-            count += 1;
+        while (newExp >= 1500)
+        {            
+            ++m_guildLevel;
+            sScriptMgr->OnGuildLevelUpEvent(this, m_guildLevel);
             newExp -= 1500;
         }
-        m_guildLevel += count;
     }
     m_guildExp = newExp;
 
@@ -2337,7 +2345,14 @@ void Guild::AddGuildExp(uint32 value, bool randombonus)
 
 void Guild::AddGuildLevel(uint32 value)
 {
-    m_guildLevel += value;
+    uint32 count = value;
+    while (count >= 1)
+    {
+        ++m_guildLevel;
+        sScriptMgr->OnGuildLevelUpEvent(this, m_guildLevel);
+        --count;
+    }
+
     UpdateLevelAndExp();
 }
 

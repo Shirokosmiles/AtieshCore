@@ -2090,6 +2090,11 @@ void ScriptMgr::OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, Obj
     FOREACH_SCRIPT(GuildScript)->OnBankEvent(guild, eventType, tabId, playerGuid, itemOrMoney, itemStackCount, destTabId);
 }
 
+void ScriptMgr::OnGuildLevelUpEvent(Guild* guild, uint32 receivedLevel)
+{
+    FOREACH_SCRIPT(GuildScript)->OnLevelUp(guild, receivedLevel);
+}
+
 // Group
 void ScriptMgr::OnGroupAddMember(Group* group, ObjectGuid guid)
 {

@@ -686,6 +686,7 @@ class TC_GAME_API Guild
 
         // Broadcasts
         void BroadcastToGuild(WorldSession* session, bool officerOnly, std::string const& msg, uint32 language = LANG_UNIVERSAL) const;
+        void BroadcastToGuildNote(std::string const& msg) const;
         void BroadcastPacketToRank(WorldPacket* packet, uint8 rankId) const;
         void BroadcastPacket(WorldPacket* packet) const;
         void ItemBroadcastToGuild(Player* player, std::string const& msg) const;
