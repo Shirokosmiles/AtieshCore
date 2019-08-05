@@ -236,6 +236,27 @@ class TC_GAME_API EmblemInfo
         uint32 m_backgroundColor;
 };
 
+// Guild Progress Info
+class TC_GAME_API GuildProgressInfo
+{
+public:
+    GuildProgressInfo() : m_guildLevel(0), m_guildExp(0) { }
+
+    void LoadFromDB(Field* fields);
+    void SaveToDB(ObjectGuid::LowType guildId) const;
+
+    uint32 GetGuildLevel() const { return m_guildLevel; }
+    uint32 GetGuildExperience() const { return m_guildExp; }
+    void SetGuildLevel(uint32 level) { m_guildLevel = level; }
+    void AddGuildLevel(uint32 level = 1) { m_guildLevel += level; }
+    void RemoveGuildLevel(uint32 level = 1) { m_guildLevel -= level; }
+    void SetExperience(uint32 value) { m_guildExp = value; }
+
+private:
+    uint32 m_guildLevel;
+    uint32 m_guildExp;
+};
+
 // Structure for storing guild bank rights and remaining slots together.
 class GuildBankRightsAndSlots
 {
@@ -692,6 +713,13 @@ class TC_GAME_API Guild
 
         void MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 maxLevel, uint32 minRank);
 
+        void UpdateLevelAndExp();
+        void AddGuildExp(uint32 value, bool randombonus = false);
+        void AddGuildLevel(uint32 value = 1);
+        void RemoveGuildLevel(uint32 value = 1);
+        uint32 GetGuildLevel() const { return m_progressInfo.GetGuildLevel(); }
+        uint32 GetGuildExperience() const { return m_progressInfo.GetGuildExperience(); }
+
         template<class Do>
         void BroadcastWorker(Do& _do, Player* except = nullptr)
         {
@@ -725,6 +753,7 @@ class TC_GAME_API Guild
         time_t m_createdDate;
 
         EmblemInfo m_emblemInfo;
+        GuildProgressInfo m_progressInfo;
         uint32 m_accountsNumber;
         uint64 m_bankMoney;
 

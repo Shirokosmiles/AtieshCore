@@ -852,6 +852,21 @@ void EmblemInfo::SaveToDB(ObjectGuid::LowType guildId) const
     CharacterDatabase.Execute(stmt);
 }
 
+void GuildProgressInfo::LoadFromDB(Field* fields)
+{
+    m_guildLevel = fields[12].GetUInt32();
+    m_guildExp = fields[13].GetUInt32();
+}
+
+void GuildProgressInfo::SaveToDB(ObjectGuid::LowType guildId) const
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_LEVELANDEXP);
+    stmt->setUInt32(0, m_guildLevel);
+    stmt->setUInt32(1, m_guildExp);
+    stmt->setUInt32(2, guildId);
+    CharacterDatabase.Execute(stmt);
+}
+
 // MoveItemData
 Guild::MoveItemData::MoveItemData(Guild* guild, Player* player, uint8 container, uint8 slotId) : m_pGuild(guild), m_pPlayer(player),
 m_container(container), m_slotId(slotId), m_pItem(nullptr), m_pClonedItem(nullptr)
@@ -1239,6 +1254,8 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     m_info = "";
     m_motd = "No message set.";
     m_bankMoney = 0;
+    m_progressInfo.AddGuildLevel();
+    m_progressInfo.SetExperience(0);
     m_createdDate = GameTime::GetGameTime();
     _CreateLogHolders();
 
@@ -1265,6 +1282,8 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     stmt->setUInt32(++index, m_emblemInfo.GetBorderColor());
     stmt->setUInt32(++index, m_emblemInfo.GetBackgroundColor());
     stmt->setUInt64(++index, m_bankMoney);
+    stmt->setUInt32(++index, m_progressInfo.GetGuildLevel());
+    stmt->setUInt32(++index, m_progressInfo.GetGuildExperience());
     trans->Append(stmt);
 
     _CreateDefaultGuildRanks(trans, pLeaderSession->GetSessionDbLocaleIndex()); // Create default ranks
@@ -2021,8 +2040,9 @@ bool Guild::LoadFromDB(Field* fields)
     m_motd          = fields[9].GetString();
     m_createdDate   = time_t(fields[10].GetUInt32());
     m_bankMoney     = fields[11].GetUInt64();
+    m_progressInfo.LoadFromDB(fields);
 
-    uint8 purchasedTabs = uint8(fields[12].GetUInt64());
+    uint8 purchasedTabs = uint8(fields[14].GetUInt64());
     if (purchasedTabs > GUILD_BANK_MAX_TABS)
         purchasedTabs = GUILD_BANK_MAX_TABS;
 
@@ -2293,6 +2313,51 @@ void Guild::MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 max
     data.put<uint32>(0, count);
 
     session->SendPacket(&data);
+}
+
+void Guild::UpdateLevelAndExp()
+{
+    m_progressInfo.SaveToDB(m_id);
+}
+
+void Guild::AddGuildExp(uint32 value, bool randombonus)
+{
+    uint32 currectExp = m_progressInfo.GetGuildExperience();
+
+    if (randombonus)
+        currectExp += urand(10, 45);
+    
+    uint32 newExp = currectExp + value;
+    if (newExp > 1500)
+    {
+        uint32 count = 0;
+        while (newExp > 1500)
+        {
+            count += 1;
+            newExp -= 1500;
+        }
+        m_progressInfo.AddGuildLevel(count);        
+    }
+    m_progressInfo.SetExperience(newExp);
+
+    UpdateLevelAndExp();
+}
+
+void Guild::AddGuildLevel(uint32 value)
+{
+    m_progressInfo.AddGuildLevel(value);
+    UpdateLevelAndExp();
+}
+
+void Guild::RemoveGuildLevel(uint32 value)
+{
+    uint32 currectLvl = m_progressInfo.GetGuildLevel();
+    if (value >= currectLvl)
+        m_progressInfo.SetGuildLevel(1);
+    else        
+        m_progressInfo.RemoveGuildLevel(value);
+
+    UpdateLevelAndExp();
 }
 
 // Members handling
