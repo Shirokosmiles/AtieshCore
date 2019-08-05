@@ -820,6 +820,8 @@ void Battleground::EndBattleground(uint32 winner)
             }
 
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, player->GetMapId());
+            if (isBattleground() && player->GetGuild())
+                sScriptMgr->OnGuildBattlegrroundWonMemberEvent(player->GetGuild(), player);
         }
         else
         {

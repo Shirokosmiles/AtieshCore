@@ -792,7 +792,16 @@ class TC_GAME_API GuildScript : public ScriptObject
 
         virtual void OnBankEvent(Guild* /*guild*/, uint8 /*eventType*/, uint8 /*tabId*/, ObjectGuid::LowType /*playerGuid*/, uint32 /*itemOrMoney*/, uint16 /*itemStackCount*/, uint8 /*destTabId*/) { }
 
-        virtual void OnLevelUp(Guild* /*guild*/, uint32 /*receivedLevel*/) { }
+        // ATiesh features : GuildSystem
+        virtual void OnLevelUp(Guild* /*guild*/, Player* /*player*/, uint32 /*receivedLevel*/) { }
+
+        virtual void OnExpReceived(Guild* /*guild*/, Player* /*player*/, uint32 /*receivedExp*/) { }
+
+        virtual void OnArenaWon(Guild* /*guild*/, Player* /*player*/) { }
+
+        virtual void OnBattlegroundWon(Guild* /*guild*/, Player* /*player*/) { }
+
+        virtual void OnLFGComplete(Guild* /*guild*/, Player* /*player*/) { }
 };
 
 class TC_GAME_API GroupScript : public ScriptObject
@@ -1063,7 +1072,12 @@ class TC_GAME_API ScriptMgr
             bool isDestBank, uint8 destContainer, uint8 destSlotId);
         void OnGuildEvent(Guild* guild, uint8 eventType, ObjectGuid::LowType playerGuid1, ObjectGuid::LowType playerGuid2, uint8 newRank);
         void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, ObjectGuid::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
-        void OnGuildLevelUpEvent(Guild* guild, uint32 receivedLevel);
+        // ATiesh features : GuildSystem
+        void OnGuildLevelUpEvent(Guild* guild, Player* player, uint32 receivedLevel);
+        void OnGuildExpirienceUpEvent(Guild* guild, Player* player, uint32 receivedExp);
+        void OnGuildArenaWonMemberEvent(Guild* guild, Player* player);
+        void OnGuildBattlegrroundWonMemberEvent(Guild* guild, Player* player);
+        void OnGuildLFGCompleteEvent(Guild* guild, Player* player);
 
     public: /* GroupScript */
 

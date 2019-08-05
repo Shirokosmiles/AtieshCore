@@ -1793,6 +1793,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetPVPCapPoints() const { return m_pvpcap; }
         bool IsWeeklyPVPCapComplete() const { return m_pvpcapReceived; }
 
+        // PVP Reward
+        void RewardTitleForRating(uint16 rating);
+        void RewardTitleForKills(uint32 kills);
+
         // Walking data from move packets
         void SetWalkingFlag(bool walkstatus) { m_walking = walkstatus; }
         bool HasWalkingFlag() const { return m_walking; }
@@ -2269,8 +2273,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool HasTitle(uint32 bitIndex) const;
         bool HasTitle(CharTitlesEntry const* title) const;
         void SetTitle(CharTitlesEntry const* title, bool lost = false);
-        void RewardTitleForRating(uint16 rating);
-        void RewardTitleForKills(uint32 kills);
 
         //bool isActiveObject() const { return true; }
         bool CanSeeSpellClickOn(Creature const* creature) const;

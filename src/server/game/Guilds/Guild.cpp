@@ -2321,35 +2321,36 @@ void Guild::UpdateLevelAndExp()
     CharacterDatabase.Execute(stmt);
 }
 
-void Guild::AddGuildExp(uint32 value, bool randombonus)
+void Guild::AddGuildExp(uint32 value, Player* player, bool randombonus)
 {
     uint32 currentExp = GetGuildExperience();
     uint32 newExp = currentExp + value;
 
     if (randombonus)
-        newExp += urand(10, 45);
+        newExp += urand(1, 45);
     
     if (newExp >= 1500)
     {
         while (newExp >= 1500)
         {            
             ++m_guildLevel;
-            sScriptMgr->OnGuildLevelUpEvent(this, m_guildLevel);
+            sScriptMgr->OnGuildLevelUpEvent(this, player, m_guildLevel);
             newExp -= 1500;
         }
     }
     m_guildExp = newExp;
+    sScriptMgr->OnGuildExpirienceUpEvent(this, player, value);
 
     UpdateLevelAndExp();
 }
 
-void Guild::AddGuildLevel(uint32 value)
+void Guild::AddGuildLevel(uint32 value, Player* player)
 {
     uint32 count = value;
     while (count >= 1)
     {
         ++m_guildLevel;
-        sScriptMgr->OnGuildLevelUpEvent(this, m_guildLevel);
+        sScriptMgr->OnGuildLevelUpEvent(this, player, m_guildLevel);
         --count;
     }
 

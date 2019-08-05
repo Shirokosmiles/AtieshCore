@@ -696,8 +696,8 @@ class TC_GAME_API Guild
         void UpdateLevelAndExp();
         void SetGuildLevel(uint32 value) { m_guildLevel = value; }
         void SetGuildExp(uint32 value) { m_guildExp = value; }
-        void AddGuildExp(uint32 value, bool randombonus = false);
-        void AddGuildLevel(uint32 value = 1);
+        void AddGuildExp(uint32 value, Player* player, bool randombonus = false);
+        void AddGuildLevel(uint32 value, Player * player);
         void RemoveGuildLevel(uint32 value = 1);
         uint32 GetGuildLevel() const { return m_guildLevel; }
         uint32 GetGuildExperience() const { return m_guildExp; }

@@ -2090,9 +2090,29 @@ void ScriptMgr::OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, Obj
     FOREACH_SCRIPT(GuildScript)->OnBankEvent(guild, eventType, tabId, playerGuid, itemOrMoney, itemStackCount, destTabId);
 }
 
-void ScriptMgr::OnGuildLevelUpEvent(Guild* guild, uint32 receivedLevel)
+void ScriptMgr::OnGuildLevelUpEvent(Guild* guild, Player* player, uint32 receivedLevel)
 {
-    FOREACH_SCRIPT(GuildScript)->OnLevelUp(guild, receivedLevel);
+    FOREACH_SCRIPT(GuildScript)->OnLevelUp(guild, player, receivedLevel);
+}
+
+void ScriptMgr::OnGuildExpirienceUpEvent(Guild* guild, Player* player, uint32 receivedExp)
+{
+    FOREACH_SCRIPT(GuildScript)->OnExpReceived(guild, player, receivedExp);
+}
+
+void ScriptMgr::OnGuildArenaWonMemberEvent(Guild* guild, Player* player)
+{
+    FOREACH_SCRIPT(GuildScript)->OnArenaWon(guild, player);
+}
+
+void ScriptMgr::OnGuildBattlegrroundWonMemberEvent(Guild* guild, Player* player)
+{
+    FOREACH_SCRIPT(GuildScript)->OnBattlegroundWon(guild, player);
+}
+
+void ScriptMgr::OnGuildLFGCompleteEvent(Guild* guild, Player* player)
+{
+    FOREACH_SCRIPT(GuildScript)->OnLFGComplete(guild, player);
 }
 
 // Group

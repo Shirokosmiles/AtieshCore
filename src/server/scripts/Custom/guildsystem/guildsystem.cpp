@@ -42,16 +42,29 @@ class GuildSystem : public GuildScript
 public:
     GuildSystem() : GuildScript("GuildSystem") { }
 
-    std::string GetNewReachedLevel(uint32 level) const
+    std::string GetNewReachedLevel(uint32 level, Player* player) const
     {
         std::ostringstream str;
-        str << "Congratulations! The guild has reached a " << level << " level";
+        if (player)
+            str << "Congratulations! The guild has reached a " << level << " level. The last experience has gained by " << player->GetName();
+        else
+            str << "Congratulations! The guild has reached a " << level << " level";
         return str.str();
     }
 
-    void OnLevelUp(Guild* guild, uint32 receivedLevel) override
+    std::string GetNewReachedExp(uint32 value, Player* player) const
     {
-        guild->BroadcastToGuildNote(GetNewReachedLevel(receivedLevel));
+        std::ostringstream str;
+        if (player)
+            str << "The guild has received a " << value << " experience. Points has gained by " << player->GetName();
+        else
+            str << "The guild has received a " << value << " experience points";
+        return str.str();
+    }
+
+    void OnLevelUp(Guild* guild, Player* player, uint32 receivedLevel) override
+    {
+        guild->BroadcastToGuildNote(GetNewReachedLevel(receivedLevel, player));
         switch (receivedLevel)
         {
             case 2:
@@ -90,6 +103,29 @@ public:
             case 35:
                 break;
         }
+    }
+
+    void OnExpReceived(Guild* guild, Player* player, uint32 receivedExp) override
+    {
+        guild->BroadcastToGuildNote(GetNewReachedExp(receivedExp, player));
+    }
+
+    void OnArenaWon(Guild* guild, Player* player) override
+    {
+        uint32 receivedExp = 5;
+        guild->AddGuildExp(receivedExp, player);
+    }
+
+    void OnBattlegroundWon(Guild* guild, Player* player) override
+    {
+        uint32 receivedExp = 1;
+        guild->AddGuildExp(receivedExp, player);
+    }
+
+    void OnLFGComplete(Guild* guild, Player* player) override
+    {
+        uint32 receivedExp = 1;
+        guild->AddGuildExp(receivedExp, player);
     }
 };
 
@@ -161,7 +197,7 @@ public:
         if (value)
             addedlvl = atoi(value);
 
-        targetGuild->AddGuildLevel(addedlvl);
+        targetGuild->AddGuildLevel(addedlvl, target);
         handler->PSendSysMessage("Guild %s has received %u additional levels, and now has %u level", targetGuild->GetName().c_str(), addedlvl, targetGuild->GetGuildLevel());
         return true;
     }
@@ -201,7 +237,7 @@ public:
         if (value)
             addedExp = atoi(value);
 
-        targetGuild->AddGuildExp(addedExp);
+        targetGuild->AddGuildExp(addedExp, target);
         handler->PSendSysMessage("Guild %s has received %u additional experience, and now has %u Exp", targetGuild->GetName().c_str(), addedExp, targetGuild->GetGuildExperience());
         return true;
     }

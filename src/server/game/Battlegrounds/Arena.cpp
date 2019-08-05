@@ -21,6 +21,7 @@
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldStatePackets.h"
@@ -270,6 +271,8 @@ void Arena::EndBattleground(uint32 winner)
                         player->CastSpell(player, SPELL_LAST_MAN_STANDING, true);
 
                     winnerArenaTeam->MemberWon(player, loserMatchmakerRating, winnerMatchmakerChange);
+                    if (player->GetGuild())
+                        sScriptMgr->OnGuildArenaWonMemberEvent(player->GetGuild(), player);
                 }
                 else
                 {
