@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
 * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
 *
@@ -64,7 +64,7 @@ Data Tele[] = // key = i & Key
     { 1, 3, 9, "|TInterface/ICONS/Achievement_Dungeon_Naxxramas_10man:25|t Подземелья BC", 0, 59, 0, 0, 0, 0, 0, 0 },
     { 1, 4, 9, "|TInterface/ICONS/Achievement_Dungeon_Naxxramas_Normal:25|t Подземелья WotLK", 0, 69, 0, 0, 0, 0, 0, 0 },
     { 1, 5, 9, "|TInterface/ICONS/Achievement_Dungeon_Naxxramas_25man:25|t Рейдовые телепоры", 0, 57, 0, 0, 0, 0, 0, 0 },
-    { 1, 10, 9, "|TInterface/ICONS/Spell_fire_felfireward:25|t Прочие телепорты", 0, 80, 0, 0, 0, 0, 0, 0 },
+    //{ 1, 10, 9, "|TInterface/ICONS/Spell_fire_felfireward:25|t Прочие телепорты", 0, 80, 0, 0, 0, 0, 0, 0 },
     
     { 2, 0, 2, "|TInterface/ICONS/Achievement_Boss_Mekgineer_Thermaplugg .png:25|t Гномреган |cffff0000(24-34)|r", 0, 25, 2, 0, -5163.54f, 925.423f, 257.181f, 1.57423f },
     { 2, 0, 2, "|TInterface/ICONS/Achievement_Boss_EdwinVancleef:25|t Мертвые копи |cffff0000(15-21)|r", 0, 17, 2, 0, -11209.6f, 1666.54f, 24.6974f, 1.42053f },
@@ -209,16 +209,6 @@ Data Tele[] = // key = i & Key
     { 9, 0, 2, "|TInterface/ICONS/achievement_zone_icecrown_01:25|t Ледяная корона |cffff0000(77-80)|r", 0, 77, 0, 571, 8323.28f, 2763.5f, 655.093f, 2.87223f },
     { 9, 0, 2, "|TInterface/ICONS/achievement_zone_stormpeaks_03:25|t Озеро ледяных оков |cffff0000(PvP)|r", 0, 77, 0, 571, 4522.23f, 2828.01f, 389.975f, 0.215009f },
     { 9, 1, 7, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:25|t [Назад]", 0, 0, 0, 0, 0, 0, 0, 0 },
-
-    { 10, 0, 2, "|TInterface/ICONS/Achievement_Arena_2v2_7:25|t Джамп", 0, 80, 0, 169, -1641.657104f, -576.635803f, 118.556992f, 0.141738f },			
-    { 10, 0, 2, "|TInterface/ICONS/Achievement_Arena_2v2_7:25|t Бессмертные Души", 0, 80, 0, 1, -11808.95f, -4737.97f, 5.9716f, 3.47454f },
-    { 10, 0, 2, "|TInterface/ICONS/Achievement_Arena_2v2_7:25|t Акула", 0, 80, 0, 1, 5078.207520f, -6816.839355f, 4.579811f, 0.342080f },
-    { 10, 0, 2, "|TInterface/ICONS/Achievement_Arena_2v2_7:25|t Злая Панда", 0, 80, 0, 1, 4794.006348f, -6384.777344f, 107.372040f, 4.068978f },
-    { 10, 0, 2, "|TInterface/ICONS/Achievement_Arena_2v2_7:25|t Череп и Кости", 0, 80, 0, 1, 6139.717773f, -1293.815430f, 379.230225f, 5.263196f },
-    { 10, 0, 2, "|TInterface/ICONS/Achievement_Arena_2v2_7:25|t Чума", 0, 80, 0, 1, -7847.695801f, 695.177734f, -29.928991f, 4.018467f },
-    { 10, 0, 2, "|TInterface/ICONS/Achievement_Arena_2v2_7:25|t Ледяной Дракон", 0, 80, 0, 1, -5804.846191f, -3855.156006f, -88.647224f, 4.953506f },
-    { 10, 0, 2, "|TInterface/ICONS/Achievement_Arena_2v2_7:25|t Тень Короля Лича", 0, 80, 0, 0, -3358.708008f, -3562.596191f, 53.180382f, 0.812192f },
-    { 10, 1, 7, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:25|t [Назад]", 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 // TextIDs from npc_text
