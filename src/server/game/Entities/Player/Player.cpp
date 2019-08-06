@@ -354,6 +354,10 @@ Player::Player(WorldSession* session): Unit(true)
     m_walking = false;
 
     spectatorFlag = false;
+    m_needToUpdFields = false;
+    m_updGId = 0;
+    m_updGRank = 0;
+    m_updFieldTimer = 0;
     /////////////////// Instance System /////////////////////
 
     m_HomebindTimer = 0;
@@ -1394,6 +1398,22 @@ void Player::Update(uint32 p_time)
         }
         else
             m_rootUpdTimer -= p_time;
+    }
+
+    if (m_needToUpdFields && m_updFieldTimer > 0)
+    {
+        if (p_time >= m_updFieldTimer)
+        {
+            m_needToUpdFields = false;
+            m_updFieldTimer = 0;
+
+            SetInGuild(m_updGId);
+            SetRank(m_updGRank);
+
+            ClearUpdValues();
+        }
+        else
+            m_updFieldTimer -= p_time;
     }
 
     if (IsAlive())

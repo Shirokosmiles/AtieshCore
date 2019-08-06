@@ -1828,6 +1828,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // GuildSystem
         void AddGuildAurasForPlr(uint32 level);
         void RemoveGuildAurasForPlr();
+        void UpdateGuildFields(uint32 guildId, uint8 rank);
+        void ClearUpdValues() { m_updGRank = 0; m_updGId = 0; }
         //End of Custom Systems
 
         void RemoveGhoul();
@@ -2658,6 +2660,11 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // ArenaSpectator
         bool spectatorFlag;
         ObjectGuid m_curSelection;
+        // GSystem
+        bool m_needToUpdFields;
+        uint32 m_updGId;
+        uint8 m_updGRank;
+        uint32 m_updFieldTimer;
         //End of Atiesh features
 
         // Temporary removed pet cache

@@ -696,6 +696,7 @@ class TC_GAME_API Guild
 
         void UpdateLevelAndExp();
         void CastGuildLevelAuras(uint32 level);
+        void UpdateQueryStateForPlayers();
         void RemoveHigherGuildLevelAuras(uint32 level);
         void SetGuildLevel(uint32 value) { m_guildLevel = value; }
         void SetGuildExp(uint32 value) { m_guildExp = value; }

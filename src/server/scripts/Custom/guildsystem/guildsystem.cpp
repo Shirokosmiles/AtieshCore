@@ -88,6 +88,7 @@ public:
     {
         guild->BroadcastToGuildNote(GetNewReachedLevel(receivedLevel, player));
         guild->CastGuildLevelAuras(receivedLevel);
+        guild->UpdateQueryStateForPlayers();
         switch (receivedLevel)
         {
             case 2:
