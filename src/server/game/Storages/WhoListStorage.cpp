@@ -47,7 +47,11 @@ void WhoListStorageMgr::Update()
 
         wstrToLower(widePlayerName);
 
-        std::string guildName = sGuildMgr->GetGuildNameById(itr->second->GetGuildId());
+        std::string guildName = ""; 
+        if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_WHO_LIST))
+            guildName = sGuildMgr->GetGuildNameByIdWithLvl(itr->second->GetGuildId());
+        else
+            guildName = sGuildMgr->GetGuildNameById(itr->second->GetGuildId());
         std::wstring wideGuildName;
         if (!Utf8toWStr(guildName, wideGuildName))
             continue;

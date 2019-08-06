@@ -4550,6 +4550,20 @@ DuelPhase.Enabled = 0
 
 ###################################################################################################
 #
+# GuildSystem
+#
+#    GSystem.WhoList.Enabled
+#    Description: Make a visible guild level in WhoList
+#    Default:     0 - disabled
+#
+
+GSystem.WhoList.Enabled = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+#
 # StartPack.Script
 #
 #    Description: Give a possibility to receive start-pack items from item helper
