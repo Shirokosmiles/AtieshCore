@@ -35,6 +35,18 @@ public:
                 amount *= 2;
         }
     }
+
+    void OnLogin(Player* player, bool /*firstLogin*/) override
+    {
+        if (Guild* guildtarget = player->GetGuild())
+            player->AddGuildAurasForPlr(guildtarget->GetGuildLevel());
+    }
+
+    void OnLogout(Player* player) override
+    {
+        if (Guild* guildtarget = player->GetGuild())
+            player->RemoveGuildAurasForPlr();
+    }
 };
 
 class GuildSystem : public GuildScript
@@ -62,9 +74,20 @@ public:
         return str.str();
     }
 
+    void OnAddMember(Guild* guild, Player* player, uint8& /*plRank*/) override
+    {
+        player->AddGuildAurasForPlr(guild->GetGuildLevel());
+    }
+
+    void OnRemoveMember(Guild* guild, Player* player, bool /*isDisbanding*/, bool /*isKicked*/) override
+    {
+        player->RemoveGuildAurasForPlr();
+    }
+
     void OnLevelUp(Guild* guild, Player* player, uint32 receivedLevel) override
     {
         guild->BroadcastToGuildNote(GetNewReachedLevel(receivedLevel, player));
+        guild->CastGuildLevelAuras(receivedLevel);
         switch (receivedLevel)
         {
             case 2:

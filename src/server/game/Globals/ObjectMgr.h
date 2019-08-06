@@ -174,6 +174,14 @@ struct GameTele
 
 typedef std::unordered_map<uint32, GameTele> GameTeleContainer;
 
+struct GuildSpellAuras
+{
+    uint32 spellauraId;
+    uint32 reqlevel;
+};
+
+typedef std::unordered_map<uint32, GuildSpellAuras> GuildSpellAurasContainer;
+
 enum ScriptsType
 {
     SCRIPTS_FIRST = 1,
@@ -1230,6 +1238,7 @@ class TC_GAME_API ObjectMgr
         void LoadNPCSpellClickSpells();
 
         void LoadGameTele();
+        void LoadGuildSpellAuras();
 
         void LoadGossipMenu();
         void LoadGossipMenuItems();
@@ -1479,6 +1488,17 @@ class TC_GAME_API ObjectMgr
         bool AddGameTele(GameTele& data);
         bool DeleteGameTele(std::string const& name);
 
+        //Guild Spell Auras
+        GuildSpellAuras const* GetGuildSpellAura(uint32 spellId) const
+        {
+            GuildSpellAurasContainer::const_iterator itr = _guildSpellAurasStore.find(spellId);
+            if (itr == _guildSpellAurasStore.end()) return nullptr;
+            return &itr->second;
+        }
+        GuildSpellAuras const* GetGuildSpellAurasbyLevel(uint32 guildLevel) const;
+        GuildSpellAurasContainer const& GetGuildSpellAurasMap() const { return _guildSpellAurasStore; }
+        //Guild Spell Auras end
+
         Trainer::Trainer const* GetTrainer(uint32 creatureId) const;
 
         VendorItemData const* GetNpcVendorItemList(uint32 entry) const
@@ -1609,6 +1629,7 @@ class TC_GAME_API ObjectMgr
         ReservedNamesContainer _reservedNamesStore;
 
         GameTeleContainer _gameTeleStore;
+        GuildSpellAurasContainer _guildSpellAurasStore;
 
         ScriptNameContainer _scriptNamesStore;
 

@@ -1825,6 +1825,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetSpectate(bool on);
         // Duel Phase
         uint32 GetNormalPhase() const;
+        // GuildSystem
+        void AddGuildAurasForPlr(uint32 level);
+        void RemoveGuildAurasForPlr();
         //End of Custom Systems
 
         void RemoveGhoul();

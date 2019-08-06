@@ -2312,62 +2312,6 @@ void Guild::MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 max
     session->SendPacket(&data);
 }
 
-void Guild::UpdateLevelAndExp()
-{
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_LEVELANDEXP);
-    stmt->setUInt32(0, m_guildLevel);
-    stmt->setUInt32(1, m_guildExp);
-    stmt->setUInt32(2, m_id);
-    CharacterDatabase.Execute(stmt);
-}
-
-void Guild::AddGuildExp(uint32 value, Player* player, bool randombonus)
-{
-    uint32 currentExp = GetGuildExperience();
-    uint32 newExp = currentExp + value;
-
-    if (randombonus)
-        newExp += urand(1, 45);
-    
-    if (newExp >= 1500)
-    {
-        while (newExp >= 1500)
-        {            
-            ++m_guildLevel;
-            sScriptMgr->OnGuildLevelUpEvent(this, player, m_guildLevel);
-            newExp -= 1500;
-        }
-    }
-    m_guildExp = newExp;
-    sScriptMgr->OnGuildExpirienceUpEvent(this, player, value);
-
-    UpdateLevelAndExp();
-}
-
-void Guild::AddGuildLevel(uint32 value, Player* player)
-{
-    uint32 count = value;
-    while (count >= 1)
-    {
-        ++m_guildLevel;
-        sScriptMgr->OnGuildLevelUpEvent(this, player, m_guildLevel);
-        --count;
-    }
-
-    UpdateLevelAndExp();
-}
-
-void Guild::RemoveGuildLevel(uint32 value)
-{
-    uint32 currentLvl = GetGuildLevel();
-    if (value >= currentLvl)
-        SetGuildLevel(1);
-    else
-        m_guildLevel -= value;
-
-    UpdateLevelAndExp();
-}
-
 // Members handling
 bool Guild::AddMember(SQLTransaction& trans, ObjectGuid guid, uint8 rankId)
 {

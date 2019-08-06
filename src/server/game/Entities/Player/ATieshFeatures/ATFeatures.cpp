@@ -21,8 +21,10 @@
 #include "Chat.h"
 #include "Item.h"
 #include "Player.h"
+#include "Guild.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "ScriptMgr.h"
 
  // Vanish System
 void Player::SetVanishTimer()
@@ -721,4 +723,123 @@ uint32 Player::GetNormalPhase() const
         newPhase = PHASEMASK_NORMAL;
 
     return newPhase;
+}
+
+// Guild System
+void Player::AddGuildAurasForPlr(uint32 level)
+{
+    GuildSpellAurasContainer const& guildSpellAurasMap = sObjectMgr->GetGuildSpellAurasMap();
+
+    for (GuildSpellAurasContainer::const_iterator itr = guildSpellAurasMap.begin(); itr != guildSpellAurasMap.end(); ++itr)
+    {
+        GuildSpellAuras const* gspellAuras = &itr->second;
+        if (gspellAuras->reqlevel > level)
+            continue;
+
+        CastSpell(this, gspellAuras->spellauraId);
+    }
+}
+
+void Player::RemoveGuildAurasForPlr()
+{
+    GuildSpellAurasContainer const& guildSpellAurasMap = sObjectMgr->GetGuildSpellAurasMap();
+
+    for (GuildSpellAurasContainer::const_iterator itr = guildSpellAurasMap.begin(); itr != guildSpellAurasMap.end(); ++itr)
+    {
+        GuildSpellAuras const* gspellAuras = &itr->second;
+        RemoveAurasDueToSpell(gspellAuras->spellauraId);
+    }
+}
+
+void Guild::UpdateLevelAndExp()
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_LEVELANDEXP);
+    stmt->setUInt32(0, m_guildLevel);
+    stmt->setUInt32(1, m_guildExp);
+    stmt->setUInt32(2, m_id);
+    CharacterDatabase.Execute(stmt);
+}
+
+void Guild::CastGuildLevelAuras(uint32 level)
+{
+    GuildSpellAurasContainer const& guildSpellAurasMap = sObjectMgr->GetGuildSpellAurasMap();
+
+    for (GuildSpellAurasContainer::const_iterator itr = guildSpellAurasMap.begin(); itr != guildSpellAurasMap.end(); ++itr)
+    {
+        GuildSpellAuras const* gspellAuras = &itr->second;
+        if (gspellAuras->reqlevel > level)
+            continue;
+
+        for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+        {
+            if (Player * player = itr->second->FindConnectedPlayer())
+                player->CastSpell(player, gspellAuras->spellauraId);
+        }
+    }
+}
+
+void Guild::RemoveHigherGuildLevelAuras(uint32 level)
+{
+    GuildSpellAurasContainer const& guildSpellAurasMap = sObjectMgr->GetGuildSpellAurasMap();
+
+    for (GuildSpellAurasContainer::const_iterator itr = guildSpellAurasMap.begin(); itr != guildSpellAurasMap.end(); ++itr)
+    {
+        GuildSpellAuras const* gspellAuras = &itr->second;
+        if (gspellAuras->reqlevel <= level)
+            continue;
+
+        for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+        {
+            if (Player * player = itr->second->FindConnectedPlayer())
+                player->RemoveAurasDueToSpell(gspellAuras->spellauraId);
+        }
+    }
+}
+
+void Guild::AddGuildExp(uint32 value, Player* player, bool randombonus)
+{
+    uint32 currentExp = GetGuildExperience();
+    uint32 newExp = currentExp + value;
+
+    if (randombonus)
+        newExp += urand(1, 45);
+
+    if (newExp >= 1500)
+    {
+        while (newExp >= 1500)
+        {
+            ++m_guildLevel;
+            sScriptMgr->OnGuildLevelUpEvent(this, player, m_guildLevel);
+            newExp -= 1500;
+        }
+    }
+    m_guildExp = newExp;
+    sScriptMgr->OnGuildExpirienceUpEvent(this, player, value);
+
+    UpdateLevelAndExp();
+}
+
+void Guild::AddGuildLevel(uint32 value, Player* player)
+{
+    uint32 count = value;
+    while (count >= 1)
+    {
+        ++m_guildLevel;
+        sScriptMgr->OnGuildLevelUpEvent(this, player, m_guildLevel);
+        --count;
+    }
+
+    UpdateLevelAndExp();
+}
+
+void Guild::RemoveGuildLevel(uint32 value)
+{
+    uint32 currentLvl = GetGuildLevel();
+    if (value >= currentLvl)
+        SetGuildLevel(1);
+    else
+        m_guildLevel -= value;
+
+    RemoveHigherGuildLevelAuras(m_guildLevel);
+    UpdateLevelAndExp();
 }

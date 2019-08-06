@@ -694,6 +694,8 @@ class TC_GAME_API Guild
         void MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 maxLevel, uint32 minRank);
 
         void UpdateLevelAndExp();
+        void CastGuildLevelAuras(uint32 level);
+        void RemoveHigherGuildLevelAuras(uint32 level);
         void SetGuildLevel(uint32 value) { m_guildLevel = value; }
         void SetGuildExp(uint32 value) { m_guildExp = value; }
         void AddGuildExp(uint32 value, Player* player, bool randombonus = false);

@@ -9071,6 +9071,52 @@ bool ObjectMgr::DeleteGameTele(const std::string& name)
     return false;
 }
 
+void ObjectMgr::LoadGuildSpellAuras()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _guildSpellAurasStore.clear();                                  // for reload case
+
+    //                                                     0                1
+    QueryResult result = WorldDatabase.Query("SELECT id, spell_aura_id, required_guild_level FROM guild_auras");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 Guild Spell Auras. DB table `guild_auras` is empty!");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+
+        GuildSpellAuras gt;
+        gt.spellauraId = fields[1].GetUInt32();
+        gt.reqlevel = fields[2].GetUInt32();
+
+        _guildSpellAurasStore[id] = gt;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u Guild Spell Auras in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+GuildSpellAuras const* ObjectMgr::GetGuildSpellAurasbyLevel(uint32 guildLevel) const
+{
+    for (GuildSpellAurasContainer::const_iterator itr = _guildSpellAurasStore.begin(); itr != _guildSpellAurasStore.end(); ++itr)
+    {
+        if (itr->second.reqlevel <= guildLevel)
+            return &itr->second;
+    }
+
+    return nullptr;
+}
+
 void ObjectMgr::LoadMailLevelRewards()
 {
     uint32 oldMSTime = getMSTime();

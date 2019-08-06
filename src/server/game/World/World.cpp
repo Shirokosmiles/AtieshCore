@@ -2069,6 +2069,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading GameTeleports...");
     sObjectMgr->LoadGameTele();
 
+    TC_LOG_INFO("server.loading", "Loading Guild Spell Auras...");
+    sObjectMgr->LoadGuildSpellAuras();
+
     TC_LOG_INFO("server.loading", "Loading Trainers...");       // must be after LoadCreatureTemplates
     sObjectMgr->LoadTrainers();
 
