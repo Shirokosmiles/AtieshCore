@@ -27,7 +27,7 @@ class GuildSystem_player : public PlayerScript
 public:
     GuildSystem_player() : PlayerScript("GuildSystem_player") { }
 
-    void OnGiveXP(Player* player, uint32& amount, Unit* victim) override
+    void OnGiveXP(Player* player, uint32& amount, Unit* /*victim*/) override
     {
         if (Guild* guildtarget = player->GetGuild())
         {
@@ -44,7 +44,7 @@ public:
 
     void OnLogout(Player* player) override
     {
-        if (Guild* guildtarget = player->GetGuild())
+        if (player->GetGuild())
             player->RemoveGuildAurasForPlr();
     }
 };
@@ -79,7 +79,7 @@ public:
         player->AddGuildAurasForPlr(guild->GetGuildLevel());
     }
 
-    void OnRemoveMember(Guild* guild, Player* player, bool /*isDisbanding*/, bool /*isKicked*/) override
+    void OnRemoveMember(Guild* /*guild*/, Player* player, bool /*isDisbanding*/, bool /*isKicked*/) override
     {
         player->RemoveGuildAurasForPlr();
     }
@@ -266,7 +266,7 @@ public:
         return true;
     }
 
-    static bool HandleGuildRepairCommand(ChatHandler* handler, char const* args)
+    static bool HandleGuildRepairCommand(ChatHandler* handler, char const* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player)
@@ -287,7 +287,7 @@ public:
         return true;
     }
 
-    static bool HandleGuildMyBankCommand(ChatHandler* handler, char const* args)
+    static bool HandleGuildMyBankCommand(ChatHandler* handler, char const* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player)

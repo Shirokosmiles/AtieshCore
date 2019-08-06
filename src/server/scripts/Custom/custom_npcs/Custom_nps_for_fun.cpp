@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
 * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
 *
@@ -2809,7 +2809,7 @@ public:
             return skill == SKILL_COOKING || skill == SKILL_FIRST_AID;
         }
 
-        void CompleteLearnProfession(Player *pPlayer, Creature *pCreature, SkillType skill)
+        void CompleteLearnProfession(Player* pPlayer, Creature* /*pCreature*/, SkillType skill)
         {
             if (PlayerAlreadyHasTwoProfessions(pPlayer) && !IsSecondarySkill(skill))
                 me->Whisper("You already know two professions!", LANG_UNIVERSAL, pPlayer, false);
@@ -3669,6 +3669,7 @@ public:
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 case 112:
+                {
                     if (player->HasSkill(SKILL_FIRST_AID))
                     {
                         player->PlayerTalkClass->SendCloseGossip();
@@ -3678,7 +3679,9 @@ public:
                     CompleteLearnProfession(player, creature, SKILL_FIRST_AID);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
+                }
                 case 113:
+                {
                     if (player->HasSkill(SKILL_FISHING))
                     {
                         player->PlayerTalkClass->SendCloseGossip();
@@ -3688,12 +3691,16 @@ public:
                     CompleteLearnProfession(player, creature, SKILL_FISHING);
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
+                }
                 case 8:
+                {
                     player->CombatStop();
                     player->CastSpell(player, 24222);
                     CloseGossipMenuFor(player);
                     break;
+                }
                 case 5: // Верховая езда
+                {
                     CloseGossipMenuFor(player);
                     //creature->Whisper(MSG_RIDING_COMPLETE, LANG_UNIVERSAL, player, false);
                     player->CastSpell(player, 33389, false); // Apprentice Riding
@@ -3702,93 +3709,119 @@ public:
                     player->CastSpell(player, 34093, false); // Artisan Riding
                     player->LearnSpell(54197, false); // Allows you to ride flying mounts in Northrend.
                     break;
+                }
                 case 6: // Оружейные навыки
+                {
                     switch (player->GetClass())
                     {
-                    case CLASS_WARRIOR:
-                        CloseGossipMenuFor(player);
-                        //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                        player->LearnSpell(5011, false); // Арбалеты
-                        player->LearnSpell(200, false); // Древковое оружие
-                        player->LearnSpell(15590, false); // Кулачное оружие
-                        player->LearnSpell(264, false); // Луки
-                        player->LearnSpell(266, false); // Ружья
-                        player->LearnSpell(227, false); // Посохи
-                        break;
-                    case CLASS_PALADIN:
-                        CloseGossipMenuFor(player);
-                        //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                        player->LearnSpell(197, false); // Двуручные топоры
-                        player->LearnSpell(200, false); // Древковое оружие
-                        player->LearnSpell(196, false); // Одноручные топоры
-                        break;
-                    case CLASS_WARLOCK:
-                        CloseGossipMenuFor(player);
-                        //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                        player->LearnSpell(201, false); // Одноручные мечи
-                        break;
-                    case CLASS_PRIEST:
-                        CloseGossipMenuFor(player);
-                        //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                        player->LearnSpell(1180, false); // Кинжалы
-                        break;
-                    case CLASS_HUNTER:
-                        CloseGossipMenuFor(player);
-                        //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                        player->LearnSpell(5011, false); // Арбалеты
-                        player->LearnSpell(202, false); // Двуручные мечи
-                        player->LearnSpell(200, false); // Древковое оружие
-                        player->LearnSpell(15590, false); // Кулачное оружие
-                        player->LearnSpell(264, false); // Луки
-                        player->LearnSpell(2567, false); // Метательное оружие
-                        player->LearnSpell(227, false); // Посохи
-                        break;
-                    case CLASS_MAGE:
-                        CloseGossipMenuFor(player);
-                        ////creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                        player->LearnSpell(1180, false); // Кинжалы
-                        player->LearnSpell(201, false); // Одноручные мечи
-                        break;
-                    case CLASS_SHAMAN:
-                        CloseGossipMenuFor(player);
-                        ////creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                        player->LearnSpell(199, false); // Двуручное дробящее оружие
-                        player->LearnSpell(197, false); // Двуручные топоры
-                        player->LearnSpell(1180, false); // Кинжалы
-                        player->LearnSpell(15590, false); // Кулачное оружие
-                        player->LearnSpell(196, false); // Одноручные топоры
-                        break;
-                    case CLASS_ROGUE:
-                        CloseGossipMenuFor(player);
-                        //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                        player->LearnSpell(5011, false); // Арбалеты
-                        player->LearnSpell(198, false); // Одноручное дробящее оружие
-                        player->LearnSpell(15590, false); // Кулачное оружие
-                        player->LearnSpell(264, false); // Луки
-                        player->LearnSpell(201, false); // Одноручные мечи
-                        player->LearnSpell(266, false); // Ружья
-                        player->LearnSpell(196, false); // Одноручные топоры
-                        break;
-                    case CLASS_DEATH_KNIGHT:
-                        CloseGossipMenuFor(player);
-                        //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                        player->LearnSpell(199, false); // Двуручное дробящее оружие
-                        player->LearnSpell(198, false); // Одноручное дробящее оружие
-                        break;
-                    case CLASS_DRUID:
-                        CloseGossipMenuFor(player);
-                        //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                        player->LearnSpell(199, false); // Двуручное дробящее оружие
-                        player->LearnSpell(200, false); // Древковое оружие
-                        player->LearnSpell(15590, false); // Кулачное оружие
-                        break;
+                        case CLASS_WARRIOR:
+                        {
+                            CloseGossipMenuFor(player);
+                            //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
+                            player->LearnSpell(5011, false); // Арбалеты
+                            player->LearnSpell(200, false); // Древковое оружие
+                            player->LearnSpell(15590, false); // Кулачное оружие
+                            player->LearnSpell(264, false); // Луки
+                            player->LearnSpell(266, false); // Ружья
+                            player->LearnSpell(227, false); // Посохи
+                            break;
+                        }
+                        case CLASS_PALADIN:
+                        {
+                            CloseGossipMenuFor(player);
+                            //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
+                            player->LearnSpell(197, false); // Двуручные топоры
+                            player->LearnSpell(200, false); // Древковое оружие
+                            player->LearnSpell(196, false); // Одноручные топоры
+                            break;
+                        }
+                        case CLASS_WARLOCK:
+                        {
+                            CloseGossipMenuFor(player);
+                            //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
+                            player->LearnSpell(201, false); // Одноручные мечи
+                            break;
+                        }
+                        case CLASS_PRIEST:
+                        {
+                            CloseGossipMenuFor(player);
+                            //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
+                            player->LearnSpell(1180, false); // Кинжалы
+                            break;
+                        }
+                        case CLASS_HUNTER:
+                        {
+                            CloseGossipMenuFor(player);
+                            //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
+                            player->LearnSpell(5011, false); // Арбалеты
+                            player->LearnSpell(202, false); // Двуручные мечи
+                            player->LearnSpell(200, false); // Древковое оружие
+                            player->LearnSpell(15590, false); // Кулачное оружие
+                            player->LearnSpell(264, false); // Луки
+                            player->LearnSpell(2567, false); // Метательное оружие
+                            player->LearnSpell(227, false); // Посохи
+                            break;
+                        }
+                        case CLASS_MAGE:
+                        {
+                            CloseGossipMenuFor(player);
+                            ////creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
+                            player->LearnSpell(1180, false); // Кинжалы
+                            player->LearnSpell(201, false); // Одноручные мечи
+                            break;
+                        }
+                        case CLASS_SHAMAN:
+                        {
+                            CloseGossipMenuFor(player);
+                            ////creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
+                            player->LearnSpell(199, false); // Двуручное дробящее оружие
+                            player->LearnSpell(197, false); // Двуручные топоры
+                            player->LearnSpell(1180, false); // Кинжалы
+                            player->LearnSpell(15590, false); // Кулачное оружие
+                            player->LearnSpell(196, false); // Одноручные топоры
+                            break;
+                        }
+                        case CLASS_ROGUE:
+                        {
+                            CloseGossipMenuFor(player);
+                            //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
+                            player->LearnSpell(5011, false); // Арбалеты
+                            player->LearnSpell(198, false); // Одноручное дробящее оружие
+                            player->LearnSpell(15590, false); // Кулачное оружие
+                            player->LearnSpell(264, false); // Луки
+                            player->LearnSpell(201, false); // Одноручные мечи
+                            player->LearnSpell(266, false); // Ружья
+                            player->LearnSpell(196, false); // Одноручные топоры
+                            break;
+                        }
+                        case CLASS_DEATH_KNIGHT:
+                        {
+                            CloseGossipMenuFor(player);
+                            //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
+                            player->LearnSpell(199, false); // Двуручное дробящее оружие
+                            player->LearnSpell(198, false); // Одноручное дробящее оружие
+                            break;
+                        }
+                        case CLASS_DRUID:
+                        {
+                            CloseGossipMenuFor(player);
+                            //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
+                            player->LearnSpell(199, false); // Двуручное дробящее оружие
+                            player->LearnSpell(200, false); // Древковое оружие
+                            player->LearnSpell(15590, false); // Кулачное оружие
+                            break;
+                        }
                     }
+                    break;
+                }
                 case 7: // Улучшить навыки защиты и владения оружием до максимума
+                {
                     CloseGossipMenuFor(player);
                     //creature->Whisper(MSG_MAX_SKILL, LANG_UNIVERSAL, player, false);
                     player->UpdateWeaponsSkillsToMaxSkillsForLevel();
                     ChatHandler(player->GetSession()).PSendSysMessage("Ваши навыки защиты и владения оружием улучшены до максимума.");
                     break;
+                }
                 }
             }
             return true;
