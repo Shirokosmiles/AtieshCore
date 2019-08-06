@@ -1401,7 +1401,10 @@ void Guild::HandleQuery(WorldSession* session)
 {
     WorldPacket data(SMSG_GUILD_QUERY_RESPONSE, 8 * 32 + 200);      // Guess size
     data << uint32(m_id);
-    data << m_name;
+    if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_QUERY_OPCODE))
+        data << PrepareGuildNameByIdWithLvl(m_name, m_guildLevel);
+    else
+        data << m_name;
 
     // Rank name
     for (uint8 i = 0; i < GUILD_RANKS_MAX_COUNT; ++i)               // Always show 10 ranks

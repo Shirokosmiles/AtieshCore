@@ -634,6 +634,7 @@ class TC_GAME_API Guild
         uint64 GetBankMoney() const { return m_bankMoney; }
 
         bool SetName(std::string const& name);
+        std::string PrepareGuildNameByIdWithLvl(std::string const& guildName, uint32 level);
 
         // Handle client commands
         void HandleRoster(WorldSession* session);

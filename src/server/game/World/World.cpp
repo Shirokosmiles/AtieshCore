@@ -1485,6 +1485,8 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_DUEL_IN_SPECIAL_PHASE] = sConfigMgr->GetBoolDefault("DuelPhase.Enabled", false);
     // GuildSystem script
     m_bool_configs[CONFIG_GSYSTEM_IN_WHO_LIST] = sConfigMgr->GetBoolDefault("GSystem.WhoList.Enabled", false);
+    m_bool_configs[CONFIG_GSYSTEM_IN_QUERY_OPCODE] = sConfigMgr->GetBoolDefault("GSystem.QueryList.Enabled", false);
+
     // Vanish Fade Delay
     m_int_configs[CONFIG_VANISH_VISION_TIMER]                   = sConfigMgr->GetIntDefault("VanishVisionTimer", 600);
     m_int_configs[CONFIG_VANISH_CC_BREAK_TIMER]                 = sConfigMgr->GetIntDefault("VanishCCbreakTimer", 300);

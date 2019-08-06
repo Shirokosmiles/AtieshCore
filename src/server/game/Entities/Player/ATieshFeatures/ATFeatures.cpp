@@ -843,3 +843,11 @@ void Guild::RemoveGuildLevel(uint32 value)
     RemoveHigherGuildLevelAuras(m_guildLevel);
     UpdateLevelAndExp();
 }
+
+std::string Guild::PrepareGuildNameByIdWithLvl(std::string const& guildName, uint32 level)
+{
+    std::ostringstream str;
+    str << guildName << " (" << level << " level)";
+
+    return str.str();
+}

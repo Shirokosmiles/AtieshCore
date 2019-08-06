@@ -4559,6 +4559,13 @@ DuelPhase.Enabled = 0
 
 GSystem.WhoList.Enabled = 0
 
+#    GSystem.QueryList.Enabled
+#    Description: Make a visible guild level in query opcode (visible name/guild above character)
+#    Default:     0 - disabled
+#
+
+GSystem.QueryList.Enabled = 0
+
 #
 ###################################################################################################
 
