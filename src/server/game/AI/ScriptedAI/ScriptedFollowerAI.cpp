@@ -157,7 +157,7 @@ void FollowerAI::UpdateFollowerAI(uint32 /*uiDiff*/)
 
 void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, uint32 quest)
 {
-    if (Map* map = me->GetMap())
+    if (me->GetMap())
     {
         if (CreatureData const* cdata = me->GetCreatureData())
         {
