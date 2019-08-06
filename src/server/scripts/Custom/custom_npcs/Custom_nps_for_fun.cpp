@@ -382,7 +382,6 @@ public:
 
             switch (action)
             {
-
             case 100:
                 player->PlayerTalkClass->SendCloseGossip();
                 break;
@@ -2812,10 +2811,14 @@ public:
 
         void CompleteLearnProfession(Player *pPlayer, Creature *pCreature, SkillType skill)
         {
-            if (PlayerAlreadyHasTwoProfessions(pPlayer) && !IsSecondarySkill(skill));
+            if (PlayerAlreadyHasTwoProfessions(pPlayer) && !IsSecondarySkill(skill))
+                me->Whisper("You already know two professions!", LANG_UNIVERSAL, pPlayer, false);
+
             else
             {
-                if (!LearnAllRecipesInProfession(pPlayer, skill));
+                if (!LearnAllRecipesInProfession(pPlayer, skill))
+                    me->Whisper("Ooops, error", LANG_UNIVERSAL, pPlayer, false);
+
             }
         }
 
