@@ -22,6 +22,7 @@ void AddSC_landro_longshot();
 void AddSC_arena_spectator_script();
 void AddSC_PhasedDueling();
 void AddSC_GuildSystem();
+void AddSC_custom_npc();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -33,4 +34,5 @@ void AddCustomScripts()
     AddSC_arena_spectator_script();
     AddSC_PhasedDueling();
     AddSC_GuildSystem();
+    AddSC_custom_npc();
 }
