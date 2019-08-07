@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
 * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -19,25 +19,11 @@
 
 #include "AccountMgr.h"
 #include "Chat.h"
-#include "DatabaseEnv.h"
-#include "GossipDef.h"
-#include "GameTime.h"
-#include "GameEventMgr.h"
-#include "Player.h"
 #include "ScriptedGossip.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "Spell.h"
-#include "Map.h"
-#include "World.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
 #include "Item.h"
 #include "Language.h"
-#include "Log.h"
-#include <sstream>
-#include <string>
-#include <vector>
 
 #define CONST_ARENA_RENAME 100
 #define CONST_ARENA_CUSTOMIZE 100
@@ -297,37 +283,37 @@ public:
                         // стартовый пакет
                         switch (player->GetClass())
                         {
-                            case CLASS_WARRIOR:
-                                AddGossipItemFor(player, 0, LANG_ITEM_START_PACK_ITEM, GOSSIP_SENDER_MAIN, 83);
-                                break;
-                            case CLASS_PALADIN:
-                                AddGossipItemFor(player, 0, LANG_ITEM_START_PACK_ITEM, GOSSIP_SENDER_MAIN, 84);
-                                break;
-                            case CLASS_HUNTER:
-                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 85);
-                                break;
-                            case CLASS_ROGUE:
-                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 86);
-                                break;
-                            case CLASS_PRIEST:
-                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 87);
-                                break;
-                            case CLASS_DEATH_KNIGHT:
-                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 88);
-                                break;
-                            case CLASS_SHAMAN:
-                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 89);
-                                break;
-                            case CLASS_MAGE:
-                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 90);
-                                break;
-                            case CLASS_WARLOCK:
-                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 91);
-                                break;
-                            case CLASS_DRUID:
-                                AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 92);
-                                break;
-                            }
+                        case CLASS_WARRIOR:
+                            AddGossipItemFor(player, 0, LANG_ITEM_START_PACK_ITEM, GOSSIP_SENDER_MAIN, 83);
+                            break;
+                        case CLASS_PALADIN:
+                            AddGossipItemFor(player, 0, LANG_ITEM_START_PACK_ITEM, GOSSIP_SENDER_MAIN, 84);
+                            break;
+                        case CLASS_HUNTER:
+                            AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 85);
+                            break;
+                        case CLASS_ROGUE:
+                            AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 86);
+                            break;
+                        case CLASS_PRIEST:
+                            AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 87);
+                            break;
+                        case CLASS_DEATH_KNIGHT:
+                            AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 88);
+                            break;
+                        case CLASS_SHAMAN:
+                            AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 89);
+                            break;
+                        case CLASS_MAGE:
+                            AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 90);
+                            break;
+                        case CLASS_WARLOCK:
+                            AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 91);
+                            break;
+                        case CLASS_DRUID:
+                            AddGossipItemFor(player, 0, GTS(LANG_ITEM_START_PACK_ITEM), GOSSIP_SENDER_MAIN, 92);
+                            break;
+                        }
                     }
 
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);
@@ -1062,10 +1048,8 @@ public:
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_REMOVE_WEAKNESS), GOSSIP_SENDER_MAIN, 18);
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_GIVE_BUFFS), GOSSIP_SENDER_MAIN, 19);
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_VIP_BANK), GOSSIP_SENDER_MAIN, 20);
-                    //AddGossipItemFor(player, 0, "|TInterface\\icons\\Ability_mount_rocketmountblue:25:25:-15:0|tПолучить Вип Маунта", GOSSIP_SENDER_MAIN, 21); 
                     if (!player->IsInCombat() || !player->IsInFlight() || !player->GetMap()->IsBattlegroundOrArena() || !player->HasStealthAura() || !player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || !player->isDead())
                         AddGossipItemFor(player, 0, GTS(LANG_ITEM_REMOVE_COOLDOWN), GOSSIP_SENDER_MAIN, 22);
-                    //AddGossipItemFor(player, 0, "|TInterface/ICONS/spell_holy_borrowedtime:25:25:-15:0|t Сбросить 'КД' заданий", GOSSIP_SENDER_MAIN, 23);
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 3);
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                     break;
@@ -1149,12 +1133,6 @@ public:
                 }
                 case 17:
                 {
-                    /*if (player->HasAura(58712))
-                    {
-                        player->GetSession()->SendAreaTriggerMessage("%s", GTS(LANG_ITEM_MSG_COOLDOWN));
-                        CloseGossipMenuFor(player);
-                    }
-                    else */
                     if (!player->HasAura(26013))
                     {
                         player->PlayerTalkClass->SendCloseGossip();
@@ -1164,8 +1142,6 @@ public:
                     {
                         player->PlayerTalkClass->SendCloseGossip();
                         player->RemoveAurasDueToSpell(26013);
-                        //player->CastSpell(player, 34461, true);
-                        //player->CastSpell(player, 58712, true);
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_DESERTER_REMOVED);
                     }
                     break;
@@ -1200,22 +1176,6 @@ public:
                     player->GetSession()->SendShowBank(player->GetGUID());
                     break;
                 }
-                /* case 21:
-                {
-                    if (player->HasSpell(50281))
-                    {
-                        player->PlayerTalkClass->SendCloseGossip();
-                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_ALREADY_ITEM);
-                    }
-                    else
-                    {
-                        CloseGossipMenuFor(player);
-                        player->LearnSpell(50281, false); // Vip маунт
-                        break;
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cff006699Вы успешно получили вип маунта|r");
-                    }
-                    break;
-                }*/
                 case 22:
                 {
                     if (player->HasAura(45523))
