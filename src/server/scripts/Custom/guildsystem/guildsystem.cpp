@@ -451,7 +451,6 @@ public:
         GuildWars data;
         data.attackerGuildId = ownGuild->GetId();
         data.defenderGuildId = targetGuild->GetId();
-        data.winnerGuildId = 0;
         if (sGuildMgr->StartNewWar(data))
             handler->PSendSysMessage("Your Guild started War with %s", guildName);
 

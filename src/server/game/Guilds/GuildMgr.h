@@ -29,11 +29,18 @@ struct GuildWars
 {
     uint32 attackerGuildId;
     uint32 defenderGuildId;
-    time_t timeOfStartWar;
-    time_t timeOfEndWar;
-    uint32 winnerGuildId;
 };
 typedef std::unordered_map<uint32, GuildWars> GuildWarsContainer;
+
+struct GuildWarsHistory
+{
+    std::string attackerGuild;
+    std::string defenderGuild;
+    time_t timeOfStartWar;
+    time_t timeOfEndWar;
+    std::string winnerGuild;
+};
+typedef std::unordered_map<uint32, GuildWarsHistory> GuildWarsHistoryContainer;
 
 class TC_GAME_API GuildMgr
 {
@@ -56,6 +63,7 @@ public:
 
     void LoadGuilds();
     void LoadGuildWarData();
+    void LoadGuildWarHistory();
     void AddGuild(Guild* guild);
     void RemoveGuild(ObjectGuid::LowType guildId);
 
@@ -76,6 +84,7 @@ protected:
     GuildContainer GuildStore;
     
     GuildWarsContainer _guildWarStore;
+    GuildWarsHistoryContainer _guildWarHistoryStore;
 };
 
 #define sGuildMgr GuildMgr::instance()

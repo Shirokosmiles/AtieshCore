@@ -2059,6 +2059,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Guilds Wars...");
     sGuildMgr->LoadGuildWarData();
 
+    TC_LOG_INFO("server.loading", "Loading Guilds Wars History...");
+    sGuildMgr->LoadGuildWarHistory();
+
     TC_LOG_INFO("server.loading", "Loading ArenaTeams...");
     sArenaTeamMgr->LoadArenaTeams();
 
