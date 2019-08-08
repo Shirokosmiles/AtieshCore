@@ -11344,7 +11344,11 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
         if (Player* killerPlr = attacker->ToPlayer())
         {
             if (Player* killedPlr = victim->ToPlayer())
+            {
                 sScriptMgr->OnPVPKill(killerPlr, killedPlr);
+                if (killerPlr->IsInGuildWarWith(killedPlr))
+                    sScriptMgr->OnGuildKillGuildEnemyEvent(killerPlr->GetGuild(), killerPlr);
+            }
             else if (Creature* killedCre = victim->ToCreature())
                 sScriptMgr->OnCreatureKill(killerPlr, killedCre);
         }

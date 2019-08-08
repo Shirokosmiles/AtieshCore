@@ -806,6 +806,8 @@ class TC_GAME_API GuildScript : public ScriptObject
         virtual void OnBattlegroundWon(Guild* /*guild*/, Player* /*player*/) { }
 
         virtual void OnLFGComplete(Guild* /*guild*/, Player* /*player*/) { }
+
+        virtual void OnKillGuildEnemyEvent(Guild* /*guild*/, Player* /*killer*/) { }
 };
 
 class TC_GAME_API GroupScript : public ScriptObject
@@ -1084,6 +1086,7 @@ class TC_GAME_API ScriptMgr
         void OnGuildArenaWonMemberEvent(Guild* guild, Player* player);
         void OnGuildBattlegrroundWonMemberEvent(Guild* guild, Player* player);
         void OnGuildLFGCompleteEvent(Guild* guild, Player* player);
+        void OnGuildKillGuildEnemyEvent(Guild* guild, Player* killer);
 
     public: /* GroupScript */
 

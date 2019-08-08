@@ -113,6 +113,12 @@ public:
         guild->UpdateGuildWarFlag(false);
     }
 
+    void OnKillGuildEnemyEvent(Guild* guild, Player* killer) override
+    {
+        uint32 receivedExp = 1;
+        guild->AddGuildExp(receivedExp, killer);
+    }
+
     void OnAddMember(Guild* guild, Player* player, uint8& /*plRank*/) override
     {
         player->AddGuildAurasForPlr(guild->GetGuildLevel());

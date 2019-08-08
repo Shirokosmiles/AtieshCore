@@ -2125,6 +2125,11 @@ void ScriptMgr::OnGuildLFGCompleteEvent(Guild* guild, Player* player)
     FOREACH_SCRIPT(GuildScript)->OnLFGComplete(guild, player);
 }
 
+void ScriptMgr::OnGuildKillGuildEnemyEvent(Guild* guild, Player* killer)
+{
+    FOREACH_SCRIPT(GuildScript)->OnKillGuildEnemyEvent(guild, killer);
+}
+
 // Group
 void ScriptMgr::OnGroupAddMember(Group* group, ObjectGuid guid)
 {
