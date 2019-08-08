@@ -909,6 +909,9 @@ class TC_GAME_API Unit : public WorldObject
         // faction template id
         uint32 GetFaction() const override { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
         void SetFaction(uint32 faction) override { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction); }
+        // GSystem
+        uint32 GetGuildWarFaction() const;
+        void UpdateFactionForSelfAndControllList();
 
         bool IsInPartyWith(Unit const* unit) const;
         bool IsInRaidWith(Unit const* unit) const;

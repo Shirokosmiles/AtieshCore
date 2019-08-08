@@ -25,6 +25,16 @@
 
 class Guild;
 
+struct GuildWars
+{
+    uint32 attackerGuildId;
+    uint32 defenderGuildId;
+    time_t timeOfStartWar;
+    time_t timeOfEndWar;
+    uint32 winnerGuildId;
+};
+typedef std::unordered_map<uint32, GuildWars> GuildWarsContainer;
+
 class TC_GAME_API GuildMgr
 {
 private:
@@ -42,10 +52,19 @@ public:
     std::string GetGuildNameById(ObjectGuid::LowType guildId) const;
     std::string GetGuildNameByIdWithLvl(ObjectGuid::LowType guildId) const;
     std::string GetGuildNameWithGLvl(std::string const& guildName, uint32 level) const;
+    std::string GetGuildEnemy(ObjectGuid::LowType guildId) const;
 
     void LoadGuilds();
+    void LoadGuildWarData();
     void AddGuild(Guild* guild);
     void RemoveGuild(ObjectGuid::LowType guildId);
+
+    // GSystem
+    bool GuildHasWarState(ObjectGuid::LowType firstguildId);
+    bool IsGuildsInWar(ObjectGuid::LowType firstguildId, ObjectGuid::LowType secondguildId);
+    bool StartNewWar(GuildWars& data);
+    void StopWarBetween(ObjectGuid::LowType firstguildId, ObjectGuid::LowType secondguildId, ObjectGuid::LowType winnerguildId);
+    void StopAllGuildWarsFor(ObjectGuid::LowType guildId); // Stop all GW before Disband
 
     ObjectGuid::LowType GenerateGuildId();
     void SetNextGuildId(ObjectGuid::LowType Id) { NextGuildId = Id; }
@@ -55,6 +74,8 @@ protected:
     typedef std::unordered_map<ObjectGuid::LowType, Guild*> GuildContainer;
     ObjectGuid::LowType NextGuildId;
     GuildContainer GuildStore;
+    
+    GuildWarsContainer _guildWarStore;
 };
 
 #define sGuildMgr GuildMgr::instance()

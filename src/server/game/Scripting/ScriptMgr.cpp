@@ -2090,6 +2090,16 @@ void ScriptMgr::OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, Obj
     FOREACH_SCRIPT(GuildScript)->OnBankEvent(guild, eventType, tabId, playerGuid, itemOrMoney, itemStackCount, destTabId);
 }
 
+void ScriptMgr::OnGuildEnteredInGuildWar(Guild* guild, std::string const& guildName)
+{
+    FOREACH_SCRIPT(GuildScript)->EnteredInGuildWar(guild, guildName);
+}
+
+void ScriptMgr::OnGuildLeftInGuildWar(Guild* guild, std::string const& guildName, std::string const& winnerguildName)
+{
+    FOREACH_SCRIPT(GuildScript)->LeftInGuildWar(guild, guildName, winnerguildName);
+}
+
 void ScriptMgr::OnGuildLevelUpEvent(Guild* guild, Player* player, uint32 receivedLevel)
 {
     FOREACH_SCRIPT(GuildScript)->OnLevelUp(guild, player, receivedLevel);

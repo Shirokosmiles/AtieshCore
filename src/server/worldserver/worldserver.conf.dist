@@ -45,7 +45,6 @@
 #    MISC ANTI-CHEAT SETTINGS
 #    TRANSMOGRIFICATION CONFIG
 #    CROSSFACTION BG CONFIG
-#    GUILD LOOT CONFIG
 #    FIRST LOGIN ACC BONUS CONFIG
 #    VIP SYSTEM CONFIG
 #
@@ -4480,21 +4479,6 @@ CrossfactionBG.enable = 1
 
 ###################################################################################################
 #
-# GUILD LOOT CONFIG
-#
-#    Description: Guild announce when member take a loot with Quality >= EPIC
-#    Default:     1 - enabled
-#
-#    Guild.LootBroadcast.Enabled = 1 - enabled.
-#    Guild.LootBroadcast.Enabled = 0 - disabled.
-
-Guild.LootBroadcast.Enabled = 1
-
-#
-###################################################################################################
-
-###################################################################################################
-#
 # FIRST LOGIN ACC BONUS CONFIG
 #
 #    Description: First character on account will receive a money bonus
@@ -4551,20 +4535,34 @@ DuelPhase.Enabled = 0
 ###################################################################################################
 #
 # GuildSystem
+
+#    Description: Guild announce when member take a loot with Quality >= EPIC
+#    Default:     1 - enabled
 #
-#    GSystem.WhoList.Enabled
+#    Guild.LootBroadcast.Enabled = 1 - enabled.
+#    Guild.LootBroadcast.Enabled = 0 - disabled.
+
+Guild.LootBroadcast.Enabled = 1
+
+#
+#    GSystem.ShowLevelGuild.WhoList
 #    Description: Make a visible guild level in WhoList
 #    Default:     0 - disabled
 #
 
-GSystem.WhoList.Enabled = 0
+GSystem.ShowLevelGuild.WhoList.Enabled = 0
 
-#    GSystem.QueryList.Enabled
+#    GSystem.ShowLevelGuild.EnemyList
+#    Description: Make a visible guild level in Guild Wars info
+#    Default:     0 - disabled
+
+GSystem.ShowLevelGuild.EnemyList.Enabled = 0
+
+#    GSystem.ShowLevelGuild.QueryList
 #    Description: Make a visible guild level in query opcode (visible name/guild above character)
 #    Default:     0 - disabled
-#
 
-GSystem.QueryList.Enabled = 0
+GSystem.ShowLevelGuild.QueryList.Enabled = 0
 
 #
 ###################################################################################################

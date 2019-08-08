@@ -1587,6 +1587,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool IsGroupVisibleFor(Player const* p) const;
         bool IsInSameGroupWith(Player const* p) const;
         bool IsInSameRaidWith(Player const* p) const;
+        bool IsInGuildWarWith(Player const* p) const;
         void UninviteFromGroup();
         static void RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT, ObjectGuid kicker = ObjectGuid::Empty, char const* reason = nullptr);
         void RemoveFromGroup(RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT) { RemoveFromGroup(GetGroup(), GetGUID(), method); }
@@ -1598,6 +1599,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
         uint32 GetGuildId() const { return GetUInt32Value(PLAYER_GUILDID);  }
         Guild* GetGuild();
+        Guild* GetGuild() const;
         int GetGuildIdInvited() const { return m_GuildIdInvited; }
         static void RemovePetitionsAndSigns(ObjectGuid guid, CharterTypes type);
 
@@ -1829,6 +1831,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void AddGuildAurasForPlr(uint32 level);
         void RemoveGuildAurasForPlr();
         void UpdateGuildFields(uint32 guildId, uint8 rank);
+        void UpdGuildQuery(Guild* guild);
         void ClearUpdValues() { m_updGRank = 0; m_updGId = 0; }
         //End of Custom Systems
 
@@ -1888,6 +1891,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         static uint32 TeamForRace(uint8 race);
         TeamId GetTeamId() const { return GetTeam() == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE; }
+        TeamId GetCFSTeamId() const { return GetCFSTeam() == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE; }
         void SetFactionForRace(uint8 race);
 
         void InitDisplayIds();

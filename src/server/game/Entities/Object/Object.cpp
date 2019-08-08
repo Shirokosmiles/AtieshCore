@@ -2636,6 +2636,10 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
                 if (selfPlayerOwner->duel && selfPlayerOwner->duel->Opponent == targetPlayerOwner && selfPlayerOwner->duel->State == DUEL_STATE_IN_PROGRESS)
                     return REP_HOSTILE;
 
+                // GSystem - enemysystem always hostile to opponent
+                if (selfPlayerOwner->IsInGuildWarWith(targetPlayerOwner))
+                    return REP_HOSTILE;
+
                 // same group - checks dependant only on our faction - skip FFA_PVP for example
                 if (selfPlayerOwner->IsInRaidWith(targetPlayerOwner))
                     return REP_FRIENDLY; // return true to allow config option AllowTwoSide.Interaction.Group to work

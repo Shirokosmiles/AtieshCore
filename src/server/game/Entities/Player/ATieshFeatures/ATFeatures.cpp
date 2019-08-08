@@ -21,7 +21,9 @@
 #include "Chat.h"
 #include "Item.h"
 #include "Player.h"
+#include "GridNotifiersImpl.h"
 #include "Guild.h"
+#include "GuildMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "ScriptMgr.h"
@@ -759,6 +761,48 @@ void Player::UpdateGuildFields(uint32 guildId, uint8 rank)
     m_updGRank = rank;
 }
 
+void Player::UpdGuildQuery(Guild* guild)
+{
+    if (!IsInWorld())
+        return;
+
+    std::list<Player*> targets;
+    Trinity::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange(), false);
+    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, GetVisibilityRange());
+    for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+    {
+        Player* player = (*iter);
+        if (!player->HaveAtClient(this))
+            continue;
+
+        guild->HandleQuery(player->GetSession());
+    }
+}
+
+bool Player::IsInGuildWarWith(Player const* p) const
+{
+    if (!GetGuild())
+        return false;
+
+    if (!p->GetGuild())
+        return false;
+
+    if (GetBattleground())
+        return false;
+
+    if (p->GetBattleground())
+        return false;
+
+    return sGuildMgr->IsGuildsInWar(GetGuild()->GetId(), p->GetGuild()->GetId());
+}
+
+Guild* Player::GetGuild() const
+{
+    uint32 guildId = GetGuildId();
+    return guildId ? sGuildMgr->GetGuildById(guildId) : nullptr;
+}
+
 void Guild::UpdateLevelAndExp()
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_LEVELANDEXP);
@@ -794,13 +838,31 @@ void Guild::UpdateQueryStateForPlayers()
         {
             if (player->IsInWorld())
             {
-                HandleQuery(player->GetSession());
                 uint8 temprank = player->GetRank();
                 player->SetInGuild(0);
                 player->SetRank(0);
                 player->UpdateGuildFields(GetId(), temprank);
+                player->UpdGuildQuery(this);
             }
         }
+    }
+}
+
+void Guild::UpdateGuildWarFlag(bool startGW)
+{
+    for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        if (Player* player = itr->second->FindConnectedPlayer())
+            if (player->IsInWorld())
+            {
+                if (startGW)
+                {
+                    if (!player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
+                        player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+                    player->InitPvP();
+                }
+                player->UpdateFactionForSelfAndControllList();
+            }
     }
 }
 

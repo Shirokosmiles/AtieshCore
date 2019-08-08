@@ -615,8 +615,10 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_GET_CHARACTERS_ONLINE_ON_ACCOUNT, "SELECT guid FROM characters WHERE online > 0 AND account = ?", CONNECTION_SYNCH);
     // PVP Reward weekly cap
     PrepareStatement(CHAR_UPD_RESET_PVPWEEKLYCAP, "UPDATE characters SET pvpweeklycap = 0", CONNECTION_ASYNC);
-    // Guild Level, Expirience
+    // Guild Level, Experience
     PrepareStatement(CHAR_UPD_GUILD_LEVELANDEXP, "UPDATE guild SET GuildLevel = ?, GuildExperience = ? WHERE guildid = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_GUILD_WAR_START, "INSERT INTO guild_wars (id, Attacker_guild_Id, Defender_guild_Id) VALUES (?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UPD_GUILD_WAR_STOP, "UPDATE guild_wars SET time_of_end = NOW(), winner = ? WHERE id = ?", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

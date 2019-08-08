@@ -695,6 +695,7 @@ class TC_GAME_API Guild
         void MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 maxLevel, uint32 minRank);
 
         void UpdateLevelAndExp();
+        void UpdateGuildWarFlag(bool startGW);
         void CastGuildLevelAuras(uint32 level);
         void UpdateQueryStateForPlayers();
         void RemoveHigherGuildLevelAuras(uint32 level);

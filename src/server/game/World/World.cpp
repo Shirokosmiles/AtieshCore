@@ -1484,8 +1484,9 @@ void World::LoadConfigSettings(bool reload)
     // Duel Phase script
     m_bool_configs[CONFIG_DUEL_IN_SPECIAL_PHASE] = sConfigMgr->GetBoolDefault("DuelPhase.Enabled", false);
     // GuildSystem script
-    m_bool_configs[CONFIG_GSYSTEM_IN_WHO_LIST] = sConfigMgr->GetBoolDefault("GSystem.WhoList.Enabled", false);
-    m_bool_configs[CONFIG_GSYSTEM_IN_QUERY_OPCODE] = sConfigMgr->GetBoolDefault("GSystem.QueryList.Enabled", false);
+    m_bool_configs[CONFIG_GSYSTEM_IN_WHO_LIST] = sConfigMgr->GetBoolDefault("GSystem.ShowLevelGuild.WhoList.Enabled", false);
+    m_bool_configs[CONFIG_GSYSTEM_IN_GUILDENEMY_LIST] = sConfigMgr->GetBoolDefault("GSystem.ShowLevelGuild.EnemyList.Enabled", false);
+    m_bool_configs[CONFIG_GSYSTEM_IN_QUERY_OPCODE] = sConfigMgr->GetBoolDefault("GSystem.ShowLevelGuild.QueryList.Enabled", false);
 
     // Vanish Fade Delay
     m_int_configs[CONFIG_VANISH_VISION_TIMER]                   = sConfigMgr->GetIntDefault("VanishVisionTimer", 600);
@@ -2054,6 +2055,9 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading Guilds...");
     sGuildMgr->LoadGuilds();
+
+    TC_LOG_INFO("server.loading", "Loading Guilds Wars...");
+    sGuildMgr->LoadGuildWarData();
 
     TC_LOG_INFO("server.loading", "Loading ArenaTeams...");
     sArenaTeamMgr->LoadArenaTeams();

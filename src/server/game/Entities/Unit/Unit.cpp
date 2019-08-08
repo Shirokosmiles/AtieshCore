@@ -12034,6 +12034,40 @@ TransportBase* Unit::GetDirectTransport() const
     return GetTransport();
 }
 
+uint32 Unit::GetGuildWarFaction() const
+{
+    if (ToPlayer())
+    {
+        if (ToPlayer()->GetCFSTeamId() == TEAM_ALLIANCE)
+            return 2;
+        else
+            return 1;
+    }
+    else if (ToPet() || ToTotem())
+    {
+        if (Unit* owner = GetCharmerOrOwner())
+        {
+            if (owner->ToPlayer())
+            {
+                if (owner->ToPlayer()->GetCFSTeamId() == TEAM_ALLIANCE)
+                    return 2;
+                else
+                    return 1;
+            }
+        }
+    }
+
+    return GetFaction();
+}
+
+void Unit::UpdateFactionForSelfAndControllList()
+{
+    ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
+
+    for (Unit* unit : m_Controlled)
+        unit->ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
+}
+
 bool Unit::IsInPartyWith(Unit const* unit) const
 {
     if (this == unit)
@@ -13603,6 +13637,27 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
             else if (index == UNIT_FIELD_BYTES_2 || index == UNIT_FIELD_FACTIONTEMPLATE)
             {
                 bool ConfigAccessGroups = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) || sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP);
+                bool inGuildWar = false;
+                if (ToPlayer() && target->ToPlayer())
+                    if (ToPlayer()->IsInGuildWarWith(target->ToPlayer()))
+                        inGuildWar = true;
+
+                if (target->ToPet() || target->ToTotem())
+                {
+                    if (Unit* targetPlr = target->GetCharmerOrOwner())
+                        if (targetPlr->ToPlayer() && ToPlayer())
+                            if (ToPlayer()->IsInGuildWarWith(target->ToPlayer()))
+                                inGuildWar = true;
+                }
+
+                if (ToPet() || ToTotem())
+                {
+                    if (Unit* thisOwner = GetCharmerOrOwner())
+                        if (thisOwner->ToPlayer() && target->ToPlayer())
+                            if (thisOwner->ToPlayer()->IsInGuildWarWith(target->ToPlayer()))
+                                inGuildWar = true;
+                }
+                
                 if (IsControlledByPlayer() && target != this && ConfigAccessGroups && IsInRaidWith(target))
                 {
                     FactionTemplateEntry const* ft1 = GetFactionTemplateEntry();
@@ -13618,6 +13673,13 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                     }
                     else
                         fieldBuffer << m_uint32Values[index];
+                }
+                else if (inGuildWar)
+                {
+                    if (index == UNIT_FIELD_BYTES_2)
+                        fieldBuffer << m_uint32Values[index];
+                    else if (index == UNIT_FIELD_FACTIONTEMPLATE)
+                        fieldBuffer << uint32(target->GetGuildWarFaction());
                 }
                 else
                     fieldBuffer << m_uint32Values[index];

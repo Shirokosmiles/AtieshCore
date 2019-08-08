@@ -39,7 +39,15 @@ public:
     void OnLogin(Player* player, bool /*firstLogin*/) override
     {
         if (Guild* guildtarget = player->GetGuild())
+        {
             player->AddGuildAurasForPlr(guildtarget->GetGuildLevel());
+            if (sGuildMgr->GuildHasWarState(guildtarget->GetId()))
+            {
+                if (!player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
+                    player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+                player->InitPvP();
+            }
+        }
     }
 
     void OnLogout(Player* player) override
@@ -74,14 +82,53 @@ public:
         return str.str();
     }
 
+    std::string GetNameOFGuildNewEnemy(std::string const& guildName) const
+    {
+        std::ostringstream str;
+        str << "The guild has entered in Guild War with " << guildName;
+        return str.str();
+    }
+
+    std::string GetNameOFGuildOldEnemyAndWinner(std::string const& guildName, std::string const& winnerguildName) const
+    {
+        std::ostringstream str;
+        str << "The guild has ended Guild War with " << guildName << ". Winner of this Guild War : " << winnerguildName;
+        return str.str();
+    }
+
+    void OnDisband(Guild* guild) override
+    {
+        sGuildMgr->StopAllGuildWarsFor(guild->GetId());
+    }
+
+    void EnteredInGuildWar(Guild* guild, std::string const& guildName) override
+    {
+        guild->BroadcastToGuildNote(GetNameOFGuildNewEnemy(guildName));
+        guild->UpdateGuildWarFlag(true);
+    }
+
+    void LeftInGuildWar(Guild* guild, std::string const& guildName, std::string const& winnerguildName) override
+    {
+        guild->BroadcastToGuildNote(GetNameOFGuildOldEnemyAndWinner(guildName, winnerguildName));
+        guild->UpdateGuildWarFlag(false);
+    }
+
     void OnAddMember(Guild* guild, Player* player, uint8& /*plRank*/) override
     {
         player->AddGuildAurasForPlr(guild->GetGuildLevel());
+        if (sGuildMgr->GuildHasWarState(guild->GetId()))
+        {
+            if (!player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
+                player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+            player->InitPvP();
+            player->UpdateFactionForSelfAndControllList();
+        }
     }
 
     void OnRemoveMember(Guild* /*guild*/, Player* player, bool /*isDisbanding*/, bool /*isKicked*/) override
     {
         player->RemoveGuildAurasForPlr();
+        player->UpdateFactionForSelfAndControllList();
     }
 
     void OnLevelUp(Guild* guild, Player* player, uint32 receivedLevel) override
@@ -160,6 +207,12 @@ public:
 
     std::vector<ChatCommand> GetCommands() const override
     {
+        static std::vector<ChatCommand> warCommandTable =
+        {
+            { "start",          rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleStartWarGuildProgressCommand, "" },
+            { "stop",           rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleStopWarGuildProgressCommand,  "" },
+            { "",               rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleWarGuildProgressCommand,      "" },
+        };
         static std::vector<ChatCommand> guildProgressCommandTable =
         {
             { "addexperience",  rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildAddExperienceCommand, "" },
@@ -167,6 +220,7 @@ public:
             { "removelevel",    rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildRemoveLevelCommand,   "" },
             { "repair",         rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildRepairCommand,        "" },
             { "mybank",         rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildMyBankCommand,        "" },
+            { "war",            rbac::RBAC_PERM_COMMAND_GUILD_INFO,     false, nullptr,           "", warCommandTable },
             { "",               rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildProgressCommand,      "" },
         };
         static std::vector<ChatCommand> commandTable =
@@ -339,6 +393,97 @@ public:
         }
 
         handler->GetSession()->SendShowBank(player->GetGUID());
+        return true;
+    }
+
+    static bool HandleWarGuildProgressCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        Guild* targetGuild = player->GetGuild();
+        if (!targetGuild)
+            return false;
+        // Display Guild Information
+        if (!sGuildMgr->GuildHasWarState(targetGuild->GetId()))
+            handler->PSendSysMessage("Guild has not enemies "); // Extra Information
+        else
+            handler->PSendSysMessage("Guild has next emeies: %s ", sGuildMgr->GetGuildEnemy(targetGuild->GetId())); // Extra Information
+        return true;
+    }
+
+    static bool HandleStartWarGuildProgressCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        Guild* ownGuild = player->GetGuild();
+        if (!ownGuild)
+            return false;
+
+        if (!*args)
+            return false;
+
+        char* guildStr = handler->extractQuotedArg((char*)args);
+        if (!guildStr)
+            return false;
+
+        std::string guildName = guildStr;
+
+        Guild* targetGuild = sGuildMgr->GetGuildByName(guildName);
+        if (!targetGuild)
+            return false;
+
+        if (sGuildMgr->IsGuildsInWar(ownGuild->GetId(), targetGuild->GetId()))
+        {
+            handler->PSendSysMessage("Guild %s already is enemy of your guild", guildName);
+            return true;
+        }
+
+        GuildWars data;
+        data.attackerGuildId = ownGuild->GetId();
+        data.defenderGuildId = targetGuild->GetId();
+        data.winnerGuildId = 0;
+        if (sGuildMgr->StartNewWar(data))
+            handler->PSendSysMessage("Your Guild started War with %s", guildName);
+
+        return true;
+    }
+
+    static bool HandleStopWarGuildProgressCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        Guild* ownGuild = player->GetGuild();
+        if (!ownGuild)
+            return false;
+
+        if (!*args)
+            return false;
+
+        char* guildStr = handler->extractQuotedArg((char*)args);
+        if (!guildStr)
+            return false;
+
+        std::string guildName = guildStr;
+
+        Guild* targetGuild = sGuildMgr->GetGuildByName(guildName);
+        if (!targetGuild)
+            return false;
+
+        if (!sGuildMgr->IsGuildsInWar(ownGuild->GetId(), targetGuild->GetId()))
+        {
+            handler->PSendSysMessage("Guild %s is not enemy of your guild", guildName);
+            return true;
+        }
+                
+        sGuildMgr->StopWarBetween(ownGuild->GetId(), targetGuild->GetId(), targetGuild->GetId());
+        handler->PSendSysMessage("Your Guild has stopped War with %s", guildName);
+
         return true;
     }
 };
