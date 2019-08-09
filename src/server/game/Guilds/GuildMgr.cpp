@@ -69,17 +69,17 @@ std::string GuildMgr::GetGuildEnemy(ObjectGuid::LowType guildId) const
         if (itr->second.attackerGuildId == guildId)
         {
             if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
-                str << GetGuildNameByIdWithLvl(itr->second.defenderGuildId) << "\n";
+                str << GetGuildNameByIdWithLvl(itr->second.defenderGuildId) << "\n|cFFF00000";
             else
-                str << GetGuildNameById(itr->second.defenderGuildId) << "\n";
+                str << GetGuildNameById(itr->second.defenderGuildId) << "\n|cFFF00000";
         }
 
         if (itr->second.defenderGuildId == guildId)
         {
             if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
-                str << GetGuildNameByIdWithLvl(itr->second.attackerGuildId) << "\n";
+                str << GetGuildNameByIdWithLvl(itr->second.attackerGuildId) << "\n|cFFF00000";
             else
-                str << GetGuildNameById(itr->second.attackerGuildId) << "\n";
+                str << GetGuildNameById(itr->second.attackerGuildId) << "\n|cFFF00000";
         }
     }
 
@@ -216,6 +216,8 @@ bool GuildMgr::StartNewWar(GuildWars& data)
     if (!firstguild || !secondguild)
         return false;
 
+    firstguild->UpdateGuildWarFlag(true);
+    secondguild->UpdateGuildWarFlag(true);
     sScriptMgr->OnGuildEnteredInGuildWar(firstguild, defenderName);
     sScriptMgr->OnGuildEnteredInGuildWar(secondguild, attackerName);
     return true;
@@ -224,7 +226,7 @@ bool GuildMgr::StartNewWar(GuildWars& data)
 void GuildMgr::StopWarBetween(ObjectGuid::LowType firstguildId, ObjectGuid::LowType secondguildId, ObjectGuid::LowType winnerguildId)
 {
     uint32 WarId = 0;
-    for (GuildWarsContainer::iterator itr = _guildWarStore.begin(); itr != _guildWarStore.end(); ++itr)
+    for (GuildWarsContainer::const_iterator itr = _guildWarStore.begin(); itr != _guildWarStore.end(); ++itr)
     {
         bool firstGIsAttacker = itr->second.attackerGuildId == firstguildId && itr->second.defenderGuildId == secondguildId;
         if (firstGIsAttacker)
@@ -266,19 +268,24 @@ void GuildMgr::StopWarBetween(ObjectGuid::LowType firstguildId, ObjectGuid::LowT
     if (!firstguild || !secondguild)
         return;
 
+    if (!GuildHasWarState(firstguildId))
+        firstguild->UpdateGuildWarFlag(false);
+    if (!GuildHasWarState(secondguildId))
+        secondguild->UpdateGuildWarFlag(false);
+
     sScriptMgr->OnGuildLeftInGuildWar(firstguild, GetGuildNameByIdWithLvl(secondguildId), winnerName);
     sScriptMgr->OnGuildLeftInGuildWar(secondguild, GetGuildNameByIdWithLvl(firstguildId), winnerName);
 }
 
 void GuildMgr::StopAllGuildWarsFor(ObjectGuid::LowType guildId)
 {
-    for (GuildWarsContainer::iterator itr = _guildWarStore.begin(); itr != _guildWarStore.end(); ++itr)
+    for (GuildWarsHistoryContainer::const_iterator itr = _guildWarHistoryStore.begin(); itr != _guildWarHistoryStore.end(); ++itr)
     {
-        bool firstGIsAttacker = itr->second.attackerGuildId == guildId;
+        bool firstGIsAttacker = itr->second.attackerGuildId == guildId && itr->second.winnerGuild == "";
         if (firstGIsAttacker)
             StopWarBetween(guildId, itr->second.defenderGuildId, itr->second.defenderGuildId);
 
-        bool secondGIsAttacker = itr->second.defenderGuildId == guildId;
+        bool secondGIsAttacker = itr->second.defenderGuildId == guildId && itr->second.winnerGuild == "";
         if (secondGIsAttacker)
             StopWarBetween(guildId, itr->second.attackerGuildId, itr->second.attackerGuildId);
     }

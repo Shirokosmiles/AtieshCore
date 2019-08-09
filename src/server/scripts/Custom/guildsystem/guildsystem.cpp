@@ -76,13 +76,11 @@ public:
     void EnteredInGuildWar(Guild* guild, std::string const& guildName) override
     {
         guild->BroadcastToGuildEnteredInGWWith(guildName);
-        guild->UpdateGuildWarFlag(true);
     }
 
     void LeftInGuildWar(Guild* guild, std::string const& guildName, std::string const& winnerguildName) override
     {
         guild->BroadcastToGuildEndedGWWith(guildName, winnerguildName);
-        guild->UpdateGuildWarFlag(false);
     }
 
     void OnAddMember(Guild* guild, Player* player, uint8& /*plRank*/) override

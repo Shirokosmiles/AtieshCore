@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -1004,7 +1004,7 @@ bool Guild::CanStartGuildWarByTimer(WorldSession* session, std::string& msg)
     {
         time_t deltaStart = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_START);
         time_t timeOfPossible = dateLastWarStart + deltaStart;
-        if (now - timeOfPossible < deltaStart)
+        if (timeOfPossible > now)
         {
             msg = NotEnoughTimer(session, timeOfPossible);
             return false;
@@ -1015,7 +1015,7 @@ bool Guild::CanStartGuildWarByTimer(WorldSession* session, std::string& msg)
     {
         time_t deltaEnd = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_END);
         time_t timeOfPossible = dateLastWarEnd + deltaEnd;
-        if (now - timeOfPossible < deltaEnd)
+        if (timeOfPossible > now)
         {            
             msg = NotEnoughTimer(session, timeOfPossible);
             return false;
