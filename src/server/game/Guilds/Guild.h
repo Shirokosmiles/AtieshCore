@@ -713,6 +713,7 @@ class TC_GAME_API Guild
         void AddGuildExp(uint32 value, Player* player, bool randombonus = false);
         void AddGuildLevel(uint32 value, Player* player);
         void RemoveGuildLevel(uint32 value, Player* player);
+        bool CanStartGuildWarByGuildRights(WorldSession* session);
         bool CanStartGuildWarByCount(WorldSession* session, std::string& msg, bool defendGuild);
         bool CanStartGuildWarByTimer(WorldSession* session, std::string& msg);
         uint32 GetGuildLevel() const { return m_guildLevel; }

@@ -192,23 +192,23 @@ public:
     {
         static std::vector<ChatCommand> warCommandTable =
         {
-            { "start",          rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleStartWarGuildProgressCommand, "" },
-            { "stop",           rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleStopWarGuildProgressCommand,  "" },
-            { "",               rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleWarGuildProgressCommand,      "" },
+            { "start",          rbac::RBAC_PERM_GSYSTEM_COMMANDS,     true, &HandleStartWarGuildProgressCommand, "" },
+            { "stop",           rbac::RBAC_PERM_GSYSTEM_COMMANDS,     true, &HandleStopWarGuildProgressCommand,  "" },
+            { "",               rbac::RBAC_PERM_GSYSTEM_COMMANDS,     true, &HandleWarGuildProgressCommand,      "" },
         };
         static std::vector<ChatCommand> guildProgressCommandTable =
         {
-            { "addexperience",  rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildAddExperienceCommand, "" },
-            { "addlevel",       rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildAddLevelCommand,      "" },
-            { "removelevel",    rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildRemoveLevelCommand,   "" },
-            { "repair",         rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildRepairCommand,        "" },
-            { "mybank",         rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildMyBankCommand,        "" },
-            { "war",            rbac::RBAC_PERM_COMMAND_GUILD_INFO,     false, nullptr,           "", warCommandTable },
-            { "",               rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildProgressCommand,      "" },
+            { "addexperience",  rbac::RBAC_PERM_GSYSTEM_COMMANDS,     true, &HandleGuildAddExperienceCommand, "" },
+            { "addlevel",       rbac::RBAC_PERM_GSYSTEM_COMMANDS,     true, &HandleGuildAddLevelCommand,      "" },
+            { "removelevel",    rbac::RBAC_PERM_GSYSTEM_COMMANDS,     true, &HandleGuildRemoveLevelCommand,   "" },
+            { "repair",         rbac::RBAC_PERM_GSYSTEM_COMMANDS,     true, &HandleGuildRepairCommand,        "" },
+            { "mybank",         rbac::RBAC_PERM_GSYSTEM_COMMANDS,     true, &HandleGuildMyBankCommand,        "" },
+            { "war",            rbac::RBAC_PERM_GSYSTEM_COMMANDS,     false, nullptr,           "", warCommandTable },
+            { "",               rbac::RBAC_PERM_GSYSTEM_COMMANDS,     true, &HandleGuildProgressCommand,      "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "gprogress",  rbac::RBAC_PERM_COMMAND_GUILD,  true, nullptr, "", guildProgressCommandTable },
+            { "gprogress",  rbac::RBAC_PERM_GSYSTEM_COMMANDS,  true, nullptr, "", guildProgressCommandTable },
         };
         return commandTable;
     }
@@ -468,6 +468,12 @@ public:
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
         {
             handler->PSendSysMessage("Guild Wars disabled");
+            return true;
+        }
+
+        if (!ownGuild->CanStartGuildWarByGuildRights(player->GetSession()))
+        {
+            handler->PSendSysMessage(LANG_GSYSTEM_GW_REQ_GUILDRIGHTS);
             return true;
         }
 

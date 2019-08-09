@@ -1,4 +1,4 @@
-DELETE FROM `trinity_string` where `entry` IN (12000, 12001, 12002, 12003, 12004, 12005, 12006, 12007, 12008, 12009, 12010, 12011, 12012, 12013, 12014, 12015, 12016, 12017, 12018, 12019, 12020, 12021);
+DELETE FROM `trinity_string` where `entry` IN (12000, 12001, 12002, 12003, 12004, 12005, 12006, 12007, 12008, 12009, 12010, 12011, 12012, 12013, 12014, 12015, 12016, 12017, 12018, 12019, 12020, 12021, 12022);
 INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12000', '|cffe6cc80Not enough guild members for start Guild War', '|cffe6cc80Недостаточно игроков в гильдии для начала Войны Гильдий'),
 ('12001', '|cffe6cc80Not enough guild members in target guild for starting Guild War', '|cffe6cc80В противоположной гильдии недостаточно игроков для начала Войны Гильдий'),
@@ -21,4 +21,5 @@ INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12018', '|cffe6cc80The Guild |cff00ff00%s |cffe6cc80already is enemy of your guild', '|cffe6cc80Гильдия |cff00ff00%s |cffe6cc80уже является врагом вашей гильдии на данный момент'),
 ('12019', 'You declared a Guild War against %s', 'Вы объявилу Войну Гильдии %s'),
 ('12020', 'You admitted defeat in this war against the guild %s', 'Вы признали свое поражение в войне против гильдии %s'),
-('12021', '|caa88aa88To use this feature, your guild must reach a |cff00ff00%u |caa88aa88level', '|caa88aa88Для пользования данной функцией, ваша гильдия должна достичь |cff00ff00%u |caa88aa88уровня');
+('12021', '|caa88aa88To use this feature, your guild must reach a |cff00ff00%u |caa88aa88level', '|caa88aa88Для пользования данной функцией, ваша гильдия должна достичь |cff00ff00%u |caa88aa88уровня'),
+('12022', 'You have not rights to declare Guild War.\nYou should to have guild rank with rights to |cff00ff00modify guild information', 'У вас недостаточно прав гильдии для объявления войны другой гильдии.\nНеобходимо иметь ранг с правами |cff00ff00изменения гильдейской информации');

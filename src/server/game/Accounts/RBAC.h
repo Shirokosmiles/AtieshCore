@@ -807,6 +807,9 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_SPECTATE_VIEW                          = 1017,
     RBAC_PERM_COMMAND_SPECTATE_RESET                         = 1018,
     RBAC_PERM_COMMAND_SPECTATE_LEAVE                         = 1019,
+
+    // GuildProgress
+    RBAC_PERM_GSYSTEM_COMMANDS                               = 1020,
     RBAC_PERM_MAX
 };
 

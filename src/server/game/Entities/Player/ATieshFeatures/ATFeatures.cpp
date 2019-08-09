@@ -981,6 +981,14 @@ std::string Guild::NotEnoughTimer(WorldSession* session, time_t possible)
     return str.str();
 }
 
+bool Guild::CanStartGuildWarByGuildRights(WorldSession* session)
+{
+    if (!_HasRankRight(session->GetPlayer(), GR_RIGHT_MODIFY_GUILD_INFO))
+        return false;
+
+    return true;
+}
+
 bool Guild::CanStartGuildWarByCount(WorldSession* session, std::string& msg, bool defendGuild)
 {
     uint32 minCount = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_MIN_PLAYERS);
