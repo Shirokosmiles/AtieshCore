@@ -1347,6 +1347,30 @@ enum TrinityStrings
     LANG_SPECTATE_YOU_TARGET_SPECTATOR    = 11593,
     LANG_SPECTATE_DIFERENT_ARENAS         = 11594,
     LANG_SPECTATE_TARGET_INVISEBLE        = 11595,
-    LANG_SPECTATE_CANT_FIND_PLAYER        = 11596
+    LANG_SPECTATE_CANT_FIND_PLAYER        = 11596,
+
+    // GSystem
+    LANG_GSYSTEM_MIN_PLAYERS              = 12000, //"Not enough guild members for start Guild War"
+    LANG_GSYSTEM_MIN_PLAYERS_DEF          = 12001, //"Not enough guild members in target guild for starting Guild War"
+    LANG_GSYSTEM_MIN_TIMER                = 12002, //"You can start new Guild War only"
+    LANG_GSYSTEM_ANNOUNCE_LVL_UP_BY       = 12003, //"Congratulations! The guild has reached a " << level << " level. The last experience has gained by "
+    LANG_GSYSTEM_ANNOUNCE_LVL_UP          = 12004, //"Congratulations! The guild has reached a " << level"
+    LANG_GSYSTEM_ANNOUNCE_EXP_UP_BY       = 12005, //"The guild has received a " << value << " experience. Points has gained by "
+    LANG_GSYSTEM_ANNOUNCE_EXP_UP          = 12006, //"The guild has received a " << value << " experience."
+    LANG_GSYSTEM_ANNOUNCE_START_WAR       = 12007, //"The guild has entered in Guild War with "
+    LANG_GSYSTEM_ANNOUNCE_END_WAR         = 12008, //"The guild has ended Guild War with " << guildName << ". Winner of this Guild War : "
+    LANG_GSYSTEM_ANNOUNCE_INFO            = 12009, //"Guild has %u level, and %u / 1500 experience for next level"
+    LANG_GSYSTEM_ANNOUNCE_SANCTION_LVL    = 12010, //"Guild has %u level, and %u / 1500 experience for next level"
+    LANG_GSYSTEM_NAME_WITH_LEVEL          = 12011,
+    LANG_GSYSTEM_GM_RECEIVED_LEVEL        = 12012, //"Guild %s has received %u additional levels, and now has %u level"
+    LANG_GSYSTEM_GM_RECEIVED_EXP          = 12013, //"Guild %s has received %u additional experience, and now has %u Exp"
+    LANG_GSYSTEM_GM_LOOSED_LEVEL          = 12014, //"Guild %s has lost %u additional levels, and now has %u level"
+    LANG_GSYSTEM_GW_NO_ENEMY              = 12015, //"Guild has not enemies "
+    LANG_GSYSTEM_GW_HAS_ENEMY             = 12016, //"Guild has next emeies: /n %s "
+    LANG_GSYSTEM_GW_NOT_ENEMY             = 12017, //"Guild %s is not enemy of your guild"
+    LANG_GSYSTEM_GW_ALREADY_ENEMY         = 12018, //"Guild %s already is enemy of your guild"
+    LANG_GSYSTEM_GW_START                 = 12019, //"You declared a Guild War against %s"
+    LANG_GSYSTEM_GW_STOP                  = 12020, //"You admitted defeat in this war against the guild %s"
+    LANG_GSYSTEM_GW_REQ_LEVEL             = 12021 //"You admitted defeat in this war against the guild %s"
 };
 #endif

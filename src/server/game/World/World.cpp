@@ -1439,6 +1439,28 @@ void World::LoadConfigSettings(bool reload)
     SetACMapExcludes(sConfigMgr->GetStringDefault("AntiCheats.forceExcludeMapsid", ""));
     TC_LOG_INFO("server.loading", "AntiCheats disabled for %u maps", (uint32)excludeACMapsId.size());
 
+    // GSystem
+    // Guild - broadcast loot
+    m_bool_configs[CONFIG_LOOT_GUILD_ENABLED] = sConfigMgr->GetBoolDefault("GSystem.LootBroadcast.Enabled", false);
+    // GuildSystem script
+    m_bool_configs[CONFIG_GSYSTEM_LEVEL_ENABLED] = sConfigMgr->GetBoolDefault("GSystem.GuildLevel.Enabled", false);
+    m_bool_configs[CONFIG_GSYSTEM_IN_WHO_LIST] = sConfigMgr->GetBoolDefault("GSystem.GuildLevel.ShowLevelGuild.WhoList.Enabled", false);    
+    m_bool_configs[CONFIG_GSYSTEM_IN_QUERY_OPCODE] = sConfigMgr->GetBoolDefault("GSystem.GuildLevel.ShowLevelGuild.QueryList.Enabled", false);
+    rate_values[RATE_GSYSTEM_BONUS_EXP] = sConfigMgr->GetFloatDefault("GSystem.GuildLevel.Rate.XP.Bonus", 2.0f);
+    m_int_configs[CONFIG_GSYSTEM_LVL_FOR_BANK] = sConfigMgr->GetIntDefault("GSystem.GuildLevel.LvL.ForMyBank", 5);
+    m_int_configs[CONFIG_GSYSTEM_LVL_FOR_REPAIR] = sConfigMgr->GetIntDefault("GSystem.GuildLevel.LvL.ForRepair", 3);
+    // Experience
+    m_int_configs[CONFIG_GSYSTEM_ARENA_EXP] = sConfigMgr->GetIntDefault("GSystem.GuildLevel.Exp.ForArena", 5);
+    m_int_configs[CONFIG_GSYSTEM_BG_EXP] = sConfigMgr->GetIntDefault("GSystem.GuildLevel.Exp.ForBG", 1);
+    m_int_configs[CONFIG_GSYSTEM_LFG_EXP] = sConfigMgr->GetIntDefault("GSystem.GuildLevel.Exp.ForLFG", 1);    
+    // GuildWar
+    m_bool_configs[CONFIG_GSYSTEM_GUILDWARS_ENABLED] = sConfigMgr->GetBoolDefault("GSystem.GuildWars.Enabled", false);
+    m_bool_configs[CONFIG_GSYSTEM_IN_GUILDENEMY_LIST] = sConfigMgr->GetBoolDefault("GSystem.GuildWars.ShowLevelGuild.EnemyList.Enabled", false);
+    m_int_configs[CONFIG_GSYSTEM_GW_MIN_PLAYERS] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Minimal.PlayerCount", 10);
+    m_int_configs[CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_START] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Minimal.Delta.PreviousStartTimer", 3600);
+    m_int_configs[CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_END] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Minimal.Delta.PreviousEndTimer", 3600);
+    m_int_configs[CONFIG_GSYSTEM_GW_KILL_EXP] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Exp.ForEnemyGuildKill", 1);
+
     // VIP system
     m_bool_configs[CONFIG_VIP_DEBUFF]        = sConfigMgr->GetBoolDefault("Config.Vip.Debuff.Command", false);
     m_bool_configs[CONFIG_VIP_BANK]          = sConfigMgr->GetBoolDefault("Config.Vip.Bank.Command", false);
@@ -1468,8 +1490,6 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_VIP_XP_QUEST]   = sConfigMgr->GetFloatDefault("Rate.XP.Quest.Premium", 1.0f);
     rate_values[RATE_VIP_HONOR]      = sConfigMgr->GetFloatDefault("Rate.Honor.Premium", 1.0f);
     rate_values[RATE_VIP_REPUTATION] = sConfigMgr->GetFloatDefault("Rate.Reputation.Gain.Premium", 1.0f);
-    // Guild - broadcast loot
-    m_bool_configs[CONFIG_LOOT_GUILD_ENABLED]                   = sConfigMgr->GetBoolDefault("Guild.LootBroadcast.Enabled", false);
     // Raid info
     m_bool_configs[CONFIG_RAID_INFO]                            = sConfigMgr->GetBoolDefault("RaidInfo.Enabled", false);
     // First Login Acc Bonus script
@@ -1483,10 +1503,6 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_CREATECHAR_BONUS_STARTPACK] = sConfigMgr->GetBoolDefault("StartPack.Script.Enabled", false);
     // Duel Phase script
     m_bool_configs[CONFIG_DUEL_IN_SPECIAL_PHASE] = sConfigMgr->GetBoolDefault("DuelPhase.Enabled", false);
-    // GuildSystem script
-    m_bool_configs[CONFIG_GSYSTEM_IN_WHO_LIST] = sConfigMgr->GetBoolDefault("GSystem.ShowLevelGuild.WhoList.Enabled", false);
-    m_bool_configs[CONFIG_GSYSTEM_IN_GUILDENEMY_LIST] = sConfigMgr->GetBoolDefault("GSystem.ShowLevelGuild.EnemyList.Enabled", false);
-    m_bool_configs[CONFIG_GSYSTEM_IN_QUERY_OPCODE] = sConfigMgr->GetBoolDefault("GSystem.ShowLevelGuild.QueryList.Enabled", false);
 
     // Vanish Fade Delay
     m_int_configs[CONFIG_VANISH_VISION_TIMER]                   = sConfigMgr->GetIntDefault("VanishVisionTimer", 600);

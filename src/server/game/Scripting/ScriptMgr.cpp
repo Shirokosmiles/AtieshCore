@@ -2105,6 +2105,11 @@ void ScriptMgr::OnGuildLevelUpEvent(Guild* guild, Player* player, uint32 receive
     FOREACH_SCRIPT(GuildScript)->OnLevelUp(guild, player, receivedLevel);
 }
 
+void ScriptMgr::OnGuildLevelDownEvent(Guild* guild, Player* player, uint32 newLevel, uint32 lost)
+{
+    FOREACH_SCRIPT(GuildScript)->OnLevelDown(guild, player, newLevel, lost);
+}
+
 void ScriptMgr::OnGuildExpirienceUpEvent(Guild* guild, Player* player, uint32 receivedExp)
 {
     FOREACH_SCRIPT(GuildScript)->OnExpReceived(guild, player, receivedExp);

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -20,13 +20,15 @@
 #include "Battleground.h"
 #include "Chat.h"
 #include "Item.h"
-#include "Player.h"
+#include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "ScriptMgr.h"
+#include "Player.h"
+#include "Language.h"
 
  // Vanish System
 void Player::SetVanishTimer()
@@ -782,6 +784,9 @@ void Player::UpdGuildQuery(Guild* guild)
 
 bool Player::IsInGuildWarWith(Player const* p) const
 {
+    if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
+        return false;
+
     if (!GetGuild())
         return false;
 
@@ -824,8 +829,23 @@ void Guild::CastGuildLevelAuras(uint32 level)
 
         for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
         {
-            if (Player * player = itr->second->FindConnectedPlayer())
+            if (Player* player = itr->second->FindConnectedPlayer())
                 player->CastSpell(player, gspellAuras->spellauraId);
+        }
+    }
+}
+
+void Guild::RemoveGuildLevelAuras()
+{
+    GuildSpellAurasContainer const& guildSpellAurasMap = sObjectMgr->GetGuildSpellAurasMap();
+
+    for (GuildSpellAurasContainer::const_iterator itr = guildSpellAurasMap.begin(); itr != guildSpellAurasMap.end(); ++itr)
+    {
+        GuildSpellAuras const* gspellAuras = &itr->second;
+        for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+        {
+            if (Player* player = itr->second->FindConnectedPlayer())
+                player->RemoveAurasDueToSpell(gspellAuras->spellauraId);
         }
     }
 }
@@ -920,7 +940,7 @@ void Guild::AddGuildLevel(uint32 value, Player* player)
     UpdateLevelAndExp();
 }
 
-void Guild::RemoveGuildLevel(uint32 value)
+void Guild::RemoveGuildLevel(uint32 value, Player* player)
 {
     uint32 currentLvl = GetGuildLevel();
     if (value >= currentLvl)
@@ -928,14 +948,134 @@ void Guild::RemoveGuildLevel(uint32 value)
     else
         m_guildLevel -= value;
 
+    sScriptMgr->OnGuildLevelDownEvent(this, player, m_guildLevel, value);
+
     RemoveHigherGuildLevelAuras(m_guildLevel);
     UpdateLevelAndExp();
 }
 
-std::string Guild::PrepareGuildNameByIdWithLvl(std::string const& guildName, uint32 level)
+std::string Guild::PrepareGuildNameByIdWithLvl(WorldSession* session, std::string const& guildName, uint32 level)
 {
     std::ostringstream str;
-    str << guildName << " (" << level << " level)";
+    str << guildName << " (" << level << session->GetTrinityString(LANG_GSYSTEM_NAME_WITH_LEVEL) << ")";
 
     return str.str();
+}
+
+std::string Guild::NotEnough(WorldSession* session, uint32 need, uint32 guildcount, bool defendGuild)
+{
+    if (defendGuild)
+        return session->GetTrinityString(LANG_GSYSTEM_MIN_PLAYERS_DEF);
+
+    std::ostringstream str;
+    str << session->GetTrinityString(LANG_GSYSTEM_MIN_PLAYERS) << " ( " << guildcount << " / " << need << " )";
+
+    return str.str();
+}
+
+std::string Guild::NotEnoughTimer(WorldSession* session, time_t possible)
+{
+    std::ostringstream str;
+    str << session->GetTrinityString(LANG_GSYSTEM_MIN_TIMER) << " ( " << TimeToHumanReadable(possible) << " )";
+
+    return str.str();
+}
+
+bool Guild::CanStartGuildWarByCount(WorldSession* session, std::string& msg, bool defendGuild)
+{
+    uint32 minCount = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_MIN_PLAYERS);
+    uint32 gcount = GetMemberCount();
+    if (gcount < minCount)
+    {
+        msg = NotEnough(session, minCount, gcount, defendGuild);
+        return false;
+    }  
+
+    return true;
+}
+
+bool Guild::CanStartGuildWarByTimer(WorldSession* session, std::string& msg)
+{    
+    time_t dateLastWarStart = sGuildMgr->GetTimeOfLastWarStart(GetId());
+    time_t dateLastWarEnd = sGuildMgr->GetTimeOfLastWarEnd(GetId());
+    time_t now = GameTime::GetGameTime();
+
+    if (dateLastWarStart)
+    {
+        time_t deltaStart = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_START);
+        time_t timeOfPossible = dateLastWarStart + deltaStart;
+        if (now - timeOfPossible < deltaStart)
+        {
+            msg = NotEnoughTimer(session, timeOfPossible);
+            return false;
+        }
+    }
+
+    if (dateLastWarEnd)
+    {
+        time_t deltaEnd = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_END);
+        time_t timeOfPossible = dateLastWarEnd + deltaEnd;
+        if (now - timeOfPossible < deltaEnd)
+        {            
+            msg = NotEnoughTimer(session, timeOfPossible);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void Guild::BroadcastToGuildLevelUp(uint32 level, std::string const& playerName) const
+{
+    for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        if (Player * player = itr->second->FindConnectedPlayer())
+        {
+            if (playerName != "")
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_LVL_UP_BY, level, playerName);
+            else
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_LVL_UP, level);
+        }
+    }
+}
+
+void Guild::BroadcastToGuildLevelDown(uint32 level, uint32 lost, std::string const& playerName) const
+{
+    for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        if (Player * player = itr->second->FindConnectedPlayer())
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_SANCTION_LVL, playerName, lost, level);
+    }
+}
+
+void Guild::BroadcastToGuildExp(uint32 level, std::string const& playerName) const
+{
+    for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        if (Player * player = itr->second->FindConnectedPlayer())
+        {
+            if (playerName != "")
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_EXP_UP_BY, level, playerName);
+            else
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_EXP_UP, level);
+        }
+    }
+}
+
+void Guild::BroadcastToGuildEnteredInGWWith(std::string const& guildName) const
+{
+    for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        if (Player * player = itr->second->FindConnectedPlayer())
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_START_WAR, guildName);
+    }
+}
+
+void Guild::BroadcastToGuildEndedGWWith(std::string const& guildName, std::string const& winnername) const
+{
+    for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        if (Player * player = itr->second->FindConnectedPlayer())
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_END_WAR, guildName, winnername);
+    }
 }

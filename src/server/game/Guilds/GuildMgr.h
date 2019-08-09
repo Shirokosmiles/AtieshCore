@@ -35,7 +35,9 @@ typedef std::unordered_map<uint32, GuildWars> GuildWarsContainer;
 struct GuildWarsHistory
 {
     std::string attackerGuild;
+    uint32 attackerGuildId;
     std::string defenderGuild;
+    uint32 defenderGuildId;
     time_t timeOfStartWar;
     time_t timeOfEndWar;
     std::string winnerGuild;
@@ -57,22 +59,30 @@ public:
     Guild* GetGuildById(ObjectGuid::LowType guildId) const;
     Guild* GetGuildByName(std::string const& guildName) const;
     std::string GetGuildNameById(ObjectGuid::LowType guildId) const;
+
+    void LoadGuilds();
+    void AddGuild(Guild* guild);
+    void RemoveGuild(ObjectGuid::LowType guildId);
+
+    // Atiesh features
+    // GSystem
     std::string GetGuildNameByIdWithLvl(ObjectGuid::LowType guildId) const;
     std::string GetGuildNameWithGLvl(std::string const& guildName, uint32 level) const;
     std::string GetGuildEnemy(ObjectGuid::LowType guildId) const;
 
-    void LoadGuilds();
-    void LoadGuildWarData();
-    void LoadGuildWarHistory();
-    void AddGuild(Guild* guild);
-    void RemoveGuild(ObjectGuid::LowType guildId);
+    time_t GetTimeOfLastWarStart(ObjectGuid::LowType guildId);
+    time_t GetTimeOfLastWarEnd(ObjectGuid::LowType guildId);
 
-    // GSystem
-    bool GuildHasWarState(ObjectGuid::LowType firstguildId);
+    bool GuildHasWarState(ObjectGuid::LowType guildId);
     bool IsGuildsInWar(ObjectGuid::LowType firstguildId, ObjectGuid::LowType secondguildId);
     bool StartNewWar(GuildWars& data);
+
     void StopWarBetween(ObjectGuid::LowType firstguildId, ObjectGuid::LowType secondguildId, ObjectGuid::LowType winnerguildId);
     void StopAllGuildWarsFor(ObjectGuid::LowType guildId); // Stop all GW before Disband
+
+    void LoadGuildWarData();
+    void LoadGuildWarHistory();
+    // Atiesh features end
 
     ObjectGuid::LowType GenerateGuildId();
     void SetNextGuildId(ObjectGuid::LowType Id) { NextGuildId = Id; }
@@ -82,9 +92,11 @@ protected:
     typedef std::unordered_map<ObjectGuid::LowType, Guild*> GuildContainer;
     ObjectGuid::LowType NextGuildId;
     GuildContainer GuildStore;
-    
+
+    // Atiesh features
     GuildWarsContainer _guildWarStore;
     GuildWarsHistoryContainer _guildWarHistoryStore;
+    // Atiesh features end
 };
 
 #define sGuildMgr GuildMgr::instance()

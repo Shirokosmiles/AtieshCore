@@ -619,8 +619,8 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_UPD_GUILD_LEVELANDEXP, "UPDATE guild SET GuildLevel = ?, GuildExperience = ? WHERE guildid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_GUILD_WAR_START, "INSERT INTO guild_wars (id, Attacker_Guild_ID, Defender_Guild_ID) VALUES (?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_GUILD_WAR_STOP, "DELETE FROM guild_wars WHERE id = ?", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_INS_GUILD_WAR_START_HISTORY, "INSERT INTO guild_wars_history (id, Attacker_Guild, Defender_Guild, Time_Of_Start, Time_Of_End, Winner) VALUES (?, ?, ?, NOW(), 0, ?)", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_UPD_GUILD_WAR_STOP_HISTORY, "UPDATE guild_wars_history SET Time_Of_End = NOW(), Winner = ? WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_GUILD_WAR_START_HISTORY, "INSERT INTO guild_wars_history (id, Attacker_Guild_ID, Attacker_Guild, Defender_Guild_ID, Defender_Guild, Time_Of_Start, Time_Of_End, Winner) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UPD_GUILD_WAR_STOP_HISTORY, "UPDATE guild_wars_history SET Time_Of_End = ?, Winner = ? WHERE id = ?", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

@@ -634,7 +634,6 @@ class TC_GAME_API Guild
         uint64 GetBankMoney() const { return m_bankMoney; }
 
         bool SetName(std::string const& name);
-        std::string PrepareGuildNameByIdWithLvl(std::string const& guildName, uint32 level);
 
         // Handle client commands
         void HandleRoster(WorldSession* session);
@@ -687,25 +686,38 @@ class TC_GAME_API Guild
 
         // Broadcasts
         void BroadcastToGuild(WorldSession* session, bool officerOnly, std::string const& msg, uint32 language = LANG_UNIVERSAL) const;
-        void BroadcastToGuildNote(std::string const& msg) const;
         void BroadcastPacketToRank(WorldPacket* packet, uint8 rankId) const;
         void BroadcastPacket(WorldPacket* packet) const;
-        void ItemBroadcastToGuild(Player* player, std::string const& msg) const;
 
         void MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 maxLevel, uint32 minRank);
 
+        // Atiesh features
+        std::string PrepareGuildNameByIdWithLvl(WorldSession* session, std::string const& guildName, uint32 level);
+        std::string NotEnough(WorldSession* session, uint32 need, uint32 guildcount, bool defendGuild);
+        std::string NotEnoughTimer(WorldSession* session, time_t possible);
+        void BroadcastToGuildLevelUp(uint32 level, std::string const& playerName) const;
+        void BroadcastToGuildLevelDown(uint32 level, uint32 lost, std::string const& playerName) const;
+        void BroadcastToGuildExp(uint32 level, std::string const& playerName) const;
+        void BroadcastToGuildEnteredInGWWith(std::string const& guildname) const;
+        void BroadcastToGuildEndedGWWith(std::string const& guildName, std::string const& winnername) const;
+
+        void ItemBroadcastToGuild(Player* player, std::string const& msg) const;
         void UpdateLevelAndExp();
         void UpdateGuildWarFlag(bool startGW);
         void CastGuildLevelAuras(uint32 level);
+        void RemoveGuildLevelAuras();
         void UpdateQueryStateForPlayers();
         void RemoveHigherGuildLevelAuras(uint32 level);
         void SetGuildLevel(uint32 value) { m_guildLevel = value; }
         void SetGuildExp(uint32 value) { m_guildExp = value; }
         void AddGuildExp(uint32 value, Player* player, bool randombonus = false);
-        void AddGuildLevel(uint32 value, Player * player);
-        void RemoveGuildLevel(uint32 value = 1);
+        void AddGuildLevel(uint32 value, Player* player);
+        void RemoveGuildLevel(uint32 value, Player* player);
+        bool CanStartGuildWarByCount(WorldSession* session, std::string& msg, bool defendGuild);
+        bool CanStartGuildWarByTimer(WorldSession* session, std::string& msg);
         uint32 GetGuildLevel() const { return m_guildLevel; }
         uint32 GetGuildExperience() const { return m_guildExp; }
+        // Atiesh features end
 
         template<class Do>
         void BroadcastWorker(Do& _do, Player* except = nullptr)
@@ -743,8 +755,10 @@ class TC_GAME_API Guild
         uint32 m_accountsNumber;
         uint64 m_bankMoney;
 
+        // Atiesh features
         uint32 m_guildLevel;
         uint32 m_guildExp;
+        // Atiesh features end
 
         Ranks m_ranks;
         Members m_members;

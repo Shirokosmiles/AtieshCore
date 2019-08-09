@@ -48,7 +48,7 @@ void WhoListStorageMgr::Update()
         wstrToLower(widePlayerName);
 
         std::string guildName = ""; 
-        if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_WHO_LIST))
+        if (sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED) && sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_WHO_LIST))
             guildName = sGuildMgr->GetGuildNameByIdWithLvl(itr->second->GetGuildId());
         else
             guildName = sGuildMgr->GetGuildNameById(itr->second->GetGuildId());

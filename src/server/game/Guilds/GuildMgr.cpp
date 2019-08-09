@@ -43,15 +43,97 @@ void GuildMgr::RemoveGuild(ObjectGuid::LowType guildId)
     GuildStore.erase(guildId);
 }
 
-bool GuildMgr::GuildHasWarState(ObjectGuid::LowType firstguildId)
+// Atiesh Features
+std::string GuildMgr::GetGuildNameByIdWithLvl(ObjectGuid::LowType guildId) const
+{
+    std::string glvl = "";
+    if (Guild * guild = GetGuildById(guildId))
+        return GetGuildNameWithGLvl(guild->GetName(), guild->GetGuildLevel());
+
+    return "";
+}
+
+std::string GuildMgr::GetGuildNameWithGLvl(std::string const& guildName, uint32 level) const
+{
+    std::ostringstream str;
+    str << guildName << " (" << level << " level)";
+
+    return str.str();
+}
+
+std::string GuildMgr::GetGuildEnemy(ObjectGuid::LowType guildId) const
+{
+    std::ostringstream str;
+    for (GuildWarsContainer::const_iterator itr = _guildWarStore.begin(); itr != _guildWarStore.end(); ++itr)
+    {
+        if (itr->second.attackerGuildId == guildId)
+        {
+            if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
+                str << GetGuildNameByIdWithLvl(itr->second.defenderGuildId) << "\n";
+            else
+                str << GetGuildNameById(itr->second.defenderGuildId) << "\n";
+        }
+
+        if (itr->second.defenderGuildId == guildId)
+        {
+            if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
+                str << GetGuildNameByIdWithLvl(itr->second.attackerGuildId) << "\n";
+            else
+                str << GetGuildNameById(itr->second.attackerGuildId) << "\n";
+        }
+    }
+
+    return str.str();
+}
+
+
+time_t GuildMgr::GetTimeOfLastWarStart(ObjectGuid::LowType guildId)
+{
+    time_t tmpTime = 0;
+    for (GuildWarsHistoryContainer::const_iterator itr = _guildWarHistoryStore.begin(); itr != _guildWarHistoryStore.end(); ++itr)
+    {
+        bool firstGIsAttacker = itr->second.attackerGuildId == guildId;
+        if (firstGIsAttacker)
+            if (itr->second.timeOfStartWar > tmpTime)
+                tmpTime = itr->second.timeOfStartWar;
+
+        bool secondGIsAttacker = itr->second.defenderGuildId == guildId;
+        if (secondGIsAttacker)
+            if (itr->second.timeOfStartWar > tmpTime)
+                tmpTime = itr->second.timeOfStartWar;
+    }
+
+    return tmpTime;
+}
+
+time_t GuildMgr::GetTimeOfLastWarEnd(ObjectGuid::LowType guildId)
+{
+    time_t tmpTime = 0;
+    for (GuildWarsHistoryContainer::const_iterator itr = _guildWarHistoryStore.begin(); itr != _guildWarHistoryStore.end(); ++itr)
+    {
+        bool firstGIsAttacker = itr->second.attackerGuildId == guildId;
+        if (firstGIsAttacker)
+            if (itr->second.timeOfEndWar > tmpTime)
+                tmpTime = itr->second.timeOfEndWar;
+
+        bool secondGIsAttacker = itr->second.defenderGuildId == guildId;
+        if (secondGIsAttacker)
+            if (itr->second.timeOfEndWar > tmpTime)
+                tmpTime = itr->second.timeOfEndWar;
+    }
+
+    return tmpTime;
+}
+
+bool GuildMgr::GuildHasWarState(ObjectGuid::LowType guildId)
 {
     for (GuildWarsContainer::const_iterator itr = _guildWarStore.begin(); itr != _guildWarStore.end(); ++itr)
     {
-        bool firstGIsAttacker = itr->second.attackerGuildId == firstguildId;
+        bool firstGIsAttacker = itr->second.attackerGuildId == guildId;
         if (firstGIsAttacker)
             return true;
 
-        bool secondGIsAttacker = itr->second.defenderGuildId == firstguildId;
+        bool secondGIsAttacker = itr->second.defenderGuildId == guildId;
         if (secondGIsAttacker)
             return true;
     }
@@ -86,12 +168,27 @@ bool GuildMgr::StartNewWar(GuildWars& data)
     // use next
     ++new_id;
 
-    std::string attackerName = GetGuildNameByIdWithLvl(data.attackerGuildId);
-    std::string defenderName = GetGuildNameByIdWithLvl(data.defenderGuildId);
+    std::string attackerName;
+    std::string defenderName;
+    if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
+    {
+        attackerName = GetGuildNameByIdWithLvl(data.attackerGuildId);
+        defenderName = GetGuildNameByIdWithLvl(data.defenderGuildId);
+    }
+    else
+    {
+        attackerName = GetGuildNameById(data.attackerGuildId);
+        defenderName = GetGuildNameById(data.defenderGuildId);
+    }
+    
 
     GuildWarsHistory gwh;
+    gwh.attackerGuildId = data.attackerGuildId;
     gwh.attackerGuild = attackerName;
+    gwh.defenderGuildId = data.defenderGuildId;
     gwh.defenderGuild = defenderName;
+    gwh.timeOfStartWar = uint32(GameTime::GetGameTime());
+    gwh.timeOfEndWar = 0;
     gwh.winnerGuild = "";
 
     _guildWarStore[new_id] = data;
@@ -105,9 +202,13 @@ bool GuildMgr::StartNewWar(GuildWars& data)
 
     PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD_WAR_START_HISTORY);
     stmt2->setUInt32(0, new_id);
-    stmt2->setString(1, gwh.attackerGuild);
-    stmt2->setString(2, gwh.defenderGuild);
-    stmt2->setString(3, gwh.winnerGuild);
+    stmt2->setUInt32(1, gwh.attackerGuildId);
+    stmt2->setString(2, gwh.attackerGuild);
+    stmt2->setUInt32(3, gwh.defenderGuildId);
+    stmt2->setString(4, gwh.defenderGuild);
+    stmt2->setUInt32(5, gwh.timeOfStartWar);
+    stmt2->setUInt32(6, gwh.timeOfEndWar);
+    stmt2->setString(7, gwh.winnerGuild);
     CharacterDatabase.Execute(stmt2);
 
     Guild* firstguild = GetGuildById(data.attackerGuildId);
@@ -155,8 +256,9 @@ void GuildMgr::StopWarBetween(ObjectGuid::LowType firstguildId, ObjectGuid::LowT
     CharacterDatabase.Execute(stmt);
 
     PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_WAR_STOP_HISTORY);
-    stmt2->setString(0, winnerName);
-    stmt2->setUInt32(1, WarId);
+    stmt2->setUInt32(0, uint32(GameTime::GetGameTime()));
+    stmt2->setString(1, winnerName);
+    stmt2->setUInt32(2, WarId);
     CharacterDatabase.Execute(stmt2);
 
     Guild* firstguild = GetGuildById(firstguildId);
@@ -181,6 +283,7 @@ void GuildMgr::StopAllGuildWarsFor(ObjectGuid::LowType guildId)
             StopWarBetween(guildId, itr->second.attackerGuildId, itr->second.attackerGuildId);
     }
 }
+// Atiesh Features end
 
 ObjectGuid::LowType GuildMgr::GenerateGuildId()
 {
@@ -220,48 +323,6 @@ std::string GuildMgr::GetGuildNameById(ObjectGuid::LowType guildId) const
 {
     if (Guild* guild = GetGuildById(guildId))
         return guild->GetName();
-
-    return "";
-}
-
-std::string GuildMgr::GetGuildNameWithGLvl(std::string const& guildName, uint32 level) const
-{
-    std::ostringstream str;
-    str << guildName << " (" << level << " level)";
-
-    return str.str();
-}
-
-std::string GuildMgr::GetGuildEnemy(ObjectGuid::LowType guildId) const
-{
-    std::ostringstream str;
-    for (GuildWarsContainer::const_iterator itr = _guildWarStore.begin(); itr != _guildWarStore.end(); ++itr)
-    {
-        if (itr->second.attackerGuildId == guildId)
-        {
-            if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
-                str << GetGuildNameByIdWithLvl(itr->second.defenderGuildId) << "\n";
-            else
-                str << GetGuildNameById(itr->second.defenderGuildId) << "\n";
-        }
-
-        if (itr->second.defenderGuildId == guildId)
-        {
-            if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
-                str << GetGuildNameByIdWithLvl(itr->second.attackerGuildId) << "\n";
-            else
-                str << GetGuildNameById(itr->second.attackerGuildId) << "\n";
-        }
-    }
-
-    return str.str();
-}
-
-std::string GuildMgr::GetGuildNameByIdWithLvl(ObjectGuid::LowType guildId) const
-{
-    std::string glvl = "";
-    if (Guild* guild = GetGuildById(guildId))
-        return GetGuildNameWithGLvl(guild->GetName(), guild->GetGuildLevel());
 
     return "";
 }
@@ -626,7 +687,7 @@ void GuildMgr::LoadGuildWarHistory()
     _guildWarHistoryStore.clear();                                  // for reload case
 
     //                                                     0                1
-    QueryResult result = CharacterDatabase.Query("SELECT id, Attacker_Guild, Defender_Guild, Time_Of_Start, Time_Of_End, Winner FROM guild_wars_history");
+    QueryResult result = CharacterDatabase.Query("SELECT id, Attacker_Guild_ID, Attacker_Guild, Defender_Guild_ID, Defender_Guild, Time_Of_Start, Time_Of_End, Winner FROM guild_wars_history");
 
     if (!result)
     {
@@ -643,11 +704,13 @@ void GuildMgr::LoadGuildWarHistory()
         uint32 id = fields[0].GetUInt32();
 
         GuildWarsHistory gwh;
-        gwh.attackerGuild = fields[1].GetString();
-        gwh.defenderGuild = fields[2].GetString();
-        gwh.timeOfStartWar = fields[3].GetUInt32();
-        gwh.timeOfEndWar = fields[4].GetUInt32();
-        gwh.winnerGuild = fields[5].GetString();
+        gwh.attackerGuildId = fields[1].GetUInt32();
+        gwh.attackerGuild = fields[2].GetString();
+        gwh.defenderGuildId = fields[3].GetUInt32();
+        gwh.defenderGuild = fields[4].GetString();
+        gwh.timeOfStartWar = time_t(fields[5].GetUInt32());
+        gwh.timeOfEndWar = time_t(fields[6].GetUInt32());
+        gwh.winnerGuild = fields[7].GetString();
 
         _guildWarHistoryStore[id] = gwh;
 

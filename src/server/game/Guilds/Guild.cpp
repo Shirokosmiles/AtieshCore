@@ -1287,6 +1287,7 @@ bool Guild::Create(Player* pLeader, std::string const& name)
 // Disbands guild and deletes all related data from database
 void Guild::Disband()
 {
+    sGuildMgr->StopAllGuildWarsFor(GetId());
     // Call scripts before guild data removed from database
     sScriptMgr->OnGuildDisband(this);
 
@@ -1401,8 +1402,8 @@ void Guild::HandleQuery(WorldSession* session)
 {
     WorldPacket data(SMSG_GUILD_QUERY_RESPONSE, 8 * 32 + 200);      // Guess size
     data << uint32(m_id);
-    if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_QUERY_OPCODE))
-        data << PrepareGuildNameByIdWithLvl(m_name, m_guildLevel);
+    if (sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED) && sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_QUERY_OPCODE))
+        data << PrepareGuildNameByIdWithLvl(session, m_name, m_guildLevel);
     else
         data << m_name;
 
@@ -2243,15 +2244,6 @@ void Guild::BroadcastToGuild(WorldSession* session, bool officerOnly, std::strin
                 if (player->GetSession() && _HasRankRight(player, officerOnly ? GR_RIGHT_OFFCHATLISTEN : GR_RIGHT_GCHATLISTEN) &&
                     !player->GetSocial()->HasIgnore(session->GetPlayer()->GetGUID()))
                     player->SendDirectMessage(&data);
-    }
-}
-
-void Guild::BroadcastToGuildNote(std::string const& msg) const
-{
-    for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
-    {
-        if (Player* player = itr->second->FindConnectedPlayer())
-            ChatHandler(player->GetSession()).PSendSysMessage("%s", msg);
     }
 }
 

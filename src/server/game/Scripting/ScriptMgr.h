@@ -799,6 +799,8 @@ class TC_GAME_API GuildScript : public ScriptObject
 
         virtual void OnLevelUp(Guild* /*guild*/, Player* /*player*/, uint32 /*receivedLevel*/) { }
 
+        virtual void OnLevelDown(Guild* /*guild*/, Player* /*player*/, uint32 /*newLevel*/, uint32 /*lost*/) { }
+
         virtual void OnExpReceived(Guild* /*guild*/, Player* /*player*/, uint32 /*receivedExp*/) { }
 
         virtual void OnArenaWon(Guild* /*guild*/, Player* /*player*/) { }
@@ -1082,6 +1084,7 @@ class TC_GAME_API ScriptMgr
         void OnGuildEnteredInGuildWar(Guild* guild, std::string const& guildName);
         void OnGuildLeftInGuildWar(Guild* guild, std::string const& guildName, std::string const& winnerguildName);
         void OnGuildLevelUpEvent(Guild* guild, Player* player, uint32 receivedLevel);
+        void OnGuildLevelDownEvent(Guild* guild, Player* player, uint32 newLevel, uint32 lost);
         void OnGuildExpirienceUpEvent(Guild* guild, Player* player, uint32 receivedExp);
         void OnGuildArenaWonMemberEvent(Guild* guild, Player* player);
         void OnGuildBattlegrroundWonMemberEvent(Guild* guild, Player* player);

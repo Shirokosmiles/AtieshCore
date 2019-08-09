@@ -4539,30 +4539,101 @@ DuelPhase.Enabled = 0
 #    Description: Guild announce when member take a loot with Quality >= EPIC
 #    Default:     1 - enabled
 #
-#    Guild.LootBroadcast.Enabled = 1 - enabled.
-#    Guild.LootBroadcast.Enabled = 0 - disabled.
+#    GSystem.LootBroadcast.Enabled = 1 - enabled.
+#    GSystem.LootBroadcast.Enabled = 0 - disabled.
 
-Guild.LootBroadcast.Enabled = 1
+GSystem.LootBroadcast.Enabled = 1
 
-#
-#    GSystem.ShowLevelGuild.WhoList
-#    Description: Make a visible guild level in WhoList
+#    GSystem.GuildLevel
+#    Description: Make a possible guild level system
+
+GSystem.GuildLevel.Enabled = 1
+
+#    GSystem.GuildLevel.ShowLevelGuild.WhoList
+#    Description: Make a visible guild level in whoList
 #    Default:     0 - disabled
 #
 
-GSystem.ShowLevelGuild.WhoList.Enabled = 0
+GSystem.GuildLevel.ShowLevelGuild.WhoList.Enabled = 1
 
-#    GSystem.ShowLevelGuild.EnemyList
-#    Description: Make a visible guild level in Guild Wars info
-#    Default:     0 - disabled
-
-GSystem.ShowLevelGuild.EnemyList.Enabled = 0
-
-#    GSystem.ShowLevelGuild.QueryList
+#    GSystem.GuildLevel.ShowLevelGuild.QueryList
 #    Description: Make a visible guild level in query opcode (visible name/guild above character)
 #    Default:     0 - disabled
 
-GSystem.ShowLevelGuild.QueryList.Enabled = 0
+GSystem.GuildLevel.ShowLevelGuild.QueryList.Enabled = 1
+
+#    GSystem.GuildLevel.Rate.XP.Bonus
+#    Description: Rate for character experience when guild >= 2 level
+#    Default:     2
+
+GSystem.GuildLevel.Rate.XP.Bonus = 2
+
+#    GSystem.GuildLevel.LvL.ForMyBank
+#    Description: Level of guild for opening MyBank func
+#    Default:     5
+
+GSystem.GuildLevel.LvL.ForMyBank = 5
+
+#    GSystem.GuildLevel.LvL.ForRepair
+#    Description: Level of guild for opening Repair func
+#    Default:     3
+
+GSystem.GuildLevel.LvL.ForRepair = 3
+
+#    GSystem.GuildLevel.Exp.ForArena
+#    Description: exp of guild for Win on Arena of each guild member
+#    Default:     5
+
+GSystem.GuildLevel.Exp.ForArena = 5
+
+#    GSystem.GuildLevel.Exp.ForBG
+#    Description: exp of guild for Win on BG of each guild member
+#    Default:     1
+
+GSystem.GuildLevel.Exp.ForBG = 1
+
+#    GSystem.GuildLevel.Exp.ForLFG
+#    Description: exp of guild for Win on LFG of each guild member
+#    Default:     1
+
+GSystem.GuildLevel.Exp.ForLFG = 1
+
+# GuildWars System
+#    GSystem.GuildWars.Enabled
+#    Description: Give possibility to make Guild Wars between guilds
+#    Default:     1
+
+GSystem.GuildWars.Enabled = 1
+
+#    GSystem.GuildWars.ShowLevelGuild.EnemyList
+#    Description: Show Enemy Guild Level in GW enemy list
+#    Default:     1
+
+GSystem.GuildWars.ShowLevelGuild.EnemyList.Enabled = 1
+
+#    GSystem.GuildWars.Minimal.PlayerCount
+#    Description: minimal count of members in guild for participation in GW
+#    Default:     1
+
+GSystem.GuildWars.Minimal.PlayerCount = 10
+
+#    GSystem.GuildWars.Minimal.Delta.PreviousStartTimer
+#    Description: minimal timer for guild from previous start war time for starting a new war
+#    Default:     3600 (1 hour)
+
+GSystem.GuildWars.Minimal.Delta.PreviousStartTimer = 3600
+
+#    GSystem.GuildWars.Minimal.Delta.PreviousEndTimer
+#    Description: minimal timer for guild from previous end war time for starting a new war
+#    Default:     3600 (1 hour)
+
+GSystem.GuildWars.Minimal.Delta.PreviousEndTimer = 3600
+
+#    GSystem.GuildWars.Exp.ForEnemyGuildKill
+#    Description: reward guild by exp for killing members of enemy guild (in GW status). Depend from GSystem.GuildLevel.Enabled
+#    Default:     1
+
+GSystem.GuildWars.Exp.ForEnemyGuildKill = 1
 
 #
 ###################################################################################################
