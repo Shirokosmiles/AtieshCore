@@ -1372,6 +1372,7 @@ enum TrinityStrings
     LANG_GSYSTEM_GW_START                 = 12019, //"You declared a Guild War against %s"
     LANG_GSYSTEM_GW_STOP                  = 12020, //"You admitted defeat in this war against the guild %s"
     LANG_GSYSTEM_GW_REQ_LEVEL             = 12021,
-    LANG_GSYSTEM_GW_REQ_GUILDRIGHTS       = 12022  //"You have not rights to declare Guild War.\nYou should to have guild rank with rights to modify guild information"
+    LANG_GSYSTEM_GW_REQ_GUILDRIGHTS       = 12022,  //"You have not rights to declare Guild War.\nYou should to have guild rank with rights to modify guild information"
+    LANG_GSYSTEM_GW_REQ_ONEFACTION        = 12023   //"You can declare War only inside one faction (Alliance or Horde)"
 };
 #endif

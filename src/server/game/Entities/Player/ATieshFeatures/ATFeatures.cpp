@@ -802,6 +802,17 @@ bool Player::IsInGuildWarWith(Player const* p) const
     return sGuildMgr->IsGuildsInWar(GetGuild()->GetId(), p->GetGuild()->GetId());
 }
 
+bool Player::IsFromDiffFactionGuildWarWith(Player const* p) const
+{
+    if (!GetGuild())
+        return false;
+
+    if (!p->GetGuild())
+        return false;
+
+    return GetGuild()->GetGuildFaction() != p->GetGuild()->GetGuildFaction();
+}
+
 Guild* Player::GetGuild() const
 {
     uint32 guildId = GetGuildId();

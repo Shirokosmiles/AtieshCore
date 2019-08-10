@@ -22,4 +22,5 @@ INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12019', 'You declared a Guild War against %s', 'Вы объявилу Войну Гильдии %s'),
 ('12020', 'You admitted defeat in this war against the guild %s', 'Вы признали свое поражение в войне против гильдии %s'),
 ('12021', '|caa88aa88To use this feature, your guild must reach a |cff00ff00%u |caa88aa88level', '|caa88aa88Для пользования данной функцией, ваша гильдия должна достичь |cff00ff00%u |caa88aa88уровня'),
-('12022', 'You have not rights to declare Guild War.\nYou should to have guild rank with rights to |cff00ff00modify guild information', 'У вас недостаточно прав гильдии для объявления войны другой гильдии.\nНеобходимо иметь ранг с правами |cff00ff00изменения гильдейской информации');
+('12022', 'You have not rights to declare Guild War.\nYou should to have guild rank with rights to |cff00ff00modify guild information', 'У вас недостаточно прав гильдии для объявления войны другой гильдии.\nНеобходимо иметь ранг с правами |cff00ff00изменения гильдейской информации'),
+('12023', '|cffe6cc80You can declare War only inside one faction (Alliance or Horde)', '|cffe6cc80Вы можете объявить Войну только гильдии из вашей фракции (Альянс или Орда)');

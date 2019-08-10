@@ -718,6 +718,7 @@ class TC_GAME_API Guild
         bool CanStartGuildWarByTimer(WorldSession* session, std::string& msg);
         uint32 GetGuildLevel() const { return m_guildLevel; }
         uint32 GetGuildExperience() const { return m_guildExp; }
+        uint32 GetGuildFaction() const { return m_guildFaction; }
         // Atiesh features end
 
         template<class Do>
@@ -759,6 +760,7 @@ class TC_GAME_API Guild
         // Atiesh features
         uint32 m_guildLevel;
         uint32 m_guildExp;
+        uint32 m_guildFaction;
         // Atiesh features end
 
         Ranks m_ranks;

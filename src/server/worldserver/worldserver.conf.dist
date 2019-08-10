@@ -4605,6 +4605,12 @@ GSystem.GuildLevel.Exp.ForLFG = 1
 
 GSystem.GuildWars.Enabled = 1
 
+#    GSystem.GuildWars.BetweenBothFaction
+#    Description: Give possibility to make Guild Wars between guilds from both faction (Alliance and Horde)
+#    Default:     1
+
+GSystem.GuildWars.BetweenBothFaction.Enabled = 1
+
 #    GSystem.GuildWars.ShowLevelGuild.EnemyList
 #    Description: Show Enemy Guild Level in GW enemy list
 #    Default:     1

@@ -477,6 +477,15 @@ public:
             return true;
         }
 
+        if (ownGuild->GetGuildFaction() != targetGuild->GetGuildFaction())
+        {
+            if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_BETWEEN_TWO_FACTION_ENABLED))
+            {
+                handler->PSendSysMessage(LANG_GSYSTEM_GW_REQ_ONEFACTION);
+                return true;
+            }
+        }
+
         if (sGuildMgr->IsGuildsInWar(ownGuild->GetId(), targetGuild->GetId()))
         {
             handler->PSendSysMessage(LANG_GSYSTEM_GW_ALREADY_ENEMY, guildName.c_str());

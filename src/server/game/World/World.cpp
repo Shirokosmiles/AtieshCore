@@ -1455,6 +1455,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_GSYSTEM_LFG_EXP] = sConfigMgr->GetIntDefault("GSystem.GuildLevel.Exp.ForLFG", 1);    
     // GuildWar
     m_bool_configs[CONFIG_GSYSTEM_GUILDWARS_ENABLED] = sConfigMgr->GetBoolDefault("GSystem.GuildWars.Enabled", false);
+    m_bool_configs[CONFIG_GSYSTEM_GUILDWARS_BETWEEN_TWO_FACTION_ENABLED] = sConfigMgr->GetBoolDefault("GSystem.GuildWars.BetweenBothFaction.Enabled", false);
     m_bool_configs[CONFIG_GSYSTEM_IN_GUILDENEMY_LIST] = sConfigMgr->GetBoolDefault("GSystem.GuildWars.ShowLevelGuild.EnemyList.Enabled", false);
     m_int_configs[CONFIG_GSYSTEM_GW_MIN_PLAYERS] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Minimal.PlayerCount", 10);
     m_int_configs[CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_START] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Minimal.Delta.PreviousStartTimer", 3600);

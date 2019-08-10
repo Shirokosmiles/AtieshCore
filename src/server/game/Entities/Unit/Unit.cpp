@@ -13642,16 +13642,25 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
             {
                 bool ConfigAccessGroups = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) || sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP);
                 bool inGuildWar = false;
+                bool fromDiffFaction = false;
                 if (ToPlayer() && target->ToPlayer())
                     if (ToPlayer()->IsInGuildWarWith(target->ToPlayer()))
+                    {
                         inGuildWar = true;
+                        if (ToPlayer()->IsFromDiffFactionGuildWarWith(target->ToPlayer()))
+                            fromDiffFaction = true;
+                    }
 
                 if (target->ToPet() || target->ToTotem())
                 {
                     if (Unit* targetPlr = target->GetCharmerOrOwner())
                         if (targetPlr->ToPlayer() && ToPlayer())
                             if (ToPlayer()->IsInGuildWarWith(target->ToPlayer()))
+                            {
                                 inGuildWar = true;
+                                if (ToPlayer()->IsFromDiffFactionGuildWarWith(target->ToPlayer()))
+                                    fromDiffFaction = true;
+                            }
                 }
 
                 if (ToPet() || ToTotem())
@@ -13659,7 +13668,11 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                     if (Unit* thisOwner = GetCharmerOrOwner())
                         if (thisOwner->ToPlayer() && target->ToPlayer())
                             if (thisOwner->ToPlayer()->IsInGuildWarWith(target->ToPlayer()))
+                            {
                                 inGuildWar = true;
+                                if (thisOwner->ToPlayer()->IsFromDiffFactionGuildWarWith(target->ToPlayer()))
+                                    fromDiffFaction = true;
+                            }
                 }
                 
                 if (IsControlledByPlayer() && target != this && ConfigAccessGroups && IsInRaidWith(target))
@@ -13678,7 +13691,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                     else
                         fieldBuffer << m_uint32Values[index];
                 }
-                else if (inGuildWar)
+                else if (inGuildWar && !fromDiffFaction)
                 {
                     if (index == UNIT_FIELD_BYTES_2)
                         fieldBuffer << m_uint32Values[index];
