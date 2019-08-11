@@ -202,8 +202,6 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
 
         if (channelId)
             cMgr->LeftChannel(channelId, zone);
-        else
-            cMgr->LeftChannel(channelName);
     }
 
     TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL finished handler all is OK");
