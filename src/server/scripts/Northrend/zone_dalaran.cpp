@@ -61,6 +61,10 @@ enum NPCs // All outdoor guards are within 35.0f of these NPCs
     NPC_SUNREAVER_GUARDIAN_MAGE            = 29255,
 };
 
+Position const AllianceEnterPoint = { 5757.f, 716.0f };
+Position const AllianceTavernPoint = { 5732.f, 677.f };
+Position const HordeEnterPoint = { 5861.f, 591.f };
+
 class npc_mageguard_dalaran : public CreatureScript
 {
 public:
@@ -73,6 +77,27 @@ public:
             creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_NORMAL, true);
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
+            checkdist = 0.f;
+            factionAlliance = me->GetEntry() == NPC_SILVER_COVENANT_GUARDIAN_MAGE;
+            spellid = factionAlliance ? SPELL_TRESPASSER_A : SPELL_TRESPASSER_H;
+            if (me->IsWithinDist2d(AllianceEnterPoint.GetPositionX(), AllianceEnterPoint.GetPositionY(), 15.f))
+            {
+                checkdist = 7.0f;
+                point = AllianceEnterPoint;
+            }
+            else if (me->IsWithinDist2d(AllianceTavernPoint.GetPositionX(), AllianceTavernPoint.GetPositionY(), 15.f))
+            {
+                checkdist = 5.0f;
+                point = AllianceTavernPoint;
+            }
+            else if (me->IsWithinDist2d(HordeEnterPoint.GetPositionX(), HordeEnterPoint.GetPositionY(), 25.f))
+            {
+                checkdist = 10.0f;
+                point = HordeEnterPoint;
+            }
+
+            if (checkdist)
+                _events.ScheduleEvent(1, 1000);
         }
 
         void Reset() override { }
@@ -81,55 +106,49 @@ public:
 
         void AttackStart(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* who) override
+        void UpdateAI(uint32 diff) override
         {
-            if (!who || !who->IsInWorld() || who->GetZoneId() != 4395)
+            if (!me || !me->IsAlive())
                 return;
 
-            if (!me->IsWithinDist(who, 65.0f, false))
-                return;
+            _events.Update(diff);
 
-            Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
-
-            if (!player || player->IsGameMaster() || player->IsBeingTeleported() ||
-                // If player has Disguise aura for quest A Meeting With The Magister or An Audience With The Arcanist, do not teleport it away but let it pass
-                player->HasAura(SPELL_SUNREAVER_DISGUISE_FEMALE) || player->HasAura(SPELL_SUNREAVER_DISGUISE_MALE) ||
-                player->HasAura(SPELL_SILVER_COVENANT_DISGUISE_FEMALE) || player->HasAura(SPELL_SILVER_COVENANT_DISGUISE_MALE) ||
-                // If player has already been teleported, don't try to teleport again
-                player->HasAura(SPELL_TRESPASSER_A) || player->HasAura(SPELL_TRESPASSER_H))
-                return;
-
-            switch (me->GetEntry())
+            while (uint32 eventId = _events.ExecuteEvent())
             {
-                case NPC_SILVER_COVENANT_GUARDIAN_MAGE:
-                    if (player->GetTeam() == HORDE)              // Horde unit found in Alliance area
+                switch (eventId)
+                {
+                    case 1:
                     {
-                        if (GetClosestCreatureWithEntry(me, NPC_APPLEBOUGH_A, 32.0f))
-                        {
-                            if (me->isInBackInMap(who, 8.0f))   // In my line of sight, "outdoors", and behind me
-                                DoCast(who, SPELL_TRESPASSER_A); // Teleport the Horde unit out
-                        }
-                        else                                      // In my line of sight, and "indoors"
-                            DoCast(who, SPELL_TRESPASSER_A);     // Teleport the Horde unit out
+                        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+                        for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                            if (Player* plr = itr->GetSource())
+                                if (plr->IsAlive() && !plr->IsGameMaster() && plr->IsWithinDist2d(point.GetPositionX(), point.GetPositionY(), checkdist) && (plr->GetPositionZ() < 670))
+                                {
+                                    if ((factionAlliance && plr->GetTeamId() == TEAM_HORDE) || (!factionAlliance && plr->GetTeamId() == TEAM_ALLIANCE))
+                                    {
+                                        if (// If player has Disguise aura for quest A Meeting With The Magister or An Audience With The Arcanist, do not teleport it away but let it pass
+                                            plr->HasAura(SPELL_SUNREAVER_DISGUISE_FEMALE) || plr->HasAura(SPELL_SUNREAVER_DISGUISE_MALE) ||
+                                            plr->HasAura(SPELL_SILVER_COVENANT_DISGUISE_FEMALE) || plr->HasAura(SPELL_SILVER_COVENANT_DISGUISE_MALE))
+                                            continue;
+
+                                        DoCast(plr, spellid, TRIGGERED_FULL_MASK);
+                                        me->CombatStop();
+                                    }
+                                }
+
+                        _events.ScheduleEvent(1, 1000);
+                        break;
                     }
-                    break;
-                case NPC_SUNREAVER_GUARDIAN_MAGE:
-                    if (player->GetTeam() == ALLIANCE)           // Alliance unit found in Horde area
-                    {
-                        if (GetClosestCreatureWithEntry(me, NPC_SWEETBERRY_H, 32.0f))
-                        {
-                            if (me->isInBackInMap(who, 8.0f))   // In my line of sight, "outdoors", and behind me
-                                DoCast(who, SPELL_TRESPASSER_H); // Teleport the Alliance unit out
-                        }
-                        else                                      // In my line of sight, and "indoors"
-                            DoCast(who, SPELL_TRESPASSER_H);     // Teleport the Alliance unit out
-                    }
-                    break;
+                }
             }
-            return;
         }
 
-        void UpdateAI(uint32 /*diff*/) override { }
+    private:
+        bool factionAlliance;
+        Position point;
+        uint32 spellid;
+        float checkdist;
+        EventMap _events;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
