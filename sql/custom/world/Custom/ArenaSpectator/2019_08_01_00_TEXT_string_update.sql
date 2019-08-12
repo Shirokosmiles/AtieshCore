@@ -1,6 +1,5 @@
-DELETE FROM `trinity_string` WHERE `entry` IN (11576, 11577, 11578, 11579, 11580, 11581, 11582, 11583, 11584, 11585, 11586, 11587, 11588, 11589, 11590, 11591, 11592, 11593, 11594, 11595, 11596);
+DELETE FROM `trinity_string` WHERE `entry` IN (11577, 11578, 11579, 11580, 11581, 11582, 11583, 11584, 11585, 11586, 11587, 11588, 11589, 11590, 11591, 11592, 11593, 11594, 11595, 11596);
 INSERT INTO `trinity_string` VALUES
-(11576,'Receive start-pack items',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Получить стартовый пакет'),
 (11577,'2vs2 (Current games: ' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2vs2 (Текущие игры: '),
 (11578,'3vs3 (Current games: ' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'3vs3 (Текущие игры: '),
 (11579,'5vs5 (Current games: ' ,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'5vs5 (Текущие игры: '),

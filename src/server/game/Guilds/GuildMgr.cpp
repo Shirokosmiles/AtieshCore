@@ -300,6 +300,29 @@ void GuildMgr::StopAllGuildWarsFor(ObjectGuid::LowType guildId)
             StopWarBetween(guildId, itr->second.attackerGuildId, itr->second.attackerGuildId);
     }
 }
+
+void GuildMgr::UpdateWarFlagForAllEnemiesAndThis(ObjectGuid::LowType guildId)
+{
+    for (GuildWarsContainer::const_iterator itr = _guildWarStore.begin(); itr != _guildWarStore.end(); ++itr)
+    {
+        bool firstGIsAttacker = itr->second.attackerGuildId == guildId;
+        if (firstGIsAttacker)
+        {
+            if (Guild* defenderGuild = GetGuildById(itr->second.defenderGuildId))
+                defenderGuild->UpdateGuildWarFlag(false);
+        }
+
+        bool secondGIsAttacker = itr->second.defenderGuildId == guildId;
+        if (secondGIsAttacker)
+        {
+            if (Guild* attackerGuild = GetGuildById(itr->second.attackerGuildId))
+                attackerGuild->UpdateGuildWarFlag(false);
+        }
+    }
+
+    if (Guild* Guild = GetGuildById(guildId))
+        Guild->UpdateGuildWarFlag(false);
+}
 // Atiesh Features end
 
 ObjectGuid::LowType GuildMgr::GenerateGuildId()

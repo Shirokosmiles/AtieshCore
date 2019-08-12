@@ -1246,7 +1246,7 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     m_guildLevel = 1;
     m_guildExp = 0;
     m_guildFaction = pLeader->GetCFSTeamId();
-    m_guildRating = 1500;
+    m_guildRating = 0;
     m_createdDate = GameTime::GetGameTime();
     _CreateLogHolders();
 

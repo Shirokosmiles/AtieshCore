@@ -1382,6 +1382,13 @@ enum TrinityStrings
     LANG_GSYSTEM_GW_STOP                  = 12020, //"You admitted defeat in this war against the guild %s"
     LANG_GSYSTEM_GW_REQ_LEVEL             = 12021,
     LANG_GSYSTEM_GW_REQ_GUILDRIGHTS       = 12022,  //"You have not rights to declare Guild War.\nYou should to have guild rank with rights to modify guild information"
-    LANG_GSYSTEM_GW_REQ_ONEFACTION        = 12023   //"You can declare War only inside one faction (Alliance or Horde)"
+    LANG_GSYSTEM_GW_REQ_ONEFACTION        = 12023,   //"You can declare War only inside one faction (Alliance or Horde)"
+    LANG_GSYSTEM_GUILD_MENU               = 12024, // "|TInterface\\icons\\spell_shadow_darksummoning:25:25:-15:0|t Guild Menu|r"
+    LANG_GSYSTEM_GUILD_INFO               = 12025, // "|TInterface\\icons\\spell_shadow_shadesofdarkness:25:25:-15:0|t Guild Info|r"
+    LANG_GSYSTEM_GUILD_WAR_INFO           = 12026, // "|TInterface\\icons\\spell_shadow_deathpact:25:25:-15:0|t Guild War Info|r"
+    LANG_GSYSTEM_GUILD_WAR_DECLARE        = 12027, // "|TInterface\\icons\\Achievement_Arena_3v3_4:25:25:-15:0|t Declare The War with guild:|r"
+    LANG_GSYSTEM_GUILD_WAR_ADMIT          = 12028, // "|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Admit defeat with guild:|r"
+    LANG_GSYSTEM_GUILD_WAR_DECLARE_SURE   = 12029, // "Are you sure you want to Declare The War?"
+    LANG_GSYSTEM_GUILD_WAR_ADMIT_SURE     = 12030 // "Are you sure you want to Admit defeat?"
 };
 #endif

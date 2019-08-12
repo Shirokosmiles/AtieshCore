@@ -1,4 +1,4 @@
-DELETE FROM `trinity_string` where `entry` IN (12000, 12001, 12002, 12003, 12004, 12005, 12006, 12007, 12008, 12009, 12010, 12011, 12012, 12013, 12014, 12015, 12016, 12017, 12018, 12019, 12020, 12021, 12022, 12023);
+DELETE FROM `trinity_string` where `entry` IN (12000, 12001, 12002, 12003, 12004, 12005, 12006, 12007, 12008, 12009, 12010, 12011, 12012, 12013, 12014, 12015, 12016, 12017, 12018, 12019, 12020, 12021, 12022, 12023, 12024, 12025, 12026, 12027, 12028, 12029, 12030);
 INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12000', '|cffe6cc80Not enough guild members for start Guild War', '|cffe6cc80Недостаточно игроков в гильдии для начала Войны Гильдий'),
 ('12001', '|cffe6cc80Not enough guild members in target guild for starting Guild War', '|cffe6cc80В противоположной гильдии недостаточно игроков для начала Войны Гильдий'),
@@ -9,7 +9,7 @@ INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12006', '|cffe6cc80The Guild has received a |cff00ff00%u |cffe6cc80 experience.', '|cffe6cc80Гильдия заработала |cff00ff00%u |cffe6cc80 очков опыта.'),
 ('12007', '|cffe6cc80The Guild has entered in Guild War with |cFFF00000%s', '|cffe6cc80Гильдия вступила в Войну с |cFFF00000%s'),
 ('12008', '|cffe6cc80The Guild has ended Guild War with |c00FF23CC%s|cffe6cc80.\n|cffe6cc80The Winner of this Guild War : |cff00ff00%s|cffe6cc80. Guild Rating has been changed on "|cff00ff00%i|cffe6cc80".', '|cffe6cc80Гильдия окончила Войну Гильдий с |c00FF23CC%s|cffe6cc80.\n|cffe6cc80Победителем Войны признана : |cff00ff00%%s|cffe6cc80. Рейтинг гильдии был изменен на "|cff00ff00%i|cffe6cc80".'),
-('12009', 'The Guild has %u level, and %u / 1500 experience for next level. Guild Rating = %i', 'Гильдия имеет %u уровень и %u / 1500 очков опыта до следующего уровня. Гильдейский Рейтинг равен = %i'),
+('12009', '|cffe6cc80The Guild has |cff00ff00%u|cffe6cc80 level, and |cff00ff00%u / 1500|cffe6cc80 experience for next level.\n|cffe6cc80Guild Rating Points |cff00ff00%u', '|cffe6cc80Гильдия имеет |cff00ff00%u|cffe6cc80 уровень и |cff00ff00%u / 1500|cffe6cc80 очков опыта до следующего уровня.\n|cffe6cc80Гильдейские очки рейтинга |cff00ff00%u'),
 ('12010', '|cFFF00000The Guild was fined by |c00FF23CC%s |cffe6cc80on |cff00ff00%u |cffe6cc80levels. Now Guild have |cff00ff00%u |cffe6cc80level', '|cFFF00000Гильдия была оштрафована |c00FF23CC%s |cffe6cc80на |cff00ff00%u |cFFF00000уровней, и сейчас уровень гильдии равен |cff00ff00%u'),
 ('12011', ' level', ' уровня'),
 ('12012', 'The Guild %s has received %u additional levels, and now has %u level', 'Гильдия %s получила %u дополнительных уровней, и сейчас имеет %u уровень'),
@@ -23,4 +23,11 @@ INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12020', 'You admitted defeat in this war against the guild %s', 'Вы признали свое поражение в войне против гильдии %s'),
 ('12021', '|caa88aa88To use this feature, your guild must reach a |cff00ff00%u |caa88aa88level', '|caa88aa88Для пользования данной функцией, ваша гильдия должна достичь |cff00ff00%u |caa88aa88уровня'),
 ('12022', 'You have not rights to declare Guild War.\nYou should to have guild rank with rights to |cff00ff00modify guild information', 'У вас недостаточно прав гильдии для объявления войны другой гильдии.\nНеобходимо иметь ранг с правами |cff00ff00изменения гильдейской информации'),
-('12023', '|cffe6cc80You can declare War only inside one faction (Alliance or Horde)', '|cffe6cc80Вы можете объявить Войну только гильдии из вашей фракции (Альянс или Орда)');
+('12023', '|cffe6cc80You can declare War only inside one faction (Alliance or Horde)', '|cffe6cc80Вы можете объявить Войну только гильдии из вашей фракции (Альянс или Орда)'),
+('12024', '|TInterface\\icons\\spell_shadow_darksummoning:25:25:-15:0|t Guild Menu|r', '|TInterface\\icons\\spell_shadow_darksummoning:25:25:-15:0|t Гильдейское меню|r'),
+('12025', '|TInterface\\icons\\spell_shadow_shadesofdarkness:25:25:-15:0|t Guild Info|r', '|TInterface\\icons\\spell_shadow_shadesofdarkness:25:25:-15:0|t Гильдейское инфо|r'),
+('12026', '|TInterface\\icons\\spell_shadow_deathpact:25:25:-15:0|t Guild War Info|r', '|TInterface\\icons\\spell_shadow_deathpact:25:25:-15:0|t Гильдейские Войны, инфо|r'),
+('12027', '|TInterface\\icons\\Achievement_Arena_3v3_4:25:25:-15:0|t Declare The War with guild:|r', '|TInterface\\icons\\Achievement_Arena_3v3_4:25:25:-15:0|t Объявить Гильдейскую Войну с гильдией:|r'),
+('12028', '|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Admit defeat with guild:|r', '|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Признать поражение в Войне с гильдией:|r'),
+('12029', 'Are you sure you want to Declare The War?', 'Вы уверены, что готовы объявить Войну?'),
+('12030', 'Are you sure you want to Admit defeat?', 'Вы уверены, что готовы признать поражение?');

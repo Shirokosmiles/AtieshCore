@@ -79,6 +79,7 @@ public:
 
     void StopWarBetween(ObjectGuid::LowType firstguildId, ObjectGuid::LowType secondguildId, ObjectGuid::LowType winnerguildId);
     void StopAllGuildWarsFor(ObjectGuid::LowType guildId); // Stop all GW before Disband
+    void UpdateWarFlagForAllEnemiesAndThis(ObjectGuid::LowType guildId);
 
     void LoadGuildWarData();
     void LoadGuildWarHistory();

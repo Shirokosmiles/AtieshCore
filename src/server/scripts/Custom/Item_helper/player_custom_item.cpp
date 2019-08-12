@@ -19,6 +19,8 @@
 
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "Guild.h"
+#include "GuildMgr.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
 #include "WorldSession.h"
@@ -93,6 +95,9 @@ public:
         }
 
         player->PlayerTalkClass->ClearMenus();
+
+        if (player->GetGuild())
+            AddGossipItemFor(player, 0, GTS(LANG_GSYSTEM_GUILD_MENU), GOSSIP_SENDER_MAIN, 103);
 
         // показатель бонусов с системой определение кол.бонусов (бонус, бонуса, бонусов)
         AddGossipItemFor(player, 0, getString(GTS(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 1);
@@ -240,6 +245,9 @@ public:
                 case 3:
                 {
                     player->PlayerTalkClass->ClearMenus();
+
+                    if (player->GetGuild())
+                        AddGossipItemFor(player, 0, GTS(LANG_GSYSTEM_GUILD_MENU), GOSSIP_SENDER_MAIN, 103);
 
                     // показатель бонусов с системой определение кол.бонусов (бонус, бонуса, бонусов)
                     AddGossipItemFor(player, 0, getString(GTS(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 1);
@@ -1989,8 +1997,112 @@ public:
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
+                case 103: // Guild Menu
+                {
+                    player->PlayerTalkClass->ClearMenus();
+                    AddGossipItemFor(player, 0, GTS(LANG_GSYSTEM_GUILD_INFO), GOSSIP_SENDER_MAIN, 104);
+                    AddGossipItemFor(player, 0, GTS(LANG_GSYSTEM_GUILD_WAR_INFO), GOSSIP_SENDER_MAIN, 105);
+
+                    if (player->GetGuild()->CanStartGuildWarByGuildRights(player->GetSession()))
+                    {
+                        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GTS(LANG_GSYSTEM_GUILD_WAR_DECLARE), GOSSIP_SENDER_MAIN, 106, GTS(LANG_GSYSTEM_GUILD_WAR_DECLARE_SURE), 0, true);
+                        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GTS(LANG_GSYSTEM_GUILD_WAR_ADMIT), GOSSIP_SENDER_MAIN, 107, GTS(LANG_GSYSTEM_GUILD_WAR_ADMIT_SURE), 0, true);
+                    }                    
+
+                    AddGossipItemFor(player, 0, GTS(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 3);
+                    SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+                    break;
+                }
+                case 104: // Guild Info
+                {
+                    player->PlayerTalkClass->ClearMenus();
+                    if (Guild* guild = player->GetGuild())
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_INFO, guild->GetGuildLevel(), guild->GetGuildExperience(), guild->GetGuildRating());
+
+                    CloseGossipMenuFor(player);
+                    break;
+                }
+                case 105: // Guild War info
+                {
+                    player->PlayerTalkClass->ClearMenus();
+                    if (Guild* guild = player->GetGuild())
+                    {
+                        if (!sGuildMgr->GuildHasWarState(guild->GetId()))
+                            ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_NO_ENEMY);
+                        else
+                            ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_HAS_ENEMY, sGuildMgr->GetGuildEnemy(guild->GetId()));
+                    }
+                    CloseGossipMenuFor(player);
+                    break;
+                }
             }
         }
+    }
+
+    void OnGossipSelectCode(Player* player, Item* /*item*/, uint32 /*sender*/, uint32 action, const char* code) override
+    {
+        player->PlayerTalkClass->ClearMenus();
+
+        if (!*code)
+            return;
+
+        std::string guildName = code;
+
+        Guild* targetGuild = sGuildMgr->GetGuildByName(guildName);
+        if (!targetGuild)
+            return;
+
+        Guild* ownGuild = player->GetGuild();
+        if (!ownGuild)
+            return;
+
+        if (action == 106)
+        {
+            if (sGuildMgr->IsGuildsInWar(player->GetGuildId(), targetGuild->GetId()))
+            {
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_ALREADY_ENEMY, guildName.c_str());
+                return;
+            }
+
+            std::string msg;
+            if (!ownGuild->CanStartGuildWarByCount(player->GetSession(), msg, false))
+            {
+                ChatHandler(player->GetSession()).PSendSysMessage("%s", msg.c_str());
+                return;
+            }
+
+            if (!ownGuild->CanStartGuildWarByTimer(player->GetSession(), msg))
+            {
+                ChatHandler(player->GetSession()).PSendSysMessage("%s", msg.c_str());
+                return;
+            }
+
+            if (!targetGuild->CanStartGuildWarByCount(player->GetSession(), msg, true))
+            {
+                ChatHandler(player->GetSession()).PSendSysMessage("%s", msg.c_str());
+                return;
+            }
+
+            GuildWars data;
+            data.attackerGuildId = ownGuild->GetId();
+            data.defenderGuildId = targetGuild->GetId();
+            if (sGuildMgr->StartNewWar(data))
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_START, guildName.c_str());
+
+        }
+        else if (action == 107)
+        {
+            if (!sGuildMgr->IsGuildsInWar(ownGuild->GetId(), targetGuild->GetId()))
+            {
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_NOT_ENEMY, guildName.c_str());
+                return;
+            }
+
+            sGuildMgr->StopWarBetween(ownGuild->GetId(), targetGuild->GetId(), targetGuild->GetId());
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_STOP, guildName.c_str());
+        }
+
+        player->PlayerTalkClass->SendCloseGossip();
     }
 };
 

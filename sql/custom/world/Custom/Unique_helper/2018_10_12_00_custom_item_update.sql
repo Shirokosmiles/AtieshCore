@@ -1,5 +1,5 @@
 -- Custom string
-DELETE FROM `trinity_string` WHERE `entry` IN (11566, 11567, 11568, 11569, 11570, 11571, 11572, 11573, 11574);
+DELETE FROM `trinity_string` WHERE `entry` IN (11566, 11567, 11568, 11569, 11570, 11571, 11572, 11573, 11574, 11576);
 INSERT INTO `trinity_string` VALUES
 (11566,'You can not use it on BattleGround or Arena!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы не можете использовать его на БГ и Арене!'),
 (11567,'You can not use it while you in stealth!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Вы не можете использовать его, пока находитесь в режиме незаметности!'),
@@ -9,7 +9,8 @@ INSERT INTO `trinity_string` VALUES
 (11571,'|TInterface\\icons\\Ability_Mage_PotentSpirit:25:25:-15:0|tTrade Shop',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Ability_Mage_PotentSpirit:25:25:-15:0|tМагазин'),
 (11572,'|TInterface\\icons\\Achievement_BG_interruptX_flagcapture_attempts:25:25:-15:0|tYour Weekly PVP Bonus Cap : (',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Achievement_BG_interruptX_flagcapture_attempts:25:25:-15:0|tYour Weekly PVP Bonus Cap : ('),
 (11573,'|TInterface\\icons\\Achievement_BG_interruptX_flagcapture_attempts_1game:25:25:-15:0|tYour Weekly PVP Bonus Cap : (',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Achievement_BG_interruptX_flagcapture_attempts_1game:25:25:-15:0|tYour Weekly PVP Bonus Cap : ('),
-(11574,'|TInterface\\icons\\Spell_chargepositive:25:25:-15:0|tBank',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Spell_chargepositive:25:25:-15:0|tБанк');
+(11574,'|TInterface\\icons\\Spell_chargepositive:25:25:-15:0|tBank',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Spell_chargepositive:25:25:-15:0|tБанк'),
+(11576,'|TInterface\\icons\\Ability_Warrior_Intervene:25:25:-15:0|t Receive start-pack items',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'|TInterface\\icons\\Ability_Warrior_Intervene:25:25:-15:0|t Получить стартовый пакет');
 
 DELETE FROM `trinity_string` WHERE `entry` IN (11500, 11501, 11502, 11503, 11504, 11505, 11506, 11507, 11508, 11509, 11510, 11511, 11512, 11513, 11514, 11515, 11516, 11517, 11518, 11519, 11520, 11521, 11522, 11523, 11524, 11525, 11526, 11527, 11528, 11529, 11530, 11531, 11532, 11533, 11534, 11535, 11536, 11537, 11538, 11539, 11540, 11541, 11542, 11543, 11544, 11545, 11546, 11547, 11548, 11549, 11550, 11551, 11552, 11553, 11554, 11555, 11556, 11557, 11558, 11559, 11560, 11561, 11562, 11563, 11564, 11565);
 -- LANG_ITEM_MSG_ALREADY_ITEM

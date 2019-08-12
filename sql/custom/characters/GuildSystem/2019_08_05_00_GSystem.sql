@@ -8,4 +8,4 @@ ALTER TABLE `guild`
 	ADD COLUMN `GuildFaction` INT(10) NOT NULL DEFAULT '0' AFTER `GuildExperience`;
 	
 ALTER TABLE `guild`
-	ADD COLUMN `GuildRating` INT(10) NOT NULL DEFAULT '1500' AFTER `GuildFaction`;
+	ADD COLUMN `GuildRating` INT(10) NOT NULL DEFAULT '0' AFTER `GuildFaction`;

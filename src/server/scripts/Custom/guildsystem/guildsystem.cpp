@@ -96,17 +96,20 @@ public:
             if (!player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
                 player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
             player->InitPvP();
-            player->UpdateFactionForSelfAndControllList();
+            sGuildMgr->UpdateWarFlagForAllEnemiesAndThis(guild->GetId());
         }
     }
 
-    void OnRemoveMember(Guild* /*guild*/, Player* player, bool /*isDisbanding*/, bool /*isKicked*/) override
+    void OnRemoveMember(Guild* guild, Player* player, bool /*isDisbanding*/, bool /*isKicked*/) override
     {
         if (sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             player->RemoveGuildAurasForPlr();
 
         if (sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
-            player->UpdateFactionForSelfAndControllList();
+        {
+            if (sGuildMgr->GuildHasWarState(guild->GetId()))
+                sGuildMgr->UpdateWarFlagForAllEnemiesAndThis(guild->GetId());
+        }
     }
 
     void OnLevelUp(Guild* guild, Player* player, uint32 receivedLevel) override
