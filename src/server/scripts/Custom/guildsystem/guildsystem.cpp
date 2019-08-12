@@ -78,9 +78,9 @@ public:
         guild->BroadcastToGuildEnteredInGWWith(guildName);
     }
 
-    void LeftInGuildWar(Guild* guild, std::string const& guildName, std::string const& winnerguildName) override
+    void LeftInGuildWar(Guild* guild, int32 ratingChange, std::string const& guildName, std::string const& winnerguildName) override
     {
-        guild->BroadcastToGuildEndedGWWith(guildName, winnerguildName);
+        guild->BroadcastToGuildEndedGWWith(guildName, winnerguildName, ratingChange);
     }
 
     void OnAddMember(Guild* guild, Player* player, uint8& /*plRank*/) override
@@ -244,7 +244,7 @@ public:
 
         // Display Guild Information
         handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
-        handler->PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_INFO, guild->GetGuildLevel(), guild->GetGuildExperience());
+        handler->PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_INFO, guild->GetGuildLevel(), guild->GetGuildExperience(), guild->GetGuildRating());
         return true;
     }
 

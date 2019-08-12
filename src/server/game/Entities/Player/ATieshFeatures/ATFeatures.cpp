@@ -828,6 +828,78 @@ void Guild::UpdateLevelAndExp()
     CharacterDatabase.Execute(stmt);
 }
 
+void Guild::UpdateGuildRating(int32 changes, bool winner)
+{
+    if (winner)
+        m_guildRating += changes;
+    else
+    {
+        int32 checkrating = m_guildRating;
+        if (checkrating + changes > 0)
+            m_guildRating += changes;
+        else
+            m_guildRating = 0;
+    }
+
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RATING);
+    stmt->setUInt32(0, m_guildRating);
+    stmt->setUInt32(1, m_id);
+    CharacterDatabase.Execute(stmt);
+}
+
+int32 Guild::WonAgainst(uint32 Own_Rating, uint32 Opponent_Rating)
+{
+    // Called when the team has won
+    // Change in Matchmaker rating
+    int32 mod = GetMatchmakerRatingMod(Own_Rating, Opponent_Rating, true);
+
+    // Return the rating change, used to display it on the results screen
+    return mod;
+}
+
+int32 Guild::LostAgainst(uint32 Own_Rating, uint32 Opponent_Rating)
+{
+    // Called when the team has lost
+    // Change in Matchmaker Rating
+    int32 mod = GetMatchmakerRatingMod(Own_Rating, Opponent_Rating, false);
+
+    // return the rating change, used to display it on the results screen
+    return mod;
+}
+
+int32 Guild::GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating, bool won /*, float& confidence_factor*/)
+{
+    // 'Chance' calculation - to beat the opponent
+    // This is a simulation. Not much info on how it really works
+    float chance = GetChanceAgainst(ownRating, opponentRating);
+    float won_mod = (won) ? 1.0f : 0.0f;
+    float mod = won_mod - chance;
+
+    // Work in progress:
+    /*
+    // This is a simulation, as there is not much info on how it really works
+    float confidence_mod = min(1.0f - fabs(mod), 0.5f);
+
+    // Apply confidence factor to the mod:
+    mod *= confidence_factor
+
+    // And only after that update the new confidence factor
+    confidence_factor -= ((confidence_factor - 1.0f) * confidence_mod) / confidence_factor;
+    */
+
+    // Real rating modification
+    mod *= sWorld->getFloatConfig(CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER);
+
+    return (int32)ceil(mod);
+}
+
+float Guild::GetChanceAgainst(uint32 ownRating, uint32 opponentRating)
+{
+    // Returns the chance to win against a team with the given rating, used in the rating adjustment calculation
+    // ELO system
+    return 1.0f / (1.0f + std::exp(std::log(10.0f) * (float(opponentRating) - float(ownRating)) / 650.0f));
+}
+
 void Guild::CastGuildLevelAuras(uint32 level)
 {
     GuildSpellAurasContainer const& guildSpellAurasMap = sObjectMgr->GetGuildSpellAurasMap();
@@ -1090,11 +1162,11 @@ void Guild::BroadcastToGuildEnteredInGWWith(std::string const& guildName) const
     }
 }
 
-void Guild::BroadcastToGuildEndedGWWith(std::string const& guildName, std::string const& winnername) const
+void Guild::BroadcastToGuildEndedGWWith(std::string const& guildName, std::string const& winnername, int32 ratingChange) const
 {
     for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         if (Player * player = itr->second->FindConnectedPlayer())
-            ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_END_WAR, guildName, winnername);
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_END_WAR, guildName, winnername, ratingChange);
     }
 }

@@ -1,4 +1,4 @@
-DELETE FROM `trinity_string` where `entry` IN (12000, 12001, 12002, 12003, 12004, 12005, 12006, 12007, 12008, 12009, 12010, 12011, 12012, 12013, 12014, 12015, 12016, 12017, 12018, 12019, 12020, 12021, 12022);
+DELETE FROM `trinity_string` where `entry` IN (12000, 12001, 12002, 12003, 12004, 12005, 12006, 12007, 12008, 12009, 12010, 12011, 12012, 12013, 12014, 12015, 12016, 12017, 12018, 12019, 12020, 12021, 12022, 12023);
 INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12000', '|cffe6cc80Not enough guild members for start Guild War', '|cffe6cc80Недостаточно игроков в гильдии для начала Войны Гильдий'),
 ('12001', '|cffe6cc80Not enough guild members in target guild for starting Guild War', '|cffe6cc80В противоположной гильдии недостаточно игроков для начала Войны Гильдий'),
@@ -8,8 +8,8 @@ INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12005', '|cffe6cc80The Guild has received a |cff00ff00%u |cffe6cc80 experience. Points has gained by %s', '|cffe6cc80Гильдия заработала |cff00ff00%u |cffe6cc80 очков опыта, добытые благодаря %s'),
 ('12006', '|cffe6cc80The Guild has received a |cff00ff00%u |cffe6cc80 experience.', '|cffe6cc80Гильдия заработала |cff00ff00%u |cffe6cc80 очков опыта.'),
 ('12007', '|cffe6cc80The Guild has entered in Guild War with |cFFF00000%s', '|cffe6cc80Гильдия вступила в Войну с |cFFF00000%s'),
-('12008', '|cffe6cc80The Guild has ended Guild War with |c00FF23CC%s|cffe6cc80.\n|cffe6cc80The Winner of this Guild War : |cff00ff00%s', '|cffe6cc80Гильдия окончила Войну Гильдий с |c00FF23CC%s|cffe6cc80.\n|cffe6cc80Победителем Войны признана : |cff00ff00%%s'),
-('12009', 'The Guild has %u level, and %u / 1500 experience for next level', 'Гильдия имеет %u уровень и %u / 1500 очков опыта до следующего уровня.'),
+('12008', '|cffe6cc80The Guild has ended Guild War with |c00FF23CC%s|cffe6cc80.\n|cffe6cc80The Winner of this Guild War : |cff00ff00%s|cffe6cc80. Guild Rating has been changed on "|cff00ff00%i|cffe6cc80".', '|cffe6cc80Гильдия окончила Войну Гильдий с |c00FF23CC%s|cffe6cc80.\n|cffe6cc80Победителем Войны признана : |cff00ff00%%s|cffe6cc80. Рейтинг гильдии был изменен на "|cff00ff00%i|cffe6cc80".'),
+('12009', 'The Guild has %u level, and %u / 1500 experience for next level. Guild Rating = %i', 'Гильдия имеет %u уровень и %u / 1500 очков опыта до следующего уровня. Гильдейский Рейтинг равен = %i'),
 ('12010', '|cFFF00000The Guild was fined by |c00FF23CC%s |cffe6cc80on |cff00ff00%u |cffe6cc80levels. Now Guild have |cff00ff00%u |cffe6cc80level', '|cFFF00000Гильдия была оштрафована |c00FF23CC%s |cffe6cc80на |cff00ff00%u |cFFF00000уровней, и сейчас уровень гильдии равен |cff00ff00%u'),
 ('12011', ' level', ' уровня'),
 ('12012', 'The Guild %s has received %u additional levels, and now has %u level', 'Гильдия %s получила %u дополнительных уровней, и сейчас имеет %u уровень'),

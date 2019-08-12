@@ -2095,9 +2095,9 @@ void ScriptMgr::OnGuildEnteredInGuildWar(Guild* guild, std::string const& guildN
     FOREACH_SCRIPT(GuildScript)->EnteredInGuildWar(guild, guildName);
 }
 
-void ScriptMgr::OnGuildLeftInGuildWar(Guild* guild, std::string const& guildName, std::string const& winnerguildName)
+void ScriptMgr::OnGuildLeftInGuildWar(Guild* guild, int32 ratingChange, std::string const& guildName, std::string const& winnerguildName)
 {
-    FOREACH_SCRIPT(GuildScript)->LeftInGuildWar(guild, guildName, winnerguildName);
+    FOREACH_SCRIPT(GuildScript)->LeftInGuildWar(guild, ratingChange, guildName, winnerguildName);
 }
 
 void ScriptMgr::OnGuildLevelUpEvent(Guild* guild, Player* player, uint32 receivedLevel)

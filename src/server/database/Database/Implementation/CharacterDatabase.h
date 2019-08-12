@@ -531,6 +531,7 @@ enum CharacterDatabaseStatements : uint32
     CHAR_UPD_RESET_PVPWEEKLYCAP,
 
     CHAR_UPD_GUILD_LEVELANDEXP,
+    CHAR_UPD_GUILD_RATING,
     // for guild_wars
     CHAR_INS_GUILD_WAR_START,
     CHAR_DEL_GUILD_WAR_STOP,

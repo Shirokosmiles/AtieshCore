@@ -795,7 +795,7 @@ class TC_GAME_API GuildScript : public ScriptObject
         // ATiesh features : GuildSystem
         virtual void EnteredInGuildWar(Guild* /*guild*/, std::string const& /*guildName*/) { }
 
-        virtual void LeftInGuildWar(Guild* /*guild*/, std::string const& /*guildName*/, std::string const& /*winnerguildName*/) { }
+        virtual void LeftInGuildWar(Guild* /*guild*/, int32 /*ratingChange*/, std::string const& /*guildName*/, std::string const& /*winnerguildName*/) { }
 
         virtual void OnLevelUp(Guild* /*guild*/, Player* /*player*/, uint32 /*receivedLevel*/) { }
 
@@ -1082,7 +1082,7 @@ class TC_GAME_API ScriptMgr
         void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, ObjectGuid::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
         // ATiesh features : GuildSystem
         void OnGuildEnteredInGuildWar(Guild* guild, std::string const& guildName);
-        void OnGuildLeftInGuildWar(Guild* guild, std::string const& guildName, std::string const& winnerguildName);
+        void OnGuildLeftInGuildWar(Guild* guild, int32 changeRating, std::string const& guildName, std::string const& winnerguildName);
         void OnGuildLevelUpEvent(Guild* guild, Player* player, uint32 receivedLevel);
         void OnGuildLevelDownEvent(Guild* guild, Player* player, uint32 newLevel, uint32 lost);
         void OnGuildExpirienceUpEvent(Guild* guild, Player* player, uint32 receivedExp);

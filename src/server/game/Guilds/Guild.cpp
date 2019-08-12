@@ -1198,6 +1198,7 @@ Guild::Guild():
     m_guildLevel(0),
     m_guildExp(0),
     m_guildFaction(0),
+    m_guildRating(0),
     m_eventLog(nullptr)
 {
     memset(&m_bankEventLog, 0, (GUILD_BANK_MAX_TABS + 1) * sizeof(LogHolder*));
@@ -1245,6 +1246,7 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     m_guildLevel = 1;
     m_guildExp = 0;
     m_guildFaction = pLeader->GetCFSTeamId();
+    m_guildRating = 1500;
     m_createdDate = GameTime::GetGameTime();
     _CreateLogHolders();
 
@@ -1273,7 +1275,8 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     stmt->setUInt64(++index, m_bankMoney);
     stmt->setUInt32(++index, m_guildLevel);
     stmt->setUInt32(++index, m_guildExp);
-    stmt->setUInt32(++index, m_guildFaction);
+    stmt->setUInt32(++index, m_guildFaction); 
+    stmt->setUInt32(++index, m_guildRating);
     trans->Append(stmt);
 
     _CreateDefaultGuildRanks(trans, pLeaderSession->GetSessionDbLocaleIndex()); // Create default ranks
@@ -2037,8 +2040,9 @@ bool Guild::LoadFromDB(Field* fields)
     m_guildLevel    = fields[12].GetUInt32();
     m_guildExp      = fields[13].GetUInt32();
     m_guildFaction  = fields[14].GetUInt32();
+    m_guildRating   = fields[15].GetUInt32();
 
-    uint8 purchasedTabs = uint8(fields[15].GetUInt64());
+    uint8 purchasedTabs = uint8(fields[16].GetUInt64());
     if (purchasedTabs > GUILD_BANK_MAX_TABS)
         purchasedTabs = GUILD_BANK_MAX_TABS;
 

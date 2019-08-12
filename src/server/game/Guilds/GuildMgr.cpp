@@ -263,18 +263,28 @@ void GuildMgr::StopWarBetween(ObjectGuid::LowType firstguildId, ObjectGuid::LowT
     stmt2->setUInt32(2, WarId);
     CharacterDatabase.Execute(stmt2);
 
-    Guild* firstguild = GetGuildById(firstguildId);
-    Guild* secondguild = GetGuildById(secondguildId);
-    if (!firstguild || !secondguild)
+    uint32 looserID = firstguildId == winnerguildId ? secondguildId : firstguildId;
+    Guild* looserGuild = GetGuildById(looserID);
+    Guild* winnerGuild = GetGuildById(winnerguildId);
+    if (!looserGuild || !winnerGuild)
         return;
 
-    if (!GuildHasWarState(firstguildId))
-        firstguild->UpdateGuildWarFlag(false);
-    if (!GuildHasWarState(secondguildId))
-        secondguild->UpdateGuildWarFlag(false);
+    uint32 looserTeamRating = looserGuild->GetGuildRating();
+    uint32 winerTeamRating = winnerGuild->GetGuildRating();
 
-    sScriptMgr->OnGuildLeftInGuildWar(firstguild, GetGuildNameByIdWithLvl(secondguildId), winnerName);
-    sScriptMgr->OnGuildLeftInGuildWar(secondguild, GetGuildNameByIdWithLvl(firstguildId), winnerName);
+    int32 winnerMatchmakerChange = winnerGuild->WonAgainst(winerTeamRating, looserTeamRating);
+    int32 loserMatchmakerChange = looserGuild->LostAgainst(looserTeamRating, winerTeamRating);
+
+    looserGuild->UpdateGuildRating(loserMatchmakerChange, false);
+    winnerGuild->UpdateGuildRating(winnerMatchmakerChange, true);
+
+    if (!GuildHasWarState(looserID))
+        looserGuild->UpdateGuildWarFlag(false);
+    if (!GuildHasWarState(winnerguildId))
+        winnerGuild->UpdateGuildWarFlag(false);
+
+    sScriptMgr->OnGuildLeftInGuildWar(looserGuild, loserMatchmakerChange, GetGuildNameByIdWithLvl(winnerguildId), winnerName);
+    sScriptMgr->OnGuildLeftInGuildWar(winnerGuild, winnerMatchmakerChange, GetGuildNameByIdWithLvl(looserID), winnerName);
 }
 
 void GuildMgr::StopAllGuildWarsFor(ObjectGuid::LowType guildId)
@@ -358,8 +368,8 @@ void GuildMgr::LoadGuilds()
 
                                                      //          0          1       2             3              4              5              6
         QueryResult result = CharacterDatabase.Query("SELECT g.guildid, g.name, g.leaderguid, g.EmblemStyle, g.EmblemColor, g.BorderStyle, g.BorderColor, "
-                                                     //   7                  8       9       10            11           12              13              14             15
-                                                     "g.BackgroundColor, g.info, g.motd, g.createdate, g.BankMoney, g.GuildLevel, g.GuildExperience, g.GuildFaction, COUNT(gbt.guildid) "
+                                                     //   7                  8       9       10            11           12              13              14             15               16
+                                                     "g.BackgroundColor, g.info, g.motd, g.createdate, g.BankMoney, g.GuildLevel, g.GuildExperience, g.GuildFaction, g.GuildRating, COUNT(gbt.guildid) "
                                                      "FROM guild g LEFT JOIN guild_bank_tab gbt ON g.guildid = gbt.guildid GROUP BY g.guildid ORDER BY g.guildid ASC");
 
         if (!result)

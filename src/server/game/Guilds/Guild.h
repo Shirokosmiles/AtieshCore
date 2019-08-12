@@ -699,10 +699,18 @@ class TC_GAME_API Guild
         void BroadcastToGuildLevelDown(uint32 level, uint32 lost, std::string const& playerName) const;
         void BroadcastToGuildExp(uint32 level, std::string const& playerName) const;
         void BroadcastToGuildEnteredInGWWith(std::string const& guildname) const;
-        void BroadcastToGuildEndedGWWith(std::string const& guildName, std::string const& winnername) const;
+        void BroadcastToGuildEndedGWWith(std::string const& guildName, std::string const& winnername, int32 ratingChange) const;
+
+        // GW rating
+        void UpdateGuildRating(int32 changes, bool winner);
+        int32 GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
+        //int32 GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
+        float GetChanceAgainst(uint32 ownRating, uint32 opponentRating);
+        int32 WonAgainst(uint32 Own_Rating, uint32 Opponent_Rating);
+        int32 LostAgainst(uint32 Own_Rating, uint32 Opponent_Rating);
 
         void ItemBroadcastToGuild(Player* player, std::string const& msg) const;
-        void UpdateLevelAndExp();
+        void UpdateLevelAndExp();        
         void UpdateGuildWarFlag(bool startGW);
         void CastGuildLevelAuras(uint32 level);
         void RemoveGuildLevelAuras();
@@ -719,6 +727,7 @@ class TC_GAME_API Guild
         uint32 GetGuildLevel() const { return m_guildLevel; }
         uint32 GetGuildExperience() const { return m_guildExp; }
         uint32 GetGuildFaction() const { return m_guildFaction; }
+        uint32 GetGuildRating() const { return m_guildRating; }
         // Atiesh features end
 
         template<class Do>
@@ -761,6 +770,7 @@ class TC_GAME_API Guild
         uint32 m_guildLevel;
         uint32 m_guildExp;
         uint32 m_guildFaction;
+        uint32 m_guildRating;
         // Atiesh features end
 
         Ranks m_ranks;
