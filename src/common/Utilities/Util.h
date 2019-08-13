@@ -200,10 +200,13 @@ inline bool isNumericOrSpace(wchar_t wchar)
 
 inline bool isNormalSymbol(wchar_t wchar)
 {
-    if (wchar == 0x2116) // ¹
+    if (wchar == 0x2116) // ?
         return true;
 
     if (wchar == 0x2F) // "/"
+        return true;
+
+    if (wchar == 0x27) // "'"
         return true;
 
     switch (wchar)
@@ -219,7 +222,7 @@ inline bool isNormalSymbol(wchar_t wchar)
     case L'~':
     case L'@':
     case L'"':
-    //case L'¹':
+    //case L'?':
     case L'#':
     case L'$':
     case L'%':
