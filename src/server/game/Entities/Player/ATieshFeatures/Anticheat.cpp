@@ -16,10 +16,15 @@
  */
 
 #include "AccountMgr.h"
+#include "DBCStores.h"
+#include "GameTime.h"
 #include "Language.h"
+#include "Log.h"
 #include "MapManager.h"
 #include "Player.h"
 #include "Realm.h"
+#include "World.h"
+#include "WorldSession.h"
 
 // Anticheat System
 void Player::SetUnderACKmount()
