@@ -64,7 +64,7 @@ Data Tele[] = // key = i & Key
     { 1, 3, 9, "|TInterface/ICONS/Achievement_Dungeon_Naxxramas_10man:25|t BC instances", 0, 59, 0, 0, 0, 0, 0, 0 },
     { 1, 4, 9, "|TInterface/ICONS/Achievement_Dungeon_Naxxramas_Normal:25|t WotLK instances", 0, 69, 0, 0, 0, 0, 0, 0 },
     { 1, 5, 9, "|TInterface/ICONS/Achievement_Dungeon_Naxxramas_25man:25|t Raids", 0, 57, 0, 0, 0, 0, 0, 0 },
-    //{ 1, 10, 9, "|TInterface/ICONS/Spell_fire_felfireward:25|t Прочие телепорты", 0, 80, 0, 0, 0, 0, 0, 0 },
+    //{ 1, 10, 9, "|TInterface/ICONS/Spell_fire_felfireward:25|t ?????? ?????????", 0, 80, 0, 0, 0, 0, 0, 0 },
     
     { 2, 0, 2, "|TInterface/ICONS/Achievement_Boss_Mekgineer_Thermaplugg:25|t Gnomeregan |cffff0000(24-34)|r", 0, 25, 2, 0, -5163.54f, 925.423f, 257.181f, 1.57423f },
     { 2, 0, 2, "|TInterface/ICONS/Achievement_Boss_EdwinVancleef:25|t The Deadmines |cffff0000(15-21)|r", 0, 17, 2, 0, -11209.6f, 1666.54f, 24.6974f, 1.42053f },
@@ -214,11 +214,11 @@ Data Tele[] = // key = i & Key
 // TextIDs from npc_text
 enum eEnums
 {
-    TEXT_MAIN_H = 300000,			//Horde main menu text               "За Орду!"
-    TEXT_MAIN_A = 300001,			//Alliance main menu text            "За Альянс!"
-    TEXT_DUNGEON = 300002,			//Dungeon teleport menu texts        "Какие подземелья вы хотите исследовать?"
-    TEXT_RAID = 300003,			//Raid teleport menu text            "Будьте осторожны при выборе рейдового подземелья. Меня не будет рядом, когда вы начнете погибать."
-    TEXT_AREA = 300004,			//Area teleport location menu texts  "Куда бы вы хотели отправиться?"
+    TEXT_MAIN_H = 300000,			//Horde main menu text               "?? ????!"
+    TEXT_MAIN_A = 300001,			//Alliance main menu text            "?? ??????!"
+    TEXT_DUNGEON = 300002,			//Dungeon teleport menu texts        "????? ?????????? ?? ?????? ????????????"
+    TEXT_RAID = 300003,			//Raid teleport menu text            "?????? ????????? ??? ?????? ????????? ??????????. ???? ?? ????? ?????, ????? ?? ??????? ????????."
+    TEXT_AREA = 300004,			//Area teleport location menu texts  "???? ?? ?? ?????? ????????????"
 
     TELEPORT_COUNT = sizeof Tele / sizeof(*Tele),
 };
@@ -560,8 +560,8 @@ enum Enchants
     ENCHANT_KISTIRYK_SOCKET = 3723, 
     ENCHANT_ZAPYASTIE_SOCKET = 3717,
     
-    ENCHANT_SPINA = 3859, // Пружинистая паутинка
-    ENCHANT_SPINADVA = 3605 // Эластичная подкладка
+    ENCHANT_SPINA = 3859, // ??????????? ????????
+    ENCHANT_SPINADVA = 3605 // ?????????? ?????????
     
 };
 
@@ -645,7 +645,7 @@ public:
             switch (action)
             {
             case 1002:
-                // Сокеты
+                // ??????
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_shadowspirit_01:20:20:-15:0|t[Meta]", GOSSIP_SENDER_MAIN, 1101);
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_gem_38:20:20:-15:0|t[Yellow]", GOSSIP_SENDER_MAIN, 1102);
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_gem_37:20:20:-15:0|t[Red]", GOSSIP_SENDER_MAIN, 1103);
@@ -682,7 +682,7 @@ public:
                 player->GetSession()->SendListInventory(me->GetGUID(), 400007);
                 break;
             case 1003:
-                // Символы
+                // ???????
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_holy_avenginewrath:20:20:-15:0|t[Paladin]", GOSSIP_SENDER_MAIN, 1121);
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_nature_thunderclap:20:20:-15:0|t[Warrior]", GOSSIP_SENDER_MAIN, 1122);
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_shadow_painspike:20:20:-15:0|t[Hunter]", GOSSIP_SENDER_MAIN, 1123);
@@ -747,7 +747,7 @@ public:
                     AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_jewelry_ring_83:20:20:-15:0|t[Enchant: ring]", GOSSIP_SENDER_MAIN, 12);
                 }
 
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|t[remove enchant from item]", GOSSIP_SENDER_MAIN, 14);
+                //AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|t[remove enchant from item]", GOSSIP_SENDER_MAIN, 14);
 
                 player->PlayerTalkClass->SendGossipMenu(100007, me->GetGUID());
                 return true;
@@ -857,7 +857,7 @@ public:
                     AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 spell power +8 mp5 [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 137);
                     AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 spell power +15 crit effect rating [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 411);
                     AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+60 dodge + 15 defense [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 138);
-                    // AddGossipItemFor(player,7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 к сопротивлению силам природы и 30 к выносливости", GOSSIP_SENDER_MAIN, 139);
+                    // AddGossipItemFor(player,7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 ? ????????????? ????? ??????? ? 30 ? ????????????", GOSSIP_SENDER_MAIN, 139);
                 }
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 attack power +15 crit rating", GOSSIP_SENDER_MAIN, 140);
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+24 attack power +8 mp5", GOSSIP_SENDER_MAIN, 141);
@@ -957,8 +957,8 @@ public:
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+75 attack power +22 crit rating", GOSSIP_SENDER_MAIN, 186);
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 spell power +20 spirit", GOSSIP_SENDER_MAIN, 187);
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 spell power +30 stamina", GOSSIP_SENDER_MAIN, 188);
-                // AddGossipItemFor(player,7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+72 к выносливости и +35 к ловкости", GOSSIP_SENDER_MAIN, 189);
-                // AddGossipItemFor(player,7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+100 к силе атаки и +36 к рейтингу критического удара", GOSSIP_SENDER_MAIN, 190);
+                // AddGossipItemFor(player,7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+72 ? ???????????? ? +35 ? ????????", GOSSIP_SENDER_MAIN, 189);
+                // AddGossipItemFor(player,7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+100 ? ???? ????? ? +36 ? ???????? ???????????? ?????", GOSSIP_SENDER_MAIN, 190);
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100017, me->GetGUID());
                 return true;
@@ -2081,7 +2081,7 @@ public:
             {
                 switch (action)
                 {
-                    case 4: // Профессии
+                    case 4: // ?????????
                     {
                         uint32 freeProfs = player->GetFreePrimaryProfessionPoints();
                         if (freeProfs > 0)
@@ -2105,7 +2105,7 @@ public:
                         player->PlayerTalkClass->SendGossipMenu(68, me->GetGUID());
                         break;
                     }
-                    case 5: // Верховая езда
+                    case 5: // ???????? ????
                     {
                         CloseGossipMenuFor(player);
                         //creature->Whisper(MSG_RIDING_COMPLETE, LANG_UNIVERSAL, player, false);
@@ -2116,95 +2116,95 @@ public:
                         player->LearnSpell(54197, false); // Allows you to ride flying mounts in Northrend.
                         break;
                     }
-                    case 6: // Оружейные навыки
+                    case 6: // ????????? ??????
                     {
                         switch (player->GetClass())
                         {
                             case CLASS_WARRIOR:
                             {
                                 //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                                player->LearnSpell(5011, false); // Арбалеты
-                                player->LearnSpell(200, false); // Древковое оружие
-                                player->LearnSpell(15590, false); // Кулачное оружие
-                                player->LearnSpell(264, false); // Луки
-                                player->LearnSpell(266, false); // Ружья
-                                player->LearnSpell(227, false); // Посохи
+                                player->LearnSpell(5011, false); // ????????
+                                player->LearnSpell(200, false); // ????????? ??????
+                                player->LearnSpell(15590, false); // ???????? ??????
+                                player->LearnSpell(264, false); // ????
+                                player->LearnSpell(266, false); // ?????
+                                player->LearnSpell(227, false); // ??????
                                 break;
                             }
                             case CLASS_PALADIN:
                             {
                                 //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                                player->LearnSpell(197, false); // Двуручные топоры
-                                player->LearnSpell(200, false); // Древковое оружие
-                                player->LearnSpell(196, false); // Одноручные топоры
+                                player->LearnSpell(197, false); // ????????? ??????
+                                player->LearnSpell(200, false); // ????????? ??????
+                                player->LearnSpell(196, false); // ?????????? ??????
                                 break;
                             }
                             case CLASS_WARLOCK:
                             {
                                 //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                                player->LearnSpell(201, false); // Одноручные мечи
+                                player->LearnSpell(201, false); // ?????????? ????
                                 break;
                             }
                             case CLASS_PRIEST:
                             {
                                 //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                                player->LearnSpell(1180, false); // Кинжалы
+                                player->LearnSpell(1180, false); // ???????
                                 break;
                             }
                             case CLASS_HUNTER:
                             {
                                 //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                                player->LearnSpell(5011, false); // Арбалеты
-                                player->LearnSpell(202, false); // Двуручные мечи
-                                player->LearnSpell(200, false); // Древковое оружие
-                                player->LearnSpell(15590, false); // Кулачное оружие
-                                player->LearnSpell(264, false); // Луки
-                                player->LearnSpell(2567, false); // Метательное оружие
-                                player->LearnSpell(227, false); // Посохи
+                                player->LearnSpell(5011, false); // ????????
+                                player->LearnSpell(202, false); // ????????? ????
+                                player->LearnSpell(200, false); // ????????? ??????
+                                player->LearnSpell(15590, false); // ???????? ??????
+                                player->LearnSpell(264, false); // ????
+                                player->LearnSpell(2567, false); // ??????????? ??????
+                                player->LearnSpell(227, false); // ??????
                                 break;
                             }
                             case CLASS_MAGE:
                             {
                                 ////creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                                player->LearnSpell(1180, false); // Кинжалы
-                                player->LearnSpell(201, false); // Одноручные мечи
+                                player->LearnSpell(1180, false); // ???????
+                                player->LearnSpell(201, false); // ?????????? ????
                                 break;
                             }
                             case CLASS_SHAMAN:
                             {
                                 ////creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                                player->LearnSpell(199, false); // Двуручное дробящее оружие
-                                player->LearnSpell(197, false); // Двуручные топоры
-                                player->LearnSpell(1180, false); // Кинжалы
-                                player->LearnSpell(15590, false); // Кулачное оружие
-                                player->LearnSpell(196, false); // Одноручные топоры
+                                player->LearnSpell(199, false); // ????????? ???????? ??????
+                                player->LearnSpell(197, false); // ????????? ??????
+                                player->LearnSpell(1180, false); // ???????
+                                player->LearnSpell(15590, false); // ???????? ??????
+                                player->LearnSpell(196, false); // ?????????? ??????
                                 break;
                             }
                             case CLASS_ROGUE:
                             {
                                 //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                                player->LearnSpell(5011, false); // Арбалеты
-                                player->LearnSpell(198, false); // Одноручное дробящее оружие
-                                player->LearnSpell(15590, false); // Кулачное оружие
-                                player->LearnSpell(264, false); // Луки
-                                player->LearnSpell(201, false); // Одноручные мечи
-                                player->LearnSpell(266, false); // Ружья
-                                player->LearnSpell(196, false); // Одноручные топоры
+                                player->LearnSpell(5011, false); // ????????
+                                player->LearnSpell(198, false); // ?????????? ???????? ??????
+                                player->LearnSpell(15590, false); // ???????? ??????
+                                player->LearnSpell(264, false); // ????
+                                player->LearnSpell(201, false); // ?????????? ????
+                                player->LearnSpell(266, false); // ?????
+                                player->LearnSpell(196, false); // ?????????? ??????
                                 break;
                             }
                             case CLASS_DEATH_KNIGHT:
                             {
                                 //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                                player->LearnSpell(199, false); // Двуручное дробящее оружие
-                                player->LearnSpell(198, false); // Одноручное дробящее оружие
+                                player->LearnSpell(199, false); // ????????? ???????? ??????
+                                player->LearnSpell(198, false); // ?????????? ???????? ??????
                                 break;
                             }
                             case CLASS_DRUID:
                             {
                                 //creature->Whisper(MSG_WEAPON_SKILLS_COMPLETE, LANG_UNIVERSAL, player, false);
-                                player->LearnSpell(199, false); // Двуручное дробящее оружие
-                                player->LearnSpell(200, false); // Древковое оружие
-                                player->LearnSpell(15590, false); // Кулачное оружие
+                                player->LearnSpell(199, false); // ????????? ???????? ??????
+                                player->LearnSpell(200, false); // ????????? ??????
+                                player->LearnSpell(15590, false); // ???????? ??????
                                 break;
                             }
                         }
