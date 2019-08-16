@@ -21,6 +21,7 @@ INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `descripti
 (1, 40856, 1, 'set warrior'),
 (1, 40797, 1, 'set warrior'),
 (1, 40836, 1, 'set warrior'),
+(1, 40778, 1, 'set warrior'),
 (1, 40878, 1, 'set warrior'),
 (1, 40877, 1, 'set warrior'),
 (1, 40887, 1, 'set warrior'),
@@ -30,8 +31,11 @@ INSERT INTO `item_present_slot` (`PresentSlotID`, `ItemId`, `Counts`, `descripti
 (1, 39401, 1, 'set warrior ring1'),
 (1, 42989, 1, 'set warrior ring t1'),
 (1, 42122, 1, 'set warrior ring t2'),
+(1, 42123, 1, 'set warrior ring t2'),
 (1, 42331, 2, 'set warrior w1'),
 (1, 42449, 1, 'set warrior w2'),
+(1, 42284, 1, 'set warrior w1_1'),
+(1, 42449, 1, 'set warrior w1_1'),
 (1, 42558, 1, 'set warrior shield');
 
 -- ----------------------------

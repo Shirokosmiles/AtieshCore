@@ -608,7 +608,7 @@ void WorldSession::HandleListInventoryOpcode(WorldPacket& recvData)
 void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
 {
     Creature* vendor = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
-    if (!vendor)
+    if (!vendor && !vendorEntry)
     {
         TC_LOG_DEBUG("network", "WORLD: SendListInventory - %s not found or you can not interact with him.", vendorGuid.ToString().c_str());
         _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, ObjectGuid::Empty, 0);
@@ -619,9 +619,12 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    // Stop the npc if moving
-    vendor->PauseMovement(sWorld->getIntConfig(CONFIG_CREATURE_STOP_FOR_PLAYER));
-    vendor->SetHomePosition(vendor->GetPosition());
+    if (vendor)
+    {
+        // Stop the npc if moving
+        vendor->PauseMovement(sWorld->getIntConfig(CONFIG_CREATURE_STOP_FOR_PLAYER));
+        vendor->SetHomePosition(vendor->GetPosition());
+    }
 
     SetCurrentVendor(vendorEntry);
 
@@ -645,7 +648,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
     size_t countPos = data.wpos();
     data << uint8(count);
 
-    float discountMod = _player->GetReputationPriceDiscount(vendor);
+    float discountMod = vendor ? _player->GetReputationPriceDiscount(vendor) : 0.0f;
 
     for (uint8 slot = 0; slot < itemCount; ++slot)
     {
@@ -660,17 +663,20 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
                 if (!_player->IsGameMaster() && ((itemTemplate->Flags2 & ITEM_FLAG2_FACTION_HORDE && _player->GetTeam() == ALLIANCE) || (itemTemplate->Flags2 == ITEM_FLAG2_FACTION_ALLIANCE && _player->GetTeam() == HORDE)))
                     continue;
 
-                // Items sold out are not displayed in list
-                uint32 leftInStock = !item->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(item);
-                if (!_player->IsGameMaster() && !leftInStock)
-                    continue;
-
-                if (!sConditionMgr->IsObjectMeetingVendorItemConditions(vendor->GetEntry(), item->item, _player, vendor))
+                uint32 leftInStock = 0xFFFFFFFF;
+                if (vendor)
                 {
-                    TC_LOG_DEBUG("condition", "SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), item->item);
-                    continue;
-                }
+                    // Items sold out are not displayed in list
+                    leftInStock = !item->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(item);
+                    if (!_player->IsGameMaster() && !leftInStock)
+                        continue;                
 
+                    if (!sConditionMgr->IsObjectMeetingVendorItemConditions(vendor->GetEntry(), item->item, _player, vendor))
+                    {
+                        TC_LOG_DEBUG("condition", "SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), item->item);
+                        continue;
+                    }
+                }
                 // reputation discount
                 int32 price = item->IsGoldRequired(itemTemplate) ? uint32(floor(itemTemplate->BuyPrice * discountMod)) : 0;
 
