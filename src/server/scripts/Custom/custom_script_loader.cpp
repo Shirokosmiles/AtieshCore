@@ -23,6 +23,7 @@ void AddSC_arena_spectator_script();
 void AddSC_PhasedDueling();
 void AddSC_GuildSystem();
 void AddSC_custom_npc();
+void AddSC_VAS_AutoBalance();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -35,4 +36,5 @@ void AddCustomScripts()
     AddSC_PhasedDueling();
     AddSC_GuildSystem();
     AddSC_custom_npc();
+    AddSC_VAS_AutoBalance();
 }

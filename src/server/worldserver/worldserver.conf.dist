@@ -4820,3 +4820,16 @@ Chat.StrictMessages.Enabled = 0
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+# VAS
+#
+#        Description: Change HP and Damage value for Units in Dungeons in %
+#        Default:     100 - (full HP and Damage)
+#                     10 - (units have only 10% of HP and can damage 10% of real damage value)
+
+VAS.Unit.PercentOfHPAndDamage = 100
+
+#
+###################################################################################################

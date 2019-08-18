@@ -182,7 +182,7 @@ class instance_icecrown_citadel : public InstanceMapScript
             void OnPlayerEnter(Player* player) override
             {
                 if (!TeamInInstance)
-                    TeamInInstance = player->GetTeam();
+                    TeamInInstance = player->GetCFSTeam();
 
                 if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                     SpawnGunship();
@@ -323,13 +323,10 @@ class instance_icecrown_citadel : public InstanceMapScript
             // Weekly quest spawn prevention
             uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
             {
-                if (!TeamInInstance)
-                {
-                    Map::PlayerList const& players = instance->GetPlayers();
-                    if (!players.isEmpty())
-                        if (Player* player = players.begin()->GetSource())
-                            TeamInInstance = player->GetTeam();
-                }
+                Map::PlayerList const& players = instance->GetPlayers();
+                if (!players.isEmpty())
+                    if (Player* player = players.begin()->GetSource())
+                        TeamInInstance = player->GetCFSTeam();
 
                 uint32 entry = data->id;
                 switch (entry)

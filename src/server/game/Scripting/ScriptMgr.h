@@ -417,6 +417,9 @@ class TC_GAME_API UnitScript : public ScriptObject
 
         // Called when an unit exits a vehicle
         virtual void ModifyVehiclePassengerExitPos(Unit* /*passenger*/, Vehicle* /*vehicle*/, Position& /*pos*/) { }
+
+        // Called when an unit appear in world
+        virtual void AddToWorldWithHealth(Unit* /*unit*/, uint32 /*maxhealth*/) { }
 };
 
 class TC_GAME_API CreatureScript : public ScriptObject
@@ -1107,6 +1110,7 @@ class TC_GAME_API ScriptMgr
         void ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage);
         void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage);
         void ModifyVehiclePassengerExitPos(Unit* passenger, Vehicle* vehicle, Position& pos);
+        void OnAddToWorldWithHealth(Unit* unit, uint32 health);
 
     private:
         uint32 _scriptCount;
