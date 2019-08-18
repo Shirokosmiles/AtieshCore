@@ -94,6 +94,15 @@ bool VendorItemData::RemoveItem(uint32 item_id)
     return found;
 }
 
+bool VendorItemData::HasItem(uint32 item_id) const
+{
+    for (VendorItem const& vendorItem : m_items)
+        if (vendorItem.item == item_id)
+            return true;
+
+    return false;
+}
+
 VendorItem const* VendorItemData::FindItemCostPair(uint32 item_id, uint32 extendedCost) const
 {
     for (VendorItem const& vendorItem : m_items)

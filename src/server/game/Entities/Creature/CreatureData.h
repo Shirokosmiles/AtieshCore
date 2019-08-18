@@ -373,6 +373,7 @@ struct VendorItemData
         m_items.emplace_back(item, maxcount, ptime, ExtendedCost);
     }
     bool RemoveItem(uint32 item_id);
+    bool HasItem(uint32 item_id) const;
     VendorItem const* FindItemCostPair(uint32 item_id, uint32 extendedCost) const;
     void Clear()
     {

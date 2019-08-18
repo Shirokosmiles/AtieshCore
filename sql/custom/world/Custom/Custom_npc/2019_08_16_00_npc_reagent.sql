@@ -2,7 +2,7 @@
 -- FULL `creature_template` of entry 190014 
 DELETE FROM `creature_template` where `entry` =190014;
 INSERT INTO `creature_template` (`entry`, `modelid1`, `modelid2`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `scale`, `rank`, `dmgschool`, `baseattacktime`, `rangeattacktime`, `unit_class`, `unit_flags`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `AIName`, `MovementType`, `HoverHeight`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`) VALUES
-(190014, 19646, 0, "Reagents", NULL, NULL, 0, 80, 80, 2, 35, 1, 1, 0, 0, 2000, 0, 1, 0, 7, 138936390, 0, 0, 0, '', 0, 1, 0, 0, 1, 0, 0, 'npc_reagent');
+(190014, 19646, 0, "Reagents", NULL, NULL, 0, 80, 80, 2, 35, 129, 1, 0, 0, 2000, 0, 1, 0, 7, 138936390, 0, 0, 0, '', 0, 1, 0, 0, 1, 0, 0, 'npc_reagent');
 
 -- Trade Goods
 -- FULL `creature_template` of entry 400050 Trade Goods
@@ -119,11 +119,11 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 (400051,0,40195,0,0,0),
 (400051,0,36901,0,0,0);
 
--- Mining
+-- Blacksmithing Reagents
 -- FULL `creature_template` of entry 400052
 DELETE FROM `creature_template` where `entry` =400052;
 INSERT INTO `creature_template` (`entry`, `modelid1`, `modelid2`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `scale`, `rank`, `dmgschool`, `baseattacktime`, `rangeattacktime`, `unit_class`, `unit_flags`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `AIName`, `MovementType`, `HoverHeight`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`) VALUES
-(400052, 19646, 0, "Mining", NULL, NULL, 0, 80, 80, 2, 35, 129, 1, 0, 0, 2000, 0, 1, 0, 7, 138936390, 0, 0, 0, '', 0, 1, 0, 0, 1, 0, 0, '');
+(400052, 19646, 0, "Blacksmithing Reagents", NULL, NULL, 0, 80, 80, 2, 35, 129, 1, 0, 0, 2000, 0, 1, 0, 7, 138936390, 0, 0, 0, '', 0, 1, 0, 0, 1, 0, 0, '');
 
 DELETE FROM `npc_vendor` WHERE (`entry`=400052);
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES 
@@ -235,7 +235,6 @@ INSERT INTO `creature_template` (`entry`, `modelid1`, `modelid2`, `name`, `subna
 DELETE FROM `npc_vendor` WHERE (`entry`=400054);
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
 (400054,0,2901,0,0,0),
-(400054,0,6219,0,0,0),
 (400054,0,10580,0,0,0),
 (400054,0,20815,0,0,0),
 (400054,0,23820,0,0,0),
@@ -261,7 +260,6 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 (400054,0,49040,0,0,0),
 (400054,0,42641,0,0,0),
 (400054,0,44951,0,0,0),
-(400054,0,3470,0,0,0),
 (400054,0,3486,0,0,0);
 
 -- Engineering
