@@ -1543,6 +1543,7 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_VAS_DAMAGE_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfDamage", 100.0f);
     rate_values[RATE_VAS_HEAL_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfHeal", 100.0f);
     rate_values[RATE_VAS_MAXHP_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfMaxHP", 100.0f);
+    rate_values[RATE_VAS_MAXMP_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfMaxMP", 100.0f);
     //End of Custom Systems
 
     // Dungeon finder

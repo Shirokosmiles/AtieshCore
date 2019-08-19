@@ -30,9 +30,6 @@ public:
 
     uint32 VAS_Modifer_DealDamage(Unit* target, Unit* victim, uint32 damage)
     {
-        if (!victim || !victim->IsInWorld())
-            return damage;
-
         if (target->ToPlayer())
             return damage;
 
@@ -48,9 +45,6 @@ public:
 
     uint32 VAS_Modifer_DealHeal(Unit* target, Unit* victim, uint32 damage)
     {
-        if (!victim || !victim->IsInWorld())
-            return damage;
-
         if (target->ToPlayer() || victim->ToPlayer()) // Heal by player should be 100%
             return damage;
 
@@ -68,9 +62,22 @@ public:
 
         if (!unit->ToPlayer() && !unit->IsPet() && !unit->IsTotem() && unit->GetMap()->IsDungeon())
         {
-            float damageMultiplier = sWorld->getRate(RATE_VAS_DAMAGE_PERCENT);
-            float newhealth = CalculatePct(maxhealth, damageMultiplier);
+            float healthMultiplier = sWorld->getRate(RATE_VAS_MAXHP_PERCENT);
+            float newhealth = CalculatePct(maxhealth, healthMultiplier);
             maxhealth = newhealth;
+        }
+    }
+
+    void CreatureUpdateLevelDependantStatsWithMaxMana(Unit* unit, uint32& maxmana) override
+    {
+        if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
+            return;
+
+        if (!unit->ToPlayer() && !unit->IsPet() && !unit->IsTotem() && unit->GetMap()->IsDungeon())
+        {
+            float manaMultiplier = sWorld->getRate(RATE_VAS_MAXMP_PERCENT);
+            float newmana = CalculatePct(maxmana, manaMultiplier);
+            maxmana = newmana;
         }
     }
 
@@ -89,8 +96,9 @@ public:
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
 
-        if (attacker->GetMap()->IsDungeon() && target->GetMap()->IsDungeon())
-            damage = VAS_Modifer_DealDamage(attacker, target, damage);
+        if (target && attacker && target->IsInWorld() && attacker->IsInWorld())
+            if (attacker->GetMap()->IsDungeon() && target->GetMap()->IsDungeon())
+                damage = VAS_Modifer_DealDamage(attacker, target, damage);
     }
 
     void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage) override
@@ -98,8 +106,9 @@ public:
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
 
-        if (attacker->GetMap()->IsDungeon() && target->GetMap()->IsDungeon())
-            damage = VAS_Modifer_DealDamage(attacker, target, damage);
+        if (target && attacker && target->IsInWorld() && attacker->IsInWorld())
+            if (attacker->GetMap()->IsDungeon() && target->GetMap()->IsDungeon())
+                damage = VAS_Modifer_DealDamage(attacker, target, damage);
     }
 
     void OnHeal(Unit* healer, Unit* reciever, uint32& gain) override
@@ -107,8 +116,9 @@ public:
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
 
-        if (healer->GetMap()->IsDungeon())
-            gain = VAS_Modifer_DealHeal(healer, reciever, gain);
+        if (reciever && healer && reciever->IsInWorld() && healer->IsInWorld())
+            if (healer->GetMap() && healer->GetMap()->IsDungeon())
+                gain = VAS_Modifer_DealHeal(healer, reciever, gain);
     }
 };
 

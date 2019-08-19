@@ -576,14 +576,10 @@ class boss_professor_putricide : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (events.IsInPhase(PHASE_COMBAT_1) || events.IsInPhase(PHASE_COMBAT_2) || events.IsInPhase(PHASE_COMBAT_3))
-                    if (!UpdateVictim())
-                        return;
+                if (!me || !me->IsAlive())
+                    return;
 
                 events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
@@ -707,10 +703,13 @@ class boss_professor_putricide : public CreatureScript
                         default:
                             break;
                     }
-
-                    if (me->HasUnitState(UNIT_STATE_CASTING))
-                        return;
                 }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                if (!UpdateVictim())
+                    return;
 
                 DoMeleeAttackIfReady();
             }

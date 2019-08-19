@@ -2202,6 +2202,11 @@ void ScriptMgr::OnCreatureUpdateLevelDependantStatsWithMaxHealth(Unit* unit, uin
     FOREACH_SCRIPT(UnitScript)->CreatureUpdateLevelDependantStatsWithMaxHealth(unit, health);
 }
 
+void ScriptMgr::OnCreatureUpdateLevelDependantStatsWithMaxMana(Unit* unit, uint32& mana)
+{
+    FOREACH_SCRIPT(UnitScript)->CreatureUpdateLevelDependantStatsWithMaxMana(unit, mana);
+}
+
 SpellScriptLoader::SpellScriptLoader(char const* name)
     : ScriptObject(name)
 {
