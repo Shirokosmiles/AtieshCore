@@ -140,7 +140,9 @@ enum Events
     EVENT_CHOKING_GAS_BOMB      = 12,
     EVENT_UNBOUND_PLAGUE        = 13,
     EVENT_MUTATED_PLAGUE        = 14,
-    EVENT_PHASE_TRANSITION      = 15
+    EVENT_PREPARE_TO_COMBAT     = 15,
+    EVENT_EVADE_BEFORE_COMBAT   = 16,
+    EVENT_PHASE_TRANSITION      = 17
 };
 
 enum Phases
@@ -148,9 +150,9 @@ enum Phases
     PHASE_NONE          = 0,
     PHASE_FESTERGUT     = 1,
     PHASE_ROTFACE       = 2,
-    PHASE_COMBAT_1      = 4,
-    PHASE_COMBAT_2      = 5,
-    PHASE_COMBAT_3      = 6
+    PHASE_COMBAT_1      = 3,
+    PHASE_COMBAT_2      = 4,
+    PHASE_COMBAT_3      = 5
 };
 
 enum Points
@@ -236,7 +238,7 @@ class boss_professor_putricide : public CreatureScript
 
             void Reset() override
             {
-                if (!(events.IsInPhase(PHASE_ROTFACE) || events.IsInPhase(PHASE_FESTERGUT)))
+                if (events.IsInPhase(PHASE_ROTFACE) || events.IsInPhase(PHASE_FESTERGUT))
                     instance->SetBossState(DATA_PROFESSOR_PUTRICIDE, NOT_STARTED);
                 instance->SetData(DATA_NAUSEA_ACHIEVEMENT, uint32(true));
 
@@ -395,7 +397,7 @@ class boss_professor_putricide : public CreatureScript
                         instance->SetBossState(DATA_ROTFACE, IN_PROGRESS);   // needed here for delayed gate close
                         me->SetSpeedRate(MOVE_RUN, _baseSpeed);
                         DoAction(ACTION_ROTFACE_OOZE);
-                        events.ScheduleEvent(EVENT_ROTFACE_OOZE_FLOOD, 25s, 0, PHASE_ROTFACE);
+                        events.ScheduleEvent(EVENT_ROTFACE_OOZE_FLOOD, 25s);
                         break;
                     case POINT_TABLE:
                         // stop attack
@@ -440,14 +442,14 @@ class boss_professor_putricide : public CreatureScript
                         me->SetReactState(REACT_PASSIVE);
                         DoZoneInCombat(me);
                         if (IsHeroic())
-                            events.ScheduleEvent(EVENT_FESTERGUT_GOO, urand(13000, 18000), 0, PHASE_FESTERGUT);
+                            events.ScheduleEvent(EVENT_FESTERGUT_GOO, urand(13000, 18000));
                         break;
                     case ACTION_FESTERGUT_GAS:
                         Talk(SAY_FESTERGUT_GASEOUS_BLIGHT);
                         DoCast(me, SPELL_RELEASE_GAS_VISUAL, true);
                         break;
                     case ACTION_FESTERGUT_DEATH:
-                        events.ScheduleEvent(EVENT_FESTERGUT_DIES, 4s, 0, PHASE_FESTERGUT);
+                        events.ScheduleEvent(EVENT_FESTERGUT_DIES, 4s);
                         break;
                     case ACTION_ROTFACE_COMBAT:
                         SetPhase(PHASE_ROTFACE);
@@ -489,7 +491,7 @@ class boss_professor_putricide : public CreatureScript
                             _oozeFloodStage = 0;
                         break;
                     case ACTION_ROTFACE_DEATH:
-                        events.ScheduleEvent(EVENT_ROTFACE_DIES, 4500ms, 0, PHASE_ROTFACE);
+                        events.ScheduleEvent(EVENT_ROTFACE_DIES, 4500ms);
                         break;
                     case ACTION_CHANGE_PHASE:
                         me->SetSpeedRate(MOVE_RUN, _baseSpeed*2.0f);
@@ -588,22 +590,20 @@ class boss_professor_putricide : public CreatureScript
                         case EVENT_FESTERGUT_DIES:
                             Talk(SAY_FESTERGUT_DEATH);
                             if (instance->GetBossState(DATA_ROTFACE) == DONE)
-                                events.SetPhase(PHASE_COMBAT_1);
-                            EnterEvadeMode();
+                                events.ScheduleEvent(EVENT_PREPARE_TO_COMBAT, 5000);
                             break;
                         case EVENT_FESTERGUT_GOO:
                             DoCastAOE(SPELL_MALLEABLE_GOO_SUMMON, CastSpellExtraArgs(true).AddSpellMod(SPELLVALUE_MAX_TARGETS, 1));
-                            events.ScheduleEvent(EVENT_FESTERGUT_GOO, (Is25ManRaid() ? 10000 : 30000) + urand(0, 5000), 0, PHASE_FESTERGUT);
+                            events.ScheduleEvent(EVENT_FESTERGUT_GOO, (Is25ManRaid() ? 10000 : 30000) + urand(0, 5000));
                             break;
                         case EVENT_ROTFACE_DIES:
                             Talk(SAY_ROTFACE_DEATH);
                             if (instance->GetBossState(DATA_FESTERGUT) == DONE)
-                                events.SetPhase(PHASE_COMBAT_1);
-                            EnterEvadeMode();
+                                events.ScheduleEvent(EVENT_PREPARE_TO_COMBAT, urand(0, 5000));
                             break;
                         case EVENT_ROTFACE_OOZE_FLOOD:
                             DoAction(ACTION_ROTFACE_OOZE);
-                            events.ScheduleEvent(EVENT_ROTFACE_OOZE_FLOOD, 25s, 0, PHASE_ROTFACE);
+                            events.ScheduleEvent(EVENT_ROTFACE_OOZE_FLOOD, 25s);
                             break;
                         case EVENT_BERSERK:
                             Talk(SAY_BERSERK);
@@ -699,6 +699,20 @@ class boss_professor_putricide : public CreatureScript
                                 default:
                                     break;
                             }
+                        }
+                        case EVENT_PREPARE_TO_COMBAT:
+                        {
+                            events.SetPhase(PHASE_COMBAT_1);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetImmuneToPC(false);
+                            me->GetMotionMaster()->MovePoint(POINT_TABLE, tablePos);
+                            events.ScheduleEvent(EVENT_EVADE_BEFORE_COMBAT, 15500);
+                            break;
+                        }
+                        case EVENT_EVADE_BEFORE_COMBAT:
+                        {
+                            EnterEvadeMode();
+                            break;
                         }
                         default:
                             break;
