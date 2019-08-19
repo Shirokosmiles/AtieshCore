@@ -33,6 +33,9 @@ public:
         if (!victim || !victim->IsInWorld())
             return damage;
 
+        if (target->ToPlayer())
+            return damage;
+
         if (victim->ToPlayer() || victim->IsHunterPet() || victim->IsPet() || victim->IsSummon())
         {
             float damageMultiplier = sWorld->getRate(RATE_VAS_DAMAGE_PERCENT);
@@ -76,8 +79,9 @@ public:
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
 
-        if (attacker->GetMap()->IsDungeon() && target->GetMap()->IsDungeon())
-            damage = VAS_Modifer_DealDamage(attacker, target, damage);
+        if (target && attacker && target->IsInWorld() && attacker->IsInWorld())
+            if (attacker->GetMap()->IsDungeon() && target->GetMap()->IsDungeon())
+                damage = VAS_Modifer_DealDamage(attacker, target, damage);
     }
 
     void ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage) override
