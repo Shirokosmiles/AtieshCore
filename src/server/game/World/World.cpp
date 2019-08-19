@@ -1539,7 +1539,10 @@ void World::LoadConfigSettings(bool reload)
     // Strong Chat.System control
     m_bool_configs[CONFIG_CHATRESTRICTSYMBOLS_ENABLED] = sConfigMgr->GetBoolDefault("Chat.StrictMessages.Enabled", false);
 
-    rate_values[RATE_VAS_DAMAGE_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfHPAndDamage", 100.0f);
+    m_bool_configs[CONFIG_VAS_AUTOBALANCE] = sConfigMgr->GetBoolDefault("VAS.Unit.Enabled", false);
+    rate_values[RATE_VAS_DAMAGE_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfDamage", 100.0f);
+    rate_values[RATE_VAS_HEAL_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfHeal", 100.0f);
+    rate_values[RATE_VAS_MAXHP_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfMaxHP", 100.0f);
     //End of Custom Systems
 
     // Dungeon finder

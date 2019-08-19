@@ -4829,7 +4829,10 @@ Chat.StrictMessages.Enabled = 0
 #        Default:     100 - (full HP and Damage)
 #                     10 - (units have only 10% of HP and can damage 10% of real damage value)
 
-VAS.Unit.PercentOfHPAndDamage = 100
+VAS.Unit.Enabled = 1
+VAS.Unit.PercentOfDamage = 100
+VAS.Unit.PercentOfHeal = 100
+VAS.Unit.PercentOfMaxHP = 100
 
 #
 ###################################################################################################

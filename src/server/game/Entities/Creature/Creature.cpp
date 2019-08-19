@@ -1499,6 +1499,9 @@ void Creature::UpdateLevelDependantStats()
     uint32 basehp = stats->GenerateHealth(cInfo);
     uint32 health = uint32(basehp * healthmod);
 
+    // Hook for OnCreateCreatureWithHealth Event
+    sScriptMgr->OnCreatureUpdateLevelDependantStatsWithMaxHealth(ToUnit(), health);
+
     SetCreateHealth(health);
     SetMaxHealth(health);
     SetHealth(health);

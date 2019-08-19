@@ -9704,9 +9704,6 @@ void Unit::AddToWorld()
 {
     if (!IsInWorld())
         WorldObject::AddToWorld();
-
-    // Hook for OnAddToWorldWithHealth Event
-    sScriptMgr->OnAddToWorldWithHealth(this, GetMaxHealth());
 }
 
 void Unit::RemoveFromWorld()

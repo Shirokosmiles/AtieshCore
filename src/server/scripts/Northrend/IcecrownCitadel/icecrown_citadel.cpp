@@ -1603,13 +1603,13 @@ public:
         void Initialize()
         {
             me->SetReactState(REACT_AGGRESSIVE);
-            me->GetMotionMaster()->MoveRandom(10.0f);
+            me->GetMotionMaster()->MoveRandom(50.0f);
+            _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 10000);
         }
 
         void Reset() override
         {
-            _events.Reset();
-            _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 3000);
+            _events.Reset();            
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1635,9 +1635,6 @@ public:
             if (!me || !me->IsAlive())
                 return;
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
             _events.Update(diff);
 
             while (uint32 eventId = _events.ExecuteEvent())
@@ -1645,11 +1642,11 @@ public:
                 switch (eventId)
                 {
                     case EVENT_END_LEAP:
-                        me->GetMotionMaster()->MoveRandom(10.0f);
+                        me->GetMotionMaster()->MoveRandom(50.0f);
                         break;
                     case EVENT_FLESH_EATING_BITE:
                         DoCast(SPELL_FLESH_EATING_BITE);
-                        _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 2500);
+                        _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 7500);
                         break;
                     default:
                         break;

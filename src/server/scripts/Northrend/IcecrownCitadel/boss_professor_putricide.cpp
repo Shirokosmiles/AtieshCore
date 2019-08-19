@@ -242,7 +242,6 @@ class boss_professor_putricide : public CreatureScript
 
                 events.Reset();
                 summons.DespawnAll();
-                SetPhase(PHASE_COMBAT_1);
                 _experimentState = EXPERIMENT_STATE_OOZE;
                 me->SetReactState(REACT_DEFENSIVE);
                 me->SetWalk(false);
@@ -577,8 +576,9 @@ class boss_professor_putricide : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (!(events.IsInPhase(PHASE_ROTFACE) || events.IsInPhase(PHASE_FESTERGUT)) && !UpdateVictim())
-                    return;
+                if (events.IsInPhase(PHASE_COMBAT_1) || events.IsInPhase(PHASE_COMBAT_2) || events.IsInPhase(PHASE_COMBAT_3))
+                    if (!UpdateVictim())
+                        return;
 
                 events.Update(diff);
 
@@ -591,6 +591,8 @@ class boss_professor_putricide : public CreatureScript
                     {
                         case EVENT_FESTERGUT_DIES:
                             Talk(SAY_FESTERGUT_DEATH);
+                            if (instance->GetBossState(DATA_ROTFACE) == DONE)
+                                events.SetPhase(PHASE_COMBAT_1);
                             EnterEvadeMode();
                             break;
                         case EVENT_FESTERGUT_GOO:
@@ -599,6 +601,8 @@ class boss_professor_putricide : public CreatureScript
                             break;
                         case EVENT_ROTFACE_DIES:
                             Talk(SAY_ROTFACE_DEATH);
+                            if (instance->GetBossState(DATA_FESTERGUT) == DONE)
+                                events.SetPhase(PHASE_COMBAT_1);
                             EnterEvadeMode();
                             break;
                         case EVENT_ROTFACE_OOZE_FLOOD:

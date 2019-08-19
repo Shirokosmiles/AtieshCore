@@ -2197,9 +2197,9 @@ void ScriptMgr::ModifyVehiclePassengerExitPos(Unit* passenger, Vehicle* vehicle,
     FOREACH_SCRIPT(UnitScript)->ModifyVehiclePassengerExitPos(passenger, vehicle, pos);
 }
 
-void ScriptMgr::OnAddToWorldWithHealth(Unit* unit, uint32 health)
+void ScriptMgr::OnCreatureUpdateLevelDependantStatsWithMaxHealth(Unit* unit, uint32& health)
 {
-    FOREACH_SCRIPT(UnitScript)->AddToWorldWithHealth(unit, health);
+    FOREACH_SCRIPT(UnitScript)->CreatureUpdateLevelDependantStatsWithMaxHealth(unit, health);
 }
 
 SpellScriptLoader::SpellScriptLoader(char const* name)
