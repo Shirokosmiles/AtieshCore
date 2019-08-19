@@ -87,7 +87,7 @@ public:
             return;
 
         if (target && attacker && target->IsInWorld() && attacker->IsInWorld())
-            if (attacker->GetMap()->IsDungeon() && target->GetMap()->IsDungeon())
+            if (target->GetMap() && target->GetMap()->IsDungeon())
                 damage = VAS_Modifer_DealDamage(attacker, target, damage);
     }
 
@@ -97,7 +97,7 @@ public:
             return;
 
         if (target && attacker && target->IsInWorld() && attacker->IsInWorld())
-            if (attacker->GetMap()->IsDungeon() && target->GetMap()->IsDungeon())
+            if (target->GetMap() && target->GetMap()->IsDungeon())
                 damage = VAS_Modifer_DealDamage(attacker, target, damage);
     }
 
@@ -107,7 +107,7 @@ public:
             return;
 
         if (target && attacker && target->IsInWorld() && attacker->IsInWorld())
-            if (attacker->GetMap()->IsDungeon() && target->GetMap()->IsDungeon())
+            if(target->GetMap() && target->GetMap()->IsDungeon())
                 damage = VAS_Modifer_DealDamage(attacker, target, damage);
     }
 
