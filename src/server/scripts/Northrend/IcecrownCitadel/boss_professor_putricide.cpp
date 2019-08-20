@@ -140,9 +140,7 @@ enum Events
     EVENT_CHOKING_GAS_BOMB      = 12,
     EVENT_UNBOUND_PLAGUE        = 13,
     EVENT_MUTATED_PLAGUE        = 14,
-    EVENT_PREPARE_TO_COMBAT     = 15,
-    EVENT_EVADE_BEFORE_COMBAT   = 16,
-    EVENT_PHASE_TRANSITION      = 17
+    EVENT_PHASE_TRANSITION      = 15
 };
 
 enum Phases
@@ -257,7 +255,10 @@ class boss_professor_putricide : public CreatureScript
 
             void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
             {
-                if (why == EVADE_REASON_BOUNDARY && (events.IsInPhase(PHASE_ROTFACE) || events.IsInPhase(PHASE_FESTERGUT)))
+                if (why == EVADE_REASON_BOUNDARY && (events.IsInPhase(PHASE_FESTERGUT) || events.IsInPhase(PHASE_ROTFACE)))
+                    return;
+
+                if (why == EVADE_REASON_OTHER && (events.IsInPhase(PHASE_COMBAT_1) || events.IsInPhase(PHASE_COMBAT_2) || events.IsInPhase(PHASE_COMBAT_3)))
                     return;
 
                 BossAI::EnterEvadeMode(why);
@@ -449,6 +450,7 @@ class boss_professor_putricide : public CreatureScript
                         DoCast(me, SPELL_RELEASE_GAS_VISUAL, true);
                         break;
                     case ACTION_FESTERGUT_DEATH:
+                        SetPhase(PHASE_NONE);
                         events.ScheduleEvent(EVENT_FESTERGUT_DIES, 4s);
                         break;
                     case ACTION_ROTFACE_COMBAT:
@@ -491,6 +493,7 @@ class boss_professor_putricide : public CreatureScript
                             _oozeFloodStage = 0;
                         break;
                     case ACTION_ROTFACE_DEATH:
+                        SetPhase(PHASE_NONE);
                         events.ScheduleEvent(EVENT_ROTFACE_DIES, 4500ms);
                         break;
                     case ACTION_CHANGE_PHASE:
@@ -548,6 +551,14 @@ class boss_professor_putricide : public CreatureScript
                                 break;
                         }
                         break;
+                    case ACTION_COMBAT_PREPARE:
+                    {
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetImmuneToPC(false);
+                        me->GetMotionMaster()->MovePoint(POINT_TABLE, tablePos);
+                        EnterEvadeMode();
+                        break;
+                    }
                     default:
                         break;
                 }
@@ -590,7 +601,7 @@ class boss_professor_putricide : public CreatureScript
                         case EVENT_FESTERGUT_DIES:
                             Talk(SAY_FESTERGUT_DEATH);
                             if (instance->GetBossState(DATA_ROTFACE) == DONE)
-                                events.ScheduleEvent(EVENT_PREPARE_TO_COMBAT, 5000);
+                                DoAction(ACTION_COMBAT_PREPARE);
                             break;
                         case EVENT_FESTERGUT_GOO:
                             DoCastAOE(SPELL_MALLEABLE_GOO_SUMMON, CastSpellExtraArgs(true).AddSpellMod(SPELLVALUE_MAX_TARGETS, 1));
@@ -599,7 +610,7 @@ class boss_professor_putricide : public CreatureScript
                         case EVENT_ROTFACE_DIES:
                             Talk(SAY_ROTFACE_DEATH);
                             if (instance->GetBossState(DATA_FESTERGUT) == DONE)
-                                events.ScheduleEvent(EVENT_PREPARE_TO_COMBAT, urand(0, 5000));
+                                DoAction(ACTION_COMBAT_PREPARE);
                             break;
                         case EVENT_ROTFACE_OOZE_FLOOD:
                             DoAction(ACTION_ROTFACE_OOZE);
@@ -699,21 +710,7 @@ class boss_professor_putricide : public CreatureScript
                                 default:
                                     break;
                             }
-                        }
-                        case EVENT_PREPARE_TO_COMBAT:
-                        {
-                            events.SetPhase(PHASE_COMBAT_1);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            me->SetImmuneToPC(false);
-                            me->GetMotionMaster()->MovePoint(POINT_TABLE, tablePos);
-                            events.ScheduleEvent(EVENT_EVADE_BEFORE_COMBAT, 15500);
-                            break;
-                        }
-                        case EVENT_EVADE_BEFORE_COMBAT:
-                        {
-                            EnterEvadeMode();
-                            break;
-                        }
+                        }                        
                         default:
                             break;
                     }

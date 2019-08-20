@@ -504,7 +504,10 @@ enum ICSharedActions
 
     // The Lich King
     ACTION_RESTORE_LIGHT        = -72262,
-    ACTION_FROSTMOURNE_INTRO    = -36823
+    ACTION_FROSTMOURNE_INTRO    = -36823,
+
+    // Profession prepare
+    ACTION_COMBAT_PREPARE       = -366781
 };
 
 enum ICWeekliesICC
