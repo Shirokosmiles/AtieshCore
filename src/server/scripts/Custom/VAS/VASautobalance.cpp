@@ -33,7 +33,7 @@ public:
         if (!attacker || !victim)
             return damage;
 
-        if (!attacker->GetMap() || !attacker->GetMap()->IsDungeon())
+        if (!attacker->FindMap() || !attacker->FindMap()->IsDungeon())
             return damage;
 
         if (attacker->ToPlayer()) // decrease only unit damage (not player)
@@ -54,7 +54,7 @@ public:
         if (!reciever || !healer)
             return heal;
 
-        if (!healer->GetMap() || !healer->GetMap()->IsDungeon())
+        if (!healer->FindMap() || !healer->FindMap()->IsDungeon())
             return heal;
 
         if (reciever->ToPlayer()) // Heal casted on player should be 100%
@@ -77,7 +77,7 @@ public:
         if (!unit)
             return;
 
-        if (!unit->GetMap() || !unit->GetMap()->IsDungeon())
+        if (!unit->FindMap() || !unit->FindMap()->IsDungeon())
             return;
 
         if (unit->GetCharmerOrOwner())
