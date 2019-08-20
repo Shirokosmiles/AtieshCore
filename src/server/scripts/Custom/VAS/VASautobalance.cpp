@@ -30,9 +30,6 @@ public:
 
     uint32 VAS_Modifer_DealDamage(Unit* attacker, Unit* victim, uint32 damage)
     {
-        if (!attacker || !victim)
-            return damage;
-
         if (!attacker->FindMap() || !attacker->FindMap()->IsDungeon())
             return damage;
 
@@ -51,9 +48,6 @@ public:
 
     uint32 VAS_Modifer_DealHeal(Unit* healer, Unit* reciever, uint32 heal)
     {
-        if (!reciever || !healer)
-            return heal;
-
         if (!healer->FindMap() || !healer->FindMap()->IsDungeon())
             return heal;
 
@@ -97,7 +91,7 @@ public:
         if (!unit)
             return;
 
-        if (!unit->GetMap() || !unit->GetMap()->IsDungeon())
+        if (!unit->FindMap() || !unit->FindMap()->IsDungeon())
             return;
 
         if (unit->GetCharmerOrOwner())

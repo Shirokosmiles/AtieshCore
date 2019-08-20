@@ -1079,8 +1079,12 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
         }
     }
 
-    // Script Hook For CalculateSpellDamageTaken -- Allow scripts to change the Damage post class mitigation calculations
-    sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);
+    Unit* attacker = damageInfo->attacker;
+    if (attacker && attacker->IsAlive())
+    {
+        // Script Hook For CalculateSpellDamageTaken -- Allow scripts to change the Damage post class mitigation calculations
+        sScriptMgr->ModifySpellDamageTaken(ASSERT_NOTNULL(victim), ASSERT_NOTNULL(attacker), damage);
+    }
 
     if (damageInfo->target->UnderCheatDeath())
     {
@@ -1209,8 +1213,12 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
         damage = MeleeDamageBonusDone(damageInfo->Target, damage, damageInfo->AttackType, nullptr, schoolMask);
         damage = damageInfo->Target->MeleeDamageBonusTaken(this, damage, damageInfo->AttackType, nullptr, schoolMask);
 
-        // Script Hook For CalculateMeleeDamage -- Allow scripts to change the Damage pre class mitigation calculations
-        sScriptMgr->ModifyMeleeDamage(damageInfo->Target, damageInfo->Attacker, damage);
+        Unit* attacker = damageInfo->Attacker;
+        if (attacker && attacker->IsAlive())
+        {
+            // Script Hook For CalculateMeleeDamage -- Allow scripts to change the Damage pre class mitigation calculations
+            sScriptMgr->ModifyMeleeDamage(ASSERT_NOTNULL(victim), ASSERT_NOTNULL(attacker), damage);
+        }        
 
         // Calculate armor reduction
         if (Unit::IsDamageReducedByArmor(SpellSchoolMask(damageInfo->Damages[i].DamageSchoolMask)))
@@ -6230,8 +6238,11 @@ void Unit::SetCharm(Unit* charm, bool apply)
     if (addhealth)
         gain = victim->ModifyHealth(int32(addhealth));
 
-    // Hook for OnHeal Event
-    sScriptMgr->OnHeal(healer, victim, (uint32&)gain);
+    if (healer && victim)
+    {
+        // Hook for OnHeal Event
+        sScriptMgr->OnHeal(ASSERT_NOTNULL(healer), ASSERT_NOTNULL(victim), (uint32&)gain);
+    }
 
     Unit* unit = healer;
     if (healer && healer->GetTypeId() == TYPEID_UNIT && healer->IsTotem())
