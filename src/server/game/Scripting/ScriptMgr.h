@@ -418,11 +418,8 @@ class TC_GAME_API UnitScript : public ScriptObject
         // Called when an unit exits a vehicle
         virtual void ModifyVehiclePassengerExitPos(Unit* /*passenger*/, Vehicle* /*vehicle*/, Position& /*pos*/) { }
 
-        // Called when an unit calculate max HP 
-        virtual void CreatureUpdateLevelDependantStatsWithMaxHealth(Unit* /*unit*/, uint32& /*maxhealth*/) { }
-
-        // Called when an unit calculate max Mana
-        virtual void CreatureUpdateLevelDependantStatsWithMaxMana(Unit* /*unit*/, uint32& /*maxmana*/) { }
+        // Called when an unit added in world
+        virtual void InstanceCreatureAddToWorld(Unit* /*unit*/) { }
 };
 
 class TC_GAME_API CreatureScript : public ScriptObject
@@ -1113,8 +1110,7 @@ class TC_GAME_API ScriptMgr
         void ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage);
         void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage);
         void ModifyVehiclePassengerExitPos(Unit* passenger, Vehicle* vehicle, Position& pos);
-        void OnCreatureUpdateLevelDependantStatsWithMaxHealth(Unit* unit, uint32& health);
-        void OnCreatureUpdateLevelDependantStatsWithMaxMana(Unit* unit, uint32& mana);
+        void OnInstanceCreatureAddToWorld(Unit* unit);
 
     private:
         uint32 _scriptCount;

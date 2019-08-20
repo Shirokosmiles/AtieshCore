@@ -27,6 +27,7 @@
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "World.h"
 
 enum ScriptTexts
 {
@@ -260,7 +261,8 @@ class boss_deathbringer_saurfang : public CreatureScript
                 ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
                 _fallenChampionCastCount = 0;
                 FightWonValue = 100000;
-                sScriptMgr->OnCreatureUpdateLevelDependantStatsWithMaxHealth(me->ToUnit(), FightWonValue);
+                float healthMultiplier = sWorld->getRate(RATE_VAS_MAXHP_PERCENT);
+                FightWonValue = CalculatePct(FightWonValue, healthMultiplier);
             }
 
             void Reset() override
@@ -268,6 +270,7 @@ class boss_deathbringer_saurfang : public CreatureScript
                 if (_dead)
                     return;
                 _Reset();
+                events.Reset();
                 events.SetPhase(PHASE_COMBAT);
                 _frenzied = false;
                 _dead = false;
@@ -782,6 +785,9 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
+                if (!me || !me->IsAlive())
+                    return;
+
                 _events.Update(diff);
                 while (uint32 eventId = _events.ExecuteEvent())
                 {
@@ -968,6 +974,9 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
+                if (!me || !me->IsAlive())
+                    return;
+
                 _events.Update(diff);
                 while (uint32 eventId = _events.ExecuteEvent())
                 {

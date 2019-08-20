@@ -28,7 +28,7 @@ public:
     {
     }
 
-    uint32 VAS_Modifer_DealDamage(Unit* attacker, Unit* /*victim*/, uint32 damage)
+    uint32 VAS_Modifer_DealDamage(Unit* attacker, Unit* victim, uint32 damage)
     {
         if (!attacker->FindMap() || !attacker->FindMap()->IsDungeon())
             return damage;
@@ -63,7 +63,7 @@ public:
         return newheal;
     }
 
-    void CreatureUpdateLevelDependantStatsWithMaxHealth(Unit* unit, uint32& maxhealth) override
+    void InstanceCreatureAddToWorld(Unit* unit) override
     {
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
@@ -71,36 +71,37 @@ public:
         if (!unit)
             return;
 
-        if (!unit->FindMap() || !unit->FindMap()->IsDungeon())
-            return;
-
         if (unit->GetCharmerOrOwner())
             if (unit->ToPet() || unit->ToTotem() || unit->IsSummon())
                 return;
-
+                
+        uint32 maxhealth = unit->GetMaxHealth();
         float healthMultiplier = sWorld->getRate(RATE_VAS_MAXHP_PERCENT);
-        float newhealth = CalculatePct(maxhealth, healthMultiplier);
-        maxhealth = newhealth;
-    }
+        uint32 newmaxhealth = CalculatePct(maxhealth, healthMultiplier);
 
-    void CreatureUpdateLevelDependantStatsWithMaxMana(Unit* unit, uint32& maxmana) override
-    {
-        if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
-            return;
+        float healthPct = unit->GetHealthPct();
+        uint32 newhealth = CalculatePct(newmaxhealth, healthPct);
 
-        if (!unit)
-            return;
+        unit->SetCreateHealth(newmaxhealth);
+        unit->SetMaxHealth(newmaxhealth);
+        unit->SetHealth(newhealth);
 
-        if (!unit->FindMap() || !unit->FindMap()->IsDungeon())
-            return;
+        if (unit->ToCreature())
+            unit->ToCreature()->ResetPlayerDamageReq();
 
-        if (unit->GetCharmerOrOwner())
-            if (unit->ToPet() || unit->ToTotem() || unit->IsSummon())
-                return;
+        // mana section
+        uint32 maxmana = unit->GetCreateMana();
+        float mpMultiplier = sWorld->getRate(RATE_VAS_MAXMP_PERCENT);
+        uint32 newhmaxmana = CalculatePct(maxmana, mpMultiplier);
 
-        float manaMultiplier = sWorld->getRate(RATE_VAS_MAXMP_PERCENT);
-        float newmana = CalculatePct(maxmana, manaMultiplier);
-        maxmana = newmana;
+        unit->SetCreateMana(newhmaxmana);
+        if (unit->GetClass() == UNIT_CLASS_MAGE || unit->GetClass() == UNIT_CLASS_PALADIN)
+        {
+            unit->SetMaxPower(POWER_MANA, newhmaxmana);
+            unit->SetFullPower(POWER_MANA);
+        }
+
+        unit->SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, (float)newmaxhealth);
     }
 
     void ModifyPeriodicDamageAurasTick(Unit* victim, Unit* attacker, uint32& damage) override

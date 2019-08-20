@@ -263,7 +263,6 @@ class boss_valithria_dreamwalker : public CreatureScript
                 _instance(creature->GetInstanceScript()), _portalCount(RAID_MODE<uint32>(3, 8, 3, 8))
             {
                 Initialize();
-                _spawnHealth = me->GetHealth();
             }
 
             void Initialize()
@@ -277,10 +276,6 @@ class boss_valithria_dreamwalker : public CreatureScript
 
             void InitializeAI() override
             {
-                if (CreatureData const* data = sObjectMgr->GetCreatureData(me->GetSpawnId()))
-                    if (data->curhealth)
-                        _spawnHealth = data->curhealth;
-
                 if (!me->isDead())
                     Reset();
             }
@@ -288,7 +283,7 @@ class boss_valithria_dreamwalker : public CreatureScript
             void Reset() override
             {
                 _events.Reset();
-                me->SetHealth(_spawnHealth);
+
                 me->SetReactState(REACT_PASSIVE);
                 me->LoadCreaturesAddon();
                 // immune to percent heals
@@ -298,6 +293,10 @@ class boss_valithria_dreamwalker : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_ID, 56131, true);
                 _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
                 Initialize();
+
+                _spawnHealth = me->GetMaxHealth();
+                uint32 health = CalculatePct(_spawnHealth, 50.f);
+                me->SetHealth(health);
             }
 
             void AttackStart(Unit* /*target*/) override
@@ -413,6 +412,8 @@ class boss_valithria_dreamwalker : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
+                if (!me || !me->IsAlive())
+                    return;
                 // does not enter combat
                 if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) != IN_PROGRESS)
                     return;

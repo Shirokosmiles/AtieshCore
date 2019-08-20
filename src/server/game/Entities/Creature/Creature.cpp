@@ -308,6 +308,9 @@ void Creature::AddToWorld()
                     transport->AddPassenger(this);
             }
         }
+
+        if (GetMap()->IsDungeon())
+            sScriptMgr->OnInstanceCreatureAddToWorld(this->ToUnit());
     }
 }
 
@@ -1499,12 +1502,6 @@ void Creature::UpdateLevelDependantStats()
     uint32 basehp = stats->GenerateHealth(cInfo);
     uint32 health = uint32(basehp * healthmod);
 
-    if (IsInWorld())
-    {
-        // Hook for OnCreatureUpdateLevelDependantStatsWithMaxHealth Event
-        sScriptMgr->OnCreatureUpdateLevelDependantStatsWithMaxHealth(ASSERT_NOTNULL(ToUnit()), health);
-    }
-
     SetCreateHealth(health);
     SetMaxHealth(health);
     SetHealth(health);
@@ -1512,12 +1509,6 @@ void Creature::UpdateLevelDependantStats()
 
     // mana
     uint32 mana = stats->GenerateMana(cInfo);
-    // Hook for OnCreatureUpdateLevelDependantStatsWithMaxMana Event
-    if (IsInWorld())
-    {
-        if (GetClass() == UNIT_CLASS_PALADIN || GetClass() == UNIT_CLASS_MAGE)
-            sScriptMgr->OnCreatureUpdateLevelDependantStatsWithMaxMana(ASSERT_NOTNULL(ToUnit()), mana);
-    }
     SetCreateMana(mana);
 
     switch (GetClass())
