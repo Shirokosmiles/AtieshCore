@@ -34,7 +34,7 @@ public:
             return damage;
 
         if (!attacker->GetMap() || !attacker->GetMap()->IsDungeon())
-            return;
+            return damage;
 
         if (attacker->ToPlayer()) // decrease only unit damage (not player)
             return damage;
@@ -55,7 +55,7 @@ public:
             return heal;
 
         if (!healer->GetMap() || !healer->GetMap()->IsDungeon())
-            return;
+            return heal;
 
         if (reciever->ToPlayer()) // Heal casted on player should be 100%
             return heal;
