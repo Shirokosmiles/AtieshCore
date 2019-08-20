@@ -43,7 +43,7 @@ class instance_forge_of_souls : public InstanceMapScript
                 SetBossNumber(EncounterCount);
                 LoadBossBoundaries(boundaries);
 
-                teamInInstance = 0;
+                teamInInstance = instance->ToInstanceMap()->GetPlayersTeam();
             }
 
             void OnPlayerEnter(Player* player) override

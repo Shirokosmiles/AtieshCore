@@ -49,7 +49,7 @@ class instance_pit_of_saron : public InstanceMapScript
                 SetHeaders(DataHeader);
                 SetBossNumber(EncounterCount);
                 LoadDoorData(Doors);
-                _teamInInstance = 0;
+                _teamInInstance = instance->ToInstanceMap()->GetPlayersTeam();
                 _cavernActive = 0;
                 _shardsHit = 0;
             }

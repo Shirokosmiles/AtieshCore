@@ -89,7 +89,7 @@ class instance_halls_of_reflection : public InstanceMapScript
                 SetHeaders(DataHeader);
                 SetBossNumber(EncounterCount);
 
-                _teamInInstance           = 0;
+                _teamInInstance           = instance->ToInstanceMap()->GetPlayersTeam();
                 _waveCount                = 0;
                 _introState               = NOT_STARTED;
                 _frostswornGeneralState   = NOT_STARTED;
