@@ -44,8 +44,9 @@ public:
                 return damage;
 
         float damageMultiplier = sWorld->getRate(RATE_VAS_DAMAGE_PERCENT);
-        float newdamage = CalculatePct(damage, damageMultiplier);
-        return uint32(newdamage);
+        float tmpnewdamage = CalculatePct(damage, damageMultiplier);
+        uint32 newdamage = uint32(tmpnewdamage);
+        return newdamage;
     }
 
     uint32 VAS_Modifer_DealHeal(Unit* healer, Unit* reciever, uint32 heal)
@@ -63,8 +64,9 @@ public:
             return heal;
 
         float healMultiplier = sWorld->getRate(RATE_VAS_HEAL_PERCENT);
-        float newheal = CalculatePct(heal, healMultiplier);
-        return uint32(newheal);
+        float tmpnewheal = CalculatePct(heal, healMultiplier);
+        uint32 newheal = uint32(tmpnewheal);
+        return newheal;
     }
 
     void CreatureUpdateLevelDependantStatsWithMaxHealth(Unit* unit, uint32& maxhealth) override
