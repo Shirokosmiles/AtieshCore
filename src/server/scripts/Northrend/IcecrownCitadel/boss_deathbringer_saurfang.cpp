@@ -458,6 +458,9 @@ class boss_deathbringer_saurfang : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
+                if (!me || !me->IsAlive())
+                    return;
+
                 if (!UpdateVictim() && !(events.IsInPhase(PHASE_INTRO_A) || events.IsInPhase(PHASE_INTRO_H)))
                     return;
 

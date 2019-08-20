@@ -28,31 +28,43 @@ public:
     {
     }
 
-    uint32 VAS_Modifer_DealDamage(Unit* target, Unit* victim, uint32 damage)
+    uint32 VAS_Modifer_DealDamage(Unit* attacker, Unit* victim, uint32 damage)
     {
-        if (target->ToPlayer())
+        if (!attacker || !victim)
             return damage;
 
-        if (victim->ToPlayer() || victim->IsHunterPet() || victim->IsPet() || victim->IsSummon())
-        {
-            float damageMultiplier = sWorld->getRate(RATE_VAS_DAMAGE_PERCENT);
-            float newdamage = CalculatePct(damage, damageMultiplier);
-            damage = uint32(newdamage);
-        }
+        if (!attacker->GetMap() || !attacker->GetMap()->IsDungeon())
+            return;
 
-        return damage;
+        if (attacker->ToPlayer()) // decrease only unit damage (not player)
+            return damage;
+
+        if (attacker->GetCharmerOrOwner())
+            if (attacker->ToPet() || attacker->ToTotem() || attacker->IsSummon())
+                return damage;
+
+        float damageMultiplier = sWorld->getRate(RATE_VAS_DAMAGE_PERCENT);
+        float newdamage = CalculatePct(damage, damageMultiplier);
+        return uint32(newdamage);
     }
 
-    uint32 VAS_Modifer_DealHeal(Unit* target, Unit* victim, uint32 damage)
+    uint32 VAS_Modifer_DealHeal(Unit* healer, Unit* reciever, uint32 heal)
     {
-        if (target->ToPlayer() || victim->ToPlayer()) // Heal by player should be 100%
-            return damage;
+        if (!reciever || !healer)
+            return heal;
+
+        if (!healer->GetMap() || !healer->GetMap()->IsDungeon())
+            return;
+
+        if (reciever->ToPlayer()) // Heal casted on player should be 100%
+            return heal;
+
+        if (healer->ToPlayer()) // Heal casted by player should be 100%
+            return heal;
 
         float healMultiplier = sWorld->getRate(RATE_VAS_HEAL_PERCENT);
-        float newheal = CalculatePct(damage, healMultiplier);
-        damage = uint32(newheal);
-
-        return damage;
+        float newheal = CalculatePct(heal, healMultiplier);
+        return uint32(newheal);
     }
 
     void CreatureUpdateLevelDependantStatsWithMaxHealth(Unit* unit, uint32& maxhealth) override
@@ -60,12 +72,19 @@ public:
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
 
-        if (!unit->ToPlayer() && !unit->IsPet() && !unit->IsTotem() && unit->GetMap()->IsDungeon())
-        {
-            float healthMultiplier = sWorld->getRate(RATE_VAS_MAXHP_PERCENT);
-            float newhealth = CalculatePct(maxhealth, healthMultiplier);
-            maxhealth = newhealth;
-        }
+        if (!unit)
+            return;
+
+        if (!unit->GetMap() || !unit->GetMap()->IsDungeon())
+            return;
+
+        if (unit->GetCharmerOrOwner())
+            if (unit->ToPet() || unit->ToTotem() || unit->IsSummon())
+                return;
+
+        float healthMultiplier = sWorld->getRate(RATE_VAS_MAXHP_PERCENT);
+        float newhealth = CalculatePct(maxhealth, healthMultiplier);
+        maxhealth = newhealth;
     }
 
     void CreatureUpdateLevelDependantStatsWithMaxMana(Unit* unit, uint32& maxmana) override
@@ -73,42 +92,43 @@ public:
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
 
-        if (!unit->ToPlayer() && !unit->IsPet() && !unit->IsTotem() && unit->GetMap()->IsDungeon())
-        {
-            float manaMultiplier = sWorld->getRate(RATE_VAS_MAXMP_PERCENT);
-            float newmana = CalculatePct(maxmana, manaMultiplier);
-            maxmana = newmana;
-        }
+        if (!unit)
+            return;
+
+        if (!unit->GetMap() || !unit->GetMap()->IsDungeon())
+            return;
+
+        if (unit->GetCharmerOrOwner())
+            if (unit->ToPet() || unit->ToTotem() || unit->IsSummon())
+                return;
+
+        float manaMultiplier = sWorld->getRate(RATE_VAS_MAXMP_PERCENT);
+        float newmana = CalculatePct(maxmana, manaMultiplier);
+        maxmana = newmana;
     }
 
-    void ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage) override
+    void ModifyPeriodicDamageAurasTick(Unit* victim, Unit* attacker, uint32& damage) override
     {
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
 
-        if (target && attacker && target->IsInWorld() && attacker->IsInWorld())
-            if (target->GetMap() && target->GetMap()->IsDungeon())
-                damage = VAS_Modifer_DealDamage(attacker, target, damage);
+        damage = VAS_Modifer_DealDamage(attacker, victim, damage);
     }
 
-    void ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage) override
+    void ModifyMeleeDamage(Unit* victim, Unit* attacker, uint32& damage) override
     {
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
 
-        if (target && attacker && target->IsInWorld() && attacker->IsInWorld())
-            if (target->GetMap() && target->GetMap()->IsDungeon())
-                damage = VAS_Modifer_DealDamage(attacker, target, damage);
+        damage = VAS_Modifer_DealDamage(attacker, victim, damage);
     }
 
-    void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage) override
+    void ModifySpellDamageTaken(Unit* victim, Unit* attacker, int32& damage) override
     {
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
 
-        if (target && attacker && target->IsInWorld() && attacker->IsInWorld())
-            if(target->GetMap() && target->GetMap()->IsDungeon())
-                damage = VAS_Modifer_DealDamage(attacker, target, damage);
+        damage = VAS_Modifer_DealDamage(attacker, victim, damage);
     }
 
     void OnHeal(Unit* healer, Unit* reciever, uint32& gain) override
@@ -116,9 +136,7 @@ public:
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
             return;
 
-        if (reciever && healer && reciever->IsInWorld() && healer->IsInWorld())
-            if (healer->GetMap() && healer->GetMap()->IsDungeon())
-                gain = VAS_Modifer_DealHeal(healer, reciever, gain);
+        gain = VAS_Modifer_DealHeal(healer, reciever, gain);
     }
 };
 
