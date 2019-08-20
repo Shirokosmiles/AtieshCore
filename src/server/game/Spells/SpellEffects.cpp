@@ -2843,7 +2843,9 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
     creatureTarget->DespawnOrUnsummon();
 
     uint8 level = (creatureTarget->GetLevel() < (unitCaster->GetLevel() - 5)) ? (unitCaster->GetLevel() - 5) : creatureTarget->GetLevel();
-
+    uint8 checklevel = sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL);
+    if (checklevel > level)
+        level = checklevel;
     // prepare visual effect for levelup
     pet->SetUInt32Value(UNIT_FIELD_LEVEL, level - 1);
 
