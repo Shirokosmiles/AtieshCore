@@ -1499,8 +1499,11 @@ void Creature::UpdateLevelDependantStats()
     uint32 basehp = stats->GenerateHealth(cInfo);
     uint32 health = uint32(basehp * healthmod);
 
-    // Hook for OnCreatureUpdateLevelDependantStatsWithMaxHealth Event
-    sScriptMgr->OnCreatureUpdateLevelDependantStatsWithMaxHealth(ASSERT_NOTNULL(ToUnit()), health);
+    if (IsInWorld())
+    {
+        // Hook for OnCreatureUpdateLevelDependantStatsWithMaxHealth Event
+        sScriptMgr->OnCreatureUpdateLevelDependantStatsWithMaxHealth(ASSERT_NOTNULL(ToUnit()), health);
+    }
 
     SetCreateHealth(health);
     SetMaxHealth(health);
@@ -1510,8 +1513,11 @@ void Creature::UpdateLevelDependantStats()
     // mana
     uint32 mana = stats->GenerateMana(cInfo);
     // Hook for OnCreatureUpdateLevelDependantStatsWithMaxMana Event
-    if (GetClass() == UNIT_CLASS_PALADIN || GetClass() == UNIT_CLASS_MAGE)
-        sScriptMgr->OnCreatureUpdateLevelDependantStatsWithMaxMana(ASSERT_NOTNULL(ToUnit()), mana);
+    if (IsInWorld())
+    {
+        if (GetClass() == UNIT_CLASS_PALADIN || GetClass() == UNIT_CLASS_MAGE)
+            sScriptMgr->OnCreatureUpdateLevelDependantStatsWithMaxMana(ASSERT_NOTNULL(ToUnit()), mana);
+    }
     SetCreateMana(mana);
 
     switch (GetClass())

@@ -28,7 +28,7 @@ public:
     {
     }
 
-    uint32 VAS_Modifer_DealDamage(Unit* attacker, Unit* victim, uint32 damage)
+    uint32 VAS_Modifer_DealDamage(Unit* attacker, Unit* /*victim*/, uint32 damage)
     {
         if (!attacker->FindMap() || !attacker->FindMap()->IsDungeon())
             return damage;
