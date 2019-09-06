@@ -968,8 +968,11 @@ class spell_eadric_hammer_of_righteous : public SpellScriptLoader
                 return ValidateSpellInfo({ SPELL_HAMMER_RIGHT_DUMMY, SPELL_HAMMER_JUSTICE_STUN });
             }
 
-            void HandleDamage()
+            void HandleDamage(SpellMissInfo missInfo)
             {
+                if (missInfo != SPELL_MISS_NONE)
+                    return;
+
                 if (Unit* target = GetHitUnit())
                 {
                     if (!target->HasAura(SPELL_HAMMER_JUSTICE_STUN))
@@ -985,7 +988,7 @@ class spell_eadric_hammer_of_righteous : public SpellScriptLoader
 
             void Register() override
             {
-                BeforeHit += SpellHitFn(spell_eadric_hammer_of_righteous_SpellScript::HandleDamage);
+                BeforeHit += BeforeSpellHitFn(spell_eadric_hammer_of_righteous_SpellScript::HandleDamage);
             }
         };
 

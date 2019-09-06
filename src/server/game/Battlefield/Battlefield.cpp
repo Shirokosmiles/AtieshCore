@@ -28,6 +28,7 @@
 #include "GroupMgr.h"
 #include "Log.h"
 #include "Map.h"
+#include "MiscPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -588,40 +589,36 @@ void Battlefield::ShowCreature(Creature* creature, bool aggressive)
 
 void Battlefield::DoPlaySoundToAll(uint32 soundId)
 {
-    WorldPacket data;
-    data.Initialize(SMSG_PLAY_SOUND, 4);
-    data << uint32(soundId);
-
-    BroadcastPacketToWar(data);
+    BroadcastPacketToWar(WorldPackets::Misc::PlaySound(soundId).Write());
 }
 
-void Battlefield::BroadcastPacketToZone(WorldPacket& data) const
+void Battlefield::BroadcastPacketToZone(WorldPacket const* data) const
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = _players[team].begin(); itr != _players[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindConnectedPlayer(*itr))
-                player->SendDirectMessage(&data);
+                player->SendDirectMessage(data);
     }
 }
 
-void Battlefield::BroadcastPacketToQueue(WorldPacket& data) const
+void Battlefield::BroadcastPacketToQueue(WorldPacket const* data) const
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = _playerQueue[team].begin(); itr != _playerQueue[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindConnectedPlayer(*itr))
-                player->SendDirectMessage(&data);
+                player->SendDirectMessage(data);
     }
 }
 
-void Battlefield::BroadcastPacketToWar(WorldPacket& data) const
+void Battlefield::BroadcastPacketToWar(WorldPacket const* data) const
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = _playersInWar[team].begin(); itr != _playersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindConnectedPlayer(*itr))
-                player->SendDirectMessage(&data);
+                player->SendDirectMessage(data);
     }
 }
 

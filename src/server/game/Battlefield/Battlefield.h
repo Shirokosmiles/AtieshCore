@@ -148,9 +148,9 @@ class TC_GAME_API Battlefield : public ZoneScript
         void ShowCreature(Creature* creature, bool aggressive);
         void DoPlaySoundToAll(uint32 soundId);
         // packet senders
-        void BroadcastPacketToZone(WorldPacket& data) const;
-        void BroadcastPacketToQueue(WorldPacket& data) const;
-        void BroadcastPacketToWar(WorldPacket& data) const;
+        void BroadcastPacketToZone(WorldPacket const* data) const;
+        void BroadcastPacketToQueue(WorldPacket const* data) const;
+        void BroadcastPacketToWar(WorldPacket const* data) const;
         void AddCapturePoint(BattlefieldCapturePoint* capturePoint) { _capturePoints.push_back(capturePoint); }
         void TeamCastSpell(TeamId team, int32 spellId);
 

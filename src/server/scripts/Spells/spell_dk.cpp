@@ -2192,8 +2192,11 @@ class spell_dk_scourge_strike : public SpellScriptLoader
                 return ValidateSpellInfo({ SPELL_DK_SCOURGE_STRIKE_TRIGGERED });
             }
 
-            void HandleBeforeHit()
+            void HandleBeforeHit(SpellMissInfo missInfo)
             {
+                if (missInfo != SPELL_MISS_NONE)
+                    return;
+
                 // Save calculated damage before hit, so we can do shadow damage even if absorbed
                 damageDone = GetHitDamage();
             }
@@ -2228,7 +2231,7 @@ class spell_dk_scourge_strike : public SpellScriptLoader
 
             void Register() override
             {
-                BeforeHit += SpellHitFn(spell_dk_scourge_strike_SpellScript::HandleBeforeHit);
+                BeforeHit += BeforeSpellHitFn(spell_dk_scourge_strike_SpellScript::HandleBeforeHit);
                 OnEffectHitTarget += SpellEffectFn(spell_dk_scourge_strike_SpellScript::HandleDummy, EFFECT_2, SPELL_EFFECT_DUMMY);
                 AfterHit += SpellHitFn(spell_dk_scourge_strike_SpellScript::HandleAfterHit);
             }

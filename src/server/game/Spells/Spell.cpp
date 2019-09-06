@@ -2513,6 +2513,8 @@ void Spell::TargetInfo::PreprocessTarget(Spell* spell)
     if ((MissCondition == SPELL_MISS_IMMUNE || MissCondition == SPELL_MISS_IMMUNE2) && spell->m_caster->GetTypeId() == TYPEID_PLAYER && unit->GetTypeId() == TYPEID_PLAYER && spell->m_caster->IsValidAttackTarget(unit, spell->GetSpellInfo()))
         unit->SetInCombatWith(spell->m_caster->ToPlayer());
 
+    spell->CallScriptBeforeHitHandlers(MissCondition);
+
     _enablePVP = false; // need to check PvP state before spell effects, but act on it afterwards
     if (_spellHitTarget)
     {
@@ -2821,7 +2823,7 @@ void Spell::GOTargetInfo::DoTargetSpellHit(Spell* spell, uint8 effIndex)
     if (!go)
         return;
 
-    spell->CallScriptBeforeHitHandlers();
+    spell->CallScriptBeforeHitHandlers(SPELL_MISS_NONE);
 
     spell->HandleEffects(nullptr, nullptr, go, effIndex, SPELL_EFFECT_HANDLE_HIT_TARGET);
 
@@ -2845,7 +2847,7 @@ void Spell::GOTargetInfo::DoTargetSpellHit(Spell* spell, uint8 effIndex)
 
 void Spell::ItemTargetInfo::DoTargetSpellHit(Spell* spell, uint8 effIndex)
 {
-    spell->CallScriptBeforeHitHandlers();
+    spell->CallScriptBeforeHitHandlers(SPELL_MISS_NONE);
 
     spell->HandleEffects(nullptr, TargetItem, nullptr, effIndex, SPELL_EFFECT_HANDLE_HIT_TARGET);
 
@@ -2866,8 +2868,6 @@ SpellMissInfo Spell::PreprocessSpellHit(Unit* unit, bool scaleAura, TargetInfo& 
     // For delayed spells immunity may be applied between missile launch and hit - check immunity for that case
     if (m_spellInfo->Speed && unit->IsImmunedToSpell(m_spellInfo, m_caster))
         return SPELL_MISS_IMMUNE;
-
-    CallScriptBeforeHitHandlers();
 
     if (Player* player = unit->ToPlayer())
     {
@@ -8242,7 +8242,7 @@ void Spell::CallScriptSuccessfulDispel(SpellEffIndex effIndex)
     }
 }
 
-void Spell::CallScriptBeforeHitHandlers()
+void Spell::CallScriptBeforeHitHandlers(SpellMissInfo missInfo)
 {
     for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
     {
@@ -8250,7 +8250,7 @@ void Spell::CallScriptBeforeHitHandlers()
         (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_BEFORE_HIT);
         auto hookItrEnd = (*scritr)->BeforeHit.end(), hookItr = (*scritr)->BeforeHit.begin();
         for (; hookItr != hookItrEnd; ++hookItr)
-            (*hookItr).Call(*scritr);
+            (*hookItr).Call(*scritr, missInfo);
 
         (*scritr)->_FinishScriptCall();
     }
