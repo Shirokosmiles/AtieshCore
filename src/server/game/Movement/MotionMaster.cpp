@@ -687,6 +687,8 @@ void MotionMaster::MoveCharge(float x, float y, float z, float speed /*= SPEED_C
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
         TC_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveCharge: '%s', charging point Id: %u (X: %f, Y: %f, Z: %f)", _owner->GetGUID().ToString().c_str(), id, x, y, z);
+        _owner->ToPlayer()->SetUnderACKmount();
+        _owner->ToPlayer()->SetSkipOnePacketForASH(true);
         Add(new ChargeMovementGenerator<Player>(id, x, y, z, generatePath, speed));
     }
     else
@@ -709,6 +711,8 @@ void MotionMaster::MoveCharge(PathGenerator const& path, float speed /*= SPEED_C
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
         TC_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveCharge: '%s', charging point Id: %u (X: %f, Y: %f, Z: %f) BY PATH", _owner->GetGUID().ToString().c_str(), id, x, y, z);
+        _owner->ToPlayer()->SetUnderACKmount();
+        _owner->ToPlayer()->SetSkipOnePacketForASH(true);
         Add(new ChargePathMovementGenerator<Player>(id, x, y, z, path, speed));
     }
     else
@@ -788,7 +792,9 @@ void MotionMaster::MoveJump(float x, float y, float z, float o, float speedXY, f
     {
         TC_LOG_DEBUG("misc", "Player (GUID: %u) MoveJump at point (X: %f Y: %f Z: %f) and speedXY = %f, max_height = %f",
             _owner->GetGUID().GetCounter(), x, y, z, speedXY, max_height);
-        Add(new JumpMovementGenerator<Player>(id, x, y, z, o, speedXY, max_height, hasOrientation));
+        _owner->ToPlayer()->SetUnderACKmount();
+        _owner->ToPlayer()->SetSkipOnePacketForASH(true);
+        Add(new JumpMovementGenerator<Player>(id, x, y, z, o, speedXY, max_height, hasOrientation));        
     }
     else
     {
