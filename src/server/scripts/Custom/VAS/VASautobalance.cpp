@@ -33,12 +33,15 @@ public:
         if (!attacker->FindMap() || !attacker->FindMap()->IsDungeon())
             return damage;
 
-        if (attacker->ToPlayer()) // decrease only unit damage (not player)
+        if (attacker->ToPlayer() && !victim->ToPlayer()) // decrease only unit damage (not player)
             return damage;
 
         if (attacker->GetCharmerOrOwner())
             if (attacker->ToPet() || attacker->ToTotem() || attacker->IsSummon())
                 return damage;
+
+        if (!attacker->ToPlayer() && attacker->IsControlledByPlayer())
+            return damage;
 
         float damageMultiplier = sWorld->getRate(RATE_VAS_DAMAGE_PERCENT);
         float tmpnewdamage = CalculatePct(damage, damageMultiplier);

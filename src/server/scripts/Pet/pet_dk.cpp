@@ -290,8 +290,14 @@ class npc_pet_dk_rune_weapon : public CreatureScript
 
             void IsSummonedBy(WorldObject* summoner) override
             {
-                if (Unit * ownercaster = summoner->ToUnit())
+                if (Unit* ownercaster = summoner->ToUnit())
                 {
+                    if (ownercaster->ToPlayer())
+                    {
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, ownercaster->GetFloatValue(UNIT_FIELD_MINDAMAGE) / 2);
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, ownercaster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) / 2);
+                    }
+
                     DoCast(ownercaster, SPELL_COPY_WEAPON, true);
                     DoCast(ownercaster, SPELL_DK_RUNE_WEAPON_MARK, true);
                 }

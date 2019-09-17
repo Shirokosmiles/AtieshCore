@@ -991,11 +991,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
         SetCreateHealth(health);
         SetCreateMana(mana);
-        SetCreateStat(STAT_STRENGTH, 22);
-        SetCreateStat(STAT_AGILITY, 22);
-        SetCreateStat(STAT_STAMINA, 25);
-        SetCreateStat(STAT_INTELLECT, 28);
-        SetCreateStat(STAT_SPIRIT, 27);
+        SetCreateStat(STAT_STRENGTH, 22 + 2 * petlevel);
+        SetCreateStat(STAT_AGILITY, 22 + 1.5f * petlevel);
+        SetCreateStat(STAT_STAMINA, 25 + 2 * petlevel);
+        SetCreateStat(STAT_INTELLECT, 28 + 2 * petlevel);
+        SetCreateStat(STAT_SPIRIT, 27 + 1.5f * petlevel);
     }
 
     // Power

@@ -6229,6 +6229,13 @@ void Unit::SetCharm(Unit* charm, bool apply)
     Unit* victim = healInfo.GetTarget();
     uint32 addhealth = healInfo.GetHeal();
 
+    if (healer && victim)
+    {
+        // Hook for OnHeal Event
+        sScriptMgr->OnHeal(ASSERT_NOTNULL(healer), ASSERT_NOTNULL(victim), addhealth);
+        healInfo.SetHeal(addhealth);
+    }
+
     if (UnitAI* victimAI = victim->GetAI())
         victimAI->HealReceived(healer, addhealth);
 
@@ -6237,12 +6244,6 @@ void Unit::SetCharm(Unit* charm, bool apply)
 
     if (addhealth)
         gain = victim->ModifyHealth(int32(addhealth));
-
-    if (healer && victim)
-    {
-        // Hook for OnHeal Event
-        sScriptMgr->OnHeal(ASSERT_NOTNULL(healer), ASSERT_NOTNULL(victim), (uint32&)gain);
-    }
 
     Unit* unit = healer;
     if (healer && healer->GetTypeId() == TYPEID_UNIT && healer->IsTotem())
