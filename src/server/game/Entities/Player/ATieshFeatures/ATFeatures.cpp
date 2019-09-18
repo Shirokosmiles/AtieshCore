@@ -828,7 +828,7 @@ void Guild::UpdateLevelAndExp()
     CharacterDatabase.Execute(stmt);
 }
 
-void Guild::UpdateGuildRating(int32 changes, bool winner)
+void Guild::UpdateGuildRating(int32 changes, bool winner, Player* player)
 {
     if (winner)
         m_guildRating += changes;
@@ -840,6 +840,9 @@ void Guild::UpdateGuildRating(int32 changes, bool winner)
         else
             m_guildRating = 0;
     }
+
+    if (player)
+        sScriptMgr->OnGuildExpirienceUpEvent(this, player, changes);
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RATING);
     stmt->setUInt32(0, m_guildRating);
@@ -1149,6 +1152,20 @@ void Guild::BroadcastToGuildExp(uint32 level, std::string const& playerName) con
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_EXP_UP_BY, level, playerName);
             else
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_EXP_UP, level);
+        }
+    }
+}
+
+void Guild::BroadcastToGuildRating(uint32 level, std::string const& playerName) const
+{
+    for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        if (Player * player = itr->second->FindConnectedPlayer())
+        {
+            if (playerName != "")
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY, level, playerName);
+            else
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_RATING_UP, level);
         }
     }
 }

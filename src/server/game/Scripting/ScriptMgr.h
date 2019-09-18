@@ -409,6 +409,12 @@ class TC_GAME_API UnitScript : public ScriptObject
         // Called when DoT's Tick Damage is being Dealt
         virtual void ModifyPeriodicDamageAurasTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
 
+        // Called when DoT's Tick Damage is being Dealt
+        virtual void ModifyPeriodicHealthLeechAuraTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
+
+        // Called when DoT's Tick Damage is being Dealt
+        virtual void ModifyPeriodicHealAurasTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
+
         // Called when Melee Damage is being Dealt
         virtual void ModifyMeleeDamage(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
 
@@ -806,6 +812,8 @@ class TC_GAME_API GuildScript : public ScriptObject
 
         virtual void OnExpReceived(Guild* /*guild*/, Player* /*player*/, uint32 /*receivedExp*/) { }
 
+        virtual void OnRatingReceived(Guild* /*guild*/, Player* /*player*/, uint32 /*receivedRating*/) { }
+
         virtual void OnArenaWon(Guild* /*guild*/, Player* /*player*/) { }
 
         virtual void OnBattlegroundWon(Guild* /*guild*/, Player* /*player*/) { }
@@ -1089,6 +1097,7 @@ class TC_GAME_API ScriptMgr
         void OnGuildLevelUpEvent(Guild* guild, Player* player, uint32 receivedLevel);
         void OnGuildLevelDownEvent(Guild* guild, Player* player, uint32 newLevel, uint32 lost);
         void OnGuildExpirienceUpEvent(Guild* guild, Player* player, uint32 receivedExp);
+        void OnGuildRatingUpEvent(Guild* guild, Player* player, uint32 receivedExp);
         void OnGuildArenaWonMemberEvent(Guild* guild, Player* player);
         void OnGuildBattlegrroundWonMemberEvent(Guild* guild, Player* player);
         void OnGuildLFGCompleteEvent(Guild* guild, Player* player);
@@ -1107,6 +1116,8 @@ class TC_GAME_API ScriptMgr
         void OnHeal(Unit* healer, Unit* reciever, uint32& gain);
         void OnDamage(Unit* attacker, Unit* victim, uint32& damage);
         void ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage);
+        void ModifyPeriodicHealthLeechAuraTick(Unit* target, Unit* attacker, uint32& damage);
+        void ModifyPeriodicHealAurasTick(Unit* target, Unit* attacker, uint32& damage);
         void ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage);
         void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage);
         void ModifyVehiclePassengerExitPos(Unit* passenger, Vehicle* vehicle, Position& pos);

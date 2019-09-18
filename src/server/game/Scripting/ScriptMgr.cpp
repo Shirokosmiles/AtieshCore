@@ -2115,6 +2115,11 @@ void ScriptMgr::OnGuildExpirienceUpEvent(Guild* guild, Player* player, uint32 re
     FOREACH_SCRIPT(GuildScript)->OnExpReceived(guild, player, receivedExp);
 }
 
+void ScriptMgr::OnGuildRatingUpEvent(Guild* guild, Player* player, uint32 receivedExp)
+{
+    FOREACH_SCRIPT(GuildScript)->OnRatingReceived(guild, player, receivedExp);
+}
+
 void ScriptMgr::OnGuildArenaWonMemberEvent(Guild* guild, Player* player)
 {
     FOREACH_SCRIPT(GuildScript)->OnArenaWon(guild, player);
@@ -2180,6 +2185,16 @@ void ScriptMgr::OnDamage(Unit* attacker, Unit* victim, uint32& damage)
 void ScriptMgr::ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage)
 {
     FOREACH_SCRIPT(UnitScript)->ModifyPeriodicDamageAurasTick(target, attacker, damage);
+}
+
+void ScriptMgr::ModifyPeriodicHealthLeechAuraTick(Unit* target, Unit* attacker, uint32& damage)
+{
+    FOREACH_SCRIPT(UnitScript)->ModifyPeriodicHealthLeechAuraTick(target, attacker, damage);
+}
+
+void ScriptMgr::ModifyPeriodicHealAurasTick(Unit* target, Unit* attacker, uint32& damage)
+{
+    FOREACH_SCRIPT(UnitScript)->ModifyPeriodicHealAurasTick(target, attacker, damage);
 }
 
 void ScriptMgr::ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage)

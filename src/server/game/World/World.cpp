@@ -39,6 +39,7 @@
 #include "CreatureAIRegistry.h"
 #include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
+#include "DalaranGEventMgr.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
@@ -1520,6 +1521,16 @@ void World::LoadConfigSettings(bool reload)
     // Mail External 
     m_bool_configs[CONFIG_EXTERNAL_MAIL_ENABLE]                 = sConfigMgr->GetBoolDefault("External.Mail.Enable", false);
     m_int_configs[CONFIG_EXTERNAL_MAIL_INTERVAL]                = sConfigMgr->GetIntDefault("External.Mail.Interval", 1);
+
+    // Dalaran Game Event
+    m_bool_configs[CONFIG_DALARAN_GAME_EVENTS]                   = sConfigMgr->GetBoolDefault("DalaranGEvent.Enable", false);
+    m_bool_configs[CONFIG_DALARAN_GAME_EVENTS_INSTANT_RETURN]    = sConfigMgr->GetBoolDefault("DalaranGEvent.InstantReviveAndReturn.Enable", false);
+    m_bool_configs[CONFIG_DALARAN_GAME_EVENTS_SQUAD_ENABLED]     = sConfigMgr->GetBoolDefault("DalaranGEvent.Squad.Enable", false);
+
+    m_int_configs[CONFIG_DALARAN_GAME_EVENTS_TIMER]              = sConfigMgr->GetIntDefault("DalaranGEvent.Interval", 45);
+    m_int_configs[CONFIG_DALARAN_GAME_EVENTS_DURATION_TIMER]     = sConfigMgr->GetIntDefault("DalaranGEvent.Duration", 5);
+    m_int_configs[CONFIG_DALARAN_GAME_EVENTS_MIN_PLAYERS]        = sConfigMgr->GetIntDefault("DalaranGEvent.Min.Players", 5);
+    
     // Whether to use LoS from M2 objects
     m_bool_configs[CONFIG_CHECK_M2_LOS]                         = sConfigMgr->GetBoolDefault("CheckM2ObjectLoS", true);
     // PVP Reward
@@ -2569,6 +2580,9 @@ void World::Update(uint32 diff)
 
     sBattlefieldMgr->Update(diff);
     sWorldUpdateTime.RecordUpdateTimeDuration("BattlefieldMgr");
+
+    sDalaranGEventMgr->Update(diff);
+    sWorldUpdateTime.RecordUpdateTimeDuration("UpdateDalaranGEventMgr");
 
     ///- Delete all characters which have been deleted X days before
     if (m_timers[WUPDATE_DELETECHARS].Passed())

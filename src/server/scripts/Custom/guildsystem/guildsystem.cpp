@@ -149,6 +149,17 @@ public:
         guild->BroadcastToGuildExp(receivedExp, name);
     }
 
+    void OnRatingReceived(Guild* guild, Player* player, uint32 receivedRating) override
+    {
+        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+            return;
+
+        std::string name = "";
+        if (player)
+            name = player->GetName();
+        guild->BroadcastToGuildExp(receivedRating, name);
+    }
+
     void OnArenaWon(Guild* guild, Player* player) override
     {
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))

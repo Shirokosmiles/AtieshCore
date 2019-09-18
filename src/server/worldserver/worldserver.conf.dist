@@ -4836,3 +4836,17 @@ VAS.Unit.PercentOfMaxHP = 100
 
 #
 ###################################################################################################
+
+###################################################################################################
+#
+# DalaranGEvent
+
+DalaranGEvent.Enable = 1
+DalaranGEvent.InstantReviveAndReturn.Enable = 1
+DalaranGEvent.Squad.Enable = 1
+DalaranGEvent.Interval = 50
+DalaranGEvent.Duration = 10
+DalaranGEvent.Min.Players = 5
+
+#
+###################################################################################################

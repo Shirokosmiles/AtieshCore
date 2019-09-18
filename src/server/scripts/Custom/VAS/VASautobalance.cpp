@@ -115,6 +115,22 @@ public:
         damage = VAS_Modifer_DealDamage(attacker, victim, damage);
     }
 
+    void ModifyPeriodicHealthLeechAuraTick(Unit* victim, Unit* attacker, uint32& damage) override
+    {
+        if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
+            return;
+
+        damage = VAS_Modifer_DealHeal(attacker, victim, damage);
+    }
+
+    void ModifyPeriodicHealAurasTick(Unit* victim, Unit* attacker, uint32& damage) override
+    {
+        if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))
+            return;
+
+        damage = VAS_Modifer_DealHeal(attacker, victim, damage);
+    }
+
     void ModifyMeleeDamage(Unit* victim, Unit* attacker, uint32& damage) override
     {
         if (!sWorld->getBoolConfig(CONFIG_VAS_AUTOBALANCE))

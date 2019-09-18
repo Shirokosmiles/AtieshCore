@@ -31,6 +31,7 @@
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
+#include "DalaranGEventMgr.h"
 #include "Formulas.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
@@ -11358,6 +11359,14 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
             if (Player* killedPlr = victim->ToPlayer())
             {
                 sScriptMgr->OnPVPKill(killerPlr, killedPlr);
+                if (sDalaranGEventMgr->IsActiveEvent() && sDalaranGEventMgr->IsMemberOfEvent(killedPlr))
+                {
+                    if (sWorld->getBoolConfig(CONFIG_DALARAN_GAME_EVENTS_INSTANT_RETURN))
+                        sDalaranGEventMgr->RemovePlayerFromFight(killedPlr, true);
+                    else
+                        sDalaranGEventMgr->DecreaseAliveCounter();
+                }
+
                 if (killerPlr->IsInGuildWarWith(killedPlr))
                     sScriptMgr->OnGuildKillGuildEnemyEvent(killerPlr->GetGuild(), killerPlr);
             }

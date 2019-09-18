@@ -5257,7 +5257,7 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     if (target && caster)
     {
         // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
-        sScriptMgr->ModifyPeriodicDamageAurasTick(ASSERT_NOTNULL(target), ASSERT_NOTNULL(caster), damage);
+        sScriptMgr->ModifyPeriodicHealthLeechAuraTick(ASSERT_NOTNULL(target), ASSERT_NOTNULL(caster), damage);
     }
 
     // dynobj auras must always have a caster
@@ -5389,7 +5389,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     if (target && caster)
     {
         // Script Hook For HandlePeriodicHealAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
-        sScriptMgr->ModifyPeriodicDamageAurasTick(ASSERT_NOTNULL(target), ASSERT_NOTNULL(caster), damage);
+        sScriptMgr->ModifyPeriodicHealAurasTick(ASSERT_NOTNULL(target), ASSERT_NOTNULL(caster), damage);
     }
 
     if (GetAuraType() == SPELL_AURA_OBS_MOD_HEALTH)

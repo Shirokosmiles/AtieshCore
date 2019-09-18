@@ -1389,6 +1389,23 @@ enum TrinityStrings
     LANG_GSYSTEM_GUILD_WAR_DECLARE        = 12027, // "|TInterface\\icons\\Achievement_Arena_3v3_4:25:25:-15:0|t Declare The War with guild:|r"
     LANG_GSYSTEM_GUILD_WAR_ADMIT          = 12028, // "|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Admit defeat with guild:|r"
     LANG_GSYSTEM_GUILD_WAR_DECLARE_SURE   = 12029, // "Are you sure you want to Declare The War?"
-    LANG_GSYSTEM_GUILD_WAR_ADMIT_SURE     = 12030 // "Are you sure you want to Admit defeat?"
+    LANG_GSYSTEM_GUILD_WAR_ADMIT_SURE     = 12030, // "Are you sure you want to Admit defeat?"
+    LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY    = 12031, //"The guild has received a " << value << " rating points. Points has gained by "
+    LANG_GSYSTEM_ANNOUNCE_RATING_UP       = 12032, //"The guild has received a " << value << " rating points."
+
+    // Dalaran Crater Event
+    LANG_DALARAN_CRATER_START_ANNOUNCE_30_SEC     = 12500, // "Dalaran Crater PVP (Battle Royale) Event will start in 1 minute. %u players will fight !"
+    LANG_DALARAN_CRATER_START_ANNOUNCE            = 12501, // "Dalaran Crater PVP (Battle Royale) Event has been Started!"
+    LANG_DALARAN_CRATER_PREPARE_TO_STOP_ANNOUNCE  = 12502, // "Dalaran Crater PVP (Battle Royale) Event will ended in 1 minute! In this match will fight %u players"
+    LANG_DALARAN_CRATER_DURATION_STOP_ANNOUNCE    = 12503, // "Dalaran Crater PVP (Battle Royale) Event has been Stoped for time out duration!"
+    LANG_DALARAN_CRATER_SUCCESS_STOP_ANNOUNCE     = 12504, // "Dalaran Crater PVP (Battle Royale) Event has been Stoped! Winner of this match %s"
+    LANG_DALARAN_CRATER_PREPARE_TO_RETURN_PLAYERS = 12505, // "All members of Dalaran Event will be revived and teleported in previous location in 45 seconds"
+    LANG_DALARAN_CRATER_LEAVE_PLAYER_AND_COUNT    = 12506, // "Player %s has leave the Battle. Alive players : %u"
+    LANG_DALARAN_CRATER_LEAVE_PLAYER_NOT_ALIVE    = 12507, // "You can not take a participation in Dalaran Event (you are died). Try to enjoy in next time"
+    LANG_DALARAN_CRATER_NOT_ENOGH_MIN_PLAYERS     = 12508, // "Dalaran Crater PVP (Battle Royale) Event can not be starte. Not enough players. Try to enjoy in next time"
+    LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_60  = 12509, // "Dalaran Crater PVP (Battle Royale) Event will be started in 1 minute"
+    LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_30  = 12510, // "Dalaran Crater PVP (Battle Royale) Event will be started in 30 seconds"
+    LANG_DALARAN_CRATER_REGISTRATION_QUEUE        = 12511, // "You have successfully registered in Dalaran Crater PVP (Battle Royale) Event"
+    LANG_DALARAN_CRATER_REGISTRATION_QUEUE_ABORT  = 12512, // "You have successfully canceled registration in Dalaran Crater PVP (Battle Royale) Event"
 };
 #endif
