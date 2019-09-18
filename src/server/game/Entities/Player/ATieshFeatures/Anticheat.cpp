@@ -83,6 +83,9 @@ bool Player::CheckOnFlyHack()
     if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
         return true;
 
+    if (GetAreaId() == 4859) // Area: 4859 (??????? ????) 
+        return true;
+
     if (GetPlayerMovingMe())
     {
         if (GetPlayerMovingMe()->UnderACKmount())
