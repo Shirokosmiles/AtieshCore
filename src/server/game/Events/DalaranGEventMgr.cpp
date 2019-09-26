@@ -34,7 +34,7 @@ enum EventTypes
 
     EVENT_STOP_DURATION_FIGHT       = 4,
     EVENT_STOP_SUCCESS_FIGHT        = 5,
-    EVENT_STOP_RETURN_PLAYERS       = 6,
+    EVENT_STOP_RETURN_PLAYERS       = 6
 };
 
 DalaranGEventMgr* DalaranGEventMgr::instance()
@@ -82,8 +82,32 @@ void DalaranGEventMgr::Update(uint32 diff)
                 _events.ScheduleEvent(EVENT_START_PREPARING_TO_START, 0);
         }
     }
-    else if (alivePlayerCount == 1)
-        _events.ScheduleEvent(EVENT_STOP_SUCCESS_FIGHT, 0);
+    else
+    {
+        std::list<Player*> playerList;
+        for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
+        {
+            if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+            {
+                if (player->GetMapId() != 0)
+                {
+                    playerList.push_back(player);
+                    continue;
+                }
+            }
+        }
+
+        if (!playerList.empty())
+        {
+            for (std::list<Player*>::const_iterator iter = playerList.begin(); iter != playerList.end(); ++iter)
+                RemovePlayerFromQueue(*iter);
+
+            playerList.clear();
+        }
+
+        if (alivePlayerCount == 1)
+            _events.ScheduleEvent(EVENT_STOP_SUCCESS_FIGHT, 0);
+    }
 
     if (m_DurationTimer > 0)
     {
@@ -193,12 +217,14 @@ void DalaranGEventMgr::TeleportAllPlayersInZone()
 {
     _registration = false;
 
+    std::list<Player*> playerList;
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
-        if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
         {
             if (!player->IsAlive())
             {
+                playerList.push_back(player);
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_DALARAN_CRATER_LEAVE_PLAYER_NOT_ALIVE);
                 continue;
             }
@@ -216,6 +242,14 @@ void DalaranGEventMgr::TeleportAllPlayersInZone()
 
             ++alivePlayerCount;
         }        
+    }
+
+    if (!playerList.empty())
+    {
+        for (std::list<Player*>::const_iterator iter = playerList.begin(); iter != playerList.end(); ++iter)
+            RemovePlayerFromQueue(*iter);
+
+        playerList.clear();
     }
 
     SpawnGOLight();
@@ -278,7 +312,7 @@ void DalaranGEventMgr::RemovePlayerFromFight(Player* player, bool withteleport)
     if (!IsMemberOfEvent(player))
         return;
 
-    bool found = false;
+    uint32 id = 0;
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
         if (itr->second.guid == player->GetGUID())
@@ -296,19 +330,17 @@ void DalaranGEventMgr::RemovePlayerFromFight(Player* player, bool withteleport)
                         player->RemoveByteFlag(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG, UNIT_BYTE2_FLAG_FFA_PVP);
                 }
 
-                found = true;
-                break;
+                id = itr->first;
             }
         }
     }
 
-    if (found)
+    if (id)
     {
-        RemovePlayerFromQueue(player);
-        --alivePlayerCount;
-
+        _playersDataStore.erase(id);
         BroadcastToMemberAboutLeavePlayer(player->GetName());
-    }    
+        --alivePlayerCount;
+    }
 }
 
 void DalaranGEventMgr::ReceiveWinnerName()
@@ -316,6 +348,7 @@ void DalaranGEventMgr::ReceiveWinnerName()
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+        {
             if (player->IsAlive())
             {
                 _winnername = player->GetName();
@@ -325,8 +358,8 @@ void DalaranGEventMgr::ReceiveWinnerName()
                     player->GetGuild()->AddGuildExp(15, player, true);
                     player->GetGuild()->UpdateGuildRating(2, true, player);
                 }
-                break;
             }
+        }
     }
 }
 
@@ -359,12 +392,10 @@ void DalaranGEventMgr::RemovePlayerFromQueue(Player* player)
     uint32 id = 0;
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
-        if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
-        {
+        if (itr->second.guid == player->GetGUID())
             id = itr->first;
-            break;
-        }
     }
 
-    _playersDataStore.erase(id);
+    if (id)
+        _playersDataStore.erase(id);
 }

@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
 * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -183,15 +183,18 @@ public:
                 }
         }
 
-        if (sDalaranGEventMgr->IsPossibleToRegister())
+        if (sWorld->getBoolConfig(CONFIG_DALARAN_GAME_EVENTS))
         {
-            if (!sDalaranGEventMgr->IsMemberOfEvent(player))
-                AddGossipItemFor(player, 0, "Register in Dalaran Crater Event PVP (Battle Royale) Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
+            if (sDalaranGEventMgr->IsPossibleToRegister())
+            {
+                if (!sDalaranGEventMgr->IsMemberOfEvent(player))
+                    AddGossipItemFor(player, 0, "Register in Dalaran Crater Event PVP (Battle Royale) Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
+                else
+                    AddGossipItemFor(player, 0, "Leave Dalaran Crater Event PVP (Battle Royale) - Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
+            }
             else
-                AddGossipItemFor(player, 0, "Leave Dalaran Crater Event PVP (Battle Royale) - Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
+                AddGossipItemFor(player, 0, "Dalaran Crater Event PVP (Battle Royale) - In Process " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
         }
-        else
-            AddGossipItemFor(player, 0, "Dalaran Crater Event PVP (Battle Royale) - In Process " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
 
         AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);
         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
@@ -343,15 +346,18 @@ public:
                         }
                     }
 
-                    if (sDalaranGEventMgr->IsPossibleToRegister())
+                    if (sWorld->getBoolConfig(CONFIG_DALARAN_GAME_EVENTS))
                     {
-                        if (!sDalaranGEventMgr->IsMemberOfEvent(player))
-                            AddGossipItemFor(player, 0, "Register in Dalaran Crater Event PVP (Battle Royale) Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
+                        if (sDalaranGEventMgr->IsPossibleToRegister())
+                        {
+                            if (!sDalaranGEventMgr->IsMemberOfEvent(player))
+                                AddGossipItemFor(player, 0, "Register in Dalaran Crater Event PVP (Battle Royale) Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
+                            else
+                                AddGossipItemFor(player, 0, "Leave Dalaran Crater Event PVP (Battle Royale) - Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
+                        }
                         else
-                            AddGossipItemFor(player, 0, "Leave Dalaran Crater Event PVP (Battle Royale) - Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
+                            AddGossipItemFor(player, 0, "Dalaran Crater Event PVP (Battle Royale) - In Process " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
                     }
-                    else
-                        AddGossipItemFor(player, 0, "Dalaran Crater Event PVP (Battle Royale) - In Process " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
 
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());

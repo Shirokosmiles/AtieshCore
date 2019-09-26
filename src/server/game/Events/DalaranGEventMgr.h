@@ -69,7 +69,7 @@ private:
     std::string _winnername;
     EventMap _events;
 
-    PlayersDataContainer _playersDataStore; 
+    PlayersDataContainer _playersDataStore;
 public:
     static DalaranGEventMgr* instance();
 
