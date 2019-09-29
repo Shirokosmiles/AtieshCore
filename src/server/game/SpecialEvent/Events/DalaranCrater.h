@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _DALARANGEVENTMGR_H
-#define _DALARANGEVENTMGR_H
+#ifndef _DALARANGEVENT_H
+#define _DALARANGEVENT_H
 
 #include "GameTime.h"
 #include "ObjectGuid.h"
@@ -50,24 +50,10 @@ enum DalaranPhase
 
 class TC_GAME_API DalaranGEvent : public SpecialEvent
 {
-private:   
-    bool activeFight;
-    bool registration;
+public:
+    ~DalaranGEvent() { }
 
-    uint32 possibleDistance;
-    DalaranPhase phaseStage;
-    // timers
-    TimeTrackerSmall prepareTimer;
-    TimeTrackerSmall combatTimer;
-    TimeTrackerSmall playersTimer;
-
-    uint32 m_DurationTimer;
-    uint32 m_TeleporterTimer;
-    uint32 alivePlayerCount;
-    std::string _winnername;
-
-    PlayersDataContainer _playersDataStore;
-    bool IsActiveDalaranEvent() const { return activeFight; }        
+    bool IsActiveDalaranEvent() const { return activeFight; }
 
     // phase
     DalaranPhase GetPhase() { return phaseStage; }
@@ -92,14 +78,32 @@ private:
 
     void BroadcastToMemberAboutLeavePlayer(std::string const& Name);
     void BroadcastToMemberPrepare();
-    
-    // Fight stage    
+
+    // Fight stage
     void RemovePlayerFromFight(Player* player, bool withteleport = false);
     void ReceiveWinnerName();
     void DecreaseAliveCounter() { --alivePlayerCount; }
     // Queue stage
     void InvitePlayerToQueue(Player* player);
     void RemovePlayerFromQueue(Player* player);
+
+private:   
+    bool activeFight;
+    bool registration;
+
+    uint32 possibleDistance;
+    DalaranPhase phaseStage;
+    // timers
+    TimeTrackerSmall prepareTimer;
+    TimeTrackerSmall combatTimer;
+    TimeTrackerSmall playersTimer;
+
+    uint32 m_DurationTimer;
+    uint32 m_TeleporterTimer;
+    uint32 alivePlayerCount;
+    std::string _winnername;
+
+    PlayersDataContainer _playersDataStore;
 };
 
-#endif // _DALARANGEVENTMGR_H
+#endif // _DALARANGEVENT_H

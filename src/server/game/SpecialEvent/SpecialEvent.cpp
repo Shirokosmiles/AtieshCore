@@ -15,18 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DalaranCrater.h"
 #include "GameTime.h"
 #include "SpecialEvent.h"
 
-SpecialEvent::SpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
+SpecialEvent::SpecialEvent() : _active(false), _enabled(true), _eventId(0), _timer(0), _noEventTime(0), _gameTimeNextEvent(0), _plrCount(0)
 {
-    _active = active;
-    _enabled = enabled;
-    _eventId = id;
-    _timer = cooldownTimer * MINUTE * IN_MILLISECONDS;
-    _noEventTime = durationTimer * MINUTE * IN_MILLISECONDS;
-    _gameTimeNextEvent = uint32(GameTime::GetGameTime() + cooldownTimer * MINUTE);
-    _plrCount = 0;
 }
 
 void SpecialEvent::Update(uint32 diff)
@@ -43,6 +37,20 @@ void SpecialEvent::Update(uint32 diff)
         else // time to start a new battle
             StartSpecialEvent();
     }
+}
+
+bool SpecialEvent::SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
+{
+    if (!enabled || !id || !cooldownTimer || !durationTimer)
+        return false;
+
+    _active = active;
+    _eventId = id;
+    _timer = cooldownTimer * MINUTE * IN_MILLISECONDS;
+    _noEventTime = durationTimer * MINUTE * IN_MILLISECONDS;
+    _gameTimeNextEvent = uint32(GameTime::GetGameTime() + cooldownTimer * MINUTE);
+
+    return true;
 }
 
 void SpecialEvent::StartSpecialEvent()

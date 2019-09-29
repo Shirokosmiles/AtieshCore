@@ -23,7 +23,8 @@
 
 enum SpecialEventId
 {
-    SPECIALEVENT_EVENTID_DALARANCRATER = 1, // Dalaran Crater PVP battle
+    SPECIALEVENT_EVENTID_WINTERGRASP   = 1, // Wintergrasp (for Future implementation)
+    SPECIALEVENT_EVENTID_DALARANCRATER = 2, // Dalaran Crater PVP battle
     SPECIALEVENT_EVENTID_MAX
 };
 
@@ -36,9 +37,9 @@ enum SpecialEventTimers
 class TC_GAME_API SpecialEvent
 {
     public:
-        explicit SpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer);
+        explicit SpecialEvent();
         ~SpecialEvent() {};
-        
+
         // enables or disables the special event
         void StartSpecialEvent();
         void EndSpecialEvent(bool endByTimer);        
@@ -53,12 +54,13 @@ class TC_GAME_API SpecialEvent
         void SetTimer(uint32 timer) { _timer.Reset(timer); }       
         */
         uint32 GetEventId() { return _eventId; }
-        uint32 GetNormalTimer() { return _EventTime; }
-        uint32 GetBetweenEventsTimer() { return _noEventTime; }
+        uint32 GetCooldownTimer() { return _EventTime; }
+        uint32 GetDurationTimer() { return _noEventTime; }
         time_t GetTimeOfNextEvent() { return _gameTimeNextEvent; }
         void SetNextTimeOfEvent(time_t time) { _gameTimeNextEvent = time; }
         uint32 GetCountPlayerInEvent() { return _plrCount; }
         // Functions for each Event Scripts
+        bool SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer);
         virtual void Update(uint32 diff);
         virtual void OnSpecialEventStart() { }
         virtual void OnSpecialEventEnd(bool /*endByTimer*/) { }

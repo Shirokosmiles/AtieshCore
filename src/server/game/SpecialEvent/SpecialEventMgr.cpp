@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DalaranCrater.h"
 #include "SpecialEventMgr.h"
 #include "SpecialEvent.h"
 #include "Log.h"
@@ -43,10 +44,13 @@ void SpecialEventMgr::InitSpecialEvents()
 {
     uint32 oldMSTime = getMSTime();
 
-    _specialEventContainer.clear();                                  // for reload case
+    for (auto itr = _specialEventContainer.begin(); itr != _specialEventContainer.end(); ++itr)
+        delete itr->second;
+
+    _specialEventContainer.clear();
 
     //                                                     0                1
-    QueryResult result = WorldDatabase.Query("SELECT eventId, cooldownTimer, durationTimer, activeStatus FROM special_events");
+    QueryResult result = WorldDatabase.Query("SELECT eventId, cooldownTimer, durationTimer, activeStatus, description FROM special_events");
 
     if (!result)
     {
@@ -64,10 +68,44 @@ void SpecialEventMgr::InitSpecialEvents()
         uint32 cooldownTimer = fields[1].GetUInt32();
         uint32 durationTimer = fields[2].GetUInt32();
         uint32 activeStatus = fields[3].GetUInt32();
+        std::string const description = fields[4].GetString();
 
         bool enabledStatus = activeStatus > 0;
-        SpecialEvent* se = new SpecialEvent(false, enabledStatus, id, cooldownTimer, durationTimer);
-        _specialEventContainer[id] = se;
+        switch (id)
+        {
+            //case SPECIALEVENT_EVENTID_WINTERGRASP:
+            //    break;
+            case SPECIALEVENT_EVENTID_DALARANCRATER:
+                if (DalaranGEvent* DC = new DalaranGEvent())
+                {
+                    if (!DC->SetupSpecialEvent(false, enabledStatus, id, cooldownTimer, durationTimer))
+                    {
+                        TC_LOG_ERROR("server.loading", ">> Special Event (id: %u) - %s initialization failed!", id, description);
+                        delete DC;
+                    }
+                    else
+                    {
+                        _specialEventContainer[id] = DC;
+                        TC_LOG_INFO("server.loading", ">> Special Event (id: %u) - %s successfully initialized", id, description);
+                    }
+                }
+                break;
+            default:
+                if (SpecialEvent* se = new SpecialEvent())
+                {
+                    if (!se->SetupSpecialEvent(false, enabledStatus, id, cooldownTimer, durationTimer))
+                    {
+                        TC_LOG_ERROR("server.loading", ">> Special Event (id: %u) - %s initialization failed!", id, description);
+                        delete se;
+                    }
+                    else
+                    {
+                        _specialEventContainer[id] = se;
+                        TC_LOG_INFO("server.loading", ">> Special Event (id: %u) - %s successfully initialized", id, description);
+                    }
+                }
+                break;
+        }
 
         ++count;
     } while (result->NextRow());

@@ -22,6 +22,7 @@
 #include <unordered_map>
 
 class Player;
+class SpecialEvent;
 enum SpecialEventId;
 
 typedef std::unordered_map<uint32, SpecialEvent*> SpecialEventsContainer;

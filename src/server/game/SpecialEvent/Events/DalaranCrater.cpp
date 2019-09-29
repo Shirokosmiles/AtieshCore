@@ -214,7 +214,7 @@ void DalaranGEvent::StartFightEvent()
 {
     SetPhase(BATTLE_PHASE_1);
     activeFight = true;
-    m_DurationTimer = GetNormalTimer() - (IN_MILLISECONDS * MINUTE);
+    m_DurationTimer = GetDurationTimer() - (IN_MILLISECONDS * MINUTE);
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
@@ -231,7 +231,7 @@ void DalaranGEvent::StopFightEvent()
     alivePlayerCount = 0;
     _plrCount = 0;
     sWorld->SendWorldText(LANG_DALARAN_CRATER_PREPARE_TO_RETURN_PLAYERS);    
-    SetNextTimeOfEvent(uint32(GameTime::GetGameTime() + GetNormalTimer() * MINUTE));
+    SetNextTimeOfEvent(uint32(GameTime::GetGameTime() + GetCooldownTimer() * MINUTE));
 
     if (!sWorld->IsFFAPvPRealm())
     {
@@ -250,7 +250,7 @@ void DalaranGEvent::SpawnGOLight()
         if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
         {
             QuaternionData rotation = QuaternionData::fromEulerAnglesZYX(player->GetOrientation(), 0.f, 0.f);
-            player->SummonGameObject(182483, DalaranCraterPoint, rotation, GetNormalTimer());
+            player->SummonGameObject(182483, DalaranCraterPoint, rotation, GetDurationTimer());
         }
     }    
 }

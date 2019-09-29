@@ -2074,15 +2074,19 @@ public:
                 case 106: // Register Dalaran Crater queue
                 {
                     player->PlayerTalkClass->ClearMenus();
-                    sDalaranGEventMgr->InvitePlayerToQueue(player);
-                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_DALARAN_CRATER_REGISTRATION_QUEUE, sDalaranGEventMgr->GetCountPlayerInEvent());
+                    if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEvent(SPECIALEVENT_EVENTID_DALARANCRATER))
+                    {
+                        DalaranEvent->AddPlayer(player->GetGUID());
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_DALARAN_CRATER_REGISTRATION_QUEUE, DalaranEvent->GetCountPlayerInEvent());
+                    }
                     CloseGossipMenuFor(player);
                     break;
                 }
                 case 107: // Leave Dalaran Crater queue
                 {
                     player->PlayerTalkClass->ClearMenus();
-                    sDalaranGEventMgr->RemovePlayerFromQueue(player);
+                    if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEvent(SPECIALEVENT_EVENTID_DALARANCRATER))
+                        DalaranEvent->RemovePlayer(player->GetGUID());
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_DALARAN_CRATER_REGISTRATION_QUEUE_ABORT);
                     CloseGossipMenuFor(player);
                     break;
