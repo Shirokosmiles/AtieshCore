@@ -18,10 +18,10 @@
 #ifndef _DALARANGEVENTMGR_H
 #define _DALARANGEVENTMGR_H
 
-#include "Common.h"
 #include "GameTime.h"
 #include "ObjectGuid.h"
-#include "EventMap.h"
+#include "SpecialEvent.h"
+#include "Position.h"
 #include "World.h"
 
 WorldLocation const DalaranCrater(0, 276.82178f, 368.0858f, 121.2f, 4.135169f);
@@ -37,51 +37,53 @@ struct PlayersData
 };
 typedef std::unordered_map<uint32, PlayersData> PlayersDataContainer;
 
-class TC_GAME_API DalaranGEventMgr
+enum DalaranPhase
 {
-private:
-    DalaranGEventMgr()
-    {
-        _activeFight = false;
-        _registration = true;
-        _announce60 = false;
-        _announce30 = false;
-        m_UpdateTimer = 0;
-        m_DurationTimer = 0;
-        alivePlayerCount = 0;
-        gameTimeNextEvent = uint32(GameTime::GetGameTime() + (sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_TIMER) * MINUTE));
-        _winnername = "";
-        _events.Reset();
-    };
-    ~DalaranGEventMgr() { };
-    
-    bool _activeFight;
-    bool _registration;
-    bool _announce60;
-    bool _announce30;
+    PREPARE_PHASE_60  = 1,
+    PREPARE_PHASE_30  = 2,
+    PREPARE_PHASE_0   = 3,
+    BATTLE_PHASE_1    = 4,
+    BATTLE_PHASE_2    = 5,
+    BATTLE_PHASE_3    = 6,
+    BATTLE_ENDED      = 7
+};
 
-    // update interval
-    uint32 m_UpdateTimer;
+class TC_GAME_API DalaranGEvent : public SpecialEvent
+{
+private:   
+    bool activeFight;
+    bool registration;
+
+    uint32 possibleDistance;
+    DalaranPhase phaseStage;
+    // timers
+    TimeTrackerSmall prepareTimer;
+    TimeTrackerSmall combatTimer;
+    TimeTrackerSmall playersTimer;
+
     uint32 m_DurationTimer;
+    uint32 m_TeleporterTimer;
     uint32 alivePlayerCount;
-    time_t gameTimeNextEvent;
-
     std::string _winnername;
-    EventMap _events;
 
     PlayersDataContainer _playersDataStore;
-public:
-    static DalaranGEventMgr* instance();
+    bool IsActiveDalaranEvent() const { return activeFight; }        
 
-    bool IsActiveEvent() const { return _activeFight; }
-    bool IsPossibleToRegister() const { return _registration; }
-    uint32 GetCountPlayerInEvent();
-    time_t GetTimeOfNextEvent() { return gameTimeNextEvent; }
+    // phase
+    DalaranPhase GetPhase() { return phaseStage; }
+    void SetPhase(DalaranPhase phase) { phaseStage = phase; }
 
-    void Update(uint32 diff);
+    void Update(uint32 diff) override;
+    void OnSpecialEventStart() override;
+    void OnSpecialEventEnd(bool /*endByTimer*/) override;
+    void AddPlayer(ObjectGuid playerGUID) override;
+    void RemovePlayer(ObjectGuid playerGUID) override;
+    bool IsPossibleToRegister() override { return registration; }
+    bool IsMemberOfEvent(Player* player) override;
+    uint32 GetCountPlayerInPlayerMap();
 
-    void StartEvent();
-    void StopEvent();
+    void StartFightEvent();
+    void StopFightEvent();
 
     void SpawnGOLight();
 
@@ -90,8 +92,7 @@ public:
 
     void BroadcastToMemberAboutLeavePlayer(std::string const& Name);
     void BroadcastToMemberPrepare();
-
-    bool IsMemberOfEvent(Player* player);
+    
     // Fight stage    
     void RemovePlayerFromFight(Player* player, bool withteleport = false);
     void ReceiveWinnerName();
@@ -100,7 +101,5 @@ public:
     void InvitePlayerToQueue(Player* player);
     void RemovePlayerFromQueue(Player* player);
 };
-
-#define sDalaranGEventMgr DalaranGEventMgr::instance()
 
 #endif // _DALARANGEVENTMGR_H

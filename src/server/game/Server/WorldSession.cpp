@@ -28,7 +28,8 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "DBCStructure.h"
-#include "DalaranGEventMgr.h"
+#include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
 #include "GameTime.h"
 #include "Group.h"
 #include "Guild.h"
@@ -508,8 +509,11 @@ void WorldSession::LogoutPlayer(bool save)
 
         sOutdoorPvPMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
 
-        if (sDalaranGEventMgr->IsActiveEvent() && sDalaranGEventMgr->IsMemberOfEvent(_player))
-            sDalaranGEventMgr->RemovePlayerFromFight(_player, true);
+        if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEvent(SPECIALEVENT_EVENTID_DALARANCRATER))
+        {
+            if (DalaranEvent->IsMemberOfEvent(_player))
+                DalaranEvent->RemovePlayer(_player->GetGUID());
+        }
 
         for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
         {

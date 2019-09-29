@@ -19,7 +19,8 @@
 
 #include "AccountMgr.h"
 #include "Chat.h"
-#include "DalaranGEventMgr.h"
+#include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "ScriptedGossip.h"
@@ -183,17 +184,17 @@ public:
                 }
         }
 
-        if (sWorld->getBoolConfig(CONFIG_DALARAN_GAME_EVENTS))
+        if (SpecialEvent * DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEvent(SPECIALEVENT_EVENTID_DALARANCRATER))
         {
-            if (sDalaranGEventMgr->IsPossibleToRegister())
+            if (DalaranEvent->IsPossibleToRegister())
             {
-                if (!sDalaranGEventMgr->IsMemberOfEvent(player))
-                    AddGossipItemFor(player, 0, "Register in Dalaran Crater Event PVP (Battle Royale) Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
+                if (!DalaranEvent->IsMemberOfEvent(player))
+                    AddGossipItemFor(player, 0, "Register in Dalaran Crater Event PVP (Battle Royale) Queue " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
                 else
-                    AddGossipItemFor(player, 0, "Leave Dalaran Crater Event PVP (Battle Royale) - Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
+                    AddGossipItemFor(player, 0, "Leave Dalaran Crater Event PVP (Battle Royale) - Queue " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
             }
             else
-                AddGossipItemFor(player, 0, "Dalaran Crater Event PVP (Battle Royale) - In Process " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
+                AddGossipItemFor(player, 0, "Dalaran Crater Event PVP (Battle Royale) - will Available " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
         }
 
         AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);
@@ -346,17 +347,17 @@ public:
                         }
                     }
 
-                    if (sWorld->getBoolConfig(CONFIG_DALARAN_GAME_EVENTS))
+                    if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEvent(SPECIALEVENT_EVENTID_DALARANCRATER))
                     {
-                        if (sDalaranGEventMgr->IsPossibleToRegister())
+                        if (DalaranEvent->IsPossibleToRegister())
                         {
-                            if (!sDalaranGEventMgr->IsMemberOfEvent(player))
-                                AddGossipItemFor(player, 0, "Register in Dalaran Crater Event PVP (Battle Royale) Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
+                            if (!DalaranEvent->IsMemberOfEvent(player))
+                                AddGossipItemFor(player, 0, "Register in Dalaran Crater Event PVP (Battle Royale) Queue " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
                             else
-                                AddGossipItemFor(player, 0, "Leave Dalaran Crater Event PVP (Battle Royale) - Queue " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
+                                AddGossipItemFor(player, 0, "Leave Dalaran Crater Event PVP (Battle Royale) - Queue " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
                         }
                         else
-                            AddGossipItemFor(player, 0, "Dalaran Crater Event PVP (Battle Royale) - In Process " + NextTimeDalaranEvent(sDalaranGEventMgr->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
+                            AddGossipItemFor(player, 0, "Dalaran Crater Event PVP (Battle Royale) - will Available " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
                     }
 
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);

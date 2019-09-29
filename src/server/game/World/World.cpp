@@ -39,7 +39,7 @@
 #include "CreatureAIRegistry.h"
 #include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
-#include "DalaranGEventMgr.h"
+#include "SpecialEventMgr.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
@@ -1523,12 +1523,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_EXTERNAL_MAIL_INTERVAL]                = sConfigMgr->GetIntDefault("External.Mail.Interval", 1);
 
     // Dalaran Game Event
-    m_bool_configs[CONFIG_DALARAN_GAME_EVENTS]                   = sConfigMgr->GetBoolDefault("DalaranGEvent.Enable", false);
     m_bool_configs[CONFIG_DALARAN_GAME_EVENTS_INSTANT_RETURN]    = sConfigMgr->GetBoolDefault("DalaranGEvent.InstantReviveAndReturn.Enable", false);
     m_bool_configs[CONFIG_DALARAN_GAME_EVENTS_SQUAD_ENABLED]     = sConfigMgr->GetBoolDefault("DalaranGEvent.Squad.Enable", false);
-
-    m_int_configs[CONFIG_DALARAN_GAME_EVENTS_TIMER]              = sConfigMgr->GetIntDefault("DalaranGEvent.Interval", 45);
-    m_int_configs[CONFIG_DALARAN_GAME_EVENTS_DURATION_TIMER]     = sConfigMgr->GetIntDefault("DalaranGEvent.Duration", 5);
     m_int_configs[CONFIG_DALARAN_GAME_EVENTS_MIN_PLAYERS]        = sConfigMgr->GetIntDefault("DalaranGEvent.Min.Players", 5);
     
     // Whether to use LoS from M2 objects
@@ -2301,6 +2297,10 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Starting Battlefield System");
     sBattlefieldMgr->Initialize();
 
+    ///- Initialize Special Events
+    TC_LOG_INFO("server.loading", "Starting SpecialEvents System");
+    sSpecialEventMgr->InitSpecialEvents();
+
     TC_LOG_INFO("server.loading", "Loading Transports...");
     sTransportMgr->SpawnContinentTransports();
 
@@ -2581,8 +2581,8 @@ void World::Update(uint32 diff)
     sBattlefieldMgr->Update(diff);
     sWorldUpdateTime.RecordUpdateTimeDuration("BattlefieldMgr");
 
-    sDalaranGEventMgr->Update(diff);
-    sWorldUpdateTime.RecordUpdateTimeDuration("UpdateDalaranGEventMgr");
+    sSpecialEventMgr->Update(diff);
+    sWorldUpdateTime.RecordUpdateTimeDuration("SpecialEventMgr");
 
     ///- Delete all characters which have been deleted X days before
     if (m_timers[WUPDATE_DELETECHARS].Passed())

@@ -16,7 +16,7 @@
  */
 
 #include "Chat.h"
-#include "DalaranGEventMgr.h"
+#include "DalaranCrater.h"
 #include "Group.h"
 #include "Guild.h"
 #include "ObjectAccessor.h"
@@ -26,154 +26,195 @@
 #include "Log.h"
 #include "WorldSession.h"
 
-enum EventTypes
+void DalaranGEvent::Update(uint32 diff)
 {
-    EVENT_START_PREPARING_TO_START  = 1,
-    EVENT_START_BEGIN_START         = 2,
-    EVENT_START_DONT_ENOUGHT        = 3,
+    SpecialEvent::Update(diff);
 
-    EVENT_STOP_DURATION_FIGHT       = 4,
-    EVENT_STOP_SUCCESS_FIGHT        = 5,
-    EVENT_STOP_RETURN_PLAYERS       = 6
-};
+    if (IsActiveDalaranEvent())
+    {
+        // Timers for Players (distance / mapid ) and their Damage if out of range
+        bool combatphases = GetPhase() > PREPARE_PHASE_0 && GetPhase() != BATTLE_ENDED;        
+        if (combatphases)
+        {            
+            playersTimer.Update(diff);
+            if (playersTimer.Passed())
+            {
+                std::list<Player*> playerList;
+                // First check on Map valid
+                for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
+                {
+                    if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+                    {
+                        if (player->GetMapId() != 0)
+                        {
+                            playerList.push_back(player);
+                            continue;
+                        }
 
-DalaranGEventMgr* DalaranGEventMgr::instance()
-{
-    static DalaranGEventMgr instance;
-    return &instance;
+                        // Second check on distance valid (damage players if not near)
+                        if (!player->IsWithinDist2d(DalaranCraterPoint.GetPositionX(), DalaranCraterPoint.GetPositionY(), possibleDistance))
+                            player->DealDamage(player, player, CalculatePct(player->GetMaxHealth(), 1.0f));
+                    }
+                }
+
+                if (!playerList.empty())
+                {
+                    for (std::list<Player*>::const_iterator iter = playerList.begin(); iter != playerList.end(); ++iter)
+                        RemovePlayerFromQueue(*iter);
+                }
+
+                playerList.clear();
+
+                if (alivePlayerCount == 1)
+                {
+                    ReceiveWinnerName();
+                    sWorld->SendWorldText(LANG_DALARAN_CRATER_SUCCESS_STOP_ANNOUNCE, _winnername.c_str());
+                }
+
+                playersTimer.Reset(IN_MILLISECONDS);
+            }            
+        }
+
+        // Timers for state Combat ( 1-2-3 phases for others handlers)
+        combatTimer.Update(diff);
+        if (combatTimer.Passed())
+        {
+            switch (GetPhase())
+            {
+                case BATTLE_PHASE_1:
+                    possibleDistance = 300.0f;                    
+                    combatTimer.Reset(2 * IN_MILLISECONDS * MINUTE);
+                    SetPhase(BATTLE_PHASE_2);
+                    break;
+                case BATTLE_PHASE_2:
+                    possibleDistance = 150.0f;                    
+                    combatTimer.Reset(1 * IN_MILLISECONDS * MINUTE);
+                    SetPhase(BATTLE_PHASE_3);
+                    break;
+                case BATTLE_PHASE_3:
+                    possibleDistance = 75.0f;
+                    combatTimer.Reset(1 * IN_MILLISECONDS * MINUTE);
+                    break;
+            }                
+        }
+
+        if (m_DurationTimer > 0)
+        {
+            if (diff >= m_DurationTimer)
+            {
+                m_DurationTimer = 0;
+                sWorld->SendWorldText(LANG_DALARAN_CRATER_PREPARE_TO_STOP_ANNOUNCE, GetCountPlayerInEvent());
+            }
+            else
+                m_DurationTimer -= diff;
+        }
+    }
+    else
+    {
+        prepareTimer.Update(diff);
+        if (prepareTimer.Passed())
+        {
+            switch (GetPhase())
+            {
+            case PREPARE_PHASE_60:
+                sWorld->SendWorldText(LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_60);
+                SetPhase(PREPARE_PHASE_30);
+                prepareTimer.Reset(30 * IN_MILLISECONDS);
+                break;
+            case PREPARE_PHASE_30:
+                sWorld->SendWorldText(LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_30);
+                SetPhase(PREPARE_PHASE_0);
+                prepareTimer.Reset(30 * IN_MILLISECONDS);
+                break;
+            case PREPARE_PHASE_0:
+                if (GetCountPlayerInEvent() < sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_MIN_PLAYERS))
+                {
+                    sWorld->SendWorldText(LANG_DALARAN_CRATER_NOT_ENOGH_MIN_PLAYERS);
+                    _timer.Reset(_noEventTime);
+                }
+                else
+                {
+                    TeleportAllPlayersInZone();
+                    BroadcastToMemberPrepare();
+                    sWorld->SendWorldText(LANG_DALARAN_CRATER_START_ANNOUNCE);
+                    StartFightEvent();
+                }
+                prepareTimer.Reset(1000);
+                break;
+            }
+        }
+
+        if (m_TeleporterTimer > 0)
+        {
+            if (diff >= m_TeleporterTimer)
+            {
+                m_TeleporterTimer = 0;
+                TeleportAllPlayersBack();
+            }
+            else
+                m_TeleporterTimer -= diff;
+        }
+    }
 }
 
-uint32 DalaranGEventMgr::GetCountPlayerInEvent()
+void DalaranGEvent::OnSpecialEventStart()
+{
+    SetPhase(PREPARE_PHASE_60);
+}
+
+void DalaranGEvent::OnSpecialEventEnd(bool /*endByTimer*/)
+{
+    sWorld->SendWorldText(LANG_DALARAN_CRATER_DURATION_STOP_ANNOUNCE);
+    StopFightEvent();
+}
+
+void DalaranGEvent::AddPlayer(ObjectGuid playerGUID)
+{
+    if (Player* player = ObjectAccessor::FindConnectedPlayer(playerGUID))
+    {
+        InvitePlayerToQueue(player);
+        ++_plrCount;
+    }
+}
+
+void DalaranGEvent::RemovePlayer(ObjectGuid playerGUID)
+{
+    if (Player* player = ObjectAccessor::FindConnectedPlayer(playerGUID))
+    {
+        if (IsActiveDalaranEvent())
+        {
+            if (sWorld->getBoolConfig(CONFIG_DALARAN_GAME_EVENTS_INSTANT_RETURN))
+                RemovePlayerFromFight(player);
+            else
+                RemovePlayerFromQueue(player);
+        }
+        else
+            RemovePlayerFromQueue(player);
+    }
+}
+
+bool DalaranGEvent::IsMemberOfEvent(Player* player)
+{
+    for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
+    {
+        if (itr->second.guid == player->GetGUID())
+            return true;
+    }
+
+    return false;
+}
+
+uint32 DalaranGEvent::GetCountPlayerInPlayerMap()
 {
     uint32 count = _playersDataStore.size();
     return count;
 }
 
-void DalaranGEventMgr::Update(uint32 diff)
+void DalaranGEvent::StartFightEvent()
 {
-    if (!sWorld->getBoolConfig(CONFIG_DALARAN_GAME_EVENTS))
-        return;
-
-    m_UpdateTimer += diff;
-
-    _events.Update(diff);
-
-    if (!IsActiveEvent())
-    {
-        if (_registration && !_announce60 && m_UpdateTimer >= (sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_TIMER) * IN_MILLISECONDS * MINUTE) - (IN_MILLISECONDS * MINUTE))
-        {
-            sWorld->SendWorldText(LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_60);
-            _announce60 = true;
-        }
-
-        if (_registration && !_announce30 && m_UpdateTimer >= (sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_TIMER) * IN_MILLISECONDS * MINUTE) - (IN_MILLISECONDS * (MINUTE / 2)))
-        {
-            sWorld->SendWorldText(LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_30);
-            _announce30 = true;
-        }
-
-        if (_registration && m_UpdateTimer >= sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_TIMER) * IN_MILLISECONDS * MINUTE)
-        {
-            m_UpdateTimer = 0;
-
-            if (GetCountPlayerInEvent() < sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_MIN_PLAYERS))
-                _events.ScheduleEvent(EVENT_START_DONT_ENOUGHT, 0);
-            else
-                _events.ScheduleEvent(EVENT_START_PREPARING_TO_START, 0);
-        }
-    }
-    else
-    {
-        std::list<Player*> playerList;
-        for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
-        {
-            if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
-            {
-                if (player->GetMapId() != 0)
-                {
-                    playerList.push_back(player);
-                    continue;
-                }
-            }
-        }
-
-        if (!playerList.empty())
-        {
-            for (std::list<Player*>::const_iterator iter = playerList.begin(); iter != playerList.end(); ++iter)
-                RemovePlayerFromQueue(*iter);
-
-            playerList.clear();
-        }
-
-        if (alivePlayerCount == 1)
-            _events.ScheduleEvent(EVENT_STOP_SUCCESS_FIGHT, 0);
-    }
-
-    if (m_DurationTimer > 0)
-    {
-        if (diff >= m_DurationTimer)
-        {
-            m_DurationTimer = 0;
-            sWorld->SendWorldText(LANG_DALARAN_CRATER_PREPARE_TO_STOP_ANNOUNCE, GetCountPlayerInEvent());
-            _events.ScheduleEvent(EVENT_STOP_DURATION_FIGHT, 1min);
-        }
-        else
-            m_DurationTimer -= diff;
-    }
-
-    while (uint32 eventId = _events.ExecuteEvent())
-    {
-        switch (eventId)
-        {
-            case EVENT_START_PREPARING_TO_START:
-            {
-                TeleportAllPlayersInZone();
-                BroadcastToMemberPrepare();
-                _events.ScheduleEvent(EVENT_START_BEGIN_START, 30s);
-                break;
-            }
-            case EVENT_START_BEGIN_START:
-            {
-                sWorld->SendWorldText(LANG_DALARAN_CRATER_START_ANNOUNCE);
-                StartEvent();
-                break;
-            }
-            case EVENT_START_DONT_ENOUGHT:
-            {
-                _events.Reset();
-                sWorld->SendWorldText(LANG_DALARAN_CRATER_NOT_ENOGH_MIN_PLAYERS);
-                break;
-            }
-            case EVENT_STOP_DURATION_FIGHT:
-            {
-                sWorld->SendWorldText(LANG_DALARAN_CRATER_DURATION_STOP_ANNOUNCE);
-                StopEvent();
-                break;
-            }
-            case EVENT_STOP_SUCCESS_FIGHT:
-            {
-                ReceiveWinnerName();
-                sWorld->SendWorldText(LANG_DALARAN_CRATER_SUCCESS_STOP_ANNOUNCE, _winnername.c_str());
-                StopEvent();
-                break;
-            }
-            case EVENT_STOP_RETURN_PLAYERS:
-            {
-                _events.Reset();
-                TeleportAllPlayersBack();
-                break;
-            }
-            default:
-                break;
-        }
-    }
-}
-
-void DalaranGEventMgr::StartEvent()
-{
-    _activeFight = true;
-    _events.Reset();
-    m_DurationTimer = sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_DURATION_TIMER) * IN_MILLISECONDS * MINUTE;
+    SetPhase(BATTLE_PHASE_1);
+    activeFight = true;
+    m_DurationTimer = GetNormalTimer() - (IN_MILLISECONDS * MINUTE);
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
@@ -181,15 +222,16 @@ void DalaranGEventMgr::StartEvent()
     }
 }
 
-void DalaranGEventMgr::StopEvent()
+void DalaranGEvent::StopFightEvent()
 {
-    _activeFight = false;
-    _events.Reset();
+    SetPhase(BATTLE_ENDED);
+    activeFight = false;
     m_DurationTimer = 0;
+    m_TeleporterTimer = 45 * IN_MILLISECONDS;
     alivePlayerCount = 0;
-
-    sWorld->SendWorldText(LANG_DALARAN_CRATER_PREPARE_TO_RETURN_PLAYERS);
-    _events.ScheduleEvent(EVENT_STOP_RETURN_PLAYERS, 45s);
+    _plrCount = 0;
+    sWorld->SendWorldText(LANG_DALARAN_CRATER_PREPARE_TO_RETURN_PLAYERS);    
+    SetNextTimeOfEvent(uint32(GameTime::GetGameTime() + GetNormalTimer() * MINUTE));
 
     if (!sWorld->IsFFAPvPRealm())
     {
@@ -201,21 +243,21 @@ void DalaranGEventMgr::StopEvent()
     }
 }
 
-void DalaranGEventMgr::SpawnGOLight()
+void DalaranGEvent::SpawnGOLight()
 {
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
         if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
         {
             QuaternionData rotation = QuaternionData::fromEulerAnglesZYX(player->GetOrientation(), 0.f, 0.f);
-            player->SummonGameObject(182483, DalaranCraterPoint, rotation, sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_DURATION_TIMER) * IN_MILLISECONDS * MINUTE);
+            player->SummonGameObject(182483, DalaranCraterPoint, rotation, GetNormalTimer());
         }
     }    
 }
 
-void DalaranGEventMgr::TeleportAllPlayersInZone()
+void DalaranGEvent::TeleportAllPlayersInZone()
 {
-    _registration = false;
+    registration = false;
 
     std::list<Player*> playerList;
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
@@ -255,7 +297,7 @@ void DalaranGEventMgr::TeleportAllPlayersInZone()
     SpawnGOLight();
 }
 
-void DalaranGEventMgr::TeleportAllPlayersBack()
+void DalaranGEvent::TeleportAllPlayersBack()
 {
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
@@ -271,14 +313,10 @@ void DalaranGEventMgr::TeleportAllPlayersBack()
     }
 
     _playersDataStore.clear();    
-    _registration = true;
-    _announce60 = false;
-    _announce30 = false;
-    m_UpdateTimer = 0;
-    gameTimeNextEvent = uint32(GameTime::GetGameTime() + sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_TIMER) * MINUTE);
+    registration = true;    
 }
 
-void DalaranGEventMgr::BroadcastToMemberAboutLeavePlayer(std::string const& Name)
+void DalaranGEvent::BroadcastToMemberAboutLeavePlayer(std::string const& Name)
 {
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
@@ -287,7 +325,7 @@ void DalaranGEventMgr::BroadcastToMemberAboutLeavePlayer(std::string const& Name
     }
 }
 
-void DalaranGEventMgr::BroadcastToMemberPrepare()
+void DalaranGEvent::BroadcastToMemberPrepare()
 {
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
@@ -296,18 +334,7 @@ void DalaranGEventMgr::BroadcastToMemberPrepare()
     }
 }
 
-bool DalaranGEventMgr::IsMemberOfEvent(Player* player)
-{
-    for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
-    {
-        if (itr->second.guid == player->GetGUID())
-            return true;
-    }
-
-    return false;
-}
-
-void DalaranGEventMgr::RemovePlayerFromFight(Player* player, bool withteleport)
+void DalaranGEvent::RemovePlayerFromFight(Player* player, bool withteleport)
 {
     if (!IsMemberOfEvent(player))
         return;
@@ -340,10 +367,11 @@ void DalaranGEventMgr::RemovePlayerFromFight(Player* player, bool withteleport)
         _playersDataStore.erase(id);
         BroadcastToMemberAboutLeavePlayer(player->GetName());
         --alivePlayerCount;
+        --_plrCount;
     }
 }
 
-void DalaranGEventMgr::ReceiveWinnerName()
+void DalaranGEvent::ReceiveWinnerName()
 {
     for (PlayersDataContainer::const_iterator itr = _playersDataStore.begin(); itr != _playersDataStore.end(); ++itr)
     {
@@ -363,7 +391,7 @@ void DalaranGEventMgr::ReceiveWinnerName()
     }
 }
 
-void DalaranGEventMgr::InvitePlayerToQueue(Player* player)
+void DalaranGEvent::InvitePlayerToQueue(Player* player)
 {
     PlayersData pd;
     pd.guid = player->GetGUID();
@@ -384,7 +412,7 @@ void DalaranGEventMgr::InvitePlayerToQueue(Player* player)
     _playersDataStore[new_id] = pd;
 }
 
-void DalaranGEventMgr::RemovePlayerFromQueue(Player* player)
+void DalaranGEvent::RemovePlayerFromQueue(Player* player)
 {
     if (!IsMemberOfEvent(player))
         return;
@@ -397,5 +425,8 @@ void DalaranGEventMgr::RemovePlayerFromQueue(Player* player)
     }
 
     if (id)
+    {
         _playersDataStore.erase(id);
+        --_plrCount;
+    }
 }
