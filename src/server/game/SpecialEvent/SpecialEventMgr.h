@@ -24,6 +24,7 @@
 class Player;
 class SpecialEvent;
 enum SpecialEventId;
+enum LocaleConstant : uint8;
 
 class TC_GAME_API SpecialEventMgr
 {
