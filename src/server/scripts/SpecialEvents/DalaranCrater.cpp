@@ -117,18 +117,26 @@ void DalaranGEvent::Update(uint32 diff)
             switch (GetPhase())
             {
                 case BATTLE_PHASE_1:
-                    possibleDistance = 300.0f;                    
+                {
+                    possibleDistance = 300.0f;
                     combatTimer.Reset(2 * IN_MILLISECONDS * MINUTE);
                     SetPhase(BATTLE_PHASE_2);
                     break;
+                }
                 case BATTLE_PHASE_2:
-                    possibleDistance = 150.0f;                    
+                {
+                    possibleDistance = 150.0f;
                     combatTimer.Reset(1 * IN_MILLISECONDS * MINUTE);
                     SetPhase(BATTLE_PHASE_3);
                     break;
+                }
                 case BATTLE_PHASE_3:
+                {
                     possibleDistance = 75.0f;
                     combatTimer.Reset(1 * IN_MILLISECONDS * MINUTE);
+                    break;
+                }
+                default:
                     break;
             }                
         }
@@ -151,46 +159,56 @@ void DalaranGEvent::Update(uint32 diff)
         {
             switch (GetPhase())
             {
-            case PREPARE_PHASE_60:
-                sWorld->SendWorldText(LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_60);
-                SetPhase(PREPARE_PHASE_30);
-                prepareTimer.Reset(30 * IN_MILLISECONDS);
-                break;
-            case PREPARE_PHASE_30:
-                sWorld->SendWorldText(LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_30);
-                SetPhase(PREPARE_PHASE_0);
-                prepareTimer.Reset(30 * IN_MILLISECONDS);
-                break;
-            case PREPARE_PHASE_0:
-                if (GetCountPlayerInEvent() < sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_MIN_PLAYERS))
+                case PREPARE_PHASE_60:
                 {
-                    sWorld->SendWorldText(LANG_DALARAN_CRATER_NOT_ENOGH_MIN_PLAYERS);
-                    m_playersDataStore.clear();
-                    registration = true;                    
-                    
-                    // Update timers
-                    prepareTimer.Reset(_noEventTime);
-                    combatTimer.Reset(_noEventTime);                    
-                    SetPhase(BATTLE_ENDED);
-
-                    // For main class SpecialEvent
-                    _timer.Reset(_noEventTime);
-                    _active = false;
-                    _gameTimeNextEvent = uint32(GameTime::GetGameTime() + _noEventTime / IN_MILLISECONDS);
-                }
-                else
-                {
-                    TeleportAllPlayersInZone();
-                    BroadcastToMemberPrepare();
-                    // players droped in ground and rdy to start fight (30 sec announce and set FFAPVP flag)
-                    SetPhase(BATTLE_PHASE_0);
+                    sWorld->SendWorldText(LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_60);
+                    SetPhase(PREPARE_PHASE_30);
                     prepareTimer.Reset(30 * IN_MILLISECONDS);
-                }                
-                break;
-            case BATTLE_PHASE_0:
-                StartFightEvent();
-                break;
-            }            
+                    break;
+                }
+                case PREPARE_PHASE_30:
+                {
+                    sWorld->SendWorldText(LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_30);
+                    SetPhase(PREPARE_PHASE_0);
+                    prepareTimer.Reset(30 * IN_MILLISECONDS);
+                    break;
+                }
+                case PREPARE_PHASE_0:
+                {
+                    if (GetCountPlayerInEvent() < sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_MIN_PLAYERS))
+                    {
+                        sWorld->SendWorldText(LANG_DALARAN_CRATER_NOT_ENOGH_MIN_PLAYERS);
+                        m_playersDataStore.clear();
+                        registration = true;
+
+                        // Update timers
+                        prepareTimer.Reset(_noEventTime);
+                        combatTimer.Reset(_noEventTime);
+                        SetPhase(BATTLE_ENDED);
+
+                        // For main class SpecialEvent
+                        _timer.Reset(_noEventTime);
+                        _active = false;
+                        _gameTimeNextEvent = uint32(GameTime::GetGameTime() + _noEventTime / IN_MILLISECONDS);
+                    }
+                    else
+                    {
+                        TeleportAllPlayersInZone();
+                        BroadcastToMemberPrepare();
+                        // players droped in ground and rdy to start fight (30 sec announce and set FFAPVP flag)
+                        SetPhase(BATTLE_PHASE_0);
+                        prepareTimer.Reset(30 * IN_MILLISECONDS);
+                    }
+                    break;
+                }
+                case BATTLE_PHASE_0:
+                {
+                    StartFightEvent();
+                    break;
+                }
+                default:
+                    break;
+            }
         }
 
         if (m_TeleporterTimer > 0)
