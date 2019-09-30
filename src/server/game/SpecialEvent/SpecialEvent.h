@@ -68,10 +68,10 @@ class TC_GAME_API SpecialEvent
         virtual void Update(uint32 diff);
         virtual void OnSpecialEventStart() { }
         virtual void OnSpecialEventEnd(bool /*endByTimer*/) { }
-        virtual void AddPlayer(ObjectGuid playerGUID) { }
-        virtual void RemovePlayer(ObjectGuid playerGUID) { }
+        virtual void AddPlayer(ObjectGuid /*playerGUID*/) { }
+        virtual void RemovePlayer(ObjectGuid /*playerGUID*/) { }
         virtual bool IsPossibleToRegister() { return true; }
-        virtual bool IsMemberOfEvent(Player* player) { return false; }
+        virtual bool IsMemberOfEvent(Player* /*player*/) { return false; }
         virtual uint32 GetCountPlayerInEvent() { return 0; }
 
     protected:
