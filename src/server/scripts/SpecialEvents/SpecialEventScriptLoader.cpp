@@ -20,7 +20,7 @@ void AddSC_dalaran_crater();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
-void AddSpecialEventScripts()
+void AddSpecialEventsScripts()
 {
     AddSC_dalaran_crater();
 }
