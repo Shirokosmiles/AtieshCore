@@ -25,6 +25,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "WorldSession.h"
+#include "World.h"
 
 DalaranGEvent::DalaranGEvent()
 {

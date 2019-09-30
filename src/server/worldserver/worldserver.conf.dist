@@ -4835,12 +4835,13 @@ Chat.StrictMessages.Enabled = 0
 #
 #        Description: Change HP and Damage value for Units in Dungeons in %
 #        Default:     100 - (full HP and Damage)
-#                     10 - (units have only 10% of HP and can damage 10% of real damage value)
+#                     10 - (units have only 10% of HP or can deal damage 10% of base damage value)
 
 VAS.Unit.Enabled = 1
 VAS.Unit.PercentOfDamage = 100
 VAS.Unit.PercentOfHeal = 100
 VAS.Unit.PercentOfMaxHP = 100
+VAS.Unit.PercentOfMaxMP = 100
 
 #
 ###################################################################################################
@@ -4849,11 +4850,8 @@ VAS.Unit.PercentOfMaxHP = 100
 #
 # DalaranGEvent
 
-DalaranGEvent.Enable = 1
 DalaranGEvent.InstantReviveAndReturn.Enable = 1
 DalaranGEvent.Squad.Enable = 1
-DalaranGEvent.Interval = 50
-DalaranGEvent.Duration = 10
 DalaranGEvent.Min.Players = 5
 
 #
