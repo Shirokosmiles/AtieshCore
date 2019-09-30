@@ -48,6 +48,7 @@ class OutdoorPvP;
 class Player;
 class Quest;
 class ScriptMgr;
+class SpecialEvent;
 class Spell;
 class SpellInfo;
 class SpellScript;
@@ -499,6 +500,18 @@ class TC_GAME_API OutdoorPvPScript : public ScriptObject
 
         // Should return a fully valid OutdoorPvP object for the type ID.
         virtual OutdoorPvP* GetOutdoorPvP() const = 0;
+};
+
+class TC_GAME_API SpecialEventScript : public ScriptObject
+{
+protected:
+
+    SpecialEventScript(char const* name);
+
+public:
+
+    // Should return a fully valid OutdoorPvP object for the type ID.
+    virtual SpecialEvent* GetSpecialEvent() const = 0;
 };
 
 class TC_GAME_API CommandScript : public ScriptObject
@@ -985,6 +998,10 @@ class TC_GAME_API ScriptMgr
     public: /* OutdoorPvPScript */
 
         OutdoorPvP* CreateOutdoorPvP(uint32 scriptId);
+
+    public: /* SpecialEventScript */
+
+        SpecialEvent* CreateSpecialEvent(uint32 scriptId);
 
     public: /* CommandScript */
 

@@ -11359,10 +11359,7 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
         {
             if (Player* killedPlr = victim->ToPlayer())
             {
-                sScriptMgr->OnPVPKill(killerPlr, killedPlr);
-                if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEvent(SPECIALEVENT_EVENTID_DALARANCRATER))
-                    DalaranEvent->RemovePlayer(player->GetGUID());
-
+                sScriptMgr->OnPVPKill(killerPlr, killedPlr); 
                 if (killerPlr->IsInGuildWarWith(killedPlr))
                     sScriptMgr->OnGuildKillGuildEnemyEvent(killerPlr->GetGuild(), killerPlr);
             }
@@ -11378,6 +11375,12 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
 
     if (victim)
     {
+        if (victim->ToPlayer())
+        {
+            if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEvent(SPECIALEVENT_EVENTID_DALARANCRATER))
+                DalaranEvent->RemovePlayer(victim->ToPlayer()->GetGUID());
+        }
+
         if (victim->ToTempSummon())
             victim->ToTempSummon()->Killed();
     }

@@ -18,8 +18,8 @@
 #ifndef SPECIALEVENT_H_
 #define SPECIALEVENT_H_
 
-#include "SharedDefines.h"
 #include "Timer.h"
+#include "SharedDefines.h"
 
 enum SpecialEventId
 {
@@ -33,12 +33,16 @@ enum SpecialEventTimers
     SPECIALEVENT_OBJECTIVE_UPDATE_INTERVAL = 1000,
     SPECIALEVENT_RESURRECT_ITERVAL = 30000
 };
-
+class SpecialEvent;
 class TC_GAME_API SpecialEvent
 {
+    friend class SpecialEventMgr;
     public:
-        explicit SpecialEvent();
-        ~SpecialEvent() {};
+
+        // ctor
+        SpecialEvent();
+        // dtor
+        virtual ~SpecialEvent();
 
         // enables or disables the special event
         void StartSpecialEvent();
@@ -57,10 +61,10 @@ class TC_GAME_API SpecialEvent
         uint32 GetCooldownTimer() { return _EventTime; }
         uint32 GetDurationTimer() { return _noEventTime; }
         time_t GetTimeOfNextEvent() { return _gameTimeNextEvent; }
-        void SetNextTimeOfEvent(time_t time) { _gameTimeNextEvent = time; }
-        uint32 GetCountPlayerInEvent() { return _plrCount; }
+        void RegisterEvent(uint32 eventId);
+
         // Functions for each Event Scripts
-        bool SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer);
+        virtual bool SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer);
         virtual void Update(uint32 diff);
         virtual void OnSpecialEventStart() { }
         virtual void OnSpecialEventEnd(bool /*endByTimer*/) { }
@@ -68,6 +72,7 @@ class TC_GAME_API SpecialEvent
         virtual void RemovePlayer(ObjectGuid playerGUID) { }
         virtual bool IsPossibleToRegister() { return true; }
         virtual bool IsMemberOfEvent(Player* player) { return false; }
+        virtual uint32 GetCountPlayerInEvent() { return 0; }
 
     protected:
         TimeTrackerSmall _timer;
@@ -78,7 +83,6 @@ class TC_GAME_API SpecialEvent
         uint32 _EventTime;      // length of the event
         uint32 _noEventTime;    // time between two events
         time_t _gameTimeNextEvent;
-        uint32 _plrCount;
 };
 
 #endif

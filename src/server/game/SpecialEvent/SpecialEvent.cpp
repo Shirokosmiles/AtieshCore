@@ -15,13 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DalaranCrater.h"
 #include "GameTime.h"
 #include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
+#include "Log.h"
+#include "ObjectAccessor.h"
 
-SpecialEvent::SpecialEvent() : _active(false), _enabled(true), _eventId(0), _timer(0), _noEventTime(0), _gameTimeNextEvent(0), _plrCount(0)
-{
-}
+SpecialEvent::SpecialEvent() : _timer(0), _active(false), _enabled(true), _eventId(0), _noEventTime(0), _gameTimeNextEvent(0) { }
+
+SpecialEvent::~SpecialEvent() { }
 
 void SpecialEvent::Update(uint32 diff)
 {
@@ -39,6 +41,11 @@ void SpecialEvent::Update(uint32 diff)
     }
 }
 
+void SpecialEvent::RegisterEvent(uint32 eventId)
+{
+    sSpecialEventMgr->AddEvent(eventId, this);
+}
+
 bool SpecialEvent::SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
 {
     if (!enabled || !id || !cooldownTimer || !durationTimer)
@@ -46,9 +53,10 @@ bool SpecialEvent::SetupSpecialEvent(bool active, bool enabled, uint32 id, uint3
 
     _active = active;
     _eventId = id;
-    _timer = cooldownTimer * MINUTE * IN_MILLISECONDS;
-    _noEventTime = durationTimer * MINUTE * IN_MILLISECONDS;
-    _gameTimeNextEvent = uint32(GameTime::GetGameTime() + cooldownTimer * MINUTE);
+    _EventTime = durationTimer * MINUTE * IN_MILLISECONDS;
+    _noEventTime = cooldownTimer * MINUTE * IN_MILLISECONDS;
+    _gameTimeNextEvent = uint32(GameTime::GetGameTime() + durationTimer * MINUTE);
+    RegisterEvent(_eventId);
 
     return true;
 }
@@ -69,13 +77,13 @@ void SpecialEvent::EndSpecialEvent(bool endByTimer)
     if (!_active)
         return;
 
+    // Reset timer
+    _timer.Reset(_noEventTime);
+    _gameTimeNextEvent = uint32(GameTime::GetGameTime() + _noEventTime / IN_MILLISECONDS);
     _active = false;
 
     //if (!endByTimer)
     //    SetDefenderTeam(GetAttackerTeam());
 
     OnSpecialEventEnd(endByTimer);
-
-    // Reset timer
-    _timer.Reset(_noEventTime);
 }

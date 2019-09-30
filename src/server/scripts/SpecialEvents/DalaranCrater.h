@@ -42,16 +42,18 @@ enum DalaranPhase
     PREPARE_PHASE_60  = 1,
     PREPARE_PHASE_30  = 2,
     PREPARE_PHASE_0   = 3,
-    BATTLE_PHASE_1    = 4,
-    BATTLE_PHASE_2    = 5,
-    BATTLE_PHASE_3    = 6,
-    BATTLE_ENDED      = 7
+    BATTLE_PHASE_0    = 4,
+    BATTLE_PHASE_1    = 5,
+    BATTLE_PHASE_2    = 6,
+    BATTLE_PHASE_3    = 7,
+    BATTLE_ENDED      = 8
 };
 
 class TC_GAME_API DalaranGEvent : public SpecialEvent
 {
 public:
-    ~DalaranGEvent() { }
+    DalaranGEvent();
+    ~DalaranGEvent();
 
     bool IsActiveDalaranEvent() const { return activeFight; }
 
@@ -66,6 +68,9 @@ public:
     void RemovePlayer(ObjectGuid playerGUID) override;
     bool IsPossibleToRegister() override { return registration; }
     bool IsMemberOfEvent(Player* player) override;
+    uint32 GetCountPlayerInEvent() override { return GetCountPlayerInPlayerMap(); }
+    bool SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer) override;
+
     uint32 GetCountPlayerInPlayerMap();
 
     void StartFightEvent();
@@ -103,7 +108,7 @@ private:
     uint32 alivePlayerCount;
     std::string _winnername;
 
-    PlayersDataContainer _playersDataStore;
+    PlayersDataContainer m_playersDataStore;
 };
 
 #endif // _DALARANGEVENT_H

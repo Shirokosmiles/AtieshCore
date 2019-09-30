@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DalaranCrater.h"
+#include "ScriptMgr.h"
 #include "SpecialEventMgr.h"
 #include "SpecialEvent.h"
 #include "Log.h"
@@ -26,12 +26,14 @@ SpecialEventMgr::SpecialEventMgr()
     _updateTimer = 0;
 }
 
-SpecialEventMgr::~SpecialEventMgr()
+void SpecialEventMgr::Die()
 {
-    for (auto itr = _specialEventContainer.begin(); itr != _specialEventContainer.end(); ++itr)
-        delete itr->second;
+    for (SpecialEventSet::iterator itr = m_SpecialEventSet.begin(); itr != m_SpecialEventSet.end(); ++itr)
+        delete* itr;
 
-    _specialEventContainer.clear();
+    m_SpecialEventSet.clear();
+    m_SpecialEventDatas.fill(0);
+    m_SpecialEventMap.clear();
 }
 
 SpecialEventMgr* SpecialEventMgr::instance()
@@ -44,79 +46,81 @@ void SpecialEventMgr::InitSpecialEvents()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (auto itr = _specialEventContainer.begin(); itr != _specialEventContainer.end(); ++itr)
-        delete itr->second;
-
-    _specialEventContainer.clear();
-
-    //                                                     0                1
-    QueryResult result = WorldDatabase.Query("SELECT eventId, cooldownTimer, durationTimer, activeStatus, description FROM special_events");
-
+    //                                                 0       1            2               3               4           5
+    QueryResult result = WorldDatabase.Query("SELECT TypeId, ScriptName, cooldownTimer, durationTimer, activeStatus, comment FROM special_events");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 Special Events. DB table `special_events` is empty!");
+        TC_LOG_INFO("server.loading", ">> Loaded 0 Special Events definitions. DB table `special_events` is empty.");
         return;
     }
 
     uint32 count = 0;
+    uint32 typeId = 0;
+    uint32 cooldownTimer = 0;
+    uint32 durationTimer = 0;
+    uint32 activeStatus = 0;
+    std::string comment = "";
+    bool enabledStatus = false;
 
     do
     {
         Field* fields = result->Fetch();
 
-        uint32 id = fields[0].GetUInt32();
-        uint32 cooldownTimer = fields[1].GetUInt32();
-        uint32 durationTimer = fields[2].GetUInt32();
-        uint32 activeStatus = fields[3].GetUInt32();
-        std::string const description = fields[4].GetString();
+        typeId = fields[0].GetUInt8();        
 
-        bool enabledStatus = activeStatus > 0;
-        switch (id)
+        if (typeId >= SPECIALEVENT_EVENTID_MAX)
         {
-            //case SPECIALEVENT_EVENTID_WINTERGRASP:
-            //    break;
-            case SPECIALEVENT_EVENTID_DALARANCRATER:
-                if (DalaranGEvent* DC = new DalaranGEvent())
-                {
-                    if (!DC->SetupSpecialEvent(false, enabledStatus, id, cooldownTimer, durationTimer))
-                    {
-                        TC_LOG_ERROR("server.loading", ">> Special Event (id: %u) - %s initialization failed!", id, description);
-                        delete DC;
-                    }
-                    else
-                    {
-                        _specialEventContainer[id] = DC;
-                        TC_LOG_INFO("server.loading", ">> Special Event (id: %u) - %s successfully initialized", id, description);
-                    }
-                }
-                break;
-            default:
-                if (SpecialEvent* se = new SpecialEvent())
-                {
-                    if (!se->SetupSpecialEvent(false, enabledStatus, id, cooldownTimer, durationTimer))
-                    {
-                        TC_LOG_ERROR("server.loading", ">> Special Event (id: %u) - %s initialization failed!", id, description);
-                        delete se;
-                    }
-                    else
-                    {
-                        _specialEventContainer[id] = se;
-                        TC_LOG_INFO("server.loading", ">> Special Event (id: %u) - %s successfully initialized", id, description);
-                    }
-                }
-                break;
+            TC_LOG_ERROR("sql.sql", "Invalid Special Event TypeId value %u in special_events; skipped.", typeId);
+            continue;
         }
+
+        SpecialEventId realTypeId = SpecialEventId(typeId);
+        m_SpecialEventDatas[realTypeId] = sObjectMgr->GetScriptId(fields[1].GetString());
+
+        cooldownTimer = fields[2].GetUInt32();
+        durationTimer = fields[3].GetUInt32();
+        activeStatus = fields[4].GetUInt32();
+        comment = fields[5].GetString();
+        enabledStatus = activeStatus > 0;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u Special Events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    SpecialEvent* se;
+    for (uint8 i = 1; i < SPECIALEVENT_EVENTID_MAX; ++i)
+    {
+        if (!m_SpecialEventDatas[i])
+        {
+            TC_LOG_ERROR("sql.sql", "Could not initialize Special Event for type ID %u; no entry in database.", uint32(i));
+            continue;
+        }
+
+        se = sScriptMgr->CreateSpecialEvent(m_SpecialEventDatas[i]);
+        if (!se)
+        {
+            TC_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID %u; got NULL pointer from script.", uint32(i));
+            continue;
+        }
+
+        if (!se->SetupSpecialEvent(false, enabledStatus, typeId, cooldownTimer, durationTimer))
+        {
+            TC_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID %u; SetupSpecialEvent failed.", uint32(i));
+            delete se;
+            continue;
+
+        }
+
+        TC_LOG_INFO("server.loading", ">> Special Event (id: %u) - %s successfully initialized", uint32(i), comment.c_str());
+        m_SpecialEventSet.push_back(se);
+    }
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u Special Event definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));    
 }
 
 SpecialEvent* SpecialEventMgr::GetEnabledSpecialEvent(uint32 eventId)
 {
-    auto itr = _specialEventContainer.find(eventId);
-    if (itr == _specialEventContainer.end())
+    SpecialEventMap::iterator itr = m_SpecialEventMap.find(eventId);
+    if (itr == m_SpecialEventMap.end())
         return nullptr;
 
     if (!itr->second->IsEnabled())
@@ -127,11 +131,12 @@ SpecialEvent* SpecialEventMgr::GetEnabledSpecialEvent(uint32 eventId)
 
 SpecialEvent* SpecialEventMgr::GetSpecialEvent(SpecialEventId eventId)
 {
-    for (auto itr = _specialEventContainer.begin(); itr != _specialEventContainer.end(); ++itr)
-    {
-        if (itr->second->GetEventId() == eventId)
-            return itr->second;
-    }
+    SpecialEventMap::iterator itr = m_SpecialEventMap.find(eventId);
+    if (itr == m_SpecialEventMap.end())
+        return nullptr;
+
+    if (itr->second->GetEventId() == eventId)
+        return itr->second;
 
     return nullptr;
 }
@@ -141,12 +146,13 @@ void SpecialEventMgr::Update(uint32 diff)
     _updateTimer += diff;
     if (_updateTimer > SPECIALEVENT_OBJECTIVE_UPDATE_INTERVAL)
     {
-        for (auto itr = _specialEventContainer.begin(); itr != _specialEventContainer.end(); ++itr)
-        {
-            if (itr->second->IsEnabled())
-                itr->second->Update(_updateTimer);
-        }
-
+        for (SpecialEventSet::iterator itr = m_SpecialEventSet.begin(); itr != m_SpecialEventSet.end(); ++itr)
+            (*itr)->Update(_updateTimer);
         _updateTimer = 0;
     }
+}
+
+void SpecialEventMgr::AddEvent(uint32 eventId, SpecialEvent* handle)
+{
+    m_SpecialEventMap[eventId] = handle;
 }

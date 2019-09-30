@@ -35,6 +35,7 @@
 #include "ScriptReloadMgr.h"
 #include "ScriptSystem.h"
 #include "SmartAI.h"
+#include "SpecialEventMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -84,6 +85,10 @@ struct is_script_database_bound<BattlegroundScript>
 
 template<>
 struct is_script_database_bound<OutdoorPvPScript>
+    : std::true_type { };
+
+template<>
+struct is_script_database_bound<SpecialEventScript>
     : std::true_type { };
 
 template<>
@@ -626,6 +631,44 @@ public:
         if ((!initialize) && swapped)
         {
             sOutdoorPvPMgr->InitOutdoorPvP();
+            swapped = false;
+        }
+    }
+
+    void BeforeUnload() final override
+    {
+        ASSERT(!swapped);
+    }
+
+private:
+    bool swapped;
+};
+
+/// This hook is responsible for swapping SpecialEvent's
+template<typename Base>
+class ScriptRegistrySwapHooks<SpecialEventScript, Base>
+    : public ScriptRegistrySwapHookBase
+{
+public:
+    ScriptRegistrySwapHooks() : swapped(false) { }
+
+    void BeforeReleaseContext(std::string const& context) final override
+    {
+        auto const bounds = static_cast<Base*>(this)->_ids_of_contexts.equal_range(context);
+
+        if ((!swapped) && (bounds.first != bounds.second))
+        {
+            swapped = true;
+            sSpecialEventMgr->Die();
+        }
+    }
+
+    void BeforeSwapContext(bool initialize) override
+    {
+        // Never swap outdoor pvp scripts when initializing
+        if ((!initialize) && swapped)
+        {
+            sSpecialEventMgr->InitSpecialEvents();
             swapped = false;
         }
     }
@@ -1623,6 +1666,12 @@ OutdoorPvP* ScriptMgr::CreateOutdoorPvP(uint32 scriptId)
     return tmpscript->GetOutdoorPvP();
 }
 
+SpecialEvent* ScriptMgr::CreateSpecialEvent(uint32 scriptId)
+{
+    GET_SCRIPT_RET(SpecialEventScript, scriptId, tmpscript, nullptr);
+    return tmpscript->GetSpecialEvent();
+}
+
 std::vector<ChatCommand> ScriptMgr::GetChatCommands()
 {
     std::vector<ChatCommand> table;
@@ -2334,6 +2383,12 @@ OutdoorPvPScript::OutdoorPvPScript(char const* name)
     ScriptRegistry<OutdoorPvPScript>::Instance()->AddScript(this);
 }
 
+SpecialEventScript::SpecialEventScript(char const* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<SpecialEventScript>::Instance()->AddScript(this);
+}
+
 CommandScript::CommandScript(char const* name)
     : ScriptObject(name)
 {
@@ -2420,6 +2475,7 @@ template class TC_GAME_API ScriptRegistry<GameObjectScript>;
 template class TC_GAME_API ScriptRegistry<AreaTriggerScript>;
 template class TC_GAME_API ScriptRegistry<BattlegroundScript>;
 template class TC_GAME_API ScriptRegistry<OutdoorPvPScript>;
+template class TC_GAME_API ScriptRegistry<SpecialEventScript>;
 template class TC_GAME_API ScriptRegistry<CommandScript>;
 template class TC_GAME_API ScriptRegistry<WeatherScript>;
 template class TC_GAME_API ScriptRegistry<AuctionHouseScript>;

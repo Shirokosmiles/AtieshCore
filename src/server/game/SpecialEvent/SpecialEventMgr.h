@@ -25,12 +25,17 @@ class Player;
 class SpecialEvent;
 enum SpecialEventId;
 
-typedef std::unordered_map<uint32, SpecialEvent*> SpecialEventsContainer;
-
 class TC_GAME_API SpecialEventMgr
 {
+    private:
+        SpecialEventMgr();
+        ~SpecialEventMgr() { };
+
     public:
         static SpecialEventMgr* instance();
+
+        // cleanup
+        void Die();
 
         // create SpecialEvents
         void InitSpecialEvents();
@@ -38,14 +43,24 @@ class TC_GAME_API SpecialEventMgr
         SpecialEvent* GetEnabledSpecialEvent(uint32 eventId);
         SpecialEvent* GetSpecialEvent(SpecialEventId eventId);
 
+        void AddEvent(uint32 eventId, SpecialEvent* handle);
         void Update(uint32 diff);
 
     private:
-        SpecialEventMgr();
-        ~SpecialEventMgr();
+        typedef std::vector<SpecialEvent*> SpecialEventSet;
+        typedef std::unordered_map<uint32 /*zoneid*/, SpecialEvent*> SpecialEventMap;
+        typedef std::array<uint32, SPECIALEVENT_EVENTID_MAX> SpecialEventScriptIds;
 
-        // contains all initiated battlefields
-        SpecialEventsContainer _specialEventContainer;
+        // contains all initiated outdoor pvp events
+        // used when initing / cleaning up
+        SpecialEventSet m_SpecialEventSet;
+
+        // maps the zone ids to an outdoor pvp event
+        // used in player event handling
+        SpecialEventMap m_SpecialEventMap;
+
+        // Holds the outdoor PvP templates
+        SpecialEventScriptIds m_SpecialEventDatas;
         // update interval
         uint32 _updateTimer;
 };
