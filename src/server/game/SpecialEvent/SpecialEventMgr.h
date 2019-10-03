@@ -21,10 +21,19 @@
 #include "SpecialEvent.h"
 #include <unordered_map>
 
+struct SpecialEventList
+{
+    std::string scriptname;    
+    uint32 cooldownTimer;
+    uint32 durationTimer;
+    bool enabled;
+    std::string comment;
+};
+typedef std::unordered_map<uint32, SpecialEventList> SpecialEventInfoContainer;
+
 class Player;
 class SpecialEvent;
 class ZoneScript;
-enum SpecialEventId : uint32;
 enum LocaleConstant : uint8;
 
 class TC_GAME_API SpecialEventMgr
@@ -45,18 +54,18 @@ class TC_GAME_API SpecialEventMgr
         void Update(uint32 diff);
 
         // event sector
-        void AddEvent(SpecialEventId eventId, SpecialEvent* handle);
+        void AddEvent(uint32 eventId, SpecialEvent* handle);
         
-        SpecialEvent* GetSpecialEventByEventId(SpecialEventId eventId) const;
+        SpecialEvent* GetSpecialEventByEventId(uint32 eventId) const;
         SpecialEvent* GetSpecialEventByZoneId(uint32 zoneId) const;
 
-        SpecialEvent* GetEnabledSpecialEventByEventId(SpecialEventId eventId) const;
+        SpecialEvent* GetEnabledSpecialEventByEventId(uint32 eventId) const;
         SpecialEvent* GetEnabledSpecialEventByZoneId(uint32 zoneId) const;
 
         // ZoneScript
         void AddZone(uint32 zoneId, SpecialEvent* handle);
         ZoneScript* GetZoneScriptbyZoneId(uint32 zoneId) const;
-        ZoneScript* GetZoneScriptbyEventId(SpecialEventId eventId) const;
+        ZoneScript* GetZoneScriptbyEventId(uint32 eventId) const;
 
         // handlers
         // called when a player enters a battlefield area
@@ -84,6 +93,8 @@ class TC_GAME_API SpecialEventMgr
 
         // Holds the outdoor PvP templates
         SpecialEventScriptIds m_SpecialEventDatas;
+
+        SpecialEventInfoContainer m_SpecialEventStore;
         // update interval
         uint32 _updateTimer;
 };

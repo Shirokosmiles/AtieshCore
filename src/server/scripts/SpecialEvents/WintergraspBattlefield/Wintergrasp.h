@@ -289,7 +289,7 @@ public:
     explicit BattlefieldWintergrasp();
     ~BattlefieldWintergrasp();
 
-    bool SetupSpecialEvent(bool active, bool enabled, SpecialEventId id, uint32 cooldownTimer, uint32 durationTimer) override;
+    bool SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer) override;
 
     void OnCreatureCreate(Creature* object) override;
     void OnCreatureRemove(Creature* object) override;

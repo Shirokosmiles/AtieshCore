@@ -53,8 +53,6 @@ public:
     TeamId GetControllingTeamId() const override;
     // enum TeamId
     TeamId GetAttackingTeamId() const override;
-    // Battle timer
-    uint32 GetTimer() const { return _timer.GetExpiry(); }
 
 private:
     Battlefield(Battlefield const&) = delete;

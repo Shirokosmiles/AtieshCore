@@ -17,4 +17,6 @@ CREATE TABLE `special_events` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 INSERT INTO `special_events`(`TypeId`, `ScriptName`, `cooldownTimer`, `durationTimer`, `activeStatus`, `comment`) VALUES 
+(1, 'wintergrasp_bf', 150, 30, 1, 'Wintergrasp battlefield'),
 (2, 'dalaran_crater', 45, 7, 1, 'Dalaran Crater PVP Event');
+

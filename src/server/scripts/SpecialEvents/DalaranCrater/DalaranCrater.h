@@ -69,7 +69,7 @@ public:
     bool IsPossibleToRegister() override { return registration; }
     bool IsMemberOfEvent(Player* player) override;
     uint32 GetCountPlayerInEvent() override { return GetCountPlayerInPlayerMap(); }
-    bool SetupSpecialEvent(bool active, bool enabled, SpecialEventId id, uint32 cooldownTimer, uint32 durationTimer) override;
+    bool SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer) override;
 
     uint32 GetCountPlayerInPlayerMap();
 

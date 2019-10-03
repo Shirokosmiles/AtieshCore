@@ -18,11 +18,19 @@
 #ifndef SPECIALEVENT_H_
 #define SPECIALEVENT_H_
 
-#include "Player.h"
 #include "Timer.h"
 #include "SharedDefines.h"
 #include "ObjectMgr.h"
+#include "Player.h"
 #include "ZoneScript.h"
+
+enum SpecialEventTypes
+{
+    SPECIALEVENT_EVENTID_WINTERGRASP = 1,
+    SPECIALEVENT_EVENTID_DALARANCRATER,
+
+    SPECIALEVENT_EVENTID_MAX
+};
 
 namespace WorldPackets
 {
@@ -62,14 +70,14 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         uint32 GetCooldownTimer() { return _EventTime; }
         uint32 GetDurationTimer() { return _noEventTime; }
         time_t GetTimeOfNextEvent() { return _gameTimeNextEvent; }
-        void RegisterEvent(SpecialEventId eventId);
+        void RegisterEvent(uint32 eventId);
         void RegisterZoneIdForEvent(uint32 zoneId);
-        SpecialEventId GetEventId() const { return _eventId; }
+        uint32 GetEventId() const { return _eventId; }
         // Battle timer
         uint32 GetTimer() const { return _timer.GetExpiry(); }
 
         // Functions for each Event Scripts
-        virtual bool SetupSpecialEvent(bool active, bool enabled, SpecialEventId id, uint32 cooldownTimer, uint32 durationTimer);
+        virtual bool SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer);
         virtual void Update(uint32 diff);
         virtual void OnSpecialEventStart() { }
         virtual void OnSpecialEventEnd(bool /*endByTimer*/) { }
@@ -120,7 +128,7 @@ class TC_GAME_API SpecialEvent : public ZoneScript
 
     protected:
         // constant information
-        SpecialEventId _eventId;
+        uint32 _eventId;
         TimeTrackerSmall _timer;
         bool _active;
         bool _enabled;

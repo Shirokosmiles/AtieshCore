@@ -34,7 +34,7 @@ class bf_commandscript : public CommandScript
 public:
     bf_commandscript() : CommandScript("bf_commandscript") { }
 
-    static std::string GetBattleIdString(SpecialEventId battleId)
+    static std::string GetBattleIdString(uint32 battleId)
     {
         switch (battleId)
         {

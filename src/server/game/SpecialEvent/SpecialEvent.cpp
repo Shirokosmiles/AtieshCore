@@ -22,7 +22,7 @@
 #include "Log.h"
 #include "ObjectAccessor.h"
 
-SpecialEvent::SpecialEvent() : _eventId(SPECIALEVENT_EVENTID_NONE), _timer(0), _active(false), _enabled(true), _noEventTime(0), _gameTimeNextEvent(0) { }
+SpecialEvent::SpecialEvent() : _eventId(0), _timer(0), _active(false), _enabled(true), _noEventTime(0), _gameTimeNextEvent(0) { }
 
 SpecialEvent::~SpecialEvent() { }
 
@@ -42,7 +42,7 @@ void SpecialEvent::Update(uint32 diff)
     }
 }
 
-void SpecialEvent::RegisterEvent(SpecialEventId eventId)
+void SpecialEvent::RegisterEvent(uint32 eventId)
 {
     sSpecialEventMgr->AddEvent(eventId, this);
 }
@@ -52,7 +52,7 @@ void SpecialEvent::RegisterZoneIdForEvent(uint32 zoneId)
     sSpecialEventMgr->AddZone(zoneId, this);
 }
 
-bool SpecialEvent::SetupSpecialEvent(bool active, bool enabled, SpecialEventId id, uint32 cooldownTimer, uint32 durationTimer)
+bool SpecialEvent::SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
 {
     if (!enabled || !id || !cooldownTimer || !durationTimer)
         return false;

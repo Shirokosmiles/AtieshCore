@@ -18,7 +18,7 @@
 #include "ScriptMgr.h"
 #include "SpecialEvent.h"
 #include "SpecialEventMgr.h"
-#include "Wintergrasp.h"
+#include "../SpecialEvents/WintergraspBattlefield/Wintergrasp.h"
 #include "ConditionMgr.h"
 #include "Creature.h"
 #include "DBCStructure.h"

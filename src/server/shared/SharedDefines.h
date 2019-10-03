@@ -3577,14 +3577,6 @@ enum BattlefieldZoneId : uint32
     BATTLEFIELD_ZONEID_WINTERGRASP = 4197 // Wintergrasp battle zone
 };
 
-enum SpecialEventId : uint32
-{
-    SPECIALEVENT_EVENTID_NONE          = 0,
-    SPECIALEVENT_EVENTID_WINTERGRASP   = 1, // Wintergrasp (for Future implementation)
-    SPECIALEVENT_EVENTID_DALARANCRATER = 2, // Dalaran Crater PVP battle
-    SPECIALEVENT_EVENTID_MAX
-};
-
 enum MailResponseType
 {
     MAIL_SEND               = 0,

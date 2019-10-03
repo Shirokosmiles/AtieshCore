@@ -75,13 +75,15 @@ BattlefieldWintergrasp::BattlefieldWintergrasp() : Battlefield(BATTLEFIELD_BATTL
         WintergraspGraveyardPointer graveyard = std::make_unique<WintergraspGraveyard>(this, *itr);
         EmplaceGraveyard(itr->Id, std::move(graveyard));
     }
+
+    _eventId = SPECIALEVENT_EVENTID_WINTERGRASP;
 }
 
 BattlefieldWintergrasp::~BattlefieldWintergrasp()
 {
 }
 
-bool BattlefieldWintergrasp::SetupSpecialEvent(bool active, bool enabled, SpecialEventId id, uint32 cooldownTimer, uint32 durationTimer)
+bool BattlefieldWintergrasp::SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
 {
     // override Setup for Set time of first run in cooldownTimer
     if (SpecialEvent::SetupSpecialEvent(active, enabled, id, cooldownTimer, durationTimer))
@@ -328,4 +330,20 @@ void WintergraspGraveyard::OnObjectRemove(WorldObject* object)
         return;
 
     BattlefieldGraveyard::OnObjectRemove(object);
+}
+
+class SpecialEvent_Wintergrasp : public SpecialEventScript
+{
+public:
+    SpecialEvent_Wintergrasp() : SpecialEventScript("wintergrasp_bf") { }
+
+    SpecialEvent* GetSpecialEvent() const override
+    {
+        return new BattlefieldWintergrasp();
+    }
+};
+
+void AddSC_WintergraspBattlefieldScripts()
+{
+    new SpecialEvent_Wintergrasp();
 }

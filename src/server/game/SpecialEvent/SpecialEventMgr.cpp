@@ -36,6 +36,7 @@ void SpecialEventMgr::Die()
     m_SpecialEventDatas.fill(0);
     m_SpecialEventMap.clear();
     m_SpecialEventZoneMap.clear();
+    m_SpecialEventStore.clear();
 }
 
 SpecialEventMgr* SpecialEventMgr::instance()
@@ -48,6 +49,7 @@ void SpecialEventMgr::InitSpecialEvents()
 {
     uint32 oldMSTime = getMSTime();
 
+    m_SpecialEventStore.clear();
     //                                                 0       1            2               3               4           5
     QueryResult result = WorldDatabase.Query("SELECT TypeId, ScriptName, cooldownTimer, durationTimer, activeStatus, comment FROM special_events");
     if (!result)
@@ -57,10 +59,11 @@ void SpecialEventMgr::InitSpecialEvents()
     }
 
     uint32 count = 0;
-    SpecialEventId typeId = SPECIALEVENT_EVENTID_NONE;
+    uint32 typeId = 0;
+
+    // for setup declare
     uint32 cooldownTimer = 0;
     uint32 durationTimer = 0;
-    uint32 activeStatus = 0;
     std::string comment = "";
     bool enabledStatus = false;
 
@@ -68,22 +71,26 @@ void SpecialEventMgr::InitSpecialEvents()
     {
         Field* fields = result->Fetch();
 
-        typeId = SpecialEventId(fields[0].GetUInt8());
+        typeId = fields[0].GetUInt8();
 
         if (typeId >= SPECIALEVENT_EVENTID_MAX)
         {
-            TC_LOG_ERROR("sql.sql", "Invalid Special Event TypeId value %u in special_events; skipped.", uint8(typeId));
+            TC_LOG_ERROR("sql.sql", "Invalid Special Event TypeId value %u in special_events; skipped.", typeId);
             continue;
         }
 
-        SpecialEventId realTypeId = typeId;
+        // helper for keeping full info about special events
+        SpecialEventTypes realTypeId = SpecialEventTypes(typeId);
         m_SpecialEventDatas[realTypeId] = sObjectMgr->GetScriptId(fields[1].GetString());
 
-        cooldownTimer = fields[2].GetUInt32();
-        durationTimer = fields[3].GetUInt32();
-        activeStatus = fields[4].GetUInt32();
-        comment = fields[5].GetString();
-        enabledStatus = activeStatus > 0;
+        SpecialEventList sel;
+        sel.scriptname = fields[1].GetString();
+        sel.cooldownTimer = fields[2].GetUInt32();
+        sel.durationTimer = fields[3].GetUInt32();
+        sel.enabled = fields[4].GetUInt32() > 0;
+        sel.comment = fields[5].GetString();        
+
+        m_SpecialEventStore[typeId] = sel;
 
         ++count;
     } while (result->NextRow());
@@ -93,26 +100,37 @@ void SpecialEventMgr::InitSpecialEvents()
     {
         if (!m_SpecialEventDatas[i])
         {
-            TC_LOG_ERROR("sql.sql", "Could not initialize Special Event for type ID %u; no entry in database.", uint32(i));
+            TC_LOG_ERROR("sql.sql", "Could not initialize Special Event for type ID %u; no entry in database.", i);
             continue;
         }
 
         se = sScriptMgr->CreateSpecialEvent(m_SpecialEventDatas[i]);
         if (!se)
         {
-            TC_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID %u; got NULL pointer from script.", uint32(i));
+            TC_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID %u; got NULL pointer from script.", i);
             continue;
         }
 
-        if (!se->SetupSpecialEvent(false, enabledStatus, typeId, cooldownTimer, durationTimer))
+        for (SpecialEventInfoContainer::const_iterator itr = m_SpecialEventStore.begin(); itr != m_SpecialEventStore.end(); ++itr)
         {
-            TC_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID %u; SetupSpecialEvent failed.", uint32(i));
+            if (itr->first == i)
+            {
+                enabledStatus = itr->second.enabled;
+                cooldownTimer = itr->second.cooldownTimer;
+                durationTimer = itr->second.durationTimer;
+                comment = itr->second.comment;
+            }
+        }
+
+        if (!se->SetupSpecialEvent(false, enabledStatus, i, cooldownTimer, durationTimer))
+        {
+            TC_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID %u; SetupSpecialEvent failed.", i);
             delete se;
             continue;
 
         }
 
-        TC_LOG_INFO("server.loading", ">> Special Event (id: %u) - %s successfully initialized", uint32(i), comment.c_str());
+        TC_LOG_INFO("server.loading", ">> Special Event (id: %u) - %s successfully initialized", i, comment.c_str());
         m_SpecialEventSet.push_back(se);
     }
 
@@ -130,12 +148,12 @@ void SpecialEventMgr::Update(uint32 diff)
     }
 }
 
-void SpecialEventMgr::AddEvent(SpecialEventId eventId, SpecialEvent* handle)
+void SpecialEventMgr::AddEvent(uint32 eventId, SpecialEvent* handle)
 {
     m_SpecialEventMap[eventId] = handle;
 }
 
-SpecialEvent* SpecialEventMgr::GetSpecialEventByEventId(SpecialEventId eventId) const
+SpecialEvent* SpecialEventMgr::GetSpecialEventByEventId(uint32 eventId) const
 {
     SpecialEventMap::const_iterator itr = m_SpecialEventMap.find(eventId);
     if (itr != m_SpecialEventMap.end())
@@ -158,7 +176,7 @@ SpecialEvent* SpecialEventMgr::GetSpecialEventByZoneId(uint32 zoneId) const
     return itr->second;
 }
 
-SpecialEvent* SpecialEventMgr::GetEnabledSpecialEventByEventId(SpecialEventId eventId) const
+SpecialEvent* SpecialEventMgr::GetEnabledSpecialEventByEventId(uint32 eventId) const
 {
     SpecialEventMap::const_iterator itr = m_SpecialEventMap.find(eventId);
     if (itr == m_SpecialEventMap.end())
@@ -194,7 +212,7 @@ ZoneScript* SpecialEventMgr::GetZoneScriptbyZoneId(uint32 zoneId) const
         return nullptr;
 }
 
-ZoneScript* SpecialEventMgr::GetZoneScriptbyEventId(SpecialEventId eventId) const
+ZoneScript* SpecialEventMgr::GetZoneScriptbyEventId(uint32 eventId) const
 {
     SpecialEventMap::const_iterator itr = m_SpecialEventMap.find(eventId);
     if (itr != m_SpecialEventMap.end())
