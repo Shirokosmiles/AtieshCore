@@ -81,6 +81,20 @@ BattlefieldWintergrasp::~BattlefieldWintergrasp()
 {
 }
 
+bool BattlefieldWintergrasp::SetupSpecialEvent(bool active, bool enabled, SpecialEventId id, uint32 cooldownTimer, uint32 durationTimer)
+{
+    // override Setup for Set time of first run in cooldownTimer
+    if (SpecialEvent::SetupSpecialEvent(active, enabled, id, cooldownTimer, durationTimer))
+    {
+        _timer = cooldownTimer;
+        _gameTimeNextEvent = uint32(GameTime::GetGameTime() + cooldownTimer * MINUTE);
+        RegisterZoneIdForEvent(BATTLEFIELD_ZONEID_WINTERGRASP);
+        return true;
+    }
+
+    return false;
+}
+
 void BattlefieldWintergrasp::OnCreatureCreate(Creature* object)
 {
     switch (object->GetEntry())

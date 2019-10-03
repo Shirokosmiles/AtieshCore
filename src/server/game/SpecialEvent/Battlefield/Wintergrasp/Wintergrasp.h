@@ -20,6 +20,8 @@
 
 #include "Battlefield.h"
 #include "BattlefieldEntities.h"
+#include "GameTime.h"
+#include "SpecialEvent.h"
 #include <memory>
 #include <unordered_map>
 
@@ -286,6 +288,8 @@ class TC_GAME_API BattlefieldWintergrasp : public Battlefield
 public:
     explicit BattlefieldWintergrasp();
     ~BattlefieldWintergrasp();
+
+    bool SetupSpecialEvent(bool active, bool enabled, SpecialEventId id, uint32 cooldownTimer, uint32 durationTimer) override;
 
     void OnCreatureCreate(Creature* object) override;
     void OnCreatureRemove(Creature* object) override;

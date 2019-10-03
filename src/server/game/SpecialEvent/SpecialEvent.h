@@ -63,6 +63,7 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         uint32 GetDurationTimer() { return _noEventTime; }
         time_t GetTimeOfNextEvent() { return _gameTimeNextEvent; }
         void RegisterEvent(SpecialEventId eventId);
+        void RegisterZoneIdForEvent(uint32 zoneId);
         SpecialEventId GetEventId() const { return _eventId; }
         // Battle timer
         uint32 GetTimer() const { return _timer.GetExpiry(); }
