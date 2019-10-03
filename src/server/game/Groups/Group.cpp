@@ -35,6 +35,7 @@
 #include "Log.h"
 #include "LFGMgr.h"
 #include "Random.h"
+#include "SpecialEvent.h"
 #include "SpellAuras.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
@@ -2540,9 +2541,9 @@ void Group::SetBattlegroundGroup(Battleground* bg)
     m_bgGroup = bg;
 }
 
-void Group::SetBattlefieldGroup(Battlefield *bg)
+void Group::SetBattlefieldGroup(SpecialEvent* bf)
 {
-    m_bfGroup = bg;
+    m_bfGroup = bf;
 }
 
 void Group::SetGroupMemberFlag(ObjectGuid guid, bool apply, GroupMemberFlags flag)

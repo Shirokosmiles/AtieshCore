@@ -27,8 +27,8 @@
 #include "Timer.h"
 #include <map>
 
-class Battlefield;
 class Battleground;
+class SpecialEvent;
 class Creature;
 class InstanceSave;
 class Map;
@@ -255,7 +255,7 @@ class TC_GAME_API Group
         void ConvertToRaid();
 
         void SetBattlegroundGroup(Battleground* bg);
-        void SetBattlefieldGroup(Battlefield* bf);
+        void SetBattlefieldGroup(SpecialEvent* bf);
         GroupJoinBattlegroundResult CanJoinBattlegroundQueue(Battleground const* bgOrTemplate, BattlegroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
 
         void ChangeMembersGroup(ObjectGuid guid, uint8 group);
@@ -358,7 +358,7 @@ class TC_GAME_API Group
         Difficulty          m_dungeonDifficulty;
         Difficulty          m_raidDifficulty;
         Battleground*       m_bgGroup;
-        Battlefield*        m_bfGroup;
+        SpecialEvent*       m_bfGroup;
         ObjectGuid          m_targetIcons[TARGETICONCOUNT];
         LootMethod          m_lootMethod;
         ItemQualities       m_lootThreshold;

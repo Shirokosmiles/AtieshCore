@@ -18,26 +18,34 @@
 #ifndef SPECIALEVENT_H_
 #define SPECIALEVENT_H_
 
+#include "Player.h"
 #include "Timer.h"
 #include "SharedDefines.h"
+#include "ObjectMgr.h"
+#include "ZoneScript.h"
 
-enum SpecialEventId
+namespace WorldPackets
 {
-    SPECIALEVENT_EVENTID_WINTERGRASP   = 1, // Wintergrasp (for Future implementation)
-    SPECIALEVENT_EVENTID_DALARANCRATER = 2, // Dalaran Crater PVP battle
-    SPECIALEVENT_EVENTID_MAX
-};
+    namespace WorldState
+    {
+        class InitWorldStates;
+    }
+}
 
 enum SpecialEventTimers
 {
-    SPECIALEVENT_OBJECTIVE_UPDATE_INTERVAL = 1000,
-    SPECIALEVENT_RESURRECT_ITERVAL = 30000
+    SPECIALEVENT_OBJECTIVE_UPDATE_INTERVAL = 1000
 };
-class SpecialEvent;
-class TC_GAME_API SpecialEvent
+
+class BattlefieldGraveyard;
+class ObjectGuid;
+class Player;
+class Unit;
+
+class TC_GAME_API SpecialEvent : public ZoneScript
 {
     friend class SpecialEventMgr;
-    public:
+    public:        
 
         // ctor
         SpecialEvent();
@@ -51,38 +59,74 @@ class TC_GAME_API SpecialEvent
         bool IsEnabled() const { return _enabled; }
         bool IsActiveTime() const { return _active; }
 
-        /*void SetId(uint32 id) { _eventId = id; }
-        void SetNormalTimer(uint32 timer) { _EventTime = timer; }
-        void SetDurationTimer(uint32 timer) { _noEventTime = timer; }
-
-        void SetTimer(uint32 timer) { _timer.Reset(timer); }       
-        */
-        uint32 GetEventId() { return _eventId; }
         uint32 GetCooldownTimer() { return _EventTime; }
         uint32 GetDurationTimer() { return _noEventTime; }
         time_t GetTimeOfNextEvent() { return _gameTimeNextEvent; }
-        void RegisterEvent(uint32 eventId);
+        void RegisterEvent(SpecialEventId eventId);
+        SpecialEventId GetEventId() const { return _eventId; }
+        // Battle timer
+        uint32 GetTimer() const { return _timer.GetExpiry(); }
 
         // Functions for each Event Scripts
-        virtual bool SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer);
+        virtual bool SetupSpecialEvent(bool active, bool enabled, SpecialEventId id, uint32 cooldownTimer, uint32 durationTimer);
         virtual void Update(uint32 diff);
         virtual void OnSpecialEventStart() { }
         virtual void OnSpecialEventEnd(bool /*endByTimer*/) { }
         virtual void AddPlayer(ObjectGuid /*playerGUID*/) { }
         virtual void RemovePlayer(ObjectGuid /*playerGUID*/) { }
         virtual bool IsPossibleToRegister() { return true; }
-        virtual bool IsMemberOfEvent(Player* /*player*/) { return false; }
+        virtual bool IsMemberOfEvent(Player* /*player*/) { return false; }        
         virtual uint32 GetCountPlayerInEvent() { return 0; }
 
+        // Can players inside the battlefield zone use ground mounts?
+        virtual bool IsMountAllowed() const { return true; }
+        // Can players inside the battlefield zone use flying mounts?
+        virtual bool IsFlyingMountAllowed() const { return true; }
+        // Is the referenced SpellArea spellId allowed for the referenced player and newArea?
+        virtual bool IsSpellAreaAllowed(uint32 /*spellId*/, Player const* /*player*/, uint32 /*newArea*/) const { return false; }
+
+        // Zone Sector
+        // Called when a player enters the battlefield zone
+        virtual void HandlePlayerEnterZone(Player* player) { }
+        // Called when a player leaves the battlefield zone
+        virtual void HandlePlayerLeaveZone(Player* player) { }
+        // Called when a player inside the battlefield zone kills a unit
+        virtual void HandleKill(Player* /*killer*/, Unit* /*victim*/) { }
+        // Called when a player queries a gossip from a spirit healer
+        virtual void HandleAreaSpiritHealerQueryOpcode(Player* /*player*/, ObjectGuid /*source*/) { }
+        // Called when a player moves into a resurrection queue
+        virtual void HandleAddPlayerToResurrectionQueue(Player* /*player*/, ObjectGuid /*source*/) { }
+        // Called when a player moves out of a resurrection queue
+        virtual void HandleRemovePlayerFromResurrectionQueue(Player* /*player*/) { }
+
+        virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
+        virtual void SendGlobalWorldStates(Player const* /*player*/) const { }
+
+        // Closest available graveyard WorldSafeLocsEntry for Player's TeamId
+        virtual WorldSafeLocsEntry const* GetClosestGraveyardLocation(Player* who)
+        {
+            return sObjectMgr->GetClosestGraveyard(who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), who->GetMapId(), who->GetTeam());
+        }
+
+        // enum PvPTeamId
+        virtual PvPTeamId GetControllingTeam() const { return PVP_TEAM_NEUTRAL; }
+        // enum PvPTeamId
+        virtual PvPTeamId GetAttackingTeam() const { return PVP_TEAM_NEUTRAL; }
+        // enum TeamId
+        virtual TeamId GetControllingTeamId() const { return TEAM_NEUTRAL; }
+        // enum TeamId
+        virtual TeamId GetAttackingTeamId() const { return TEAM_NEUTRAL; }        
+
     protected:
+        // constant information
+        SpecialEventId _eventId;
         TimeTrackerSmall _timer;
         bool _active;
         bool _enabled;
         // from database
-        uint32 _eventId;
         uint32 _EventTime;      // length of the event
         uint32 _noEventTime;    // time between two events
-        time_t _gameTimeNextEvent;
+        time_t _gameTimeNextEvent;        
 };
 
 #endif

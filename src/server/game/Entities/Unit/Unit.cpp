@@ -18,8 +18,6 @@
 
 #include "Unit.h"
 #include "AbstractFollower.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "BattlegroundScore.h"
 #include "CellImpl.h"
@@ -11316,22 +11314,26 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
         }
     }
 
-    // outdoor pvp things, do these after setting the death state, else the player activity notify won't work... doh...
-    // handle player kill only if not suicide (spirit of redemption for example)
+    // OutdoorPvP, must be done after setting the death state, else the player activity notify won't work
+    //   - handle only if not suicide
     if (player && attacker != victim)
     {
-        if (OutdoorPvP* pvp = player->GetOutdoorPvP())
-            pvp->HandleKill(player, victim);
+        if (OutdoorPvP* outdoorPVP = player->GetOutdoorPvP())
+            outdoorPVP->HandleKill(player, victim);
+    }
 
-        if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(player->GetZoneId()))
-            battlefield->HandleKill(player, victim);
+    // SpecialEvent (battlefield)
+    if (player)
+    {
+        if (SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(player->GetZoneId()))
+            se->HandleKill(player, victim);
     }
 
     //if (victim->GetTypeId() == TYPEID_PLAYER)
     //    if (OutdoorPvP* pvp = victim->ToPlayer()->GetOutdoorPvP())
     //        pvp->HandlePlayerActivityChangedpVictim->ToPlayer();
 
-    // battleground things (do this at the end, so the death state flag will be properly set to handle in the bg->handlekill)
+    // Battleground, must be done after setting the death state
     if (player && player->InBattleground())
     {
         if (Battleground* bg = player->GetBattleground())
@@ -11377,7 +11379,7 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
     {
         if (victim->ToPlayer())
         {
-            if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEvent(SPECIALEVENT_EVENTID_DALARANCRATER))
+            if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_DALARANCRATER))
                 DalaranEvent->RemovePlayer(victim->ToPlayer()->GetGUID());
         }
 

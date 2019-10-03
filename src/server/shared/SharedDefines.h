@@ -3526,12 +3526,24 @@ enum BanReturn
 
 enum PvPTeamId
 {
-    PVP_TEAM_HORDE       = 0, // Battleground: Horde,    Arena: Green
-    PVP_TEAM_ALLIANCE    = 1, // Battleground: Alliance, Arena: Gold
-    PVP_TEAM_NEUTRAL     = 2  // Battleground: Neutral,  Arena: None
+    PVP_TEAM_HORDE    = 0, // Battleground/Battlefield: Horde,    Arena: Green
+    PVP_TEAM_ALLIANCE = 1, // Battleground/Battlefield: Alliance, Arena: Gold
+    PVP_TEAM_NEUTRAL  = 2  // Battleground/Battlefield: Neutral,  Arena: None
 };
 
-uint8 constexpr PVP_TEAMS_COUNT = 2;
+static uint8 constexpr PVP_TEAMS_COUNT = 2;
+
+constexpr TeamId TeamIdByPvPTeamId(PvPTeamId value)
+{
+    switch (value)
+    {
+        case PVP_TEAM_HORDE: return TEAM_HORDE;
+        case PVP_TEAM_ALLIANCE: return TEAM_ALLIANCE;
+        case PVP_TEAM_NEUTRAL: return TEAM_NEUTRAL;
+        default: break;
+    }
+    return TEAM_NEUTRAL;
+}
 
 // indexes of BattlemasterList.dbc
 enum BattlegroundTypeId : uint32
@@ -3552,13 +3564,26 @@ enum BattlegroundTypeId : uint32
     BATTLEGROUND_RB             = 32  // Random Battleground
 };
 
-#define MAX_BATTLEGROUND_TYPE_ID 33
+static uint32 constexpr MAX_BATTLEGROUND_TYPE_ID = 33;
 
-/*enum BattlefieldBattleId : uint8
+enum BattlefieldBattleId : uint32
 {
     BATTLEFIELD_BATTLEID_WINTERGRASP = 1, // Wintergrasp battle
-    BATTLEFIELD_BATTLEID_MAX = 2
-};*/
+    BATTLEFIELD_BATTLEID_MAX         = 2
+};
+
+enum BattlefieldZoneId : uint32
+{
+    BATTLEFIELD_ZONEID_WINTERGRASP = 4197 // Wintergrasp battle zone
+};
+
+enum SpecialEventId : uint32
+{
+    SPECIALEVENT_EVENTID_NONE          = 0,
+    SPECIALEVENT_EVENTID_WINTERGRASP   = 1, // Wintergrasp (for Future implementation)
+    SPECIALEVENT_EVENTID_DALARANCRATER = 2, // Dalaran Crater PVP battle
+    SPECIALEVENT_EVENTID_MAX
+};
 
 enum MailResponseType
 {

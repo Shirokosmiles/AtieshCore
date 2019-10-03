@@ -20,6 +20,7 @@
 #include "SpecialEvent.h"
 #include "Log.h"
 #include "Player.h"
+#include "ZoneScript.h"
 
 SpecialEventMgr::SpecialEventMgr()
 {
@@ -34,6 +35,7 @@ void SpecialEventMgr::Die()
     m_SpecialEventSet.clear();
     m_SpecialEventDatas.fill(0);
     m_SpecialEventMap.clear();
+    m_SpecialEventZoneMap.clear();
 }
 
 SpecialEventMgr* SpecialEventMgr::instance()
@@ -55,7 +57,7 @@ void SpecialEventMgr::InitSpecialEvents()
     }
 
     uint32 count = 0;
-    uint32 typeId = 0;
+    SpecialEventId typeId = SPECIALEVENT_EVENTID_NONE;
     uint32 cooldownTimer = 0;
     uint32 durationTimer = 0;
     uint32 activeStatus = 0;
@@ -66,15 +68,15 @@ void SpecialEventMgr::InitSpecialEvents()
     {
         Field* fields = result->Fetch();
 
-        typeId = fields[0].GetUInt8();        
+        typeId = SpecialEventId(fields[0].GetUInt8());
 
         if (typeId >= SPECIALEVENT_EVENTID_MAX)
         {
-            TC_LOG_ERROR("sql.sql", "Invalid Special Event TypeId value %u in special_events; skipped.", typeId);
+            TC_LOG_ERROR("sql.sql", "Invalid Special Event TypeId value %u in special_events; skipped.", uint8(typeId));
             continue;
         }
 
-        SpecialEventId realTypeId = SpecialEventId(typeId);
+        SpecialEventId realTypeId = typeId;
         m_SpecialEventDatas[realTypeId] = sObjectMgr->GetScriptId(fields[1].GetString());
 
         cooldownTimer = fields[2].GetUInt32();
@@ -117,9 +119,48 @@ void SpecialEventMgr::InitSpecialEvents()
     TC_LOG_INFO("server.loading", ">> Loaded %u Special Event definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));    
 }
 
-SpecialEvent* SpecialEventMgr::GetEnabledSpecialEvent(uint32 eventId)
+void SpecialEventMgr::Update(uint32 diff)
 {
-    SpecialEventMap::iterator itr = m_SpecialEventMap.find(eventId);
+    _updateTimer += diff;
+    if (_updateTimer > SPECIALEVENT_OBJECTIVE_UPDATE_INTERVAL)
+    {
+        for (SpecialEventSet::const_iterator itr = m_SpecialEventSet.begin(); itr != m_SpecialEventSet.end(); ++itr)
+            (*itr)->Update(_updateTimer);
+        _updateTimer = 0;
+    }
+}
+
+void SpecialEventMgr::AddEvent(SpecialEventId eventId, SpecialEvent* handle)
+{
+    m_SpecialEventMap[eventId] = handle;
+}
+
+SpecialEvent* SpecialEventMgr::GetSpecialEventByEventId(SpecialEventId eventId) const
+{
+    SpecialEventMap::const_iterator itr = m_SpecialEventMap.find(eventId);
+    if (itr != m_SpecialEventMap.end())
+        return itr->second;
+    else
+        return nullptr;
+
+    return nullptr;
+}
+
+SpecialEvent* SpecialEventMgr::GetSpecialEventByZoneId(uint32 zoneId) const
+{
+    SpecialEventZoneMap::const_iterator itr = m_SpecialEventZoneMap.find(zoneId);
+    if (itr == m_SpecialEventZoneMap.end())
+        return nullptr;
+
+    if (!itr->second->IsEnabled())
+        return nullptr;
+
+    return itr->second;
+}
+
+SpecialEvent* SpecialEventMgr::GetEnabledSpecialEventByEventId(SpecialEventId eventId) const
+{
+    SpecialEventMap::const_iterator itr = m_SpecialEventMap.find(eventId);
     if (itr == m_SpecialEventMap.end())
         return nullptr;
 
@@ -129,30 +170,54 @@ SpecialEvent* SpecialEventMgr::GetEnabledSpecialEvent(uint32 eventId)
     return itr->second;
 }
 
-SpecialEvent* SpecialEventMgr::GetSpecialEvent(SpecialEventId eventId)
+SpecialEvent* SpecialEventMgr::GetEnabledSpecialEventByZoneId(uint32 zoneId) const
 {
-    SpecialEventMap::iterator itr = m_SpecialEventMap.find(eventId);
-    if (itr == m_SpecialEventMap.end())
-        return nullptr;
-
-    if (itr->second->GetEventId() == eventId)
+    SpecialEventZoneMap::const_iterator itr = m_SpecialEventZoneMap.find(zoneId);
+    if (itr != m_SpecialEventZoneMap.end())
         return itr->second;
-
-    return nullptr;
+    else
+        return nullptr;
 }
 
-void SpecialEventMgr::Update(uint32 diff)
+// Zone sector
+void SpecialEventMgr::AddZone(uint32 zoneId, SpecialEvent* handle)
 {
-    _updateTimer += diff;
-    if (_updateTimer > SPECIALEVENT_OBJECTIVE_UPDATE_INTERVAL)
-    {
-        for (SpecialEventSet::iterator itr = m_SpecialEventSet.begin(); itr != m_SpecialEventSet.end(); ++itr)
-            (*itr)->Update(_updateTimer);
-        _updateTimer = 0;
-    }
+    m_SpecialEventZoneMap[zoneId] = handle;
 }
 
-void SpecialEventMgr::AddEvent(uint32 eventId, SpecialEvent* handle)
+ZoneScript* SpecialEventMgr::GetZoneScriptbyZoneId(uint32 zoneId) const
 {
-    m_SpecialEventMap[eventId] = handle;
+    SpecialEventZoneMap::const_iterator itr = m_SpecialEventZoneMap.find(zoneId);
+    if (itr == m_SpecialEventZoneMap.end())
+        return itr->second;
+    else
+        return nullptr;
 }
+
+ZoneScript* SpecialEventMgr::GetZoneScriptbyEventId(SpecialEventId eventId) const
+{
+    SpecialEventMap::const_iterator itr = m_SpecialEventMap.find(eventId);
+    if (itr != m_SpecialEventMap.end())
+        return itr->second;
+    else
+        return nullptr;
+}
+
+void SpecialEventMgr::HandlePlayerEnterZone(Player* player, uint32 zoneId)
+{
+    SpecialEventZoneMap::const_iterator itr = m_SpecialEventZoneMap.find(zoneId);
+    if (itr == m_SpecialEventZoneMap.end())
+        return;
+
+    itr->second->HandlePlayerEnterZone(player);
+}
+
+void SpecialEventMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneId)
+{
+    SpecialEventZoneMap::const_iterator itr = m_SpecialEventZoneMap.find(zoneId);
+    if (itr == m_SpecialEventZoneMap.end())
+        return;
+
+    itr->second->HandlePlayerLeaveZone(player);
+}
+

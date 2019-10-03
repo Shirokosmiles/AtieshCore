@@ -508,12 +508,15 @@ void WorldSession::LogoutPlayer(bool save)
             _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
 
         sOutdoorPvPMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
+        sSpecialEventMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
 
-        if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEvent(SPECIALEVENT_EVENTID_DALARANCRATER))
+        // TODO rework by leaveZone for Dalaran
+        /*
+        if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_DALARANCRATER))
         {
             if (DalaranEvent->IsMemberOfEvent(_player))
                 DalaranEvent->RemovePlayer(_player->GetGUID());
-        }
+        }*/
 
         for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
         {

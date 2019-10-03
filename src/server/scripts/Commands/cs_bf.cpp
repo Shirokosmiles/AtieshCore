@@ -23,8 +23,8 @@ Category: commandscripts
 EndScriptData */
 
 #include "ScriptMgr.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
+#include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
 #include "Chat.h"
 #include "Language.h"
 #include "RBAC.h"
@@ -34,11 +34,11 @@ class bf_commandscript : public CommandScript
 public:
     bf_commandscript() : CommandScript("bf_commandscript") { }
 
-    static std::string GetBattleIdString(BattlefieldId battleId)
+    static std::string GetBattleIdString(SpecialEventId battleId)
     {
         switch (battleId)
         {
-            case BATTLEFIELD_BATTLEID_WINTERGRASP:
+            case SPECIALEVENT_EVENTID_WINTERGRASP:
                 return "Wintergrasp";
             default:
                 return "";
@@ -49,11 +49,11 @@ public:
     {
         static std::vector<ChatCommand> battlefieldcommandTable =
         {
-            { "start",          rbac::RBAC_PERM_COMMAND_BF_START,  false, &HandleBattlefieldStart,  "" },
-            { "stop",           rbac::RBAC_PERM_COMMAND_BF_STOP,   false, &HandleBattlefieldEnd,    "" },
-            { "switch",         rbac::RBAC_PERM_COMMAND_BF_SWITCH, false, &HandleBattlefieldSwitch, "" },
-            { "timer",          rbac::RBAC_PERM_COMMAND_BF_TIMER,  false, &HandleBattlefieldTimer,  "" },
-            { "enable",         rbac::RBAC_PERM_COMMAND_BF_ENABLE, false, &HandleBattlefieldEnable, "" },
+            { "start",          rbac::RBAC_PERM_COMMAND_BF_START,  false, /*&HandleBattlefieldStart*/nullptr,  "" },
+            { "stop",           rbac::RBAC_PERM_COMMAND_BF_STOP,   false, /*&HandleBattlefieldEnd*/nullptr,    "" },
+            { "switch",         rbac::RBAC_PERM_COMMAND_BF_SWITCH, false, /*&HandleBattlefieldSwitch*/nullptr, "" },
+            { "timer",          rbac::RBAC_PERM_COMMAND_BF_TIMER,  false, /*&HandleBattlefieldTimer*/nullptr,  "" },
+            { "enable",         rbac::RBAC_PERM_COMMAND_BF_ENABLE, false, /*&HandleBattlefieldEnable*/nullptr, "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -62,6 +62,7 @@ public:
         return commandTable;
     }
 
+    /*
     static bool HandleBattlefieldStart(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -241,6 +242,7 @@ public:
         handler->PSendSysMessage(LANG_COMMAND_BF_TIMER, GetBattleIdString(battleId), battlefield->GetTimer(), battlefield->IsWarTime() ? "war time" : "no war time");
         return true;
     }
+    */
 };
 
 void AddSC_bf_commandscript()

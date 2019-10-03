@@ -23,9 +23,8 @@
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Bag.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
-#include "BattlefieldWG.h"
+#include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundScore.h"
@@ -2127,7 +2126,7 @@ void Player::RemoveFromWorld()
         if (!lootGuid.IsEmpty())
             m_session->DoLootRelease(lootGuid);
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
-        sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
+        sSpecialEventMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
     }
 
     // Remove items from world before self - player must be found in Item::RemoveFromObjectUpdate
@@ -5197,32 +5196,32 @@ void Player::RepopAtGraveyard()
         SpawnCorpseBones();
     }
 
-    WorldSafeLocsEntry const* ClosestGrave;
+    WorldSafeLocsEntry const* ClosestGraveyard;
 
     // Special handle for battleground maps
     if (Battleground* bg = GetBattleground())
-        ClosestGrave = bg->GetClosestGraveyard(this);
+        ClosestGraveyard = bg->GetClosestGraveyard(this);
     else
     {
-        if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(GetZoneId()))
-            ClosestGrave = battlefield->GetClosestGraveyard(this);
+        if (SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(GetZoneId()))
+            ClosestGraveyard = battlefield->GetClosestGraveyardLocation(this);
         else
-            ClosestGrave = sObjectMgr->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
+            ClosestGraveyard = sObjectMgr->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
     }
 
     // stop countdown until repop
     m_deathTimer = 0;
 
-    // if no grave found, stay at the current location
+    // if no grave is found, stay at the current location
     // and don't show spirit healer location
-    if (ClosestGrave)
+    if (ClosestGraveyard)
     {
-        TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, GetOrientation(), shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
-        if (isDead())                                        // not send if alive, because it used in TeleportTo()
+        TeleportTo(ClosestGraveyard->map_id, ClosestGraveyard->x, ClosestGraveyard->y, ClosestGraveyard->z, GetOrientation(), shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
+        if (isDead()) // don't send if alive, it's used in TeleportTo()
         {
-            WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4*4);  // show spirit healer position on minimap
-            data << ClosestGrave->map_id;
-            data << TaggedPosition<Position::XYZ>(ClosestGrave->x, ClosestGrave->y, ClosestGrave->z);
+            WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4 * 4); // show spirit healer position on minimap
+            data << ClosestGraveyard->map_id;
+            data << TaggedPosition<Position::XYZ>(ClosestGraveyard->x, ClosestGraveyard->y, ClosestGraveyard->z);
             SendDirectMessage(&data);
         }
     }
@@ -7284,7 +7283,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     if (oldZone != newZone)
     {
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, oldZone);
-        sBattlefieldMgr->HandlePlayerLeaveZone(this, oldZone);
+        sSpecialEventMgr->HandlePlayerLeaveZone(this, oldZone);
     }
 
     // group update
@@ -7356,7 +7355,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     if (oldZone != newZone)
     {
         sOutdoorPvPMgr->HandlePlayerEnterZone(this, newZone);
-        sBattlefieldMgr->HandlePlayerEnterZone(this, newZone);
+        sSpecialEventMgr->HandlePlayerEnterZone(this, newZone);
         SendInitWorldStates(newZone, newArea);              // only if really enters to new zone, not just area change, works strange...
         if (Guild* guild = GetGuild())
             guild->UpdateMemberData(this, GUILD_MEMBER_DATA_ZONEID, newZone);
@@ -8564,7 +8563,7 @@ bool Player::CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const
 void Player::RemovedInsignia(Player* looterPlr)
 {
     // If player is not in battleground and not in wintergrasp
-    if (!GetBattlegroundId() && GetZoneId() != AREA_WINTERGRASP)
+    if (!GetBattlegroundId() && !sSpecialEventMgr->GetEnabledSpecialEventByZoneId(GetZoneId()))
         return;
 
     // If not released spirit, do it !
@@ -8811,7 +8810,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                     loot->FillLoot(PLAYER_CORPSE_LOOT_ENTRY, LootTemplates_Creature, this, true);
             }
             // For wintergrasp Quests
-            else if (GetZoneId() == AREA_WINTERGRASP)
+            else if (GetZoneId() == BATTLEFIELD_ZONEID_WINTERGRASP)
                 loot->FillLoot(PLAYER_CORPSE_LOOT_ENTRY, LootTemplates_Creature, this, true);
 
             // It may need a better formula
@@ -9027,7 +9026,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     Battleground* battleground = GetBattleground();
     OutdoorPvP* outdoorPvP = sOutdoorPvPMgr->GetOutdoorPvPToZoneId(zoneId);
     InstanceScript* instance = GetInstanceScript();
-    Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(zoneId);
+    SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(zoneId);
 
     TC_LOG_DEBUG("network", "Player::SendInitWorldStates: Sending SMSG_INIT_WORLD_STATES for Map: %u, Zone: %u", mapId, zoneId);
 
@@ -9612,9 +9611,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
         }
         break;
     case 4197: // Wintergrasp
-        if (battlefield && battlefield->GetBattleId() == BATTLEFIELD_BATTLEID_WINTERGRASP)
+        if (se && se->GetEventId() == SPECIALEVENT_EVENTID_WINTERGRASP)
         {
-            battlefield->FillInitialWorldStates(packet);
+            se->FillInitialWorldStates(packet);
             break;
         }
     default:
@@ -9643,16 +9642,8 @@ void Player::SendBGWeekendWorldStates() const
 
 void Player::SendBattlefieldWorldStates() const
 {
-    /// Send misc stuff that needs to be sent on every login, like the battle timers.
-    if (sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
-    {
-        if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP))
-        {
-            SendUpdateWorldState(WORLDSTATE_WINTERGRASP_ACTIVE, battlefield->IsWarTime() ? 0 : 1);
-            uint32 timer = battlefield->IsWarTime() ? 0 : (battlefield->GetTimer() / 1000); // 0 - Time to next battle
-            SendUpdateWorldState(ClockWorldState[1], uint32(GameTime::GetGameTime() + timer));
-        }
-    }
+    if (SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(SPECIALEVENT_EVENTID_WINTERGRASP))
+        battlefield->SendGlobalWorldStates(this);
 }
 
 uint32 Player::GetXPRestBonus(uint32 xp)

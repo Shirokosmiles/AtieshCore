@@ -44,7 +44,7 @@ DalaranGEvent::DalaranGEvent()
     playersTimer.Reset(IN_MILLISECONDS);
 }
 
-bool DalaranGEvent::SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
+bool DalaranGEvent::SetupSpecialEvent(bool active, bool enabled, SpecialEventId id, uint32 cooldownTimer, uint32 durationTimer)
 {
     // override Setup for Set time of first run in cooldownTimer
     if (SpecialEvent::SetupSpecialEvent(active, enabled, id, cooldownTimer, durationTimer))

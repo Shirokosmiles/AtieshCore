@@ -24,8 +24,8 @@ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "Bag.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
+#include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Chat.h"
@@ -1751,8 +1751,8 @@ public:
                 nearestLoc = bg->GetClosestGraveyard(player);
             else
             {
-                if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(player->GetZoneId()))
-                    nearestLoc = battlefield->GetClosestGraveyard(player);
+                if (SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(player->GetZoneId()))
+                    nearestLoc = battlefield->GetClosestGraveyardLocation(player);
                 else
                     nearestLoc = sObjectMgr->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam());
             }

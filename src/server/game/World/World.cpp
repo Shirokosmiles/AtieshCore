@@ -28,7 +28,6 @@
 #include "ArenaTeamMgr.h"
 #include "AuctionHouseBot.h"
 #include "AuctionHouseMgr.h"
-#include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
 #include "CalendarMgr.h"
 #include "ChannelMgr.h"
@@ -1604,7 +1603,7 @@ void World::LoadConfigSettings(bool reload)
 
     // Wintergrasp battlefield
     m_bool_configs[CONFIG_WINTERGRASP_ENABLE] = sConfigMgr->GetBoolDefault("Wintergrasp.Enable", false);
-    m_int_configs[CONFIG_WINTERGRASP_PLR_MAX] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMax", 100);
+    m_int_configs[CONFIG_WINTERGRASP_PLR_MAX] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMax", 120);
     m_int_configs[CONFIG_WINTERGRASP_PLR_MIN] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMin", 0);
     m_int_configs[CONFIG_WINTERGRASP_PLR_MIN_LVL] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMinLvl", 77);
     m_int_configs[CONFIG_WINTERGRASP_BATTLETIME] = sConfigMgr->GetIntDefault("Wintergrasp.BattleTimer", 30);
@@ -2301,10 +2300,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Starting Outdoor PvP System");
     sOutdoorPvPMgr->InitOutdoorPvP();
 
-    ///- Initialize Battlefield
-    TC_LOG_INFO("server.loading", "Starting Battlefield System");
-    sBattlefieldMgr->Initialize();
-
     ///- Initialize Special Events
     TC_LOG_INFO("server.loading", "Starting SpecialEvents System");
     sSpecialEventMgr->InitSpecialEvents();
@@ -2591,9 +2586,6 @@ void World::Update(uint32 diff)
 
     sOutdoorPvPMgr->Update(diff);
     sWorldUpdateTime.RecordUpdateTimeDuration("UpdateOutdoorPvPMgr");
-
-    sBattlefieldMgr->Update(diff);
-    sWorldUpdateTime.RecordUpdateTimeDuration("BattlefieldMgr");
 
     sSpecialEventMgr->Update(diff);
     sWorldUpdateTime.RecordUpdateTimeDuration("SpecialEventMgr");

@@ -17,8 +17,6 @@
  */
 
 #include "Spell.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Common.h"
@@ -44,6 +42,8 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
+#include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellHistory.h"
 #include "SpellInfo.h"
@@ -6267,9 +6267,9 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                 // allow always ghost flight spells
                 if (m_originalCaster && m_originalCaster->GetTypeId() == TYPEID_PLAYER && m_originalCaster->IsAlive())
                 {
-                    if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(m_originalCaster->GetZoneId()))
+                    if (SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(m_originalCaster->GetZoneId()))
                     {
-                        if (battlefield && !battlefield->CanFlyIn())
+                        if (battlefield && !battlefield->IsFlyingMountAllowed())
                             return SPELL_FAILED_NOT_HERE;
                     }
                     if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(m_originalCaster->GetAreaId()))

@@ -15,13 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "BattlefieldEntities.h"
 #include "GameTime.h"
 #include "SpecialEvent.h"
 #include "SpecialEventMgr.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 
-SpecialEvent::SpecialEvent() : _timer(0), _active(false), _enabled(true), _eventId(0), _noEventTime(0), _gameTimeNextEvent(0) { }
+SpecialEvent::SpecialEvent() : _eventId(SPECIALEVENT_EVENTID_NONE), _timer(0), _active(false), _enabled(true), _noEventTime(0), _gameTimeNextEvent(0) { }
 
 SpecialEvent::~SpecialEvent() { }
 
@@ -41,12 +42,12 @@ void SpecialEvent::Update(uint32 diff)
     }
 }
 
-void SpecialEvent::RegisterEvent(uint32 eventId)
+void SpecialEvent::RegisterEvent(SpecialEventId eventId)
 {
     sSpecialEventMgr->AddEvent(eventId, this);
 }
 
-bool SpecialEvent::SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
+bool SpecialEvent::SetupSpecialEvent(bool active, bool enabled, SpecialEventId id, uint32 cooldownTimer, uint32 durationTimer)
 {
     if (!enabled || !id || !cooldownTimer || !durationTimer)
         return false;
@@ -87,3 +88,4 @@ void SpecialEvent::EndSpecialEvent(bool endByTimer)
 
     OnSpecialEventEnd(endByTimer);
 }
+

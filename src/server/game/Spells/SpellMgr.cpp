@@ -17,8 +17,6 @@
  */
 
 #include "SpellMgr.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
 #include "Containers.h"
@@ -30,6 +28,8 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SharedDefines.h"
+#include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
 #include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellInfo.h"
@@ -716,8 +716,11 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
 
     if (player)
     {
-        if (Battleground* bg = player->GetBattleground())
-            return bg->IsSpellAllowed(spellId, player);
+        if (Battleground * battleground = player->GetBattleground())
+            return battleground->IsSpellAllowed(spellId, player);
+
+        if (SpecialEvent * battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(newZone))
+            return battlefield->IsSpellAreaAllowed(spellId, player, newArea);
     }
 
     // Extra conditions
@@ -740,8 +743,8 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player || !player->IsAlive())
                 return false;
 
-            Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(player->GetZoneId());
-            if (!battlefield || battlefield->CanFlyIn() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
+            SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(player->GetZoneId());
+            if (!battlefield || battlefield->IsFlyingMountAllowed() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
                 return false;
             break;
         }
@@ -751,8 +754,8 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player)
                 return false;
 
-            Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(player->GetZoneId());
-            if (!battlefield || battlefield->GetBattleId() != BATTLEFIELD_BATTLEID_WINTERGRASP)
+            SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(player->GetZoneId());
+            if (!battlefield || battlefield->GetEventId() != SPECIALEVENT_EVENTID_WINTERGRASP)
                 return false;
 
             // team that controls the workshop in the specified area
@@ -770,8 +773,8 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player)
                 return false;
 
-            if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP))
-                return battlefield->IsEnabled() && player->GetTeamId() == battlefield->GetDefenderTeam() && !battlefield->IsWarTime();
+            if (SpecialEvent * battlefield = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_WINTERGRASP))
+                return player->GetTeamId() == battlefield->GetControllingTeam() && !battlefield->IsActiveTime();
             break;
         }
         case 74411: // Battleground - Dampening
@@ -779,8 +782,8 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player)
                 return false;
 
-            if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(player->GetZoneId()))
-                return battlefield->IsWarTime();
+            if (SpecialEvent * battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(player->GetZoneId()))
+                return battlefield->IsActiveTime();
             break;
         }
 

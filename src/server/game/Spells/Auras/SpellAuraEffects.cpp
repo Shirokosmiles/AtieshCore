@@ -17,8 +17,6 @@
  */
 
 #include "SpellAuraEffects.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Common.h"
@@ -4502,8 +4500,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             {
                                 if (Battleground* bg = target->ToPlayer()->GetBattleground())
                                     bg->RemovePlayerFromResurrectQueue(target->GetGUID());
-                                if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(target->GetZoneId()))
-                                    battlefield->RemovePlayerFromResurrectQueue(target->GetGUID());
                             }
                             break;
                         case 36730:                                     // Flame Strike

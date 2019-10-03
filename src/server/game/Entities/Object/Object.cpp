@@ -17,7 +17,6 @@
  */
 
 #include "Object.h"
-#include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "CinematicMgr.h"
@@ -38,6 +37,8 @@
 #include "ReputationMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
+#include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
 #include "TemporarySummon.h"
 #include "Totem.h"
 #include "Transport.h"
@@ -1951,17 +1952,21 @@ void Map::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= null
 
 void WorldObject::SetZoneScript()
 {
-    if (Map* map = FindMap())
+    Map* map = FindMap();
+    if (!map)
+        return;
+
+    if (map->IsBattlegroundOrArena())
+        return;
+
+    if (map->IsDungeon())
+        m_zoneScript = (ZoneScript*)map->ToInstanceMap()->GetInstanceScript();
+    else
     {
-        if (map->IsDungeon())
-            m_zoneScript = (ZoneScript*)map->ToInstanceMap()->GetInstanceScript();
-        else if (!map->IsBattlegroundOrArena())
-        {
-            if (ZoneScript* battlefield = sBattlefieldMgr->GetZoneScript(GetZoneId()))
-                m_zoneScript = battlefield;
-            else
-                m_zoneScript = sOutdoorPvPMgr->GetZoneScript(GetZoneId());
-        }
+        if (SpecialEvent* battlefield = sSpecialEventMgr->GetSpecialEventByZoneId(GetZoneId()))
+            m_zoneScript = battlefield;
+        else
+            m_zoneScript = sOutdoorPvPMgr->GetZoneScript(GetZoneId());
     }
 }
 

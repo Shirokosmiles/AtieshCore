@@ -17,9 +17,6 @@
  */
 
 #include "AccountMgr.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
-#include "BattlefieldWG.h"
 #include "Battleground.h"
 #include "Common.h"
 #include "Corpse.h"
@@ -36,6 +33,8 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "Pet.h"
+#include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
 #include "RBAC.h"
 #include "Realm.h"
 #include "Transport.h"
@@ -175,30 +174,24 @@ void WorldSession::HandleMoveWorldportAck()
         allowMount = mInstance->AllowMount;
     }
 
-    // mount allow check
-    if (!allowMount)
-        player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
     // update zone immediately, otherwise leave channel will cause crash in mtmap
     uint32 newzone, newarea;
     player->GetZoneAndAreaId(newzone, newarea);
     player->UpdateZone(newzone, newarea);
 
-    bool InBattlefield = false;
-    if (loc.GetMapId() == MAPID_WINTERGRASP && newzone == ZONEID_WINTERGRASP)
-    {
-        if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(newzone))
-        {
-            if (battlefield->IsWarTime())
-                _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-            InBattlefield = true;
-        }
-    }
+    SpecialEvent* se = nullptr;
+    if (newzone == BATTLEFIELD_ZONEID_WINTERGRASP)
+        if (se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(newzone))
+            allowMount = se->IsMountAllowed();
+
+    // mount allow check
+    if (!allowMount)
+        player->RemoveAurasByType(SPELL_AURA_MOUNTED);    
 
     // flight fast teleport case
     if (GetPlayer()->IsInFlight())
     {
-        if (!_player->InBattleground() && !InBattlefield)
+        if (!player->InBattleground() && !se)
         {
             // short preparations to continue flight
             MovementGenerator* movementGenerator = GetPlayer()->GetMotionMaster()->GetCurrentMovementGenerator();
