@@ -4293,7 +4293,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         70834, // Bone Storm (Lord Marrowgar)
         70835, // Bone Storm (Lord Marrowgar)
         70836, // Bone Storm (Lord Marrowgar)
-        72864, // Death Plague (Rotting Frost Giant)
         71160, // Plague Stench (Stinky)
         71161, // Plague Stench (Stinky)
         71123  // Decimate (Stinky & Precious)
@@ -4985,6 +4984,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 47198, 47199, 47200 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_1].SpellClassMask[0] |= 0x00004000; // Drain soul
+    });
+
+    // Soul Sickness (Forge of Souls)
+    ApplySpellFix({ 69131 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_DECREASE_SPEED;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
