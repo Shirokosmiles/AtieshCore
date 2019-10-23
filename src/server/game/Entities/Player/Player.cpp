@@ -23436,13 +23436,28 @@ void Player::ResetSpells(bool myClassOnly)
 
 void Player::LearnCustomSpells()
 {
+    // learn default race/class spells
+    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getCFSRace(), GetClass());
+    ASSERT(info);
+    for (PlayerCreateInfoSpells::const_iterator itr = info->learnSpells.begin(); itr != info->learnSpells.end(); ++itr)
+    {
+        uint32 tspell = *itr;
+        TC_LOG_DEBUG("entities.player.loading", "Player::LearnSpells: Player '%s' (%s, Class: %u Race: %u): Adding initial spell (SpellID: %u)",
+            GetName().c_str(), GetGUID().ToString().c_str(), uint32(GetClass()), uint32(getCFSRace()), tspell);
+
+        if (!IsInWorld())                                    // will send in INITIAL_SPELLS in list anyway at map add
+            AddSpell(tspell, true, true, true, false);
+        else                                                // but send in normal spell in game learn case
+            LearnSpell(tspell, true);
+    }
+
     if (!sWorld->getBoolConfig(CONFIG_START_ALL_SPELLS))
         return;
 
     // learn default race/class spells
-    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getCFSRace(), GetClass());
-    ASSERT(info);
-    for (PlayerCreateInfoSpells::const_iterator itr = info->customSpells.begin(); itr != info->customSpells.end(); ++itr)
+    PlayerInfo const* sinfo = sObjectMgr->GetPlayerInfo(getCFSRace(), GetClass());
+    ASSERT(sinfo);
+    for (PlayerCreateInfoSpells::const_iterator itr = sinfo->customSpells.begin(); itr != sinfo->customSpells.end(); ++itr)
     {
         uint32 tspell = *itr;
         TC_LOG_DEBUG("entities.player.loading", "Player::LearnCustomSpells: Player '%s' (%s, Class: %u Race: %u): Adding initial spell (SpellID: %u)",

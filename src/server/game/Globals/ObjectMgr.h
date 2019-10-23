@@ -715,6 +715,7 @@ struct PlayerInfo
     PlayerCreateInfoItems item;
     PlayerCreateInfoSpells customSpells;
     PlayerCreateInfoSpells castSpells;
+    PlayerCreateInfoSpells learnSpells;
     PlayerCreateInfoActions action;
     PlayerCreateInfoSkills skills;
 
