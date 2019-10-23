@@ -813,6 +813,33 @@ bool Player::IsFromDiffFactionGuildWarWith(Player const* p) const
     return GetGuild()->GetGuildFaction() != p->GetGuild()->GetGuildFaction();
 }
 
+void Player::LearnSpellFromAutoLearnSpells(uint8 level)
+{
+    if (!sWorld->getBoolConfig(CONFIG_PLAYER_AUTO_LEARN_ENABLED))
+        return;
+
+    uint8 classid = GetClass();
+    uint8 raceid = getCFSRace();
+    PlayerAutoLearnContainer const& playerAutoLearnMap = sObjectMgr->GetPlayerAutoLearnMap();
+
+    for (PlayerAutoLearnContainer::const_iterator itr = playerAutoLearnMap.begin(); itr != playerAutoLearnMap.end(); ++itr)
+    {
+        PlayerAutoLearn const* pautolearn = &itr->second;
+        if (pautolearn->reqlevel != level)
+            continue;
+
+        if (pautolearn->reqclass != 0)
+            if (pautolearn->reqclass != classid)
+                continue;
+
+        if (pautolearn->reqrace != 0)
+            if (pautolearn->reqrace != raceid)
+                continue;
+
+        LearnSpell(pautolearn->spellId, false);
+    }
+}
+
 Guild* Player::GetGuild() const
 {
     uint32 guildId = GetGuildId();

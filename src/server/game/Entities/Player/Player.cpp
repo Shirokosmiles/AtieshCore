@@ -2887,7 +2887,7 @@ void Player::GiveLevel(uint8 level)
             }
 
     SendQuestGiverStatusMultiple();
-
+    LearnSpellFromAutoLearnSpells(level);
     sScriptMgr->OnPlayerLevelChanged(this, oldLevel);
 }
 

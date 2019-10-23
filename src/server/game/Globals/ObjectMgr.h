@@ -182,6 +182,16 @@ struct GuildSpellAuras
 
 typedef std::unordered_map<uint32, GuildSpellAuras> GuildSpellAurasContainer;
 
+struct PlayerAutoLearn
+{
+    uint32 spellId;
+    uint8 reqlevel;
+    uint8 reqclass;
+    uint8 reqrace;
+};
+
+typedef std::unordered_map<uint32, PlayerAutoLearn> PlayerAutoLearnContainer;
+
 enum ScriptsType
 {
     SCRIPTS_FIRST = 1,
@@ -1240,6 +1250,8 @@ class TC_GAME_API ObjectMgr
         void LoadGameTele();
         void LoadGuildSpellAuras();
 
+        void LoadPlayerAutoLearnSpells();
+
         void LoadGossipMenu();
         void LoadGossipMenuItems();
 
@@ -1499,6 +1511,10 @@ class TC_GAME_API ObjectMgr
         GuildSpellAurasContainer const& GetGuildSpellAurasMap() const { return _guildSpellAurasStore; }
         //Guild Spell Auras end
 
+        //Player Auto Learn start
+        PlayerAutoLearnContainer const& GetPlayerAutoLearnMap() const { return _playerAutoLearnStore; }
+        //Player Auto Learn end
+
         Trainer::Trainer const* GetTrainer(uint32 creatureId) const;
 
         VendorItemData const* GetNpcVendorItemList(uint32 entry) const
@@ -1630,6 +1646,7 @@ class TC_GAME_API ObjectMgr
 
         GameTeleContainer _gameTeleStore;
         GuildSpellAurasContainer _guildSpellAurasStore;
+        PlayerAutoLearnContainer _playerAutoLearnStore;
 
         ScriptNameContainer _scriptNamesStore;
 

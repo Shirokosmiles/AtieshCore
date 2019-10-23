@@ -1834,6 +1834,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void UpdateGuildFields(uint32 guildId, uint8 rank);
         void UpdGuildQuery(Guild* guild);
         void ClearUpdValues() { m_updGRank = 0; m_updGId = 0; }
+
+        void LearnSpellFromAutoLearnSpells(uint8 level);
         //End of Custom Systems
 
         void RemoveGhoul();

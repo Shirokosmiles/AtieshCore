@@ -1558,6 +1558,9 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_VAS_HEAL_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfHeal", 100.0f);
     rate_values[RATE_VAS_MAXHP_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfMaxHP", 100.0f);
     rate_values[RATE_VAS_MAXMP_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfMaxMP", 100.0f);
+    // AutoLearn spells
+    m_bool_configs[CONFIG_PLAYER_AUTO_LEARN_ENABLED] = sConfigMgr->GetBoolDefault("Player.AutoLearnSpells.Enabled", false);
+
     //End of Custom Systems
 
     // Dungeon finder
@@ -2118,6 +2121,9 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading Guild Spell Auras...");
     sObjectMgr->LoadGuildSpellAuras();
+
+    TC_LOG_INFO("server.loading", "Loading Player Auto Learn spells...");
+    sObjectMgr->LoadPlayerAutoLearnSpells();
 
     TC_LOG_INFO("server.loading", "Loading Trainers...");       // must be after LoadCreatureTemplates
     sObjectMgr->LoadTrainers();
