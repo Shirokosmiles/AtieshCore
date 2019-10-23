@@ -322,6 +322,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_flyhackTimer = 0;
     if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FLYHACK_ENABLED))
         m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
+    m_reloadModelsDisplayTimer = 0;
     m_mountTimer = 0;
     m_rootUpdTimer = 0;
     m_ACKmounted = false;
@@ -1377,6 +1378,17 @@ void Player::Update(uint32 p_time)
             m_flyhackTimer -= p_time;
     }
 
+    if (m_reloadModelsDisplayTimer > 0)
+    {
+        if (p_time >= m_reloadModelsDisplayTimer)
+        {
+            RemoveAura(54844);
+            m_reloadModelsDisplayTimer = 0;
+        }
+        else
+            m_reloadModelsDisplayTimer -= p_time;
+    }
+
     if (m_ACKmounted && m_mountTimer > 0)
     {
         if (p_time >= m_mountTimer)
@@ -2109,6 +2121,9 @@ void Player::AddToWorld()
     for (uint8 i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; ++i)
         if (m_items[i])
             m_items[i]->AddToWorld();
+
+    CastSpell(this, 54844, true);
+    m_reloadModelsDisplayTimer = 500;
 }
 
 void Player::RemoveFromWorld()

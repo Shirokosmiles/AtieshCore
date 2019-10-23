@@ -2637,6 +2637,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_mountTimer;
         uint32 m_rootUpdTimer;
         uint32 m_flyhackTimer;
+        uint32 m_reloadModelsDisplayTimer;
 
         // Timestamp on client clock of the moment the most recently processed movement packet was SENT by the client
         uint32 lastMoveClientTimestamp;
