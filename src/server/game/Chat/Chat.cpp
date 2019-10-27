@@ -670,8 +670,8 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
 
             if (chatType == CHAT_MSG_CHANNEL)
             {
-                ASSERT(channelName.length() > 0);
-                data << channelName;
+                if (channelName.length() > 0)
+                    data << channelName;
             }
 
             receiverGUIDPos = data.wpos();
