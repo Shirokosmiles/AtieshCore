@@ -1508,6 +1508,8 @@ void World::LoadConfigSettings(bool reload)
     // Bags autoequip script
     m_bool_configs[CONFIG_CREATECHAR_BONUS_BAGS] = sConfigMgr->GetBoolDefault("BAG.Script.Enabled", false);
     m_int_configs[CONFIG_CREATECHAR_BONUS_BAGS_ID] = sConfigMgr->GetIntDefault("BAG.Script.BonusBagsID", 51809);
+    SetBankBagsIdMap(sConfigMgr->GetStringDefault("BAG.Script.BankBagsID", ""));
+    TC_LOG_INFO("server.loading", "BAG.ScriptBankBagsID for %u bankBagsId", (uint32)mapbankBagsId.size());
     // Start-Pack script
     m_bool_configs[CONFIG_CREATECHAR_BONUS_STARTPACK] = sConfigMgr->GetBoolDefault("StartPack.Script.Enabled", false);
     // Duel Phase script
@@ -3717,6 +3719,16 @@ void World::SetACMapExcludes(const std::string& mapIdExcludes)
     std::string temp;
     while (std::getline(excludeStream, temp, ','))
         excludeACMapsId.insert(atoi(temp.c_str()));
+}
+
+void World::SetBankBagsIdMap(const std::string& bankBagsId)
+{
+    mapbankBagsId.clear();
+
+    std::stringstream excludeStream(bankBagsId);
+    std::string temp;
+    while (std::getline(excludeStream, temp, ','))
+        mapbankBagsId.insert(atoi(temp.c_str()));
 }
 
 Realm realm;

@@ -867,6 +867,9 @@ class TC_GAME_API World
         void SetACMapExcludes(const std::string& mapIdExcludes);
         bool isMapDisabledForAC(uint32 mapid) const { return excludeACMapsId.count(mapid); }
 
+        void SetBankBagsIdMap(const std::string& bankBagsId);
+        bool isBankBagsID(uint32 id) const { return mapbankBagsId.count(id); }
+
     protected:
         void _UpdateGameTime();
 
@@ -979,6 +982,7 @@ class TC_GAME_API World
         uint32 _warnDiff;
         time_t _warnShutdownTime;
         std::unordered_set<uint32> excludeACMapsId;
+        std::unordered_set<uint32> mapbankBagsId;
 
     friend class debug_commandscript;
 };

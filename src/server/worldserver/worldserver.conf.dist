@@ -4543,6 +4543,10 @@ BAG.Script.Enabled = 0
 
 BAG.Script.BonusBagsID = 51809
 
+#    Description: a BankBagsID of bags ( 304005 ), which can't be used as bag, only as bank cell
+
+BAG.Script.BankBagsID = "304005"
+
 #
 ###################################################################################################
 

@@ -76,6 +76,11 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recvData)
     if (srcslot == dstslot)
         return;
 
+    Item* pSrcItem = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, srcslot);
+    bool bankbag = false;
+    if (pSrcItem->IsBag() && pSrcItem->GetTemplate() && pSrcItem->GetTemplate()->ItemId && sWorld->isBankBagsID(pSrcItem->GetTemplate()->ItemId))
+        bankbag = true;
+
     if (!_player->IsValidPos(INVENTORY_SLOT_BAG_0, srcslot, true))
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
@@ -99,6 +104,16 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recvData)
         TC_LOG_DEBUG("network", "WORLD: HandleSwapInvItemOpcode - Unit (%s) not found or you can't interact with him.", m_currentBankerGUID.ToString().c_str());
         return;
     }
+
+    if (bankbag && !_player->IsBankPos(INVENTORY_SLOT_BAG_0, dstslot))
+    {
+        if (_player->IsEquipmentPos(INVENTORY_SLOT_BAG_0, dstslot))
+        {
+            _player->SendEquipError(EQUIP_ERR_NOT_A_BAG, pSrcItem, nullptr);
+            return;
+        }
+    }
+        
 
     uint16 src = ((INVENTORY_SLOT_BAG_0 << 8) | srcslot);
     uint16 dst = ((INVENTORY_SLOT_BAG_0 << 8) | dstslot);
@@ -178,6 +193,15 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     Item* pSrcItem  = _player->GetItemByPos(srcbag, srcslot);
     if (!pSrcItem)
         return;                                             // only at cheat
+
+    if (pSrcItem->IsBag() && pSrcItem->GetTemplate() && pSrcItem->GetTemplate()->ItemId && sWorld->isBankBagsID(pSrcItem->GetTemplate()->ItemId))
+    {
+        if (_player->IsInventoryPos(srcbag, srcslot))
+        {
+            _player->SendEquipError(EQUIP_ERR_NOT_A_BAG, pSrcItem, nullptr);
+            return;
+        }
+    }
 
     uint16 dest;
     InventoryResult msg = _player->CanEquipItem(NULL_SLOT, dest, pSrcItem, !pSrcItem->IsBag());
