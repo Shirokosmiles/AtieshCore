@@ -78,7 +78,7 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recvData)
 
     Item* pSrcItem = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, srcslot);
     bool bankbag = false;
-    if (pSrcItem->IsBag() && pSrcItem->GetTemplate() && pSrcItem->GetTemplate()->ItemId && sWorld->isBankBagsID(pSrcItem->GetTemplate()->ItemId))
+    if (pSrcItem && pSrcItem->IsBag() && pSrcItem->GetTemplate() && pSrcItem->GetTemplate()->ItemId && sWorld->isBankBagsID(pSrcItem->GetTemplate()->ItemId))
         bankbag = true;
 
     if (!_player->IsValidPos(INVENTORY_SLOT_BAG_0, srcslot, true))
@@ -113,7 +113,6 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recvData)
             return;
         }
     }
-        
 
     uint16 src = ((INVENTORY_SLOT_BAG_0 << 8) | srcslot);
     uint16 dst = ((INVENTORY_SLOT_BAG_0 << 8) | dstslot);
@@ -155,6 +154,11 @@ void WorldSession::HandleSwapItem(WorldPacket& recvData)
     if (src == dst)
         return;
 
+    Item* pSrcItem = _player->GetItemByPos(srcbag, srcslot);
+    bool bankbag = false;
+    if (pSrcItem && pSrcItem->IsBag() && pSrcItem->GetTemplate() && pSrcItem->GetTemplate()->ItemId && sWorld->isBankBagsID(pSrcItem->GetTemplate()->ItemId))
+        bankbag = true;
+
     if (!_player->IsValidPos(srcbag, srcslot, true))
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
@@ -177,6 +181,15 @@ void WorldSession::HandleSwapItem(WorldPacket& recvData)
     {
         TC_LOG_DEBUG("network", "WORLD: HandleSwapItem - Unit (%s) not found or you can't interact with him.", m_currentBankerGUID.ToString().c_str());
         return;
+    }
+
+    if (bankbag && !_player->IsBankPos(dstbag, dstslot))
+    {
+        if (_player->IsEquipmentPos(dstbag, dstslot))
+        {
+            _player->SendEquipError(EQUIP_ERR_NOT_A_BAG, pSrcItem, nullptr);
+            return;
+        }
     }
 
     _player->SwapItem(src, dst);
