@@ -18,6 +18,8 @@
 
 #include "Spell.h"
 #include "Battleground.h"
+#include "Battlefield.h"
+#include "BattlefieldMgr.h"
 #include "CellImpl.h"
 #include "Common.h"
 #include "ConditionMgr.h"
@@ -6270,6 +6272,11 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                     if (SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(m_originalCaster->GetZoneId()))
                     {
                         if (battlefield && !battlefield->IsFlyingMountAllowed())
+                            return SPELL_FAILED_NOT_HERE;
+                    }
+                    if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(m_originalCaster->GetZoneId()))
+                    {
+                        if (battlefield && !battlefield->CanFlyIn())
                             return SPELL_FAILED_NOT_HERE;
                     }
                     if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(m_originalCaster->GetAreaId()))

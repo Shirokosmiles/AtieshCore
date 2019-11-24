@@ -38,8 +38,8 @@ public:
     {
         switch (battleId)
         {
-            case SPECIALEVENT_EVENTID_WINTERGRASP:
-                return "Wintergrasp";
+            //case SPECIALEVENT_EVENTID_WINTERGRASP:
+            //    return "Wintergrasp";
             default:
                 return "";
         }

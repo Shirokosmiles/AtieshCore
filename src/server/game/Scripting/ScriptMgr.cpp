@@ -21,6 +21,7 @@
 #include "Config.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
+#include "BattlefieldMgr.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "GossipDef.h"
@@ -85,6 +86,10 @@ struct is_script_database_bound<BattlegroundScript>
 
 template<>
 struct is_script_database_bound<OutdoorPvPScript>
+    : std::true_type { };
+
+template<>
+struct is_script_database_bound<BattlefieldScript>
     : std::true_type { };
 
 template<>
@@ -631,6 +636,44 @@ public:
         if ((!initialize) && swapped)
         {
             sOutdoorPvPMgr->InitOutdoorPvP();
+            swapped = false;
+        }
+    }
+
+    void BeforeUnload() final override
+    {
+        ASSERT(!swapped);
+    }
+
+private:
+    bool swapped;
+};
+
+/// This hook is responsible for swapping Battlefield's
+template<typename Base>
+class ScriptRegistrySwapHooks<BattlefieldScript, Base>
+    : public ScriptRegistrySwapHookBase
+{
+public:
+    ScriptRegistrySwapHooks() : swapped(false) { }
+
+    void BeforeReleaseContext(std::string const& context) final override
+    {
+        auto const bounds = static_cast<Base*>(this)->_ids_of_contexts.equal_range(context);
+
+        if ((!swapped) && (bounds.first != bounds.second))
+        {
+            swapped = true;
+            sBattlefieldMgr->Die();
+        }
+    }
+
+    void BeforeSwapContext(bool initialize) override
+    {
+        // Never swap outdoor pvp scripts when initializing
+        if ((!initialize) && swapped)
+        {
+            sBattlefieldMgr->InitBattleFields();
             swapped = false;
         }
     }
@@ -1666,6 +1709,12 @@ OutdoorPvP* ScriptMgr::CreateOutdoorPvP(uint32 scriptId)
     return tmpscript->GetOutdoorPvP();
 }
 
+Battlefield* ScriptMgr::CreateBattlefield(uint32 scriptId)
+{
+    GET_SCRIPT_RET(BattlefieldScript, scriptId, tmpscript, nullptr);
+    return tmpscript->GetBattlefield();
+}
+
 SpecialEvent* ScriptMgr::CreateSpecialEvent(uint32 scriptId)
 {
     GET_SCRIPT_RET(SpecialEventScript, scriptId, tmpscript, nullptr);
@@ -2383,6 +2432,12 @@ OutdoorPvPScript::OutdoorPvPScript(char const* name)
     ScriptRegistry<OutdoorPvPScript>::Instance()->AddScript(this);
 }
 
+BattlefieldScript::BattlefieldScript(char const* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<BattlefieldScript>::Instance()->AddScript(this);
+}
+
 SpecialEventScript::SpecialEventScript(char const* name)
     : ScriptObject(name)
 {
@@ -2475,6 +2530,7 @@ template class TC_GAME_API ScriptRegistry<GameObjectScript>;
 template class TC_GAME_API ScriptRegistry<AreaTriggerScript>;
 template class TC_GAME_API ScriptRegistry<BattlegroundScript>;
 template class TC_GAME_API ScriptRegistry<OutdoorPvPScript>;
+template class TC_GAME_API ScriptRegistry<BattlefieldScript>;
 template class TC_GAME_API ScriptRegistry<SpecialEventScript>;
 template class TC_GAME_API ScriptRegistry<CommandScript>;
 template class TC_GAME_API ScriptRegistry<WeatherScript>;

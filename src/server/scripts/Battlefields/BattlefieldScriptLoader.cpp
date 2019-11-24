@@ -16,12 +16,11 @@
  */
 
 // This is where scripts' loading functions should be declared:
-void AddSC_DalaranCraterScripts();
-
+void AddSC_BattlefieldWintergraspScripts();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
-void AddSpecialEventsScripts()
+void AddBattlefieldsScripts()
 {
-    AddSC_DalaranCraterScripts();
+    AddSC_BattlefieldWintergraspScripts();
 }

@@ -18,6 +18,8 @@
 
 #include "Unit.h"
 #include "AbstractFollower.h"
+#include "Battlefield.h"
+#include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "BattlegroundScore.h"
 #include "CellImpl.h"
@@ -11326,8 +11328,11 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
     }
 
     // SpecialEvent (battlefield)
-    if (player)
+    if (player && victim)
     {
+        if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(player->GetZoneId()))
+            battlefield->HandleKill(player, victim);
+
         if (SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(player->GetZoneId()))
             se->HandleKill(player, victim);
     }

@@ -17,6 +17,7 @@
  */
 
 #include "Object.h"
+#include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "CinematicMgr.h"
@@ -1963,7 +1964,9 @@ void WorldObject::SetZoneScript()
         m_zoneScript = (ZoneScript*)map->ToInstanceMap()->GetInstanceScript();
     else
     {
-        if (SpecialEvent* battlefield = sSpecialEventMgr->GetSpecialEventByZoneId(GetZoneId()))
+        if (SpecialEvent* SE = sSpecialEventMgr->GetSpecialEventByZoneId(GetZoneId()))
+            m_zoneScript = SE;
+        else if (ZoneScript* battlefield = sBattlefieldMgr->GetZoneScriptbyZoneId(GetZoneId()))
             m_zoneScript = battlefield;
         else
             m_zoneScript = sOutdoorPvPMgr->GetZoneScript(GetZoneId());

@@ -23,8 +23,8 @@
  */
 
 #include "ScriptMgr.h"
-#include "SpecialEvent.h"
-#include "SpecialEventMgr.h"
+#include "Battlefield.h"
+#include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "DBCStores.h"
@@ -2090,8 +2090,8 @@ class spell_gen_mount : public SpellScriptLoader
                     bool canFly = spellInfo && (spellInfo->CheckLocation(target->GetMapId(), zoneid, areaid, target) == SPELL_CAST_OK);
 
                     // check battlefield
-                    SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(target->GetZoneId());
-                    if (canFly && battlefield && !battlefield->IsFlyingMountAllowed())
+                    Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(target->GetZoneId());
+                    if (canFly && battlefield && !battlefield->CanFlyIn())
                         canFly = false;
 
                     uint32 mount = 0;

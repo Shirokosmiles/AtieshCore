@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "BattlefieldEntities.h"
 #include "GameTime.h"
 #include "SpecialEvent.h"
 #include "SpecialEventMgr.h"

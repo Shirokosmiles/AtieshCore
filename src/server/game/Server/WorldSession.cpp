@@ -24,6 +24,7 @@
 #include "AccountMgr.h"
 #include "AddonMgr.h"
 #include "BattlegroundMgr.h"
+#include "BattlefieldMgr.h"
 #include "Config.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -508,6 +509,7 @@ void WorldSession::LogoutPlayer(bool save)
             _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
 
         sOutdoorPvPMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
+        sBattlefieldMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
         sSpecialEventMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
 
         // TODO rework by leaveZone for Dalaran

@@ -3533,18 +3533,6 @@ enum PvPTeamId
 
 static uint8 constexpr PVP_TEAMS_COUNT = 2;
 
-constexpr TeamId TeamIdByPvPTeamId(PvPTeamId value)
-{
-    switch (value)
-    {
-        case PVP_TEAM_HORDE: return TEAM_HORDE;
-        case PVP_TEAM_ALLIANCE: return TEAM_ALLIANCE;
-        case PVP_TEAM_NEUTRAL: return TEAM_NEUTRAL;
-        default: break;
-    }
-    return TEAM_NEUTRAL;
-}
-
 // indexes of BattlemasterList.dbc
 enum BattlegroundTypeId : uint32
 {
@@ -3565,17 +3553,6 @@ enum BattlegroundTypeId : uint32
 };
 
 static uint32 constexpr MAX_BATTLEGROUND_TYPE_ID = 33;
-
-enum BattlefieldBattleId : uint32
-{
-    BATTLEFIELD_BATTLEID_WINTERGRASP = 1, // Wintergrasp battle
-    BATTLEFIELD_BATTLEID_MAX         = 2
-};
-
-enum BattlefieldZoneId : uint32
-{
-    BATTLEFIELD_ZONEID_WINTERGRASP = 4197 // Wintergrasp battle zone
-};
 
 enum MailResponseType
 {

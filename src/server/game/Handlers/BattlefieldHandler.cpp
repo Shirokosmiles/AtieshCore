@@ -16,8 +16,8 @@
  */
 
 #include "WorldSession.h"
-#include "SpecialEvent.h"
-#include "SpecialEventMgr.h"
+#include "Battlefield.h"
+#include "BattlefieldMgr.h"
 #include "BattlefieldPackets.h"
 #include "GameTime.h"
 #include "Log.h"
@@ -25,15 +25,15 @@
 #include "Player.h"
 #include "WorldPacket.h"
 
-/**
- * @fn void WorldSession::SendBattlefieldInvitePlayerToWar(uint32 battleId, uint32 zoneId, uint32 acceptTime)
- *
- * @brief Sends join war frame to the player
- *
- * @param battleId   BattlefieldId enum
- * @param zoneId     Zone where the battlefield is
- * @param acceptTime Time in seconds displayed
- */
+ /**
+  * @fn void WorldSession::SendBattlefieldInvitePlayerToWar(uint32 battleId, uint32 zoneId, uint32 acceptTime)
+  *
+  * @brief Sends join war frame to the player
+  *
+  * @param battleId   BattlefieldId enum
+  * @param zoneId     Zone where the battlefield is
+  * @param acceptTime Time in seconds displayed
+  */
 void WorldSession::SendBattlefieldInvitePlayerToWar(uint32 battleId, uint32 zoneId, uint32 acceptTime)
 {
     WorldPackets::Battlefield::BattlefieldMgrEntryInvite entryInvite;
@@ -104,7 +104,7 @@ void WorldSession::SendBattlefieldEntered(uint32 battleId)
  * @param battleId BattlefieldId enum
  * @param reason   Reason why player the left
  */
-void WorldSession::SendBattlefieldLeaveMessage(uint32 battleId, BattlefieldLeaveReason reason /*= BF_LEAVE_REASON_EXITED*/)
+void WorldSession::SendBattlefieldLeaveMessage(uint32 battleId, BFLeaveReason reason /*= BF_LEAVE_REASON_EXITED*/)
 {
     WorldPackets::Battlefield::BattlefieldMgrEjected ejected;
     ejected.BattleID = battleId;
@@ -141,15 +141,14 @@ void WorldSession::HandleBattlefieldEntryInviteResponse(WorldPackets::Battlefiel
     bool accepted = entryInviteResponse.AcceptedInvite;
     TC_LOG_DEBUG("network", "WorldSession::HandleBattlefieldEntryInviteResponse: battleId: %u, accepted: %u", battleId, accepted);
 
-    SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByEventId(battleId);
+    Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(BattlefieldId(battleId));
     if (!battlefield)
         return;
 
-    /*
     if (accepted)
         battlefield->PlayerAcceptsInviteToWar(_player);
     else
-        battlefield->PlayerLeavesQueue(_player, true);*/
+        battlefield->PlayerLeavesQueue(_player, true);
 }
 
 /**
@@ -163,13 +162,12 @@ void WorldSession::HandleBattlefieldQueueInviteResponse(WorldPackets::Battlefiel
     bool accepted = queueInviteResponse.AcceptedInvite;
     TC_LOG_DEBUG("network", "WorldSession::HandleBattlefieldQueueInviteResponse: battleId: %u, accepted: %u", battleId, accepted);
 
-    
-    SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByEventId(battleId);
+    Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(BattlefieldId(battleId));
     if (!battlefield)
         return;
-    
-    //if (accepted)
-    //    battlefield->PlayerAcceptsInviteToQueue(_player);
+
+    if (accepted)
+        battlefield->PlayerAcceptsInviteToQueue(_player);
 }
 
 /**
@@ -182,9 +180,9 @@ void WorldSession::HandleBattlefieldExitRequest(WorldPackets::Battlefield::Battl
     uint32 battleId = exitRequest.BattleID;
     TC_LOG_DEBUG("network", "WorldSession::HandleBattlefieldExitRequest: battleId: %u ", battleId);
 
-    SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByEventId(battleId);
+    Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(BattlefieldId(battleId));
     if (!battlefield)
         return;
 
-    //battlefield->PlayerLeavesQueue(_player);
+    battlefield->PlayerLeavesQueue(_player);
 }

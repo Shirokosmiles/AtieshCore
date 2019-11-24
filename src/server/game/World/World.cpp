@@ -29,6 +29,7 @@
 #include "AuctionHouseBot.h"
 #include "AuctionHouseMgr.h"
 #include "BattlegroundMgr.h"
+#include "BattlefieldMgr.h"
 #include "CalendarMgr.h"
 #include "ChannelMgr.h"
 #include "CharacterCache.h"
@@ -2308,6 +2309,10 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Starting Outdoor PvP System");
     sOutdoorPvPMgr->InitOutdoorPvP();
 
+    ///- Initialize Battlefield
+    TC_LOG_INFO("server.loading", "Starting Battlefield System");
+    sBattlefieldMgr->InitBattleFields();
+
     ///- Initialize Special Events
     TC_LOG_INFO("server.loading", "Starting SpecialEvents System");
     sSpecialEventMgr->InitSpecialEvents();
@@ -2594,6 +2599,9 @@ void World::Update(uint32 diff)
 
     sOutdoorPvPMgr->Update(diff);
     sWorldUpdateTime.RecordUpdateTimeDuration("UpdateOutdoorPvPMgr");
+
+    sBattlefieldMgr->Update(diff);
+    sWorldUpdateTime.RecordUpdateTimeDuration("BattlefieldMgr");
 
     sSpecialEventMgr->Update(diff);
     sWorldUpdateTime.RecordUpdateTimeDuration("SpecialEventMgr");
