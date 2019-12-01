@@ -86,6 +86,8 @@ uint32 ByteBuffer::ReadPackedTime()
 
 void ByteBuffer::append(uint8 const* src, size_t cnt)
 {
+    if (!cnt)
+        return;
     ASSERT(src, "Attempted to put a NULL-pointer in ByteBuffer (pos: " SZFMTD " size: " SZFMTD ")", _wpos, size());
     ASSERT(cnt, "Attempted to put a zero-sized value in ByteBuffer (pos: " SZFMTD " size: " SZFMTD ")", _wpos, size());
     ASSERT(size() < 10000000);
