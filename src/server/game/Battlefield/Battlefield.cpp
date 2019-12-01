@@ -64,15 +64,21 @@ bool Battlefield::SetupBattlefield(bool active, bool enabled, uint32 id, uint32 
     _minPlayerLevel = minlevel;
     _defenderTeam = controlteam == 0 ? TEAM_ALLIANCE : TEAM_HORDE;
 
+    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+    {
+        _playersInWar[team].clear();
+        _groups[team].clear();
+    }
+
     if (_enabled)
     {
         if (remainingtime)
-            _timer.Update(remainingtime);
+            _timer.Reset(remainingtime * MINUTE * IN_MILLISECONDS);
         else
-            _timer.Update(durationTimer);
+            _timer.Reset(_battleTime);
     }
     else
-        _timer.Update(cooldownTimer);
+        _timer.Reset(_noWarBattleTime);
 
     RegisterBattlefield(_battleId);
 

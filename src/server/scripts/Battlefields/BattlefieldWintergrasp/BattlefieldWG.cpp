@@ -321,23 +321,47 @@ bool BattlefieldWintergrasp::SetupBattlefield(bool active, bool enabled, uint32 
     _zoneId = ZONEID_WINTERGRASP;
     RegisterZoneIdForBattlefield(_zoneId);
     _mapId = MAPID_WINTERGRASP;
-    _map = sMapMgr->FindMap(_mapId, 0);    
+    _map = sMapMgr->FindMap(_mapId, 0);
+    if (!_map)
+        return false;
     _acceptInviteTime = 20;
     _startGroupingTime = 15 * MINUTE * IN_MILLISECONDS;
     _startGrouping = false;
     _data.resize(DATA_WINTERGRASP_MAX);
 
-    sWorld->setWorldState(WORLDSTATE_WINTERGRASP_ACTIVE, uint64(_active));
-    sWorld->setWorldState(WORLDSTATE_WINTERGRASP_DEFENDER, uint64(_defenderTeam));
-    if (remainingtime)
-        sWorld->setWorldState(ClockWorldState[0], uint64(remainingtime * MINUTE * IN_MILLISECONDS));
-    else
-        sWorld->setWorldState(ClockWorldState[0], uint64(_active ? _battleTime : _noWarBattleTime));
+    sWorld->setWorldState(WORLDSTATE_WINTERGRASP_ACTIVE, _active ? 1 : 0);
+    sWorld->setWorldState(WORLDSTATE_WINTERGRASP_DEFENDER, _defenderTeam);
+    sWorld->setWorldState(ClockWorldState[0], GetTimer());
 
-    SetData(DATA_WINTERGRASP_WON_ALLIANCE, uint32(sWorld->getWorldState(WORLDSTATE_WINTERGRASP_ATTACKED_ALLIANCE)));
-    SetData(DATA_WINTERGRASP_DEF_ALLIANCE, uint32(sWorld->getWorldState(WORLDSTATE_WINTERGRASP_DEFENDED_ALLIANCE)));
-    SetData(DATA_WINTERGRASP_WON_HORDE, uint32(sWorld->getWorldState(WORLDSTATE_WINTERGRASP_ATTACKED_HORDE)));
-    SetData(DATA_WINTERGRASP_DEF_HORDE, uint32(sWorld->getWorldState(WORLDSTATE_WINTERGRASP_DEFENDED_HORDE)));
+    SetData(DATA_WINTERGRASP_WON_ALLIANCE, 0);
+    SetData(DATA_WINTERGRASP_DEF_ALLIANCE, 0);
+    SetData(DATA_WINTERGRASP_WON_HORDE, 0);
+    SetData(DATA_WINTERGRASP_DEF_HORDE, 0);
+
+    if (_active)
+    {
+        if (_defenderTeam == TEAM_ALLIANCE)
+            SetData(DATA_WINTERGRASP_DEF_ALLIANCE, 1);
+        else
+            SetData(DATA_WINTERGRASP_DEF_HORDE, 1);
+    }
+    else
+    {
+        if (_defenderTeam == TEAM_ALLIANCE)
+            SetData(DATA_WINTERGRASP_WON_ALLIANCE, 1);
+        else
+            SetData(DATA_WINTERGRASP_WON_HORDE, 1);
+    }
+
+    SetData(DATA_WINTERGRASP_DAMAGED_TOWER_DEFENCE, 0);
+    SetData(DATA_WINTERGRASP_BROKEN_TOWER_DEFENCE, 0);
+    SetData(DATA_WINTERGRASP_DAMAGED_TOWER_ATTACK, 0);
+    SetData(DATA_WINTERGRASP_BROKEN_TOWER_ATTACK, 0);
+    
+    sWorld->setWorldState(WORLDSTATE_WINTERGRASP_ATTACKED_ALLIANCE, GetData(DATA_WINTERGRASP_WON_ALLIANCE));
+    sWorld->setWorldState(WORLDSTATE_WINTERGRASP_DEFENDED_ALLIANCE, GetData(DATA_WINTERGRASP_DEF_ALLIANCE));
+    sWorld->setWorldState(WORLDSTATE_WINTERGRASP_ATTACKED_HORDE, GetData(DATA_WINTERGRASP_WON_HORDE));
+    sWorld->setWorldState(WORLDSTATE_WINTERGRASP_DEFENDED_HORDE, GetData(DATA_WINTERGRASP_DEF_HORDE));
 
     SetGraveyardNumber(GRAVEYARDID_MAX);
 
@@ -393,6 +417,9 @@ bool BattlefieldWintergrasp::SetupBattlefield(bool active, bool enabled, uint32 
     }
 
     UpdateVehicleCounter(true);
+
+    if (_active)
+        OnBattleStart();
 
     return true;
 }
