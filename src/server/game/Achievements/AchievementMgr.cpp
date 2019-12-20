@@ -34,6 +34,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "Mail.h"
+#include "MailMgr.h"
 #include "Map.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
@@ -1552,13 +1553,14 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     // mail
     if (reward->SenderCreatureId)
     {
-        MailDraft draft(reward->MailTemplateId);
+        std::string subject = "";
+        std::string text = "";
 
         if (!reward->MailTemplateId)
         {
             // subject and text
-            std::string subject = reward->Subject;
-            std::string text = reward->Body;
+            subject = reward->Subject;
+            text = reward->Body;
 
             LocaleConstant localeConstant = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
             if (localeConstant != LOCALE_enUS)
@@ -1569,23 +1571,24 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                     ObjectMgr::GetLocaleString(loc->Text,    localeConstant, text);
                 }
             }
-
-            draft = MailDraft(subject, text);
         }
 
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
-
+        std::list<Item*>itemlist;
         Item* item = reward->ItemId ? Item::CreateItem(reward->ItemId, 1, GetPlayer()) : nullptr;
         if (item)
         {
             // save new item before send
             item->SaveToDB(trans);                               // save for prevent lost at next mail load, if send fail then item will deleted
-
             // item
-            draft.AddItem(item);
+            itemlist.push_back(item);
         }
 
-        draft.SendMailTo(trans, GetPlayer(), MailSender(MAIL_CREATURE, reward->SenderCreatureId));
+        if (!reward->MailTemplateId)
+            sMailMgr->SendMailWithItemsByGUID(reward->SenderCreatureId, GetPlayer()->GetGUID().GetCounter(), MAIL_CREATURE, subject, text, 0, itemlist);
+        else
+            sMailMgr->SendMailWithTemplateByGUID(reward->SenderCreatureId, GetPlayer()->GetGUID().GetCounter(), MAIL_CREATURE, reward->MailTemplateId);
+        itemlist.clear();
         CharacterDatabase.CommitTransaction(trans);
     }
 }

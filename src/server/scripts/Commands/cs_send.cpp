@@ -21,6 +21,7 @@
 #include "Item.h"
 #include "Language.h"
 #include "Mail.h"
+#include "MailMgr.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
@@ -42,9 +43,15 @@ public:
             { "money",   rbac::RBAC_PERM_COMMAND_SEND_MONEY,   true, &HandleSendMoneyCommand,   "" },
         };
 
+        static std::vector<ChatCommand> MailMgrcommandTable =
+        {
+            { "",   rbac::RBAC_PERM_COMMAND_SEND_MONEY,   true, &HandleExpireTime,   "" },
+        };
+
         static std::vector<ChatCommand> commandTable =
         {
             { "send", rbac::RBAC_PERM_COMMAND_SEND, false, nullptr, "", sendCommandTable },
+            { "mailMgr", rbac::RBAC_PERM_COMMAND_SEND, true, nullptr, "", MailMgrcommandTable },
         };
         return commandTable;
     }
@@ -80,14 +87,11 @@ public:
         std::string text    = msgText;
 
         // from console, use non-existing sender
-        MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
+        ObjectGuid::LowType pguid = 0;
+        if (handler->GetSession())
+            pguid = handler->GetSession()->GetPlayer()->GetGUID().GetCounter();
 
-        /// @todo Fix poor design
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
-        MailDraft(subject, text)
-            .SendMailTo(trans, MailReceiver(target, targetGuid.GetCounter()), sender);
-
-        CharacterDatabase.CommitTransaction(trans);
+        sMailMgr->SendMailByGUID(pguid, targetGuid.GetCounter(), MAIL_NORMAL, subject, text, 0);
 
         std::string nameLink = handler->playerLink(targetName);
         handler->PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
@@ -178,25 +182,24 @@ public:
             }
         }
 
-        // from console show nonexisting sender
-        MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
-
-        // fill mail
-        MailDraft draft(subject, text);
-
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
-
+        std::list<Item*>itemlist;
+        SQLTransaction trans = CharacterDatabase.BeginTransaction();        
         for (ItemPairs::const_iterator itr = items.begin(); itr != items.end(); ++itr)
         {
             if (Item* item = Item::CreateItem(itr->first, itr->second, handler->GetSession() ? handler->GetSession()->GetPlayer() : 0))
             {
                 item->SaveToDB(trans);              // Save to prevent being lost at next mail load. If send fails, the item will be deleted.
-                draft.AddItem(item);
+                itemlist.push_back(item);
             }
         }
-
-        draft.SendMailTo(trans, MailReceiver(receiver, receiverGuid.GetCounter()), sender);
         CharacterDatabase.CommitTransaction(trans);
+
+        ObjectGuid::LowType pguid = 0;
+        if (handler->GetSession())
+            pguid = handler->GetSession()->GetPlayer()->GetGUID().GetCounter();
+
+        sMailMgr->SendMailWithItemsByGUID(pguid, receiverGuid.GetCounter(), MAIL_NORMAL, subject, text, 0, itemlist);
+        itemlist.clear();
 
         std::string nameLink = handler->playerLink(receiverName);
         handler->PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
@@ -239,15 +242,11 @@ public:
         std::string text    = msgText;
 
         // from console show nonexisting sender
-        MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
+        ObjectGuid::LowType pguid = 0;
+        if (handler->GetSession())
+            pguid = handler->GetSession()->GetPlayer()->GetGUID().GetCounter();
 
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
-
-        MailDraft(subject, text)
-            .AddMoney(money)
-            .SendMailTo(trans, MailReceiver(receiver, receiverGuid.GetCounter()), sender);
-
-        CharacterDatabase.CommitTransaction(trans);
+        sMailMgr->SendMailByGUID(pguid, receiverGuid.GetCounter(), MAIL_NORMAL, subject, text, money);
 
         std::string nameLink = handler->playerLink(receiverName);
         handler->PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
@@ -281,6 +280,16 @@ public:
         // Confirmation message
         std::string nameLink = handler->GetNameLink(player);
         handler->PSendSysMessage(LANG_SENDMESSAGE, nameLink.c_str(), msgStr);
+
+        return true;
+    }
+    /// Send a message to a player in game
+    static bool HandleExpireTime(ChatHandler* handler, char const* /*args*/)
+    {
+        time_t expTime = sMailMgr->GetMailMgrExpiryTimer();
+        /// - Send the message
+        std::string time = secsToTimeString(uint64(expTime));
+        handler->PSendSysMessage("|cffff0000[next ExpiryMail will in]:|r %s", time);
 
         return true;
     }

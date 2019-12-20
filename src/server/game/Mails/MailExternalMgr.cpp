@@ -18,6 +18,7 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "Mail.h"
+#include "MailMgr.h"
 #include "MailExternalMgr.h"
 #include "Item.h"
 #include "Log.h"
@@ -53,35 +54,24 @@ void MailExternalMgr::Update()
         uint32 itemId = fields[5].GetUInt32();
         uint32 itemCount = fields[6].GetUInt32();
 
-        Player *receiver = ObjectAccessor::FindConnectedPlayer(receiver_guid);
-
-        MailDraft mail(subject, body);
-
-        if (money)
-        {
-            TC_LOG_DEBUG("mailexternal", "External Mail> Adding money");
-            mail.AddMoney(money);
-        }
-
+        std::list<Item*> itemlist;
         if (itemId)
         {
             if (!sObjectMgr->GetItemTemplate(itemId))
-            {
                 TC_LOG_DEBUG("mailexternal", "External Mail> Item entry %u from `mail_external` doesn't exist in DB, skipped.", itemId);
-            }
             else
-            {
-                TC_LOG_DEBUG("mailexternal", "External Mail> Adding %u of item with id %u", itemCount, itemId);
+            {                
                 if (Item* mailItem = Item::CreateItem(itemId, itemCount))
-                {
+                {                    
+                    itemlist.push_back(mailItem);
                     mailItem->SaveToDB(trans);
-                    mail.AddItem(mailItem);
+                    TC_LOG_DEBUG("mailexternal", "External Mail> Adding %u of item with id %u", itemCount, itemId);
                 }
             }
         }
 
-        mail.SendMailTo(trans, receiver ? receiver : MailReceiver(receiver_guid), MailSender(MAIL_NORMAL, 0, MAIL_STATIONERY_GM), MAIL_CHECK_MASK_RETURNED);
-
+        sMailMgr->SendMailWithItemsByGUID(receiver_guid, receiver_guid, MAIL_NORMAL, subject, body, money, itemlist);
+        itemlist.clear();
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXTERNAL_MAIL);
         stmt->setUInt32(0, id);
         trans->Append(stmt);
