@@ -23,8 +23,8 @@ Category: commandscripts
 EndScriptData */
 
 #include "ScriptMgr.h"
-#include "SpecialEvent.h"
-#include "SpecialEventMgr.h"
+#include "BattleField.h"
+#include "BattleFieldMgr.h"
 #include "Chat.h"
 #include "Language.h"
 #include "RBAC.h"
@@ -38,8 +38,8 @@ public:
     {
         switch (battleId)
         {
-            //case SPECIALEVENT_EVENTID_WINTERGRASP:
-            //    return "Wintergrasp";
+            case BATTLEFIELD_BATTLEID_WINTERGRASP:
+                return "Wintergrasp";
             default:
                 return "";
         }
@@ -62,7 +62,6 @@ public:
         return commandTable;
     }
 
-    /*
     static bool HandleBattlefieldStart(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -80,7 +79,7 @@ public:
         }
 
         BattlefieldId battleId = BattlefieldId(battlearg);
-        Battlefield* battlefield = sBattlefieldMgr->GetBattlefield(battleId);
+        Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(battleId);
         if (!battlefield)
             return true;
 
@@ -100,7 +99,7 @@ public:
         handler->PSendSysMessage(LANG_COMMAND_BF_START, GetBattleIdString(battleId));
         return true;
     }
-
+    
     static bool HandleBattlefieldEnd(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -118,7 +117,7 @@ public:
         }
 
         BattlefieldId battleId = BattlefieldId(battlearg);
-        Battlefield* battlefield = sBattlefieldMgr->GetBattlefield(battleId);
+        Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(battleId);
         if (!battlefield)
             return true;
 
@@ -138,7 +137,7 @@ public:
         handler->PSendSysMessage(LANG_COMMAND_BF_STOP, GetBattleIdString(battleId));
         return true;
     }
-
+    
     static bool HandleBattlefieldEnable(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -156,7 +155,7 @@ public:
         }
 
         BattlefieldId battleId = BattlefieldId(battlearg);
-        Battlefield* battlefield = sBattlefieldMgr->GetBattlefield(battleId);
+        Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(battleId);
         if (!battlefield)
             return true;
 
@@ -172,7 +171,7 @@ public:
         }
         return true;
     }
-
+    
     static bool HandleBattlefieldSwitch(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -190,7 +189,7 @@ public:
         }
 
         BattlefieldId battleId = BattlefieldId(battlearg);
-        Battlefield* battlefield = sBattlefieldMgr->GetBattlefield(battleId);
+        Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(battleId);
         if (!battlefield)
             return true;
 
@@ -204,7 +203,7 @@ public:
         handler->PSendSysMessage(LANG_COMMAND_BF_SWITCH, GetBattleIdString(battleId));
         return true;
     }
-
+    
     static bool HandleBattlefieldTimer(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -226,7 +225,7 @@ public:
         }
 
         BattlefieldId battleId = BattlefieldId(battlearg);
-        Battlefield* battlefield = sBattlefieldMgr->GetBattlefield(battleId);
+        Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(battleId);
         if (!battlefield)
             return true;
 
@@ -241,8 +240,7 @@ public:
         battlefield->SendInitWorldStatesToAll();
         handler->PSendSysMessage(LANG_COMMAND_BF_TIMER, GetBattleIdString(battleId), battlefield->GetTimer(), battlefield->IsWarTime() ? "war time" : "no war time");
         return true;
-    }
-    */
+    }    
 };
 
 void AddSC_bf_commandscript()
