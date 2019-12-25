@@ -1017,9 +1017,9 @@ uint8 MailMgr::HandleMailTakeItem(Player* player, uint32 mailID, ObjectGuid::Low
             if (!it || !itemexist)
             {
                 if (!it && itemexist)
-                    TC_LOG_ERROR("mailMgr", "Mail (%u) has item (GUID: %u), but doesn not exist in ItemMap of pointers", item_guid);
+                    TC_LOG_ERROR("mailMgr", "Mail (%u) has item (GUID: %u), but doesn not exist in ItemMap of pointers", mailID, item_guid);
                 if (it && !itemexist)
-                    TC_LOG_ERROR("mailMgr", "Mail (%u) has item (GUID: %u), but doesn not exist in MailItemMap", item_guid);
+                    TC_LOG_ERROR("mailMgr", "Mail (%u) has item (GUID: %u), but doesn not exist in MailItemMap", mailID, item_guid);
                 continue; // return 0
             }
 

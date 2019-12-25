@@ -23,8 +23,8 @@ Category: commandscripts
 EndScriptData */
 
 #include "ScriptMgr.h"
-#include "BattleField.h"
-#include "BattleFieldMgr.h"
+#include "Battlefield.h"
+#include "BattlefieldMgr.h"
 #include "Chat.h"
 #include "Language.h"
 #include "RBAC.h"
