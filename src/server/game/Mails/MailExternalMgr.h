@@ -30,7 +30,17 @@ private:
 public:
     static MailExternalMgr* instance();
 
-    void Update();
+    void Initialize();
+
+    void Update(uint32 diff);
+
+protected:
+    void _DoUpdate();
+
+private:
+    // update interval
+    uint32 m_updateTimer;
+    TimeTrackerSmall _timer;
 };
 
 #define sMailExternalMgr MailExternalMgr::instance()

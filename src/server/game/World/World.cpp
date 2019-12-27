@@ -1025,12 +1025,6 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_GROUP_VISIBILITY] = sConfigMgr->GetIntDefault("Visibility.GroupMode", 1);
 
     m_int_configs[CONFIG_MAIL_DELIVERY_DELAY] = sConfigMgr->GetIntDefault("MailDeliveryDelay", HOUR);
-    m_int_configs[CONFIG_CLEAN_OLD_MAIL_TIME] = sConfigMgr->GetIntDefault("CleanOldMailTime", 4);
-    if (m_int_configs[CONFIG_CLEAN_OLD_MAIL_TIME] > 23)
-    {
-        TC_LOG_ERROR("server.loading", "CleanOldMailTime (%u) must be an hour, between 0 and 23. Set to 4.", m_int_configs[CONFIG_CLEAN_OLD_MAIL_TIME]);
-        m_int_configs[CONFIG_CLEAN_OLD_MAIL_TIME] = 4;
-    }
 
     m_int_configs[CONFIG_UPTIME_UPDATE] = sConfigMgr->GetIntDefault("UpdateUptimeInterval", 10);
     if (int32(m_int_configs[CONFIG_UPTIME_UPDATE]) <= 0)
@@ -1528,7 +1522,6 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CROSSFACTION_SYSTEM_BATTLEGROUNDS]           = sConfigMgr->GetBoolDefault("CrossfactionBG.enable", true);
     // Mail External 
     m_bool_configs[CONFIG_EXTERNAL_MAIL_ENABLE]                 = sConfigMgr->GetBoolDefault("External.Mail.Enable", false);
-    m_int_configs[CONFIG_EXTERNAL_MAIL_INTERVAL]                = sConfigMgr->GetIntDefault("External.Mail.Interval", 1);
 
     // Dalaran Game Event
     m_bool_configs[CONFIG_DALARAN_GAME_EVENTS_INSTANT_RETURN]    = sConfigMgr->GetBoolDefault("DalaranGEvent.InstantReviveAndReturn.Enable", false);
@@ -1604,15 +1597,6 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_PDUMP_NO_PATHS] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowPaths", true);
     m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowOverwrite", true);
     m_bool_configs[CONFIG_UI_QUESTLEVELS_IN_DIALOGS] = sConfigMgr->GetBoolDefault("UI.ShowQuestLevelsInDialogs", false);
-
-    // Wintergrasp battlefield
-    m_bool_configs[CONFIG_WINTERGRASP_ENABLE] = sConfigMgr->GetBoolDefault("Wintergrasp.Enable", false);
-    m_int_configs[CONFIG_WINTERGRASP_PLR_MAX] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMax", 120);
-    m_int_configs[CONFIG_WINTERGRASP_PLR_MIN] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMin", 0);
-    m_int_configs[CONFIG_WINTERGRASP_PLR_MIN_LVL] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMinLvl", 77);
-    m_int_configs[CONFIG_WINTERGRASP_BATTLETIME] = sConfigMgr->GetIntDefault("Wintergrasp.BattleTimer", 30);
-    m_int_configs[CONFIG_WINTERGRASP_NOBATTLETIME] = sConfigMgr->GetIntDefault("Wintergrasp.NoBattleTimer", 150);
-    m_int_configs[CONFIG_WINTERGRASP_RESTART_AFTER_CRASH] = sConfigMgr->GetIntDefault("Wintergrasp.CrashRestartTimer", 10);
 
     // Stats limits
     m_bool_configs[CONFIG_STATS_LIMITS_ENABLE] = sConfigMgr->GetBoolDefault("Stats.Limits.Enable", false);
@@ -2254,8 +2238,6 @@ void World::SetInitialWorldSettings()
 
     m_timers[WUPDATE_CHANNEL_SAVE].SetInterval(getIntConfig(CONFIG_PRESERVE_CUSTOM_CHANNEL_INTERVAL) * MINUTE * IN_MILLISECONDS);
 
-    m_timers[WUPDATE_MAIL_EXTERNAL].SetInterval(getIntConfig(CONFIG_EXTERNAL_MAIL_INTERVAL) * IN_MILLISECONDS * MINUTE); // update mail list external every 5 minutes
-
     ///- Initialize MapManager
     TC_LOG_INFO("server.loading", "Starting Map System");
     sMapMgr->Initialize();
@@ -2304,6 +2286,10 @@ void World::SetInitialWorldSettings()
     ///- Initialize Mails
     TC_LOG_INFO("server.loading", "Starting Mail System");
     sMailMgr->Initialize();
+
+    ///- Initialize Mails
+    TC_LOG_INFO("server.loading", "Starting Mail External System");
+    sMailExternalMgr->Initialize();
 
     ///- Initialize Warden
     TC_LOG_INFO("server.loading", "Loading Warden Checks...");
@@ -2478,14 +2464,6 @@ void World::Update(uint32 diff)
     if (currentGameTime > m_NextGuildReset)
         ResetGuildCap();
 
-    ///- Handle external mail
-    if (m_timers[WUPDATE_MAIL_EXTERNAL].Passed())
-    {
-        m_timers[WUPDATE_MAIL_EXTERNAL].Reset();
-        if (sWorld->getBoolConfig(CONFIG_EXTERNAL_MAIL_ENABLE))
-            sMailExternalMgr->Update();
-    }
-
     /// <ul><li> Handle auctions when the timer has passed
     if (m_timers[WUPDATE_AUCTIONS].Passed())
     {
@@ -2584,6 +2562,9 @@ void World::Update(uint32 diff)
 
     sMailMgr->Update(diff);
     sWorldUpdateTime.RecordUpdateTimeDuration("MailMgr");
+
+    sMailExternalMgr->Update(diff);
+    sWorldUpdateTime.RecordUpdateTimeDuration("MailExternalMgr");
 
     ///- Delete all characters which have been deleted X days before
     if (m_timers[WUPDATE_DELETECHARS].Passed())

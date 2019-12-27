@@ -9525,14 +9525,11 @@ void Player::SendBGWeekendWorldStates() const
 void Player::SendBattlefieldWorldStates() const
 {
     /// Send misc stuff that needs to be sent on every login, like the battle timers.
-    if (sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
+    if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP))
     {
-        if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP))
-        {
-            SendUpdateWorldState(WORLDSTATE_WINTERGRASP_ACTIVE, battlefield->IsWarTime() ? 0 : 1);
-            uint32 timer = battlefield->IsWarTime() ? 0 : (battlefield->GetTimer() / 1000); // 0 - Time to next battle
-            SendUpdateWorldState(ClockWorldState[1], uint32(GameTime::GetGameTime() + timer));
-        }
+        SendUpdateWorldState(WORLDSTATE_WINTERGRASP_ACTIVE, battlefield->IsWarTime() ? 0 : 1);
+        uint32 timer = battlefield->IsWarTime() ? 0 : (battlefield->GetTimer() / 1000); // 0 - Time to next battle
+        SendUpdateWorldState(ClockWorldState[1], uint32(GameTime::GetGameTime() + timer));
     }
 }
 

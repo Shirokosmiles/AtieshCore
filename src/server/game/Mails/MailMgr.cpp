@@ -71,14 +71,14 @@ void MailMgr::Initialize()
 void MailMgr::Update(uint32 diff)
 {
     m_updateTimer += diff;
-    if (m_updateTimer > MAIL_UPDATE_INTERVAL) // upd only each 1 sec
+    if (m_updateTimer >= MAIL_UPDATE_INTERVAL) // upd only each 1 sec
     {
         _ExpTimer.Update(m_updateTimer/1000);
         if (_ExpTimer.Passed())
             _DeleteExpiryMails();
 
         m_updateTimer = 0;
-    }    
+    }
 }
 
 void MailMgr::SendMailBy(Object* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, MailCheckMask mask, uint32 deliver_delay, uint32 COD)

@@ -29,7 +29,28 @@ MailExternalMgr* MailExternalMgr::instance()
     return &instance;
 }
 
-void MailExternalMgr::Update()
+void MailExternalMgr::Initialize()
+{
+    _timer.Reset(MINUTE);    // upd only 1 time in minute
+}
+
+void MailExternalMgr::Update(uint32 diff)
+{
+    m_updateTimer += diff;
+    if (m_updateTimer >= MAIL_UPDATE_INTERVAL) // upd only each 1 sec
+    {
+        _timer.Update(m_updateTimer / 1000);
+        if (_timer.Passed())
+        {
+            _DoUpdate();
+            _timer.Reset(MINUTE);
+        }
+
+        m_updateTimer = 0;
+    }
+}
+
+void MailExternalMgr::_DoUpdate()
 {
     TC_LOG_DEBUG("mailexternal", "External Mail> Sending mails in queue...");
 
@@ -45,7 +66,7 @@ void MailExternalMgr::Update()
 
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         uint32 id = fields[0].GetUInt32();
         ObjectGuid receiver_guid = ObjectGuid(HighGuid::Player, fields[1].GetUInt32());
         std::string subject = fields[2].GetString();
@@ -60,9 +81,9 @@ void MailExternalMgr::Update()
             if (!sObjectMgr->GetItemTemplate(itemId))
                 TC_LOG_DEBUG("mailexternal", "External Mail> Item entry %u from `mail_external` doesn't exist in DB, skipped.", itemId);
             else
-            {                
+            {
                 if (Item* mailItem = Item::CreateItem(itemId, itemCount))
-                {                    
+                {
                     itemlist.push_back(mailItem);
                     mailItem->SaveToDB(trans);
                     TC_LOG_DEBUG("mailexternal", "External Mail> Adding %u of item with id %u", itemCount, itemId);
@@ -80,5 +101,5 @@ void MailExternalMgr::Update()
     } while (result->NextRow());
 
     CharacterDatabase.CommitTransaction(trans);
-    TC_LOG_DEBUG("mailexternal", "External Mail> All Mails Sent...");
+    TC_LOG_DEBUG("mailexternal", "External Mail> All Mails Sent...");    
 }
