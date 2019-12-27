@@ -1206,7 +1206,7 @@ public:
                     else
                     {
                         player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-                        for (int i = 0; i < 16; i++)
+                        for (int i = 0; i < sizeof(aurass); ++i)
                             player->AddAura(aurass[i], player);
                         player->GetSession()->SendNotification("|cffC67171Buffs received!");
                         player->CastSpell(player, 45523, true);
