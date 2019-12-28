@@ -1330,10 +1330,11 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 uiAction) override
         {
+            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(uiAction);
             ClearGossipMenuFor(player);
-            CloseGossipMenuFor(player);
+
             switch (action)
             {
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -1359,6 +1360,8 @@ public:
             default:
                 break;
             }
+
+            CloseGossipMenuFor(player);
             return true;
         }
 
