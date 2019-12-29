@@ -5875,9 +5875,9 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                                 else
                                 {
                                     float x, y, z;
-                                    target->GetClosePoint(x, y, z, targetObjectSize);
-                                    target->GetMap()->getObjectHitPos(target->GetPhaseMask(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + targetObjectSize, x, y, z + targetObjectSize, x, y, z, -targetObjectSize);
-                                    result = m_preGeneratedPath->CalculatePath(x, y, z + targetObjectSize, false, false);
+                                    target->GetClosePoint(x, y, z, targetObjectSizeForZOffset);
+                                    target->GetMap()->getObjectHitPos(target->GetPhaseMask(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + targetObjectSizeForZOffset, x, y, z + targetObjectSizeForZOffset, x, y, z, -targetObjectSizeForZOffset);
+                                    result = m_preGeneratedPath->CalculatePath(x, y, z + targetObjectSizeForZOffset, false, false);
                                     
                                     if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
                                         return SPELL_FAILED_NOPATH;
