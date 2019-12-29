@@ -57,7 +57,9 @@ enum DeathKnightSpells
     SPELL_BLOOD_STRIKE                  = 49926,
     SPELL_PLAGUE_STRIKE                 = 49917,
      
-    SPELL_DISMISS_RUNEBLADE             = 50707 // Right now despawn is done by its duration
+    SPELL_DISMISS_RUNEBLADE             = 50707, // Right now despawn is done by its duration,
+    // Gargoyle attack
+    SPELL_ATTACK_GARGOYLE               = 51963
 };
 
 enum GargoyleState
@@ -72,9 +74,9 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
 public:
     npc_pet_dk_ebon_gargoyle() : CreatureScript("npc_pet_dk_ebon_gargoyle") { }
 
-    struct npc_pet_dk_ebon_gargoyleAI : CasterAI
+    struct npc_pet_dk_ebon_gargoyleAI : ScriptedAI
     {
-        npc_pet_dk_ebon_gargoyleAI(Creature* creature) : CasterAI(creature)
+        npc_pet_dk_ebon_gargoyleAI(Creature* creature) : ScriptedAI(creature)
         {
             Initialize();
         }
@@ -86,11 +88,6 @@ public:
                 return;
 
             me->SetReactState(REACT_PASSIVE);
-            me->CombatStop(true);
-            me->StopMoving();
-            me->GetMotionMaster()->Clear();
-            me->SetCanFly(true);
-
             me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
 
             _events.Reset();
@@ -168,15 +165,19 @@ public:
                         // Start combat
                         if (Unit* target = ObjectAccessor::GetUnit(*me, victim))
                         {
-                            me->Attack(target, false);
+                            me->Attack(target, true);
                             me->GetMotionMaster()->MoveChase(target);
+                            DoCast(target, SPELL_ATTACK_GARGOYLE);
                         }
-                        me->SetCanFly(false);
                         break;
                     }
                     case EVENT_COMBAT_OUT:
                     {
-                        me->CombatStop(true);
+                        bool mutualPVP = false;
+                        if (Unit* target = ObjectAccessor::GetUnit(*me, victim))
+                            if (target->ToPlayer())
+                                mutualPVP = true;
+                        me->CombatStop(true, mutualPVP);
                         // Stop Fighting
                         me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
 
@@ -184,9 +185,7 @@ public:
                         me->CastSpell(me, SPELL_DK_SANCTUARY, true);
                         me->SetReactState(REACT_PASSIVE);
 
-                        //! HACK: Creature's can't have MOVEMENTFLAG_FLYING
                         // Fly Away
-                        me->SetCanFly(true);
                         me->SetSpeedRate(MOVE_FLIGHT, 0.75f);
                         me->SetSpeedRate(MOVE_RUN, 0.75f);
                         float newx = me->GetPositionX() + 20 * std::cos(me->GetOrientation());
@@ -205,7 +204,11 @@ public:
                 }
             }
 
-            CasterAI::UpdateAI(diff);
+            if (UpdateVictim())
+                DoSpellAttackIfReady(SPELL_ATTACK_GARGOYLE);
+
+            if (UpdateVictim() && !me->HasUnitState(UNIT_STATE_CASTING))
+                DoMeleeAttackIfReady();
         }
 
         void JustDied(Unit* /*killer*/) override
