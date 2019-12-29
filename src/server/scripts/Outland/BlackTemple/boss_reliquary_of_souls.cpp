@@ -256,9 +256,6 @@ struct boss_reliquary_of_souls : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
-            return;
-
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
