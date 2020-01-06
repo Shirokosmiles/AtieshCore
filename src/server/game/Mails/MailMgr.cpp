@@ -724,6 +724,14 @@ void MailMgr::RemoveMail(uint32 mailID, SQLTransaction& trans)
 
 void MailMgr::AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowType itemGuidLow, ObjectGuid::LowType receiver, SQLTransaction& trans)
 {
+    bool itemexist = false;
+    for (MailItemMap::const_iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
+        if (itr->second.item_guid == itemGuidLow)
+            itemexist = true;
+
+    if (itemexist)
+        return;
+
     // find max id
     uint32 new_id = 0;
     for (MailItemMap::const_iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
