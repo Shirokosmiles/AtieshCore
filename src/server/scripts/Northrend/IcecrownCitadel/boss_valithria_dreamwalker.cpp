@@ -349,7 +349,7 @@ class boss_valithria_dreamwalker : public CreatureScript
                 else if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == NOT_STARTED)
                 {
                     if (Creature* archmage = me->FindNearestCreature(NPC_RISEN_ARCHMAGE, 30.0f))
-                        DoZoneInCombat(archmage); // on one of them, that will make it all start
+                        archmage->EngageWithTarget(healer);   // call JustEngagedWith on one of them, that will make it all start
                 }
             }
 
@@ -514,17 +514,12 @@ class npc_green_dragon_combat_trigger : public CreatureScript
 
             void JustEnteredCombat(Unit* target) override
             {
-                if (IsEngaged())
-                    return;
-
                 if (!instance->CheckRequiredBosses(DATA_VALITHRIA_DREAMWALKER, target->ToPlayer()))
                 {
                     EnterEvadeMode(EVADE_REASON_SEQUENCE_BREAK);
                     instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                     return;
                 }
-
-                EngagementStart(target);
 
                 me->setActive(true);
                 DoZoneInCombat();
@@ -638,7 +633,7 @@ class npc_the_lich_king_controller : public CreatureScript
             {
                 // must not be in dream phase
                 summon->SetPhaseMask((summon->GetPhaseMask() & ~0x10), true);
-                DoZoneInCombat(summon);
+                summon->AI()->DoZoneInCombat();
                 if (summon->GetEntry() != NPC_SUPPRESSER)
                     if (Unit* target = me->GetCombatManager().GetAnyTarget())
                         summon->AI()->AttackStart(target);
@@ -707,6 +702,7 @@ class npc_risen_archmage : public CreatureScript
 
             void Initialize()
             {
+                _canCallJustEngagedWith = true;
                 _isInitialArchmage = false;
             }
 
@@ -724,29 +720,33 @@ class npc_risen_archmage : public CreatureScript
                 Initialize();
             }
 
-            void JustEnteredCombat(Unit* who) override
+            void JustEngagedWith(Unit* target) override
             {
-                if (IsEngaged())
-                    return;
-
-                me->InterruptNonMeleeSpells(false);
-
-                EngagementStart(who);
-
-                if (_isInitialArchmage)
+                me->FinishSpell(CURRENT_CHANNELED_SPELL, false);
+                if (_isInitialArchmage && _canCallJustEngagedWith)
                 {
                     if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
-                        DoZoneInCombat(lichKing);
+                    {
+                        lichKing->EngageWithTarget(target);
+                        lichKing->AI()->DoZoneInCombat();
+                    }
 
                     if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
-                        DoZoneInCombat(trigger);
+                    {
+                        trigger->EngageWithTarget(target);
+                        trigger->AI()->DoZoneInCombat();
+                    }
                 }
             }
 
             void DoAction(int32 action) override
             {
                 if (action == ACTION_ENTER_COMBAT)
+                {
+                    _canCallJustEngagedWith = false;
                     DoZoneInCombat();
+                    _canCallJustEngagedWith = true;
+                }
                 else if (action == ACTION_SETUP_ARCHMAGES)
                     _isInitialArchmage = true;
             }
@@ -810,6 +810,7 @@ class npc_risen_archmage : public CreatureScript
         private:
             EventMap _events;
             InstanceScript* _instance;
+            bool _canCallJustEngagedWith;
             bool _isInitialArchmage;
         };
 
