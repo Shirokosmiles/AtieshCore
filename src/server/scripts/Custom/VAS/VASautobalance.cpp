@@ -74,6 +74,9 @@ public:
         if (!unit)
             return;
 
+        if(unit->GetLevel() < 3)
+            return;
+
         if (unit->GetCharmerOrOwner())
             if (unit->ToPet() || unit->ToTotem() || unit->IsSummon())
                 return;
