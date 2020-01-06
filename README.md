@@ -58,7 +58,7 @@ Read file [COPYING](COPYING).
 
 ## Authors &amp; Contributors
 
-Read file [THANKS](THANKS).
+Read file [AUTHORS](AUTHORS).
 
 
 ## Links
