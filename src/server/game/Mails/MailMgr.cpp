@@ -730,7 +730,10 @@ void MailMgr::AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowTy
             itemexist = true;
 
     if (itemexist)
+    {
+        TC_LOG_ERROR("mailMgr", "New Mail (%u) :: AddNewMailItem (GUID: %u), but item with this item_guid already exist, skip", mailID, itemGuidLow);
         return;
+    }
 
     // find max id
     uint32 new_id = 0;
