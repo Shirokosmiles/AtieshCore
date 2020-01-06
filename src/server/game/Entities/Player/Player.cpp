@@ -18341,7 +18341,15 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
         while (!problematicItems.empty())
         {
             std::string subject = GetSession()->GetTrinityString(LANG_NOT_EQUIPPED_ITEM);
-            sMailMgr->SendMailWithItemsBy(this, this->GetGUID().GetCounter(), subject, "There were problems with equipping item(s).", 0, problematicItems);
+
+            std::list<Item*> sendItems;
+            for (uint8 i = 0; !problematicItems.empty() && i < MAX_MAIL_ITEMS; ++i)
+            {
+                sendItems.push_back(problematicItems.front());
+                problematicItems.pop_front();
+            }
+            sMailMgr->SendMailWithItemsBy(this, this->GetGUID().GetCounter(), subject, "There were problems with equipping item(s).", 0, sendItems);
+            sendItems.clear();
         }
         CharacterDatabase.CommitTransaction(trans);
     }
