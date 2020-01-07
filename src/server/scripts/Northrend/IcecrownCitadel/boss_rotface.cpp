@@ -116,11 +116,6 @@ class boss_rotface : public CreatureScript
             void Reset() override
             {
                 _Reset();
-                events.ScheduleEvent(EVENT_SLIME_SPRAY, 20s);
-                events.ScheduleEvent(EVENT_HASTEN_INFECTIONS, 90s);
-                events.ScheduleEvent(EVENT_MUTATED_INFECTION, 14s);
-                if (IsHeroic())
-                    events.ScheduleEvent(EVENT_VILE_GAS, 22s, 27s);
 
                 infectionStage = 0;
                 infectionCooldown = 14000;
@@ -148,6 +143,12 @@ class boss_rotface : public CreatureScript
 
                 if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_GREEN_PLAGUE_MONSTER_ENTRANCE)))
                     go->SetGoState(GO_STATE_READY);
+
+                events.ScheduleEvent(EVENT_SLIME_SPRAY, 20s);
+                events.ScheduleEvent(EVENT_HASTEN_INFECTIONS, 90s);
+                events.ScheduleEvent(EVENT_MUTATED_INFECTION, 14s);
+                if (IsHeroic())
+                    events.ScheduleEvent(EVENT_VILE_GAS, 22s, 27s);
             }
 
             void JustDied(Unit* /*killer*/) override
@@ -209,7 +210,7 @@ class boss_rotface : public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_SLIME_SPRAY:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                             {
                                 DoSummon(NPC_OOZE_SPRAY_STALKER, *target, 8000, TEMPSUMMON_TIMED_DESPAWN);
                                 Talk(EMOTE_SLIME_SPRAY);

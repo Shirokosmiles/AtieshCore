@@ -1639,7 +1639,7 @@ void GameObject::Use(Unit* user)
                 if (player->GetMap() != GetMap())
                     break;
 
-                if (player->GetAreaId() != GetAreaId())
+                if (!player->GetMap()->IsDungeon() && player->GetAreaId() != GetAreaId())
                     break;
 
                 if (!IsEmptyTempSummonsList())

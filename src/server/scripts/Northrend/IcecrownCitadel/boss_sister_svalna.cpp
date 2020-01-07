@@ -501,7 +501,7 @@ struct boss_sister_svalna : public BossAI
                     }
                     break;
                 case EVENT_IMPALING_SPEAR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150.0f, true, true, -SPELL_IMPALING_SPEAR))
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0 /* if want to do SOLO playe use 1*/, 150.0f, true, true, -SPELL_IMPALING_SPEAR))
                     {
                         DoCast(me, SPELL_AETHER_SHIELD);
                         DoCast(target, SPELL_IMPALING_SPEAR);

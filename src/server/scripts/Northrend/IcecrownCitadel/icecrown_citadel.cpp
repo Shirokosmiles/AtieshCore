@@ -179,6 +179,7 @@ enum ICCTimedEventIds
 
     // Putricide pre event
     EVENT_PUTRICIDE_TRAP,
+    EVENT_START_LEAP_AND_DROP,
     EVENT_END_LEAP,
     EVENT_SUMMON_FLESH_EATING_BUG,
     EVENT_FLESH_EATING_BITE,
@@ -1598,19 +1599,12 @@ public:
     {
         npc_flesh_eating_insectAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
         {
-            Initialize();
-        }
-
-        void Initialize()
-        {
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->GetMotionMaster()->MoveRandom(50.0f);
-            _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 10000);
+            me->SetReactState(REACT_DEFENSIVE);
         }
 
         void Reset() override
         {
-            _events.Reset();            
+            _events.Reset();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1623,8 +1617,9 @@ public:
             switch (action)
             {
                 case ACTION_PUTRICIDE_BUG_LEAP:
-                    DoCast(SPELL_RANDOM_LEAP);
-                    _events.ScheduleEvent(EVENT_END_LEAP, 2500);
+                    //me->GetMotionMaster()->MoveCharge(4357.353027f, 3115.832764f, 374.922791f);
+                    _events.ScheduleEvent(EVENT_START_LEAP_AND_DROP, 2500);
+                    _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 10000);
                     break;
                 default:
                     break;
@@ -1642,11 +1637,22 @@ public:
             {
                 switch (eventId)
                 {
+                    case EVENT_START_LEAP_AND_DROP:
+                        if (Player* rplayer = me->SelectNearestPlayer(125.0f))
+                            me->GetMotionMaster()->MoveFleeing(rplayer);
+                        else
+                            me->GetMotionMaster()->MoveRandom(125.f);
+
+                        _events.ScheduleEvent(EVENT_END_LEAP, 1500);
+                        break;
                     case EVENT_END_LEAP:
-                        me->GetMotionMaster()->MoveRandom(50.0f);
+                        if (Player* rplayer = me->SelectNearestPlayer(125.0f))
+                            DoCast(rplayer, SPELL_RANDOM_LEAP, true);
+                        _events.ScheduleEvent(EVENT_END_LEAP, 3500);
                         break;
                     case EVENT_FLESH_EATING_BITE:
-                        DoCast(SPELL_FLESH_EATING_BITE);
+                        if (Player* rplayer = me->SelectNearestPlayer(5.0f))
+                            DoCast(rplayer, SPELL_FLESH_EATING_BITE, true);
                         _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 7500);
                         break;
                     default:
