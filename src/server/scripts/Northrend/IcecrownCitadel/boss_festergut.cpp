@@ -113,6 +113,9 @@ class boss_festergut : public CreatureScript
                         gasDummy->RemoveAurasDueToSpell(gaseousBlightVisual[i]);
                     }
                 }
+
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_ORANGE_PLAGUE_MONSTER_ENTRANCE)))
+                    go->SetGoState(GO_STATE_ACTIVE);
             }
 
             void JustEngagedWith(Unit* who) override
@@ -131,6 +134,9 @@ class boss_festergut : public CreatureScript
                 if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                     professor->AI()->DoAction(ACTION_FESTERGUT_COMBAT);
                 DoZoneInCombat();
+
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_ORANGE_PLAGUE_MONSTER_ENTRANCE)))
+                    go->SetGoState(GO_STATE_READY);
             }
 
             void JustDied(Unit* /*killer*/) override

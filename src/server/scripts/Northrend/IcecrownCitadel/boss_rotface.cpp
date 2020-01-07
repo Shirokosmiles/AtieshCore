@@ -124,6 +124,9 @@ class boss_rotface : public CreatureScript
 
                 infectionStage = 0;
                 infectionCooldown = 14000;
+
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_GREEN_PLAGUE_MONSTER_ENTRANCE)))
+                    go->SetGoState(GO_STATE_ACTIVE);
             }
 
             void JustEngagedWith(Unit* who) override
@@ -142,6 +145,9 @@ class boss_rotface : public CreatureScript
 
                 DoZoneInCombat();
                 DoCast(me, SPELL_GREEN_ABOMINATION_HITTIN__YA_PROC, true);
+
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_GREEN_PLAGUE_MONSTER_ENTRANCE)))
+                    go->SetGoState(GO_STATE_READY);
             }
 
             void JustDied(Unit* /*killer*/) override

@@ -509,7 +509,9 @@ class instance_icecrown_citadel : public InstanceMapScript
                     case GO_LORD_MARROWGAR_S_ENTRANCE:
                     case GO_ORATORY_OF_THE_DAMNED_ENTRANCE:
                     case GO_ORANGE_PLAGUE_MONSTER_ENTRANCE:
+                        PutricideNormalGateGUIDs[0] = go->GetGUID();
                     case GO_GREEN_PLAGUE_MONSTER_ENTRANCE:
+                        PutricideNormalGateGUIDs[1] = go->GetGUID();
                     case GO_CRIMSON_HALL_DOOR:
                     case GO_BLOOD_ELF_COUNCIL_DOOR:
                     case GO_BLOOD_ELF_COUNCIL_DOOR_RIGHT:
@@ -785,6 +787,10 @@ class instance_icecrown_citadel : public InstanceMapScript
                         return DeathbringerSaurfangEventGUID;
                     case GO_SAURFANG_S_DOOR:
                         return DeathbringerSaurfangDoorGUID;
+                    case GO_ORANGE_PLAGUE_MONSTER_ENTRANCE: //festergut
+                        return PutricideNormalGateGUIDs[0];
+                    case GO_GREEN_PLAGUE_MONSTER_ENTRANCE:
+                        return PutricideNormalGateGUIDs[1];
                     case DATA_FESTERGUT:
                         return FestergutGUID;
                     case DATA_ROTFACE:
@@ -1524,6 +1530,7 @@ class instance_icecrown_citadel : public InstanceMapScript
             ObjectGuid FrostwingSigilGUID;
             ObjectGuid PutricidePipeGUIDs[2];
             ObjectGuid PutricideGateGUIDs[2];
+            ObjectGuid PutricideNormalGateGUIDs[2];
             ObjectGuid PutricideCollisionGUID;
             ObjectGuid FestergutGUID;
             ObjectGuid RotfaceGUID;
