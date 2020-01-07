@@ -329,6 +329,8 @@ struct boss_sister_svalna : public BossAI
         _Reset();
         me->SetReactState(REACT_DEFENSIVE);
         _isEventInProgress = false;
+        _shielded = false;
+        _spearTarget = ObjectGuid::Empty;
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -356,9 +358,9 @@ struct boss_sister_svalna : public BossAI
         if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
             crok->AI()->Talk(SAY_CROK_COMBAT_SVALNA);
         DoCastSelf(SPELL_DIVINE_SURGE, true);
-        events.ScheduleEvent(EVENT_SVALNA_COMBAT, 9s);
-        events.ScheduleEvent(EVENT_IMPALING_SPEAR, 40s, 50s);
-        events.ScheduleEvent(EVENT_AETHER_SHIELD, 100s, 110s);
+        events.ScheduleEvent(EVENT_SVALNA_COMBAT, 1s);
+        events.ScheduleEvent(EVENT_IMPALING_SPEAR, 1s, 5s);
+        //events.ScheduleEvent(EVENT_AETHER_SHIELD, 100s, 110s);
     }
 
     void KilledUnit(Unit* victim) override
@@ -492,14 +494,24 @@ struct boss_sister_svalna : public BossAI
                 case EVENT_SVALNA_COMBAT:
                     me->SetReactState(REACT_DEFENSIVE);
                     Talk(SAY_SVALNA_AGGRO);
+                    if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
+                    {
+                        crok->AI()->Talk(SAY_CROK_COMBAT_SVALNA);
+                        crok->SetReactState(REACT_AGGRESSIVE);
+                    }
                     break;
                 case EVENT_IMPALING_SPEAR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, true, -SPELL_IMPALING_SPEAR))
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150.0f, true, true, -SPELL_IMPALING_SPEAR))
                     {
                         DoCast(me, SPELL_AETHER_SHIELD);
                         DoCast(target, SPELL_IMPALING_SPEAR);
+                        _shielded = true;
+                        _spearTarget = target->GetGUID();
                     }
                     events.ScheduleEvent(EVENT_IMPALING_SPEAR, 20s, 25s);
+                    break;
+                case EVENT_AETHER_SHIELD:
+                    me->RemoveAura(SPELL_AETHER_SHIELD);
                     break;
                 default:
                     break;
@@ -509,10 +521,22 @@ struct boss_sister_svalna : public BossAI
                 return;
         }
 
+        if (_shielded)
+        {
+            if (Unit* target = ObjectAccessor::GetUnit(*me, _spearTarget))
+                if (!target->IsAlive() || !target->HasAura(SPELL_IMPALING_SPEAR))
+                {
+                    _shielded = false;
+                    events.ScheduleEvent(EVENT_AETHER_SHIELD, 0);
+                }
+        }
+
         DoMeleeAttackIfReady();
     }
 
 private:
+    bool _shielded;
+    ObjectGuid _spearTarget;
     bool _isEventInProgress;
 };
 
