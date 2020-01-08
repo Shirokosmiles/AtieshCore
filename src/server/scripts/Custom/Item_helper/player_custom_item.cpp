@@ -124,6 +124,8 @@ public:
             // pvp weekly bonus cap
             AddGossipItemFor(player, 0, flag + " )", GOSSIP_SENDER_MAIN, 3);
         }
+        // promo
+        AddGossipItemFor(player, 0, "Enter Promo-Code", GOSSIP_SENDER_MAIN, 0, "Are you sure that the entered code is correct?", 0, true);
         // магазин
         AddGossipItemFor(player, 0, GTS(LANG_ITEM_MENU_TRADE), GOSSIP_SENDER_MAIN, 2);
         // trainer
@@ -2102,6 +2104,75 @@ public:
         if (!*code)
             return;
 
+        // only for Promo-codes
+        if (!action)
+        {
+            std::string codeUINT = code;
+            uint32 id = 0;
+
+            if (sObjectMgr->GetPromoCode(codeUINT, id))
+            {
+                PromotionCodesContainer const& promoMap = sObjectMgr->GetPromotionCodesMap();
+                for (PromotionCodesContainer::const_iterator itr = promoMap.begin(); itr != promoMap.end(); ++itr)
+                {
+                    PromotionCodes const* promo = &itr->second;
+
+                    if (promo->code == codeUINT && !promo->used)
+                    {
+                        if (promo->arena)
+                            player->ModifyArenaPoints(promo->arena);
+                        if (promo->honor)
+                            player->ModifyHonorPoints(promo->honor);
+                        if (promo->item_1)
+                        {
+                            uint32 count = 1;
+                            if (promo->item_count_1 && promo->item_count_1 > 1)
+                                count = promo->item_count_1;
+                            player->AddItem(promo->item_1, count);
+                        }
+                        if (promo->item_2)
+                        {
+                            uint32 count = 1;
+                            if (promo->item_count_2 && promo->item_count_2 > 1)
+                                count = promo->item_count_2;
+                            player->AddItem(promo->item_2, count);
+                        }
+                        if (promo->item_3)
+                        {
+                            uint32 count = 1;
+                            if (promo->item_count_3 && promo->item_count_3 > 1)
+                                count = promo->item_count_3;
+                            player->AddItem(promo->item_3, count);
+                        }
+                        if (promo->money)
+                            player->ModifyMoney(promo->money);
+                        if (promo->coin)
+                        {
+                            uint32 coins = player->GetCoins();
+                            coins += promo->coin;
+                            player->SetCoins(coins);
+                            AccountMgr::SetCoins(player->GetSession()->GetAccountId(), coins);
+                        }
+                        if (promo->spell_1)
+                            player->LearnSpell(promo->spell_1, false, false);
+                        if (promo->spell_2)
+                            player->LearnSpell(promo->spell_2, false, false);
+                        if (promo->spell_3)
+                            player->LearnSpell(promo->spell_3, false, false);
+                        if (promo->aura)
+                            player->AddAura(promo->aura, player);
+                    }
+                }
+
+                if (id)
+                    sObjectMgr->UsePromoCode(id);
+            }
+
+            player->PlayerTalkClass->SendCloseGossip();
+            return;
+        }
+
+        //for GuildWars system
         std::string guildName = code;
 
         Guild* targetGuild = sGuildMgr->GetGuildByName(guildName);
