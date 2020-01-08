@@ -17,6 +17,7 @@
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "AccountMgr.h"
 #include "DatabaseEnv.h"
 #include "GossipDef.h"
 #include "Player.h"
@@ -54,8 +55,6 @@ public:
     {
         landro_longshotAI(Creature* creature) : ScriptedAI(creature) { }
 
-        int SelectedReward;
-
         bool GossipHello(Player* player) override
         {
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Do you desire something special?", GOSSIP_SENDER_MAIN, PROMOTION);
@@ -65,52 +64,106 @@ public:
 
         bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
-            uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
+            uint32 MenuID = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             player->PlayerTalkClass->ClearMenus();
 
-            if (action != 0)
+            uint32 ActionMenuID = 0;
+            std::string OptionText = "";
+            /// Find items for given menu id.
+            GossipMenuItemsMapBounds bounds = sObjectMgr->GetGossipMenuItemsMapBounds(MenuID);
+            /// Return if there are none.
+            if (bounds.first != bounds.second)
             {
-                SelectedReward = action;
-            }
+                /// Iterate over each of them.
+                for (GossipMenuItemsContainer::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
+                {
+                    /// Find the one with the given menu item id.
+                    ActionMenuID = itr->second.ActionMenuID;
+                    OptionText = itr->second.OptionText;
 
-            QueryResult GetGossipFields = WorldDatabase.PQuery("SELECT OptionText, ActionMenuID FROM gossip_menu_option WHERE MenuID = %u", action);
-            do
-            {
-                Field * fields = GetGossipFields->Fetch();
+                    if (ActionMenuID != 0)
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, OptionText, GOSSIP_SENDER_MAIN, ActionMenuID);
+                    else
+                        AddGossipItemFor(player, 0, OptionText, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, "", 0, true);
+                }
+            }            
 
-                std::string OptionText = fields[0].GetString();
-                uint32  ActionMenuID = fields[1].GetUInt32();
-                if (ActionMenuID != 0)
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, OptionText, GOSSIP_SENDER_MAIN, ActionMenuID);
-                else
-                    AddGossipItemFor(player, 0, OptionText, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, "", 0, true);
-
-            } while (GetGossipFields->NextRow());
-
-            player->PlayerTalkClass->SendGossipMenu(PROMOTION_MENU_TEXT, me->GetGUID());
+            player->PlayerTalkClass->SendGossipMenu(PROMOTION_MENU_TEXT, me->GetGUID());            
             return true;
         }
 
         bool GossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 /*gossipListId*/, char const* code) override
         {
             player->PlayerTalkClass->ClearMenus();
-            uint32 codeUINT = (uint32)atol(code);
-            if (!codeUINT)
+            if (!code)
                 return false;
-            QueryResult SearchForCode = WorldDatabase.PQuery("SELECT item FROM promotion_codes WHERE code = %u AND collection = %u AND used = 0", codeUINT, SelectedReward);
-            if (!SearchForCode)
+
+            std::string codeUINT = code;
+            uint32 id = 0;
+            bool founded = false;
+
+            if (sObjectMgr->GetPromoCode(codeUINT, id))
             {
-                me->AI()->Talk(SAY_WRONG);
+                PromotionCodesContainer const& promoMap = sObjectMgr->GetPromotionCodesMap();
+                for (PromotionCodesContainer::const_iterator itr = promoMap.begin(); itr != promoMap.end(); ++itr)
+                {
+                    PromotionCodes const* promo = &itr->second;
+
+                    if (promo->code == codeUINT && !promo->used)
+                    {
+                        founded = true;
+                        if (promo->arena)
+                            player->ModifyArenaPoints(promo->arena);
+                        if (promo->honor)
+                            player->ModifyHonorPoints(promo->honor);
+                        if (promo->item_1)
+                        {
+                            uint32 count = 1;
+                            if (promo->item_count_1 && promo->item_count_1 > 1)
+                                count = promo->item_count_1;
+                            player->AddItem(promo->item_1, count);
+                        }
+                        if (promo->item_2)
+                        {
+                            uint32 count = 1;
+                            if (promo->item_count_2 && promo->item_count_2 > 1)
+                                count = promo->item_count_2;
+                            player->AddItem(promo->item_2, count);
+                        }
+                        if (promo->item_3)
+                        {
+                            uint32 count = 1;
+                            if (promo->item_count_3 && promo->item_count_3 > 1)
+                                count = promo->item_count_3;
+                            player->AddItem(promo->item_3, count);
+                        }
+                        if (promo->money)
+                            player->ModifyMoney(promo->money);
+                        if (promo->coin)
+                        {
+                            uint32 coins = player->GetCoins();
+                            coins += promo->coin;
+                            player->SetCoins(coins);
+                            AccountMgr::SetCoins(player->GetSession()->GetAccountId(), coins);
+                        }
+                        if (promo->spell_1)
+                            player->LearnSpell(promo->spell_1, false, false);
+                        if (promo->spell_2)
+                            player->LearnSpell(promo->spell_2, false, false);
+                        if (promo->spell_3)
+                            player->LearnSpell(promo->spell_3, false, false);
+                        if (promo->aura)
+                            player->AddAura(promo->aura, player);
+                    }
+                }
             }
+
+            if (!founded)
+                me->AI()->Talk(SAY_WRONG);
             else
             {
                 me->AI()->Talk(SAY_CORRECT);
-                do
-                {
-                    Field * fields = SearchForCode->Fetch();
-                    player->AddItem(fields[0].GetUInt32(), 1);
-                    WorldDatabase.PQuery("Update promotion_codes SET USED = 1 WHERE code = %u", codeUINT);
-                } while (SearchForCode->NextRow());
+                sObjectMgr->UsePromoCode(id);
             }
 
             player->PlayerTalkClass->SendCloseGossip();

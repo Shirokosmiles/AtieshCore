@@ -9078,6 +9078,160 @@ void ObjectMgr::LoadPlayerAutoLearnSpells()
     TC_LOG_INFO("server.loading", ">> Loaded %u Guild Spell Auras in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+void ObjectMgr::LoadPromoCodes()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _promoCodesStore.clear();                                  // for reload case
+
+    //                                                0       1        2     3      4      5      6       7       8         9              10           11         12     13       14      15       16    17
+    QueryResult result = WorldDatabase.Query("SELECT id, collection, code, honor, arena, money, item_1, item_2, item_3, item_count_1, item_count_2, item_count_3, aura, spell_1, spell_2, spell_3, coin, used FROM promotion_codes");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 Promo Codes. DB table `promotion_codes` is empty!");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+
+        PromotionCodes pc;
+
+        pc.collection = fields[1].GetUInt32();
+        pc.code = fields[2].GetString();
+        pc.honor = fields[3].GetUInt32();
+        pc.arena = fields[4].GetUInt32();
+        pc.money = fields[5].GetUInt32();
+        pc.item_1 = fields[6].GetUInt32();
+        pc.item_2 = fields[7].GetUInt32();
+        pc.item_3 = fields[8].GetUInt32();
+        pc.item_count_1 = fields[9].GetUInt32();
+        pc.item_count_2 = fields[10].GetUInt32();
+        pc.item_count_3 = fields[11].GetUInt32();
+        pc.aura = fields[12].GetUInt32();
+        pc.spell_1 = fields[13].GetUInt32();
+        pc.spell_2 = fields[14].GetUInt32();
+        pc.spell_3 = fields[15].GetUInt32();
+        pc.coin = fields[16].GetUInt32();
+        pc.used = fields[17].GetUInt8();
+
+        _promoCodesStore[id] = pc;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u Promotion Codes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+PromotionCodes const* ObjectMgr::GetPromoCode(const std::string& name, uint32& id) const
+{
+    // explicit name case
+    std::wstring wname;
+    if (!Utf8toWStr(name, wname))
+        return nullptr;
+
+    id = 0;
+
+    for (PromotionCodesContainer::const_iterator itr = _promoCodesStore.begin(); itr != _promoCodesStore.end(); ++itr)
+    {
+        if (itr->second.code == name)
+        {
+            id = itr->first;
+            return &itr->second;
+        }
+    }
+
+    return nullptr;
+}
+
+bool ObjectMgr::AddPromoCode(PromotionCodes& promo)
+{
+    // find max id
+    uint32 new_id = 0;
+    for (PromotionCodesContainer::const_iterator itr = _promoCodesStore.begin(); itr != _promoCodesStore.end(); ++itr)
+        if (itr->first > new_id)
+            new_id = itr->first;
+
+    // use next
+    ++new_id;
+
+    _promoCodesStore[new_id] = promo;
+
+    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_PROMO_CODE);
+
+    stmt->setUInt32(0, new_id);
+    stmt->setUInt32(1, promo.collection);
+    stmt->setString(2, promo.code);
+    stmt->setUInt32(3, promo.honor);
+    stmt->setUInt32(4, promo.arena);
+    stmt->setUInt32(5, promo.money);
+    stmt->setUInt32(6, promo.item_1);
+    stmt->setUInt32(7, promo.item_2);
+    stmt->setUInt32(8, promo.item_3);
+    stmt->setUInt32(9, promo.item_count_1);
+    stmt->setUInt32(10, promo.item_count_2);
+    stmt->setUInt32(11, promo.item_count_3);
+    stmt->setUInt32(12, promo.aura);
+    stmt->setUInt32(13, promo.spell_1);
+    stmt->setUInt32(14, promo.spell_2);
+    stmt->setUInt32(15, promo.spell_3);
+    stmt->setUInt32(16, promo.coin);
+    stmt->setUInt8(17, promo.used);
+
+    WorldDatabase.Execute(stmt);
+
+    return true;
+}
+
+bool ObjectMgr::DeletePromoCode(const std::string& name)
+{
+    // explicit name case
+    std::wstring wname;
+    if (!Utf8toWStr(name, wname))
+        return false;
+
+    for (PromotionCodesContainer::iterator itr = _promoCodesStore.begin(); itr != _promoCodesStore.end(); ++itr)
+    {
+        if (itr->second.code == name)
+        {
+            PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_PROMO_CODE);
+
+            stmt->setString(0, itr->second.code);
+
+            WorldDatabase.Execute(stmt);
+
+            _promoCodesStore.erase(itr);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void ObjectMgr::UsePromoCode(uint32 id)
+{
+    for (PromotionCodesContainer::iterator itr = _promoCodesStore.begin(); itr != _promoCodesStore.end(); ++itr)
+    {
+        if (itr->first == id)
+        {
+            itr->second.used = 1;
+
+            PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_PROMO_CODE_USED);
+
+            stmt->setUInt8(0, 1);
+            stmt->setUInt32(1, id);
+
+            WorldDatabase.Execute(stmt);
+        }
+    }
+}
+
 void ObjectMgr::LoadMailLevelRewards()
 {
     uint32 oldMSTime = getMSTime();

@@ -192,6 +192,29 @@ struct PlayerAutoLearn
 
 typedef std::unordered_map<uint32, PlayerAutoLearn> PlayerAutoLearnContainer;
 
+struct PromotionCodes
+{
+    uint32 collection;
+    std::string code;
+    uint32 honor;
+    uint32 arena;
+    uint32 money;
+    uint32 item_1;
+    uint32 item_2;
+    uint32 item_3;
+    uint32 item_count_1;
+    uint32 item_count_2;
+    uint32 item_count_3;
+    uint32 aura;
+    uint32 spell_1;
+    uint32 spell_2;
+    uint32 spell_3;
+    uint32 coin;
+    uint8 used;
+};
+
+typedef std::unordered_map<uint32, PromotionCodes> PromotionCodesContainer;
+
 enum ScriptsType
 {
     SCRIPTS_FIRST = 1,
@@ -1253,6 +1276,8 @@ class TC_GAME_API ObjectMgr
 
         void LoadPlayerAutoLearnSpells();
 
+        void LoadPromoCodes();
+
         void LoadGossipMenu();
         void LoadGossipMenuItems();
 
@@ -1509,9 +1534,23 @@ class TC_GAME_API ObjectMgr
         GuildSpellAurasContainer const& GetGuildSpellAurasMap() const { return _guildSpellAurasStore; }
         //Guild Spell Auras end
 
-        //Player Auto Learn start
+        //Player Auto Learn start        
         PlayerAutoLearnContainer const& GetPlayerAutoLearnMap() const { return _playerAutoLearnStore; }
         //Player Auto Learn end
+
+        //Promo codes start
+        PromotionCodes const* GetPromoCode(uint32 id) const
+        {
+            PromotionCodesContainer::const_iterator itr = _promoCodesStore.find(id);
+            if (itr == _promoCodesStore.end()) return nullptr;
+            return &itr->second;
+        }
+        PromotionCodes const* GetPromoCode(std::string const& name, uint32& id) const;
+        PromotionCodesContainer const& GetPromotionCodesMap() const { return _promoCodesStore; }
+        bool AddPromoCode(PromotionCodes& data);
+        bool DeletePromoCode(std::string const& name);
+        void UsePromoCode(uint32 id);
+        //Promo codes end
 
         Trainer::Trainer const* GetTrainer(uint32 creatureId) const;
 
@@ -1644,6 +1683,7 @@ class TC_GAME_API ObjectMgr
         GameTeleContainer _gameTeleStore;
         GuildSpellAurasContainer _guildSpellAurasStore;
         PlayerAutoLearnContainer _playerAutoLearnStore;
+        PromotionCodesContainer _promoCodesStore;
 
         ScriptNameContainer _scriptNamesStore;
 

@@ -2110,6 +2110,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Player Auto Learn spells...");
     sObjectMgr->LoadPlayerAutoLearnSpells();
 
+    TC_LOG_INFO("server.loading", "Loading Promo Codes...");
+    sObjectMgr->LoadPromoCodes();
+
     TC_LOG_INFO("server.loading", "Loading Trainers...");       // must be after LoadCreatureTemplates
     sObjectMgr->LoadTrainers();
 
