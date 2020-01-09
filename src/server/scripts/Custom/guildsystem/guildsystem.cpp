@@ -80,7 +80,7 @@ public:
 
     void LeftInGuildWar(Guild* guild, int32 ratingChange, std::string const& guildName, std::string const& winnerguildName) override
     {
-        guild->BroadcastToGuildEndedGWWith(guildName, winnerguildName, ratingChange);
+        guild->BroadcastToGuildEndedGWWith(guildName, winnerguildName, ratingChange);        
     }
 
     void OnAddMember(Guild* guild, Player* player, uint8& /*plRank*/) override

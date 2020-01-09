@@ -1462,6 +1462,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_START] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Minimal.Delta.PreviousStartTimer", 3600);
     m_int_configs[CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_END] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Minimal.Delta.PreviousEndTimer", 3600);
     m_int_configs[CONFIG_GSYSTEM_GW_KILL_EXP] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Exp.ForEnemyGuildKill", 1);
+    m_int_configs[CONFIG_GSYSTEM_GW_WINNER_EXP] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Exp.ForWinnerOfGW", 250);
+    m_int_configs[CONFIG_GSYSTEM_GW_LOSER_EXP] = sConfigMgr->GetIntDefault("GSystem.GuildWars.Exp.ForLoserOfGW", 100);
 
     // VIP system
     m_bool_configs[CONFIG_VIP_DEBUFF]        = sConfigMgr->GetBoolDefault("Config.Vip.Debuff.Command", false);

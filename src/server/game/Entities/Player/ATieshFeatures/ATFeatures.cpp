@@ -1020,10 +1020,11 @@ void Guild::RemoveHigherGuildLevelAuras(uint32 level)
 void Guild::AddGuildExp(uint32 value, Player* player, bool randombonus)
 {
     uint32 currentExp = GetGuildExperience();
-    uint32 newExp = currentExp + value;
-
+    uint32 addedExp = value;
     if (randombonus)
-        newExp += urand(1, 45);
+        addedExp += urand(1, 45);
+
+    uint32 newExp = currentExp + addedExp;
 
     if (newExp >= 1500)
     {
@@ -1035,7 +1036,7 @@ void Guild::AddGuildExp(uint32 value, Player* player, bool randombonus)
         }
     }
     m_guildExp = newExp;
-    sScriptMgr->OnGuildExpirienceUpEvent(this, player, value);
+    sScriptMgr->OnGuildExpirienceUpEvent(this, player, addedExp);
 
     UpdateLevelAndExp();
 }
@@ -1179,20 +1180,6 @@ void Guild::BroadcastToGuildExp(uint32 level, std::string const& playerName) con
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_EXP_UP_BY, level, playerName);
             else
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_EXP_UP, level);
-        }
-    }
-}
-
-void Guild::BroadcastToGuildRating(uint32 level, std::string const& playerName) const
-{
-    for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
-    {
-        if (Player * player = itr->second->FindConnectedPlayer())
-        {
-            if (playerName != "")
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY, level, playerName);
-            else
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_RATING_UP, level);
         }
     }
 }

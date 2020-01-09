@@ -278,6 +278,11 @@ void GuildMgr::StopWarBetween(ObjectGuid::LowType firstguildId, ObjectGuid::LowT
     looserGuild->UpdateGuildRating(loserMatchmakerChange, false);
     winnerGuild->UpdateGuildRating(winnerMatchmakerChange, true);
 
+    uint32 receivedWinnerExp = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_WINNER_EXP);
+    uint32 receivedLoserExp = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_LOSER_EXP);
+    winnerGuild->AddGuildExp(receivedWinnerExp, nullptr, true);
+    looserGuild->AddGuildExp(receivedLoserExp, nullptr, true);
+
     if (!GuildHasWarState(looserID))
         looserGuild->UpdateGuildWarFlag(false);
     if (!GuildHasWarState(winnerguildId))

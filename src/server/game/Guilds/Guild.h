@@ -697,7 +697,6 @@ class TC_GAME_API Guild
         void BroadcastToGuildLevelUp(uint32 level, std::string const& playerName) const;
         void BroadcastToGuildLevelDown(uint32 level, uint32 lost, std::string const& playerName) const;
         void BroadcastToGuildExp(uint32 level, std::string const& playerName) const;
-        void BroadcastToGuildRating(uint32 level, std::string const& playerName) const;
         void BroadcastToGuildEnteredInGWWith(std::string const& guildname) const;
         void BroadcastToGuildEndedGWWith(std::string const& guildName, std::string const& winnername, int32 ratingChange) const;
 

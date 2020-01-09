@@ -1391,8 +1391,8 @@ enum TrinityStrings
     LANG_GSYSTEM_GUILD_WAR_ADMIT          = 12028, // "|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Admit defeat with guild:|r"
     LANG_GSYSTEM_GUILD_WAR_DECLARE_SURE   = 12029, // "Are you sure you want to Declare The War?"
     LANG_GSYSTEM_GUILD_WAR_ADMIT_SURE     = 12030, // "Are you sure you want to Admit defeat?"
-    LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY    = 12031, // "The guild has received a " << value << " rating points. Points has gained by "
-    LANG_GSYSTEM_ANNOUNCE_RATING_UP       = 12032, // "The guild has received a " << value << " rating points."
+    //LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY    = 12031, // "The guild has received a " << value << " rating points. Points has gained by "
+    //LANG_GSYSTEM_ANNOUNCE_RATING_UP       = 12032, // "The guild has received a " << value << " rating points."
     LANG_GSYSTEM_GUILD_DISABLED           = 12033, // "Guild Level System disabled"
     LANG_GSYSTEM_GUILD_WARS_DISABLED      = 12034, // "Guild Wars disabled"
 

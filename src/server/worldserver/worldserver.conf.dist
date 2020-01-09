@@ -4608,6 +4608,18 @@ GSystem.GuildWars.Minimal.Delta.PreviousEndTimer = 3600
 
 GSystem.GuildWars.Exp.ForEnemyGuildKill = 1
 
+#    GSystem.GuildWars.Exp.ForWinnerOfGW
+#    Description: reward winner guild by exp for Win in Guild Wars
+#    Default:     250
+
+GSystem.GuildWars.Exp.ForWinnerOfGW = 250
+
+#    GSystem.GuildWars.Exp.ForLoserOfGW
+#    Description: reward winner guild by exp for Lose in Guild Wars
+#    Default:     250
+
+GSystem.GuildWars.Exp.ForLoserOfGW = 100
+
 #
 ###################################################################################################
 
