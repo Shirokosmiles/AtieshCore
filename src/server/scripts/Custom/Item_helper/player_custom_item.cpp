@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
 * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -109,7 +109,7 @@ public:
         if (player->GetGuild())
             AddGossipItemFor(player, 0, GTS(LANG_GSYSTEM_GUILD_MENU), GOSSIP_SENDER_MAIN, 103);
 
-        // показатель бонусов с системой определение кол.бонусов (бонус, бонуса, бонусов)
+        // bonus system
         AddGossipItemFor(player, 0, getString(GTS(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 1);
         if (sWorld->getBoolConfig(CONFIG_PVP_REWARD))
         {
@@ -125,8 +125,8 @@ public:
             AddGossipItemFor(player, 0, flag + " )", GOSSIP_SENDER_MAIN, 3);
         }
         // promo
-        AddGossipItemFor(player, 0, "Enter Promo-Code", GOSSIP_SENDER_MAIN, 0, "Are you sure that the entered code is correct?", 0, true);
-        // магазин
+        AddGossipItemFor(player, 0, GTS(LANG_ENTER_PROMO_CODE), GOSSIP_SENDER_MAIN, 0, GTS(LANG_ENTERED_PROMO_CODE_CORRECT), 0, true);
+        // Shops
         AddGossipItemFor(player, 0, GTS(LANG_ITEM_MENU_TRADE), GOSSIP_SENDER_MAIN, 2);
         // trainer
         AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GTS(LANG_ITEM_CLASS_SKILLS), GOSSIP_SENDER_MAIN, 4);
@@ -138,11 +138,11 @@ public:
         if (player->IsGameMaster())
         {
             if (player->GetSession()->HasPermission(rbac::RBAC_PERM_COMMAND_SERVER_RESTART))
-                AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r", GOSSIP_SENDER_MAIN, 7);
-            AddGossipItemFor(player, 0, "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Delivery of bags", GOSSIP_SENDER_MAIN, 8);
+                AddGossipItemFor(player, 0, GTS(LANG_MENU_CLASS_SKILLS_GM), GOSSIP_SENDER_MAIN, 7);
+            AddGossipItemFor(player, 0, GTS(LANG_MENU_DELIVERY_OF_BAGS), GOSSIP_SENDER_MAIN, 8);
 
             if (player->GetLevel() < 80)
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|t Level up at 80", GOSSIP_SENDER_MAIN, 9);
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GTS(LANG_MENU_LVL_UP), GOSSIP_SENDER_MAIN, 9);
         }
 
         if (player->IsPremium())
@@ -150,7 +150,7 @@ public:
 
         if (player->CanReceiveStartPack())
         {
-            // стартовый пакет
+            // Start pack
             switch (player->GetClass())
             {
                 case CLASS_WARRIOR:
@@ -191,12 +191,12 @@ public:
             if (DalaranEvent->IsPossibleToRegister())
             {
                 if (!DalaranEvent->IsMemberOfEvent(player))
-                    AddGossipItemFor(player, 0, "Register in Dalaran Crater Event PVP (Battle Royale) Queue " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
+                    AddGossipItemFor(player, 0, GTS(LANG_DALARAN_MENU_REGISTER) + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
                 else
-                    AddGossipItemFor(player, 0, "Leave Dalaran Crater Event PVP (Battle Royale) - Queue " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
+                    AddGossipItemFor(player, 0, GTS(LANG_DALARAN_MENU_LEAVE) + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
             }
             else
-                AddGossipItemFor(player, 0, "Dalaran Crater Event PVP (Battle Royale) - will Available " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
+                AddGossipItemFor(player, 0, GTS(LANG_DALARAN_MENU_AVALIABLE) + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
         }
 
         AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);
@@ -274,7 +274,7 @@ public:
                     if (player->GetGuild())
                         AddGossipItemFor(player, 0, GTS(LANG_GSYSTEM_GUILD_MENU), GOSSIP_SENDER_MAIN, 103);
 
-                    // показатель бонусов с системой определение кол.бонусов (бонус, бонуса, бонусов)
+                    // bonus system
                     AddGossipItemFor(player, 0, getString(GTS(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 1);
                     if (sWorld->getBoolConfig(CONFIG_PVP_REWARD))
                     {
@@ -289,7 +289,7 @@ public:
                         // pvp weekly bonus cap
                         AddGossipItemFor(player, 0, flag + " )", GOSSIP_SENDER_MAIN, 3);
                     }
-                    // магазин
+                    // Shops
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_MENU_TRADE), GOSSIP_SENDER_MAIN, 2);
                     // trainer
                     AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GTS(LANG_ITEM_CLASS_SKILLS), GOSSIP_SENDER_MAIN, 4);
@@ -301,11 +301,11 @@ public:
                     if (player->IsGameMaster())
                     {
                         if (player->GetSession()->HasPermission(rbac::RBAC_PERM_COMMAND_SERVER_RESTART))
-                            AddGossipItemFor(player, 0, "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r", GOSSIP_SENDER_MAIN, 7);
-                        AddGossipItemFor(player, 0, "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Delivery of bags", GOSSIP_SENDER_MAIN, 8);
+                            AddGossipItemFor(player, 0, GTS(LANG_MENU_CLASS_SKILLS_GM), GOSSIP_SENDER_MAIN, 7);
+                        AddGossipItemFor(player, 0, GTS(LANG_MENU_DELIVERY_OF_BAGS), GOSSIP_SENDER_MAIN, 8);
 
                         if (player->GetLevel() < 80)
-                            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|t Level up at 80", GOSSIP_SENDER_MAIN, 9);
+                            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GTS(LANG_MENU_LVL_UP), GOSSIP_SENDER_MAIN, 9);
                     }
 
                     if (player->IsPremium())
@@ -313,7 +313,7 @@ public:
 
                     if (player->CanReceiveStartPack())
                     {
-                        // стартовый пакет
+                        // Start pack
                         switch (player->GetClass())
                         {
                         case CLASS_WARRIOR:
@@ -354,19 +354,19 @@ public:
                         if (DalaranEvent->IsPossibleToRegister())
                         {
                             if (!DalaranEvent->IsMemberOfEvent(player))
-                                AddGossipItemFor(player, 0, "Register in Dalaran Crater Event PVP (Battle Royale) Queue " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
+                                AddGossipItemFor(player, 0, GTS(LANG_DALARAN_MENU_REGISTER) + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 106);
                             else
-                                AddGossipItemFor(player, 0, "Leave Dalaran Crater Event PVP (Battle Royale) - Queue " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
+                                AddGossipItemFor(player, 0, GTS(LANG_DALARAN_MENU_LEAVE) + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 107);
                         }
                         else
-                            AddGossipItemFor(player, 0, "Dalaran Crater Event PVP (Battle Royale) - will Available " + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
+                            AddGossipItemFor(player, 0, GTS(LANG_DALARAN_MENU_AVALIABLE) + NextTimeDalaranEvent(DalaranEvent->GetTimeOfNextEvent()), GOSSIP_SENDER_MAIN, 3);
                     }
 
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_SERVER_MENU), GOSSIP_SENDER_MAIN, 11);
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                     break;
                 }
-                case 4: // Тренер классов
+                case 4: // Trainer class
                 {
                     CloseGossipMenuFor(player);
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
@@ -374,21 +374,21 @@ public:
                     player->GetSession()->SendTrainerList(nullptr);
                     break;
                 }
-                case 5:
+                case 5: // Teleport 
                 {
                     CloseGossipMenuFor(player);
                     player->TeleportTo(0, -8831.966797f, 632.503906f, 94.210480f, 4.61f);
                     player->CastSpell(player, 45523, true);
                     break;
                 }
-                case 6:
+                case 6: // Teleport
                 {
                     CloseGossipMenuFor(player);
                     player->TeleportTo(1, 1569.170410f, -4433.635742f, 6.718508f, 0.f);
                     player->CastSpell(player, 45523, true);
                     break;
                 }
-                case 7: // Классовые навыки
+                case 7: // Class skills
                 {
                     switch (player->GetClass())
                     {
@@ -1062,7 +1062,7 @@ public:
                     }
                     break;
                 }
-                case 8: // Выдача сумок
+                case 8: // add bug
                 {
                     if (player->HasItemCount(23162, 4))
                     {
@@ -1076,7 +1076,7 @@ public:
                     }
                     break;
                 }
-                case 9:
+                case 9: // Level gm characters
                 {
                     player->GiveLevel(80);
                     player->SaveToDB();
@@ -1084,7 +1084,7 @@ public:
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
-                case 10:
+                case 10: // VIP character management
                 {
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_COMMAND_LIST), GOSSIP_SENDER_MAIN, 13);
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_CHARACTER_MANAGEMENT), GOSSIP_SENDER_MAIN, 14);
@@ -1100,7 +1100,7 @@ public:
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                     break;
                 }
-                case 11:
+                case 11:  // VIP rates info
                 {
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_RATES), GOSSIP_SENDER_MAIN, 3);
                     AddGossipItemFor(player, 0, getString(XP, uint32(player->IsPremium() ? sWorld->getRate(RATE_VIP_XP_KILL) : sWorld->getRate(RATE_XP_KILL))).c_str(), GOSSIP_SENDER_MAIN, 3);
@@ -1112,7 +1112,7 @@ public:
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                     break;
                 }
-                case 12: // Двойная специализация
+                case 12: // dual spec
                 {
                     if (player->GetSpecsCount() == 1 && !(player->GetLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL)))
                         player->CastSpell(player, 63680, true);
@@ -1120,7 +1120,7 @@ public:
                     CloseGossipMenuFor(player);
                     break;
                 }
-                case 13:
+                case 13: // Vip info
                 {
                     ChatHandler(player->GetSession()).PSendSysMessage("|cff006699The next VIP commands are available for you:");
                     if (sWorld->getBoolConfig(CONFIG_VIP_DEBUFF))
@@ -1148,7 +1148,7 @@ public:
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
-                case 14:
+                case 14: //sub menu
                 {
                     player->PlayerTalkClass->ClearMenus();
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_DUAL_SPEC), GOSSIP_SENDER_MAIN, 12);
@@ -1159,7 +1159,7 @@ public:
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                     break;
                 }
-                case 15:
+                case 15: // sub menu
                 {
                     player->PlayerTalkClass->ClearMenus();
                     AddGossipItemFor(player, 0, GTS(LANG_ITEM_CHANGE_NAME), GOSSIP_SENDER_MAIN, 74);
@@ -1170,7 +1170,7 @@ public:
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
                     break;
                 }
-                case 16:
+                case 16: // repair
                 {
                     player->DurabilityRepairAll(false, 0.0f, true);
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_REPAIR_CONFIRM);
@@ -1597,7 +1597,7 @@ public:
                     BuyItem(player, 44115, 5);
                     break;
                 }
-                case 71: // Сброс талантов
+                case 71: // reset tall
                 {
                     player->ResetTalents(true);
                     player->SendTalentsInfoData(false);
@@ -1605,98 +1605,98 @@ public:
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_TALENT_RESET_CONFIRM);
                     break;
                 }
-                case 72: // Оружейные навыки
+                case 72: // weapon skill
                 {
                     switch (player->GetClass())
                     {
                     case CLASS_WARRIOR:
                         CloseGossipMenuFor(player);
-                        player->LearnSpell(5011, false); // Арбалеты
-                        player->LearnSpell(200, false); // Древковое оружие
-                        player->LearnSpell(15590, false); // Кулачное оружие
-                        player->LearnSpell(264, false); // Луки
-                        player->LearnSpell(266, false); // Ружья
-                        player->LearnSpell(227, false); // Посохи
+                        player->LearnSpell(5011, false); // Crossbows
+                        player->LearnSpell(200, false); // Polearms
+                        player->LearnSpell(15590, false); 
+                        player->LearnSpell(264, false);
+                        player->LearnSpell(266, false); 
+                        player->LearnSpell(227, false); 
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                         break;
                     case CLASS_PALADIN:
                         CloseGossipMenuFor(player);
-                        player->LearnSpell(197, false); // Двуручные топоры
-                        player->LearnSpell(200, false); // Древковое оружие
-                        player->LearnSpell(196, false); // Одноручные топоры
+                        player->LearnSpell(197, false); // Two-handed axes
+                        player->LearnSpell(200, false); // Polearms
+                        player->LearnSpell(196, false); // One - handed axes
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                         break;
                     case CLASS_WARLOCK:
                         CloseGossipMenuFor(player);
-                        player->LearnSpell(201, false); // Одноручные мечи
+                        player->LearnSpell(201, false); // One - handed sword
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                         break;
                     case CLASS_PRIEST:
                         CloseGossipMenuFor(player);
-                        player->LearnSpell(1180, false); // Кинжалы
+                        player->LearnSpell(1180, false); 
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                         break;
                     case CLASS_HUNTER:
                         CloseGossipMenuFor(player);
-                        player->LearnSpell(5011, false); // Арбалеты
-                        player->LearnSpell(202, false); // Двуручные мечи
-                        player->LearnSpell(200, false); // Древковое оружие
-                        player->LearnSpell(15590, false); // Кулачное оружие
-                        player->LearnSpell(264, false); // Луки
-                        player->LearnSpell(2567, false); // Метательное оружие
-                        player->LearnSpell(227, false); // Посохи
+                        player->LearnSpell(5011, false); // Crossbows
+                        player->LearnSpell(202, false); // Dual - handed sword
+                        player->LearnSpell(200, false); // Polearms
+                        player->LearnSpell(15590, false); 
+                        player->LearnSpell(264, false); 
+                        player->LearnSpell(2567, false); 
+                        player->LearnSpell(227, false); 
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                         break;
                     case CLASS_MAGE:
                         CloseGossipMenuFor(player);
-                        player->LearnSpell(1180, false); // Кинжалы
-                        player->LearnSpell(201, false); // Одноручные мечи
+                        player->LearnSpell(1180, false); 
+                        player->LearnSpell(201, false); // One - handed sword
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                         break;
                     case CLASS_SHAMAN:
                         CloseGossipMenuFor(player);
-                        player->LearnSpell(199, false); // Двуручное дробящее оружие
-                        player->LearnSpell(197, false); // Двуручные топоры
-                        player->LearnSpell(1180, false); // Кинжалы
-                        player->LearnSpell(15590, false); // Кулачное оружие
-                        player->LearnSpell(196, false); // Одноручные топоры
+                        player->LearnSpell(199, false); 
+                        player->LearnSpell(197, false); // Two-handed axes
+                        player->LearnSpell(1180, false); 
+                        player->LearnSpell(15590, false); 
+                        player->LearnSpell(196, false); // One - handed axes
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                         break;
                     case CLASS_ROGUE:
                         CloseGossipMenuFor(player);
-                        player->LearnSpell(5011, false); // Арбалеты
-                        player->LearnSpell(198, false); // Одноручное дробящее оружие
-                        player->LearnSpell(15590, false); // Кулачное оружие
-                        player->LearnSpell(264, false); // Луки
-                        player->LearnSpell(201, false); // Одноручные мечи
-                        player->LearnSpell(266, false); // Ружья
-                        player->LearnSpell(196, false); // Одноручные топоры
+                        player->LearnSpell(5011, false); // Crossbows
+                        player->LearnSpell(198, false); 
+                        player->LearnSpell(15590, false); 
+                        player->LearnSpell(264, false); 
+                        player->LearnSpell(201, false); // One - handed sword
+                        player->LearnSpell(266, false); 
+                        player->LearnSpell(196, false); // One - handed axes
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                         break;
                     case CLASS_DEATH_KNIGHT:
                         CloseGossipMenuFor(player);
-                        player->LearnSpell(199, false); // Двуручное дробящее оружие
-                        player->LearnSpell(198, false); // Одноручное дробящее оружие
+                        player->LearnSpell(199, false); 
+                        player->LearnSpell(198, false); 
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                         break;
                     case CLASS_DRUID:
                         CloseGossipMenuFor(player);
-                        player->LearnSpell(199, false); // Двуручное дробящее оружие
-                        player->LearnSpell(200, false); // Древковое оружие
-                        player->LearnSpell(15590, false); // Кулачное оружие
+                        player->LearnSpell(199, false); 
+                        player->LearnSpell(200, false); // Polearms
+                        player->LearnSpell(15590, false);
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                         break;
                     }
                     break;
                 }
-                case 73: // Улучшить навыки защиты и владения оружием до максимума
+                case 73: // skills max
                 {
                     CloseGossipMenuFor(player);
                     player->UpdateWeaponsSkillsToMaxSkillsForLevel();
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MAXSKILL_CONFIRM);
                     break;
                 }
-                case 74: // Смена имени
+                case 74: // Change name
                 {
                     if (player->GetArenaPoints() < CONST_ARENA_RENAME)
                     {
@@ -1712,7 +1712,7 @@ public:
                     }
                     break;
                 }
-                case 75: // Смена внешности
+                case 75: // Customize
                 {
                     if (player->GetArenaPoints() < CONST_ARENA_CUSTOMIZE)
                     {
@@ -1727,7 +1727,7 @@ public:
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_CUSTOMIZE_COMPLETE);
                     }
                     break;
-                case 76: // Смена фракции
+                case 76: // Change Faction
                     if (player->GetArenaPoints() < CONST_ARENA_CHANGE_FACTION)
                     {
                         ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_MSG_NO_ARENA_POINTS);
@@ -1742,7 +1742,7 @@ public:
                     }
                     break;
                 }
-                case 77: // Смена расы
+                case 77: // Change Race
                 {
                     if (player->GetArenaPoints() < CONST_ARENA_CHANGE_RACE)
                     {
@@ -1777,7 +1777,7 @@ public:
                 case 80:
                 {
                     uint32 coins = player->GetVerifiedCoins();
-                    uint32 ostatok = coast7 - coins; // 7 дней
+                    uint32 ostatok = coast7 - coins; // 7 day
 
                     if (coins >= coast7)
                     {
@@ -1785,12 +1785,12 @@ public:
                         time_t unsetdate;
                         if (player->IsPremium())
                         {
-                            unsetdate = player->GetPremiumUnsetdate() + 604800; // 7 дней
+                            unsetdate = player->GetPremiumUnsetdate() + 604800; // 7 day
                             AccountMgr::UpdateVipStatus(player->GetSession()->GetAccountId(), unsetdate);
                         }
                         else
                         {
-                            unsetdate = GameTime::GetGameTime() + 604800; // 7 дней
+                            unsetdate = GameTime::GetGameTime() + 604800; // 7 day
                             AccountMgr::SetVipStatus(player->GetSession()->GetAccountId(), unsetdate);
                         }
                         player->SetPremiumUnsetdate(unsetdate);
@@ -1812,7 +1812,7 @@ public:
                 case 81:
                 {
                     uint32 coins = player->GetVerifiedCoins();
-                    uint32 ostatok = coast14 - coins; // 14 дней
+                    uint32 ostatok = coast14 - coins; // 14 day
 
                     if (coins >= coast14)
                     {
@@ -1820,12 +1820,12 @@ public:
                         time_t unsetdate;
                         if (player->IsPremium())
                         {
-                            unsetdate = player->GetPremiumUnsetdate() + 1209600; // 14 дней
+                            unsetdate = player->GetPremiumUnsetdate() + 1209600; // 14 day
                             AccountMgr::UpdateVipStatus(player->GetSession()->GetAccountId(), unsetdate);
                         }
                         else
                         {
-                            unsetdate = GameTime::GetGameTime() + 1209600; // 14 дней
+                            unsetdate = GameTime::GetGameTime() + 1209600; // 14 day
                             AccountMgr::SetVipStatus(player->GetSession()->GetAccountId(), unsetdate);
                         }
                         player->SetPremiumUnsetdate(unsetdate);
@@ -1847,7 +1847,7 @@ public:
                 case 82:
                 {
                     uint32 coins = player->GetVerifiedCoins();
-                    uint32 ostatok = coast31 - coins; // 31 день
+                    uint32 ostatok = coast31 - coins; // 31 day
 
                     if (coins >= coast31)
                     {
@@ -1855,12 +1855,12 @@ public:
                         time_t unsetdate;
                         if (player->IsPremium())
                         {
-                            unsetdate = player->GetPremiumUnsetdate() + 2678400; // 31 дней
+                            unsetdate = player->GetPremiumUnsetdate() + 2678400; // 31 day
                             AccountMgr::UpdateVipStatus(player->GetSession()->GetAccountId(), unsetdate);
                         }
                         else
                         {
-                            unsetdate = GameTime::GetGameTime() + 2678400; // 31 дней
+                            unsetdate = GameTime::GetGameTime() + 2678400; // 31 day
                             AccountMgr::SetVipStatus(player->GetSession()->GetAccountId(), unsetdate);
                         }
                         player->SetPremiumUnsetdate(unsetdate);
@@ -2103,12 +2103,12 @@ public:
 
         if (!*code)
             return;
-
         // only for Promo-codes
         if (!action)
         {
             std::string codeUINT = code;
             uint32 id = 0;
+            bool promocode = false;
 
             if (sObjectMgr->GetPromoCode(codeUINT, id))
             {
@@ -2119,6 +2119,7 @@ public:
 
                     if (promo->code == codeUINT && !promo->used)
                     {
+                        promocode = true;
                         if (promo->arena)
                             player->ModifyArenaPoints(promo->arena);
                         if (promo->honor)
@@ -2163,11 +2164,20 @@ public:
                             player->AddAura(promo->aura, player);
                     }
                 }
-
-                if (id)
+                if (!promocode)
+                {
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_PROMO_CODE_ERROR);
+                    player->PlayerTalkClass->SendCloseGossip();
+                    return;
+                }
+                else
+                {
                     sObjectMgr->UsePromoCode(id);
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_PROMO_CODE_ACEPT);
+                    return;
+                }
             }
-
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_PROMO_CODE_ERROR);
             player->PlayerTalkClass->SendCloseGossip();
             return;
         }

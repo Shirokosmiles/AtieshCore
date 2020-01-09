@@ -252,7 +252,7 @@ public:
 
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
-            handler->PSendSysMessage("Guild Level System disabled");
+            handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
         }
 
@@ -274,7 +274,7 @@ public:
 
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
-            handler->PSendSysMessage("Guild Level System disabled");
+            handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
         }
 
@@ -300,7 +300,7 @@ public:
 
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
-            handler->PSendSysMessage("Guild Level System disabled");
+            handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
         }
 
@@ -326,7 +326,7 @@ public:
 
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
-            handler->PSendSysMessage("Guild Level System disabled");
+            handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
         }
 
@@ -352,7 +352,7 @@ public:
 
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
-            handler->PSendSysMessage("Guild Level System disabled");
+            handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
         }
 
@@ -381,7 +381,7 @@ public:
 
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
-            handler->PSendSysMessage("Guild Level System disabled");
+            handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
         }
 
@@ -444,7 +444,7 @@ public:
 
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
         {
-            handler->PSendSysMessage("Guild Wars disabled");
+            handler->PSendSysMessage(LANG_GSYSTEM_GUILD_WARS_DISABLED);
             return true;
         }
 
@@ -481,7 +481,7 @@ public:
 
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
         {
-            handler->PSendSysMessage("Guild Wars disabled");
+            handler->PSendSysMessage(LANG_GSYSTEM_GUILD_WARS_DISABLED);
             return true;
         }
 
@@ -553,7 +553,7 @@ public:
 
         if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
         {
-            handler->PSendSysMessage("Guild Wars disabled");
+            handler->PSendSysMessage(LANG_GSYSTEM_GUILD_WARS_DISABLED);
             return true;
         }
 

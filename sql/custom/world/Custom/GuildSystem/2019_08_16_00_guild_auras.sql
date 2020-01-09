@@ -1,7 +1,6 @@
 --
 -- Table structure for table `guild_auras`
 --
-
 DROP TABLE IF EXISTS `guild_auras`;
 CREATE TABLE `guild_auras`  (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,

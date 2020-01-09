@@ -1,4 +1,4 @@
-DELETE FROM `trinity_string` where `entry` IN (12000, 12001, 12002, 12003, 12004, 12005, 12006, 12007, 12008, 12009, 12010, 12011, 12012, 12013, 12014, 12015, 12016, 12017, 12018, 12019, 12020, 12021, 12022, 12023, 12024, 12025, 12026, 12027, 12028, 12029, 12030);
+DELETE FROM `trinity_string` where `entry` IN (12000, 12001, 12002, 12003, 12004, 12005, 12006, 12007, 12008, 12009, 12010, 12011, 12012, 12013, 12014, 12015, 12016, 12017, 12018, 12019, 12020, 12021, 12022, 12023, 12024, 12025, 12026, 12027, 12028, 12029, 12030, 12033, 12034);
 INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12000', '|cffe6cc80Not enough guild members for start Guild War', '|cffe6cc80Недостаточно игроков в гильдии для начала Войны Гильдий'),
 ('12001', '|cffe6cc80Not enough guild members in target guild for starting Guild War', '|cffe6cc80В противоположной гильдии недостаточно игроков для начала Войны Гильдий'),
@@ -30,4 +30,6 @@ INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12027', '|TInterface\\icons\\Achievement_Arena_3v3_4:25:25:-15:0|t Declare The War with guild:|r', '|TInterface\\icons\\Achievement_Arena_3v3_4:25:25:-15:0|t Объявить Гильдейскую Войну с гильдией:|r'),
 ('12028', '|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Admit defeat with guild:|r', '|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Признать поражение в Войне с гильдией:|r'),
 ('12029', 'Are you sure you want to Declare The War?', 'Вы уверены, что готовы объявить Войну?'),
-('12030', 'Are you sure you want to Admit defeat?', 'Вы уверены, что готовы признать поражение?');
+('12030', 'Are you sure you want to Admit defeat?', 'Вы уверены, что готовы признать поражение?'),
+('12033', 'Guild Level System disabled', 'Уровни гильдий отключены' ),
+('12034', 'Guild Wars disabled', 'Войны гильдий отключены.' );

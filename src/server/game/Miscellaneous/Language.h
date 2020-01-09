@@ -1382,8 +1382,8 @@ enum TrinityStrings
     LANG_GSYSTEM_GW_START                 = 12019, //"You declared a Guild War against %s"
     LANG_GSYSTEM_GW_STOP                  = 12020, //"You admitted defeat in this war against the guild %s"
     LANG_GSYSTEM_GW_REQ_LEVEL             = 12021,
-    LANG_GSYSTEM_GW_REQ_GUILDRIGHTS       = 12022,  //"You have not rights to declare Guild War.\nYou should to have guild rank with rights to modify guild information"
-    LANG_GSYSTEM_GW_REQ_ONEFACTION        = 12023,   //"You can declare War only inside one faction (Alliance or Horde)"
+    LANG_GSYSTEM_GW_REQ_GUILDRIGHTS       = 12022, // "You have not rights to declare Guild War.\nYou should to have guild rank with rights to modify guild information"
+    LANG_GSYSTEM_GW_REQ_ONEFACTION        = 12023, // "You can declare War only inside one faction (Alliance or Horde)"
     LANG_GSYSTEM_GUILD_MENU               = 12024, // "|TInterface\\icons\\spell_shadow_darksummoning:25:25:-15:0|t Guild Menu|r"
     LANG_GSYSTEM_GUILD_INFO               = 12025, // "|TInterface\\icons\\spell_shadow_shadesofdarkness:25:25:-15:0|t Guild Info|r"
     LANG_GSYSTEM_GUILD_WAR_INFO           = 12026, // "|TInterface\\icons\\spell_shadow_deathpact:25:25:-15:0|t Guild War Info|r"
@@ -1391,8 +1391,10 @@ enum TrinityStrings
     LANG_GSYSTEM_GUILD_WAR_ADMIT          = 12028, // "|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Admit defeat with guild:|r"
     LANG_GSYSTEM_GUILD_WAR_DECLARE_SURE   = 12029, // "Are you sure you want to Declare The War?"
     LANG_GSYSTEM_GUILD_WAR_ADMIT_SURE     = 12030, // "Are you sure you want to Admit defeat?"
-    LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY    = 12031, //"The guild has received a " << value << " rating points. Points has gained by "
-    LANG_GSYSTEM_ANNOUNCE_RATING_UP       = 12032, //"The guild has received a " << value << " rating points."
+    LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY    = 12031, // "The guild has received a " << value << " rating points. Points has gained by "
+    LANG_GSYSTEM_ANNOUNCE_RATING_UP       = 12032, // "The guild has received a " << value << " rating points."
+    LANG_GSYSTEM_GUILD_DISABLED           = 12033, // "Guild Level System disabled"
+    LANG_GSYSTEM_GUILD_WARS_DISABLED      = 12034, // "Guild Wars disabled"
 
     // Dalaran Crater Event
     LANG_DALARAN_CRATER_START_ANNOUNCE_30_SEC     = 12500, // "Dalaran Crater PVP (Battle Royale) Event will start in 1 minute. %u players will fight !"
@@ -1408,5 +1410,17 @@ enum TrinityStrings
     LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_30  = 12510, // "Dalaran Crater PVP (Battle Royale) Event will be started in 30 seconds"
     LANG_DALARAN_CRATER_REGISTRATION_QUEUE        = 12511, // "You have successfully registered in Dalaran Crater PVP (Battle Royale) Event"
     LANG_DALARAN_CRATER_REGISTRATION_QUEUE_ABORT  = 12512, // "You have successfully canceled registration in Dalaran Crater PVP (Battle Royale) Event"
+    LANG_DALARAN_MENU_REGISTER                    = 12513, // "Register in Dalaran Crater Event PVP(Battle Royale) Queue"
+    LANG_DALARAN_MENU_LEAVE                       = 12514, // "Leave Dalaran Crater Event PVP (Battle Royale) - Queue"
+    LANG_DALARAN_MENU_AVALIABLE                   = 12515, // "Dalaran Crater Event PVP (Battle Royale) - will Available"
+
+    // Custom item
+    LANG_ENTER_PROMO_CODE                         = 12535, // "Enter Promo - Code"
+    LANG_ENTERED_PROMO_CODE_CORRECT               = 12536, // "Are you sure that the entered code is correct?"
+    LANG_MENU_CLASS_SKILLS_GM                     = 12537, // "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r"
+    LANG_MENU_DELIVERY_OF_BAGS                    = 12538, // "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Delivery of bags"
+    LANG_MENU_LVL_UP                              = 12539, // "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|t Level up at 80"
+    LANG_PROMO_CODE_ERROR                         = 12540, // "Error promo - code"
+    LANG_PROMO_CODE_ACEPT                         = 12541, // "You have successfully received rewards for the promotional code"
 };
 #endif

@@ -1,4 +1,4 @@
-DELETE FROM `trinity_string` where `entry` IN (12500, 12501, 12502, 12503, 12504, 12505, 12506, 12507, 12508, 12509, 12510, 12511, 12512);
+DELETE FROM `trinity_string` where `entry` IN (12500, 12501, 12502, 12503, 12504, 12505, 12506, 12507, 12508, 12509, 12510, 12511, 12512, 12513, 12514, 12515);
 INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12500', '|cffe6cc80Dalaran Crater PVP |cFFF00000(Battle Royale) |cffe6cc80Event will start in |cff00ff0030|cffe6cc80seconds. |cff00ff00%u |cffe6cc80Players will fight!. Prepare to FIGHT!', '|cffe6cc80Кратер Даларана PVP |cFFF00000(Королевская битва) |cffe6cc80Событие будет запущено через |cff00ff0030|cffe6cc80секунд. |cff00ff00%u |cffe6cc80Игроков примут участие в битве! Готовьтесь к БИТВЕ!'),
 ('12501', '|cffe6cc80Dalaran Crater PVP |cFFF00000(Battle Royale) |cffe6cc80Event has been Started!', '|cffe6cc80Кратер Даларана PVP |cFFF00000(Королевская битва) |cffe6cc80Событие было запущено!'),
@@ -12,4 +12,7 @@ INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES
 ('12509', '|cffe6cc80Dalaran Crater PVP |cFFF00000(Battle Royale) |cffe6cc80Event will be started in 1 minute', '|cffe6cc80Кратер Даларана PVP |cFFF00000(Королевская битва) |cffe6cc80Событие будет стартовать через 1 минуту'),
 ('12510', '|cffe6cc80Dalaran Crater PVP |cFFF00000(Battle Royale) |cffe6cc80Event will be started in 30 seconds', '|cffe6cc80Кратер Даларана PVP |cFFF00000(Королевская битва) |cffe6cc80Событие будет стартовать через 30 секунд'),
 ('12511', '|cffe6cc80You have successfully registered in Dalaran Crater PVP |cFFF00000(Battle Royale) |cffe6cc80Event, |cff00ff00%u |cffe6cc80Players registered', '|cffe6cc80Вы успешно зарегистрировались на участие в Кратер Даларана PVP |cFFF00000(Королевская битва) |cffe6cc80Событии, |cff00ff00%u |cffe6cc80Игроков зарегистрировано'),
-('12512', '|cffe6cc80You have successfully canceled registration in Dalaran Crater PVP |cFFF00000(Battle Royale) |cffe6cc80Event', '|cffe6cc80Вы успешно сняли заявку на участие в Кратер Даларана PVP |cFFF00000(Королевская битва) |cffe6cc80Событии');
+('12512', '|cffe6cc80You have successfully canceled registration in Dalaran Crater PVP |cFFF00000(Battle Royale) |cffe6cc80Event', '|cffe6cc80Вы успешно сняли заявку на участие в Кратер Даларана PVP |cFFF00000(Королевская битва) |cffe6cc80Событии'),
+('12513', 'Register in Dalaran Crater Event PVP(Battle Royale) Queue','Зарегистрироваться на участие в Кратер Даларана PVP'),
+('12514', 'Leave Dalaran Crater Event PVP (Battle Royale) - Queue','Покинуть Кратер Даларана PVP'),
+('12515', 'Dalaran Crater Event PVP (Battle Royale) - will Available','Событие Кратер даларана доступно');

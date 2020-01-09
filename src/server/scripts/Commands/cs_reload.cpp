@@ -163,6 +163,7 @@ public:
             { "waypoint_data",                 rbac::RBAC_PERM_COMMAND_RELOAD_WAYPOINT_DATA,                    true,  &HandleReloadWpCommand,                         "" },
             { "vehicle_accessory",             rbac::RBAC_PERM_COMMAND_RELOAD_VEHICLE_ACCESORY,                 true,  &HandleReloadVehicleAccessoryCommand,           "" },
             { "vehicle_template_accessory",    rbac::RBAC_PERM_COMMAND_RELOAD_VEHICLE_TEMPLATE_ACCESSORY,       true,  &HandleReloadVehicleTemplateAccessoryCommand,   "" },
+            { "promotion_codes",               rbac::RBAC_PERM_RELOAD_PROMO_CODE_TABLE,                         true,  &HandleReloadPromoCodeCommand,                  "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -1206,6 +1207,14 @@ public:
         sAccountMgr->LoadRBAC();
         sWorld->ReloadRBAC();
         handler->SendGlobalGMSysMessage("RBAC data reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadPromoCodeCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        TC_LOG_INFO("misc", "Reloading promotion_codes table...");
+        sObjectMgr->LoadPromoCodes();
+        handler->SendGlobalGMSysMessage("Promotion codes reloaded.");
         return true;
     }
 };
