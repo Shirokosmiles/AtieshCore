@@ -1504,6 +1504,10 @@ void GameObject::Use(Unit* user)
     {
         case GAMEOBJECT_TYPE_DOOR:                          //0
         case GAMEOBJECT_TYPE_BUTTON:                        //1
+            // ArenaSpectator
+            if (user && user->ToPlayer() && user->ToPlayer()->IsSpectator())
+                return;
+            // ArenaSpectator end
             //doors/buttons never really despawn, only reset to default state/flags
             UseDoorOrButton(0, false, user);
             return;
