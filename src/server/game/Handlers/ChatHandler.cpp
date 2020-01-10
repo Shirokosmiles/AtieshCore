@@ -164,7 +164,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 lang = LANG_UNIVERSAL;
             else
             {
-                if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
+                if (!sWorld->getBoolConfig(CONFIG_PLAYER_UNIVERSAL_LANGUAGE))
                 {
                     bool lfgininstance = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP) && sender->isUsingLfg() && sender->inRandomLfgDungeon();
                     switch (type)

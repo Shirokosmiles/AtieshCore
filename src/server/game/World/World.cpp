@@ -1556,6 +1556,8 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_VAS_MAXMP_PERCENT] = sConfigMgr->GetFloatDefault("VAS.Unit.PercentOfMaxMP", 100.0f);
     // AutoLearn spells
     m_bool_configs[CONFIG_PLAYER_AUTO_LEARN_ENABLED] = sConfigMgr->GetBoolDefault("Player.AutoLearnSpells.Enabled", false);
+    // Universal language for all (early was in TC AllowTwoSide.Interaction.Channel)
+    m_bool_configs[CONFIG_PLAYER_UNIVERSAL_LANGUAGE] = sConfigMgr->GetBoolDefault("Player.UniversalLanguage.Enabled", false);
 
     //End of Custom Systems
 

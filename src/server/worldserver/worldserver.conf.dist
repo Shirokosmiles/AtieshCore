@@ -1544,7 +1544,7 @@ AllowTwoSide.Interaction.Calendar = 0
 
 #
 #    AllowTwoSide.Interaction.Channel
-#        Description: Allow channel chat between factions.
+#        Description: Allow channel chat between factions. (But not Universal languagem only 1 channelMgr)
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -4809,3 +4809,4 @@ DalaranGEvent.Min.Players = 5
 ###################################################################################################
 
 Player.AutoLearnSpells.Enabled = 1
+Player.UniversalLanguage.Enabled = 1
