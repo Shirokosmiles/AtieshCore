@@ -42,6 +42,7 @@ EndScriptData */
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
 #include "SpellMgr.h"
+#include "PromotionCodeMgr.h"
 #include "TicketMgr.h"
 #include "WardenCheckMgr.h"
 #include "WaypointManager.h"
@@ -1213,7 +1214,7 @@ public:
     static bool HandleReloadPromoCodeCommand(ChatHandler* handler, char const* /*args*/)
     {
         TC_LOG_INFO("misc", "Reloading promotion_codes table...");
-        sObjectMgr->LoadPromoCodes();
+        sPromotionCodeMgr->ReloadCodes();
         handler->SendGlobalGMSysMessage("Promotion codes reloaded.");
         return true;
     }

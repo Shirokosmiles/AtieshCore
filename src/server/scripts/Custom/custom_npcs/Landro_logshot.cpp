@@ -17,9 +17,8 @@
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "AccountMgr.h"
-#include "DatabaseEnv.h"
 #include "GossipDef.h"
+#include "PromotionCodeMgr.h"
 #include "Player.h"
 #include "ScriptedGossip.h"
 #include "ScriptedCreature.h"
@@ -94,77 +93,17 @@ public:
 
         bool GossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 /*gossipListId*/, char const* code) override
         {
+            if (!player)
+                return false;;
+
             player->PlayerTalkClass->ClearMenus();
             if (!code)
                 return false;
 
-            std::string codeUINT = code;
-            uint32 id = 0;
-            bool founded = false;
-
-            if (sObjectMgr->GetPromoCode(codeUINT, id))
-            {
-                PromotionCodesContainer const& promoMap = sObjectMgr->GetPromotionCodesMap();
-                for (PromotionCodesContainer::const_iterator itr = promoMap.begin(); itr != promoMap.end(); ++itr)
-                {
-                    PromotionCodes const* promo = &itr->second;
-
-                    if (promo->code == codeUINT && !promo->used)
-                    {
-                        founded = true;
-                        if (promo->arena)
-                            player->ModifyArenaPoints(promo->arena);
-                        if (promo->honor)
-                            player->ModifyHonorPoints(promo->honor);
-                        if (promo->item_1)
-                        {
-                            uint32 count = 1;
-                            if (promo->item_count_1 && promo->item_count_1 > 1)
-                                count = promo->item_count_1;
-                            player->AddItem(promo->item_1, count);
-                        }
-                        if (promo->item_2)
-                        {
-                            uint32 count = 1;
-                            if (promo->item_count_2 && promo->item_count_2 > 1)
-                                count = promo->item_count_2;
-                            player->AddItem(promo->item_2, count);
-                        }
-                        if (promo->item_3)
-                        {
-                            uint32 count = 1;
-                            if (promo->item_count_3 && promo->item_count_3 > 1)
-                                count = promo->item_count_3;
-                            player->AddItem(promo->item_3, count);
-                        }
-                        if (promo->money)
-                            player->ModifyMoney(promo->money);
-                        if (promo->coin)
-                        {
-                            uint32 coins = player->GetCoins();
-                            coins += promo->coin;
-                            player->SetCoins(coins);
-                            AccountMgr::SetCoins(player->GetSession()->GetAccountId(), coins);
-                        }
-                        if (promo->spell_1)
-                            player->LearnSpell(promo->spell_1, false, false);
-                        if (promo->spell_2)
-                            player->LearnSpell(promo->spell_2, false, false);
-                        if (promo->spell_3)
-                            player->LearnSpell(promo->spell_3, false, false);
-                        if (promo->aura)
-                            player->AddAura(promo->aura, player);
-                    }
-                }
-            }
-
-            if (!founded)
+            if (!sPromotionCodeMgr->CheckedEnteredCodeByPlayer(code, player))
                 me->AI()->Talk(SAY_WRONG);
             else
-            {
                 me->AI()->Talk(SAY_CORRECT);
-                sObjectMgr->UsePromoCode(id);
-            }
 
             player->PlayerTalkClass->SendCloseGossip();
             return true;

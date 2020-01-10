@@ -70,6 +70,7 @@
 #include "Player.h"
 #include "PlayerDump.h"
 #include "PoolMgr.h"
+#include "PromotionCodeMgr.h"
 #include "QueryCallback.h"
 #include "QuestPools.h"
 #include "Realm.h"
@@ -2114,9 +2115,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Player Auto Learn spells...");
     sObjectMgr->LoadPlayerAutoLearnSpells();
 
-    TC_LOG_INFO("server.loading", "Loading Promo Codes...");
-    sObjectMgr->LoadPromoCodes();
-
     TC_LOG_INFO("server.loading", "Loading Trainers...");       // must be after LoadCreatureTemplates
     sObjectMgr->LoadTrainers();
 
@@ -2297,6 +2295,10 @@ void World::SetInitialWorldSettings()
     ///- Initialize Mails
     TC_LOG_INFO("server.loading", "Starting Mail External System");
     sMailExternalMgr->Initialize();
+
+    ///- Initialize PromoCodes data
+    TC_LOG_INFO("server.loading", "Loading Promo Codes...");
+    sPromotionCodeMgr->Initialize();
 
     ///- Initialize Warden
     TC_LOG_INFO("server.loading", "Loading Warden Checks...");
