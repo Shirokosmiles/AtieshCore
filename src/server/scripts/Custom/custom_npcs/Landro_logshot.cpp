@@ -69,6 +69,7 @@ public:
             uint32 ActionMenuID = 0;
             std::string OptionText = "";
             /// Find items for given menu id.
+            uint8 index = 0;
             GossipMenuItemsMapBounds bounds = sObjectMgr->GetGossipMenuItemsMapBounds(MenuID);
             /// Return if there are none.
             if (bounds.first != bounds.second)
@@ -79,11 +80,11 @@ public:
                     /// Find the one with the given menu item id.
                     ActionMenuID = itr->second.ActionMenuID;
                     OptionText = itr->second.OptionText;
-
+                    ++index;
                     if (ActionMenuID != 0)
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, OptionText, GOSSIP_SENDER_MAIN, ActionMenuID);
                     else
-                        AddGossipItemFor(player, 0, OptionText, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, "", 0, true);
+                        AddGossipItemFor(player, 0, OptionText, GOSSIP_SENDER_MAIN, MenuID + index, "", ActionMenuID, true);
                 }
             }            
 
@@ -91,16 +92,18 @@ public:
             return true;
         }
 
-        bool GossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 /*gossipListId*/, char const* code) override
+        bool GossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 gossipListId, char const* code) override
         {
             if (!player)
                 return false;;
+
+            uint32 MenuID = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
 
             player->PlayerTalkClass->ClearMenus();
             if (!code)
                 return false;
 
-            if (!sPromotionCodeMgr->CheckedEnteredCodeByPlayer(code, player))
+            if (!sPromotionCodeMgr->CheckedEnteredCodeByPlayer(code, player, MenuID))
                 me->AI()->Talk(SAY_WRONG);
             else
                 me->AI()->Talk(SAY_CORRECT);
