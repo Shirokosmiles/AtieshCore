@@ -1742,6 +1742,11 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         std::string GetDescriptionACForLogs(uint8 type, float param1 = 0.f, float param2 = 0.f) const;
         std::string GetPositionACForLogs() const;
+
+        void StartWaitingLandOrSwimOpcode();
+        bool IsWaitingLandOrSwimOpcode() const { return m_antiNoFallDmg; }
+        bool IsUnderLastChanceForLandOrSwimOpcode() const { return m_antiNoFallDmgLastChance; }
+        void SetSuccessfullyLanded() { m_antiNoFallDmgLastChance = false; }
 		// Ingore group/raid-party for some quests in Instances
 		bool CanEnterInInstanceOrRaidCustom() const { return m_customAccessInZone; }
 		void SetCanEnterInInstanceOrRaidCustom(bool access) { m_customAccessInZone = access; }
@@ -2081,10 +2086,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         /*********************************************************/
         /***                 VARIOUS SYSTEMS                   ***/
         /*********************************************************/
-        void UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode);
         // only changed for direct client control (possess, vehicle etc.), not stuff you control using pet commands
         WorldObject* m_seer;
-        void SetFallInformation(uint32 time, float z);
+        void SetFallInformation(float z);
         void HandleFall(MovementInfo const& movementInfo);
 
         bool CanFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const;
@@ -2575,7 +2579,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         MapReference m_mapRef;
 
-        uint32 m_lastFallTime;
         float  m_lastFallZ;
 
         int32 m_MirrorTimer[MAX_TIMERS];
@@ -2606,9 +2609,12 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool m_canfly;              // Used for access at fly flag - handled restricted access
         bool m_ACKmounted;
         bool m_rootUpd;
+        bool m_antiNoFallDmg;
+        bool m_antiNoFallDmgLastChance;
         uint32 m_mountTimer;
         uint32 m_rootUpdTimer;
         uint32 m_flyhackTimer;
+        uint32 m_antiNoFallDmgTimer;
         uint32 m_reloadModelsDisplayTimer;
 
         // Timestamp on client clock of the moment the most recently processed movement packet was SENT by the client

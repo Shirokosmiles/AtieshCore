@@ -329,7 +329,7 @@ void Transport::RemovePassenger(WorldObject* passenger)
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(this, plr);
-            plr->SetFallInformation(0, plr->GetPositionZ());
+            plr->SetFallInformation(plr->GetPositionZ());
         }
 
         if (Creature* crt = passenger->ToCreature())
@@ -810,7 +810,7 @@ void Transport::UpdatePassengerPositions(PassengerSet& passengers)
                 if (passenger->IsInWorld() && !passenger->ToPlayer()->IsBeingTeleported())
                 {
                     GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
-                    passenger->ToPlayer()->SetFallInformation(0, passenger->GetPositionZ());
+                    passenger->ToPlayer()->SetFallInformation(passenger->GetPositionZ());
                 }
                 break;
             case TYPEID_GAMEOBJECT:

@@ -46,6 +46,12 @@ void Player::UpdateMovementInfo(MovementInfo const& movementInfo)
     SetLastMoveServerTimestamp(GameTime::GetGameTimeMS());
 }
 
+void Player::StartWaitingLandOrSwimOpcode()
+{
+    m_antiNoFallDmgTimer = 1500;
+    m_antiNoFallDmg = true;
+}
+
 bool Player::CheckOnFlyHack()
 {
     if (sWorld->isMapDisabledForAC(GetMapId()))
@@ -188,7 +194,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         else
             return true;
 
-        bool transportflag = movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT;
+        bool transportflag = movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         float x, y, z;
         Position npos;
 
@@ -369,6 +375,11 @@ std::string Player::GetDescriptionACForLogs(uint8 type, float param1, float para
         case 8: // fakeflying
         {
             str << "FakeFlying mode detected";
+            break;
+        }
+        case 9: // NoFallingDmg
+        {
+            str << "NoFallingDamage mode detected";
             break;
         }
         default:
