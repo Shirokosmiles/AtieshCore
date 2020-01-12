@@ -395,9 +395,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         }
         catch (ByteBufferException const&)
         {
-            TC_LOG_ERROR("network", "WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.",
+            TC_LOG_ERROR("network", "WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet and kick player",
                     packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
             packet->hexlike();
+            KickPlayer();
         }
 
         if (deletePacket)
