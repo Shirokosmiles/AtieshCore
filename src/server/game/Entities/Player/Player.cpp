@@ -25296,6 +25296,11 @@ InventoryResult Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 
 void Player::SetFallInformation(float z)
 {
     m_lastFallZ = z;
+
+    if (IsWaitingLandOrSwimOpcode())
+        m_antiNoFallDmg = false;
+    if (IsUnderLastChanceForLandOrSwimOpcode())
+        m_antiNoFallDmgLastChance = false;
 }
 
 void Player::HandleFall(MovementInfo const& movementInfo)
