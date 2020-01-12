@@ -3273,11 +3273,7 @@ void World::SendAutoBroadcast()
     uint32 abcenter = sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER);
 
     if (abcenter == 0)
-    {
-        std::ostringstream ss;
-        ss << "|cffffff00[|c00077766Autobroadcast|cffffff00]: |cFFF222FF" << msg.c_str() << "|r";
-        sWorld->SendAutoBroadcastText(ss.str().c_str(), NULL);
-    }
+        sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
     else if (abcenter == 1)
     {
         WorldPacket data(SMSG_NOTIFICATION, (msg.size()+1));
