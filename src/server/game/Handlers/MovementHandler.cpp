@@ -454,10 +454,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         movementInfo.transport.Reset();
     }
 
-    // So the PetAI will function properly
-    if (crMover && crMover->ToPet())
-        crMover->ToPet()->GetCharmInfo()->SetIsOnTransport(plrMover->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT));
-
     // start falling time
     if (plrMover && !plrMover->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) && movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_FAR))
         plrMover->SetFallInformation(movementInfo.pos.GetPositionZ());
@@ -468,9 +464,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         bool checkNorm = false;
         switch (opcode)
         {
-            case MSG_MOVE_HEARTBEAT:
-            case MSG_MOVE_SET_FACING:
-            case CMSG_MOVE_CHNG_TRANSPORT:
             case MSG_MOVE_FALL_LAND:
             case MSG_MOVE_START_SWIM:
                 checkNorm = true;
@@ -511,6 +504,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (opcode == MSG_MOVE_JUMP)
     {
         jumpopcode = true;
+        plrMover->SetFallInformation(plrMover->GetPositionZ());
         if (plrMover)
         {
             plrMover->SetUnderACKmount();
