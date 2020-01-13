@@ -151,6 +151,7 @@ enum ICCSisterSvalnaTimedEventIds
     EVENT_SVALNA_COMBAT,
     EVENT_IMPALING_SPEAR,
     EVENT_AETHER_SHIELD,
+    EVENT_CHECK_LIST,
 
     // Captain Arnath
     EVENT_ARNATH_FLASH_HEAL,
@@ -329,7 +330,6 @@ struct boss_sister_svalna : public BossAI
         _Reset();
         me->SetReactState(REACT_DEFENSIVE);
         _isEventInProgress = false;
-        _shielded = false;
         _spearTarget = ObjectGuid::Empty;
     }
 
@@ -505,14 +505,27 @@ struct boss_sister_svalna : public BossAI
                     {
                         DoCast(me, SPELL_AETHER_SHIELD);
                         DoCast(target, SPELL_IMPALING_SPEAR);
-                        _shielded = true;
                         _spearTarget = target->GetGUID();
+                        events.ScheduleEvent(EVENT_CHECK_LIST, 1s);
                     }
                     events.ScheduleEvent(EVENT_IMPALING_SPEAR, 20s, 25s);
                     break;
                 case EVENT_AETHER_SHIELD:
                     me->RemoveAura(SPELL_AETHER_SHIELD);
                     break;
+                case EVENT_CHECK_LIST:
+                {
+                    bool founded = false;
+                    if (Player* target = ObjectAccessor::GetPlayer(*me, _spearTarget))
+                        if (!target->IsAlive() || !target->HasAura(SPELL_IMPALING_SPEAR))
+                            founded = true;
+
+                    if (founded)
+                        events.ScheduleEvent(EVENT_AETHER_SHIELD, 0);
+                    else
+                        events.ScheduleEvent(EVENT_CHECK_LIST, 1s);
+                    break;
+                }
                 default:
                     break;
             }
@@ -521,21 +534,10 @@ struct boss_sister_svalna : public BossAI
                 return;
         }
 
-        if (_shielded)
-        {
-            if (Unit* target = ObjectAccessor::GetUnit(*me, _spearTarget))
-                if (!target->IsAlive() || !target->HasAura(SPELL_IMPALING_SPEAR))
-                {
-                    _shielded = false;
-                    events.ScheduleEvent(EVENT_AETHER_SHIELD, 0);
-                }
-        }
-
         DoMeleeAttackIfReady();
     }
 
 private:
-    bool _shielded;
     ObjectGuid _spearTarget;
     bool _isEventInProgress;
 };

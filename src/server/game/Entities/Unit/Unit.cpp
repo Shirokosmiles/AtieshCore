@@ -9860,7 +9860,7 @@ void Unit::DeleteCharmInfo()
 
 CharmInfo::CharmInfo(Unit* unit)
 : _unit(unit), _CommandState(COMMAND_FOLLOW), _petnumber(0), _oldReactState(REACT_PASSIVE),
-  _isCommandAttack(false), _isCommandFollow(false), _isAtStay(false), _isFollowing(false), _isReturning(false), _isOnTransport(false),
+  _isCommandAttack(false), _isCommandFollow(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
   _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f)
 {
     for (uint8 i = 0; i < MAX_SPELL_CHARM; ++i)

@@ -685,8 +685,6 @@ struct TC_GAME_API CharmInfo
         void RemoveStayPosition();
         bool HasStayPosition();
         void GetStayPosition(float &x, float &y, float &z);
-        void SetIsOnTransport(bool val) { _isOnTransport = val; }
-        bool IsOnTransport() { return _isOnTransport; }
 
     private:
 
@@ -704,7 +702,6 @@ struct TC_GAME_API CharmInfo
         bool _isAtStay;
         bool _isFollowing;
         bool _isReturning;
-        bool _isOnTransport;
         float _stayX;
         float _stayY;
         float _stayZ;

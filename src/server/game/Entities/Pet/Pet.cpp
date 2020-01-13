@@ -595,10 +595,10 @@ void Pet::Update(uint32 diff)
                 }
             }
 
-            if (GetCharmInfo()->IsOnTransport() && !GetTransport() && !GetVictim())
+            if (owner->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !GetTransport() && !GetVictim())
             {
                 if (GetPositionZ() != owner->GetPositionZ())
-                    Relocate(GetPositionX(), GetPositionY(), owner->GetPositionZ());
+                    Relocate(GetPositionX(), GetPositionY(), owner->GetPositionZ() + 2.0f);
             }
 
             if (m_duration > 0)
