@@ -1747,6 +1747,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool IsWaitingLandOrSwimOpcode() const { return m_antiNoFallDmg; }
         bool IsUnderLastChanceForLandOrSwimOpcode() const { return m_antiNoFallDmgLastChance; }
         void SetSuccessfullyLanded() { m_antiNoFallDmgLastChance = false; }
+        void ResetFallingData(float z);
+        void UpdateFallInformationIfNeed(float newZ) { m_lastFallZ = newZ; }
 		// Ingore group/raid-party for some quests in Instances
 		bool CanEnterInInstanceOrRaidCustom() const { return m_customAccessInZone; }
 		void SetCanEnterInInstanceOrRaidCustom(bool access) { m_customAccessInZone = access; }
@@ -2086,9 +2088,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         /*********************************************************/
         /***                 VARIOUS SYSTEMS                   ***/
         /*********************************************************/
-        // only changed for direct client control (possess, vehicle etc.), not stuff you control using pet commands
-        WorldObject* m_seer;
-        void SetFallInformation(float z);
+        // only changed for direct client control (possess, vehicle etc.), not stuff you control using pet commands        
+        WorldObject* m_seer;        
         void HandleFall(MovementInfo const& movementInfo);
 
         bool CanFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const;

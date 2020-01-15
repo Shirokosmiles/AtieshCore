@@ -1929,7 +1929,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
         // this will be used instead of the current location in SaveToDB
         m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
-        SetFallInformation(GetPositionZ());
+        ResetFallingData(GetPositionZ());
 
         // code for finish transfer called in WorldSession::HandleMovementOpcodes()
         // at client packet MSG_MOVE_TELEPORT_ACK
@@ -2031,7 +2031,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
             m_teleport_options = options;
-            SetFallInformation(GetPositionZ());
+            ResetFallingData(GetPositionZ());
             // if the player is saved before worldportack (at logout for example)
             // this will be used instead of the current location in SaveToDB
 
@@ -17923,7 +17923,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     SetUInt32Value(PLAYER_CHOSEN_TITLE, curTitle);
 
     // has to be called after last Relocate() in Player::LoadFromDB
-    SetFallInformation(GetPositionZ());
+    ResetFallingData(GetPositionZ());
 
     GetSpellHistory()->LoadFromDB<Player>(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS));
 
@@ -25293,7 +25293,7 @@ InventoryResult Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 
     return EQUIP_ERR_OK;
 }
 
-void Player::SetFallInformation(float z)
+void Player::ResetFallingData(float z)
 {
     m_lastFallZ = z;
 
@@ -26722,7 +26722,7 @@ bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/)
 bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
 {
     if (!apply)
-        SetFallInformation(GetPositionZ());
+        ResetFallingData(GetPositionZ());
 
     SetCanFlybyServer(apply);
     WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
