@@ -104,9 +104,9 @@ struct boss_kologarn : public BossAI
         SetCombatMovement(false);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         events.ScheduleEvent(EVENT_MELEE_CHECK, 6s);
         events.ScheduleEvent(EVENT_SMASH, 5s);

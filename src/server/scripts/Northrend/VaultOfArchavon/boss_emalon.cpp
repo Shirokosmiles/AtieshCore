@@ -123,7 +123,7 @@ class boss_emalon : public CreatureScript
                 events.ScheduleEvent(EVENT_BERSERK, 6min);
                 events.ScheduleEvent(EVENT_OVERCHARGE, 45s);
 
-                _JustEngagedWith();
+                BossAI::JustEngagedWith(who);
             }
 
             void UpdateAI(uint32 diff) override

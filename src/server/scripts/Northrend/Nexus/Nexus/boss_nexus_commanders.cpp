@@ -64,9 +64,9 @@ class boss_nexus_commanders : public CreatureScript
                 Initialize();
             }
 
-            void JustEngagedWith(Unit* /*who*/) override
+            void JustEngagedWith(Unit* who) override
             {
-                _JustEngagedWith();
+                BossAI::JustEngagedWith(who);
                 Talk(SAY_AGGRO);
                 me->RemoveAurasDueToSpell(SPELL_FROZEN_PRISON);
                 DoCast(me, SPELL_BATTLE_SHOUT);
