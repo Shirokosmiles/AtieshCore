@@ -719,6 +719,12 @@ enum ReactiveType
     MAX_REACTIVE
 };
 
+struct PositionUpdateInfo
+{
+    bool Relocated = false;
+    bool Turned = false;
+};
+
 // delay time next attack to prevent client attack animation problems
 #define ATTACK_DISPLAY_DELAY 200
 #define MAX_PLAYER_STEALTH_DETECT_RANGE 30.0f               // max distance for detection targets by player
@@ -1319,6 +1325,7 @@ class TC_GAME_API Unit : public WorldObject
         bool HasAuraTypeWithMiscvalue(AuraType auraType, int32 miscValue) const;
         bool HasAuraTypeWithAffectMask(AuraType auraType, SpellInfo const* affectedSpell) const;
         bool HasAuraTypeWithValue(AuraType auraType, int32 value) const;
+        bool HasAuraTypeWithTriggerSpell(AuraType auratype, uint32 triggerSpell) const;
         bool HasNegativeAuraWithInterruptFlag(uint32 flag, ObjectGuid guid = ObjectGuid::Empty) const;
         bool HasAuraWithMechanic(uint32 mechanicMask) const;
         bool HasAuraFaireFire() const;
@@ -1803,6 +1810,7 @@ class TC_GAME_API Unit : public WorldObject
     private:
 
         void UpdateSplineMovement(uint32 t_diff);
+        void InterruptMovementBasedAuras();
 
         // player or player's pet
         float GetCombatRatingReduction(CombatRating cr) const;
@@ -1858,6 +1866,8 @@ class TC_GAME_API Unit : public WorldObject
         bool _isJumping;
         bool _isCharging;
         bool needtodismount;
+
+        PositionUpdateInfo _positionUpdateInfo;
 };
 
 namespace Trinity
