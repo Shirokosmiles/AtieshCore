@@ -3374,8 +3374,8 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
             if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth())
             {
                 Unit* targetforremoveauras = unitCaster;
-                if (m_targets.GetUnitTarget() && m_spellInfo->Id == 2094) // [HACK] blind should break stealth for victim, not for rogue
-                    targetforremoveauras = m_targets.GetUnitTarget();
+               // if (m_targets.GetUnitTarget() && m_spellInfo->Id == 2094) // [HACK] blind should break stealth for victim, not for rogue
+                 //   targetforremoveauras = m_targets.GetUnitTarget();
 
                 targetforremoveauras->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
                 for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
