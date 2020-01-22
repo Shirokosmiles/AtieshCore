@@ -462,6 +462,12 @@ void Unit::Update(uint32 p_time)
     UpdateSplineMovement(p_time);
     i_motionMaster->Update(p_time);
 
+    // Wait with the aura interrupts until we have updated our movement generators and position
+    if (GetTypeId() == TYPEID_PLAYER)
+        InterruptMovementBasedAuras();
+    else if (!movespline->Finalized())
+        InterruptMovementBasedAuras();
+
     if (!GetAI() && (GetTypeId() != TYPEID_PLAYER || (IsCharmed() && GetCharmerGUID().IsCreature())))
         UpdateCharmAI();
     RefreshAI();
@@ -524,6 +530,16 @@ void Unit::UpdateSplinePosition()
         loc.orientation = GetOrientation();
 
     UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
+}
+
+void Unit::InterruptMovementBasedAuras()
+{
+    // TODO: Check if orientation transport offset changed instead of only global orientation
+    if (_positionUpdateInfo.Turned)
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
+
+    if (_positionUpdateInfo.Relocated && !GetVehicle())
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOVE);
 }
 
 void Unit::DisableSpline()
@@ -13141,15 +13157,8 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
         std::fabs(GetPositionY() - y) > 0.001f ||
         std::fabs(GetPositionZ() - z) > 0.001f);
 
-    // TODO: Check if orientation transport offset changed instead of only global orientation
-    if (turn)
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
-
     if (relocated)
     {
-        if (!GetVehicle())
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOVE);
-
         // move and update visible state if need
         if (GetTypeId() == TYPEID_PLAYER)
             GetMap()->PlayerRelocation(ToPlayer(), x, y, z, orientation);
@@ -13160,6 +13169,9 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
         UpdateOrientation(orientation);
 
     UpdatePositionData();
+
+    _positionUpdateInfo.Relocated = relocated;
+    _positionUpdateInfo.Turned = turn;
 
     return (relocated || turn);
 }
