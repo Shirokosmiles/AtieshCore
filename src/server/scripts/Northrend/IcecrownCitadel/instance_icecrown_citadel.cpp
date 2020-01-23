@@ -1142,12 +1142,12 @@ class instance_icecrown_citadel : public InstanceMapScript
                         if (data == DONE)
                         {
                             if (GameObject* go = instance->GetGameObject(PutricideDoorGUID))
-                                go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                                go->SetGoState(GO_STATE_DESTROYED);
                             HandleGameObject(PutricideCollisionGUID, true);
                             if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[0]))
-                                go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                                go->SetGoState(GO_STATE_DESTROYED);
                             if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[1]))
-                                go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                                go->SetGoState(GO_STATE_DESTROYED);
                         }
                         else if (data == IN_PROGRESS)
                         {
