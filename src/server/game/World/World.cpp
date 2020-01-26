@@ -2286,9 +2286,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Starting SpecialEvents System");
     sSpecialEventMgr->InitSpecialEvents();
 
-    TC_LOG_INFO("server.loading", "Loading Transports...");
-    sTransportMgr->SpawnContinentTransports();
-
     ///- Initialize Mails
     TC_LOG_INFO("server.loading", "Starting Mail System");
     sMailMgr->Initialize();
@@ -2336,6 +2333,9 @@ void World::SetInitialWorldSettings()
             }
         });
     }
+
+    TC_LOG_INFO("server.loading", "Loading Transports...");
+    sTransportMgr->SpawnContinentTransports();
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
 
