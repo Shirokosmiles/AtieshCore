@@ -812,7 +812,7 @@ enum RBACPermissions
     RBAC_PERM_GSYSTEM_COMMANDS                               = 1020,
 
     // Reload Promo
-    RBAC_PERM_RELOAD_PROMO_CODE_TABLE                        = 1021,
+    RBAC_PERM_RELOAD_PROMO_CODE_TABLE                        = 1022,
     RBAC_PERM_MAX
 };
 
