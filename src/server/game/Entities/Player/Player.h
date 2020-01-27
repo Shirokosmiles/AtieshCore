@@ -1746,7 +1746,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void StartWaitingLandOrSwimOpcode();
         bool IsWaitingLandOrSwimOpcode() const { return m_antiNoFallDmg; }
         bool IsUnderLastChanceForLandOrSwimOpcode() const { return m_antiNoFallDmgLastChance; }
-        void SetSuccessfullyLanded() { m_antiNoFallDmgLastChance = false; }
+        void SetSuccessfullyLanded() { m_antiNoFallDmgLastChance = false; m_antiNoFallDmg = false; }
         void ResetFallingData(float z);
         void UpdateFallInformationIfNeed(float newZ) { m_lastFallZ = newZ; }
 		// Ingore group/raid-party for some quests in Instances
