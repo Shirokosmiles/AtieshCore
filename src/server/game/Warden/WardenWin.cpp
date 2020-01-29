@@ -92,33 +92,33 @@ void WardenWin::InitializeModule()
     WardenInitModuleRequest Request;
     Request.Command1 = WARDEN_SMSG_MODULE_INITIALIZE;
     Request.Size1 = 20;
-    Request.CheckSumm1 = BuildChecksum(&Request.Unk1, 20);
     Request.Unk1 = 1;
     Request.Unk2 = 0;
     Request.Type = 1;
     Request.String_library1 = 0;
-    Request.Function1[0] = 0x002485F0;                      // 0x00400000 + 0x002485F0 SFileOpenFile
-    Request.Function1[1] = 0x002487F0;                      // 0x00400000 + 0x002487F0 SFileGetFileSize
-    Request.Function1[2] = 0x00248460;                      // 0x00400000 + 0x00248460 SFileReadFile
-    Request.Function1[3] = 0x00248730;                      // 0x00400000 + 0x00248730 SFileCloseFile
+    Request.Function1[0] = 0x00024F80;                      // 0x00400000 + 0x00024F80 SFileOpenFile
+    Request.Function1[1] = 0x000218C0;                      // 0x00400000 + 0x000218C0 SFileGetFileSize
+    Request.Function1[2] = 0x00022530;                      // 0x00400000 + 0x00022530 SFileReadFile
+    Request.Function1[3] = 0x00022910;                      // 0x00400000 + 0x00022910 SFileCloseFile
+    Request.CheckSumm1 = BuildChecksum(&Request.Unk1, 20);
 
     Request.Command2 = WARDEN_SMSG_MODULE_INITIALIZE;
     Request.Size2 = 8;
-    Request.CheckSumm2 = BuildChecksum(&Request.Unk2, 8);
     Request.Unk3 = 4;
     Request.Unk4 = 0;
     Request.String_library2 = 0;
     Request.Function2 = 0x00419D40;                         // 0x00400000 + 0x00419D40 FrameScript::GetText
     Request.Function2_set = 1;
+    Request.CheckSumm2 = BuildChecksum(&Request.Unk2, 8);
 
     Request.Command3 = WARDEN_SMSG_MODULE_INITIALIZE;
     Request.Size3 = 8;
-    Request.CheckSumm3 = BuildChecksum(&Request.Unk5, 8);
     Request.Unk5 = 1;
     Request.Unk6 = 1;
     Request.String_library3 = 0;
     Request.Function3 = 0x0046AE20;                         // 0x00400000 + 0x0046AE20 PerformanceCounter
     Request.Function3_set = 1;
+    Request.CheckSumm3 = BuildChecksum(&Request.Unk5, 8);
 
     // Encrypt with warden RC4 key.
     EncryptData((uint8*)&Request, sizeof(WardenInitModuleRequest));
