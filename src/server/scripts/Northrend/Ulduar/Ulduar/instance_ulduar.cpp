@@ -1122,97 +1122,6 @@ class spell_ulduar_teleporter : public SpellScriptLoader
         }
 };
 
-enum UlduarSpellTrash
-{
-    SPELL_DEFENDERS_SLAIN         = 65387,  // used by steelforged defender
-    SPELL_DEFENDERS_HAMSTRING     = 62845,  // used by steelforged defender
-    SPELL_DEFENDERS_LIGHTING_BOLT = 57780,  // used by steelforged defender
-    SPELL_DEFENDERS_SUNDER_ARMOR  = 50370   // used by steelforged defender
-};
-
-enum UlduarEventsTrash
-{
-    EVENT_DEFENDERS_HAMSTRING     = 1,
-    EVENT_DEFENDERS_LIGHTING_BOLT = 2,
-    EVENT_DEFENDERS_SUNDER_ARMOR  = 3
-};
-
-class npc_steelforged_defender : public CreatureScript
-{
-public:
-    npc_steelforged_defender() : CreatureScript("npc_steelforged_defender") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_steelforged_defenderAI(creature);
-    }
-
-    struct npc_steelforged_defenderAI : public CombatAI
-    {
-        npc_steelforged_defenderAI(Creature *creature) : CombatAI(creature) 
-        {
-            Initialize();
-        }
-
-        void Initialize()
-        {
-            UlduarEventsTrash.Reset();
-        }
-
-        void Reset() override
-        {
-            Initialize();
-            CombatAI::Reset();
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            UlduarEventsTrash.ScheduleEvent(EVENT_DEFENDERS_HAMSTRING, 2500);
-            UlduarEventsTrash.ScheduleEvent(EVENT_DEFENDERS_LIGHTING_BOLT, 2600);
-            UlduarEventsTrash.ScheduleEvent(EVENT_DEFENDERS_SUNDER_ARMOR, urand(500, 4000));
-        }
-
-        void JustDied(Unit* killer/*victim*/) override
-        {
-            killer->CastSpell(killer, SPELL_DEFENDERS_SLAIN, true);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!me || !me->IsAlive())
-                return;
-
-            UlduarEventsTrash.Update(diff);
-
-            while (uint32 eventId = UlduarEventsTrash.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case EVENT_DEFENDERS_HAMSTRING:
-                    DoCast(SPELL_DEFENDERS_HAMSTRING);
-                    UlduarEventsTrash.ScheduleEvent(EVENT_DEFENDERS_HAMSTRING, urand(9000, 12000));
-                    break;
-                case EVENT_DEFENDERS_LIGHTING_BOLT:
-                    DoCast(SPELL_DEFENDERS_LIGHTING_BOLT);
-                    UlduarEventsTrash.ScheduleEvent(EVENT_DEFENDERS_LIGHTING_BOLT, urand(13000, 14000));
-                    break;
-                case EVENT_DEFENDERS_SUNDER_ARMOR:
-                    DoCastAOE(SPELL_DEFENDERS_SUNDER_ARMOR);
-                    UlduarEventsTrash.ScheduleEvent(EVENT_DEFENDERS_SUNDER_ARMOR, urand(4500, 9000));
-                    break;
-                default:
-                    break;
-                }
-            }
-            DoMeleeAttackIfReady();
-            CombatAI::UpdateAI(diff);
-        }
-
-    private:
-        EventMap UlduarEventsTrash;
-    };
-};
-
 /*
 enum TramEvents
 {
@@ -1361,7 +1270,6 @@ void AddSC_instance_ulduar()
 {
     new instance_ulduar();
     new spell_ulduar_teleporter();
-    new npc_steelforged_defender();
     //new go_transport_to_mimiron();
     //new go_mimiron_activate_tram();
 }
