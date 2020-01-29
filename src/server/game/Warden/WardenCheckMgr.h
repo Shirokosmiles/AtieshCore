@@ -23,7 +23,7 @@
 #include <boost/thread/shared_mutex.hpp>
 #include "Cryptography/BigNumber.h"
 
-enum WardenActions
+enum WardenActions : uint8
 {
     WARDEN_ACTION_LOG,
     WARDEN_ACTION_KICK,
@@ -39,11 +39,12 @@ struct WardenCheck
     std::string Str;                                        // LUA, MPQ, DRIVER
     std::string Comment;
     uint16 CheckId;
-    enum WardenActions Action;
+    uint8 Action;
 };
 
 struct WardenCheckResult
 {
+    uint16 Id;
     BigNumber Result;                                       // MEM_CHECK
 };
 
@@ -54,17 +55,15 @@ class TC_GAME_API WardenCheckMgr
         ~WardenCheckMgr();
 
     public:
-        static WardenCheckMgr* instance();
+        static WardenCheckMgr* instance()
+        {
+            static WardenCheckMgr instance;
+            return &instance;
+        }
 
-        // We have a linear key without any gaps, so we use vector for fast access
-        typedef std::vector<WardenCheck*> CheckContainer;
-        typedef std::map<uint32, WardenCheckResult*> CheckResultContainer;
-
-        WardenCheck* GetWardenDataById(uint16 Id);
-        WardenCheckResult* GetWardenResultById(uint16 Id);
-
-        std::vector<uint16> MemChecksIdPool;
-        std::vector<uint16> OtherChecksIdPool;
+        WardenCheck* GetWardenDataById(uint16 /*build*/, uint16 /*id*/);
+        WardenCheckResult* GetWardenResultById(uint16 /*build*/, uint16 /*id*/);
+        void GetWardenCheckIds(bool isMemCheck /* true = MEM */, uint16 build, std::list<uint16>& list);
 
         void LoadWardenChecks();
         void LoadWardenOverrides();
@@ -72,8 +71,13 @@ class TC_GAME_API WardenCheckMgr
         boost::shared_mutex _checkStoreLock;
 
     private:
-        CheckContainer CheckStore;
-        CheckResultContainer CheckResultStore;
+        
+        typedef std::multimap< uint16, WardenCheck* > CheckMap;
+        typedef std::multimap< uint16, WardenCheckResult* > CheckResultMap;
+
+        CheckMap       CheckStore;
+        CheckResultMap CheckResultStore;
+
 };
 
 #define sWardenCheckMgr WardenCheckMgr::instance()

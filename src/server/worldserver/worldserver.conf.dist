@@ -1529,6 +1529,15 @@ Warden.ClientCheckFailAction = 0
 
 Warden.BanDuration = 86400
 
+#    Warden.DBLogLevel
+#        Description: The minimal WardenActions value of Warden check to be logged into realmd.warden_log table.
+#                     WardenActions: 0 - log, 1 - kick, 2 - ban
+#
+#        Deafult:     0 - (Logging any failed check)
+#                     3 - (Disable DB logging)
+
+Warden.DBLogLevel = 0
+
 #
 ###################################################################################################
 

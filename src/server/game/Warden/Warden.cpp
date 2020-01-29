@@ -1,3 +1,4 @@
+/**
 /*
  * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
@@ -16,25 +17,26 @@
  */
 
 #include "Common.h"
+#include "GameTime.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Log.h"
 #include "Opcodes.h"
+#include "Player.h"
 #include "ByteBuffer.h"
-#include "GameTime.h"
+#include <openssl/sha.h>
 #include "World.h"
 #include "Util.h"
 #include "Warden.h"
 #include "AccountMgr.h"
 
-#include <openssl/sha.h>
-
 Warden::Warden() : _session(nullptr), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
-                   _dataSent(false), _previousTimestamp(0), _module(nullptr), _initialized(false)
+                   _module(nullptr), _state(WardenState::STATE_INITIAL)
 {
     memset(_inputKey, 0, sizeof(_inputKey));
     memset(_outputKey, 0, sizeof(_outputKey));
     memset(_seed, 0, sizeof(_seed));
+    _previousTimestamp = GameTime::GetGameTimeMS();
 }
 
 Warden::~Warden()
@@ -42,7 +44,30 @@ Warden::~Warden()
     delete[] _module->CompressedData;
     delete _module;
     _module = nullptr;
-    _initialized = false;
+}
+
+void Warden::InitializeModule()
+{
+    SetNewState(WardenState::STATE_INITIALIZE_MODULE);
+}
+
+void Warden::RequestHash()
+{
+    TC_LOG_DEBUG("warden", "Request hash");
+
+    // Create packet structure
+    WardenHashRequest Request;
+    Request.Command = WARDEN_SMSG_HASH_REQUEST;
+    memcpy(Request.Seed, _seed, 16);
+
+    // Encrypt with warden RC4 key.
+    EncryptData((uint8*)&Request, sizeof(WardenHashRequest));
+
+    WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenHashRequest));
+    pkt.append((uint8*)&Request, sizeof(WardenHashRequest));
+    _session->SendPacket(&pkt);
+
+    SetNewState(WardenState::STATE_REQUESTED_HASH);
 }
 
 void Warden::SendModuleToClient()
@@ -69,6 +94,8 @@ void Warden::SendModuleToClient()
         pkt1.append((uint8*)&packet, burstSize + 3);
         _session->SendPacket(&pkt1);
     }
+
+    SetNewState(WardenState::STATE_SENT_MODULE);
 }
 
 void Warden::RequestModule()
@@ -89,17 +116,24 @@ void Warden::RequestModule()
     WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenModuleUse));
     pkt.append((uint8*)&request, sizeof(WardenModuleUse));
     _session->SendPacket(&pkt);
+
+    SetNewState(WardenState::STATE_REQUESTED_MODULE);
 }
 
 void Warden::Update()
 {
-    if (_initialized)
-    {
-        uint32 currentTimestamp = GameTime::GetGameTimeMS();
-        uint32 diff = currentTimestamp - _previousTimestamp;
-        _previousTimestamp = currentTimestamp;
+    uint32 currentTimestamp = GameTime::GetGameTimeMS();
+    uint32 diff = currentTimestamp - _previousTimestamp;
+    _previousTimestamp = currentTimestamp;
 
-        if (_dataSent)
+    switch (_state)
+    {
+        case WardenState::STATE_INITIAL:
+            break;
+        case WardenState::STATE_REQUESTED_MODULE:
+        case WardenState::STATE_SENT_MODULE:
+        case WardenState::STATE_REQUESTED_HASH:
+        case WardenState::STATE_REQUESTED_DATA:
         {
             uint32 maxClientResponseDelay = sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_RESPONSE_DELAY);
 
@@ -108,23 +142,34 @@ void Warden::Update()
                 // Kick player if client response delays more than set in config
                 if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
                 {
-                    TC_LOG_WARN("warden", "%s (latency: %u, IP: %s) exceeded Warden module response delay for more than %s - disconnecting client",
-                        _session->GetPlayerInfo().c_str(), _session->GetLatency(), _session->GetRemoteAddress().c_str(), secsToTimeString(maxClientResponseDelay, true).c_str());
+                    TC_LOG_WARN("warden", "%s (latency: %u, IP: %s) exceeded Warden module response delay on state %s for more than %s - disconnecting client",
+                                   _session->GetPlayerInfo().c_str(), _session->GetLatency(), _session->GetRemoteAddress().c_str(), WardenState::to_string(_state), secsToTimeString(maxClientResponseDelay, true).c_str());
                     _session->KickPlayer();
                 }
                 else
+                {
                     _clientResponseTimer += diff;
+                }
+
             }
         }
-        else
+        break;
+        case WardenState::STATE_INITIALIZE_MODULE:
+        case WardenState::STATE_RESTING:
         {
             if (diff >= _checkTimer)
             {
                 RequestData();
             }
             else
+            {
                 _checkTimer -= diff;
+            }
         }
+        break;
+        default:
+            TC_LOG_DEBUG("warden", "Unimplemented warden state!");
+            break;
     }
 }
 
@@ -136,6 +181,28 @@ void Warden::DecryptData(uint8* buffer, uint32 length)
 void Warden::EncryptData(uint8* buffer, uint32 length)
 {
     _outputCrypto.UpdateData(length, buffer);
+}
+
+void Warden::SetNewState(WardenState::Value state)
+{
+    //if we pass all initial checks, allow change
+    if (state < WardenState::STATE_REQUESTED_DATA)
+    {
+        if (state < _state)
+        {
+            TC_LOG_DEBUG("warden", "Warden Error: jump from %s to %s which is lower by initialization routine", WardenState::to_string(_state), WardenState::to_string(state));
+            return;
+        }
+    }
+
+    _state = state;
+
+    //Reset timers
+    // Set hold off timer, minimum timer should at least be 1 second    
+    uint32 holdOff = sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_CHECK_HOLDOFF);
+    _checkTimer = (holdOff < 1 ? 1 : holdOff) * IN_MILLISECONDS;
+
+    _clientResponseTimer = 0;
 }
 
 bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 length)
@@ -175,17 +242,19 @@ uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
     SHA1(data, length, hash.bytes.bytes);
     uint32 checkSum = 0;
     for (uint8 i = 0; i < 5; ++i)
+    {
         checkSum = checkSum ^ hash.ints.ints[i];
+    }
 
     return checkSum;
 }
 
 std::string Warden::Penalty(WardenCheck* check /*= nullptr*/)
 {
-    WardenActions action;
+    uint8 action = 0;
 
     if (check)
-        action = check->Action;
+        action = WardenActions(check->Action);
     else
         action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
 
@@ -223,9 +292,11 @@ std::string Warden::Penalty(WardenCheck* check /*= nullptr*/)
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
 {
     if (!_warden || recvData.empty())
+    {
         return;
+    }
 
-    _warden->DecryptData(recvData.contents(), recvData.size());
+    _warden->DecryptData(const_cast<uint8*>(recvData.contents()), recvData.size());
     uint8 opcode;
     recvData >> opcode;
     TC_LOG_DEBUG("warden", "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
@@ -256,4 +327,47 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             TC_LOG_DEBUG("warden", "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
             break;
     }
+}
+
+void Warden::RequestData()
+{
+    SetNewState(WardenState::STATE_REQUESTED_DATA);
+}
+
+void Warden::HandleData(ByteBuffer& /*buff*/)
+{
+    SetNewState(WardenState::STATE_RESTING);
+}
+
+void Warden::LogPositiveToDB(WardenCheck* check)
+{
+    if (!check || !_session)
+        return;
+
+    if (check->Action < sWorld->getIntConfig(CONFIG_WARDEN_DB_LOGLEVEL))
+        return;
+
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_WARDEN);
+    stmt->setUInt16(0, check->CheckId);
+    stmt->setUInt8(1, check->Action);
+    stmt->setUInt32(2, _session->GetAccountId());
+
+    if (Player* pl = _session->GetPlayer())
+    {
+        stmt->setUInt64(3, pl->GetGUID().GetCounter());
+        stmt->setUInt32(4, pl->GetMapId());
+        stmt->setFloat(5, pl->GetPositionX());
+        stmt->setFloat(6, pl->GetPositionY());
+        stmt->setFloat(7, pl->GetPositionZ());
+    }
+    else
+    {
+        stmt->setUInt64(3, 0);
+        stmt->setUInt32(4, 0);
+        stmt->setFloat(5, 0.0f);
+        stmt->setFloat(6, 0.0f);
+        stmt->setFloat(7, 0.0f);
+    }
+
+    LoginDatabase.Execute(stmt);
 }

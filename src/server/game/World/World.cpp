@@ -1419,6 +1419,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WARDEN_CLIENT_CHECK_HOLDOFF]  = sConfigMgr->GetIntDefault("Warden.ClientCheckHoldOff", 30);
     m_int_configs[CONFIG_WARDEN_CLIENT_FAIL_ACTION]    = sConfigMgr->GetIntDefault("Warden.ClientCheckFailAction", 0);
     m_int_configs[CONFIG_WARDEN_CLIENT_RESPONSE_DELAY] = sConfigMgr->GetIntDefault("Warden.ClientResponseDelay", 600);
+    m_int_configs[CONFIG_WARDEN_DB_LOGLEVEL]           = sConfigMgr->GetIntDefault("Warden.DBLogLevel", 0);
 
     /*********************************************************/
     /***                  CUSTOM SYSTEMS                   ***/
@@ -1538,7 +1539,8 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_PVP_REWARD]                           = sConfigMgr->GetBoolDefault("PVPBonusCapReward.Enabled", false);
     m_int_configs[CONFIG_PVP_REWARD_MAXCAP]                     = sConfigMgr->GetIntDefault("PVPBonusCapReward.MaxCap", 1500);
     m_int_configs[CONFIG_PVP_REWARD_CAP_FOR_WIN]                = sConfigMgr->GetIntDefault("PVPBonusCapReward.CapChanges.Win", 180);
-    m_int_configs[CONFIG_PVP_REWARD_CAP_FOR_LOSE]               = sConfigMgr->GetIntDefault("PVPBonusCapReward.CapChanges.Lose", 60);
+    m_int_configs[CONFIG_PVP_REWARD_CAP_FOR_LOSE]               = sConfigMgr->GetIntDefault("PVPBonusCapReward.CapChanges.Lose", 60);    
+    
     // OSX connection allow
     m_bool_configs[CONFIG_ALLOW_OSX_CONNECT]                    = sConfigMgr->GetBoolDefault("OSXPlayers.Enabled", false);
 

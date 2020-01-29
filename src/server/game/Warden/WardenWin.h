@@ -18,10 +18,6 @@
 #ifndef _WARDEN_WIN_H
 #define _WARDEN_WIN_H
 
-#include <map>
-#include "Cryptography/ARC4.h"
-#include "Cryptography/BigNumber.h"
-#include "ByteBuffer.h"
 #include "Warden.h"
 
 #pragma pack(push, 1)
@@ -59,11 +55,9 @@ struct WardenInitModuleRequest
 #pragma pack(pop)
 
 class WorldSession;
-class Warden;
+//class Warden;
 
-#define GAGARIN_CHECK_ID    832
-
-class TC_GAME_API WardenWin : public Warden
+class WardenWin : public Warden
 {
     public:
         WardenWin();
@@ -72,7 +66,6 @@ class TC_GAME_API WardenWin : public Warden
         void Init(WorldSession* session, BigNumber* K) override;
         ClientWardenModule* GetModuleForClient() override;
         void InitializeModule() override;
-        void RequestHash() override;
         void HandleHashResult(ByteBuffer &buff) override;
         void RequestData() override;
         void HandleData(ByteBuffer &buff) override;

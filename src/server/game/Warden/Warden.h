@@ -23,6 +23,10 @@
 #include "Cryptography/BigNumber.h"
 #include "ByteBuffer.h"
 #include "WardenCheckMgr.h"
+#include "Database/DatabaseEnv.h"
+
+// the default client version with info in warden_checks; for other version checks, see warden_build_specific
+#define DEFAULT_CLIENT_BUILD  12340
 
 enum WardenOpcodes
 {
@@ -46,7 +50,6 @@ enum WardenOpcodes
 enum WardenCheckType
 {
     MEM_CHECK               = 0xF3, // 243: byte moduleNameIndex + uint Offset + byte Len (check to ensure memory isn't modified)
-    MEM2_CHECK              = 0xF4, // 244: used like 243, but it returns the data of the page to be analyzed
     PAGE_CHECK_A            = 0xB2, // 178: uint Seed + byte[20] SHA1 + uint Addr + byte Len (scans all pages for specified hash)
     PAGE_CHECK_B            = 0xBF, // 191: uint Seed + byte[20] SHA1 + uint Addr + byte Len (scans only pages starts with MZ+PE headers for specified hash)
     MPQ_CHECK               = 0x98, // 152: byte fileNameIndex (check to ensure MPQ file isn't modified)
@@ -80,6 +83,42 @@ struct WardenHashRequest
     uint8 Seed[16];
 };
 
+namespace WardenState
+{
+    enum Value
+    {
+        STATE_INITIAL,
+        STATE_REQUESTED_MODULE,
+        STATE_SENT_MODULE,
+        STATE_REQUESTED_HASH,
+        STATE_INITIALIZE_MODULE,
+        STATE_REQUESTED_DATA,
+        STATE_RESTING
+    };
+
+    inline const char* to_string(WardenState::Value value)
+    {
+        switch (value)
+        {
+            case WardenState::STATE_INITIAL:
+                return "STATE_INITIAL";
+            case WardenState::STATE_REQUESTED_MODULE:
+                return "STATE_REQUESTED_MODULE";
+            case WardenState::STATE_SENT_MODULE:
+                return "STATE_SENT_MODULE";
+            case WardenState::STATE_REQUESTED_HASH:
+                return "STATE_REQUESTED_HASH";
+            case WardenState::STATE_INITIALIZE_MODULE:
+                return "STATE_INITIALIZE_MODULE";
+            case WardenState::STATE_REQUESTED_DATA:
+                return "STATE_REQUESTED_DATA";
+            case WardenState::STATE_RESTING:
+                return "STATE_RESTING";
+        }
+        return "UNDEFINED STATE";
+    }
+};
+
 #pragma pack(pop)
 
 struct ClientWardenModule
@@ -94,20 +133,17 @@ class WorldSession;
 
 class TC_GAME_API Warden
 {
-    friend class WardenWin;
-    friend class WardenMac;
-
     public:
         Warden();
         virtual ~Warden();
 
         virtual void Init(WorldSession* session, BigNumber* k) = 0;
         virtual ClientWardenModule* GetModuleForClient() = 0;
-        virtual void InitializeModule() = 0;
-        virtual void RequestHash() = 0;
+        virtual void InitializeModule();
+        virtual void RequestHash();
         virtual void HandleHashResult(ByteBuffer &buff) = 0;
-        virtual void RequestData() = 0;
-        virtual void HandleData(ByteBuffer &buff) = 0;
+        virtual void RequestData();
+        virtual void HandleData(ByteBuffer &buff);
 
         void SendModuleToClient();
         void RequestModule();
@@ -115,13 +151,17 @@ class TC_GAME_API Warden
         void DecryptData(uint8* buffer, uint32 length);
         void EncryptData(uint8* buffer, uint32 length);
 
+    void SetNewState(WardenState::Value state);
+
         static bool IsValidCheckSum(uint32 checksum, const uint8 *data, const uint16 length);
         static uint32 BuildChecksum(const uint8 *data, uint32 length);
 
         // If no check is passed, the default action from config is executed
         std::string Penalty(WardenCheck* check = nullptr);
 
-    private:
+    protected:
+        void LogPositiveToDB(WardenCheck* check);
+
         WorldSession* _session;
         uint8 _inputKey[16];
         uint8 _outputKey[16];
@@ -130,10 +170,9 @@ class TC_GAME_API Warden
         ARC4 _outputCrypto;
         uint32 _checkTimer;                          // Timer for sending check requests
         uint32 _clientResponseTimer;                 // Timer for client response delay
-        bool _dataSent;
         uint32 _previousTimestamp;
         ClientWardenModule* _module;
-        bool _initialized;
+        WardenState::Value _state;
 };
 
 #endif

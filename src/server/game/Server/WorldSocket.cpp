@@ -498,18 +498,12 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
-    // TODO inspect nessesary it in future? Or only for discordbot
-    bool accountInWhiteMessageControlList = account.Id == 409;
-    if (!accountInWhiteMessageControlList)
+    if (account.OS != "Win" && account.OS != "OSX")
     {
-        bool allowOSXplayers = sWorld->getBoolConfig(CONFIG_ALLOW_OSX_CONNECT);
-        if (account.OS != "Win" && !allowOSXplayers && account.OS == "OSX")
-        {
-            SendAuthResponseError(AUTH_REJECT);
-            TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
-            DelayedCloseSocket();
-            return;
-        }
+        SendAuthResponseError(AUTH_REJECT);
+        TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
+        DelayedCloseSocket();
+        return;
     }
 
     // Check that Key and account name are the same on client and server
@@ -608,13 +602,13 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     _authed = true;
     _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
-        account.Expansion, mutetime, account.Locale, account.Recruiter, account.IsRectuiter, accountInWhiteMessageControlList);
+        account.Expansion, mutetime, account.Locale, account.Recruiter, account.IsRectuiter);
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);
 
     // Initialize Warden system only if it is enabled by config
     bool wardenActive = sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED);
     if (wardenActive)
-        _worldSession->InitWarden(&account.SessionKey, account.OS);
+        _worldSession->InitWarden(uint16(authSession->Build), &account.SessionKey, account.OS);
 
     _queryProcessor.AddQuery(_worldSession->LoadPermissionsAsync().WithPreparedCallback(std::bind(&WorldSocket::LoadSessionPermissionsCallback, this, std::placeholders::_1)));
     AsyncRead();
