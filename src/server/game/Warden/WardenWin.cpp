@@ -371,6 +371,28 @@ void WardenWin::HandleData(ByteBuffer &buff)
                 uint8 Mem_Result;
                 buff >> Mem_Result;
 
+                if(rs->Result.IsZero()) // empty result set in database, dump results
+                {
+                    if(Mem_Result == 0)
+                    {
+                        char tmp[1024];
+                        memset(tmp, 0, sizeof(tmp));
+                        for (uint16 i = 0; i < rd->Length; ++i)
+                        {
+                            uint8 x = buff[i + buff.rpos()];
+                            sprintf(tmp + i, x < 10 ? "0%X" : "%X", x);
+                        }
+
+                        TC_LOG_DEBUG("warden", "RESULT MEM_CHECK CheckId %u account Id %u Got %s", *itr, _session->GetAccountId(), tmp);
+                        buff.rpos(buff.rpos() + rd->Length);
+                    }
+                    else
+                    {
+                        TC_LOG_DEBUG("warden", "RESULT MEM_CHECK CheckId %u account Id %u result %u", *itr, _session->GetAccountId(), Mem_Result);
+                    }
+                    continue;
+                }
+
                 if (Mem_Result != 0)
                 {
                     TC_LOG_WARN("warden", "RESULT MEM_CHECK not 0x00, CheckId %u account Id %u", *itr, _session->GetAccountId());
