@@ -732,7 +732,7 @@ public:
                 CloseGossipMenuFor(player);
                 player->SetCanEnterInInstanceOrRaidCustom(true);
                 player->TeleportTo(580, 1728.5f, 709.219f, 71.1905f, 2.78676f);
-                player->SetPhaseMask(2, true);
+                player->SetPhaseMask(2048, true);
                 break;
             default:
                 return false; // nothing defined -> trinity core handling

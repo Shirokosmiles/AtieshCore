@@ -3145,7 +3145,7 @@ void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y
 void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float distance2d, float absAngle, float controlZ) const
 {
     GetNearPoint2D(searcher, x, y, distance2d, absAngle);
-    z = GetPositionZ();
+    z = GetPositionZ() + searcher->GetCollisionHeight() > 2.0f ? searcher->GetCollisionHeight() : 2.0f;
     (searcher ? searcher : this)->UpdateAllowedPositionZ(x, y, z);
 
     // if detection disabled, return first point
