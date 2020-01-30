@@ -7,4 +7,8 @@ INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entr
  `family`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, 
  `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `DamageModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, 
  `RegenHealth`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
-(190040, 0, 0, 0, 0, 0, 19646, 0, 0, 0, 'Наблюдатель арен', NULL, NULL, 0, 80, 80, 2, 35, 129, 1, 1.14286, 1, 0, 0, 2000, 0, 1, 1, 1, 0, 0, 0, 0, 7, 138936390, 0, 0, 0, 0, 0, 0, 0, '',3, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 'npc_arena_spectator', 0);
+(190040, 0, 0, 0, 0, 0, 19646, 0, 0, 0, 'Наблюдатель арен', NULL, NULL, 0, 80, 80, 2, 35, 129, 1, 1.14286, 1, 0, 0, 2000, 0, 1, 1, 1, 0, 0, 0, 0, 7, 138936390, 0, 0, 0, 0, 0, 0, 0, '',0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 'npc_arena_spectator', 0);
+
+DELETE FROM `creature_template_movement` where `CreatureId` IN (190040);
+INSERT INTO `creature_template_movement`(`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`) VALUES 
+(190040, 1, 1, 0, 0, 0, 1);
