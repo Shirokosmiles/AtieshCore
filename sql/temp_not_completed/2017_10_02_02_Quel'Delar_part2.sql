@@ -2,18 +2,18 @@
 -- Table `creature_text`
 DELETE FROM `creature_text` WHERE CreatureID IN (37781,37763,38056,37764,37765);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(38056, 11, 0, 'My lords and ladies, I present $N, bearer of Quel\'Delar.', 14, 0, 100, 0, 0, 0, 37820, 0, 'tainted_queldelar'),
+(38056, 11, 0, 'My lords and ladies, I present $n, bearer of Quel\'Delar.', 14, 0, 100, 0, 0, 0, 37820, 0, 'tainted_queldelar'),
 (37781, 0, 0, 'Can that really be Quel\'Delar?', 14, 0, 100, 1, 0, 0, 37441, 0, 'tainted_queldelar'),
 (37764, 1, 0, 'We shall see.', 14, 0, 100, 1, 0, 0, 37442, 0, 'tainted_queldelar'),
 (37763, 2, 0, 'Look at it, Lor\'themar. It is certainly Quel\'Delar.', 14, 0, 100, 1, 0, 0, 37444, 0, 'tainted_queldelar'),
-(37764, 3, 0, 'So it is. You have my thanks, $N, for restoring Quel\'Delar to its rightful owners', 12, 0, 100, 1, 0, 0, 37388, 0, 'tainted_queldelar'),
+(37764, 3, 0, 'So it is. You have my thanks, $n, for restoring Quel\'Delar to its rightful owners', 12, 0, 100, 1, 0, 0, 37388, 0, 'tainted_queldelar'),
 (37763, 4, 0, 'What is the meaning of this treachery?', 14, 0, 100, 1, 0, 0, 37389, 0, 'tainted_queldelar'),
 (37781, 5, 0, 'Drop your weapon and surrender, traitor.', 14, 0, 100, 1, 0, 0, 37390, 0, 'tainted_queldelar'),
 (37765, 6, 0, 'This is not my doing, Rommath. There is no treachery here.', 14, 0, 100, 1, 0, 0, 37430, 0, 'tainted_queldelar'),
 (37765, 7, 0, 'Call off your men. Lor\'themar\'s own foolishness caused his injuries. Quel\'Delar is not chosen; it chooses its master.', 14, 0, 100, 1, 0, 0, 37431, 0, 'tainted_queldelar'),
 (37763, 8, 0, 'Guards, return to your posts.', 14, 0, 100, 1, 0, 0, 37432, 0, 'tainted_queldelar'),
-(37763, 9, 0, 'You will have what you have come for, $N. Take the sword and begone. And you, Auric, have a care for what you say in this sacred place.', 14, 0, 100, 1, 0, 0, 37434, 0, 'tainted_queldelar'),
-(37765, 10, 0, 'Carry the sword back to Dalaran through that portal, $N. You have done what many quel\'dorei have dreamt of for years. Quel\'Delar has been restored at last.', 14, 0, 100, 1, 0, 0, 37440, 0, 'tainted_queldelar');
+(37763, 9, 0, 'You will have what you have come for, $n. Take the sword and begone. And you, Auric, have a care for what you say in this sacred place.', 14, 0, 100, 1, 0, 0, 37434, 0, 'tainted_queldelar'),
+(37765, 10, 0, 'Carry the sword back to Dalaran through that portal, $n. You have done what many quel\'dorei have dreamt of for years. Quel\'Delar has been restored at last.', 14, 0, 100, 1, 0, 0, 37440, 0, 'tainted_queldelar');
 
 -- Table `gameobject_template`
 UPDATE `gameobject_template` SET `ScriptName` = 'go_dalaran_portal_sunwell' WHERE (entry = 195682);

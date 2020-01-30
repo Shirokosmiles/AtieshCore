@@ -2548,9 +2548,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         TimeTrackerSmall m_groupUpdateTimer;
 
-        //custom quests in instance or in raid zone by solo
-        bool m_customAccessInZone;
-
     private:
         // internal common parts for CanStore/StoreItem functions
         InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
@@ -2650,6 +2647,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_updGId;
         uint8 m_updGRank;
         uint32 m_updFieldTimer;
+
+        //custom quests in instance or in raid zone by solo
+        bool m_customAccessInZone;
         //End of Atiesh features
 
         // Temporary removed pet cache
