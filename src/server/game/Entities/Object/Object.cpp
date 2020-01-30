@@ -3146,7 +3146,8 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, 
 {
     GetNearPoint2D(searcher, x, y, distance2d, absAngle);
     z = GetPositionZ() + 2.0f;
-    (searcher ? searcher : this)->UpdateAllowedPositionZ(x, y, z);
+    if (!controlZ)
+        (searcher ? searcher : this)->UpdateAllowedPositionZ(x, y, z);
 
     // if detection disabled, return first point
     if (!sWorld->getBoolConfig(CONFIG_DETECT_POS_COLLISION))
