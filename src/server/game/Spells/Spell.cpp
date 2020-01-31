@@ -3239,17 +3239,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
 
     // create and add update event for this spell
     _spellEvent = new SpellEvent(this);
-    m_caster->m_Events.AddEvent(_spellEvent, m_caster->m_Events.CalculateTime(1));
-
-    /*
-    if (Unit* unitCaster = m_caster->ToUnit())
-        if (unitCaster->ToPlayer() && unitCaster->IsJumping())
-        {
-            SendCastResult(SPELL_FAILED_SPELL_IN_PROGRESS);
-            finish(false);
-            return;
-        }
-    */
+    m_caster->m_Events.AddEvent(_spellEvent, m_caster->m_Events.CalculateTime(1));    
 
     // check disables
     if (DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, m_caster))
@@ -3314,6 +3304,16 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
     }
     else
         m_casttime = m_spellInfo->CalcCastTime(this);
+
+    if (Unit* unitCaster = m_caster->ToUnit())
+    {
+        if (unitCaster->IsJumping() && m_casttime != 0)
+        {
+            SendCastResult(SPELL_FAILED_SPELL_IN_PROGRESS);
+            finish(false);
+            return SPELL_FAILED_SPELL_IN_PROGRESS;
+        }
+    }
 
     // don't allow channeled spells / spells with cast time to be cast while moving
     // exception are only channeled spells that have no casttime and SPELL_ATTR5_CAN_CHANNEL_WHEN_MOVING
