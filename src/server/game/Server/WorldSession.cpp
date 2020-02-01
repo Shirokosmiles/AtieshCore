@@ -1201,11 +1201,11 @@ void WorldSession::InitWarden(uint16 build, BigNumber* k, std::string const& os)
         _warden = new WardenWin();
         _warden->Init(this, k);
     }
-    else if (os == "OSX" && !sWorld->getBoolConfig(CONFIG_ALLOW_OSX_CONNECT))
+    else if (os == "OSX")
     {
         // Disabled as it is causing the client to crash
-        _warden = new WardenMac();
-        _warden->Init(this, k);
+        //_warden = new WardenMac();
+        //_warden->Init(this, k);
     }
 }
 

@@ -498,7 +498,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
-    if (account.OS != "Win" && account.OS != "OSX")
+    if ((account.OS != "Win" && account.OS != "OSX") || (account.OS == "OSX" && !sWorld->getBoolConfig(CONFIG_ALLOW_OSX_CONNECT)))
     {
         SendAuthResponseError(AUTH_REJECT);
         TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
