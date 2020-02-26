@@ -1222,9 +1222,9 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
     {
         if (!isStatic && ((cinfoid >= AV_NPC_A_GRAVEDEFENSE0 && cinfoid <= AV_NPC_A_GRAVEDEFENSE3)
             || (cinfoid >= AV_NPC_H_GRAVEDEFENSE0 && cinfoid <= AV_NPC_H_GRAVEDEFENSE3)))
-            creature->SetRespawnRadius(5.f);
+            creature->SetWanderDistance(5.f);
         else
-            creature->SetRespawnRadius(15.f);
+            creature->SetWanderDistance(15.f);
 
         creature->GetMotionMaster()->Initialize();
         creature->Respawn(true);
