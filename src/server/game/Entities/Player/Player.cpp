@@ -1353,7 +1353,7 @@ void Player::Update(uint32 p_time)
                         if (minutes == 5)
                             ChatHandler(GetSession()).PSendSysMessage(GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_NEAR_END));
                         if (minutes < 5)
-                            ChatHandler(GetSession()).PSendSysMessage(GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_EXIST), (secsToTimeString(diff, false, false)).c_str());
+                            ChatHandler(GetSession()).PSendSysMessage(GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_EXIST), (secsToTimeString(diff, TimeFormat::ShortText)).c_str());
                     }
                 }
 

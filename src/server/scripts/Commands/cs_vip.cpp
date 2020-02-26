@@ -228,7 +228,7 @@ public:
         }
 
         if (player->IsPremium())
-            handler->PSendSysMessage(LANG_PLAYER_VIP_TIME_EXIST, (secsToTimeString(player->GetPremiumUnsetdate() - GameTime::GetGameTime(), false, false)).c_str());
+            handler->PSendSysMessage(LANG_PLAYER_VIP_TIME_EXIST, (secsToTimeString(player->GetPremiumUnsetdate() - GameTime::GetGameTime(), TimeFormat::ShortText)).c_str());
 
         if (sWorld->getBoolConfig(CONFIG_VIP_ALL_DISABLED))
         {
