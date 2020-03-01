@@ -24,6 +24,7 @@
 #include "Channel.h"
 #include "ChannelMgr.h"
 #include "Chat.h"
+#include "ChatPackets.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "GameTime.h"
@@ -199,7 +200,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             }
         }
 
-        if (!sender->CanSpeak())
+        if (!CanSpeak())
         {
             std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime());
             SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
@@ -713,7 +714,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleEmoteOpcode(WorldPacket& recvData)
+void WorldSession::HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet)
 {
     // packet control
     time_t pNow = GameTime::GetGameTime();
@@ -723,7 +724,6 @@ void WorldSession::HandleEmoteOpcode(WorldPacket& recvData)
         if (countMessageChannelOpcode > 1)
         {
             TC_LOG_DEBUG("chatmessage", "CHAT: HandleEmoteOpcode received many packets from %s", GetPlayer()->GetName().c_str());
-            recvData.rfinish();
             return;
         }
     }
@@ -734,20 +734,19 @@ void WorldSession::HandleEmoteOpcode(WorldPacket& recvData)
     }
 
     if (!GetPlayer()->IsAlive() || GetPlayer()->HasUnitState(UNIT_STATE_DIED))
-    {
-        recvData.rfinish();
         return;
-    }
 
-    uint32 emote;
-    recvData >> emote;
+    uint32 emoteId = packet.EmoteID;
 
     // restrict to the only emotes hardcoded in client
-    if (emote != EMOTE_ONESHOT_NONE && emote != EMOTE_ONESHOT_WAVE)
+    if (emoteId != EMOTE_ONESHOT_NONE && emoteId != EMOTE_ONESHOT_WAVE)
         return;
 
-    sScriptMgr->OnPlayerEmote(GetPlayer(), emote);
-    GetPlayer()->HandleEmoteCommand(emote);
+    if (!_player->IsAlive() || _player->HasUnitState(UNIT_STATE_DIED))
+        return;
+
+    sScriptMgr->OnPlayerEmote(_player, emoteId);
+    _player->HandleEmoteCommand(emoteId);
 }
 
 namespace Trinity
@@ -808,7 +807,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!GetPlayer()->CanSpeak())
+    if (!CanSpeak())
     {
         std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime());
         SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
