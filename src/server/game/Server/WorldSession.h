@@ -99,6 +99,12 @@ namespace WorldPackets
         class EmoteClient;
     }
 
+    namespace Combat
+    {
+        class AttackSwing;
+        class AttackStop;
+    }
+
     namespace NPC
     {
         class Hello;
@@ -111,6 +117,7 @@ namespace WorldPackets
         class CompleteMovie;
         class NextCinematicCamera;
         class OpeningCinematic;
+        class WorldTeleport;
     }
 
     namespace Query
@@ -797,8 +804,8 @@ class TC_GAME_API WorldSession
         void HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket);
         void HandleWrapItemOpcode(WorldPacket& recvPacket);
 
-        void HandleAttackSwingOpcode(WorldPacket& recvPacket);
-        void HandleAttackStopOpcode(WorldPacket& recvPacket);
+        void HandleAttackSwingOpcode(WorldPackets::Combat::AttackSwing& packet);
+        void HandleAttackStopOpcode(WorldPackets::Combat::AttackStop& packet);
         void HandleSetSheathedOpcode(WorldPacket& recvPacket);
 
         void HandleUseItemOpcode(WorldPacket& recvPacket);
@@ -921,7 +928,7 @@ class TC_GAME_API WorldSession
         void HandleBattlefieldExitRequest(WorldPackets::Battlefield::BattlefieldMgrExitRequest& exitRequest);
 
         void HandleWardenDataOpcode(WorldPacket& recvData);
-        void HandleWorldTeleportOpcode(WorldPacket& recvData);
+        void HandleWorldTeleportOpcode(WorldPackets::Misc::WorldTeleport& worldTeleport);
         void HandleMinimapPingOpcode(WorldPacket& recvData);
         void HandleRandomRollOpcode(WorldPacket& recvData);
         void HandleFarSightOpcode(WorldPacket& recvData);

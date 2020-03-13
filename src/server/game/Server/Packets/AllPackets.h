@@ -21,6 +21,7 @@
 #include "BattlefieldPackets.h"
 #include "BattlegroundPackets.h"
 #include "ChatPackets.h"
+#include "CombatPackets.h"
 #include "NPCPackets.h"
 #include "MiscPackets.h"
 #include "QueryPackets.h"
