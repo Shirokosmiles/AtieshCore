@@ -25,9 +25,9 @@
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "Player.h"
 #include <cctype>
-#include <utf8.h>
 
 static size_t const MAX_CHANNEL_PASS_STR = 31;
+static size_t const MAX_CHANNEL_NAME_STR = 31;
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 {
@@ -54,6 +54,12 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
     if (!channelName.empty())
     {
+        if (!DisallowHyperlinksAndMaybeKick(channelName))
+            return;
+
+        if (!ValidateHyperlinksAndMaybeKick(channelName))
+            return;
+
         // Filter for message
         if (!ObjectMgr::IsValidityChecks(GetPlayer(), channelName))
         {
@@ -74,6 +80,12 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
     if (!password.empty())
     {
+        if (password.length() > MAX_CHANNEL_PASS_STR)
+        {
+            TC_LOG_ERROR("network", "Player %s tried to create a channel with a password more than " SZFMTD " characters long - blocked", GetPlayer()->GetGUID().ToString().c_str(), MAX_CHANNEL_PASS_STR);
+            return;
+        }
+
         // Filter for message
         if (!ObjectMgr::IsValidityChecks(GetPlayer(), password))
         {
@@ -88,11 +100,8 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
             TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL handler bad message from password IsValidChannelName");
             recvPacket.rfinish();
             return;
-        }        
+        }
     }
-
-    if (!ValidateHyperlinksAndMaybeKick(channelName))
-        return;
 
     TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s",
         GetPlayerInfo().c_str(), channelId, unknown1, unknown2, channelName.c_str(), password.c_str());
@@ -132,6 +141,12 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         }
         else
         { // custom channel
+            if (channelName.length() > MAX_CHANNEL_NAME_STR)
+            {
+                TC_LOG_ERROR("network", "Player %s tried to create a channel with a name more than " SZFMTD " characters long - blocked", GetPlayer()->GetGUID().ToString().c_str(), MAX_CHANNEL_NAME_STR);
+                return;
+            }
+
             if (Channel* channel = cMgr->GetCustomChannel(channelName))
                 channel->JoinChannel(GetPlayer(), password);
             else if (Channel* channel = cMgr->CreateCustomChannel(channelName))

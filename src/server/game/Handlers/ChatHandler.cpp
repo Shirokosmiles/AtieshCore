@@ -236,16 +236,16 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_BATTLEGROUND_LEADER:
         case CHAT_MSG_AFK:
         case CHAT_MSG_DND:
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
         case CHAT_MSG_WHISPER:
             recvData >> to;
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
         case CHAT_MSG_CHANNEL:
         {
             recvData >> channel;
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
         }
     }
