@@ -288,7 +288,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     bool needItemDelay = false;
 
     std::list<Item*> maillist;
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     if (items_count > 0 || money > 0)
     {

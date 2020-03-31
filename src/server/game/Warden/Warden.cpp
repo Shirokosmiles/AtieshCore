@@ -347,7 +347,7 @@ void Warden::LogPositiveToDB(WardenCheck* check)
     if (check->Action < sWorld->getIntConfig(CONFIG_WARDEN_DB_LOGLEVEL))
         return;
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_WARDEN);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_WARDEN);
     stmt->setUInt16(0, check->CheckId);
     stmt->setUInt8(1, check->Action);
     stmt->setUInt32(2, _session->GetAccountId());

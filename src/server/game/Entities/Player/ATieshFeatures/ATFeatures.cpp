@@ -848,7 +848,7 @@ Guild* Player::GetGuild() const
 
 void Guild::UpdateLevelAndExp()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_LEVELANDEXP);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_LEVELANDEXP);
     stmt->setUInt32(0, m_guildLevel);
     stmt->setUInt32(1, m_guildExp);
     stmt->setUInt32(2, m_id);
@@ -871,7 +871,7 @@ void Guild::UpdateGuildRating(int32 changes, bool winner, Player* player)
     if (player)
         sScriptMgr->OnGuildExpirienceUpEvent(this, player, changes);
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RATING);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RATING);
     stmt->setUInt32(0, m_guildRating);
     stmt->setUInt32(1, m_id);
     CharacterDatabase.Execute(stmt);

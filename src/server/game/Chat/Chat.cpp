@@ -47,7 +47,7 @@ std::vector<ChatCommand> const& ChatHandler::getCommandTable()
         // calls getCommandTable() recursively.
         commandTableCache = sScriptMgr->GetChatCommands();
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_COMMANDS);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_COMMANDS);
         PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (result)
         {
@@ -390,7 +390,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
 
                 // Database Logging
                 ObjectGuid sel_guid = player->GetTarget();
-                PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_LOG);
+                LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_LOG);
                 stmt->setString(0, player->GetName());
                 stmt->setUInt32(1, m_session->GetAccountId());
                 stmt->setString(2, fullcmd.c_str());

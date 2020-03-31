@@ -144,7 +144,7 @@ void MailMgr::SendMailWithItemsBy(Object* sender, ObjectGuid::LowType receiver, 
     {
         if (!itemlist.empty()) // it's unreal, but possible to sent message with empty list
         {
-            SQLTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             for (std::list<Item*>::const_iterator itr = itemlist.begin(); itr != itemlist.end(); ++itr)
             {
                 if (*itr)
@@ -177,7 +177,7 @@ void MailMgr::SendMailWithItemsByGUID(ObjectGuid::LowType sender, ObjectGuid::Lo
     {
         if (!itemlist.empty()) // it's unreal, but possible to sent message with empty list
         {
-            SQLTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             for (std::list<Item*>::const_iterator itr = itemlist.begin(); itr != itemlist.end(); ++itr)
             {
                 if (*itr)
@@ -240,7 +240,7 @@ void MailMgr::SendMailByAuctionHouseWithItems(AuctionEntry* sender, ObjectGuid::
     {
         if (!itemlist.empty()) // it's unreal, but possible to sent message with empty list
         {
-            SQLTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             for (std::list<Item*>::const_iterator itr = itemlist.begin(); itr != itemlist.end(); ++itr)
             {
                 if (*itr)
@@ -302,7 +302,7 @@ void MailMgr::SendMailByCalendarEventWithItems(CalendarEvent* sender, ObjectGuid
     {
         if (!itemlist.empty()) // it's unreal, but possible to sent message with empty list
         {
-            SQLTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             for (std::list<Item*>::const_iterator itr = itemlist.begin(); itr != itemlist.end(); ++itr)
             {
                 if (*itr)
@@ -384,7 +384,7 @@ void MailMgr::prepareItems(uint32 mailId, uint16 mailTemplateId, Player* receive
     mailLoot.FillLoot(mailTemplateId, LootTemplates_Mail, receiver, true, true);
 
     uint32 max_slot = mailLoot.GetMaxSlotInLootFor(receiver);
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     for (uint32 i = 0; /*m_items.size() < MAX_MAIL_ITEMS &&*/ i < max_slot; ++i)
     {
         if (LootItem* lootitem = mailLoot.LootItemInSlot(i, receiver))
@@ -419,7 +419,7 @@ uint32 MailMgr::SendReturnMailByGUID(uint32 old_mailID, ObjectGuid::LowType send
 
     if (itemexist)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_ITEM_OLDMAILID_BY_MAILID);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_ITEM_OLDMAILID_BY_MAILID);
         stmt->setUInt32(0, mail_id);
         stmt->setUInt32(1, old_mailID);
         CharacterDatabase.Execute(stmt);
@@ -432,11 +432,11 @@ uint32 MailMgr::SendReturnMailByGUID(uint32 old_mailID, ObjectGuid::LowType send
     return mail_id;
 }
 
-void MailMgr::clearDependInstanceItem(ObjectGuid::LowType playerId, uint32 mailID, SQLTransaction& trans)
+void MailMgr::clearDependInstanceItem(ObjectGuid::LowType playerId, uint32 mailID, CharacterDatabaseTransaction& trans)
 {
     ObjectGuid receiverGuid(HighGuid::Player, playerId);
     // Data needs to be at first place for Item::LoadFromDB
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEM);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEM);
     stmt->setUInt32(0, mailID);
     PreparedQueryResult resultItems = CharacterDatabase.Query(stmt);
     if (resultItems)
@@ -472,13 +472,13 @@ void MailMgr::clearDependInstanceItemsBeforeDeletePlayer(ObjectGuid::LowType pla
 {
     ObjectGuid receiverGuid(HighGuid::Player, playerId);
     // Data from ITEM_INSTANCE should be cleared also
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS_FOR_DELETE);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS_FOR_DELETE);
     stmt->setUInt32(0, playerId);
 
     PreparedQueryResult resultItems = CharacterDatabase.Query(stmt);
     if (resultItems)
     {
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         do
         {
             Field* itemFields = resultItems->Fetch();
@@ -660,7 +660,7 @@ uint32 MailMgr::AddNewMail(uint8 messageType, uint8 stationery, uint16 mailTempl
 
     // Add to DB
     uint8 index = 0;
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL);
     stmt->setUInt32(index, new_id);
     stmt->setUInt8(++index, messageType);
     stmt->setInt8(++index, stationery);
@@ -698,7 +698,7 @@ void MailMgr::RemoveAllMailsFor(ObjectGuid::LowType playerId)
     if (mID.empty())
         return;
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     for (std::list<uint32>::const_iterator itr = mID.begin(); itr != mID.end(); ++itr)
     {
         if (*itr)
@@ -709,7 +709,7 @@ void MailMgr::RemoveAllMailsFor(ObjectGuid::LowType playerId)
     clearDependInstanceItemsBeforeDeletePlayer(playerId);
 }
 
-void MailMgr::RemoveMail(uint32 mailID, SQLTransaction& trans)
+void MailMgr::RemoveMail(uint32 mailID, CharacterDatabaseTransaction& trans)
 {
     // before need to remove all mail items and instance items
     RemoveMailItemsByMailId(mailID, trans);
@@ -717,12 +717,12 @@ void MailMgr::RemoveMail(uint32 mailID, SQLTransaction& trans)
     m_mails.erase(mailID);
 
     // now clear from DB
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
     stmt->setUInt32(0, mailID);
     trans->Append(stmt);
 }
 
-void MailMgr::AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowType itemGuidLow, ObjectGuid::LowType receiver, SQLTransaction& trans)
+void MailMgr::AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowType itemGuidLow, ObjectGuid::LowType receiver, CharacterDatabaseTransaction& trans)
 {
     bool itemexist = false;
     for (MailItemMap::const_iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
@@ -750,7 +750,7 @@ void MailMgr::AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowTy
     mii.receiver_guid = receiver;
     m_mailitems[new_id] = mii;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL_ITEM);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL_ITEM);
     stmt->setUInt32(0, new_id);
     stmt->setUInt32(1, mailID);
     stmt->setUInt32(2, itemGuidLow);
@@ -760,7 +760,7 @@ void MailMgr::AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowTy
     AddMItem(itemPointer);
 }
 
-void MailMgr::RemoveMailItem(ObjectGuid::LowType itemGuidLow, SQLTransaction& trans)
+void MailMgr::RemoveMailItem(ObjectGuid::LowType itemGuidLow, CharacterDatabaseTransaction& trans)
 {
     uint32 id;
     uint32 MailId;
@@ -781,12 +781,12 @@ void MailMgr::RemoveMailItem(ObjectGuid::LowType itemGuidLow, SQLTransaction& tr
     RemoveMItem(itemGuidLow);
     m_mailitems.erase(id);
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
     stmt->setUInt32(0, itemGuidLow);
     trans->Append(stmt);
 }
 
-void MailMgr::RemoveMailItemsByMailId(uint32 mailID, SQLTransaction& trans)
+void MailMgr::RemoveMailItemsByMailId(uint32 mailID, CharacterDatabaseTransaction& trans)
 {
     std::list<uint32> miID;
     for (MailItemMap::const_iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
@@ -809,7 +809,7 @@ void MailMgr::RemoveMailItemsByMailId(uint32 mailID, SQLTransaction& trans)
 
     miID.clear();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEMS_BY_MAILID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEMS_BY_MAILID);
     stmt->setUInt32(0, mailID);
     trans->Append(stmt);
 }
@@ -860,7 +860,7 @@ bool MailMgr::HandleMailMarkAsRead(uint32 mailID)
             itr->second.state = MAIL_STATE_CHANGED;
             result = true;
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_MARK_AS_READ);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_MARK_AS_READ);
             stmt->setUInt8(0, itr->second.checked);
             stmt->setUInt8(1, itr->second.state);
             stmt->setUInt32(2, itr->first);
@@ -888,7 +888,7 @@ bool MailMgr::HandleMailDelete(uint32 mailID)
 
     if (result)
     {
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         RemoveMail(mailID, trans);
         CharacterDatabase.CommitTransaction(trans);
     }
@@ -970,7 +970,7 @@ uint8 MailMgr::HandleMailReturnToSender(uint32 mailID)
         // 2 step - update mail_items for new mailid        
         if (itemsExist)
         {
-            SQLTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             for (MailItemMap::iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
             {
                 if (itr->second.messageID == mailID)
@@ -980,7 +980,7 @@ uint8 MailMgr::HandleMailReturnToSender(uint32 mailID)
                     itr->second.messageID = new_mailID;
 
                     // owner in data will set at mail receive and item extracting
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
+                    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
                     stmt->setUInt32(0, itr->second.receiver_guid);
                     stmt->setUInt32(1, itr->second.item_guid);
                     trans->Append(stmt);
@@ -990,7 +990,7 @@ uint8 MailMgr::HandleMailReturnToSender(uint32 mailID)
         }
 
         // 3 step - delete old mail
-        SQLTransaction trans2 = CharacterDatabase.BeginTransaction();
+        CharacterDatabaseTransaction trans2 = CharacterDatabase.BeginTransaction();
         RemoveMail(old_maild, trans2);
         CharacterDatabase.CommitTransaction(trans2);        
     }
@@ -1044,7 +1044,7 @@ uint8 MailMgr::HandleMailTakeItem(Player* player, uint32 mailID, ObjectGuid::Low
             msg_result = player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, it, false);
             if (msg_result == EQUIP_ERR_OK)
             {
-                SQLTransaction trans = CharacterDatabase.BeginTransaction();
+                CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
                 if (itr->second.COD > 0)                                     //if there is COD, take COD money from player and send them to sender by mail
                 {
                     ObjectGuid sender_guid(HighGuid::Player, itr->second.sender);
@@ -1085,7 +1085,7 @@ uint8 MailMgr::HandleMailTakeItem(Player* player, uint32 mailID, ObjectGuid::Low
 
                 itr->second.state = MAIL_STATE_CHANGED;
                 //upd state
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_STATE);
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_STATE);
                 stmt->setUInt8(0, MAIL_STATE_CHANGED);
                 stmt->setUInt32(1, mailID);
                 trans->Append(stmt);
@@ -1097,7 +1097,7 @@ uint8 MailMgr::HandleMailTakeItem(Player* player, uint32 mailID, ObjectGuid::Low
                 player->SaveInventoryAndGoldToDB(trans);                
 
                 // upd owner of item
-                PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
+                CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
                 stmt2->setUInt32(0, player->GetGUID().GetCounter());
                 stmt2->setUInt32(1, item_guid);
                 trans->Append(stmt2);
@@ -1114,7 +1114,7 @@ uint8 MailMgr::HandleMailTakeItem(Player* player, uint32 mailID, ObjectGuid::Low
 
                 if (need_to_upd_has_items)
                 {
-                    PreparedStatement* stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_ITEM_HAS_ITEM);
+                    CharacterDatabasePreparedStatement* stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_ITEM_HAS_ITEM);
                     stmt3->setUInt8(0, 0);
                     stmt3->setUInt32(0, mailID);
                     trans->Append(stmt3);
@@ -1162,7 +1162,7 @@ void MailMgr::HandleMailTakeMoney(Player* player, uint32 mailID)
             player->SendMailResult(mailID, MAIL_MONEY_TAKEN, MAIL_OK);
 
             // save money and mail to prevent cheating
-            SQLTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             player->SaveGoldToDB(trans);
             _RemoveMoneyFromMail(mailID, trans);
             CharacterDatabase.CommitTransaction(trans);
@@ -1411,9 +1411,9 @@ bool MailMgr::RemoveMItem(uint32 id)
 
 // sql helper in func
 // set zero money in Mail in db when received money
-void MailMgr::_RemoveMoneyFromMail(uint32 mailId, SQLTransaction& trans) const
+void MailMgr::_RemoveMoneyFromMail(uint32 mailId, CharacterDatabaseTransaction& trans) const
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_MONEY_RECEIVED);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_MONEY_RECEIVED);
     stmt->setUInt32(0, 0);
     stmt->setUInt32(1, mailId);
     trans->Append(stmt);
@@ -1499,7 +1499,7 @@ void MailMgr::_LoadMailedItemPointers()
 {
     mMitems.clear();
     // data needs to be at first place for Item::LoadFromDB
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
         return;
@@ -1539,7 +1539,7 @@ void MailMgr::_LoadMailedItemPointers()
 
             item->FSetState(ITEM_REMOVED);
 
-            SQLTransaction temp = SQLTransaction(nullptr);
+            CharacterDatabaseTransaction temp = CharacterDatabaseTransaction(nullptr);
             item->SaveToDB(temp);                               // it also deletes item object !
             continue;
         }
@@ -1567,7 +1567,7 @@ void MailMgr::_DeleteExpiryMails(bool startServer)
 
     if (!mailIds.empty())
     {
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         for (std::list<uint32>::iterator itr = mailIds.begin(); itr != mailIds.end(); ++itr)
             RemoveMail((*itr), trans);        
         

@@ -168,7 +168,7 @@ bool PromotionCodeMgr::AddPromoCode(PromotionCodes& promo)
 
     _promoCodesStore[new_id] = promo;
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_PROMO_CODE);
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_PROMO_CODE);
 
     stmt->setUInt32(0, new_id);
     stmt->setUInt32(1, promo.collection);
@@ -205,7 +205,7 @@ bool PromotionCodeMgr::DeletePromoCode(const std::string& name)
     {
         if (itr->second.code == name)
         {
-            PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_PROMO_CODE);
+            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_PROMO_CODE);
 
             stmt->setString(0, itr->second.code);
 
@@ -232,7 +232,7 @@ bool PromotionCodeMgr::_UpdateCountOfExistPromoCode(uint32 id, Player* player)
                 itr->second.exist_count -= 1;
                 code = itr->second.code;
 
-                PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_PROMO_CODE_USED);
+                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_PROMO_CODE_USED);
                 stmt->setUInt32(0, itr->second.exist_count);
                 stmt->setUInt32(1, id);
                 WorldDatabase.Execute(stmt);
@@ -358,7 +358,7 @@ bool PromotionCodeMgr::_AddCodeInHistory(uint32 id, std::string const& code, Pla
     ph.time = GameTime::GetGameTime();
     _promoHistoryStore[new_id] = ph;
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_PROMO_CODE_HISTORY);
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_PROMO_CODE_HISTORY);
 
     stmt->setUInt32(0, new_id);
     stmt->setUInt32(1, ph.codeId);

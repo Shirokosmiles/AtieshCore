@@ -194,13 +194,13 @@ bool GuildMgr::StartNewWar(GuildWars& data)
     _guildWarStore[new_id] = data;
     _guildWarHistoryStore[new_id] = gwh;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD_WAR_START);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD_WAR_START);
     stmt->setUInt32(0, new_id);
     stmt->setUInt32(1, data.attackerGuildId);
     stmt->setUInt32(2, data.defenderGuildId);
     CharacterDatabase.Execute(stmt);
 
-    PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD_WAR_START_HISTORY);
+    CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD_WAR_START_HISTORY);
     stmt2->setUInt32(0, new_id);
     stmt2->setUInt32(1, gwh.attackerGuildId);
     stmt2->setString(2, gwh.attackerGuild);
@@ -253,11 +253,11 @@ void GuildMgr::StopWarBetween(ObjectGuid::LowType firstguildId, ObjectGuid::LowT
         itr->second.timeOfEndWar = GameTime::GetGameTime();
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_WAR_STOP);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_WAR_STOP);
     stmt->setUInt32(0, WarId);
     CharacterDatabase.Execute(stmt);
 
-    PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_WAR_STOP_HISTORY);
+    CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_WAR_STOP_HISTORY);
     stmt2->setUInt32(0, uint32(GameTime::GetGameTime()));
     stmt2->setString(1, winnerName);
     stmt2->setUInt32(2, WarId);

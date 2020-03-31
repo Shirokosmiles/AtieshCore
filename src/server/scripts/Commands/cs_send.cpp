@@ -183,7 +183,7 @@ public:
         }
 
         std::list<Item*>itemlist;
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();        
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         for (ItemPairs::const_iterator itr = items.begin(); itr != items.end(); ++itr)
         {
             if (Item* item = Item::CreateItem(itr->first, itr->second, handler->GetSession() ? handler->GetSession()->GetPlayer() : 0))

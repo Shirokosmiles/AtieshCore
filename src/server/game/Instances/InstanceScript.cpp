@@ -63,7 +63,7 @@ void InstanceScript::SaveToDB()
     if (data.empty())
         return;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_DATA);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_DATA);
     stmt->setUInt32(0, GetCompletedEncounterMask());
     stmt->setUInt32(1, GetCompletedEncounterCount());
     stmt->setString(2, data);

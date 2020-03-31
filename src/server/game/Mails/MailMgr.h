@@ -118,15 +118,15 @@ protected:
     );
 
     // Mail Item section
-    void AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowType itemGuidLow, ObjectGuid::LowType receiver, SQLTransaction& trans);
+    void AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowType itemGuidLow, ObjectGuid::LowType receiver, CharacterDatabaseTransaction& trans);
 
     Item* GetMItem(uint32 id);
     void AddMItem(Item* it);
     bool RemoveMItem(uint32 id);
 
-    void RemoveMail(uint32 mailID, SQLTransaction& trans);
-    void RemoveMailItem(ObjectGuid::LowType itemGuidLow, SQLTransaction& trans);
-    void RemoveMailItemsByMailId(uint32 mailID, SQLTransaction& trans);
+    void RemoveMail(uint32 mailID, CharacterDatabaseTransaction& trans);
+    void RemoveMailItem(ObjectGuid::LowType itemGuidLow, CharacterDatabaseTransaction& trans);
+    void RemoveMailItemsByMailId(uint32 mailID, CharacterDatabaseTransaction& trans);
 
     // helper
     bool PrepareMessageAttributeBy(Object* sender, ObjectGuid::LowType receiver, uint8& m_messageType, uint8& m_stationery, ObjectGuid::LowType& m_senderId, uint32 deliver_delay, uint32 COD, time_t& expire_time, time_t& deliver_time);
@@ -136,7 +136,7 @@ protected:
     void prepareItems(uint32 mailId, uint16 mailTemplateId, Player* receiver);
     uint32 SendReturnMailByGUID(uint32 old_mailID, ObjectGuid::LowType sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, bool itemexist, uint32 deliver_delay = 0);
 
-    void clearDependInstanceItem(ObjectGuid::LowType playerId, uint32 mailID, SQLTransaction& trans);
+    void clearDependInstanceItem(ObjectGuid::LowType playerId, uint32 mailID, CharacterDatabaseTransaction& trans);
     void clearDependInstanceItemsBeforeDeletePlayer(ObjectGuid::LowType playerId);
 
     void _LoadMails();
@@ -147,7 +147,7 @@ protected:
     time_t GetNextExpireMailUpd();
     void _DeleteExpiryMails(bool startServer = false);
 
-    void _RemoveMoneyFromMail(uint32 mailId, SQLTransaction& trans) const;
+    void _RemoveMoneyFromMail(uint32 mailId, CharacterDatabaseTransaction& trans) const;
 
 private:
     typedef std::unordered_map<uint32, Item*> ItemMap;    

@@ -54,7 +54,7 @@ void MailExternalMgr::_DoUpdate()
 {
     TC_LOG_DEBUG("mailexternal", "External Mail> Sending mails in queue...");
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_GET_EXTERNAL_MAIL);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_GET_EXTERNAL_MAIL);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
@@ -62,7 +62,7 @@ void MailExternalMgr::_DoUpdate()
         return;
     }
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     do
     {

@@ -156,9 +156,9 @@ void ArenaTeamMgr::DistributeArenaPoints()
         if (ArenaTeam* at = teamItr->second)
             at->UpdateArenaPointsHelper(PlayerPoints);
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt;
+    CharacterDatabasePreparedStatement* stmt;
 
     // Cycle that gives points to all players
     for (std::map<uint32, uint32>::iterator playerItr = PlayerPoints.begin(); playerItr != PlayerPoints.end(); ++playerItr)
@@ -198,7 +198,7 @@ void ArenaTeamMgr::DistributeArenaPoints()
     sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_END);
 
     // prepare Reset Pvp Reward Weekly Cap
-    PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_RESET_PVPWEEKLYCAP);
+    CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_RESET_PVPWEEKLYCAP);
     CharacterDatabase.Execute(stmt2);
     sWorld->ResetPVPRewardWeeklyCap();
 }
