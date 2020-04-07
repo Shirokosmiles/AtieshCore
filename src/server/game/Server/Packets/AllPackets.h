@@ -20,6 +20,7 @@
 
 #include "BattlefieldPackets.h"
 #include "BattlegroundPackets.h"
+#include "CharacterPackets.h"
 #include "ChatPackets.h"
 #include "CombatPackets.h"
 #include "GuildPackets.h"
