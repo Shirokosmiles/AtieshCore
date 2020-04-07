@@ -4549,12 +4549,6 @@ void Spell::EffectPullTowardsDest(SpellEffIndex effIndex)
     float speedXY = m_spellInfo->Effects[effIndex].MiscValue ? m_spellInfo->Effects[effIndex].MiscValue / 10.0f : 30.0f;
     float speedZ = (2 * speedXY * speedXY * distZ + Movement::gravity * distXY * distXY) / (2 * speedXY * distXY);
 
-    if (unitTarget->ToPlayer())
-    {
-        unitTarget->ToPlayer()->SetSkipOnePacketForASH(true);
-        unitTarget->ToPlayer()->SetUnderACKmount();
-    }
-
     unitTarget->JumpTo(speedXY, speedZ, true, *pos);
 }
 
