@@ -1679,7 +1679,7 @@ void Unit::HandleEmoteCommand(uint32 emoteId)
     damageReduction /= (1.0f + damageReduction);
 
     RoundToInterval(damageReduction, 0.f, 0.75f);
-    return uint32(std::max(damage * (1.0f - damageReduction), 0.0f));
+    return uint32(std::ceil(std::max(damage * (1.0f - damageReduction), 0.0f)));
 }
 
 /*static*/ uint32 Unit::CalcSpellResistedDamage(Unit const* attacker, Unit* victim, uint32 damage, SpellSchoolMask schoolMask, SpellInfo const* spellInfo)
@@ -3196,12 +3196,12 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
 
 bool Unit::IsInWater() const
 {
-    return GetBaseMap()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ());
+    return GetLiquidStatus() & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER);
 }
 
 bool Unit::IsUnderWater() const
 {
-    return GetBaseMap()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ());
+    return GetLiquidStatus() & LIQUID_MAP_UNDER_WATER;
 }
 
 void Unit::ProcessPositionDataChanged(PositionFullTerrainStatus const& data)
@@ -10754,7 +10754,7 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
 Unit* Unit::SelectNearbyNoTotemTarget(Unit* exclude, float dist) const
 {
     std::list<Unit*> targets;
-    Trinity::NearestAttackableNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
+    Trinity::NearestAttackableNoTotemUnitInObjectRangeCheck u_check(this, dist);
     Trinity::UnitListSearcher<Trinity::NearestAttackableNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
 	Cell::VisitAllObjects(this, searcher, dist);
 

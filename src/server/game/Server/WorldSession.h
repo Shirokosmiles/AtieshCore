@@ -109,6 +109,7 @@ namespace WorldPackets
     {
         class AttackSwing;
         class AttackStop;
+        class SetSheathed;
     }
 
     namespace Guild
@@ -161,6 +162,12 @@ namespace WorldPackets
         class NextCinematicCamera;
         class OpeningCinematic;
         class WorldTeleport;
+    }
+
+    namespace Pet
+    {
+        class DismissCritter;
+        class RequestPetInfo;
     }
 
     namespace Query
@@ -446,7 +453,7 @@ class TC_GAME_API WorldSession
         }
 
         void LogoutPlayer(bool save);
-        void KickPlayer();
+        void KickPlayer(std::string const& reason);
         // Returns true if all contained hyperlinks are valid
         // May kick player on false depending on world config (handler should abort)
         bool ValidateHyperlinksAndMaybeKick(std::string const& str);
@@ -459,6 +466,8 @@ class TC_GAME_API WorldSession
 
         /// Handle the authentication waiting queue (to be completed)
         void SendAuthWaitQue(uint32 position);
+
+        void SendFeatureSystemStatus();
 
         void SendNameQueryOpcode(ObjectGuid guid);
 
@@ -862,7 +871,7 @@ class TC_GAME_API WorldSession
 
         void HandleAttackSwingOpcode(WorldPackets::Combat::AttackSwing& packet);
         void HandleAttackStopOpcode(WorldPackets::Combat::AttackStop& packet);
-        void HandleSetSheathedOpcode(WorldPacket& recvPacket);
+        void HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& packet);
 
         void HandleUseItemOpcode(WorldPacket& recvPacket);
         void HandleOpenItemOpcode(WorldPacket& recvPacket);
@@ -958,7 +967,7 @@ class TC_GAME_API WorldSession
         void HandleSetActionBarToggles(WorldPacket& recvData);
 
         void HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestroyed);
-        void HandleDismissCritter(WorldPacket& recvData);
+        void HandleDismissCritter(WorldPackets::Pet::DismissCritter& dismissCritter);
 
         // Battleground
         void HandleBattlemasterHelloOpcode(WorldPacket& recvData);
@@ -1042,7 +1051,7 @@ class TC_GAME_API WorldSession
 
         void HandleSelfResOpcode(WorldPacket& recvData);
         void HandleComplainOpcode(WorldPacket& recvData);
-        void HandleRequestPetInfoOpcode(WorldPacket& recvData);
+        void HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& packet);
 
         // Socket gem
         void HandleSocketOpcode(WorldPacket& recvData);

@@ -15,23 +15,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
+#ifndef PetPackets_h__
+#define PetPackets_h__
 
-#include "BattlefieldPackets.h"
-#include "BattlegroundPackets.h"
-#include "CharacterPackets.h"
-#include "ChatPackets.h"
-#include "CombatPackets.h"
-#include "GuildPackets.h"
-#include "NPCPackets.h"
-#include "MiscPackets.h"
-#include "PetPackets.h"
-#include "QueryPackets.h"
-#include "QuestPackets.h"
-#include "SpellPackets.h"
-#include "SystemPackets.h"
-#include "TotemPackets.h"
-#include "WorldStatePackets.h"
+#include "Packet.h"
+#include "ObjectGuid.h"
 
-#endif // AllPackets_h__
+namespace WorldPackets
+{
+    namespace Pet
+    {
+        class DismissCritter final : public ClientPacket
+        {
+        public:
+            DismissCritter(WorldPacket&& packet) : ClientPacket(CMSG_DISMISS_CRITTER, std::move(packet)) { }
+
+            void Read() override;
+
+            ObjectGuid CritterGUID;
+        };
+
+        class RequestPetInfo final : public ClientPacket
+        {
+        public:
+            RequestPetInfo(WorldPacket&& packet) : ClientPacket(CMSG_REQUEST_PET_INFO, std::move(packet)) { }
+
+            void Read() override { }
+        };
+    }
+}
+
+#endif // PetPackets_h__

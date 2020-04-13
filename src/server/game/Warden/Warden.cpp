@@ -144,7 +144,7 @@ void Warden::Update()
                 {
                     TC_LOG_WARN("warden", "%s (latency: %u, IP: %s) exceeded Warden module response delay on state %s for more than %s - disconnecting client",
                                    _session->GetPlayerInfo().c_str(), _session->GetLatency(), _session->GetRemoteAddress().c_str(), WardenState::to_string(_state), secsToTimeString(maxClientResponseDelay, TimeFormat::ShortText).c_str());
-                    _session->KickPlayer();
+                    _session->KickPlayer("Warden::Update Warden module response delay exceeded");
                 }
                 else
                 {
@@ -264,7 +264,7 @@ std::string Warden::Penalty(WardenCheck* check /*= nullptr*/)
         return "None";
         break;
     case WARDEN_ACTION_KICK:
-        _session->KickPlayer();
+        _session->KickPlayer("Warden::Penalty");
         return "Kick";
         break;
     case WARDEN_ACTION_BAN:
