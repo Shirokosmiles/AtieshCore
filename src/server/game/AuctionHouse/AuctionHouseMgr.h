@@ -33,6 +33,7 @@ struct AuctionHouseEntry;
 #define MIN_AUCTION_TIME (12*HOUR)
 #define MAX_AUCTION_ITEMS 160
 #define MAX_GETALL_RETURN 55000
+#define MAX_AUCTION_ITEMS_CLIENT_PAGE 50
 
 enum AuctionError : uint8
 {
@@ -134,8 +135,8 @@ public:
     void Update();
 
     void BuildListAllLots(Player* player, uint32& totalcount);
-    void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
-    void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
+    void BuildListBidderItems(WorldPacket& data, Player* player, uint32 listfrom, uint32& count, uint32& totalcount);
+    void BuildListOwnerItems(WorldPacket& data, Player* player, uint32 listfrom, uint32& count, uint32& totalcount);
     void BuildListAuctionItems(WorldPacket& data, Player* player,
         std::wstring const& searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
         uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,

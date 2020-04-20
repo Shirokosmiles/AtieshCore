@@ -712,7 +712,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
         }
     }
 
-    auctionHouse->BuildListBidderItems(data, player, count, totalcount);
+    auctionHouse->BuildListBidderItems(data, player, listfrom, count, totalcount);
     data.put<uint32>(0, count);                           // add count to placeholder
     data << totalcount;
     data << (uint32)300;                                    //unk 2.3.0
@@ -749,7 +749,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recvData)
     uint32 count = 0;
     uint32 totalcount = 0;
 
-    auctionHouse->BuildListOwnerItems(data, _player, count, totalcount);
+    auctionHouse->BuildListOwnerItems(data, _player, listfrom, count, totalcount);
     data.put<uint32>(0, count);
     data << (uint32) totalcount;
     data << (uint32) 0;
