@@ -37,6 +37,8 @@
 #include "WorldSession.h"
 #include "WorldPacket.h"
 
+#define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
+
 MailMgr* MailMgr::instance()
 {
     static MailMgr instance;
@@ -1175,7 +1177,7 @@ void MailMgr::HandleGetMailList(Player* player, WorldPacket& data)
     // client can't work with packets > max int16 value
     const uint32 maxPacketSize = 32767;
 
-    uint32 mailsCount = 0;                                 // real send to client mails amount
+    uint32 mailsCount = 0;                                // real send to client mails amount
     uint32 realCount = 0;                                 // real mails amount
 
     data << uint32(0);                                      // real mail's count
@@ -1207,7 +1209,7 @@ void MailMgr::HandleGetMailList(Player* player, WorldPacket& data)
 
             size_t next_mail_size = 2 + 4 + 1 + (itr->second.messageType == MAIL_NORMAL ? 8 : 4) + 4 * 8 + (itr->second.subject.size() + 1) + (itr->second.body.size() + 1) + 1 + item_count * (1 + 4 + 4 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3 * 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1);
 
-            if (data.wpos() + next_mail_size > maxPacketSize)
+            if (data.wpos() + next_mail_size > MAX_NETCLIENT_PACKET_SIZE)
             {
                 realCount += 1;
                 continue;
