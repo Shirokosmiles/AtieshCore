@@ -1061,11 +1061,12 @@ void Player::SetDrunkValue(uint8 newDrunkValue, uint32 itemId /*= 0*/)
     if (newDrunkenState == oldDrunkenState)
         return;
 
-    WorldPacket data(SMSG_CROSSED_INEBRIATION_THRESHOLD, (8+4+4));
-    data << uint64(GetGUID());
-    data << uint32(newDrunkenState);
-    data << uint32(itemId);
-    SendMessageToSet(&data, true);
+    WorldPackets::Misc::CrossedInebriationThreshold data;
+    data.Guid = GetGUID();
+    data.Threshold = newDrunkenState;
+    data.ItemID = itemId;
+
+    SendMessageToSet(data.Write(), true);
 }
 
 void Player::Update(uint32 p_time)
@@ -27109,15 +27110,15 @@ uint32 Player::DoRandomRoll(uint32 minimum, uint32 maximum)
 
     uint32 roll = urand(minimum, maximum);
 
-    WorldPacket data(MSG_RANDOM_ROLL, 4 + 4 + 4 + 8);
-    data << uint32(minimum);
-    data << uint32(maximum);
-    data << uint32(roll);
-    data << GetGUID();
+    WorldPackets::Misc::RandomRoll randomRoll;
+    randomRoll.Min = minimum;
+    randomRoll.Max = maximum;
+    randomRoll.Result = roll;
+    randomRoll.Roller = GetGUID();
     if (Group* group = GetGroup())
-        group->BroadcastPacket(&data, false);
+        group->BroadcastPacket(randomRoll.Write(), false);
     else
-        SendDirectMessage(&data);
+        SendDirectMessage(randomRoll.Write());
 
     return roll;
 }

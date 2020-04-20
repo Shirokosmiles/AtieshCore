@@ -2654,10 +2654,12 @@ void Spell::TargetInfo::DoDamageAndTriggers(Spell* spell)
 
         // All calculated do it!
         // Do healing
+        bool hasHealing = false;
         std::unique_ptr<DamageInfo> spellDamageInfo;
         std::unique_ptr<HealInfo> healInfo;
         if (spell->m_healing > 0)
         {
+            hasHealing = true;
             uint32 addhealth = spell->m_healing;
             if (IsCrit)
             {
@@ -2676,8 +2678,10 @@ void Spell::TargetInfo::DoDamageAndTriggers(Spell* spell)
         }
 
         // Do damage
+        bool hasDamage = false;
         if (spell->m_damage > 0)
         {
+            hasDamage = true;
             // Fill base damage struct (unitTarget - is real spell target)
             SpellNonMeleeDamage damageInfo(caster, spell->unitTarget, spell->m_spellInfo->Id, spell->m_spellSchoolMask);
             // Check damage immunity
@@ -2717,7 +2721,7 @@ void Spell::TargetInfo::DoDamageAndTriggers(Spell* spell)
         }
 
         // Passive spell hits/misses or active spells only misses (only triggers)
-        if (spell->m_damage <= 0 && spell->m_healing <= 0)
+        if (!hasHealing && !hasDamage)
         {
             // Fill base damage struct (unitTarget - is real spell target)
             SpellNonMeleeDamage damageInfo(caster, spell->unitTarget, spell->m_spellInfo->Id, spell->m_spellSchoolMask);
@@ -6548,6 +6552,8 @@ SpellCastResult Spell::CheckCasterAuras(uint32* param1) const
                 result = mechanicResult;
         }
         else if (!CheckSpellCancelsStun(param1))
+            result = SPELL_FAILED_STUNNED;
+        else if ((m_spellInfo->Mechanic & MECHANIC_IMMUNE_SHIELD) && m_caster->ToUnit() && m_caster->ToUnit()->HasAuraWithMechanic(1 << MECHANIC_BANISH))
             result = SPELL_FAILED_STUNNED;
     }
     else if (unitflag & UNIT_FLAG_SILENCED && m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && !CheckSpellCancelsSilence(param1))

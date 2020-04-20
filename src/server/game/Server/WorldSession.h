@@ -161,6 +161,7 @@ namespace WorldPackets
         class CompleteMovie;
         class NextCinematicCamera;
         class OpeningCinematic;
+        class RandomRollClient;
         class WorldTeleport;
     }
 
@@ -997,7 +998,7 @@ class TC_GAME_API WorldSession
         void HandleWardenDataOpcode(WorldPacket& recvData);
         void HandleWorldTeleportOpcode(WorldPackets::Misc::WorldTeleport& worldTeleport);
         void HandleMinimapPingOpcode(WorldPacket& recvData);
-        void HandleRandomRollOpcode(WorldPacket& recvData);
+        void HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet);
         void HandleFarSightOpcode(WorldPacket& recvData);
         void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
         void HandleSetRaidDifficultyOpcode(WorldPacket& recvData);
