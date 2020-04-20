@@ -7909,9 +7909,12 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Worl
 
     if (uint32 mechanic = spellInfo->Effects[index].Mechanic)
     {
-        SpellImmuneContainer const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
-        if (mechanicList.count(mechanic) > 0)
-            return true;
+        if (mechanic != MECHANIC_SNARE)
+        {
+            SpellImmuneContainer const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
+            if (mechanicList.count(mechanic) > 0)
+                return true;
+        }
     }
 
     if (!spellInfo->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))
@@ -8729,7 +8732,12 @@ void Unit::UpdateSpeed(UnitMoveType mtype)
     // Apply strongest slow aura mod to speed
     int32 slow = GetMaxNegativeAuraModifier(SPELL_AURA_MOD_DECREASE_SPEED);
     if (slow)
-        AddPct(speed, slow);
+    {
+        SpellImmuneContainer const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
+        //if immune mechanic of snare NOT applied
+        if (mechanicList.count(MECHANIC_SNARE) == 0)
+            AddPct(speed, slow);
+    }
 
     if (float minSpeedMod = (float)GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MINIMUM_SPEED))
     {
