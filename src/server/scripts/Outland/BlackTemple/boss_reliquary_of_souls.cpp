@@ -361,10 +361,7 @@ struct boss_essence_of_suffering : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
-            return;
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
+        if (!me || !me->IsAlive())
             return;
 
         events.Update(diff);
@@ -390,7 +387,8 @@ struct boss_essence_of_suffering : public BossAI
                 return;
         }
 
-        DoMeleeAttackIfReady();
+        if (!_dead && UpdateVictim())
+            DoMeleeAttackIfReady();
     }
 private:
     bool _dead;
@@ -469,10 +467,7 @@ struct boss_essence_of_desire : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
-            return;
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
+        if (!me || !me->IsAlive())
             return;
 
         events.Update(diff);
@@ -502,7 +497,8 @@ struct boss_essence_of_desire : public BossAI
                 return;
         }
 
-        DoMeleeAttackIfReady();
+        if (!_dead && UpdateVictim())
+            DoMeleeAttackIfReady();
     }
 private:
     bool _dead;
@@ -545,10 +541,7 @@ struct boss_essence_of_anger : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
-            return;
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
+        if (!me || !me->IsAlive())
             return;
 
         events.Update(diff);
@@ -601,7 +594,8 @@ struct boss_essence_of_anger : public BossAI
                 return;
         }
 
-        DoMeleeAttackIfReady();
+        if (UpdateVictim())
+            DoMeleeAttackIfReady();
     }
 
     void EnterEvadeMode(EvadeReason /*why*/) override
@@ -641,12 +635,10 @@ struct npc_enslaved_soul : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
-            return;
-
         _scheduler.Update(diff);
 
-        DoMeleeAttackIfReady();
+        if (UpdateVictim())
+            DoMeleeAttackIfReady();
     }
 
     void JustDied(Unit* /*killer*/) override
