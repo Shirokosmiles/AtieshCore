@@ -3688,8 +3688,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Vampiric Touch (dispel effect)
     ApplySpellFix({ 64085 }, [](SpellInfo* spellInfo)
     {
-        // copy from similar effect of Unstable Affliction (31117)
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_FIXED_DAMAGE;
         spellInfo->AttributesEx6 |= SPELL_ATTR6_LIMIT_PCT_DAMAGE_MODS;
     });
 
@@ -3705,6 +3703,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         // shouldnt ignore resillience or damage taken auras because its damage is not based off a spell.
         spellInfo->AttributesEx4 &= ~SPELL_ATTR4_FIXED_DAMAGE;
     });
+
+    // Unstable Affliction - Dispel
+    ApplySpellFix({ 31117 }, [](SpellInfo* spellInfo)
+        {
+            // shouldnt ignore resillience or damage taken auras
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_FIXED_DAMAGE;
+        });
 
     // Tremor Totem (instant pulse)
     ApplySpellFix({ 8145 }, [](SpellInfo* spellInfo)
