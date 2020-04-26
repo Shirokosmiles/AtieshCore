@@ -191,7 +191,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
     }
 }
 
-void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, CharacterDatabaseTransaction& trans)
+void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction)
 {
     ObjectGuid owner_guid(HighGuid::Player, auction->owner);
     Player* owner = ObjectAccessor::FindConnectedPlayer(owner_guid);
@@ -202,7 +202,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, Characte
 }
 
 //call this method to send mail to auction owner, when auction is successful, it does not clear ram
-void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, CharacterDatabaseTransaction& trans)
+void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction)
 {
     ObjectGuid owner_guid(HighGuid::Player, auction->owner);
     Player* owner = ObjectAccessor::FindConnectedPlayer(owner_guid);
@@ -255,7 +255,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
 }
 
 //this function sends mail to old bidder
-void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, CharacterDatabaseTransaction& trans)
+void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder)
 {
     ObjectGuid oldBidder_guid(HighGuid::Player, auction->bidder);
     Player* oldBidder = ObjectAccessor::FindConnectedPlayer(oldBidder_guid);
@@ -275,7 +275,7 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
 }
 
 //this function sends mail, when auction is cancelled to old bidder
-void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction, CharacterDatabaseTransaction& trans)
+void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction)
 {
     ObjectGuid bidder_guid = ObjectGuid(HighGuid::Player, auction->bidder);
     Player* bidder = ObjectAccessor::FindConnectedPlayer(bidder_guid);
@@ -643,7 +643,7 @@ void AuctionHouseObject::Update()
             //we should send an "item sold" message if the seller is online
             //we send the item to the winner
             //we send the money to the seller
-            sAuctionMgr->SendAuctionSuccessfulMail(auction, trans);
+            sAuctionMgr->SendAuctionSuccessfulMail(auction);
             sAuctionMgr->SendAuctionWonMail(auction, trans);
             sScriptMgr->OnAuctionSuccessful(this, auction);
         }
