@@ -171,7 +171,6 @@ bool FollowMovementGenerator::Update(Unit* owner, uint32 diff)
                         return true;
                     }
 
-                    owner->StopMoving();
                     return true;
                 }
             }
