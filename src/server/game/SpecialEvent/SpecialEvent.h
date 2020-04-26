@@ -95,9 +95,9 @@ class TC_GAME_API SpecialEvent : public ZoneScript
 
         // Zone Sector
         // Called when a player enters the battlefield zone
-        virtual void HandlePlayerEnterZone(Player* player) { }
+        virtual void HandlePlayerEnterZone(Player* /*player*/) { }
         // Called when a player leaves the battlefield zone
-        virtual void HandlePlayerLeaveZone(Player* player) { }
+        virtual void HandlePlayerLeaveZone(Player* /*player*/) { }
         // Called when a player inside the battlefield zone kills a unit
         virtual void HandleKill(Player* /*killer*/, Unit* /*victim*/) { }
         // Called when a player queries a gossip from a spirit healer
