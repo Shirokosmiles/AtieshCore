@@ -3197,7 +3197,6 @@ void Player::UpdateNextMailTimeAndUnreads()
 {
     // calculate next delivery time (min. from non-delivered mails
     // and recalculate unReadMail
-    time_t cTime = GameTime::GetGameTime();
     m_nextMailDelivereTime = 0;
     unReadMails = sMailMgr->GetUnreadMessagesAndNextDelivertime(GetGUID().GetCounter(), m_nextMailDelivereTime);
 }
@@ -8918,7 +8917,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     Battleground* battleground = GetBattleground();
     OutdoorPvP* outdoorPvP = sOutdoorPvPMgr->GetOutdoorPvPToZoneId(zoneId);
     InstanceScript* instance = GetInstanceScript();
-    SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(zoneId);
+    //SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(zoneId);
     Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(zoneId);
 
     TC_LOG_DEBUG("network", "Player::SendInitWorldStates: Sending SMSG_INIT_WORLD_STATES for Map: %u, Zone: %u", mapId, zoneId);
