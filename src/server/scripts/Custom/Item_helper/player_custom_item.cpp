@@ -70,7 +70,7 @@ public:
     uint32 coast14 = 40;
     uint32 coast31 = 80;
 
-    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/)
+    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) override
     {
         WorldSession* session = player->GetSession();
 
@@ -233,7 +233,7 @@ public:
         }
     }
 
-    void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action)
+    void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action) override
     {
         WorldSession* session = player->GetSession();
 
@@ -1209,7 +1209,7 @@ public:
                     else
                     {
                         player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-                        for (int i = 0; i < sizeof(aurass); ++i)
+                        for (size_t i = 0; i < sizeof(aurass); ++i)
                             player->AddAura(aurass[i], player);
                         player->GetSession()->SendNotification("|cffC67171Buffs received!");
                         player->CastSpell(player, 45523, true);
