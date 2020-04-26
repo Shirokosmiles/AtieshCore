@@ -162,6 +162,7 @@ namespace WorldPackets
         class NextCinematicCamera;
         class OpeningCinematic;
         class RandomRollClient;
+        class TogglePvP;
         class WorldTeleport;
     }
 
@@ -683,7 +684,7 @@ class TC_GAME_API WorldSession
         void HandleReportLag(WorldPacket& recvPacket);
         void HandleGMResponseResolve(WorldPacket& recvPacket);
 
-        void HandleTogglePvP(WorldPacket& recvPacket);
+        void HandleTogglePvP(WorldPackets::Misc::TogglePvP& togglePvP);
 
         void HandleZoneUpdateOpcode(WorldPacket& recvPacket);
         void HandleSetSelectionOpcode(WorldPacket& recvPacket);
