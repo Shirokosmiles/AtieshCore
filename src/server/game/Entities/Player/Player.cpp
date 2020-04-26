@@ -20595,6 +20595,12 @@ void Player::ResetContestedPvP()
 
 void Player::UpdatePvPFlag(time_t currTime)
 {
+    if (!IsPvP())
+        return;
+
+    if (!pvpInfo.EndTimer || currTime < pvpInfo.EndTimer || pvpInfo.IsHostile)
+        return;
+
     if (pvpInfo.EndTimer && pvpInfo.EndTimer <= currTime)
     {
         pvpInfo.EndTimer = 0;
