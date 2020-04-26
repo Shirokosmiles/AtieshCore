@@ -40,7 +40,6 @@
 #include "Realm.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "WaypointMovementGenerator.h"
 #include "WorldSession.h"
 #include "World.h"
 
