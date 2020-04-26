@@ -93,7 +93,7 @@ void PatchMgr::LoadPatches()
         Disable();
 }
 
-bool PatchMgr::CanPatch(uint16 Build, std::string Locale)
+bool PatchMgr::CanPatch(uint16 Build, std::string /*Locale*/)
 {
     if (!IsEnabled())
         return false;
