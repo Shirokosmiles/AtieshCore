@@ -130,7 +130,7 @@ protected:
 
     // helper
     bool PrepareMessageAttributeBy(Object* sender, ObjectGuid::LowType receiver, uint8& m_messageType, uint8& m_stationery, ObjectGuid::LowType& m_senderId, uint32 deliver_delay, uint32 COD, time_t& expire_time, time_t& deliver_time);
-    bool PrepareMessageAttributeByGUID(ObjectGuid::LowType sender, ObjectGuid::LowType receiver, uint8 m_messageType, uint8& m_stationery, uint32 deliver_delay, uint32 COD, time_t& expire_time, time_t& deliver_time);
+    bool PrepareMessageAttributeByGUID(ObjectGuid::LowType sender, uint8 m_messageType, uint8& m_stationery, uint32 deliver_delay, uint32 COD, time_t& expire_time, time_t& deliver_time);
     bool PrepareMessageAttributeForAuctionAndCalendar(uint32 deliver_delay, uint32 COD, time_t& expire_time, time_t& deliver_time);
 
     void prepareItems(uint32 mailId, uint16 mailTemplateId, Player* receiver);

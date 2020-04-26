@@ -114,7 +114,7 @@ void MailMgr::SendMailByGUID(ObjectGuid::LowType sender, ObjectGuid::LowType rec
     uint8 m_stationery;
     time_t expire_time, deliver_time;
 
-    if (!PrepareMessageAttributeByGUID(sender, receiver, m_messageType, m_stationery, deliver_delay, COD, expire_time, deliver_time))
+    if (!PrepareMessageAttributeByGUID(sender, m_messageType, m_stationery, deliver_delay, COD, expire_time, deliver_time))
         return;
 
     uint32 mail_id = AddNewMail(m_messageType, m_stationery, 0, sender, receiver, subject, body, false, money, expire_time, deliver_time, COD, mask);
@@ -167,10 +167,9 @@ void MailMgr::SendMailWithItemsByGUID(ObjectGuid::LowType sender, ObjectGuid::Lo
         return;
 
     uint8 m_stationery;
-    uint32 m_money = 0;
     time_t expire_time, deliver_time;
 
-    if (!PrepareMessageAttributeByGUID(sender, receiver, m_messageType, m_stationery, deliver_delay, 0, expire_time, deliver_time))
+    if (!PrepareMessageAttributeByGUID(sender, m_messageType, m_stationery, deliver_delay, 0, expire_time, deliver_time))
         return;
 
     uint32 mail_id = AddNewMail(m_messageType, m_stationery, 0, sender, receiver, subject, body, true, money, expire_time, deliver_time, COD, mask);
@@ -360,7 +359,7 @@ void MailMgr::SendMailWithTemplateByGUID(ObjectGuid::LowType sender, ObjectGuid:
     uint32 m_money = 0;
     time_t expire_time, deliver_time;
 
-    if (!PrepareMessageAttributeByGUID(sender, receiver, messageType, m_stationery, deliver_delay, 0, expire_time, deliver_time))
+    if (!PrepareMessageAttributeByGUID(sender, messageType, m_stationery, deliver_delay, 0, expire_time, deliver_time))
         return;
 
     // The mail sent after turning in the quest The Good News and The Bad News contains 100g
@@ -411,7 +410,7 @@ uint32 MailMgr::SendReturnMailByGUID(uint32 old_mailID, ObjectGuid::LowType send
     MailCheckMask mask = MAIL_CHECK_MASK_RETURNED;
     time_t expire_time, deliver_time;
 
-    if (!PrepareMessageAttributeByGUID(sender, receiver, m_messageType, m_stationery, deliver_delay, 0, expire_time, deliver_time))
+    if (!PrepareMessageAttributeByGUID(sender, m_messageType, m_stationery, deliver_delay, 0, expire_time, deliver_time))
         return 0;
 
     uint32 mail_id = AddNewMail(m_messageType, m_stationery, 0, sender, receiver, subject, body, itemexist, money, expire_time, deliver_time, 0, mask);
@@ -586,7 +585,7 @@ bool MailMgr::PrepareMessageAttributeBy(Object* sender, ObjectGuid::LowType rece
     return true;
 }
 
-bool MailMgr::PrepareMessageAttributeByGUID(ObjectGuid::LowType senderEntry, ObjectGuid::LowType receiver, uint8 m_messageType, uint8& m_stationery, uint32 deliver_delay, uint32 COD, time_t& expire_time, time_t& deliver_time)
+bool MailMgr::PrepareMessageAttributeByGUID(ObjectGuid::LowType senderEntry, uint8 m_messageType, uint8& m_stationery, uint32 deliver_delay, uint32 COD, time_t& expire_time, time_t& deliver_time)
 {
     m_stationery = MAIL_STATIONERY_DEFAULT;
     if (!senderEntry)
@@ -1174,9 +1173,6 @@ void MailMgr::HandleMailTakeMoney(Player* player, uint32 mailID)
 
 void MailMgr::HandleGetMailList(Player* player, WorldPacket& data)
 {
-    // client can't work with packets > max int16 value
-    const uint32 maxPacketSize = 32767;
-
     uint32 mailsCount = 0;                                // real send to client mails amount
     uint32 realCount = 0;                                 // real mails amount
 
