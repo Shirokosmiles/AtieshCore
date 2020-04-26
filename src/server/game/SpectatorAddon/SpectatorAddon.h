@@ -81,7 +81,6 @@ private:
 	uint16 aStack;
 	bool aRemove;
 	uint32 aurastack;
-	uint32 slot;
 
 	bool prefixFlags[SPECTATOR_PREFIX_COUNT];
 };

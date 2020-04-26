@@ -141,7 +141,7 @@ void WardenWin::HandleHashResult(ByteBuffer &buff)
         return;
     }
 
-    TC_LOG_DEBUG("warden", "warden", "Request hash reply: succeed");
+    //TC_LOG_DEBUG("warden", "warden", "Request hash reply: succeed");
 
     // Change keys here
     memcpy(_inputKey, Module.ClientKeySeed, 16);

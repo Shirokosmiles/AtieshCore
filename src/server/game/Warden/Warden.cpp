@@ -1,4 +1,3 @@
-/**
 /*
  * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
