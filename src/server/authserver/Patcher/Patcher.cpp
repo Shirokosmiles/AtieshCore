@@ -5,7 +5,7 @@
 
 #define CHUNK_SIZE 4096
 
-Patcher::Patcher(AuthSession* Session, PatchMgr::PatchInfo* Patch) : _session(Session), _patch(Patch), _stopped(false) { }
+Patcher::Patcher(AuthSession* Session, PatchMgr::PatchInfo* Patch) : _stopped(false), _session(Session), _patch(Patch) { }
 Patcher::~Patcher()
 {
     _session->_patcher = nullptr;
@@ -38,7 +38,8 @@ void Patcher::Init(uint64 start_pos)
         _session->SendPacket(pkt);
         delete[] bytes;
 
-        Sleep(100);
+        // we need it?
+        //Sleep(100);
     }
 
     file.close();
