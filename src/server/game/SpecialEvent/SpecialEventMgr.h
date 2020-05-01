@@ -23,10 +23,13 @@
 
 struct SpecialEventList
 {
-    std::string scriptname;    
+    std::string scriptname;
+    bool isEnabled;
+    bool isActiveStatus;
+    bool isRepeatable;
     uint32 cooldownTimer;
     uint32 durationTimer;
-    bool enabled;
+
     std::string comment;
 };
 typedef std::unordered_map<uint32, SpecialEventList> SpecialEventInfoContainer;

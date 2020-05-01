@@ -17,6 +17,7 @@
 
 // This is where scripts' loading functions should be declared:
 void AddSC_DalaranCraterScripts();
+void AddSC_TheLightOfDawnScripts();
 
 
 // The name of this function should match:
@@ -24,4 +25,5 @@ void AddSC_DalaranCraterScripts();
 void AddSpecialEventsScripts()
 {
     AddSC_DalaranCraterScripts();
+    AddSC_TheLightOfDawnScripts();
 }

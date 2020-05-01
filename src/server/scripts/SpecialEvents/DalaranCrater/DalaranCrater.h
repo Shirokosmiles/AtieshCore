@@ -68,10 +68,8 @@ public:
     void RemovePlayer(ObjectGuid playerGUID) override;
     bool IsPossibleToRegister() override { return registration; }
     bool IsMemberOfEvent(Player* player) override;
-    uint32 GetCountPlayerInEvent() override { return GetCountPlayerInPlayerMap(); }
-    bool SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer) override;
-
-    uint32 GetCountPlayerInPlayerMap();
+    uint32 GetCountPlayerInEvent() override { return m_playersDataStore.size(); }
+    bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer) override;
 
     void StartFightEvent();
     void StopFightEvent();

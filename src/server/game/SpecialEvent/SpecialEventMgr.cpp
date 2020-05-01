@@ -50,8 +50,8 @@ void SpecialEventMgr::InitSpecialEvents()
     uint32 oldMSTime = getMSTime();
 
     m_SpecialEventStore.clear();
-    //                                                 0       1            2               3               4           5
-    QueryResult result = WorldDatabase.Query("SELECT TypeId, ScriptName, cooldownTimer, durationTimer, activeStatus, comment FROM special_events");
+    //                                                 0       1            2               3               4           5           6               7
+    QueryResult result = WorldDatabase.Query("SELECT TypeId, ScriptName, isEnabled, isActiveStatus, isRepeatable, cooldownTimer, durationTimer, comment FROM special_events");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 Special Events definitions. DB table `special_events` is empty.");
@@ -65,7 +65,9 @@ void SpecialEventMgr::InitSpecialEvents()
     uint32 cooldownTimer = 0;
     uint32 durationTimer = 0;
     std::string comment = "";
-    bool enabledStatus = false;
+    bool isActiveStatus = false;
+    bool isEnabled = false;
+    bool isRepeatable = false;
 
     do
     {
@@ -84,11 +86,13 @@ void SpecialEventMgr::InitSpecialEvents()
         m_SpecialEventDatas[realTypeId] = sObjectMgr->GetScriptId(fields[1].GetString());
 
         SpecialEventList sel;
-        sel.scriptname = fields[1].GetString();
-        sel.cooldownTimer = fields[2].GetUInt32();
-        sel.durationTimer = fields[3].GetUInt32();
-        sel.enabled = fields[4].GetUInt32() > 0;
-        sel.comment = fields[5].GetString();        
+        sel.scriptname     = fields[1].GetString();
+        sel.isEnabled      = fields[2].GetUInt32() > 0;
+        sel.isActiveStatus = fields[3].GetUInt32() > 0;
+        sel.isRepeatable   = fields[4].GetUInt32() > 0;
+        sel.cooldownTimer  = fields[5].GetUInt32();
+        sel.durationTimer  = fields[6].GetUInt32();
+        sel.comment        = fields[7].GetString();
 
         m_SpecialEventStore[typeId] = sel;
 
@@ -115,26 +119,27 @@ void SpecialEventMgr::InitSpecialEvents()
         {
             if (itr->first == i)
             {
-                enabledStatus = itr->second.enabled;
-                cooldownTimer = itr->second.cooldownTimer;
-                durationTimer = itr->second.durationTimer;
-                comment = itr->second.comment;
+                isActiveStatus = itr->second.isActiveStatus;
+                isEnabled      = itr->second.isEnabled;
+                isRepeatable   = itr->second.isRepeatable;
+                cooldownTimer  = itr->second.cooldownTimer;
+                durationTimer  = itr->second.durationTimer;
+                comment        = itr->second.comment;
             }
         }
 
-        if (!se->SetupSpecialEvent(false, enabledStatus, i, cooldownTimer, durationTimer))
+        if (!se->SetupSpecialEvent(isEnabled, isActiveStatus, isRepeatable, i, cooldownTimer, durationTimer))
         {
             TC_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID %u; SetupSpecialEvent failed.", i);
             delete se;
             continue;
-
         }
 
         TC_LOG_INFO("server.loading", ">> Special Event (id: %u) - %s successfully initialized", i, comment.c_str());
         m_SpecialEventSet.push_back(se);
     }
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u Special Event definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));    
+    TC_LOG_INFO("server.loading", ">> Loaded %u Special Event definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void SpecialEventMgr::Update(uint32 diff)
@@ -238,4 +243,3 @@ void SpecialEventMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneId)
 
     itr->second->HandlePlayerLeaveZone(player);
 }
-

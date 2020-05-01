@@ -26,8 +26,8 @@
 
 enum SpecialEventTypes
 {
-    SPECIALEVENT_EVENTID_DALARANCRATER = 1,
-
+    SPECIALEVENT_EVENTID_DALARANCRATER  = 1,
+    SPECIALEVENT_EVENTID_THELIGHTOFDAWN = 2,
     SPECIALEVENT_EVENTID_MAX
 };
 
@@ -52,7 +52,7 @@ class Unit;
 class TC_GAME_API SpecialEvent : public ZoneScript
 {
     friend class SpecialEventMgr;
-    public:        
+    public:
 
         // ctor
         SpecialEvent();
@@ -61,7 +61,7 @@ class TC_GAME_API SpecialEvent : public ZoneScript
 
         // enables or disables the special event
         void StartSpecialEvent();
-        void EndSpecialEvent(bool endByTimer);        
+        void EndSpecialEvent(bool endByTimer);
 
         bool IsEnabled() const { return _enabled; }
         bool IsActiveTime() const { return _active; }
@@ -76,14 +76,14 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         uint32 GetTimer() const { return _timer.GetExpiry(); }
 
         // Functions for each Event Scripts
-        virtual bool SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer);
+        virtual bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer);
         virtual void Update(uint32 diff);
         virtual void OnSpecialEventStart() { }
         virtual void OnSpecialEventEnd(bool /*endByTimer*/) { }
         virtual void AddPlayer(ObjectGuid /*playerGUID*/) { }
         virtual void RemovePlayer(ObjectGuid /*playerGUID*/) { }
         virtual bool IsPossibleToRegister() { return true; }
-        virtual bool IsMemberOfEvent(Player* /*player*/) { return false; }        
+        virtual bool IsMemberOfEvent(Player* /*player*/) { return false; }
         virtual uint32 GetCountPlayerInEvent() { return 0; }
 
         // Can players inside the battlefield zone use ground mounts?
@@ -123,7 +123,7 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         // enum TeamId
         virtual TeamId GetControllingTeamId() const { return TEAM_NEUTRAL; }
         // enum TeamId
-        virtual TeamId GetAttackingTeamId() const { return TEAM_NEUTRAL; }        
+        virtual TeamId GetAttackingTeamId() const { return TEAM_NEUTRAL; }
 
     protected:
         // constant information
@@ -131,10 +131,11 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         TimeTrackerSmall _timer;
         bool _active;
         bool _enabled;
+        bool _Repeatable;
         // from database
         uint32 _EventTime;      // length of the event
         uint32 _noEventTime;    // time between two events
-        time_t _gameTimeNextEvent;        
+        time_t _gameTimeNextEvent;
 };
 
 #endif

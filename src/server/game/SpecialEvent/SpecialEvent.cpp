@@ -21,7 +21,7 @@
 #include "Log.h"
 #include "ObjectAccessor.h"
 
-SpecialEvent::SpecialEvent() : _eventId(0), _timer(0), _active(false), _enabled(true), _noEventTime(0), _gameTimeNextEvent(0) { }
+SpecialEvent::SpecialEvent() : _eventId(0), _timer(0), _active(false), _enabled(true), _Repeatable(true), _noEventTime(0), _gameTimeNextEvent(0) { }
 
 SpecialEvent::~SpecialEvent() { }
 
@@ -32,12 +32,16 @@ void SpecialEvent::Update(uint32 diff)
 
     _timer.Update(diff);
     if (_timer.Passed())
-    {
-        // battlefield ends on time
-        if (IsActiveTime())
+    {        
+        if (IsActiveTime())     // Event ends on time
             EndSpecialEvent(true);
-        else // time to start a new battle
-            StartSpecialEvent();
+        else                    // time to start for new Event
+        {
+            if (_Repeatable)
+                StartSpecialEvent();
+            else                // For Non-Repeatable Events just reset time
+                _timer.Reset(_noEventTime);
+        }
     }
 }
 
@@ -51,16 +55,20 @@ void SpecialEvent::RegisterZoneIdForEvent(uint32 zoneId)
     sSpecialEventMgr->AddZone(zoneId, this);
 }
 
-bool SpecialEvent::SetupSpecialEvent(bool active, bool enabled, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
+bool SpecialEvent::SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
 {
-    if (!enabled || !id || !cooldownTimer || !durationTimer)
+    if (!id || !cooldownTimer || !durationTimer)
         return false;
 
     _active = active;
+    _enabled = enabled;
+    _Repeatable = repeatable;
     _eventId = id;
     _EventTime = durationTimer * MINUTE * IN_MILLISECONDS;
     _noEventTime = cooldownTimer * MINUTE * IN_MILLISECONDS;
-    _gameTimeNextEvent = uint32(GameTime::GetGameTime() + durationTimer * MINUTE);
+    _timer.Reset(cooldownTimer);
+    if (_Repeatable)
+        _gameTimeNextEvent = uint32(GameTime::GetGameTime() + cooldownTimer * MINUTE);
     RegisterEvent(_eventId);
 
     return true;
@@ -75,6 +83,10 @@ void SpecialEvent::StartSpecialEvent()
     _active = true;
 
     OnSpecialEventStart();
+
+    // If Event Repeatable
+    if (_Repeatable)
+        _gameTimeNextEvent = uint32(GameTime::GetGameTime() + (_EventTime + _noEventTime) * MINUTE);
 }
 
 void SpecialEvent::EndSpecialEvent(bool endByTimer)
@@ -82,14 +94,12 @@ void SpecialEvent::EndSpecialEvent(bool endByTimer)
     if (!_active)
         return;
 
-    // Reset timer
     _timer.Reset(_noEventTime);
-    _gameTimeNextEvent = uint32(GameTime::GetGameTime() + _noEventTime / IN_MILLISECONDS);
     _active = false;
 
-    //if (!endByTimer)
-    //    SetDefenderTeam(GetAttackerTeam());
-
     OnSpecialEventEnd(endByTimer);
-}
 
+    // If Event Repeatable
+    if (_Repeatable)
+        _gameTimeNextEvent = uint32(GameTime::GetGameTime() + _noEventTime * MINUTE);
+}
