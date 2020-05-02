@@ -630,9 +630,8 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
             std::list<Item*> itemlist;
             itemlist.push_back(pItem);
             // item will deleted or added to received mail list
-            sMailMgr->SendMailByAuctionHouseWithItems(auction, player->GetGUID().GetCounter(), auction->BuildAuctionMailSubject(AUCTION_CANCELED), AuctionEntry::BuildAuctionMailBody(0, 0, auction->buyout, auction->deposit, 0), 0, itemlist, MAIL_CHECK_MASK_COPIED);
+            sMailMgr->SendMailByAuctionHouseWithItems(auction, player->GetGUID().GetCounter(), auction->BuildAuctionMailSubject(AUCTION_CANCELED), "", 0, itemlist, MAIL_CHECK_MASK_COPIED);
             itemlist.clear();
-
         }
         else
         {
