@@ -46,14 +46,23 @@ public:
     TheLightOfDawnEvent();
     ~TheLightOfDawnEvent();
 
-    bool IsActiveTheLightOfDawnEvent() const { return activeFight; }
-
     // phase
     TheLightOfDawnPhase GetPhase() { return phaseStage; }
     void SetPhase(TheLightOfDawnPhase phase) { phaseStage = phase; }
 
     void UpdateWorldState(uint32 id, uint32 state);
+    void SendInitialWorldStates();
 
+    Creature* GetCreature(ObjectGuid guid);
+    GameObject* GetGameObject(ObjectGuid guid);
+
+    void StartTheLightOfDawnEvent();
+    void StopTheLightOfDawnEvent();
+
+    void SetupMapFromZone(uint32 zone);
+
+    // Override Sector
+    // SpecialEvent sector
     void Update(uint32 diff) override;
     void OnSpecialEventStart() override;
     void OnSpecialEventEnd(bool /*endByTimer*/) override;
@@ -61,19 +70,32 @@ public:
     void RemovePlayer(ObjectGuid playerGUID) override;
     bool IsMemberOfEvent(Player* player) override;
     uint32 GetCountPlayerInEvent() override { return m_playersDataStore.size(); }
-    bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer) override;    
+    bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer, std::string comment) override;
 
-    void StartTheLightOfDawnEvent();
-    void StopTheLightOfDawnEvent();    
-
+    // ZoneScript sector
     void HandlePlayerEnterZone(Player* player) override;
     // Called when a player leaves the battlefield zone
     void HandlePlayerLeaveZone(Player* player) override;
 
-private:   
-    bool activeFight;
+    void OnCreatureCreate(Creature* creature) override;
+
+private:
     TheLightOfDawnPhase phaseStage;
     PlayersDataContainer m_playersDataStore;
+
+    Map* _map;
+    uint32 _mapId;
+
+    uint32 defendersRemaining;
+    uint32 scourgeRemaining;
+    uint32 countdownRemaining;
+    bool soldiers_enabled;
+    bool countdown_enabled;
+    bool eventHasBegan;
+    EventMap events;
+
+    //ObjectGuid for important NPC
+    ObjectGuid Darion_Mograine;
 };
 
 #endif // _TLODEVENT_H

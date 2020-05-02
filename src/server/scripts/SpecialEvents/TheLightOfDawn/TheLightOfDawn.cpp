@@ -16,12 +16,14 @@
  */
 
 #include "Chat.h"
+#include "DBCStores.h"
 #include "TheLightOfDawn.h"
 #include "Group.h"
 #include "Guild.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "RBAC.h"
+#include "MapManager.h"
 #include "Language.h"
 #include "Log.h"
 #include "WorldSession.h"
@@ -29,39 +31,223 @@
 
 enum DataEnum
 {
-    ZONEID_THE_SCARLET_ENCLAVE = 4298, // Zone: Plaguelands: The Scarlet Enclave
+    // encounters
+    ENCOUNTER_START_TIME                = 5,
+    ENCOUNTER_TOTAL_DEFENDERS           = 300,
+    ENCOUNTER_TOTAL_SCOURGE             = 10000,
 
-    WORLD_STATE_REMAINS        = 3592,
-    WORLD_STATE_COUNTDOWN      = 3603,
-    WORLD_STATE_EVENT_BEGIN    = 3605
+    // map_id
+    MAPID_THE_SCARLET_ENCLAVE           = 609,
+    // zone id
+    ZONEID_THE_SCARLET_ENCLAVE          = 4298, // Zone: Plaguelands: The Scarlet Enclave
+
+    // world states
+    // basically world states should be shown to all players with phase mask = 128 as stated in DBC
+    // because we don't have the possibility to do that we'll just iterate through the players and set the phase mask manually based on the battle status
+    WORLD_STATE_FORCES_SHOW             = 3592,             // show the remaining units
+    WORLD_STATE_FORCES_SCOURGE          = 3591,
+    WORLD_STATE_FORCES_LIGHT            = 3590,
+    WORLD_STATE_BATTLE_TIMER_SHOW       = 3603,             // countdown timer
+    WORLD_STATE_BATTLE_TIMER_TIME       = 3604,
+    WORLD_STATE_BATTLE_BEGIN            = 3605,             // battle has begun
+
+    // Intro Events
+    EVENT_START_PREPARE                 = 1,
+    EVENT_START_COUNTDOWN_1,
+    EVENT_START_COUNTDOWN_2,
+    EVENT_START_COUNTDOWN_3,
+    EVENT_START_COUNTDOWN_4,
+    EVENT_START_COUNTDOWN_5,
+    EVENT_START_COUNTDOWN_6,
+    EVENT_START_COUNTDOWN_7,
+    EVENT_START_COUNTDOWN_8,
+    EVENT_START_COUNTDOWN_9,
+    EVENT_START_COUNTDOWN_10,
+    EVENT_START_COUNTDOWN_11,
+    EVENT_START_COUNTDOWN_12,
+    EVENT_START_COUNTDOWN_13,
+    EVENT_START_COUNTDOWN_14,
+    // Fight Events
+    EVENT_SPELL_ANTI_MAGIC_ZONE,
+    EVENT_SPELL_DEATH_STRIKE,
+    EVENT_SPELL_DEATH_EMBRACE,
+    EVENT_SPELL_UNHOLY_BLIGHT,
+    EVENT_SPELL_TALK,
+    // Positioning
+    EVENT_FINISH_FIGHT_1,
+    EVENT_FINISH_FIGHT_2,
+    EVENT_FINISH_FIGHT_3,
+    EVENT_FINISH_FIGHT_4,
+    EVENT_FINISH_FIGHT_5,
+    // Outro
+    EVENT_OUTRO_SCENE_1,
+    EVENT_OUTRO_SCENE_2,
+    EVENT_OUTRO_SCENE_3,
+    EVENT_OUTRO_SCENE_4,
+    EVENT_OUTRO_SCENE_5,
+    EVENT_OUTRO_SCENE_6,
+    EVENT_OUTRO_SCENE_7,
+    EVENT_OUTRO_SCENE_8,
+    EVENT_OUTRO_SCENE_9,
+    EVENT_OUTRO_SCENE_10,
+    EVENT_OUTRO_SCENE_11,
+    EVENT_OUTRO_SCENE_12,
+    EVENT_OUTRO_SCENE_13,
+    EVENT_OUTRO_SCENE_14,
+    EVENT_OUTRO_SCENE_15,
+    EVENT_OUTRO_SCENE_16,
+    EVENT_OUTRO_SCENE_17,
+    EVENT_OUTRO_SCENE_18,
+    EVENT_OUTRO_SCENE_19,
+    EVENT_OUTRO_SCENE_20,
+    EVENT_OUTRO_SCENE_21,
+    EVENT_OUTRO_SCENE_22,
+    EVENT_OUTRO_SCENE_23,
+    EVENT_OUTRO_SCENE_24,
+    EVENT_OUTRO_SCENE_25,
+    EVENT_OUTRO_SCENE_26,
+    EVENT_OUTRO_SCENE_27,
+    EVENT_OUTRO_SCENE_28,
+    EVENT_OUTRO_SCENE_29,
+    EVENT_OUTRO_SCENE_30,
+    EVENT_OUTRO_SCENE_31,
+    EVENT_OUTRO_SCENE_32,
+    EVENT_OUTRO_SCENE_33,
+    EVENT_OUTRO_SCENE_34,
+    EVENT_OUTRO_SCENE_35,
+    EVENT_OUTRO_SCENE_36,
+    EVENT_OUTRO_SCENE_37,
+    EVENT_OUTRO_SCENE_38,
+    EVENT_OUTRO_SCENE_39,
+    EVENT_OUTRO_SCENE_40,
+    EVENT_OUTRO_SCENE_41,
+    EVENT_OUTRO_SCENE_42,
+    EVENT_OUTRO_SCENE_43,
+    EVENT_OUTRO_SCENE_44,
+    EVENT_OUTRO_SCENE_45,
+    EVENT_OUTRO_SCENE_46,
+    EVENT_OUTRO_SCENE_47,
+    EVENT_OUTRO_SCENE_48,
+    EVENT_OUTRO_SCENE_49,
+    EVENT_OUTRO_SCENE_50,
+    EVENT_OUTRO_SCENE_51,
+    EVENT_OUTRO_SCENE_52,
+    EVENT_OUTRO_SCENE_53,
+    EVENT_OUTRO_SCENE_54,
+    EVENT_OUTRO_SCENE_55,
+    EVENT_OUTRO_SCENE_56,
+    EVENT_OUTRO_SCENE_57,
+    EVENT_OUTRO_SCENE_58,
+    EVENT_OUTRO_SCENE_59,
+    EVENT_OUTRO_SCENE_60,
+    EVENT_OUTRO_SCENE_61
 };
 
-TheLightOfDawnEvent::TheLightOfDawnEvent()
+enum LightOfDawnNPCs
 {
-    _eventId = SPECIALEVENT_EVENTID_THELIGHTOFDAWN;
-    activeFight = false;
+    // Defenders
+    NPC_DEFENDER_OF_THE_LIGHT           = 29174,
+    NPC_KORFAX_CHAMPION_OF_THE_LIGHT    = 29176,
+    NPC_COMMANDER_ELIGOR_DAWNBRINGER    = 29177,
+    NPC_LORD_MAXWELL_TYROSUS            = 29178,
+    NPC_LEONID_BARTHALOMEW_THE_REVERED  = 29179,
+    NPC_DUKE_NICHOLAS_ZVERENHOFF        = 29180,
+    NPC_RAYNE                           = 29181,
+    NPC_RIMBLAT_EARTHSHATTER            = 29182,
 
-    SetPhase(PHASE_IDLE);
+    // Scourge
+    NPC_RAMPAGING_ABOMINATION           = 29186,
+    NPC_ACHERUS_GHOUL                   = 29219,
+    NPC_WARRIOR_OF_THE_FROZEN_WASTES    = 29206,
+    NPC_FLESH_BEHEMOTH                  = 29190,
 
-    //prepareTimer.Reset(IN_MILLISECONDS);
-}
+    NPC_HIGHLORD_DARION_MOGRAINE        = 29173,
+    NPC_KOLTIRA_DEATHWEAVER             = 29199,
+    NPC_ORBAZ_BLOODBANE                 = 29204,
+    NPC_THASSARIAN                      = 29200,
 
-bool TheLightOfDawnEvent::SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
+    // Outro
+    NPC_HIGHLORD_TIRION_FORDRING        = 29175,
+    NPC_HIGHLORD_ALEXANDROS_MOGRAINE    = 29227, // ghost
+    NPC_DARION_MOGRAINE                 = 29228, // ghost
+    NPC_THE_LICH_KING                   = 29183,
+};
+
+enum LightOfDawnSays
 {
-    // override Setup for Set time of first run in cooldownTimer
-    if (SpecialEvent::SetupSpecialEvent(enabled, active, repeatable, id, cooldownTimer, durationTimer))
-    {
-        RegisterZoneIdForEvent(ZONEID_THE_SCARLET_ENCLAVE);
-        return true;
-    }
+    SAY_LIGHT_OF_DAWN01               = 0, // pre text
+    SAY_LIGHT_OF_DAWN02               = 1,
+    SAY_LIGHT_OF_DAWN03               = 2,
+    SAY_LIGHT_OF_DAWN04               = 3, // intro
+    SAY_LIGHT_OF_DAWN05               = 4,
+    SAY_LIGHT_OF_DAWN06               = 5,
+    SAY_LIGHT_OF_DAWN07               = 6, // During the fight - Korfax, Champion of the Light
+    SAY_LIGHT_OF_DAWN08               = 7, // Lord Maxwell Tyrosus
+    SAY_LIGHT_OF_DAWN09               = 8, // Highlord Darion Mograine
+    SAY_LIGHT_OF_DAWN25               = 24, // After the fight
+    SAY_LIGHT_OF_DAWN26               = 25, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN27               = 26, // Highlord Darion Mograine
+    SAY_LIGHT_OF_DAWN28               = 27, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN29               = 28, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN30               = 29, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN31               = 30, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN32               = 31, // Highlord Alexandros Mograine
+    SAY_LIGHT_OF_DAWN33               = 32, // Highlord Darion Mograine
+    SAY_LIGHT_OF_DAWN34               = 33, // Highlord Darion Mograine
+    SAY_LIGHT_OF_DAWN35               = 34, // Darion Mograine
+    SAY_LIGHT_OF_DAWN36               = 35, // Darion Mograine
+    SAY_LIGHT_OF_DAWN37               = 36, // Highlord Alexandros Mograine
+    SAY_LIGHT_OF_DAWN38               = 37, // Darion Mograine
+    SAY_LIGHT_OF_DAWN39               = 38, // Highlord Alexandros Mograine
+    SAY_LIGHT_OF_DAWN40               = 39, // Darion Mograine
+    SAY_LIGHT_OF_DAWN41               = 40, // Highlord Alexandros Mograine
+    SAY_LIGHT_OF_DAWN42               = 41, // Highlord Alexandros Mograine
+    SAY_LIGHT_OF_DAWN43               = 42, // The Lich King
+    SAY_LIGHT_OF_DAWN44               = 43, // Highlord Darion Mograine
+    SAY_LIGHT_OF_DAWN45               = 44, // The Lich King
+    SAY_LIGHT_OF_DAWN46               = 45, // The Lich King
+    SAY_LIGHT_OF_DAWN47               = 46, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN48               = 47, // The Lich King
+    SAY_LIGHT_OF_DAWN49               = 48, // The Lich King
+    SAY_LIGHT_OF_DAWN50               = 49, // Lord Maxwell Tyrosus
+    SAY_LIGHT_OF_DAWN51               = 50, // The Lich King
+    SAY_LIGHT_OF_DAWN52               = 51, // Highlord Darion Mograine
+    SAY_LIGHT_OF_DAWN53               = 52, // Highlord Darion Mograine
+    SAY_LIGHT_OF_DAWN54               = 53, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN55               = 54, // The Lich King
+    SAY_LIGHT_OF_DAWN56               = 55, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN57               = 56, // The Lich King
+    SAY_LIGHT_OF_DAWN58               = 57, // The Lich King
+    SAY_LIGHT_OF_DAWN59               = 58, // The Lich King
+    SAY_LIGHT_OF_DAWN60               = 59, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN61               = 60, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN62               = 61, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN63               = 62, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN64               = 63, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN65               = 64, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN66               = 65, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN67               = 66, // Highlord Tirion Fordring
+    SAY_LIGHT_OF_DAWN68               = 67, // Highlord Darion Mograine
 
-    return false;
-}
-
-TheLightOfDawnEvent::~TheLightOfDawnEvent()
-{
-    m_playersDataStore.clear();
-}
+    EMOTE_LIGHT_OF_DAWN01             = 68,  // Emotes
+    EMOTE_LIGHT_OF_DAWN02             = 69,
+    EMOTE_LIGHT_OF_DAWN03             = 70,
+    EMOTE_LIGHT_OF_DAWN04             = 71,
+    EMOTE_LIGHT_OF_DAWN05             = 72,
+    EMOTE_LIGHT_OF_DAWN06             = 73,
+    EMOTE_LIGHT_OF_DAWN07             = 74,
+    EMOTE_LIGHT_OF_DAWN08             = 75,
+    EMOTE_LIGHT_OF_DAWN09             = 76,
+    EMOTE_LIGHT_OF_DAWN10             = 77,
+    EMOTE_LIGHT_OF_DAWN11             = 78,
+    EMOTE_LIGHT_OF_DAWN12             = 79,
+    EMOTE_LIGHT_OF_DAWN13             = 80,
+    EMOTE_LIGHT_OF_DAWN14             = 81,
+    EMOTE_LIGHT_OF_DAWN15             = 82,
+    EMOTE_LIGHT_OF_DAWN16             = 83,
+    EMOTE_LIGHT_OF_DAWN17             = 84,
+    EMOTE_LIGHT_OF_DAWN18             = 85
+};
 
 void TheLightOfDawnEvent::UpdateWorldState(uint32 id, uint32 state)
 {
@@ -72,17 +258,133 @@ void TheLightOfDawnEvent::UpdateWorldState(uint32 id, uint32 state)
     }
 }
 
+void TheLightOfDawnEvent::SendInitialWorldStates()
+{
+    // update world states to default
+    UpdateWorldState(WORLD_STATE_FORCES_SHOW, 1);
+    UpdateWorldState(WORLD_STATE_FORCES_LIGHT, ENCOUNTER_TOTAL_DEFENDERS);
+    UpdateWorldState(WORLD_STATE_FORCES_SCOURGE, ENCOUNTER_TOTAL_SCOURGE);
+    UpdateWorldState(WORLD_STATE_BATTLE_TIMER_SHOW, 0);
+    UpdateWorldState(WORLD_STATE_BATTLE_BEGIN, 0);
+}
+
+Creature* TheLightOfDawnEvent::GetCreature(ObjectGuid guid)
+{
+    if (!_map)
+        return nullptr;
+
+    return _map->GetCreature(guid);
+}
+
+GameObject* TheLightOfDawnEvent::GetGameObject(ObjectGuid guid)
+{
+    if (!_map)
+        return nullptr;
+
+    return _map->GetGameObject(guid);
+}
+
+void TheLightOfDawnEvent::StartTheLightOfDawnEvent()
+{
+    events.Reset();
+    events.ScheduleEvent(EVENT_START_PREPARE, 0);
+}
+
+void TheLightOfDawnEvent::StopTheLightOfDawnEvent()
+{
+    events.Reset();
+}
+
+void TheLightOfDawnEvent::SetupMapFromZone(uint32 zone)
+{
+    AreaTableEntry const* areaTable = sAreaTableStore.AssertEntry(zone);
+    Map* map = sMapMgr->CreateBaseMap(areaTable->mapid);
+    ASSERT(!map->Instanceable());
+    _map = map;
+}
+
+TheLightOfDawnEvent::TheLightOfDawnEvent()
+{
+    _eventId = SPECIALEVENT_EVENTID_THELIGHTOFDAWN;
+    SetPhase(PHASE_IDLE);
+
+    //prepareTimer.Reset(IN_MILLISECONDS);
+}
+
+bool TheLightOfDawnEvent::SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer, std::string comment)
+{
+    // override Setup for Set time of first run in cooldownTimer
+    if (!SpecialEvent::SetupSpecialEvent(enabled, active, repeatable, id, cooldownTimer, durationTimer, comment))
+        return false;
+    
+    _mapId = MAPID_THE_SCARLET_ENCLAVE;
+    _map = sMapMgr->FindMap(_mapId, 0);
+    if (!_map)
+        SetupMapFromZone(ZONEID_THE_SCARLET_ENCLAVE);
+
+    if (!_map)
+        return false;
+
+    RegisterZoneIdForEvent(ZONEID_THE_SCARLET_ENCLAVE);
+    events.Reset();
+    defendersRemaining  = 0;
+    scourgeRemaining    = 0;
+    countdownRemaining  = 0;
+    soldiers_enabled    = false;
+    countdown_enabled   = false;
+    eventHasBegan       = false;
+    return true;
+}
+
+TheLightOfDawnEvent::~TheLightOfDawnEvent()
+{
+    m_playersDataStore.clear();
+}
+
 void TheLightOfDawnEvent::Update(uint32 diff)
 {
     SpecialEvent::Update(diff);
 
-    if (IsActiveTheLightOfDawnEvent())
-    {
+    events.Update(diff);
 
-    }
-    else
+    while (uint32 eventId = events.ExecuteEvent())
     {
+        switch (eventId)
+        {
+            case EVENT_START_PREPARE:
+            {
+                if (Creature* Darion = GetCreature(Darion_Mograine))
+                    Darion->AI()->Talk(SAY_LIGHT_OF_DAWN01);
 
+                countdownRemaining = ENCOUNTER_START_TIME;
+                defendersRemaining = ENCOUNTER_TOTAL_DEFENDERS;
+                scourgeRemaining   = ENCOUNTER_TOTAL_SCOURGE;
+
+                soldiers_enabled  = true;
+                countdown_enabled = true;
+
+                SendInitialWorldStates();
+
+                events.Reset();
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_1, 60s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_2, 120s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_3, 180s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_4, 240s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_5, 300s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_6, 308s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_7, 312s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_8, 316s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_9, 320s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_10, 324s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_11, 332s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_12, 335s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 337500);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 345s);
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
 
@@ -137,19 +439,6 @@ bool TheLightOfDawnEvent::IsMemberOfEvent(Player* player)
     return false;
 }
 
-void TheLightOfDawnEvent::StartTheLightOfDawnEvent()
-{
-    // Update timers
-    SetPhase(PHASE_START);
-    activeFight = true;
-}
-
-void TheLightOfDawnEvent::StopTheLightOfDawnEvent()
-{
-    SetPhase(PHASE_IDLE);
-    activeFight = false;
-}
-
 void TheLightOfDawnEvent::HandlePlayerEnterZone(Player* player)
 {
     if (!IsMemberOfEvent(player))
@@ -160,6 +449,16 @@ void TheLightOfDawnEvent::HandlePlayerLeaveZone(Player* player)
 {
     if (IsMemberOfEvent(player))
         RemovePlayer(player->GetGUID());
+}
+
+void TheLightOfDawnEvent::OnCreatureCreate(Creature* creature)
+{
+    switch (creature->GetEntry())
+    {
+        case NPC_HIGHLORD_DARION_MOGRAINE: Darion_Mograine = creature->GetGUID(); break;
+        default:
+            break;
+    }
 }
 
 class SpecialEvent_TheLightOfDawn : public SpecialEventScript

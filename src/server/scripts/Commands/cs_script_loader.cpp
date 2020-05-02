@@ -55,6 +55,7 @@ void AddSC_reload_commandscript();
 void AddSC_reset_commandscript();
 void AddSC_send_commandscript();
 void AddSC_server_commandscript();
+void AddSC_specialevent_commandscript();
 void AddSC_tele_commandscript();
 void AddSC_vip_commandscript();
 void AddSC_ticket_commandscript();
@@ -101,6 +102,7 @@ void AddCommandsScripts()
     AddSC_reset_commandscript();
     AddSC_send_commandscript();
     AddSC_server_commandscript();
+    AddSC_specialevent_commandscript();
     AddSC_tele_commandscript();
     AddSC_vip_commandscript();
     AddSC_ticket_commandscript();

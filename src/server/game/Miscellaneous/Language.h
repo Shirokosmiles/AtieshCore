@@ -1250,6 +1250,10 @@ enum TrinityStrings
     LANG_TARGETPLAYER_VIP_TIME_EXIST      = 11123,
     // Mail antispam
     LANG_ANTISPAM_ERROR                   = 11124,
+    // Special event
+    LANG_SPECIALEVENT_INFO                = 11125,
+    LANG_SPECIALEVENT_START               = 11126,
+    LANG_SPECIALEVENT_STOP                = 11127,
 
     // Custom Item
     LANG_ITEM_MSG_ALREADY_ITEM            = 11500,

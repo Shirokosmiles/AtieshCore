@@ -128,7 +128,7 @@ void SpecialEventMgr::InitSpecialEvents()
             }
         }
 
-        if (!se->SetupSpecialEvent(isEnabled, isActiveStatus, isRepeatable, i, cooldownTimer, durationTimer))
+        if (!se->SetupSpecialEvent(isEnabled, isActiveStatus, isRepeatable, i, cooldownTimer, durationTimer, comment))
         {
             TC_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID %u; SetupSpecialEvent failed.", i);
             delete se;

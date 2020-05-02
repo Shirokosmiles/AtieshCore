@@ -21,7 +21,7 @@
 #include "Log.h"
 #include "ObjectAccessor.h"
 
-SpecialEvent::SpecialEvent() : _eventId(0), _timer(0), _active(false), _enabled(true), _Repeatable(true), _noEventTime(0), _gameTimeNextEvent(0) { }
+SpecialEvent::SpecialEvent() : _eventId(0), _timer(0), _active(false), _enabled(true), _Repeatable(true), _noEventTime(0), _comment(""), _gameTimeNextEvent(0) { }
 
 SpecialEvent::~SpecialEvent() { }
 
@@ -55,18 +55,20 @@ void SpecialEvent::RegisterZoneIdForEvent(uint32 zoneId)
     sSpecialEventMgr->AddZone(zoneId, this);
 }
 
-bool SpecialEvent::SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer)
+bool SpecialEvent::SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer, std::string comment)
 {
     if (!id || !cooldownTimer || !durationTimer)
         return false;
 
-    _active = active;
     _enabled = enabled;
+    _active = active;
     _Repeatable = repeatable;
     _eventId = id;
-    _EventTime = durationTimer * MINUTE * IN_MILLISECONDS;
     _noEventTime = cooldownTimer * MINUTE * IN_MILLISECONDS;
-    _timer.Reset(cooldownTimer);
+    _EventTime = durationTimer * MINUTE * IN_MILLISECONDS;
+    _comment = comment;
+
+    _timer.Reset(_noEventTime);
     if (_Repeatable)
         _gameTimeNextEvent = uint32(GameTime::GetGameTime() + cooldownTimer * MINUTE);
     RegisterEvent(_eventId);
@@ -86,7 +88,7 @@ void SpecialEvent::StartSpecialEvent()
 
     // If Event Repeatable
     if (_Repeatable)
-        _gameTimeNextEvent = uint32(GameTime::GetGameTime() + (_EventTime + _noEventTime) * MINUTE);
+        _gameTimeNextEvent = uint32(GameTime::GetGameTime() + (_EventTime + _noEventTime) / IN_MILLISECONDS);
 }
 
 void SpecialEvent::EndSpecialEvent(bool endByTimer)
@@ -101,5 +103,5 @@ void SpecialEvent::EndSpecialEvent(bool endByTimer)
 
     // If Event Repeatable
     if (_Repeatable)
-        _gameTimeNextEvent = uint32(GameTime::GetGameTime() + _noEventTime * MINUTE);
+        _gameTimeNextEvent = uint32(GameTime::GetGameTime() + _noEventTime / IN_MILLISECONDS);
 }

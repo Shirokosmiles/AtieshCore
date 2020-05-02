@@ -69,7 +69,7 @@ public:
     bool IsPossibleToRegister() override { return registration; }
     bool IsMemberOfEvent(Player* player) override;
     uint32 GetCountPlayerInEvent() override { return m_playersDataStore.size(); }
-    bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer) override;
+    bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer, std::string comment) override;
 
     void StartFightEvent();
     void StopFightEvent();

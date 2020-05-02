@@ -65,10 +65,12 @@ class TC_GAME_API SpecialEvent : public ZoneScript
 
         bool IsEnabled() const { return _enabled; }
         bool IsActiveTime() const { return _active; }
+        bool IsRepeatable() const { return _Repeatable; }
 
         uint32 GetCooldownTimer() { return _EventTime; }
         uint32 GetDurationTimer() { return _noEventTime; }
         time_t GetTimeOfNextEvent() { return _gameTimeNextEvent; }
+        std::string GetComment() { return _comment; }
         void RegisterEvent(uint32 eventId);
         void RegisterZoneIdForEvent(uint32 zoneId);
         uint32 GetEventId() const { return _eventId; }
@@ -76,7 +78,7 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         uint32 GetTimer() const { return _timer.GetExpiry(); }
 
         // Functions for each Event Scripts
-        virtual bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer);
+        virtual bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer, std::string comment);
         virtual void Update(uint32 diff);
         virtual void OnSpecialEventStart() { }
         virtual void OnSpecialEventEnd(bool /*endByTimer*/) { }
@@ -129,12 +131,13 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         // constant information
         uint32 _eventId;
         TimeTrackerSmall _timer;
+        // from database
         bool _active;
         bool _enabled;
-        bool _Repeatable;
-        // from database
+        bool _Repeatable;        
         uint32 _EventTime;      // length of the event
         uint32 _noEventTime;    // time between two events
+        std::string _comment;
         time_t _gameTimeNextEvent;
 };
 
