@@ -3759,7 +3759,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00067801, 0x10820001, 0x00000801);
-    });        
+    });
 
     ApplySpellFix({
         70728, // Exploit Weakness (needs target selection script)
@@ -5102,7 +5102,7 @@ void SpellMgr::LoadSpellInfoCorrections()
             spellInfo->AttributesEx5 |= SPELL_ATTR5_DONT_TURN_DURING_CAST;
 
         if (spellInfo->ActiveIconID == 2158)  // flight
-            spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;                
+            spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
 
         switch (spellInfo->SpellFamilyName)
         {
