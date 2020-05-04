@@ -2574,7 +2574,6 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 
 uint32 Unit::GetShieldBlockValue(uint32 soft_cap, uint32 hard_cap) const
 {
-
     uint32 value = GetShieldBlockValue();
     float pctMod = GetShieldBlockValuePctMod();
     soft_cap *= pctMod;
@@ -9813,7 +9812,7 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
     m_Events.KillAllEvents(false);                      // non-delatable (currently cast spells) will not deleted now but it will deleted at call in Map::RemoveAllObjectsInRemoveList
     CombatStop();
     ClearComboPoints();
-    ClearComboPointHolders();    
+    ClearComboPointHolders();
 }
 
 void Unit::CleanupsBeforeDelete(bool finalCleanup)
@@ -11090,7 +11089,7 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
     return true;
 }
 
-/*static*/ void Unit::Kill(Unit* attacker, Unit* victim, bool durabilityLoss /*= true*/, bool skipreward)
+/*static*/ void Unit::Kill(Unit* attacker, Unit* victim, bool durabilityLoss /*= true*/, bool skipreward /*= false*/)
 {
     // Prevent killing unit twice (and giving reward from kill twice)
     if (!victim->GetHealth())
@@ -11807,7 +11806,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     // Set charmed
     charmer->SetCharm(this, true);
-    this->SetCharmerController(charmer);
+    SetCharmerController(charmer);
     charmer->SetCharmerControlled(this);
 
     if (Player* player = ToPlayer())
