@@ -320,10 +320,7 @@ bool TheLightOfDawnEvent::SetupSpecialEvent(bool enabled, bool active, bool repe
     _mapId = MAPID_THE_SCARLET_ENCLAVE;
     _map = sMapMgr->FindMap(_mapId, 0);
     if (!_map)
-        SetupMapFromZone(ZONEID_THE_SCARLET_ENCLAVE);
-
-    if (!_map)
-        return false;
+        _map = sMapMgr->CreateBaseMap(_mapId);
 
     RegisterZoneIdForEvent(ZONEID_THE_SCARLET_ENCLAVE);
     events.Reset();
