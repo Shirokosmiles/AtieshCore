@@ -2920,8 +2920,8 @@ SpellMissInfo Spell::PreprocessSpellHit(Unit* unit, bool scaleAura, TargetInfo& 
                 if (AttributeForMagnet || m_damage > 0)
                 {
                     unit->KillSelf();
-                    return SPELL_MISS_IMMUNE;                    
-                }                    
+                    return SPELL_MISS_IMMUNE;
+                }
             }
         }
         else if (m_caster->IsFriendlyTo(unit))
@@ -3377,16 +3377,12 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
             // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
             if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth())
             {
-                Unit* targetforremoveauras = unitCaster;
-               // if (m_targets.GetUnitTarget() && m_spellInfo->Id == 2094) // [HACK] blind should break stealth for victim, not for rogue
-                 //   targetforremoveauras = m_targets.GetUnitTarget();
-
-                targetforremoveauras->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+                unitCaster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
                 for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
                     if (m_spellInfo->Effects[i].GetUsedTargetObjectType() == TARGET_OBJECT_TYPE_UNIT)
                     {
-                        targetforremoveauras->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);
+                        unitCaster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);
                         break;
                     }
                 }
