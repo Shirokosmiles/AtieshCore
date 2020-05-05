@@ -88,10 +88,10 @@ private:
 
     uint32 defendersRemaining;
     uint32 scourgeRemaining;
-    uint32 countdownRemaining;
-    bool soldiers_enabled;
-    bool countdown_enabled;
-    bool eventHasBegan;
+    uint32 countdownTimerRemaining;
+    bool show_soldiers_count;
+    bool show_timer;
+    bool show_event_begin;
     EventMap events;
 
     //ObjectGuid for important NPC

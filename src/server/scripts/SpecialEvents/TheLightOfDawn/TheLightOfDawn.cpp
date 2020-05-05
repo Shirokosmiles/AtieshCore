@@ -48,7 +48,7 @@ enum DataEnum
     WORLD_STATE_FORCES_SCOURGE          = 3591,
     WORLD_STATE_FORCES_LIGHT            = 3590,
     WORLD_STATE_BATTLE_TIMER_SHOW       = 3603,             // countdown timer
-    WORLD_STATE_BATTLE_TIMER_TIME       = 3604,
+    WORLD_STATE_BATTLE_TIMER            = 3604,
     WORLD_STATE_BATTLE_BEGIN            = 3605,             // battle has begun
 
     // Intro Events
@@ -261,11 +261,12 @@ void TheLightOfDawnEvent::UpdateWorldState(uint32 id, uint32 state)
 void TheLightOfDawnEvent::SendInitialWorldStates()
 {
     // update world states to default
-    UpdateWorldState(WORLD_STATE_FORCES_SHOW, 1);
+    UpdateWorldState(WORLD_STATE_FORCES_SHOW, show_soldiers_count);
     UpdateWorldState(WORLD_STATE_FORCES_LIGHT, ENCOUNTER_TOTAL_DEFENDERS);
     UpdateWorldState(WORLD_STATE_FORCES_SCOURGE, ENCOUNTER_TOTAL_SCOURGE);
-    UpdateWorldState(WORLD_STATE_BATTLE_TIMER_SHOW, 0);
-    UpdateWorldState(WORLD_STATE_BATTLE_BEGIN, 0);
+    UpdateWorldState(WORLD_STATE_BATTLE_TIMER_SHOW, show_timer);
+    UpdateWorldState(WORLD_STATE_BATTLE_TIMER, countdownTimerRemaining);
+    UpdateWorldState(WORLD_STATE_BATTLE_BEGIN, show_event_begin);
 }
 
 Creature* TheLightOfDawnEvent::GetCreature(ObjectGuid guid)
@@ -324,12 +325,12 @@ bool TheLightOfDawnEvent::SetupSpecialEvent(bool enabled, bool active, bool repe
 
     RegisterZoneIdForEvent(ZONEID_THE_SCARLET_ENCLAVE);
     events.Reset();
-    defendersRemaining  = 0;
-    scourgeRemaining    = 0;
-    countdownRemaining  = 0;
-    soldiers_enabled    = false;
-    countdown_enabled   = false;
-    eventHasBegan       = false;
+    defendersRemaining      = 0;
+    scourgeRemaining        = 0;
+    countdownTimerRemaining = 0;
+    show_soldiers_count = false;
+    show_timer          = false;
+    show_event_begin    = false;
     return true;
 }
 
@@ -353,12 +354,12 @@ void TheLightOfDawnEvent::Update(uint32 diff)
                 if (Creature* Darion = GetCreature(Darion_Mograine))
                     Darion->AI()->Talk(SAY_LIGHT_OF_DAWN01);
 
-                countdownRemaining = ENCOUNTER_START_TIME;
-                defendersRemaining = ENCOUNTER_TOTAL_DEFENDERS;
-                scourgeRemaining   = ENCOUNTER_TOTAL_SCOURGE;
+                countdownTimerRemaining = ENCOUNTER_START_TIME;
+                defendersRemaining      = ENCOUNTER_TOTAL_DEFENDERS;
+                scourgeRemaining        = ENCOUNTER_TOTAL_SCOURGE;
 
-                soldiers_enabled  = true;
-                countdown_enabled = true;
+                show_soldiers_count = true;
+                show_timer          = true;
 
                 SendInitialWorldStates();
 
