@@ -351,7 +351,7 @@ void TheLightOfDawnEvent::Update(uint32 diff)
             case EVENT_START_PREPARE:
             {
                 countdownTimerRemaining = ENCOUNTER_START_TIME;
-                show_timer          = true;
+                show_timer              = true;
 
                 UpdateAllWorldStates();
 
@@ -408,7 +408,7 @@ void TheLightOfDawnEvent::Update(uint32 diff)
             case EVENT_BEFORE_FIGHT_RISE:
             {
                 if (Creature* Darion = GetCreature(Darion_Mograine))
-                    Darion->AI()->Talk(SAY_LIGHT_OF_DAWN05); // RISE!
+                    Darion->AI()->Talk(SAY_LIGHT_OF_DAWN05);    // RISE!
 
                 events.ScheduleEvent(EVENT_BEFORE_FIGHT_PREVIOUS_LIFE, 25s);
                 break;
