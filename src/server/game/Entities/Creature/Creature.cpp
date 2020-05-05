@@ -260,7 +260,7 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MapObject(), m_grou
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), _waypointPathId(0), _currentWaypointNodeInfo(0, 0),
     m_formation(nullptr), m_triggerJustAppeared(true), m_respawnCompatibilityMode(false), _lastDamagedTime(0),
     _regenerateHealth(true), _regenerateHealthLock(false),
-    m_masterCallTime(0), m_masterCallDelay(0), m_isIgnoreEvade(false), m_isNotTargetMove(false), m_startEngageTime(0)
+    m_masterCallTime(0), m_masterCallDelay(0), m_isIgnoreEvade(false), m_startEngageTime(0)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;

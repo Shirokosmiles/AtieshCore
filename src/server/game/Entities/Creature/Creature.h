@@ -311,12 +311,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         {
             m_isIgnoreEvade = setcaster;
         }
-        void SetNotTargetMove(bool setignoremover = false)
-        {
-            m_isNotTargetMove = setignoremover;
-        }
         bool isCreatureIgnoreEvade() const { return m_isIgnoreEvade; }     // will not evaded for some special NPC like ballista for DK zone
-        bool isCreatureNotTargetMove() const { return m_isNotTargetMove; } // will not calculate path at this target, HACK for except evade for some special NPC like ballista for DK zone
 
         void SetHomePosition(float x, float y, float z, float o) { m_homePosition.Relocate(x, y, z, o); }
         void SetHomePosition(Position const& pos) { m_homePosition.Relocate(pos); }
@@ -480,7 +475,6 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         uint32 m_masterCallTime;
         uint32 m_masterCallDelay;
         bool m_isIgnoreEvade;
-        bool m_isNotTargetMove;
         time_t m_startEngageTime;
 };
 

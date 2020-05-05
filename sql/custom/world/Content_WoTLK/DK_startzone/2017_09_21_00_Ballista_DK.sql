@@ -1,1 +1,1 @@
-UPDATE `creature_template` SET `ScriptName`='npc_scarlet_ballista' WHERE (`entry`='29104');
+UPDATE `creature_template` SET `AIName` = '', `ScriptName`='npc_scarlet_ballista' WHERE (`entry`='29104');

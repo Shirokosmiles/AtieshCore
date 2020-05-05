@@ -49,7 +49,8 @@ public:
         {
             uiStage_timer = 2000;
             me->SetIgnoreEvade(true);
-            me->SetNotTargetMove(true);
+            SetCombatMovement(false);
+            inCombat = false;
         }
 
         uint32 uiStage_timer;
@@ -58,7 +59,6 @@ public:
         {
             targetGUID.Clear();
             Initialize();
-            ScriptedAI::Reset();
         }
 
         void UpdateAI(uint32 diff) override
@@ -68,35 +68,43 @@ public:
 
             if (uiStage_timer <= diff)
             {
-                if (!me->IsInCombat())
+                bool targetReady = false;
+                if (targetGUID)
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, targetGUID))
+                        if (me->IsWithinDist(target, 150.0f))
+                            targetReady = true;
+                }
+
+                if (!targetReady)
                 {
                     if (Creature* target = me->FindNearestCreature(NPC_FROSTBROODVANQUISHER, 120.0f))
                     {
                         AttackStart(target);
                         targetGUID = target->GetGUID();
+                        targetReady = true;
+                        inCombat = true;
                     }
                 }
-                else
+
+                if (!targetReady && inCombat)
                 {
-                    Creature* target = ObjectAccessor::GetCreature(*me, targetGUID);
-                    if (!target || (target && !me->IsWithinDist(target, 150.0f)))
-                        EnterEvadeMode();
+                    EnterEvadeMode();
+                    inCombat = false;
                 }
 
                 uiStage_timer = 2000;
             }
             else
-                uiStage_timer -= diff;            
+                uiStage_timer -= diff;
 
-            if (!UpdateVictim() || !me->GetVictim())
-                return;
-
-            DoSpellAttackIfReady(SPELL_BALLISTA_ASSAULT);
-            ScriptedAI::UpdateAI(diff);
+            if (UpdateVictim())
+                DoSpellAttackIfReady(SPELL_BALLISTA_ASSAULT);
         }
 
     private:
         ObjectGuid targetGUID;
+        bool inCombat;
     };
 };
 
