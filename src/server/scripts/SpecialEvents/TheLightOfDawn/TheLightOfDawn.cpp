@@ -479,6 +479,13 @@ void TheLightOfDawnEvent::HandlePlayerEnterZone(Player* player)
 {
     if (!IsMemberOfEvent(player))
         AddPlayer(player->GetGUID());
+
+    player->SendUpdateWorldState(WORLD_STATE_FORCES_SHOW, show_soldiers_count);
+    player->SendUpdateWorldState(WORLD_STATE_FORCES_LIGHT, ENCOUNTER_TOTAL_DEFENDERS);
+    player->SendUpdateWorldState(WORLD_STATE_FORCES_SCOURGE, ENCOUNTER_TOTAL_SCOURGE);
+    player->SendUpdateWorldState(WORLD_STATE_BATTLE_TIMER_SHOW, show_timer);
+    player->SendUpdateWorldState(WORLD_STATE_BATTLE_TIMER, countdownTimerRemaining);
+    player->SendUpdateWorldState(WORLD_STATE_BATTLE_BEGIN, show_event_begin);
 }
 
 void TheLightOfDawnEvent::HandlePlayerLeaveZone(Player* player)
