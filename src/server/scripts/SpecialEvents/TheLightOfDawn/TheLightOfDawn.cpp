@@ -24,6 +24,7 @@
 #include "Player.h"
 #include "RBAC.h"
 #include "MapManager.h"
+#include "MiscPackets.h"
 #include "Language.h"
 #include "Log.h"
 #include "WorldSession.h"
@@ -58,15 +59,13 @@ enum DataEnum
     EVENT_START_COUNTDOWN_3,
     EVENT_START_COUNTDOWN_4,
     EVENT_START_COUNTDOWN_5,
-    EVENT_START_COUNTDOWN_6,
-    EVENT_START_COUNTDOWN_7,
-    EVENT_START_COUNTDOWN_8,
-    EVENT_START_COUNTDOWN_9,
-    EVENT_START_COUNTDOWN_10,
-    EVENT_START_COUNTDOWN_11,
-    EVENT_START_COUNTDOWN_12,
-    EVENT_START_COUNTDOWN_13,
-    EVENT_START_COUNTDOWN_14,
+
+    EVENT_BEFORE_FIGHT_RISE,
+    EVENT_BEFORE_FIGHT_PREVIOUS_LIFE,
+    EVENT_BEFORE_FIGHT_RED_SKY,
+    EVENT_BEFORE_FIGHT_START_MOVE_FOR_MONSTERS,
+    EVENT_BEFORE_FIGHT_START_MOVE,
+
     // Fight Events
     EVENT_SPELL_ANTI_MAGIC_ZONE,
     EVENT_SPELL_DEATH_STRIKE,
@@ -258,50 +257,54 @@ void TheLightOfDawnEvent::UpdateWorldState(uint32 id, uint32 state)
     }
 }
 
-void TheLightOfDawnEvent::SendInitialWorldStates()
+void TheLightOfDawnEvent::UpdateAllWorldStates()
 {
     // update world states to default
     UpdateWorldState(WORLD_STATE_FORCES_SHOW, show_soldiers_count);
-    UpdateWorldState(WORLD_STATE_FORCES_LIGHT, ENCOUNTER_TOTAL_DEFENDERS);
-    UpdateWorldState(WORLD_STATE_FORCES_SCOURGE, ENCOUNTER_TOTAL_SCOURGE);
+    UpdateWorldState(WORLD_STATE_FORCES_LIGHT, defendersRemaining);
+    UpdateWorldState(WORLD_STATE_FORCES_SCOURGE, scourgeRemaining);
     UpdateWorldState(WORLD_STATE_BATTLE_TIMER_SHOW, show_timer);
     UpdateWorldState(WORLD_STATE_BATTLE_TIMER, countdownTimerRemaining);
     UpdateWorldState(WORLD_STATE_BATTLE_BEGIN, show_event_begin);
 }
 
-Creature* TheLightOfDawnEvent::GetCreature(ObjectGuid guid)
+void TheLightOfDawnEvent::SetupInitialStates()
 {
-    if (!_map)
-        return nullptr;
+    events.Reset();
+    defendersRemaining      = ENCOUNTER_TOTAL_DEFENDERS;
+    scourgeRemaining        = ENCOUNTER_TOTAL_SCOURGE;
+    countdownTimerRemaining = 0;
+    show_soldiers_count     = true;
+    show_timer              = false;
+    show_event_begin        = false;
 
-    return _map->GetCreature(guid);
+    UpdateAllWorldStates();
 }
 
-GameObject* TheLightOfDawnEvent::GetGameObject(ObjectGuid guid)
+void TheLightOfDawnEvent::DoPlaySoundToAll(uint32 soundId)
 {
-    if (!_map)
-        return nullptr;
+    // We are using quest_players, because only players in nessesary area can show Event
+    BroadcastPacketToQuestPlayers(WorldPackets::Misc::PlaySound(soundId).Write());
+}
 
-    return _map->GetGameObject(guid);
+void TheLightOfDawnEvent::BroadcastPacketToQuestPlayers(WorldPacket const* data) const
+{
+    for (ObjectGuid playerGuid : quest_players)
+    {
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(playerGuid))
+            player->SendDirectMessage(data);
+    }
 }
 
 void TheLightOfDawnEvent::StartTheLightOfDawnEvent()
 {
-    events.Reset();
+    SetupInitialStates();
     events.ScheduleEvent(EVENT_START_PREPARE, 0);
 }
 
 void TheLightOfDawnEvent::StopTheLightOfDawnEvent()
 {
-    events.Reset();
-}
-
-void TheLightOfDawnEvent::SetupMapFromZone(uint32 zone)
-{
-    AreaTableEntry const* areaTable = sAreaTableStore.AssertEntry(zone);
-    Map* map = sMapMgr->CreateBaseMap(areaTable->mapid);
-    ASSERT(!map->Instanceable());
-    _map = map;
+    SetupInitialStates();
 }
 
 TheLightOfDawnEvent::TheLightOfDawnEvent()
@@ -324,13 +327,7 @@ bool TheLightOfDawnEvent::SetupSpecialEvent(bool enabled, bool active, bool repe
         _map = sMapMgr->CreateBaseMap(_mapId);
 
     RegisterZoneIdForEvent(ZONEID_THE_SCARLET_ENCLAVE);
-    events.Reset();
-    defendersRemaining      = 0;
-    scourgeRemaining        = 0;
-    countdownTimerRemaining = 0;
-    show_soldiers_count = false;
-    show_timer          = false;
-    show_event_begin    = false;
+    SetupInitialStates();
 
     quest_players.clear();
     return true;
@@ -353,17 +350,10 @@ void TheLightOfDawnEvent::Update(uint32 diff)
         {
             case EVENT_START_PREPARE:
             {
-                if (Creature* Darion = GetCreature(Darion_Mograine))
-                    Darion->AI()->Talk(SAY_LIGHT_OF_DAWN01);
-
                 countdownTimerRemaining = ENCOUNTER_START_TIME;
-                defendersRemaining      = ENCOUNTER_TOTAL_DEFENDERS;
-                scourgeRemaining        = ENCOUNTER_TOTAL_SCOURGE;
-
-                show_soldiers_count = true;
                 show_timer          = true;
 
-                SendInitialWorldStates();
+                UpdateAllWorldStates();
 
                 events.Reset();
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_1, 60s);
@@ -371,15 +361,6 @@ void TheLightOfDawnEvent::Update(uint32 diff)
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_3, 180s);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_4, 240s);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_5, 300s);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_6, 308s);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_7, 312s);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_8, 316s);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_9, 320s);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_10, 324s);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_11, 332s);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_12, 335s);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 337500);
-                events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 345s);
                 break;
             }
             case EVENT_START_COUNTDOWN_1:
@@ -404,6 +385,8 @@ void TheLightOfDawnEvent::Update(uint32 diff)
             {
                 --countdownTimerRemaining;  // 1 minutes
                 UpdateWorldState(WORLD_STATE_BATTLE_TIMER, countdownTimerRemaining);
+                if (Creature* Darion = GetCreature(Darion_Mograine))
+                    Darion->AI()->Talk(SAY_LIGHT_OF_DAWN02);    //The sky weeps at the glorious devastation of these lands! Soon, Azeroth's futile tears will rain down upon us!
                 break;
             }
             case EVENT_START_COUNTDOWN_5:
@@ -417,7 +400,44 @@ void TheLightOfDawnEvent::Update(uint32 diff)
                 UpdateWorldState(WORLD_STATE_BATTLE_BEGIN, show_event_begin);
 
                 if (Creature* Darion = GetCreature(Darion_Mograine))
-                    Darion->AI()->Talk(SAY_LIGHT_OF_DAWN04); // Wrong order in DB!
+                    Darion->AI()->Talk(SAY_LIGHT_OF_DAWN04);    // Death knights of Acherus, the death march begins!
+
+                events.ScheduleEvent(EVENT_BEFORE_FIGHT_RISE, 10s);
+                break;
+            }
+            case EVENT_BEFORE_FIGHT_RISE:
+            {
+                if (Creature* Darion = GetCreature(Darion_Mograine))
+                    Darion->AI()->Talk(SAY_LIGHT_OF_DAWN05); // RISE!
+
+                events.ScheduleEvent(EVENT_BEFORE_FIGHT_PREVIOUS_LIFE, 25s);
+                break;
+            }
+            case EVENT_BEFORE_FIGHT_PREVIOUS_LIFE:
+            {
+                // only for Ru locale?
+                // Need audio play (Nasha prejnyaa jisn bila bessmislenna)
+
+                events.ScheduleEvent(EVENT_BEFORE_FIGHT_RED_SKY, 7s);
+                break;
+            }
+            case EVENT_BEFORE_FIGHT_RED_SKY:
+            {
+                if (Creature* Darion = GetCreature(Darion_Mograine))
+                    Darion->AI()->Talk(SAY_LIGHT_OF_DAWN06);    // The skies turn red with the blood of the fallen! The Lich King watches over us, minions! Leave only ashes and misery in your destructive wake!
+
+                events.ScheduleEvent(EVENT_BEFORE_FIGHT_START_MOVE_FOR_MONSTERS, 3s);
+                events.ScheduleEvent(EVENT_BEFORE_FIGHT_START_MOVE, 5s);
+                break;
+            }
+            case EVENT_BEFORE_FIGHT_START_MOVE_FOR_MONSTERS:
+            {
+                // monsters start move early then Morgraine
+                break;
+            }
+            case EVENT_BEFORE_FIGHT_START_MOVE:
+            {
+                // Morgraine start moveing
                 break;
             }
             default:
@@ -486,8 +506,8 @@ void TheLightOfDawnEvent::HandlePlayerEnterZone(Player* player, uint32 zoneId)
         AddPlayer(player->GetGUID());
 
     player->SendUpdateWorldState(WORLD_STATE_FORCES_SHOW, show_soldiers_count);
-    player->SendUpdateWorldState(WORLD_STATE_FORCES_LIGHT, ENCOUNTER_TOTAL_DEFENDERS);
-    player->SendUpdateWorldState(WORLD_STATE_FORCES_SCOURGE, ENCOUNTER_TOTAL_SCOURGE);
+    player->SendUpdateWorldState(WORLD_STATE_FORCES_LIGHT, defendersRemaining);
+    player->SendUpdateWorldState(WORLD_STATE_FORCES_SCOURGE, scourgeRemaining);
     player->SendUpdateWorldState(WORLD_STATE_BATTLE_TIMER_SHOW, show_timer);
     player->SendUpdateWorldState(WORLD_STATE_BATTLE_TIMER, countdownTimerRemaining);
     player->SendUpdateWorldState(WORLD_STATE_BATTLE_BEGIN, show_event_begin);
@@ -525,6 +545,22 @@ void TheLightOfDawnEvent::HandlePlayerLeaveArea(Player* player, uint32 zoneId, u
         return;
     if (quest_players.find(player->GetGUID()) != quest_players.end())
         quest_players.erase(player->GetGUID());
+}
+
+Creature* TheLightOfDawnEvent::GetCreature(ObjectGuid guid)
+{
+    if (!_map)
+        return nullptr;
+
+    return _map->GetCreature(guid);
+}
+
+GameObject* TheLightOfDawnEvent::GetGameObject(ObjectGuid guid)
+{
+    if (!_map)
+        return nullptr;
+
+    return _map->GetGameObject(guid);
 }
 
 void TheLightOfDawnEvent::OnCreatureCreate(Creature* creature)

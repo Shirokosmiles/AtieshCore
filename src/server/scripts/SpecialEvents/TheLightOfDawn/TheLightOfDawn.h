@@ -51,15 +51,14 @@ public:
     void SetPhase(TheLightOfDawnPhase phase) { phaseStage = phase; }
 
     void UpdateWorldState(uint32 id, uint32 state);
-    void SendInitialWorldStates();
+    void UpdateAllWorldStates();
+    void SetupInitialStates();
 
-    Creature* GetCreature(ObjectGuid guid);
-    GameObject* GetGameObject(ObjectGuid guid);
-
+    void DoPlaySoundToAll(uint32 soundId);
+    void BroadcastPacketToQuestPlayers(WorldPacket const* data) const;
+    
     void StartTheLightOfDawnEvent();
     void StopTheLightOfDawnEvent();
-
-    void SetupMapFromZone(uint32 zone);
 
     // Override Sector
     // SpecialEvent sector
@@ -79,6 +78,9 @@ public:
 
     void HandlePlayerEnterArea(Player* player, uint32 zoneId, uint32 areaId) override;
     void HandlePlayerLeaveArea(Player* player, uint32 zoneId, uint32 areaId) override;
+
+    Creature* GetCreature(ObjectGuid guid);
+    GameObject* GetGameObject(ObjectGuid guid);
 
     void OnCreatureCreate(Creature* creature) override;
 
