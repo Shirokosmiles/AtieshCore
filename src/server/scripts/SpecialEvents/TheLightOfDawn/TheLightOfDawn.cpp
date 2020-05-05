@@ -331,6 +331,8 @@ bool TheLightOfDawnEvent::SetupSpecialEvent(bool enabled, bool active, bool repe
     show_soldiers_count = false;
     show_timer          = false;
     show_event_begin    = false;
+
+    quest_players.clear();
     return true;
 }
 
@@ -475,8 +477,11 @@ bool TheLightOfDawnEvent::IsMemberOfEvent(Player* player)
     return false;
 }
 
-void TheLightOfDawnEvent::HandlePlayerEnterZone(Player* player)
+void TheLightOfDawnEvent::HandlePlayerEnterZone(Player* player, uint32 zoneId)
 {
+    if (zoneId != ZONEID_THE_SCARLET_ENCLAVE)
+        return;
+
     if (!IsMemberOfEvent(player))
         AddPlayer(player->GetGUID());
 
@@ -488,10 +493,38 @@ void TheLightOfDawnEvent::HandlePlayerEnterZone(Player* player)
     player->SendUpdateWorldState(WORLD_STATE_BATTLE_BEGIN, show_event_begin);
 }
 
-void TheLightOfDawnEvent::HandlePlayerLeaveZone(Player* player)
+void TheLightOfDawnEvent::HandlePlayerLeaveZone(Player* player, uint32 zoneId)
 {
+    if (zoneId != ZONEID_THE_SCARLET_ENCLAVE)
+        return;
+
     if (IsMemberOfEvent(player))
         RemovePlayer(player->GetGUID());
+}
+
+void TheLightOfDawnEvent::HandlePlayerEnterArea(Player* player, uint32 zoneId, uint32 areaId)
+{
+    if (zoneId != ZONEID_THE_SCARLET_ENCLAVE)
+        return;
+
+    bool areaIdFounded = areaId == 4298 || areaId == 4361 || areaId == 4364;
+    if (!areaIdFounded)
+        return;
+    // Prepare list of players for members of quest LoD (should be in 2 areaid : 4364, 4298, 4361
+    if (quest_players.find(player->GetGUID()) == quest_players.end())
+        quest_players.emplace(player->GetGUID());
+}
+
+void TheLightOfDawnEvent::HandlePlayerLeaveArea(Player* player, uint32 zoneId, uint32 areaId)
+{
+    if (zoneId != ZONEID_THE_SCARLET_ENCLAVE)
+        return;
+
+    bool areaIdFounded = areaId == 4298 || areaId == 4361 || areaId == 4364;
+    if (!areaIdFounded)
+        return;
+    if (quest_players.find(player->GetGUID()) != quest_players.end())
+        quest_players.erase(player->GetGUID());
 }
 
 void TheLightOfDawnEvent::OnCreatureCreate(Creature* creature)

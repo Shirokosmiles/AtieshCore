@@ -73,9 +73,12 @@ public:
     bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer, std::string comment) override;
     bool IsSpellAreaAllowed(uint32 /*spellId*/, Player const* /*player*/, uint32 /*newArea*/) const  override { return true; }
     // ZoneScript sector
-    void HandlePlayerEnterZone(Player* player) override;
+    void HandlePlayerEnterZone(Player* player, uint32 zoneId) override;
     // Called when a player leaves the battlefield zone
-    void HandlePlayerLeaveZone(Player* player) override;
+    void HandlePlayerLeaveZone(Player* player, uint32 zoneId) override;
+
+    void HandlePlayerEnterArea(Player* player, uint32 zoneId, uint32 areaId) override;
+    void HandlePlayerLeaveArea(Player* player, uint32 zoneId, uint32 areaId) override;
 
     void OnCreatureCreate(Creature* creature) override;
 
@@ -93,6 +96,9 @@ private:
     bool show_timer;
     bool show_event_begin;
     EventMap events;
+
+    // quest container
+    GuidUnorderedSet quest_players;
 
     //ObjectGuid for important NPC
     ObjectGuid Darion_Mograine;

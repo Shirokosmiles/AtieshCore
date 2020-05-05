@@ -75,6 +75,10 @@ class TC_GAME_API SpecialEventMgr
         void HandlePlayerEnterZone(Player* player, uint32 zoneId);
         // called when player leaves a battlefield area
         void HandlePlayerLeaveZone(Player* player, uint32 zoneId);
+        // called when a player enters a battlefield area
+        void HandlePlayerEnterArea(Player* player, uint32 zoneId, uint32 areaId);
+        // called when player leaves a battlefield area
+        void HandlePlayerLeaveArea(Player* player, uint32 zoneId, uint32 areaId);
 
     private:
         typedef std::vector<SpecialEvent*> SpecialEventSet;

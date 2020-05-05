@@ -2147,6 +2147,7 @@ void Player::RemoveFromWorld()
             m_session->DoLootRelease(lootGuid);
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
+        sSpecialEventMgr->HandlePlayerLeaveArea(this, m_zoneUpdateId, m_areaUpdateId);
         sSpecialEventMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
     }
 
@@ -7168,6 +7169,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     m_zoneUpdateTimer = ZONE_UPDATE_INTERVAL;
 
     GetMap()->UpdatePlayerZoneStats(oldZone, newZone);
+    // notify about leave old areaId by player
+    sSpecialEventMgr->HandlePlayerLeaveArea(this, oldZone, m_areaUpdateId);
 
     // call leave script hooks immedately (before updating flags)
     if (oldZone != newZone)
@@ -7243,6 +7246,9 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
 
     // call enter script hooks after everyting else has processed
     sScriptMgr->OnPlayerUpdateZone(this, newZone, newArea);
+    // notify about enter in new area
+    sSpecialEventMgr->HandlePlayerEnterArea(this, newZone, newArea);
+
     if (oldZone != newZone)
     {
         sOutdoorPvPMgr->HandlePlayerEnterZone(this, newZone);

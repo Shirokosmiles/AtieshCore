@@ -232,7 +232,7 @@ void SpecialEventMgr::HandlePlayerEnterZone(Player* player, uint32 zoneId)
     if (itr == m_SpecialEventZoneMap.end())
         return;
 
-    itr->second->HandlePlayerEnterZone(player);
+    itr->second->HandlePlayerEnterZone(player, zoneId);
 }
 
 void SpecialEventMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneId)
@@ -241,5 +241,23 @@ void SpecialEventMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneId)
     if (itr == m_SpecialEventZoneMap.end())
         return;
 
-    itr->second->HandlePlayerLeaveZone(player);
+    itr->second->HandlePlayerLeaveZone(player, zoneId);
+}
+
+void SpecialEventMgr::HandlePlayerEnterArea(Player* player, uint32 zoneId, uint32 areaId)
+{
+    SpecialEventZoneMap::const_iterator itr = m_SpecialEventZoneMap.find(zoneId);
+    if (itr == m_SpecialEventZoneMap.end())
+        return;
+
+    itr->second->HandlePlayerEnterArea(player, zoneId, areaId);
+}
+
+void SpecialEventMgr::HandlePlayerLeaveArea(Player* player, uint32 zoneId, uint32 areaId)
+{
+    SpecialEventZoneMap::const_iterator itr = m_SpecialEventZoneMap.find(zoneId);
+    if (itr == m_SpecialEventZoneMap.end())
+        return;
+
+    itr->second->HandlePlayerLeaveArea(player, zoneId, areaId);
 }

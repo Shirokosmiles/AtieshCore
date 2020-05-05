@@ -96,10 +96,14 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         virtual bool IsSpellAreaAllowed(uint32 /*spellId*/, Player const* /*player*/, uint32 /*newArea*/) const { return false; }
 
         // Zone Sector
-        // Called when a player enters the battlefield zone
-        virtual void HandlePlayerEnterZone(Player* /*player*/) { }
-        // Called when a player leaves the battlefield zone
-        virtual void HandlePlayerLeaveZone(Player* /*player*/) { }
+        // Called when a player enters the zone
+        virtual void HandlePlayerEnterZone(Player* /*player*/, uint32 zoneId) { }
+        // Called when a player leaves the zone
+        virtual void HandlePlayerLeaveZone(Player* /*player*/, uint32 zoneId) { }
+        // Called when a player enters the zone and area
+        virtual void HandlePlayerEnterArea(Player* /*player*/, uint32 zoneId, uint32 areaId) { }
+        // Called when a player leaves the zone and area
+        virtual void HandlePlayerLeaveArea(Player* /*player*/, uint32 zoneId, uint32 areaId) { }
         // Called when a player inside the battlefield zone kills a unit
         virtual void HandleKill(Player* /*killer*/, Unit* /*victim*/) { }
         // Called when a player queries a gossip from a spirit healer
