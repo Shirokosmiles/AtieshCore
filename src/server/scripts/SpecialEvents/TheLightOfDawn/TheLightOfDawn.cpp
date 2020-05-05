@@ -380,6 +380,44 @@ void TheLightOfDawnEvent::Update(uint32 diff)
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 345s);
                 break;
             }
+            case EVENT_START_COUNTDOWN_1:
+            {
+                --countdownTimerRemaining;  // 4 minutes
+                UpdateWorldState(WORLD_STATE_BATTLE_TIMER, countdownTimerRemaining);
+                break;
+            }
+            case EVENT_START_COUNTDOWN_2:
+            {
+                --countdownTimerRemaining;  // 3 minutes
+                UpdateWorldState(WORLD_STATE_BATTLE_TIMER, countdownTimerRemaining);
+                break;
+            }
+            case EVENT_START_COUNTDOWN_3:
+            {
+                --countdownTimerRemaining;  // 2 minutes
+                UpdateWorldState(WORLD_STATE_BATTLE_TIMER, countdownTimerRemaining);
+                break;
+            }
+            case EVENT_START_COUNTDOWN_4:
+            {
+                --countdownTimerRemaining;  // 1 minutes
+                UpdateWorldState(WORLD_STATE_BATTLE_TIMER, countdownTimerRemaining);
+                break;
+            }
+            case EVENT_START_COUNTDOWN_5:
+            {
+                --countdownTimerRemaining;  // 0 minutes
+                UpdateWorldState(WORLD_STATE_BATTLE_TIMER, countdownTimerRemaining);
+
+                show_timer       = false;
+                show_event_begin = true;
+                UpdateWorldState(WORLD_STATE_BATTLE_TIMER_SHOW, show_timer);                
+                UpdateWorldState(WORLD_STATE_BATTLE_BEGIN, show_event_begin);
+
+                if (Creature* Darion = GetCreature(Darion_Mograine))
+                    Darion->AI()->Talk(SAY_LIGHT_OF_DAWN04); // Wrong order in DB!
+                break;
+            }
             default:
                 break;
         }
