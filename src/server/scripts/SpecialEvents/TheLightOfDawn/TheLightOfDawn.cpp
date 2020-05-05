@@ -22,6 +22,7 @@
 #include "Guild.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "SpecialEventMgr.h"
 #include "RBAC.h"
 #include "MapManager.h"
 #include "MiscPackets.h"
@@ -32,6 +33,8 @@
 
 enum DataEnum
 {
+    QUEST_THE_LIGHT_OF_DAWN             = 12801,
+
     // encounters
     ENCOUNTER_START_TIME                = 5,
     ENCOUNTER_TOTAL_DEFENDERS           = 300,
@@ -333,6 +336,24 @@ bool TheLightOfDawnEvent::SetupSpecialEvent(bool enabled, bool active, bool repe
     return true;
 }
 
+void TheLightOfDawnEvent::DoActionForMember(ObjectGuid playerGUID, uint32 param)
+{
+    // Add player (A) in quest_players (because player already in zone and area, but only now get quest QUEST_THE_LIGHT_OF_DAWN), and if another player (B) have started Event - we should add player (A) in Event too
+    for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
+    {
+        if (itr->second.guid == playerGUID)
+        {
+            if (quest_players.find(playerGUID) == quest_players.end())
+            {
+                if (!param)  // if param == 0, we should add player in quest_players
+                    quest_players.emplace(playerGUID);
+            }
+            else if (param)  // if param == 1, we should remove player
+                quest_players.erase(playerGUID);
+        }
+    }
+}
+
 TheLightOfDawnEvent::~TheLightOfDawnEvent()
 {
     m_playersDataStore.clear();
@@ -530,6 +551,9 @@ void TheLightOfDawnEvent::HandlePlayerEnterArea(Player* player, uint32 zoneId, u
     bool areaIdFounded = areaId == 4298 || areaId == 4361 || areaId == 4364;
     if (!areaIdFounded)
         return;
+
+    if (player->GetQuestStatus(QUEST_THE_LIGHT_OF_DAWN) != QUEST_STATUS_INCOMPLETE)
+        return;
     // Prepare list of players for members of quest LoD (should be in 2 areaid : 4364, 4298, 4361
     if (quest_players.find(player->GetGUID()) == quest_players.end())
         quest_players.emplace(player->GetGUID());
@@ -543,6 +567,10 @@ void TheLightOfDawnEvent::HandlePlayerLeaveArea(Player* player, uint32 zoneId, u
     bool areaIdFounded = areaId == 4298 || areaId == 4361 || areaId == 4364;
     if (!areaIdFounded)
         return;
+
+    if (player->GetQuestStatus(QUEST_THE_LIGHT_OF_DAWN) != QUEST_STATUS_INCOMPLETE)
+        return;
+
     if (quest_players.find(player->GetGUID()) != quest_players.end())
         quest_players.erase(player->GetGUID());
 }
@@ -584,7 +612,31 @@ public:
     }
 };
 
+class EndQuestTheLichKingCommand : public PlayerScript
+{
+public:
+    EndQuestTheLichKingCommand() : PlayerScript("EndQuestTheLichKingCommand") { }
+
+    void OnQuestStatusChange(Player* player, uint32 questId) override
+    {
+        if (questId != QUEST_THE_LIGHT_OF_DAWN)
+            return;
+
+        if (player->GetQuestStatus(QUEST_THE_LIGHT_OF_DAWN) == QUEST_STATUS_INCOMPLETE)
+        {
+            if (SpecialEvent* LoD = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_THELIGHTOFDAWN))
+                LoD->DoActionForMember(player->GetGUID(), 0);  // Add player in quest_players (because player already in LoD area)
+        }
+        else if (player->GetQuestStatus(QUEST_THE_LIGHT_OF_DAWN) == QUEST_STATUS_NONE)
+        {
+            if (SpecialEvent* LoD = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_THELIGHTOFDAWN))
+                LoD->DoActionForMember(player->GetGUID(), 1);  // Remove player from quest_players
+        }
+    }
+};
+
 void AddSC_TheLightOfDawnScripts()
 {
     new SpecialEvent_TheLightOfDawn();
+    new EndQuestTheLichKingCommand();
 }

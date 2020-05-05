@@ -87,6 +87,7 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         virtual bool IsPossibleToRegister() { return true; }
         virtual bool IsMemberOfEvent(Player* /*player*/) { return false; }
         virtual uint32 GetCountPlayerInEvent() { return 0; }
+        virtual void DoActionForMember(ObjectGuid /*playerGUID*/, uint32 /*param*/) { }
 
         // Can players inside the battlefield zone use ground mounts?
         virtual bool IsMountAllowed() const { return true; }

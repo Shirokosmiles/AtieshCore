@@ -61,8 +61,8 @@ public:
             {
                 case GOSSIP_ACTION_INFO_DEF + 1:
                     CloseGossipMenuFor(player);
-                    if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_THELIGHTOFDAWN))
-                        DalaranEvent->StartSpecialEvent();
+                    if (SpecialEvent* LoD = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_THELIGHTOFDAWN))
+                        LoD->StartSpecialEvent();
                     break;
             }
             return true;
@@ -73,9 +73,9 @@ public:
             if (me->IsQuestGiver())
                 player->PrepareQuestMenu(me->GetGUID());
 
-            if (SpecialEvent* DalaranEvent = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_THELIGHTOFDAWN))
+            if (SpecialEvent* LoD = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_THELIGHTOFDAWN))
             {
-                if (!DalaranEvent->IsActiveTime())
+                if (!LoD->IsActiveTime())
                     if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE)
                         AddGossipItemFor(player, 0, "I am ready, Highlord. Let the siege of the Last Hope Chapel begin!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             }

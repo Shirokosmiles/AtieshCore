@@ -71,6 +71,7 @@ public:
     uint32 GetCountPlayerInEvent() override { return m_playersDataStore.size(); }
     bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer, std::string comment) override;
     bool IsSpellAreaAllowed(uint32 /*spellId*/, Player const* /*player*/, uint32 /*newArea*/) const  override { return true; }
+    void DoActionForMember(ObjectGuid playerGUID, uint32 param) override;
     // ZoneScript sector
     void HandlePlayerEnterZone(Player* player, uint32 zoneId) override;
     // Called when a player leaves the battlefield zone
