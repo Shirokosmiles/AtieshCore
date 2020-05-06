@@ -864,21 +864,6 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "CMSG_TIME_SYNC_RESP");
 
-    Battleground* bg = _player->GetBattleground();
-    if (bg)
-    {
-        if (_player->ShouldForgetBGPlayers())
-        {
-            _player->DoForgetPlayersInBG(bg);
-            _player->SetForgetBGPlayers(false);
-        }
-    }
-    else if (_player->ShouldForgetInListPlayers())
-    {
-        _player->DoForgetPlayersInList();
-        _player->SetForgetInListPlayers(false);
-    }
-
     uint32 counter, clientTimestamp;
     recvData >> counter >> clientTimestamp;
 

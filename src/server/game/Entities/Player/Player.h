@@ -899,27 +899,24 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         PlayerAI* AI() const { return reinterpret_cast<PlayerAI*>(GetAI()); }
 
-        typedef std::vector<uint64> FakePlayers;
+        // Cross BG
         void SendChatMessage(const char *format, ...);
-        void FitPlayerInTeam(bool action, Battleground* pBattleGround = NULL);          // void FitPlayerInTeam(bool action, Battleground* bg = NULL);
-        void DoForgetPlayersInList();
-        void DoForgetPlayersInBG(Battleground* pBattleGround);                                          // void DoForgetPlayersInBG(Battleground* bg);
-        uint8 getCFSRace() const { return m_RealRace; }
+        void SendBattleGroundChat(uint32 msgtype, std::string message);
+        /// Constructs the player Chat data for the specific functions to use 
+        void BuildPlayerChat(WorldPacket* data, uint8 msgtype, std::string const& text, uint32 language) const;
+
+        void FitPlayerInTeam(bool action, Battleground* pBattleGround = NULL);                          // void FitPlayerInTeam(bool action, Battleground* bg = NULL);
+        void MorphFit(bool value);
+
         void SetCFSRace() { m_RealRace = GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_RACE); }; // SHOULD ONLY BE CALLED ON LOGIN
         void SetFakeRaceAndMorph(); // SHOULD ONLY BE CALLED ON LOGIN
         uint32 GetFakeMorph() { return m_FakeMorph; };
         uint8 getFRace() const { return m_FakeRace; }
-        void SetForgetBGPlayers(bool value) { m_ForgetBGPlayers = value; }
-        bool ShouldForgetBGPlayers() { return m_ForgetBGPlayers; }
-        void SetForgetInListPlayers(bool value) { m_ForgetInListPlayers = value; }
-        bool ShouldForgetInListPlayers() { return m_ForgetInListPlayers; }
-        void SendBattleGroundChat(uint32 msgtype, std::string message);
-        void MorphFit(bool value);
-        bool IsPlayingNative() const { return GetTeam() == m_team; }
+        uint8 getCFSRace() const { return m_RealRace; }
         uint32 GetCFSTeam() const { return m_team; }
         uint32 GetTeam() const { return m_bgData.bgTeam && GetBattleground() ? m_bgData.bgTeam : m_team; }
-        bool SendRealNameQuery();
-        FakePlayers m_FakePlayers;
+        bool IsPlayingNative() const { return GetTeam() == m_team; }
+        // End Cross BG
 
         void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
@@ -1052,9 +1049,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, bool aliveOnly = false);
         void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
         uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
-
-        /// Constructs the player Chat data for the specific functions to use 
-        void BuildPlayerChat(WorldPacket* data, uint8 msgtype, std::string const& text, uint32 language) const;
 
         // pet auras
         std::unordered_set<PetAura const*> m_petAuras;
@@ -1477,7 +1471,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 GetSpecsCount() const { return m_specsCount; }
         void SetSpecsCount(uint8 count) { m_specsCount = count; }
         void ActivateSpec(uint8 spec);
-        
         void LoadActions(PreparedQueryResult result);
 
         void InitGlyphsForLevel();
@@ -2278,7 +2271,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
         Spell* m_spellModTakingSpell;
 
-        float GetAverageItemLevel() const;        
+        float GetAverageItemLevel() const;
         bool isDebugAreaTriggers;
 
         void ClearWhisperWhiteList() { WhisperList.clear(); }
@@ -2679,8 +2672,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 manaBeforeDuel;
 
         // variables from CrossBGFaction
-        bool m_ForgetBGPlayers;
-        bool m_ForgetInListPlayers;
         uint8 m_FakeRace;
         uint8 m_RealRace;
         uint32 m_FakeMorph;

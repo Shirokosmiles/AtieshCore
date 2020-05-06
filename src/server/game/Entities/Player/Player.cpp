@@ -180,8 +180,6 @@ Player::Player(WorldSession* session): Unit(true)
     m_FakeRace = 0;
     m_RealRace = 0;
     m_FakeMorph = 0;
-    m_ForgetBGPlayers = false;
-    m_ForgetInListPlayers = false;
 
     m_speakTime = 0;
     m_speakCount = 0;

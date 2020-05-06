@@ -52,25 +52,6 @@ uint8 Unit::GetRace(bool forceoriginal) const
     return GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_RACE);
 }
 
-bool Player::SendRealNameQuery()
-{
-    if (IsPlayingNative())
-        return false;
-
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
-    data.appendPackGUID(GetGUID());                             // player guid
-    data << uint8(0);                                       // added in 3.1; if > 1, then end of packet
-    data << GetName();                                   // played name
-    data << uint8(0);                                       // realm name for cross realm BG usage
-    data << uint8(getCFSRace());
-    data << uint8(GetGender());
-    data << uint8(GetClass());
-    data << uint8(0);                                   // is not declined
-    GetSession()->SendPacket(&data);
-
-    return true;
-}
-
 void Player::SetFakeRaceAndMorph()
 {
     uint8 random;
@@ -555,52 +536,10 @@ void Player::FitPlayerInTeam(bool action, Battleground* pBattleGround)
     else
         SetFactionForRace(getCFSRace());
 
-    if (action)
-        SetForgetBGPlayers(true);
-    else
-        SetForgetInListPlayers(true);
-
     MorphFit(action);
 
     if (pBattleGround && action)
         SendChatMessage("%sYou are playing for the %s%s in this %s", MSG_COLOR_WHITE, GetTeam() == ALLIANCE ? MSG_COLOR_DARKBLUE"alliance" : MSG_COLOR_RED"horde", MSG_COLOR_WHITE, pBattleGround->GetName().c_str());
-}
-
-void Player::DoForgetPlayersInList()
-{
-    // m_FakePlayers is filled from a vector within the battleground
-    // they were in previously so all players that have been in that BG will be invalidated.
-    for (FakePlayers::const_iterator itr = m_FakePlayers.begin(); itr != m_FakePlayers.end(); ++itr)
-    {
-        WorldPacket data(SMSG_INVALIDATE_PLAYER, 8);
-        data << *itr;
-        GetSession()->SendPacket(&data);
-        if (Player* pPlayer = ObjectAccessor::FindPlayer(ObjectGuid(*itr)))
-//      if (Player* pPlayer = ObjectAccessor::FindPlayer(*itr))
-                GetSession()->SendNameQueryOpcode(pPlayer->GetGUID());
-    }
-    m_FakePlayers.clear();
-}
-
-void Player::DoForgetPlayersInBG(Battleground* pBattleGround)
-{
-    for (Battleground::BattlegroundPlayerMap::const_iterator itr = pBattleGround->GetPlayers().begin(); itr != pBattleGround->GetPlayers().end(); ++itr)
-    {
-        // Here we invalidate players in the bg to the added player
-        WorldPacket data1(SMSG_INVALIDATE_PLAYER, 8);
-        data1 << itr->first;
-        GetSession()->SendPacket(&data1);
-
-        if (Player* pPlayer = ObjectAccessor::FindPlayer(itr->first))
-        {
-            GetSession()->SendNameQueryOpcode(pPlayer->GetGUID()); // Send namequery answer instantly if player is available
-            // Here we invalidate the player added to players in the bg
-            WorldPacket data2(SMSG_INVALIDATE_PLAYER, 8);
-            data2 << GetGUID();
-            pPlayer->GetSession()->SendPacket(&data2);
-            pPlayer->GetSession()->SendNameQueryOpcode(GetGUID());
-        }
-    }
 }
 
 bool BattlegroundQueue::CheckCrossFactionMatch(BattlegroundBracketId bracket_id, Battleground* bg)
