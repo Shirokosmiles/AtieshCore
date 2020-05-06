@@ -251,6 +251,37 @@ enum LightOfDawnSays
     EMOTE_LIGHT_OF_DAWN18             = 85
 };
 
+enum LightOfDawnSpells
+{
+    // Intro Spells
+    SPELL_CAMERA_SHAKE_INIT             = 36455,
+    SPELL_CAMERA_SHAKE                  = 39983,
+    SPELL_THE_MIGHT_OF_MOGRAINE         = 53642,
+
+    // Mograine Fight
+    SPELL_ANTI_MAGIC_ZONE1              = 52893,
+    SPELL_DEATH_STRIKE                  = 53639,
+    SPELL_DEATH_EMBRACE                 = 53635,
+    SPELL_ICY_TOUCH1                    = 49723,
+    SPELL_UNHOLY_BLIGHT                 = 53640,
+
+    // Outro
+    SPELL_THE_LIGHT_OF_DAWN             = 53658,
+    SPELL_ALEXANDROS_MOGRAINE_SPAWN     = 53667,
+    SPELL_ICEBOUND_VISAGE               = 53274,
+    SPELL_SOUL_FEAST_ALEX               = 53677,
+    SPELL_MOGRAINE_CHARGE               = 53679,
+    SPELL_REBUKE                        = 53680,
+    SPELL_SOUL_FEAST_TIRION             = 53685,
+    SPELL_APOCALYPSE                    = 53210,
+    SPELL_THROW_ASHBRINGER              = 53701,
+    SPELL_REBIRTH_OF_THE_ASHBRINGER     = 53702,
+    SPELL_TIRION_CHARGE                 = 53705,
+    SPELL_EXIT_TELEPORT_VISUAL          = 61456,
+    SPELL_LAY_ON_HANDS                  = 53778,
+    SPELL_THE_LIGHT_OF_DAWN_Q           = 53606
+};
+
 void TheLightOfDawnEvent::UpdateWorldState(uint32 id, uint32 state)
 {
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
@@ -416,7 +447,10 @@ void TheLightOfDawnEvent::Update(uint32 diff)
                 UpdateWorldState(WORLD_STATE_BATTLE_BEGIN, show_event_begin);
 
                 if (Creature* Darion = GetCreature(Darion_Mograine))
+                {
                     Darion->AI()->Talk(SAY_LIGHT_OF_DAWN04);    // Death knights of Acherus, the death march begins!
+                    Darion->AI()->DoCast(SPELL_CAMERA_SHAKE_INIT);
+                }
 
                 events.ScheduleEvent(EVENT_BEFORE_FIGHT_RISE, 10s);
                 break;
@@ -638,12 +672,12 @@ public:
         if (player->GetQuestStatus(QUEST_THE_LIGHT_OF_DAWN) == QUEST_STATUS_INCOMPLETE)
         {
             if (SpecialEvent* LoD = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_THELIGHTOFDAWN))
-                LoD->DoActionForMember(player->GetGUID(), 0);  // Add player in quest_players (because player already in LoD area)
+                LoD->DoActionForMember(player->GetGUID(), 0);  // Add player isDoingQuest (because player already in LoD area)
         }
         else if (player->GetQuestStatus(QUEST_THE_LIGHT_OF_DAWN) == QUEST_STATUS_NONE)
         {
             if (SpecialEvent* LoD = sSpecialEventMgr->GetEnabledSpecialEventByEventId(SPECIALEVENT_EVENTID_THELIGHTOFDAWN))
-                LoD->DoActionForMember(player->GetGUID(), 1);  // Remove player from quest_players
+                LoD->DoActionForMember(player->GetGUID(), 1);  // Remove player isDoingQuest
         }
     }
 };
