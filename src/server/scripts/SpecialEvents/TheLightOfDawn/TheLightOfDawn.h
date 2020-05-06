@@ -42,6 +42,18 @@ enum TheLightOfDawnPhase
     PHASE_START = 2
 };
 
+enum TheLightOfDawnEncounters
+{
+    // Light
+    ENCOUNTER_DEFENDER_NUMBER         = 30, // how many of defender
+    ENCOUNTER_EARTHSHATTER_NUMBER     = 20, // how many of earthshatter
+    // Scourge
+    ENCOUNTER_ABOMINATION_NUMBER      = 13, // how many of abomination
+    ENCOUNTER_BEHEMOTH_NUMBER         = 7,  // how many of behemoth
+    ENCOUNTER_GHOUL_NUMBER            = 60, // how many of ghoul
+    ENCOUNTER_WARRIOR_NUMBER          = 12, // how many of warrior
+};
+
 class TC_GAME_API TheLightOfDawnEvent : public SpecialEvent
 {
 public:
@@ -61,6 +73,10 @@ public:
     
     void StartTheLightOfDawnEvent();
     void StopTheLightOfDawnEvent();
+
+    void SummonScorgeArmy();
+    void SummonDefenseArmy();
+    void ClearAllNPC();
 
     // Override Sector
     // SpecialEvent sector
@@ -102,8 +118,33 @@ private:
     bool show_event_begin;
     EventMap events;
 
-    //ObjectGuid for important NPC
+    // Dawn
+    ObjectGuid TirionGUID;
+    ObjectGuid AlexandrosGUID;
+    ObjectGuid DarionGUID;
+    ObjectGuid KorfaxGUID;
+    ObjectGuid MaxwellGUID;
+    ObjectGuid EligorGUID;
+    ObjectGuid RayneGUID;
+    ObjectGuid DefenderGUID[ENCOUNTER_DEFENDER_NUMBER];
+    ObjectGuid EarthshatterGUID[ENCOUNTER_EARTHSHATTER_NUMBER];
+    uint32 DefendersCount;
+    uint32 EarthshattersCount;
+
+    // Scourge
     ObjectGuid Darion_Mograine;
+    ObjectGuid KoltiraGUID;
+    ObjectGuid OrbazGUID;
+    ObjectGuid ThassarianGUID;
+    ObjectGuid LichKingGUID;
+    ObjectGuid AbominationGUID[ENCOUNTER_ABOMINATION_NUMBER];
+    ObjectGuid BehemothGUID[ENCOUNTER_BEHEMOTH_NUMBER];
+    ObjectGuid GhoulGUID[ENCOUNTER_GHOUL_NUMBER];
+    ObjectGuid WarriorGUID[ENCOUNTER_WARRIOR_NUMBER];
+    uint32 AbominationsCount;
+    uint32 BehemothsCount;
+    uint32 GhoulsCount;
+    uint32 WarriorsCount;
 };
 
 #endif // _TLODEVENT_H

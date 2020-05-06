@@ -66,6 +66,10 @@ enum DataEnum
     EVENT_BEFORE_FIGHT_RISE,
     EVENT_BEFORE_FIGHT_PREVIOUS_LIFE,
     EVENT_BEFORE_FIGHT_RED_SKY,
+    EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_1,
+    EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_2,
+    EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_3,
+    EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_4,
     EVENT_BEFORE_FIGHT_START_MOVE_FOR_MONSTERS,
     EVENT_BEFORE_FIGHT_START_MOVE,
 
@@ -313,6 +317,15 @@ void TheLightOfDawnEvent::SetupInitialStates()
     show_event_begin        = false;
 
     UpdateAllWorldStates();
+
+    // Light real count
+    DefendersCount      = 0;
+    EarthshattersCount  = 0;
+    // Scourge real count
+    AbominationsCount   = 0;
+    BehemothsCount      = 0;
+    GhoulsCount         = 0;
+    WarriorsCount       = 0;
 }
 
 void TheLightOfDawnEvent::DoPlaySoundToAll(uint32 soundId)
@@ -340,6 +353,62 @@ void TheLightOfDawnEvent::StartTheLightOfDawnEvent()
 void TheLightOfDawnEvent::StopTheLightOfDawnEvent()
 {
     SetupInitialStates();
+}
+
+void TheLightOfDawnEvent::SummonScorgeArmy()
+{
+    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_1, 500);
+    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_2, 1000);
+    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_3, 1500);
+    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_4, 2000);
+}
+
+void TheLightOfDawnEvent::SummonDefenseArmy()
+{
+
+}
+
+void TheLightOfDawnEvent::ClearAllNPC()
+{
+    // Light
+    for (uint8 i = 0; i < ENCOUNTER_DEFENDER_NUMBER; ++i)
+    {
+        if (Creature* temp = GetCreature(DefenderGUID[i]))
+            temp->setDeathState(JUST_DIED);
+        DefenderGUID[i].Clear();
+    }
+    for (uint8 i = 0; i < ENCOUNTER_EARTHSHATTER_NUMBER; ++i)
+    {
+        if (Creature* temp = GetCreature(EarthshatterGUID[i]))
+            temp->setDeathState(JUST_DIED);
+        EarthshatterGUID[i].Clear();
+    }
+
+    // Scourge
+    for (uint8 i = 0; i < ENCOUNTER_ABOMINATION_NUMBER; ++i)
+    {
+        if (Creature* temp = GetCreature(AbominationGUID[i]))
+            temp->setDeathState(JUST_DIED);
+        AbominationGUID[i].Clear();
+    }
+    for (uint8 i = 0; i < ENCOUNTER_BEHEMOTH_NUMBER; ++i)
+    {
+        if (Creature* temp = GetCreature(BehemothGUID[i]))
+            temp->setDeathState(JUST_DIED);
+        BehemothGUID[i].Clear();
+    }
+    for (uint8 i = 0; i < ENCOUNTER_GHOUL_NUMBER; ++i)
+    {
+        if (Creature* temp = GetCreature(GhoulGUID[i]))
+            temp->setDeathState(JUST_DIED);
+        GhoulGUID[i].Clear();
+    }
+    for (uint8 i = 0; i < ENCOUNTER_WARRIOR_NUMBER; ++i)
+    {
+        if (Creature* temp = GetCreature(WarriorGUID[i]))
+            temp->setDeathState(JUST_DIED);
+        WarriorGUID[i].Clear();
+    }
 }
 
 TheLightOfDawnEvent::TheLightOfDawnEvent()
@@ -383,6 +452,24 @@ void TheLightOfDawnEvent::DoActionForMember(ObjectGuid playerGUID, uint32 param)
 TheLightOfDawnEvent::~TheLightOfDawnEvent()
 {
     m_playersDataStore.clear();
+
+    // Dawn
+    TirionGUID.Clear();
+    AlexandrosGUID.Clear();
+    DarionGUID.Clear();
+    KorfaxGUID.Clear();
+    MaxwellGUID.Clear();
+    EligorGUID.Clear();
+    RayneGUID.Clear();
+
+    // Scourge
+    Darion_Mograine.Clear();
+    KoltiraGUID.Clear();
+    OrbazGUID.Clear();
+    ThassarianGUID.Clear();
+    LichKingGUID.Clear();
+
+    ClearAllNPC();
 }
 
 void TheLightOfDawnEvent::Update(uint32 diff)
@@ -447,10 +534,7 @@ void TheLightOfDawnEvent::Update(uint32 diff)
                 UpdateWorldState(WORLD_STATE_BATTLE_BEGIN, show_event_begin);
 
                 if (Creature* Darion = GetCreature(Darion_Mograine))
-                {
                     Darion->AI()->Talk(SAY_LIGHT_OF_DAWN04);    // Death knights of Acherus, the death march begins!
-                    Darion->AI()->DoCast(SPELL_CAMERA_SHAKE_INIT);
-                }
 
                 events.ScheduleEvent(EVENT_BEFORE_FIGHT_RISE, 10s);
                 break;
@@ -458,8 +542,12 @@ void TheLightOfDawnEvent::Update(uint32 diff)
             case EVENT_BEFORE_FIGHT_RISE:
             {
                 if (Creature* Darion = GetCreature(Darion_Mograine))
+                {
                     Darion->AI()->Talk(SAY_LIGHT_OF_DAWN05);    // RISE!
+                    Darion->AI()->DoCast(SPELL_CAMERA_SHAKE_INIT);
+                }
 
+                SummonScorgeArmy();
                 events.ScheduleEvent(EVENT_BEFORE_FIGHT_PREVIOUS_LIFE, 25s);
                 break;
             }
@@ -478,6 +566,82 @@ void TheLightOfDawnEvent::Update(uint32 diff)
 
                 events.ScheduleEvent(EVENT_BEFORE_FIGHT_START_MOVE_FOR_MONSTERS, 3s);
                 events.ScheduleEvent(EVENT_BEFORE_FIGHT_START_MOVE, 5s);
+                break;
+            }
+            case EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_1:
+            {
+                if (Creature* Darion = GetCreature(Darion_Mograine))
+                {
+                    Position spawnpos;
+                    while (AbominationsCount < ENCOUNTER_ABOMINATION_NUMBER)
+                    {
+                        spawnpos = Darion->GetNearPosition(frand(10.f, 200.f), frand(0, 6.14f));
+                        if (Unit* temp = Darion->SummonCreature(NPC_RAMPAGING_ABOMINATION, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                        {
+                            temp->SetWalk(false);
+                            temp->SetFaction(FACTION_UNDEAD_SCOURGE_3);
+                            AbominationGUID[AbominationsCount] = temp->GetGUID();
+                            ++AbominationsCount;
+                        }
+                    }
+                }
+                break;
+            }
+            case EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_2:
+            {
+                if (Creature* Darion = GetCreature(Darion_Mograine))
+                {
+                    Position spawnpos;
+                    while (BehemothsCount < ENCOUNTER_BEHEMOTH_NUMBER)
+                    {
+                        spawnpos = Darion->GetNearPosition(frand(10.f, 200.f), frand(0, 6.14f));
+                        if (Unit* temp = Darion->SummonCreature(NPC_FLESH_BEHEMOTH, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                        {
+                            temp->SetWalk(false);
+                            temp->SetFaction(FACTION_UNDEAD_SCOURGE_3);
+                            BehemothGUID[AbominationsCount] = temp->GetGUID();
+                            ++BehemothsCount;
+                        }
+                    }
+                }
+                break;
+            }
+            case EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_3:
+            {
+                if (Creature* Darion = GetCreature(Darion_Mograine))
+                {
+                    Position spawnpos;
+                    while (GhoulsCount < ENCOUNTER_GHOUL_NUMBER)
+                    {
+                        spawnpos = Darion->GetNearPosition(frand(10.f, 200.f), frand(0, 6.14f));
+                        if (Unit* temp = Darion->SummonCreature(NPC_ACHERUS_GHOUL, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                        {
+                            temp->SetWalk(false);
+                            temp->SetFaction(FACTION_UNDEAD_SCOURGE_3);
+                            GhoulGUID[AbominationsCount] = temp->GetGUID();
+                            ++GhoulsCount;
+                        }
+                    }
+                }
+                break;
+            }
+            case EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_4:
+            {
+                if (Creature* Darion = GetCreature(Darion_Mograine))
+                {
+                    Position spawnpos;                    
+                    while (WarriorsCount < ENCOUNTER_WARRIOR_NUMBER)
+                    {
+                        spawnpos = Darion->GetNearPosition(frand(10.f, 200.f), frand(0, 6.14f));
+                        if (Unit* temp = Darion->SummonCreature(NPC_WARRIOR_OF_THE_FROZEN_WASTES, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                        {
+                            temp->SetWalk(false);
+                            temp->SetFaction(FACTION_UNDEAD_SCOURGE_3);
+                            WarriorGUID[AbominationsCount] = temp->GetGUID();
+                            ++WarriorsCount;
+                        }
+                    }
+                }
                 break;
             }
             case EVENT_BEFORE_FIGHT_START_MOVE_FOR_MONSTERS:
@@ -643,6 +807,9 @@ void TheLightOfDawnEvent::OnCreatureCreate(Creature* creature)
     switch (creature->GetEntry())
     {
         case NPC_HIGHLORD_DARION_MOGRAINE: Darion_Mograine = creature->GetGUID(); break;
+        case NPC_KOLTIRA_DEATHWEAVER: KoltiraGUID = creature->GetGUID(); break;
+        case NPC_ORBAZ_BLOODBANE: OrbazGUID = creature->GetGUID(); break;
+        case NPC_THASSARIAN: ThassarianGUID = creature->GetGUID(); break;
         default:
             break;
     }
