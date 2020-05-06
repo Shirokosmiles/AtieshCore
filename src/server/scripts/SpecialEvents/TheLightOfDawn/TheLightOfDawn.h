@@ -31,6 +31,8 @@ WorldLocation const DalaranCraterPoint(0, 287.2068f, 381.9773f, -67.5977f, 4.135
 struct PlayersData
 {
     ObjectGuid guid;
+    bool isDoingQuest;
+    bool isInArea;
 };
 typedef std::unordered_map<uint32, PlayersData> PlayersDataContainer;
 
@@ -55,7 +57,7 @@ public:
     void SetupInitialStates();
 
     void DoPlaySoundToAll(uint32 soundId);
-    void BroadcastPacketToQuestPlayers(WorldPacket const* data) const;
+    void BroadcastPacketToPlayersInArea(WorldPacket const* data) const;
     
     void StartTheLightOfDawnEvent();
     void StopTheLightOfDawnEvent();
@@ -99,9 +101,6 @@ private:
     bool show_timer;
     bool show_event_begin;
     EventMap events;
-
-    // quest container
-    GuidUnorderedSet quest_players;
 
     //ObjectGuid for important NPC
     ObjectGuid Darion_Mograine;

@@ -286,16 +286,17 @@ void TheLightOfDawnEvent::SetupInitialStates()
 
 void TheLightOfDawnEvent::DoPlaySoundToAll(uint32 soundId)
 {
-    // We are using quest_players, because only players in nessesary area can show Event
-    BroadcastPacketToQuestPlayers(WorldPackets::Misc::PlaySound(soundId).Write());
+    // We should send data for players in area (only)
+    BroadcastPacketToPlayersInArea(WorldPackets::Misc::PlaySound(soundId).Write());
 }
 
-void TheLightOfDawnEvent::BroadcastPacketToQuestPlayers(WorldPacket const* data) const
+void TheLightOfDawnEvent::BroadcastPacketToPlayersInArea(WorldPacket const* data) const
 {
-    for (ObjectGuid playerGuid : quest_players)
+    for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
-        if (Player* player = ObjectAccessor::FindConnectedPlayer(playerGuid))
-            player->SendDirectMessage(data);
+        if (itr->second.isInArea)
+            if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+                player->SendDirectMessage(data);
     }
 }
 
@@ -331,25 +332,19 @@ bool TheLightOfDawnEvent::SetupSpecialEvent(bool enabled, bool active, bool repe
 
     RegisterZoneIdForEvent(ZONEID_THE_SCARLET_ENCLAVE);
     SetupInitialStates();
-
-    quest_players.clear();
     return true;
 }
 
 void TheLightOfDawnEvent::DoActionForMember(ObjectGuid playerGUID, uint32 param)
 {
-    // Add player (A) in quest_players (because player already in zone and area, but only now get quest QUEST_THE_LIGHT_OF_DAWN), and if another player (B) have started Event - we should add player (A) in Event too
-    for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
+    for (PlayersDataContainer::iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
         if (itr->second.guid == playerGUID)
         {
-            if (quest_players.find(playerGUID) == quest_players.end())
-            {
-                if (!param)  // if param == 0, we should add player in quest_players
-                    quest_players.emplace(playerGUID);
-            }
-            else if (param)  // if param == 1, we should remove player
-                quest_players.erase(playerGUID);
+            if (!param) // if param == 0, we should set true isDoingQuest
+                itr->second.isDoingQuest = true;
+            else        // if param == 1, we should set false isDoingQuest
+                itr->second.isDoingQuest = false;
         }
     }
 }
@@ -480,7 +475,19 @@ void TheLightOfDawnEvent::OnSpecialEventEnd(bool /*endByTimer*/)
 void TheLightOfDawnEvent::AddPlayer(ObjectGuid playerGUID)
 {
     PlayersData pd;
-    pd.guid = playerGUID;
+    pd.guid         = playerGUID;
+    pd.isDoingQuest = false;
+    pd.isInArea     = false;
+    if (Player* player = ObjectAccessor::FindConnectedPlayer(playerGUID))
+    {
+        if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE)
+            pd.isDoingQuest = true;
+
+        uint32 plrAreaid = player->GetAreaId();
+        bool areaIdFounded = plrAreaid == 4298 || plrAreaid == 4361 || plrAreaid == 4364;
+        if (areaIdFounded)
+            pd.isInArea = true;
+    }
 
     // find max id
     uint32 new_id = 0;
@@ -552,11 +559,14 @@ void TheLightOfDawnEvent::HandlePlayerEnterArea(Player* player, uint32 zoneId, u
     if (!areaIdFounded)
         return;
 
-    if (player->GetQuestStatus(QUEST_THE_LIGHT_OF_DAWN) != QUEST_STATUS_INCOMPLETE)
-        return;
-    // Prepare list of players for members of quest LoD (should be in 2 areaid : 4364, 4298, 4361
-    if (quest_players.find(player->GetGUID()) == quest_players.end())
-        quest_players.emplace(player->GetGUID());
+    for (PlayersDataContainer::iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
+    {
+        if (itr->second.guid == player->GetGUID())
+        {
+            if (!itr->second.isInArea)
+                itr->second.isInArea = true;
+        }
+    }
 }
 
 void TheLightOfDawnEvent::HandlePlayerLeaveArea(Player* player, uint32 zoneId, uint32 areaId)
@@ -568,11 +578,14 @@ void TheLightOfDawnEvent::HandlePlayerLeaveArea(Player* player, uint32 zoneId, u
     if (!areaIdFounded)
         return;
 
-    if (player->GetQuestStatus(QUEST_THE_LIGHT_OF_DAWN) != QUEST_STATUS_INCOMPLETE)
-        return;
-
-    if (quest_players.find(player->GetGUID()) != quest_players.end())
-        quest_players.erase(player->GetGUID());
+    for (PlayersDataContainer::iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
+    {
+        if (itr->second.guid == player->GetGUID())
+        {
+            if (itr->second.isInArea)
+                itr->second.isInArea = false;
+        }
+    }
 }
 
 Creature* TheLightOfDawnEvent::GetCreature(ObjectGuid guid)
