@@ -42,6 +42,7 @@ enum PaladinSpells
     SPELL_PALADIN_HOLY_SHOCK_R1_DAMAGE           = 25912,
     SPELL_PALADIN_HOLY_SHOCK_R1_HEALING          = 25914,
     SPELL_PALADIN_ILLUMINATION_ENERGIZE          = 20272,
+    SPELL_PALADIN_SEALS_OF_THE_PURE_R1           = 20224,
 
     SPELL_PALADIN_BLESSING_OF_LOWER_CITY_DRUID   = 37878,
     SPELL_PALADIN_BLESSING_OF_LOWER_CITY_PALADIN = 37879,
@@ -2125,8 +2126,14 @@ class spell_pal_seal_of_vengeance : public SpellScriptLoader
                         return;
                 }
 
+                CastSpellExtraArgs args(aurEff);
+                args.SetTriggeringAura(aurEff);
+                args.SetTriggerFlags(TRIGGERED_DONT_RESET_PERIODIC_TIMER);
+                if (AuraEffect const* talentAurEff = eventInfo.GetActor()->GetAuraEffectOfRankedSpell(SPELL_PALADIN_SEALS_OF_THE_PURE_R1, EFFECT_1))
+                    args.AddSpellMod(SPELLVALUE_BASE_POINT0, talentAurEff->GetAmount());
+
                 // don't cast triggered, spell already has SPELL_ATTR4_CAN_CAST_WHILE_CASTING attr
-                eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), DoTSpell, CastSpellExtraArgs(TRIGGERED_DONT_RESET_PERIODIC_TIMER).SetTriggeringAura(aurEff));
+                eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), DoTSpell, args);
             }
 
             void HandleSeal(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -2154,7 +2161,12 @@ class spell_pal_seal_of_vengeance : public SpellScriptLoader
 
                 CastSpellExtraArgs args(aurEff);
                 args.AddSpellBP0(amount);
-                caster->CastSpell(target, DamageSpell, args);
+
+                if (AuraEffect const* talentAurEff = caster->GetAuraEffectOfRankedSpell(SPELL_PALADIN_SEALS_OF_THE_PURE_R1, EFFECT_0))
+                    AddPct(amount, talentAurEff->GetAmount());
+
+                if (amount)
+                    caster->CastSpell(target, DamageSpell, args);
             }
 
             void Register() override
