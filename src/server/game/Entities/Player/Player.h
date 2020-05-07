@@ -916,6 +916,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetCFSTeam() const { return m_team; }
         uint32 GetTeam() const { return m_bgData.bgTeam && GetBattleground() ? m_bgData.bgTeam : m_team; }
         bool IsPlayingNative() const { return GetTeam() == m_team; }
+
+        void UpdateFakeQueryName(Battleground* pBattleGround);
         // End Cross BG
 
         void CleanupsBeforeDelete(bool finalCleanup = true) override;

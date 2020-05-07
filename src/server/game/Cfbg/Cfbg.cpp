@@ -537,6 +537,8 @@ void Player::FitPlayerInTeam(bool action, Battleground* pBattleGround)
         SetFactionForRace(getCFSRace());
 
     MorphFit(action);
+    UpdateFactionForSelfAndControllList();
+    UpdateFakeQueryName(pBattleGround);
 
     if (pBattleGround && action)
         SendChatMessage("%sYou are playing for the %s%s in this %s", MSG_COLOR_WHITE, GetTeam() == ALLIANCE ? MSG_COLOR_DARKBLUE"alliance" : MSG_COLOR_RED"horde", MSG_COLOR_WHITE, pBattleGround->GetName().c_str());
@@ -694,4 +696,25 @@ void Player::BuildPlayerChat(WorldPacket* data, uint8 msgtype, const std::string
     *data << uint32(text.length() + 1);
     *data << text;
     *data << uint8(GetChatTag());
+}
+
+void Player::UpdateFakeQueryName(Battleground* pBattleGround)
+{
+    for (Battleground::BattlegroundPlayerMap::const_iterator itr = pBattleGround->GetPlayers().begin(); itr != pBattleGround->GetPlayers().end(); ++itr)
+    {
+        // Here we invalidate players in the bg to the added player
+        WorldPacket data1(SMSG_INVALIDATE_PLAYER, 8);
+        data1 << itr->first;
+        GetSession()->SendPacket(&data1);
+        
+        if (Player* pPlayer = ObjectAccessor::FindPlayer(itr->first))
+        {
+            GetSession()->SendNameQueryOpcode(pPlayer->GetGUID()); // Send namequery answer instantly if player is available
+            // Here we invalidate the player added to players in the bg
+            WorldPacket data2(SMSG_INVALIDATE_PLAYER, 8);
+            data2 << GetGUID();
+            pPlayer->GetSession()->SendPacket(&data2);
+            pPlayer->GetSession()->SendNameQueryOpcode(GetGUID());
+        }
+    }
 }
