@@ -2713,10 +2713,6 @@ void Spell::TargetInfo::DoDamageAndTriggers(Spell* spell)
             {
                 spellDamageInfo = std::make_unique<DamageInfo>(damageInfo, SPELL_DIRECT_DAMAGE, spell->m_attackType, hitMask);
                 procSpellType |= PROC_SPELL_TYPE_DAMAGE;
-
-                if (caster->GetTypeId() == TYPEID_PLAYER && !spell->m_spellInfo->HasAttribute(SPELL_ATTR0_STOP_ATTACK_TARGET) && !spell->m_spellInfo->HasAttribute(SPELL_ATTR4_CANT_TRIGGER_ITEM_SPELLS) &&
-                    (spell->m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || spell->m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
-                    caster->ToPlayer()->CastItemCombatSpell(*spellDamageInfo);
             }
         }
 
@@ -5884,12 +5880,12 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                             targetObjectSizeForZOffset = std::min(target->GetCombatReach(), 4.0f);
 
                         // first try with raycast, if it fails fall back to normal path
-                        bool result = m_preGeneratedPath->CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + targetObjectSizeForZOffset, false, true);
+                        bool result = m_preGeneratedPath->CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + targetObjectSizeForZOffset, false);
                         if (m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
                             return SPELL_FAILED_OUT_OF_RANGE;
                         else if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
                         {
-                            result = m_preGeneratedPath->CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + targetObjectSizeForZOffset, false, false);
+                            result = m_preGeneratedPath->CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + targetObjectSizeForZOffset, false);
                             if (m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
                                 return SPELL_FAILED_OUT_OF_RANGE;
                             else if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
@@ -5902,7 +5898,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                                     float x, y, z;
                                     target->GetClosePoint(x, y, z, targetObjectSizeForZOffset);
                                     target->GetMap()->getObjectHitPos(target->GetPhaseMask(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + targetObjectSizeForZOffset, x, y, z + targetObjectSizeForZOffset, x, y, z, -targetObjectSizeForZOffset);
-                                    result = m_preGeneratedPath->CalculatePath(x, y, z + targetObjectSizeForZOffset, false, false);
+                                    result = m_preGeneratedPath->CalculatePath(x, y, z + targetObjectSizeForZOffset, false);
 
                                     if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
                                         return SPELL_FAILED_NOPATH;
@@ -6350,7 +6346,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
         if (!nonAuraEffectMask && (approximateAuraEffectMask & (1 << i)) && !m_spellInfo->IsTargetingArea())
             if (Unit* target = m_targets.GetUnitTarget())
                 if (!target->IsHighestExclusiveAuraEffect(m_spellInfo, AuraType(m_spellInfo->Effects[i].ApplyAuraName),
-                    m_spellInfo->Effects[i].CalcValue(m_caster, m_spellValue->EffectBasePoints), approximateAuraEffectMask, false))
+                    m_spellInfo->Effects[i].CalcValue(m_caster, &m_spellValue->EffectBasePoints[i]), approximateAuraEffectMask, false))
                     return SPELL_FAILED_AURA_BOUNCED;
     }
 
@@ -7632,7 +7628,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff, Position const* lo
         case SPELL_AURA_MOD_CHARM:
         case SPELL_AURA_MOD_POSSESS_PET:
         case SPELL_AURA_AOE_CHARM:
-            if (target->GetTypeId() == TYPEID_UNIT && target->IsVehicle())
+            if (target->GetVehicleKit() && target->GetVehicleKit()->IsControllableVehicle())
                 return false;
             if (target->IsMounted())
                 return false;

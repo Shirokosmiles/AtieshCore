@@ -28,6 +28,11 @@
 #include "Unit.h"
 #include "Util.h"
 
+static bool HasLostTarget(Unit* owner, Unit* target)
+{
+    return owner->GetVictim() != target;
+}
+
 static bool IsMutualChase(Unit* owner, Unit* target)
 {
     if (target->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
@@ -105,8 +110,8 @@ bool ChaseMovementGenerator::Update(Unit* owner, uint32 diff)
     if (owner->HasUnitState(UNIT_STATE_CHARGING))
         return true;
 
-    // the owner might be unable to move (rooted or casting), pause movement
-    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
+    // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting() || HasLostTarget(owner, target))
     {
         owner->StopMoving();
         _lastTargetPosition.reset();
