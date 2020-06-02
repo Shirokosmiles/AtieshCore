@@ -583,7 +583,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
     }
 }
 
-void WorldSession::HandlePetNameQuery(WorldPacket& recvData)
+void WorldSession::HandleQueryPetName(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network.opcode", "WORLD: Received CMSG_PET_NAME_QUERY");
 
@@ -593,10 +593,10 @@ void WorldSession::HandlePetNameQuery(WorldPacket& recvData)
     recvData >> petnumber;
     recvData >> petguid;
 
-    SendPetNameQuery(petguid, petnumber);
+    SendQueryPetNameResponse(petguid, petnumber);
 }
 
-void WorldSession::SendPetNameQuery(ObjectGuid petguid, uint32 petnumber)
+void WorldSession::SendQueryPetNameResponse(ObjectGuid petguid, uint32 petnumber)
 {
     Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*_player, petguid);
     if (!pet)

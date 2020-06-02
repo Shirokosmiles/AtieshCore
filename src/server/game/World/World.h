@@ -25,10 +25,10 @@
 #define __WORLD_H
 
 #include "Common.h"
+#include "AsyncCallbackProcessor.h"
 #include "DatabaseEnvFwd.h"
 #include "LockedQueue.h"
 #include "ObjectGuid.h"
-#include "QueryCallbackProcessor.h"
 #include "SharedDefines.h"
 #include "Timer.h"
 
@@ -227,6 +227,7 @@ enum WorldBoolConfigs
     CONFIG_DALARAN_GAME_EVENTS_SQUAD_ENABLED,
     CONFIG_PLAYER_AUTO_LEARN_ENABLED,
     CONFIG_PLAYER_UNIVERSAL_LANGUAGE,
+    CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
     BOOL_CONFIG_VALUE_COUNT
 };
 

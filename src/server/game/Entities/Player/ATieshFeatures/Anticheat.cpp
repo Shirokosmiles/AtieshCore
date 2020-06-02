@@ -74,7 +74,7 @@ bool Player::CheckOnFlyHack()
         return false;
     }
 
-    if (IsFlying() || IsLevitating() || IsInFlight())
+    if (IsFlying() || IsGravityDisabled() || IsInFlight())
         return true;
 
     if (GetTransport() || GetVehicle() || GetVehicleKit())
