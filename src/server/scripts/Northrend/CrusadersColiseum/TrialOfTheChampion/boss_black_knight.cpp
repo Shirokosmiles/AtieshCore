@@ -143,9 +143,9 @@ public:
             Initialize();
         }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+        void SpellHitTarget(WorldObject* target, SpellInfo const* spellInfo) override
         {
-            if (spell->Id == SPELL_EXPLODE || spell->Id == SPELL_EXPLODE_H)
+            if (spellInfo->Id == SPELL_EXPLODE || spellInfo->Id == SPELL_EXPLODE_H)
             {
                 if (!target->ToPlayer())
                     return;
@@ -220,7 +220,7 @@ public:
                 {
                     case EVENT_CLAW:
                         DoCastVictim(SPELL_CLAW);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 50.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 50.0f, true))
                         {
                             ResetThreatList();
                             AddThreat(target, 10.0f);
@@ -231,7 +231,7 @@ public:
                     case EVENT_LEAP:
                         if (me->GetEntry() == NPC_RISEN_ARELAS || me->GetEntry() == NPC_RISEN_JAEREN)
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 30.0f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f, true))
                                 DoCast(target, SPELL_LEAP);
                             events.ScheduleEvent(EVENT_LEAP, urand(8000, 10000));
                         }
@@ -334,9 +334,9 @@ public:
                 achievementCredit = false;
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        void SpellHit(WorldObject* target, SpellInfo const* spellInfo) override
         {
-            if (spell->Id == SPELL_BLACK_KNIGHT_RES)
+            if (spellInfo->Id == SPELL_BLACK_KNIGHT_RES)
             {
                 // TODO: According to sniffs, The Black Knight should update
                 // creature template to another entry, not just change his display id
@@ -454,7 +454,7 @@ public:
                         break;
                     case EVENT_DEATH_RESPITE:
                         // TODO: fixing this later
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 50.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 50.0f, true))
                             DoCast(target, SPELL_DEATH_RESPITE);
                         events.ScheduleEvent(EVENT_DEATH_RESPITE, urand(15000, 16000));
                         break;
@@ -471,7 +471,7 @@ public:
                         events.ScheduleEvent(EVENT_DEATH_BITE, 3000);
                         break;
                     case EVENT_MARKED_DEATH:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f))
                             DoCast(target, SPELL_MARKED_DEATH);
                         events.ScheduleEvent(EVENT_MARKED_DEATH, urand(13000, 15000));
                         break;

@@ -220,13 +220,13 @@ public:
         }
 
         // Fly away when dismissed
-        void SpellHit(Unit* source, SpellInfo const* spell) override
+        void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override
         {
-            if (spell->Id != SPELL_DK_DISMISS_GARGOYLE || !me->IsAlive())
-                return;
+                if (spellInfo->Id != SPELL_DK_DISMISS_GARGOYLE || !me->IsAlive())
+                    return;
 
             Unit* owner = me->GetOwner();
-            if (!owner || owner != source)
+            if (!owner || owner != caster)
                 return;
             _events.ScheduleEvent(EVENT_COMBAT_OUT, 0);
         }

@@ -305,7 +305,7 @@ public:
                 sayTimer -= diff;
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
+        void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id != SPELL_OFFER)
                 return;
@@ -576,16 +576,16 @@ public:
     {
         npc_haiphoonAI(Creature* creature) : VehicleAI(creature) { }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+        void SpellHitTarget(WorldObject* target, SpellInfo const* spellInfo) override
         {
             if (target == me)
                 return;
 
-            if (spell->Id == SPELL_DEVOUR_WIND && me->GetCharmerOrOwnerPlayerOrPlayerItself())
+            if (spellInfo->Id == SPELL_DEVOUR_WIND && me->GetCharmerOrOwnerPlayerOrPlayerItself())
             {
                 me->UpdateEntry(NPC_HAIPHOON_AIR);
             }
-            else if (spell->Id == SPELL_DEVOUR_WATER && me->GetCharmerOrOwnerPlayerOrPlayerItself())
+            else if (spellInfo->Id == SPELL_DEVOUR_WATER && me->GetCharmerOrOwnerPlayerOrPlayerItself())
             {
                 me->UpdateEntry(NPC_HAIPHOON_WATER);
             }
@@ -616,9 +616,9 @@ public:
     {
         npc_mammothAI(Creature* creature) : ScriptedAI(creature) { }        
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override
         {
-            if (spell->Id == SPELL_RIDE_SHATTERTUSK_MAMMOTH)
+            if (spellInfo->Id == SPELL_RIDE_SHATTERTUSK_MAMMOTH)
             {
                 me->StopMoving();
                 me->GetMotionMaster()->Clear();

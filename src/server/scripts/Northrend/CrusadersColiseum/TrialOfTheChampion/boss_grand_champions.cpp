@@ -365,15 +365,15 @@ struct boss_grand_championAI : BossAI
         _JustReachedHome();
     }
 
-    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    void SpellHit(WorldObject* target, SpellInfo const* spellInfo) override
     {
-        if (spell->Id == SPELL_TRAMPLE_AURA && LookingForMount && uiPhase == 0 && !me->IsImmunedToSpell(spell, caster))
+        if (spellInfo->Id == SPELL_TRAMPLE_AURA && LookingForMount && uiPhase == 0 && !me->IsImmunedToSpell(spellInfo, target))
         {
             uiPhase = 3;
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveIdle();
             Talk(EMOTE_TRAMPLE, me);
-            events.ScheduleEvent(EVENT_TRAMPLE, spell->GetDuration());
+            events.ScheduleEvent(EVENT_TRAMPLE, spellInfo->GetDuration());
         }
     }
 
@@ -1232,7 +1232,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_POLYMORPH:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 30.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f, true))
                         {
                             DoCast(target, SPELL_POLYMORPH);
                             if (me->HasAura(SPELL_HASTE))
@@ -1243,7 +1243,7 @@ public:
                         events.ScheduleEvent(EVENT_POLYMORPH, 8000);
                         break;
                     case EVENT_BLASTWAVE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_MINDISTANCE, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0))
                         {
                             if (me->IsWithinDist(target, 5.0f, false))
                             {
@@ -1413,7 +1413,7 @@ public:
                     case EVENT_CHAIN_LIGHTNING:
                         if (!isDefensive)
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                                 DoCast(target, SPELL_CHAIN_LIGHTNING);
                             events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 16000);
                         }
@@ -1516,7 +1516,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_DISENGAGE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_MINDISTANCE, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0))
                         {
                             if (me->IsWithinDist(target, 5.0f, false))
                             {
@@ -1612,7 +1612,7 @@ public:
                         events.ScheduleEvent(EVENT_EVISCERATE, 8000);
                         break;
                     case EVENT_FAN_OF_KNIVES:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_MINDISTANCE, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0))
                         {
                             if (me->IsWithinDist(target, 8.0f, false)) // 8 yards is minimum range
                                 DoCastAOE(SPELL_FAN_OF_KNIVES);
@@ -1620,7 +1620,7 @@ public:
                         events.ScheduleEvent(EVENT_FAN_OF_KNIVES, 14000);
                         break;
                     case EVENT_POISON_BOTTLE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                             DoCast(target, SPELL_POISON_BOTTLE);
                         events.ScheduleEvent(EVENT_POISON_BOTTLE, 19000);
                         break;

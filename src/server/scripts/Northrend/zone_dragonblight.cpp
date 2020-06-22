@@ -540,9 +540,9 @@ class npc_wyrmrest_defender : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+            void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
             {
-                switch (spell->Id)
+                switch (spellInfo->Id)
                 {
                     case SPELL_WYRMREST_DEFENDER_MOUNT:
                         Talk(WHISPER_MOUNTED, me->GetCharmerOrOwner());
@@ -626,9 +626,9 @@ class npc_torturer_lecraft : public CreatureScript
                     Talk (SAY_AGGRO, player);
             }
 
-            void SpellHit(Unit* caster, SpellInfo const* spell) override
+            void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override
             {
-                if (spell->Id != SPELL_HIGH_EXECUTORS_BRANDING_IRON)
+                if (spellInfo->Id != SPELL_HIGH_EXECUTORS_BRANDING_IRON)
                     return;
 
                 if (Player* player = caster->ToPlayer())
@@ -979,14 +979,14 @@ public: npc_body_magehunter() : CreatureScript("npc_body_magehunter") {}
     {
         npc_body_magehunterAI(Creature* creature) : ScriptedAI(creature) {}
 
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override
         {
             if (!caster->ToPlayer())
                 return;
 
             Player* player = caster->ToPlayer();
 
-            if  (spell->Id == SPELL_RIFLE_THE_BODIES)
+            if (spellInfo->Id == SPELL_RIFLE_THE_BODIES)
             {
                 player->CastSpell(player, SPELL_RIFLE_THE_BODIES_LOOT);
                 /*uint32 rand = urand(0, 10);

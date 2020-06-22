@@ -630,8 +630,9 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
             std::list<Item*> itemlist;
             itemlist.push_back(pItem);
             // item will deleted or added to received mail list
-            sMailMgr->SendMailByAuctionHouseWithItems(auction, player->GetGUID().GetCounter(), auction->BuildAuctionMailSubject(AUCTION_CANCELED), "", 0, itemlist, MAIL_CHECK_MASK_COPIED);
+            sMailMgr->SendMailByAuctionHouseWithItems(auction, player->GetGUID().GetCounter(), auction->BuildAuctionMailSubject(AUCTION_CANCELED), AuctionEntry::BuildAuctionMailBody(0, 0, auction->buyout, auction->deposit, 0), 0, itemlist, MAIL_CHECK_MASK_COPIED);
             itemlist.clear();
+
         }
         else
         {
@@ -711,7 +712,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
         }
     }
 
-    auctionHouse->BuildListBidderItems(data, player, listfrom, count, totalcount);
+    auctionHouse->BuildListBidderItems(data, player, count, totalcount);
     data.put<uint32>(0, count);                           // add count to placeholder
     data << totalcount;
     data << (uint32)300;                                    //unk 2.3.0
@@ -748,7 +749,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recvData)
     uint32 count = 0;
     uint32 totalcount = 0;
 
-    auctionHouse->BuildListOwnerItems(data, _player, listfrom, count, totalcount);
+    auctionHouse->BuildListOwnerItems(data, _player, count, totalcount);
     data.put<uint32>(0, count);
     data << (uint32) totalcount;
     data << (uint32) 0;

@@ -586,7 +586,7 @@ class spell_kologarn_focused_eyebeam_summon_trigger : public SpellScript
     void FilterTargetsInitial(std::list<WorldObject*>& targets)
     {
         targets.clear();
-        Unit* target = GetCaster()->ToCreature()->AI()->SelectTarget(SELECT_TARGET_MAXDISTANCE, 0, [](Unit* target) -> bool
+        Unit* target = GetCaster()->ToCreature()->AI()->SelectTarget(SelectTargetMethod::MaxDistance, 0, [](Unit* target) -> bool
         {
             return !target->HasAura(SPELL_STONE_GRIP_CONTROL_1) && !target->HasAura(SPELL_STONE_GRIP_CONTROL_2);
         });

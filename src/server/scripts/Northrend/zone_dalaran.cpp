@@ -414,14 +414,14 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override
         {
             if (!caster->ToPlayer())
                 return;
 
             Player* player = caster->ToPlayer();
 
-            if (spell->Id == SPELL_PASSENGER_BOARDED)
+            if (spellInfo->Id == SPELL_PASSENGER_BOARDED)
                 events.ScheduleEvent(EVENT_GO_FLY, 100);
 
             playerGuid = player->GetGUID();

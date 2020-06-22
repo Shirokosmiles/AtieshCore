@@ -33,7 +33,6 @@ struct AuctionHouseEntry;
 #define MIN_AUCTION_TIME (12*HOUR)
 #define MAX_AUCTION_ITEMS 160
 #define MAX_GETALL_RETURN 55000
-#define MAX_AUCTION_ITEMS_CLIENT_PAGE 50
 
 enum AuctionError : uint8
 {
@@ -100,9 +99,8 @@ struct TC_GAME_API AuctionEntry
     void SaveToDB(CharacterDatabaseTransaction& trans) const;
     bool LoadFromDB(Field* fields);
     std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
-    static std::string BuildAuctionWonMailBody(ObjectGuid guid, uint32 bid, uint32 buyout);
-    static std::string BuildAuctionSoldMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit, uint32 consignment);
-    static std::string BuildAuctionInvoiceMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit, uint32 consignment, uint32 moneyDelay, uint32 eta);
+    static std::string BuildAuctionMailBody(ObjectGuid::LowType lowGuid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut);
+
 };
 
 //this class is used as auctionhouse instance
@@ -136,8 +134,8 @@ public:
     void Update();
 
     void BuildListAllLots(Player* player, uint32& totalcount);
-    void BuildListBidderItems(WorldPacket& data, Player* player, uint32 listfrom, uint32& count, uint32& totalcount);
-    void BuildListOwnerItems(WorldPacket& data, Player* player, uint32 listfrom, uint32& count, uint32& totalcount);
+    void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
+    void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
     void BuildListAuctionItems(WorldPacket& data, Player* player,
         std::wstring const& searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
         uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
