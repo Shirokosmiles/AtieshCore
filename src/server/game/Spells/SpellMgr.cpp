@@ -17,7 +17,6 @@
 
 #include "SpellMgr.h"
 #include "BattlegroundMgr.h"
-#include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Chat.h"
 #include "Containers.h"
@@ -744,7 +743,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player || !player->IsAlive())
                 return false;
 
-            Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(player->GetZoneId());
+            Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
             if (!battlefield || battlefield->CanFlyIn() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
                 return false;
             break;
@@ -755,8 +754,8 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player)
                 return false;
 
-            Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(player->GetZoneId());
-            if (!battlefield || battlefield->GetBattleId() != BATTLEFIELD_BATTLEID_WINTERGRASP)
+            Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
+            if (!battlefield || battlefield->GetBattleId() != BATTLEFIELD_WG)
                 return false;
 
             // team that controls the workshop in the specified area
@@ -774,7 +773,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player)
                 return false;
 
-            if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP))
+            if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_WG))
                 return battlefield->IsEnabled() && player->GetTeamId() == battlefield->GetDefenderTeam() && !battlefield->IsWarTime();
             break;
         }
@@ -783,7 +782,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player)
                 return false;
 
-            if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(player->GetZoneId()))
+            if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId()))
                 return battlefield->IsWarTime();
             break;
         }

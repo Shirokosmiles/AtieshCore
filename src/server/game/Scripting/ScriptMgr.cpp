@@ -20,7 +20,6 @@
 #include "Config.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
-#include "BattlefieldMgr.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "GossipDef.h"
@@ -80,6 +79,10 @@ struct is_script_database_bound<AreaTriggerScript>
     : std::true_type { };
 
 template<>
+struct is_script_database_bound<BattlefieldScript>
+        : std::true_type { };
+
+template<>
 struct is_script_database_bound<BattlegroundScript>
     : std::true_type { };
 
@@ -88,10 +91,7 @@ struct is_script_database_bound<OutdoorPvPScript>
     : std::true_type { };
 
 template<>
-struct is_script_database_bound<BattlefieldScript>
-    : std::true_type { };
 
-template<>
 struct is_script_database_bound<SpecialEventScript>
     : std::true_type { };
 
@@ -233,7 +233,7 @@ public:
     void QueueForDelayedDelete(T&& any)
     {
         _delayed_delete_queue.push_back(
-            Trinity::make_unique<
+    std::make_unique<
                 DeleteableObject<typename std::decay<T>::type>
             >(std::forward<T>(any))
         );
@@ -605,6 +605,11 @@ class ScriptRegistrySwapHooks<GameObjectScript, Base>
         GameObject, GameObjectScript, Base
       > { };
 
+/// This hook is responsible for swapping BattlefieldScripts
+template<typename Base>
+class ScriptRegistrySwapHooks<BattlefieldScript, Base>
+        : public UnsupportedScriptRegistrySwapHooks<Base> { };
+
 /// This hook is responsible for swapping BattlegroundScript's
 template<typename Base>
 class ScriptRegistrySwapHooks<BattlegroundScript, Base>
@@ -635,44 +640,6 @@ public:
         if ((!initialize) && swapped)
         {
             sOutdoorPvPMgr->InitOutdoorPvP();
-            swapped = false;
-        }
-    }
-
-    void BeforeUnload() final override
-    {
-        ASSERT(!swapped);
-    }
-
-private:
-    bool swapped;
-};
-
-/// This hook is responsible for swapping Battlefield's
-template<typename Base>
-class ScriptRegistrySwapHooks<BattlefieldScript, Base>
-    : public ScriptRegistrySwapHookBase
-{
-public:
-    ScriptRegistrySwapHooks() : swapped(false) { }
-
-    void BeforeReleaseContext(std::string const& context) final override
-    {
-        auto const bounds = static_cast<Base*>(this)->_ids_of_contexts.equal_range(context);
-
-        if ((!swapped) && (bounds.first != bounds.second))
-        {
-            swapped = true;
-            sBattlefieldMgr->Die();
-        }
-    }
-
-    void BeforeSwapContext(bool initialize) override
-    {
-        // Never swap outdoor pvp scripts when initializing
-        if ((!initialize) && swapped)
-        {
-            sBattlefieldMgr->InitBattleFields();
             swapped = false;
         }
     }
@@ -1695,6 +1662,12 @@ bool ScriptMgr::OnAreaTrigger(Player* player, AreaTriggerEntry const* trigger)
     return tmpscript->OnTrigger(player, trigger);
 }
 
+Battlefield* ScriptMgr::CreateBattlefield(uint32 scriptId)
+{
+    GET_SCRIPT_RET(BattlefieldScript, scriptId, tmpscript, nullptr);
+    return tmpscript->GetBattlefield();
+}
+
 Battleground* ScriptMgr::CreateBattleground(BattlegroundTypeId /*typeId*/)
 {
     /// @todo Implement script-side battlegrounds.
@@ -1706,12 +1679,6 @@ OutdoorPvP* ScriptMgr::CreateOutdoorPvP(uint32 scriptId)
 {
     GET_SCRIPT_RET(OutdoorPvPScript, scriptId, tmpscript, nullptr);
     return tmpscript->GetOutdoorPvP();
-}
-
-Battlefield* ScriptMgr::CreateBattlefield(uint32 scriptId)
-{
-    GET_SCRIPT_RET(BattlefieldScript, scriptId, tmpscript, nullptr);
-    return tmpscript->GetBattlefield();
 }
 
 SpecialEvent* ScriptMgr::CreateSpecialEvent(uint32 scriptId)
@@ -2425,6 +2392,12 @@ bool OnlyOnceAreaTriggerScript::OnTrigger(Player* player, AreaTriggerEntry const
 void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(InstanceScript* script, uint32 triggerId) { script->ResetAreaTriggerDone(triggerId); }
 void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(Player const* player, AreaTriggerEntry const* trigger) { if (InstanceScript* instance = player->GetInstanceScript()) ResetAreaTriggerDone(instance, trigger->id); }
 
+BattlefieldScript::BattlefieldScript(char const* name)
+        : ScriptObject(name)
+{
+    ScriptRegistry<BattlefieldScript>::Instance()->AddScript(this);
+}
+
 BattlegroundScript::BattlegroundScript(char const* name)
     : ScriptObject(name)
 {
@@ -2435,12 +2408,6 @@ OutdoorPvPScript::OutdoorPvPScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<OutdoorPvPScript>::Instance()->AddScript(this);
-}
-
-BattlefieldScript::BattlefieldScript(char const* name)
-    : ScriptObject(name)
-{
-    ScriptRegistry<BattlefieldScript>::Instance()->AddScript(this);
 }
 
 SpecialEventScript::SpecialEventScript(char const* name)
@@ -2533,9 +2500,9 @@ template class TC_GAME_API ScriptRegistry<ItemScript>;
 template class TC_GAME_API ScriptRegistry<CreatureScript>;
 template class TC_GAME_API ScriptRegistry<GameObjectScript>;
 template class TC_GAME_API ScriptRegistry<AreaTriggerScript>;
+template class TC_GAME_API ScriptRegistry<BattlefieldScript>;
 template class TC_GAME_API ScriptRegistry<BattlegroundScript>;
 template class TC_GAME_API ScriptRegistry<OutdoorPvPScript>;
-template class TC_GAME_API ScriptRegistry<BattlefieldScript>;
 template class TC_GAME_API ScriptRegistry<SpecialEventScript>;
 template class TC_GAME_API ScriptRegistry<CommandScript>;
 template class TC_GAME_API ScriptRegistry<WeatherScript>;

@@ -186,7 +186,7 @@ void WorldSession::HandleMoveWorldportAck()
     bool InBattlefield = false;
     if (loc.GetMapId() == 571 && newzone == 4197)
     {
-        if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(newzone))
+        if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(newzone))
         {
             if (battlefield->IsWarTime())
                 _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
@@ -498,7 +498,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (plrMover && ((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
     {
         // now client not include swimming flag in case jumping under water
-        plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
+        plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetMap()->IsUnderWater(plrMover->GetPhaseMask(), movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
 
     bool jumpopcode = false;

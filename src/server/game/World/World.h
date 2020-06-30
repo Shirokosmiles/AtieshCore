@@ -157,6 +157,7 @@ enum WorldBoolConfigs
     CONFIG_QUEST_ENABLE_QUEST_TRACKER,
     CONFIG_WARDEN_ENABLED,
     CONFIG_ENABLE_MMAPS,
+    CONFIG_WINTERGRASP_ENABLE,
     CONFIG_UI_QUESTLEVELS_IN_DIALOGS,     // Should we add quest levels to the title in the NPC dialogs?
     CONFIG_EVENT_ANNOUNCE,
     CONFIG_STATS_LIMITS_ENABLE,
@@ -407,6 +408,12 @@ enum WorldIntConfigs
     CONFIG_WARDEN_DB_LOGLEVEL,
     CONFIG_WARDEN_NUM_MEM_CHECKS,
     CONFIG_WARDEN_NUM_OTHER_CHECKS,
+    CONFIG_WINTERGRASP_PLR_MAX,
+    CONFIG_WINTERGRASP_PLR_MIN,
+    CONFIG_WINTERGRASP_PLR_MIN_LVL,
+    CONFIG_WINTERGRASP_BATTLETIME,
+    CONFIG_WINTERGRASP_NOBATTLETIME,
+    CONFIG_WINTERGRASP_RESTART_AFTER_CRASH,
     CONFIG_PACKET_SPOOF_POLICY,
     CONFIG_PACKET_SPOOF_BANMODE,
     CONFIG_PACKET_SPOOF_BANDURATION,
@@ -601,18 +608,6 @@ enum RealmZone
     REALM_ZONE_CN2_6_9       = 35,                          // basic-Latin at create, any at login
     REALM_ZONE_CN3_7         = 36,                          // basic-Latin at create, any at login
     REALM_ZONE_CN5_8         = 37                           // basic-Latin at create, any at login
-};
-
-enum WorldStates
-{
-    WS_ARENA_DISTRIBUTION_TIME  = 20001,                     // Next arena distribution time
-    WS_WEEKLY_QUEST_RESET_TIME  = 20002,                     // Next weekly quest reset time
-    WS_BG_DAILY_RESET_TIME      = 20003,                     // Next daily BG reset time
-    WS_CLEANING_FLAGS           = 20004,                     // Cleaning Flags
-    WS_GUILD_DAILY_RESET_TIME   = 20006,                     // Next guild cap reset time
-    WS_MONTHLY_QUEST_RESET_TIME = 20007,                     // Next monthly quest reset time
-    WS_DAILY_QUEST_RESET_TIME   = 20008,                     // Next daily quest reset time
-    WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20009,      // Next daily calendar deletions of old events time
 };
 
 /// Storage class for commands issued for delayed execution

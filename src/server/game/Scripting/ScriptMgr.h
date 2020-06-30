@@ -26,8 +26,8 @@ class AccountMgr;
 class AuctionHouseObject;
 class Aura;
 class AuraScript;
-class Battleground;
 class Battlefield;
+class Battleground;
 class BattlegroundMap;
 class Channel;
 class ChatCommand;
@@ -480,6 +480,17 @@ class TC_GAME_API OnlyOnceAreaTriggerScript : public AreaTriggerScript
         void ResetAreaTriggerDone(Player const* /*player*/, AreaTriggerEntry const* /*trigger*/);
 };
 
+class TC_GAME_API BattlefieldScript : public ScriptObject
+{
+    protected:
+
+        BattlefieldScript(char const* name);
+
+    public:
+
+        virtual Battlefield* GetBattlefield() const = 0;
+};
+
 class TC_GAME_API BattlegroundScript : public ScriptObject
 {
     protected:
@@ -502,18 +513,6 @@ class TC_GAME_API OutdoorPvPScript : public ScriptObject
 
         // Should return a fully valid OutdoorPvP object for the type ID.
         virtual OutdoorPvP* GetOutdoorPvP() const = 0;
-};
-
-class TC_GAME_API BattlefieldScript : public ScriptObject
-{
-protected:
-
-    BattlefieldScript(char const* name);
-
-public:
-
-    // Should return a fully valid OutdoorPvP object for the type ID.
-    virtual Battlefield* GetBattlefield() const = 0;
 };
 
 class TC_GAME_API SpecialEventScript : public ScriptObject
@@ -1008,6 +1007,10 @@ class TC_GAME_API ScriptMgr
 
         bool OnAreaTrigger(Player* player, AreaTriggerEntry const* trigger);
 
+    public: /* BattlefieldScript */
+
+        Battlefield* CreateBattlefield(uint32 scriptId);
+
     public: /* BattlegroundScript */
 
         Battleground* CreateBattleground(BattlegroundTypeId typeId);
@@ -1015,10 +1018,6 @@ class TC_GAME_API ScriptMgr
     public: /* OutdoorPvPScript */
 
         OutdoorPvP* CreateOutdoorPvP(uint32 scriptId);
-
-    public: /* BattlefieldScript */
-
-        Battlefield* CreateBattlefield(uint32 scriptId);
 
     public: /* SpecialEventScript */
 

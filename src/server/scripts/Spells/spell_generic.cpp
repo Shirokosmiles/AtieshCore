@@ -214,7 +214,7 @@ class spell_spawn_blood_pool : public SpellScript
         Unit* caster = GetCaster();
         Position summonPos = caster->GetPosition();
         LiquidData liquidStatus;
-        if (caster->GetMap()->GetLiquidStatus(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), MAP_ALL_LIQUIDS, &liquidStatus, caster->GetCollisionHeight()))
+        if (caster->GetMap()->GetLiquidStatus(caster->GetPhaseMask(), caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), MAP_ALL_LIQUIDS, &liquidStatus, caster->GetCollisionHeight()))
             summonPos.m_positionZ = liquidStatus.level;
         dest.Relocate(summonPos);
     }
@@ -2203,7 +2203,7 @@ class spell_gen_mount : public SpellScriptLoader
                     bool canFly = spellInfo && (spellInfo->CheckLocation(target->GetMapId(), zoneid, areaid, target) == SPELL_CAST_OK);
 
                     // check battlefield
-                    Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(target->GetZoneId());
+                    Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
                     if (canFly && battlefield && !battlefield->CanFlyIn())
                         canFly = false;
 

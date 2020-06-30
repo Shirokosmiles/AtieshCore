@@ -107,7 +107,7 @@ bool Player::CheckOnFlyHack()
     float pz = npos.GetPositionZ();
     if (!IsInWater() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
     {
-        float waterlevel = GetBaseMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
+        float waterlevel = GetMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
         bool hovergaura = HasAuraType(SPELL_AURA_WATER_WALK) || HasAuraType(SPELL_AURA_HOVER);
         if (waterlevel && (pz - waterlevel) <= (hovergaura ? GetCollisionHeight() + 1.5f + GetHoverOffset() : GetCollisionHeight() + GetHoverOffset()))
             return true;
@@ -127,7 +127,7 @@ bool Player::CheckOnFlyHack()
         if (diff > 6.8f)
             if (diff > 6.8f + GetHoverOffset()) // better calculate the second time for false situations, but not call GetHoverOffset everytime (economy resource)
             {
-                float waterlevel = GetBaseMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
+                float waterlevel = GetMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
                 if (waterlevel && waterlevel + GetCollisionHeight() + GetHoverOffset() > pz)
                     return true;
 

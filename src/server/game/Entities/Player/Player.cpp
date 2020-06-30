@@ -24,9 +24,6 @@
 #include "Bag.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
-#include "../../../scripts/Battlefields/BattlefieldWintergrasp/BattlefieldWG.h"
-#include "SpecialEvent.h"
-#include "SpecialEventMgr.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundScore.h"
@@ -85,6 +82,8 @@
 #include "ReputationMgr.h"
 #include "SkillDiscovery.h"
 #include "SocialMgr.h"
+#include "SpecialEvent.h"
+#include "SpecialEventMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
@@ -1483,7 +1482,7 @@ void Player::Update(uint32 p_time)
     }
 
     // not auto-free ghost from body in instances or if its affected by risen ally
-    if (m_deathTimer > 0 && !GetBaseMap()->Instanceable() && !HasAuraType(SPELL_AURA_PREVENT_RESURRECTION) && !IsGhouled())
+    if (m_deathTimer > 0 && !GetMap()->Instanceable() && !HasAuraType(SPELL_AURA_PREVENT_RESURRECTION) && !IsGhouled())
     {
         if (p_time >= m_deathTimer)
         {
@@ -5088,8 +5087,8 @@ void Player::RepopAtGraveyard()
     {
         if (SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(GetZoneId()))
             ClosestGraveyard = battlefield->GetClosestGraveyardLocation(this);
-        else if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(GetZoneId()))
-            ClosestGraveyard = battlefield->GetClosestGraveyardLocation(this);
+        else if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
+            ClosestGraveyard = battlefield->GetClosestGraveyard(this);
         else
             ClosestGraveyard = sObjectMgr->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
     }
@@ -7104,7 +7103,7 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
         if (!sMapStore.LookupEntry(map))
             return 0;
 
-        zone = sMapMgr->GetZoneId(map, posx, posy, posz);
+        zone = sMapMgr->GetZoneId(PHASEMASK_NORMAL, map, posx, posy, posz);
 
         if (zone > 0)
         {
@@ -8457,8 +8456,8 @@ bool Player::CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const
     Called by remove insignia spell effect    */
 void Player::RemovedInsignia(Player* looterPlr)
 {
-    // If player is not in battleground and not in wintergrasp
-    if (!GetBattlegroundId() && GetZoneId() != AREA_WINTERGRASP)
+    // If player is not in battleground and not in worldpvpzone
+    if (!GetBattlegroundId() && !IsInWorldPvpZone())
         return;
 
     // If not released spirit, do it !
@@ -8922,7 +8921,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     OutdoorPvP* outdoorPvP = sOutdoorPvPMgr->GetOutdoorPvPToZoneId(zoneId);
     InstanceScript* instance = GetInstanceScript();
     //SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(zoneId);
-    Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefieldByZoneId(zoneId);
+    Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(zoneId);
 
     TC_LOG_DEBUG("network", "Player::SendInitWorldStates: Sending SMSG_INIT_WORLD_STATES for Map: %u, Zone: %u", mapId, zoneId);
 
@@ -9507,7 +9506,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
         }
         break;
     case 4197: // Wintergrasp
-        if (battlefield && battlefield->GetBattleId() == BATTLEFIELD_BATTLEID_WINTERGRASP)
+        if (battlefield && battlefield->GetBattleId() == BATTLEFIELD_WG)
         {
             battlefield->FillInitialWorldStates(packet);
             break;
@@ -9539,12 +9538,12 @@ void Player::SendBGWeekendWorldStates() const
 void Player::SendBattlefieldWorldStates() const
 {
     /// Send misc stuff that needs to be sent on every login, like the battle timers.
-    if (Battlefield* battlefield = sBattlefieldMgr->GetEnabledBattlefield(BATTLEFIELD_BATTLEID_WINTERGRASP))
-    {
-        SendUpdateWorldState(WORLDSTATE_WINTERGRASP_ACTIVE, battlefield->IsWarTime() ? 0 : 1);
-        uint32 timer = battlefield->IsWarTime() ? 0 : (battlefield->GetTimer() / 1000); // 0 - Time to next battle
-        SendUpdateWorldState(ClockWorldState[1], uint32(GameTime::GetGameTime() + timer));
-    }
+        if (Battlefield* wg = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
+        {
+            SendUpdateWorldState(WS_BATTLEFIELD_WG_ACTIVE, wg->IsWarTime() ? 0 : 1);
+            uint32 timer = wg->IsWarTime() ? 0 : (wg->GetTimer() / 1000); // 0 - Time to next battle
+            SendUpdateWorldState(WS_BATTLEFIELD_WG_TIME_NEXT_BATTLE, uint32(GameTime::GetGameTime() + timer));
+        }
 }
 
 uint32 Player::GetXPRestBonus(uint32 xp)
@@ -24083,7 +24082,7 @@ bool Player::isHonorOrXPTarget(Unit* victim) const
 
     if (Creature const* creature = victim->ToCreature())
     {
-        if (!creature->CanGiveExperience())
+        if (creature->IsCritter() || creature->IsTotem())
             return false;
     }
     return true;

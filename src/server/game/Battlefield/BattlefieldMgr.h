@@ -19,85 +19,48 @@
 #define BATTLEFIELD_MGR_H_
 
 #include "Battlefield.h"
-#include <unordered_map>
-
-struct BattleFieldList
-{
-    std::string scriptname;
-    uint32 cooldownTimer;
-    uint32 durationTimer;    
-    bool enabled;
-    uint32 minlevel;
-    uint32 maxplayers;
-    uint8 controlteam;
-    uint32 remainingtime;
-    bool active;
-    std::string comment;
-};
-typedef std::unordered_map<uint32, BattleFieldList> BattleFieldInfoContainer;
 
 class Player;
-class BattleField;
 class ZoneScript;
-enum BattlefieldId;
 
+// class to handle player enter / leave / areatrigger / GO use events
 class TC_GAME_API BattlefieldMgr
 {
-    private:
-        BattlefieldMgr();
-        ~BattlefieldMgr() { };
-
     public:
         static BattlefieldMgr* instance();
 
-        // cleanup
-        void Die();
-
-        // create SpecialEvents
-        void InitBattleFields();
-
-        void Update(uint32 diff);
-
-        // event sector
-        void AddBattlefield(uint32 eventId, Battlefield* handle);
-
-        Battlefield* GetEnabledBattlefieldByZoneId(uint32 zoneId);
-        Battlefield* GetEnabledBattlefield(BattlefieldId battleId);
-
-        // ZoneScript
-        void AddZone(uint32 zoneId, Battlefield* handle);
-        ZoneScript* GetZoneScriptbyZoneId(uint32 zoneId) const;
-        ZoneScript* GetZoneScriptbyEventId(uint32 eventId) const;
+        // create battlefield events
+        void InitBattlefield();
 
         // called when a player enters an battlefield area
         void HandlePlayerEnterZone(Player* player, uint32 zoneId);
         // called when player leaves an battlefield area
         void HandlePlayerLeaveZone(Player* player, uint32 zoneId);
 
+        // return assigned battlefield
+        Battlefield* GetBattlefieldToZoneId(uint32 zoneId);
+        Battlefield* GetBattlefieldByBattleId(uint32 battleId);
+
+        ZoneScript* GetZoneScript(uint32 zoneId);
+
+        void AddZone(uint32 zoneId, Battlefield* bf);
+
+        void Update(uint32 diff);
+
     private:
+        BattlefieldMgr();
+        ~BattlefieldMgr();
+
         typedef std::vector<Battlefield*> BattlefieldSet;
-        typedef std::unordered_map<uint32 /*eventid*/, Battlefield*> BattlefieldMap;
-        typedef std::unordered_map<uint32 /*zoneid*/, Battlefield*> BattlefieldZoneMap;
-        typedef std::array<uint32, BATTLEFIELD_BATTLEID_MAX> BattlefieldScriptIds;        
-
-        // contains all initiated outdoor pvp events
+        typedef std::map<uint32 /*zoneId*/, Battlefield*> BattlefieldMap;
+        // contains all initiated battlefield events
         // used when initing / cleaning up
-        BattlefieldSet m_BattlefieldSet;
-
-        // maps the event ids to an outdoor pvp event
+        BattlefieldSet _battlefieldSet;
+        // maps the zone ids to an battlefield event
         // used in player event handling
-        BattlefieldMap m_BattlefieldMap;
-
-        // maps the zone ids to an outdoor pvp event
-        // used in player event handling
-        BattlefieldZoneMap m_BattlefieldZoneMap;
-
-        // Holds the outdoor PvP templates
-        BattlefieldScriptIds m_BattlefieldScriptIds;
-
-        BattleFieldInfoContainer m_BattleFieldInfoContainer;
+        BattlefieldMap _battlefieldMap;
         // update interval
-        uint32 m_updateTimer;
+        uint32 _updateTimer;
 };
 
 #define sBattlefieldMgr BattlefieldMgr::instance()
