@@ -181,12 +181,11 @@ bool Battlefield::Update(uint32 diff)
         }
         else
             m_uiKickDontAcceptTimer -= diff;
-
-        for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-            if (itr->second->Update(diff))
-                objective_changed = true;
     }
 
+    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+        if (itr->second->Update(diff))
+            objective_changed = true;
 
     if (m_LastResurrectTimer <= diff)
     {
@@ -941,6 +940,18 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
     }
 
     return true;
+}
+
+void BfCapturePoint::SetTeam(TeamId newTeam)
+{
+    m_team = newTeam;
+    m_value = m_maxValue;
+
+    if (newTeam == TEAM_NEUTRAL)
+        m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL;
+    else
+        m_State = newTeam == TEAM_ALLIANCE ? BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE : BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE;
+    SendChangePhase();
 }
 
 GameObject* BfCapturePoint::GetCapturePointGo()

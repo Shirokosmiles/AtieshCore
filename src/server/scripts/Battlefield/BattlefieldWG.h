@@ -41,6 +41,54 @@ struct WintergraspObjectPositionData;
 typedef std::vector<BfWGGameObjectBuilding*> GameObjectBuildingVect;
 typedef std::vector<WintergraspWorkshop*> WorkshopVect;
 
+enum NPCtype
+{
+    // Attacker sector
+    WEST_TOWER_GUARD,
+    MIDDLE_TOWER_GUARD,
+    EAST_TOWER_GUARD,
+
+    WEST_BRIDGE_GUARD,
+    MIDDLE_BRIDGE_GUARD,
+    EAST_BRIDGE_GUARD,
+
+    WEST_TOWER_TURRET,
+    MIDDLE_TOWER_TURRET,
+    EAST_TOWER_TURRET,
+
+    // Defender sector
+    NE_TOWER_GUARD,
+    NW_TOWER_GUARD,
+    SE_TOWER_GUARD,
+    SW_TOWER_GUARD,
+    FORTRESS_GATE_GUARD,
+    VAULT_GATE_GUARD,
+
+    FORTRESS_GATE_TURRET,
+    VAULT_GATE_TURRET,
+    NE_TOWER_TURRET,
+    NW_TOWER_TURRET,
+    SE_TOWER_TURRET,
+    SW_TOWER_TURRET,
+
+    //workshop sector
+    WG_WORKSHOP_SE_GUARD,
+    WG_WORKSHOP_SW_GUARD,
+    WG_WORKSHOP_NE_GUARD,
+    WG_WORKSHOP_NW_GUARD,
+    WG_WORKSHOP_KEEP_WEST_GUARD,
+    WG_WORKSHOP_KEEP_EAST_GUARD
+};
+
+struct CreatureHolder
+{
+    ObjectGuid m_GUID;
+    uint8 m_npcType;
+    TeamId m_team;
+    bool m_isActive;
+};
+typedef std::unordered_map<uint32, CreatureHolder> CreatureHolderContainer;
+
 enum WintergraspSpells
 {
     // Wartime auras
@@ -355,6 +403,16 @@ class BattlefieldWG : public Battlefield
 
         uint32 GetData(uint32 data) const override;
 
+        bool IsCreatureInHolder(ObjectGuid guid);
+        bool AddCreatureInHolderByGUID(Creature* creature, uint8 npcType, TeamId team = TEAM_NEUTRAL);
+        void UpdateStatusForCreature(Creature* creature, uint8 npcType);
+        void ShowCreatureByNPCType(uint8 npcType, TeamId team);
+        void HideCreatureByNPCType(uint8 npcType, TeamId team);
+        void UpdateCreatureTurretByNPCType(uint8 npcType, TeamId team);
+        void HideCreatureTurretByNPCType(uint8 npcType);
+
+        void UpdateAllGuardsAndTurretsBeforeBattle();
+
     protected:
         bool m_isRelicInteractible;
 
@@ -364,13 +422,14 @@ class BattlefieldWG : public Battlefield
         GameObjectBuildingVect BuildingsInZone;
 
         GuidUnorderedSet m_vehicles[PVP_TEAMS_COUNT];
-        GuidVector CanonList;
 
         TeamId m_tenacityTeam;
         uint32 m_tenacityStack;
         uint32 m_saveTimer;
 
         ObjectGuid m_titansRelicGUID;
+
+        CreatureHolderContainer m_CreatureMap;
 };
 
 enum WintergraspGameObjectBuildingType
@@ -480,10 +539,10 @@ enum WintergraspGameObject
 
     GO_WINTERGRASP_TITAN_S_RELIC                 = 192829,
 
-    GO_WINTERGRASP_FORTRESS_TOWER_1              = 190221,
-    GO_WINTERGRASP_FORTRESS_TOWER_2              = 190373,
-    GO_WINTERGRASP_FORTRESS_TOWER_3              = 190377,
-    GO_WINTERGRASP_FORTRESS_TOWER_4              = 190378,
+    GO_WINTERGRASP_FORTRESS_TOWER_NW             = 190221,
+    GO_WINTERGRASP_FORTRESS_TOWER_SW             = 190373,
+    GO_WINTERGRASP_FORTRESS_TOWER_SE             = 190377,
+    GO_WINTERGRASP_FORTRESS_TOWER_NE             = 190378,
 
     GO_WINTERGRASP_SHADOWSIGHT_TOWER             = 190356,
     GO_WINTERGRASP_WINTER_S_EDGE_TOWER           = 190357,
@@ -509,6 +568,9 @@ private:
     // Linked gameobject
     ObjectGuid _buildGUID;
 
+    // ID building
+    uint32 _buildID;
+
     // the team that controls this point
     TeamId _teamControl;
 
@@ -520,16 +582,11 @@ private:
     StaticWintergraspTowerInfo const* _staticTowerInfo;
 
     // GameObject associations
-    GuidVector m_GameObjectList[PVP_TEAMS_COUNT];
-
-    // Creature associations
-    GuidVector m_CreatureBottomList[PVP_TEAMS_COUNT];
-    GuidVector m_CreatureTopList[PVP_TEAMS_COUNT];
-    GuidVector m_TowerCannonBottomList;
-    GuidVector m_TurretTopList;
+    GuidVector m_GameObjectList[3];
 
 public:
     BfWGGameObjectBuilding(BattlefieldWG* wg, WintergraspGameObjectBuildingType type, uint32 worldState);
+    ~BfWGGameObjectBuilding();
     void Init(GameObject* go);
 
     ObjectGuid const& GetGUID() const { return _buildGUID; }
@@ -543,13 +600,19 @@ public:
     // Called when associated gameobject is destroyed
     void Destroyed();
 
-    void UpdateCreatureAndGo();
-
-    void UpdateTurretAttack(bool disable);
-
+    void UpdateGo();
     void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet);
 
     void Save();
+
+    uint32 GetID() { return _buildID; }
+    bool IsAttackTower() { return _buildID >= BATTLEFIELD_WG_TOWER_SHADOWSIGHT && _buildID <= BATTLEFIELD_WG_TOWER_FLAMEWATCH; }
+    bool IsAttackSide() { return IsAttackTower(); }
+
+    bool IsAlive() { return _state != BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_DESTROY && _state != BATTLEFIELD_WG_OBJECTSTATE_HORDE_DESTROY && _state != BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY; }
+    TeamId GetTeamController() { return _teamControl; }
+
+    WintergraspGameObjectBuildingType GetType() { return _type; }
 };
 
 // Structure for the 6 workshop
@@ -557,14 +620,19 @@ struct WintergraspWorkshop
 {
 private:
     BattlefieldWG* _wg;                             // Pointer to wintergrasp
+    WintergraspCapturePoint* _capturePoint;
     ObjectGuid _buildGUID;
     WintergraspGameObjectState _state;              // For worldstate
     TeamId _teamControl;                            // Team witch control the workshop
 
     StaticWintergraspWorkshopInfo const* _staticInfo;
 
+    // GameObject associations
+    GuidVector m_GameObjectList[3];
+
 public:
     WintergraspWorkshop(BattlefieldWG* wg, uint8 type);
+    ~WintergraspWorkshop();
 
     uint8 GetId() const;
     TeamId GetTeamControl() const { return _teamControl; }
@@ -577,6 +645,10 @@ public:
     void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet);
 
     void Save();
+
+    void UpdateCreatureAndGo();
+    void LinkCapturePoint(WintergraspCapturePoint* capturePoint) { _capturePoint = capturePoint; }
+    WintergraspCapturePoint* GetCapturePoint() const { return _capturePoint; }
 };
 
 #endif

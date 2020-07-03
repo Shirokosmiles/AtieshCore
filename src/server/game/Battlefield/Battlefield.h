@@ -82,6 +82,15 @@ struct WorldSafeLocsEntry;
 typedef std::vector<BfGraveyard*> GraveyardVect;
 typedef std::map<ObjectGuid, time_t> PlayerTimerMap;
 
+struct PlayerHolder
+{
+    ObjectGuid GUID;
+    bool inZone;
+    bool isRegistered;
+    TeamId team;
+};
+typedef std::unordered_map<uint32, PlayerHolder> PlayerHolderContainer;
+
 class TC_GAME_API BfCapturePoint
 {
     public:
@@ -111,6 +120,7 @@ class TC_GAME_API BfCapturePoint
         virtual void SendChangePhase();
 
         bool SetCapturePointData(GameObject* capturePoint);
+        void SetTeam(TeamId newTeam);
         GameObject* GetCapturePointGo();
         uint32 GetCapturePointEntry() const { return m_capturePointEntry; }
 
@@ -399,7 +409,7 @@ class TC_GAME_API Battlefield : public ZoneScript
         uint32 m_StartGroupingTimer;                            // Timer for invite players in area 15 minute before start battle
         bool m_StartGrouping;                                   // bool for know if all players in area has been invited
 
-        GuidUnorderedSet m_Groups[PVP_TEAMS_COUNT];              // Contain different raid group
+        GuidUnorderedSet m_Groups[PVP_TEAMS_COUNT];             // Contain different raid group
 
         std::vector<uint64> m_Data64;
         std::vector<uint32> m_Data32;
