@@ -331,13 +331,19 @@ class npc_wg_queue : public CreatureScript
                 if (!wintergrasp)
                     return true;
 
-                if (wintergrasp->IsWarTime())
-                    wintergrasp->InvitePlayerToWar(player);
-                else
+                if (wintergrasp->PlayerInBFPlayerMap(player))
+                    return true;
+
+                if (wintergrasp->GetFreeslot(player->GetCFSTeamId()))
                 {
-                    uint32 timer = wintergrasp->GetTimer() / 1000;
-                    if (timer < 15 * MINUTE)
-                        wintergrasp->InvitePlayerToQueue(player);
+                    if (wintergrasp->IsWarTime())
+                        wintergrasp->InviteNewPlayerToWar(player, false);
+                    else
+                    {
+                        uint32 timer = wintergrasp->GetTimer() / 1000;
+                        if (timer < 15 * MINUTE)
+                            wintergrasp->InviteNewPlayerToQueue(player, false);
+                    }
                 }
                 return true;
             }

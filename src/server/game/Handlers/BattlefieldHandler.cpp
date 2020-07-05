@@ -148,7 +148,7 @@ void WorldSession::HandleBattlefieldEntryInviteResponse(WorldPackets::Battlefiel
     if (accepted)
         battlefield->PlayerAcceptInviteToWar(_player);
     else
-        battlefield->AskToLeaveQueue(_player);
+        battlefield->PlayerDeclineInviteToWar(_player);
 }
 
 /**
@@ -168,6 +168,8 @@ void WorldSession::HandleBattlefieldQueueInviteResponse(WorldPackets::Battlefiel
 
     if (accepted)
         battlefield->PlayerAcceptInviteToQueue(_player);
+    else
+        battlefield->PlayerDeclineInviteToQueue(_player);
 }
 
 /**

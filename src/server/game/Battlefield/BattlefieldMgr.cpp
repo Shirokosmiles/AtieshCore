@@ -95,7 +95,7 @@ void BattlefieldMgr::HandlePlayerEnterZone(Player* player, uint32 zoneId)
         return;
 
     Battlefield* bf = itr->second;
-    if (!bf->IsEnabled() || bf->HasPlayer(player))
+    if (!bf->IsEnabled())
         return;
 
     bf->HandlePlayerEnterZone(player, zoneId);
@@ -106,10 +106,6 @@ void BattlefieldMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneId)
 {
     BattlefieldMap::iterator itr = _battlefieldMap.find(zoneId);
     if (itr == _battlefieldMap.end())
-        return;
-
-    // teleport: remove once in removefromworld, once in updatezone
-    if (!itr->second->HasPlayer(player))
         return;
 
     itr->second->HandlePlayerLeaveZone(player, zoneId);

@@ -453,6 +453,7 @@ Player::Player(WorldSession* session): Unit(true)
     _activeCheats = CHEAT_NONE;
     healthBeforeDuel = 0;
     manaBeforeDuel = 0;
+    inBattlefieldWar = false;
 
     _cinematicMgr = new CinematicMgr(this);
 
@@ -1798,6 +1799,13 @@ void Player::ToggleAFK()
     // afk player not allowed in battleground
     if (!IsGameMaster() && isAFK() && InBattleground() && !InArena())
         LeaveBattleground();
+
+    // afk player not allowed in battlefield
+    if (!IsGameMaster() && isAFK() && InBattlefildWar())
+    {
+        if (Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
+            wintergrasp->KickPlayerFromBattlefield(GetGUID());
+    }
 }
 
 void Player::ToggleDND()

@@ -1,4 +1,4 @@
-DELETE FROM `creature` WHERE `guid` between 300000 and 300139;
+DELETE FROM `creature` WHERE `guid` between 300000 and 300281;
 DELETE FROM `creature` WHERE `id` = 30739 AND map = 571;
 DELETE FROM `creature` WHERE `id` = 30740 AND map = 571;
 
@@ -55,6 +55,28 @@ DELETE FROM `gameobject` WHERE `guid` = 7167;
 DELETE FROM `gameobject` WHERE `guid` = 76052;
 DELETE FROM `gameobject` WHERE `guid` = 7164;
 DELETE FROM `gameobject` WHERE `guid` = 76051;
+
+-- SE workshop
+DELETE FROM `gameobject` WHERE `guid` = 67252;
+DELETE FROM `gameobject` WHERE `guid` = 75193;
+DELETE FROM `gameobject` WHERE `guid` = 67250;
+DELETE FROM `gameobject` WHERE `guid` = 75192;
+DELETE FROM `gameobject` WHERE `guid` = 66678;
+DELETE FROM `gameobject` WHERE `guid` = 75173;
+DELETE FROM `gameobject` WHERE `guid` = 67254;
+DELETE FROM `gameobject` WHERE `guid` = 75194;
+
+-- SW workshop
+DELETE FROM `gameobject` WHERE `guid` = 75177;
+DELETE FROM `gameobject` WHERE `guid` = 75178;
+DELETE FROM `gameobject` WHERE `guid` = 66679;
+DELETE FROM `gameobject` WHERE `guid` = 75174;
+DELETE FROM `gameobject` WHERE `guid` = 67264;
+DELETE FROM `gameobject` WHERE `guid` = 75184;
+DELETE FROM `gameobject` WHERE `guid` = 67242;
+DELETE FROM `gameobject` WHERE `guid` = 75185;
+DELETE FROM `gameobject` WHERE `guid` = 67244;
+DELETE FROM `gameobject` WHERE `guid` = 75186;
 
 SET @CGUID := 300000;
 INSERT INTO `creature`(`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 

@@ -2065,6 +2065,13 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetRandomWinner(bool isWinner);
 
         /*********************************************************/
+        /***               BATTLEFIELD PVP SYSTEM              ***/
+        /*********************************************************/
+
+        bool InBattlefildWar() { return inBattlefieldWar; }
+        void SetBattlefieldWarMember(bool value) { inBattlefieldWar = value; }
+
+        /*********************************************************/
         /***               OUTDOOR PVP SYSTEM                  ***/
         /*********************************************************/
 
@@ -2673,6 +2680,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // variables to save health and mana before duel and restore them after duel
         uint32 healthBeforeDuel;
         uint32 manaBeforeDuel;
+
+        bool inBattlefieldWar;
 
         // variables from CrossBGFaction
         uint8 m_FakeRace;

@@ -620,7 +620,6 @@ struct WintergraspWorkshop
 {
 private:
     BattlefieldWG* _wg;                             // Pointer to wintergrasp
-    WintergraspCapturePoint* _capturePoint;
     ObjectGuid _buildGUID;
     WintergraspGameObjectState _state;              // For worldstate
     TeamId _teamControl;                            // Team witch control the workshop
@@ -647,8 +646,6 @@ public:
     void Save();
 
     void UpdateCreatureAndGo();
-    void LinkCapturePoint(WintergraspCapturePoint* capturePoint) { _capturePoint = capturePoint; }
-    WintergraspCapturePoint* GetCapturePoint() const { return _capturePoint; }
 };
 
 #endif
