@@ -72,12 +72,12 @@ enum NPCtype
     SW_TOWER_TURRET,
 
     //workshop sector
-    WG_WORKSHOP_SE_GUARD,
-    WG_WORKSHOP_SW_GUARD,
-    WG_WORKSHOP_NE_GUARD,
-    WG_WORKSHOP_NW_GUARD,
-    WG_WORKSHOP_KEEP_WEST_GUARD,
-    WG_WORKSHOP_KEEP_EAST_GUARD
+    WG_WORKSHOP_SE,
+    WG_WORKSHOP_SW,
+    WG_WORKSHOP_NE,
+    WG_WORKSHOP_NW,
+    WG_WORKSHOP_KEEP_WEST,
+    WG_WORKSHOP_KEEP_EAST
 };
 
 struct CreatureHolder
@@ -227,6 +227,9 @@ enum WintergraspNpcs
 
     NPC_TAUNKA_SPIRIT_GUIDE                         = 31841, // Horde spirit guide for Wintergrasp
     NPC_DWARVEN_SPIRIT_GUIDE                        = 31842, // Alliance spirit guide for Wintergrasp
+
+    NPC_WORKSHOP_MECHANIC_HORDE                     = 30499, // Horde mechanic for Wintergrasp
+    NPC_WORKSHOP_MECHANIC_ALLIANCE                  = 30400, // Alliance mechanic for Wintergrasp
 
     NPC_WINTERGRASP_SIEGE_ENGINE_ALLIANCE           = 28312,
     NPC_WINTERGRASP_SIEGE_ENGINE_HORDE              = 32627,

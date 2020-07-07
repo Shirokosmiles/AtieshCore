@@ -65,6 +65,8 @@ uint32 const ClockWorldState[]         = { 3781, 4354 };
 uint32 const WintergraspFaction[]      = { FACTION_ALLIANCE_GENERIC_WG, FACTION_HORDE_GENERIC_WG, FACTION_FRIENDLY };
 //TEAM_ALLIANCE/TEAM_HORDE
 uint32 const NPCGuardFaction[] = { 1891, 1979 };
+//TEAM_ALLIANCE/TEAM_HORDE
+uint32 const NPCMechanicFaction[] = { 1732, 1735 };
 /*
     WEST_TOWER_GUARD,
     MIDDLE_TOWER_GUARD,
@@ -276,10 +278,10 @@ WintergraspGameObjectWorkshopData const WGworkshopData[WG_MAX_WORKSHOPGO] =
     { { 4398.08f, 2356.5f, 376.19f, 0.525406f }, { 0.f, 0.f, 0.259692f, 0.965692f }, 194959 },
     // SW
     { { 4390.78f, 3304.09f, 372.429f, 6.09702f }, { 0.f, 0.f, 0.0929482f, -0.995671f }, 194962 },
-    // NW
-    { { 4948.52f, 3342.34f, 376.875f, 4.40057f }, { 0.f, 0.f, 0.808329f, -0.588731f }, 190487 },
     // NE
-    { { 4949.34f, 2432.59f, 320.177f, 1.38621f }, { 0.f, 0.f, 0.638929f, 0.769266f }, 190475 }
+    { { 4949.34f, 2432.59f, 320.177f, 1.38621f }, { 0.f, 0.f, 0.638929f, 0.769266f }, 192626 },
+    // NW
+    { { 4948.52f, 3342.34f, 376.875f, 4.40057f }, { 0.f, 0.f, 0.808329f, -0.588731f }, 192627 }
 };
 
 // *********************************************************
@@ -408,14 +410,23 @@ WintergraspWorkshopData const WorksshopGO[WG_MAX_WORKSHOPS] =
     {
         BATTLEFIELD_WG_WORKSHOP_NE,
         {
+            { { 4991.08f, 2525.76f, 340.918f, 4.04044f }, { 0.f, 0.f, 0.900698f, -0.434447f }, 192290, 192291 },    // Flag on west side
+            { { 5004.35f, 2486.36f, 358.449f, 2.17294f }, { 0.f, 0.f, 0.884989f, 0.465612f }, 192460, 192427 },     // banner on west side (north)
+            { { 4983.22f, 2503.27f, 357.96f, -0.436332f }, { 0.f, 0.f, -0.216439f, 0.976296f }, 192461, 192428 },   // banner on west side (south)
 
+            { { 4778.19f, 2438.06f, 345.644f, -2.94088f }, { 0.f, 0.f, -0.994969f, 0.100188f }, 192289, 192288 },   // Flag on south side
+            { { 4811.44f, 2441.85f, 357.982f, -2.02458f }, { 0.f, 0.f, -0.848048f, 0.52992f }, 192458, 192425 },    // banner on west side (west)
+            { { 4805.67f, 2407.48f, 358.191f, 1.78023f }, { 0.f, 0.f, 0.777144f, 0.629323f }, 192459, 192426 }      // banner on west side (east)
         }
     },
     // North West Workshop
     {
         BATTLEFIELD_WG_WORKSHOP_NW,
         {
-
+            { { 4857.97f, 3335.44f, 368.881f, -2.94959f }, { 0.f, 0.f, -0.995395f, 0.0958539f }, 192280, 192281 },    // Flag on south side
+            { { 4855.44f, 3297.6f, 376.496f, -3.11539f }, { 0.f, 0.f, -0.999914f, 0.0131009f }, 192435, 192401 },     // banner on south side
+            { { 5006.32f, 3280.36f, 371.242f, 2.24275f }, { 0.f, 0.f, 0.900699f, 0.434444f }, 192283, 192282 },       // Flag on east side
+            { { 5041.65f, 3294.32f, 381.92f, -1.6057f }, { 0.f, 0.f, -0.719339f, 0.694659f }, 192434, 192400 }        // banner on east side
         }
     },
     // fortness West Workshop
@@ -840,6 +851,76 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                 m_GraveyardList[graveyardId]->SetSpirit(creature, teamId);
             break;
         }
+        case NPC_WORKSHOP_MECHANIC_HORDE:
+        {
+            bool registered = false;
+            // SE workshop
+            if (creature->GetScriptName() == "wg_se_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, TEAM_HORDE))
+                    registered = true;
+            }
+
+            // SW workshop
+            if (creature->GetScriptName() == "wg_sw_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, TEAM_HORDE))
+                    registered = true;
+            }
+
+            // NE workshop
+            if (creature->GetScriptName() == "wg_ne_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, TEAM_HORDE))
+                    registered = true;
+            }
+
+            // NW workshop
+            if (creature->GetScriptName() == "wg_nw_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, TEAM_HORDE))
+                    registered = true;
+            }
+
+            if (!registered)
+                TC_LOG_ERROR("system", "NPC_WINTERGRASP_TOWER_CANNON not registered for GUID : %u", creature->GetSpawnId());
+            break;
+        }
+        case NPC_WORKSHOP_MECHANIC_ALLIANCE:
+        {
+            bool registered = false;
+            // SE workshop
+            if (creature->GetScriptName() == "wg_se_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            // SW workshop
+            if (creature->GetScriptName() == "wg_sw_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            // NE workshop
+            if (creature->GetScriptName() == "wg_ne_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            // NW workshop
+            if (creature->GetScriptName() == "wg_nw_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            if (!registered)
+                TC_LOG_ERROR("system", "NPC_WINTERGRASP_TOWER_CANNON not registered for GUID : %u", creature->GetSpawnId());
+            break;
+        }
         case NPC_WINTERGRASP_TOWER_CANNON:
         {
             bool registered = false;
@@ -959,10 +1040,55 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             }
 
             // COMMON SIDE SECTION
-            // east Vehicle Shop
-            if (creature->GetScriptName() == "wg_workshop_SE_guard")
+            // SE workshop
+            if (creature->GetScriptName() == "wg_se_workshop_standing_guard")
             {
-                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE))
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_se_workshop_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            // SW workshop
+            if (creature->GetScriptName() == "wg_sw_workshop_standing_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_sw_workshop_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            // NE workshop
+            if (creature->GetScriptName() == "wg_ne_workshop_standing_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_ne_workshop_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            // NW workshop
+            if (creature->GetScriptName() == "wg_nw_workshop_standing_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_nw_workshop_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, TEAM_ALLIANCE))
                     registered = true;
             }
 
@@ -1090,10 +1216,55 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             }
 
             // COMMON SIDE SECTION
-            // east Vehicle Shop
-            if (creature->GetScriptName() == "wg_workshop_SE_guard")
+            // SE workshop
+            if (creature->GetScriptName() == "wg_se_workshop_standing_guard")
             {
-                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE_GUARD, TEAM_HORDE))
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, TEAM_HORDE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_se_workshop_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, TEAM_HORDE))
+                    registered = true;
+            }
+
+            // SW workshop
+            if (creature->GetScriptName() == "wg_sw_workshop_standing_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, TEAM_HORDE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_sw_workshop_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, TEAM_HORDE))
+                    registered = true;
+            }
+
+            // NE workshop
+            if (creature->GetScriptName() == "wg_ne_workshop_standing_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, TEAM_HORDE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_ne_workshop_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, TEAM_HORDE))
+                    registered = true;
+            }
+
+            // NW workshop
+            if (creature->GetScriptName() == "wg_nw_workshop_standing_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, TEAM_HORDE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_nw_workshop_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, TEAM_HORDE))
                     registered = true;
             }
 
@@ -1852,12 +2023,44 @@ void BattlefieldWG::UpdateStatusForCreature(Creature* creature, uint8 npcType)
         }
 
         //workshop sector
-        case WG_WORKSHOP_SE_GUARD: break;
-        case WG_WORKSHOP_SW_GUARD: break;
-        case WG_WORKSHOP_NE_GUARD: break;
-        case WG_WORKSHOP_NW_GUARD: break;
-        case WG_WORKSHOP_KEEP_WEST_GUARD: break;
-        case WG_WORKSHOP_KEEP_EAST_GUARD: break;
+        case WG_WORKSHOP_SE:
+        case WG_WORKSHOP_SW:
+        case WG_WORKSHOP_NE:
+        case WG_WORKSHOP_NW:
+        case WG_WORKSHOP_KEEP_WEST:
+        case WG_WORKSHOP_KEEP_EAST:
+        {
+            uint8 groupbyworkshopid = 0;
+            for (WintergraspWorkshop* workshop : Workshops)
+            {
+                groupbyworkshopid = npcType - 21;
+                if (workshop->GetId() == groupbyworkshopid)
+                {
+                    switch (creature->GetEntry())
+                    {
+                        case NPC_WORKSHOP_MECHANIC_HORDE:
+                        case NPC_WORKSHOP_MECHANIC_ALLIANCE:
+                        {
+                            if (creature->GetFaction() == NPCMechanicFaction[workshop->GetTeamControl()])
+                                ShowNpc(creature, true);
+                            else
+                                HideNpc(creature);
+                            break;
+                        }
+                        case BATTLEFIELD_WG_NPC_GUARD_H:
+                        case BATTLEFIELD_WG_NPC_GUARD_A:
+                        {
+                            if (creature->GetFaction() == NPCGuardFaction[workshop->GetTeamControl()])
+                                ShowNpc(creature, true);
+                            else
+                                HideNpc(creature);
+                            break;
+                        }
+                    }
+                }
+            }
+            break;
+        }
     }
 }
 
@@ -1941,23 +2144,23 @@ void BattlefieldWG::UpdateAllGuardsAndTurretsBeforeBattle()
 
     //              workshops
     // guards
-    ShowCreatureByNPCType(WG_WORKSHOP_SE_GUARD, GetAttackerTeam()); // workshop on south should be owned by attacker team by default
-    HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, GetDefenderTeam());
+    ShowCreatureByNPCType(WG_WORKSHOP_SE, GetAttackerTeam()); // workshop on south should be owned by attacker team by default
+    HideCreatureByNPCType(WG_WORKSHOP_SE, GetDefenderTeam());
 
-    ShowCreatureByNPCType(WG_WORKSHOP_SW_GUARD, GetAttackerTeam()); // workshop on south should be owned by attacker team by default
-    HideCreatureByNPCType(WG_WORKSHOP_SW_GUARD, GetDefenderTeam());
+    ShowCreatureByNPCType(WG_WORKSHOP_SW, GetAttackerTeam()); // workshop on south should be owned by attacker team by default
+    HideCreatureByNPCType(WG_WORKSHOP_SW, GetDefenderTeam());
 
-    ShowCreatureByNPCType(WG_WORKSHOP_NE_GUARD, GetDefenderTeam()); // workshop on north should be owned by defender team by default
-    HideCreatureByNPCType(WG_WORKSHOP_NE_GUARD, GetAttackerTeam());
+    ShowCreatureByNPCType(WG_WORKSHOP_NE, GetDefenderTeam()); // workshop on north should be owned by defender team by default
+    HideCreatureByNPCType(WG_WORKSHOP_NE, GetAttackerTeam());
 
-    ShowCreatureByNPCType(WG_WORKSHOP_NW_GUARD, GetDefenderTeam()); // workshop on north should be owned by defender team by default
-    HideCreatureByNPCType(WG_WORKSHOP_NW_GUARD, GetAttackerTeam());
+    ShowCreatureByNPCType(WG_WORKSHOP_NW, GetDefenderTeam()); // workshop on north should be owned by defender team by default
+    HideCreatureByNPCType(WG_WORKSHOP_NW, GetAttackerTeam());
 
-    ShowCreatureByNPCType(WG_WORKSHOP_KEEP_WEST_GUARD, GetDefenderTeam());
-    HideCreatureByNPCType(WG_WORKSHOP_KEEP_WEST_GUARD, GetAttackerTeam());
+    ShowCreatureByNPCType(WG_WORKSHOP_KEEP_WEST, GetDefenderTeam());
+    HideCreatureByNPCType(WG_WORKSHOP_KEEP_WEST, GetAttackerTeam());
 
-    ShowCreatureByNPCType(WG_WORKSHOP_KEEP_EAST_GUARD, GetDefenderTeam());
-    HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST_GUARD, GetAttackerTeam());
+    ShowCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, GetDefenderTeam());
+    HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, GetAttackerTeam());
 }
 
 WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl) : BfCapturePoint(battlefield)
@@ -2263,7 +2466,7 @@ WintergraspWorkshop::WintergraspWorkshop(BattlefieldWG* wg, uint8 type)
     _teamControl = TEAM_NEUTRAL;
     _staticInfo = &WorkshopData[type];
 
-    if (GetId() < BATTLEFIELD_WG_WORKSHOP_NE)
+    if (GetId() < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
     {
         // Spawn associate gameobjects
         for (WintergraspGameObjectData const& gobData : WorksshopGO[GetId()].GameObject)
@@ -2392,73 +2595,73 @@ void WintergraspWorkshop::UpdateCreatureAndGo()
     {
         case BATTLEFIELD_WG_WORKSHOP_SE:
         {
-            _wg->ShowCreatureByNPCType(WG_WORKSHOP_SE_GUARD, _teamControl);
+            _wg->ShowCreatureByNPCType(WG_WORKSHOP_SE, _teamControl);
             if (_teamControl != TEAM_NEUTRAL)
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, _wg->GetOtherTeam(_teamControl));
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE, _wg->GetOtherTeam(_teamControl));
             else
             {
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE, TEAM_HORDE);
             }
             break;
         }
         case BATTLEFIELD_WG_WORKSHOP_SW:
         {
-            _wg->ShowCreatureByNPCType(WG_WORKSHOP_SW_GUARD, _teamControl);
+            _wg->ShowCreatureByNPCType(WG_WORKSHOP_SW, _teamControl);
             if (_teamControl != TEAM_NEUTRAL)
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SW_GUARD, _wg->GetOtherTeam(_teamControl));
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SW, _wg->GetOtherTeam(_teamControl));
             else
             {
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SW, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SW, TEAM_HORDE);
             }
             break;
         }
         case BATTLEFIELD_WG_WORKSHOP_NE:
         {
-            _wg->ShowCreatureByNPCType(WG_WORKSHOP_NE_GUARD, _teamControl);
+            _wg->ShowCreatureByNPCType(WG_WORKSHOP_NE, _teamControl);
             if (_teamControl != TEAM_NEUTRAL)
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_NE_GUARD, _wg->GetOtherTeam(_teamControl));
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_NE, _wg->GetOtherTeam(_teamControl));
             else
             {
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_NE, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_NE, TEAM_HORDE);
             }
             break;
         }
         case BATTLEFIELD_WG_WORKSHOP_NW:
         {
-            _wg->ShowCreatureByNPCType(WG_WORKSHOP_NW_GUARD, _teamControl);
+            _wg->ShowCreatureByNPCType(WG_WORKSHOP_NW, _teamControl);
             if (_teamControl != TEAM_NEUTRAL)
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_NW_GUARD, _wg->GetOtherTeam(_teamControl));
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_NW, _wg->GetOtherTeam(_teamControl));
             else
             {
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_NW, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_NW, TEAM_HORDE);
             }
             break;
         }
         case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST:
         {
-            _wg->ShowCreatureByNPCType(WG_WORKSHOP_KEEP_WEST_GUARD, _teamControl);
+            _wg->ShowCreatureByNPCType(WG_WORKSHOP_KEEP_WEST, _teamControl);
             if (_teamControl != TEAM_NEUTRAL)
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_WEST_GUARD, _wg->GetOtherTeam(_teamControl));
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_WEST, _wg->GetOtherTeam(_teamControl));
             else
             {
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_WEST, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_WEST, TEAM_HORDE);
             }
             break;
         }
         case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST:
         {
-            _wg->ShowCreatureByNPCType(WG_WORKSHOP_KEEP_EAST_GUARD, _teamControl);
+            _wg->ShowCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, _teamControl);
             if (_teamControl != TEAM_NEUTRAL)
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST_GUARD, _wg->GetOtherTeam(_teamControl));
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, _wg->GetOtherTeam(_teamControl));
             else
             {
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
-                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, TEAM_HORDE);
             }
             break;
         }
