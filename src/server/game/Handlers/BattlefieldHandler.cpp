@@ -110,7 +110,7 @@ void WorldSession::SendBattlefieldLeaveMessage(uint32 battleId, BFLeaveReason re
     ejected.BattleID = battleId;
     ejected.Reason = uint8(reason);
     ejected.BattleStatus = 2; // not implemented
-    ejected.Relocated = false; // not implemented
+    ejected.Relocated = false;  // (false = enabled announce about relocate)
     SendPacket(ejected.Write());
 }
 

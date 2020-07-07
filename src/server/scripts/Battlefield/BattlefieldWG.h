@@ -246,7 +246,7 @@ class WintergraspCapturePoint : public BfCapturePoint
 
         void LinkToWorkshop(WintergraspWorkshop* workshop) { m_Workshop = workshop; }
 
-        void ChangeTeam(TeamId oldteam) override;
+        void ChangeTeam(TeamId newTeam) override;
         TeamId GetTeam() const { return m_team; }
 
     protected:
@@ -627,7 +627,9 @@ private:
     StaticWintergraspWorkshopInfo const* _staticInfo;
 
     // GameObject associations
-    GuidVector m_GameObjectList[3];
+    GuidVector m_GOList[3];
+    // Flag banner GO with CapturePoint for spawn and despawn
+    GuidVector m_workshopGO;
 
 public:
     WintergraspWorkshop(BattlefieldWG* wg, uint8 type);
@@ -636,6 +638,7 @@ public:
     uint8 GetId() const;
     TeamId GetTeamControl() const { return _teamControl; }
 
+    void InitialWorkshopAndCapturePoint(TeamId teamId, uint8 workshopId);
     // Called on change faction in CapturePoint class
     void GiveControlTo(TeamId teamId, bool init = false);
 

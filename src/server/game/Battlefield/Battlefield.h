@@ -120,9 +120,11 @@ class TC_GAME_API BfCapturePoint
 
         // Returns true if the state of the objective has changed, in this case, the OutdoorPvP must send a world state ui update.
         virtual bool Update(uint32 diff);
-        virtual void ChangeTeam(TeamId /*oldTeam*/) { }
+        virtual void ChangeTeam(TeamId /*newTeam*/) { }
         virtual void SendChangePhase();
+        virtual bool ChangeState();
 
+        void SetInitialData(TeamId team);
         bool SetCapturePointData(GameObject* capturePoint);
         GameObject* GetCapturePointGo();
         uint32 GetCapturePointEntry() const { return m_capturePointEntry; }
@@ -209,6 +211,14 @@ class TC_GAME_API BfGraveyard
         Battlefield* m_Bf;
 };
 
+struct CapturePointHolder
+{
+    uint8 workshopId;
+    BfCapturePoint* pointer;
+};
+/// typedef of map witch store capturepoint and the associate gameobject entry
+typedef std::unordered_map<uint32, CapturePointHolder> CapturePointContainer;
+
 class TC_GAME_API Battlefield : public ZoneScript
 {
     friend class BattlefieldMgr;
@@ -218,9 +228,6 @@ class TC_GAME_API Battlefield : public ZoneScript
         Battlefield();
         /// Destructor
         virtual ~Battlefield();
-
-        /// typedef of map witch store capturepoint and the associate gameobject entry
-        typedef std::map<ObjectGuid::LowType /*lowguid */, BfCapturePoint*> BfCapturePointMap;
 
         /// Call this to init the Battlefield
         virtual bool SetupBattlefield() { return true; }
@@ -244,7 +251,7 @@ class TC_GAME_API Battlefield : public ZoneScript
         /// Invite all players in queue to join battle on battle start
         void InvitePlayersInQueueToWar();
         /// Invite all players not in queue to join battle on battle start
-        void InvitePlayersNotInQueueToWar();
+        void TryInvitePlayersNotInQueueToWarOrKickThem();
 
         /// Called when a Unit is kill in battlefield zone
         virtual void HandleKill(Player* /*killer*/, Unit* /*killed*/) { };
@@ -378,6 +385,17 @@ class TC_GAME_API Battlefield : public ZoneScript
         bool PlayerInBFPlayerMap(Player* plr);
         void RemovePlayer(Player* plr);
 
+        // CapturePoint system
+        void AddCapturePoint(BfCapturePoint* cp, uint8 workshopId);
+
+        BfCapturePoint* GetCapturePoint(uint32 workshop) const
+        {
+            for (CapturePointContainer::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+                if (itr->second.workshopId == workshop)
+                    return itr->second.pointer;
+            return nullptr;
+        }
+
     protected:
         ObjectGuid StalkerGuid;
         uint32 m_Timer;                                         // Global timer for event
@@ -386,7 +404,7 @@ class TC_GAME_API Battlefield : public ZoneScript
         TeamId m_DefenderTeam;
 
         // Map of the objectives belonging to this OutdoorPvP
-        BfCapturePointMap m_capturePoints;
+        CapturePointContainer m_capturePoints;
 
         // Players info maps
         PlayerHolderContainer m_PlayerMap;
@@ -429,17 +447,6 @@ class TC_GAME_API Battlefield : public ZoneScript
         void BroadcastPacketToZone(WorldPacket const* data) const;
         void BroadcastPacketToQueue(WorldPacket const* data) const;
         void BroadcastPacketToWar(WorldPacket const* data) const;
-
-        // CapturePoint system
-        void AddCapturePoint(BfCapturePoint* cp) { m_capturePoints[cp->GetCapturePointEntry()] = cp; }
-
-        BfCapturePoint* GetCapturePoint(ObjectGuid::LowType lowguid) const
-        {
-            Battlefield::BfCapturePointMap::const_iterator itr = m_capturePoints.find(lowguid);
-            if (itr != m_capturePoints.end())
-                return itr->second;
-            return nullptr;
-        }
 
         void RegisterZone(uint32 zoneid);
         void TeamCastSpell(TeamId team, int32 spellId);

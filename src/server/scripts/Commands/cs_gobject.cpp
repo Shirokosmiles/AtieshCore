@@ -68,6 +68,7 @@ public:
         static std::vector<ChatCommand> gobjectCommandTable =
         {
             { "activate",     rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,     false, &HandleGameObjectActivateCommand,  ""       },
+            { "artkit",       rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,     false, &HandleGameObjectArtKitCommand,    ""       },
             { "delete",       rbac::RBAC_PERM_COMMAND_GOBJECT_DELETE,       false, &HandleGameObjectDeleteCommand,    ""       },
             { "info",         rbac::RBAC_PERM_COMMAND_GOBJECT_INFO,         false, &HandleGameObjectInfoCommand,      ""       },
             { "move",         rbac::RBAC_PERM_COMMAND_GOBJECT_MOVE,         false, &HandleGameObjectMoveCommand,      ""       },
@@ -114,6 +115,43 @@ public:
         object->UseDoorOrButton(autoCloseTime, false, handler->GetSession()->GetPlayer());
 
         handler->PSendSysMessage("Object activated!");
+
+        return true;
+    }
+
+    static bool HandleGameObjectArtKitCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* id = strtok((char*)args, " ");
+        char* artkid = strtok(nullptr, " ");
+
+        if (!id)
+            return false;
+
+        if (!artkid)
+            return false;
+
+        ObjectGuid::LowType guidLow = atoul(id);
+        if (!guidLow)
+            return false;
+
+        uint32 artID = atoi(artkid);
+        if (!artkid)
+            return false;
+
+        GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
+        if (!object)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, guidLow);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        // Activate
+        object->SetGoArtKit(artID);
+        handler->PSendSysMessage("GameObject has activated artkid : %u", artID);
 
         return true;
     }

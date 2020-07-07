@@ -69,9 +69,8 @@ Battlefield::Battlefield()
 
 Battlefield::~Battlefield()
 {
-    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        delete itr->second;
-
+    for (CapturePointContainer::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+        delete itr->second.pointer;
     for (GraveyardVect::const_iterator itr = m_GraveyardList.begin(); itr != m_GraveyardList.end(); ++itr)
         delete *itr;
 
@@ -94,7 +93,6 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
                 {
                     BFLeaveReason reason = BF_LEAVE_REASON_LOW_LEVEL;
                     player->GetSession()->SendBattlefieldLeaveMessage(m_BattleId, reason);
-
                     AddPlayer(player, true, false, false, true, GameTime::GetGameTime() + m_TimeForAcceptInvite);
                     return;
                 }
@@ -109,8 +107,15 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
         }
         else
         {
-            if (GetFreeslot(player->GetCFSTeamId()))
-                InviteNewPlayerToQueue(player, true);
+            if (player->GetLevel() < m_MinLevel)
+                AddPlayer(player, true, false, false, false);   // we should add him in playermap, when war will start, if level will lower - will be kicked
+            else
+            {
+                if (GetFreeslot(player->GetCFSTeamId()))
+                    InviteNewPlayerToQueue(player, true);
+                else
+                    AddPlayer(player, true, false, false, false);   // we should add him in playermap, when war will start, we will try to add him in war and queue (if will exist free slot)
+            }
         }
     }
 
@@ -151,8 +156,8 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
                 RemovePlayer(player);
         }
 
-        for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-            itr->second->HandlePlayerLeave(player);
+        for (CapturePointContainer::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+            itr->second.pointer->HandlePlayerLeave(player);
     }
 
     SendRemoveWorldStates(player);
@@ -209,8 +214,8 @@ bool Battlefield::Update(uint32 diff)
     else
         m_uiAcceptTimer -= diff;
 
-    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        if (itr->second->Update(diff))
+    for (CapturePointContainer::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+        if (itr->second.pointer->Update(diff))
             objective_changed = true;
 
     if (m_LastResurrectTimer <= diff)
@@ -252,20 +257,36 @@ void Battlefield::InvitePlayersInQueueToWar()
             }
 }
 
-void Battlefield::InvitePlayersNotInQueueToWar()
+void Battlefield::TryInvitePlayersNotInQueueToWarOrKickThem()
 {
+    std::set<ObjectGuid>_playerkick;
     time_t futuretime = GameTime::GetGameTime() + m_TimeForAcceptInvite;
     for (PlayerHolderContainer::iterator itr = m_PlayerMap.begin(); itr != m_PlayerMap.end(); ++itr)
         if (!itr->second.inQueue)
         {
-            if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+            if (GetFreeslot(itr->second.team))
             {
-                itr->second.isWaitingQueue = true;
-                itr->second.isWaitingWar = true;
-                itr->second.time = futuretime;
-                player->GetSession()->SendBattlefieldInvitePlayerToWar(m_BattleId, m_ZoneId, m_TimeForAcceptInvite);
-            }            
+                if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+                {
+                    if (player->GetLevel() >= m_MinLevel)
+                    {
+                        itr->second.isWaitingQueue = true;
+                        itr->second.isWaitingWar = true;
+                        itr->second.time = futuretime;
+                        player->GetSession()->SendBattlefieldInvitePlayerToWar(m_BattleId, m_ZoneId, m_TimeForAcceptInvite);
+                    }
+                    else
+                        _playerkick.insert(itr->second.GUID);
+                }
+            }
+            else
+                _playerkick.insert(itr->second.GUID);
         }
+
+    for (auto itr = _playerkick.begin(); itr != _playerkick.end(); ++itr)
+        KickPlayerFromBattlefield(*itr);
+
+    _playerkick.clear();
 }
 
 void Battlefield::InitStalker(uint32 entry, Position const& pos)
@@ -368,9 +389,9 @@ void Battlefield::KickPlayerFromBattlefield(ObjectGuid guid)
     if (Player* player = ObjectAccessor::FindPlayer(guid))
         if (player->GetZoneId() == GetZoneId())
         {
-            player->GetSession()->SendBattlefieldLeaveMessage(m_BattleId);
             player->TeleportTo(KickPosition);
             RemovePlayer(player);
+            player->GetSession()->SendBattlefieldLeaveMessage(m_BattleId);
         }
 }
 
@@ -386,7 +407,7 @@ void Battlefield::StartBattle()
     m_isActive = true;
 
     InvitePlayersInQueueToWar();
-    InvitePlayersNotInQueueToWar();
+    TryInvitePlayersNotInQueueToWarOrKickThem();
     OnBattleStart();
 }
 
@@ -1019,6 +1040,22 @@ BfCapturePoint::BfCapturePoint(Battlefield* battlefield) : m_Bf(battlefield), m_
     m_maxSpeed = 0;
 }
 
+void Battlefield::AddCapturePoint(BfCapturePoint* cp, uint8 workshopId)
+{
+    uint32 new_id = 0;
+    for (CapturePointContainer::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+        if (itr->first > new_id)
+            new_id = itr->first;
+
+    // use next
+    ++new_id;
+
+    CapturePointHolder cph;
+    cph.pointer = cp;
+    cph.workshopId = workshopId;
+    m_capturePoints[new_id] = cph;
+}
+
 bool BfCapturePoint::HandlePlayerEnter(Player* player)
 {
     if (m_capturePointGUID)
@@ -1065,6 +1102,68 @@ void BfCapturePoint::SendChangePhase()
     }
 }
 
+bool BfCapturePoint::ChangeState()
+{
+    bool result = false;
+    if (!m_capturePointGUID)
+        return result;
+
+    if (GameObject* capturePoint = m_Bf->GetGameObject(m_capturePointGUID))
+    {
+        uint32 artkit = 0;
+        switch (m_State)
+        {
+            case BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE: artkit = 1; break;
+            case BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE: artkit = 2; break;
+            default:
+                break;
+        }
+
+        if (capturePoint->GetGoArtKit() != artkit)
+        {
+            switch (artkit)
+            {
+                case 0: m_team = TEAM_NEUTRAL; break;
+                case 1: m_team = TEAM_HORDE; break;
+                case 2: m_team = TEAM_ALLIANCE; break;
+            }
+            result = true;
+        }
+        capturePoint->SetGoArtKit(artkit);
+    }
+
+    return result;
+}
+
+void BfCapturePoint::SetInitialData(TeamId team)
+{
+    switch (team)
+    {
+        case TEAM_ALLIANCE:
+        {
+            m_value = m_maxValue;
+            m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE;
+            m_team = TEAM_ALLIANCE;
+            break;
+        }
+        case TEAM_HORDE:
+        {
+            m_value = -m_maxValue;
+            m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE;
+            m_team = TEAM_HORDE;
+            break;
+        }
+        case TEAM_NEUTRAL:
+        {
+            m_value = 0;
+            m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL;
+            m_team = TEAM_NEUTRAL;
+        }
+    }
+
+    ChangeState();
+}
+
 bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
 {
     ASSERT(capturePoint);
@@ -1077,26 +1176,15 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
     GameObjectTemplate const* goinfo = capturePoint->GetGOInfo();
     if (goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
     {
-        TC_LOG_ERROR("misc", "OutdoorPvP: GO %u is not a capture point!", capturePoint->GetEntry());
+        TC_LOG_ERROR("bg.battlefield", "SetCapturePointData: GO %u is not a capture point!", capturePoint->GetEntry());
         return false;
     }
 
     // get the needed values from goinfo
-    m_maxValue = goinfo->capturePoint.maxTime;
+    m_maxValue = (float)goinfo->capturePoint.maxTime;
     m_maxSpeed = m_maxValue / (goinfo->capturePoint.minTime ? goinfo->capturePoint.minTime : 60);
     m_neutralValuePct = goinfo->capturePoint.neutralPercent;
-    m_minValue = m_maxValue * goinfo->capturePoint.neutralPercent / 100;
-    m_capturePointEntry = capturePoint->GetEntry();
-    if (m_team == TEAM_ALLIANCE)
-    {
-        m_value = m_maxValue;
-        m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE;
-    }
-    else
-    {
-        m_value = -m_maxValue;
-        m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE;
-    }
+    m_minValue = CalculatePct(m_maxValue, m_neutralValuePct);
 
     return true;
 }
@@ -1124,43 +1212,43 @@ bool BfCapturePoint::DelCapturePoint()
 
 bool BfCapturePoint::Update(uint32 diff)
 {
-    if (!m_capturePointGUID)
+    GameObject* capturePoint = m_Bf->GetGameObject(m_capturePointGUID);
+    if (!capturePoint)
         return false;
 
-    if (GameObject* capturePoint = m_Bf->GetGameObject(m_capturePointGUID))
+    float radius = (float)capturePoint->GetGOInfo()->capturePoint.radius/2;
+
+    for (uint32 team = 0; team < 2; ++team)
     {
-        float radius = capturePoint->GetGOInfo()->capturePoint.radius;
-
-        for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+        for (GuidSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end();)
         {
-            for (GuidSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end();)
-            {
-                if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                {
-                    if (!capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
-                        itr = HandlePlayerLeave(player);
-                    else
-                        ++itr;
-                }
-                else
-                    ++itr;
-            }
+            ObjectGuid playerGuid = *itr;
+            ++itr;
+
+            if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
+                if (!capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
+                    HandlePlayerLeave(player);
         }
+    }
 
-        std::list<Player*> players;
-        Trinity::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
-        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
-        Cell::VisitWorldObjects(capturePoint, searcher, radius);
+    std::list<Player*> players;
+    Trinity::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
+    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
+    Cell::VisitWorldObjects(capturePoint, searcher, radius);
 
-        for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
-            if ((*itr)->IsOutdoorPvPActive())
-                if (m_activePlayers[(*itr)->GetTeamId()].insert((*itr)->GetGUID()).second)
-                    HandlePlayerEnter(*itr);
+    for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
+    {
+        Player* const player = *itr;
+        if (player->IsOutdoorPvPActive())
+        {
+            if (m_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second)
+                HandlePlayerEnter(*itr);
+        }
     }
 
     // get the difference of numbers
-    float fact_diff = ((float) m_activePlayers[TEAM_ALLIANCE].size() - (float) m_activePlayers[TEAM_HORDE].size()) * diff / BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL;
-    if (G3D::fuzzyEq(fact_diff, 0.0f))
+    float fact_diff = ((float)m_activePlayers[0].size() - (float)m_activePlayers[1].size()) * diff / BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL;
+    if (!fact_diff)
         return false;
 
     uint32 Challenger = 0;
@@ -1196,21 +1284,21 @@ bool BfCapturePoint::Update(uint32 diff)
 
     m_value += fact_diff;
 
-    if (m_value < -m_minValue)                              // red
+    if (m_value < -m_minValue) // red
     {
         if (m_value < -m_maxValue)
             m_value = -m_maxValue;
         m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE;
         m_team = TEAM_HORDE;
     }
-    else if (m_value > m_minValue)                          // blue
+    else if (m_value > m_minValue) // blue
     {
         if (m_value > m_maxValue)
             m_value = m_maxValue;
         m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE;
         m_team = TEAM_ALLIANCE;
     }
-    else if (oldValue * m_value <= 0)                       // grey, go through mid point
+    else if (oldValue * m_value <= 0) // grey, go through mid point
     {
         // if challenger is ally, then n->a challenge
         if (Challenger == ALLIANCE)
@@ -1220,7 +1308,7 @@ bool BfCapturePoint::Update(uint32 diff)
             m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE;
         m_team = TEAM_NEUTRAL;
     }
-    else                                                    // grey, did not go through mid point
+    else // grey, did not go through mid point
     {
         // old phase and current are on the same side, so one team challenges the other
         if (Challenger == ALLIANCE && (m_OldState == BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE || m_OldState == BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE))
@@ -1230,14 +1318,14 @@ bool BfCapturePoint::Update(uint32 diff)
         m_team = TEAM_NEUTRAL;
     }
 
-    if (G3D::fuzzyNe(m_value, oldValue))
+    if (m_value != oldValue)
         SendChangePhase();
 
     if (m_OldState != m_State)
     {
         //TC_LOG_ERROR("bg.battlefield", "%u->%u", m_OldState, m_State);
-        if (oldTeam != m_team)
-            ChangeTeam(oldTeam);
+        ChangeState();
+        ChangeTeam(m_team);
         return true;
     }
 

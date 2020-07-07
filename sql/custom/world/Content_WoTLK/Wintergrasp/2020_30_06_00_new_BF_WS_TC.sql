@@ -56,6 +56,12 @@ DELETE FROM `gameobject` WHERE `guid` = 76052;
 DELETE FROM `gameobject` WHERE `guid` = 7164;
 DELETE FROM `gameobject` WHERE `guid` = 76051;
 
+-- workshop GO
+DELETE FROM `gameobject` WHERE `guid` = 71387;
+DELETE FROM `gameobject` WHERE `guid` = 71388;
+DELETE FROM `gameobject` WHERE `guid` = 71386;
+DELETE FROM `gameobject` WHERE `guid` = 71385;
+
 -- SE workshop
 DELETE FROM `gameobject` WHERE `guid` = 67252;
 DELETE FROM `gameobject` WHERE `guid` = 75193;

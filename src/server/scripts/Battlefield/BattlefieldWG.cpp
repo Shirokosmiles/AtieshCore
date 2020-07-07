@@ -262,6 +262,26 @@ WintergraspGameObjectData const WGPortalDefenderData[WG_MAX_TELEPORTER] =
     { { 5316.252f, 2977.042f, 408.5385f, -0.82030330f }, { 0.f, 0.f, -0.39874840f, 0.9170604f }, 192951, 192951 }
 };
 
+struct WintergraspGameObjectWorkshopData
+{
+    Position Pos;
+    QuaternionData Rot;
+    uint32 entry;
+};
+uint8 const WG_MAX_WORKSHOPGO = 4;
+WintergraspGameObjectWorkshopData const WGworkshopData[WG_MAX_WORKSHOPGO] =
+{
+    // workshop GO
+    // SE
+    { { 4398.08f, 2356.5f, 376.19f, 0.525406f }, { 0.f, 0.f, 0.259692f, 0.965692f }, 194959 },
+    // SW
+    { { 4390.78f, 3304.09f, 372.429f, 6.09702f }, { 0.f, 0.f, 0.0929482f, -0.995671f }, 194962 },
+    // NW
+    { { 4948.52f, 3342.34f, 376.875f, 4.40057f }, { 0.f, 0.f, 0.808329f, -0.588731f }, 190487 },
+    // NE
+    { { 4949.34f, 2432.59f, 320.177f, 1.38621f }, { 0.f, 0.f, 0.638929f, 0.769266f }, 190475 }
+};
+
 // *********************************************************
 // **********Tower Element(GameObject, Creature)************
 // *********************************************************
@@ -343,10 +363,10 @@ struct StaticWintergraspWorkshopInfo
 
 StaticWintergraspWorkshopInfo const WorkshopData[WG_MAX_WORKSHOP] =
 {
-    { BATTLEFIELD_WG_WORKSHOP_NE, WS_BATTLEFIELD_WG_WORKSHOP_NE, { BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_ALLIANCE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_ALLIANCE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_HORDE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_HORDE   } },
-    { BATTLEFIELD_WG_WORKSHOP_NW, WS_BATTLEFIELD_WG_WORKSHOP_NW, { BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_ALLIANCE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_ALLIANCE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_HORDE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_HORDE } },
     { BATTLEFIELD_WG_WORKSHOP_SE, WS_BATTLEFIELD_WG_WORKSHOP_SE, { BATTLEFIELD_WG_TEXT_EASTSPARK_CAPTURE_ALLIANCE,     BATTLEFIELD_WG_TEXT_EASTSPARK_ATTACK_ALLIANCE,     BATTLEFIELD_WG_TEXT_EASTSPARK_CAPTURE_HORDE,     BATTLEFIELD_WG_TEXT_EASTSPARK_ATTACK_HORDE     } },
     { BATTLEFIELD_WG_WORKSHOP_SW, WS_BATTLEFIELD_WG_WORKSHOP_SW, { BATTLEFIELD_WG_TEXT_WESTSPARK_CAPTURE_ALLIANCE,     BATTLEFIELD_WG_TEXT_WESTSPARK_ATTACK_ALLIANCE,     BATTLEFIELD_WG_TEXT_WESTSPARK_CAPTURE_HORDE,     BATTLEFIELD_WG_TEXT_WESTSPARK_ATTACK_HORDE     } },
+    { BATTLEFIELD_WG_WORKSHOP_NE, WS_BATTLEFIELD_WG_WORKSHOP_NE, { BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_ALLIANCE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_ALLIANCE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_HORDE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_HORDE   } },
+    { BATTLEFIELD_WG_WORKSHOP_NW, WS_BATTLEFIELD_WG_WORKSHOP_NW, { BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_ALLIANCE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_ALLIANCE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_HORDE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_HORDE } },    
     // KEEP WORKSHOPS - It can't be taken, so it doesn't have a textids
     { BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, WS_BATTLEFIELD_WG_WORKSHOP_K_W, { 0, 0, 0, 0 } },
     { BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WS_BATTLEFIELD_WG_WORKSHOP_K_E, { 0, 0, 0, 0 } }
@@ -507,14 +527,16 @@ bool BattlefieldWG::SetupBattlefield()
     // Spawn workshop creatures and gameobjects
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
-        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_NE)
-            workshop->GiveControlTo(GetOtherTeam(m_DefenderTeam), true);
-        else
-            workshop->GiveControlTo(m_DefenderTeam, true);
+        if (WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i))
+        {
+            if (workshop->GetId() < BATTLEFIELD_WG_WORKSHOP_NE)
+                workshop->InitialWorkshopAndCapturePoint(GetAttackerTeam(), workshop->GetId());
+            else
+                workshop->InitialWorkshopAndCapturePoint(GetDefenderTeam(), workshop->GetId());
 
-        // Note: Capture point is added once the gameobject is created.
-        Workshops[i] = workshop;
+            // Note: Capture point is added once the gameobject is created.
+            Workshops[i] = workshop;
+        }
     }
 
     BuildingsInZone.resize(WG_MAX_OBJ);
@@ -1247,6 +1269,7 @@ void BattlefieldWG::OnCreatureRemove(Creature* creature)
 
 void BattlefieldWG::OnGameObjectCreate(GameObject* go)
 {
+    /*
     uint8 workshopId = 0;
 
     switch (go->GetEntry())
@@ -1271,13 +1294,15 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
     {
         if (workshop->GetId() == workshopId)
         {
-            WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, GetAttackerTeam());
+            TeamId team = workshopId < BATTLEFIELD_WG_WORKSHOP_NE ? GetAttackerTeam() : GetDefenderTeam();
+            WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, team);
             capturePoint->SetCapturePointData(go);
             capturePoint->LinkToWorkshop(workshop);
-            AddCapturePoint(capturePoint);
-            break;
+            capturePoint->SetInitialData(team);
+            AddCapturePoint(capturePoint, workshopId);
         }
     }
+    */
 }
 
 // Called when player kill a unit in wg zone
@@ -1942,10 +1967,10 @@ WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, Tea
     m_Workshop = nullptr;
 }
 
-void WintergraspCapturePoint::ChangeTeam(TeamId /*oldTeam*/)
+void WintergraspCapturePoint::ChangeTeam(TeamId newTeam)
 {
     ASSERT(m_Workshop);
-    m_Workshop->GiveControlTo(m_team);
+    m_Workshop->GiveControlTo(newTeam);
 }
 
 BfGraveyardWG::BfGraveyardWG(BattlefieldWG* battlefield) : BfGraveyard(battlefield)
@@ -2244,23 +2269,46 @@ WintergraspWorkshop::WintergraspWorkshop(BattlefieldWG* wg, uint8 type)
         for (WintergraspGameObjectData const& gobData : WorksshopGO[GetId()].GameObject)
         {
             if (GameObject* goHorde = _wg->SpawnGameObject(gobData.HordeEntry, gobData.Pos, gobData.Rot))
-                m_GameObjectList[TEAM_HORDE].push_back(goHorde->GetGUID());
+                m_GOList[TEAM_HORDE].push_back(goHorde->GetGUID());
 
             if (GameObject* goAlliance = _wg->SpawnGameObject(gobData.AllianceEntry, gobData.Pos, gobData.Rot))
-                m_GameObjectList[TEAM_ALLIANCE].push_back(goAlliance->GetGUID());
+                m_GOList[TEAM_ALLIANCE].push_back(goAlliance->GetGUID());
         }
     }
 }
 
 WintergraspWorkshop::~WintergraspWorkshop()
 {
-    for (int8 i = 0; i < PVP_TEAMS_COUNT; i++)
-        m_GameObjectList[i].clear();
+    // note : in WintergraspWorkshop  in m_GameObjectList we have 3 team (TEAM_NEUTRALL) too
+    for (int8 i = 0; i < 3; i++)
+        m_GOList[i].clear();
+    m_workshopGO.clear();
 }
 
 uint8 WintergraspWorkshop::GetId() const
 {
     return _staticInfo->WorkshopId;
+}
+
+void WintergraspWorkshop::InitialWorkshopAndCapturePoint(TeamId teamId, uint8 workshopId)
+{
+    if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+    {
+        if (GameObject* goWorkshop = _wg->SpawnGameObject(WGworkshopData[workshopId].entry, WGworkshopData[workshopId].Pos, WGworkshopData[workshopId].Rot))
+        {
+            m_workshopGO.push_back(goWorkshop->GetGUID());
+
+            if (WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(_wg, teamId))
+            {
+                capturePoint->SetCapturePointData(goWorkshop);
+                capturePoint->LinkToWorkshop(this);
+                capturePoint->SetInitialData(teamId);
+                _wg->AddCapturePoint(capturePoint, workshopId);
+            }
+        }
+    }
+
+    GiveControlTo(teamId, true);
 }
 
 void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
@@ -2270,12 +2318,16 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
         case TEAM_NEUTRAL:
         {
             // Updating worldstate
-            _state = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT;
+            _state = BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_INTACT;
             _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
 
-            // Send warning message to all player for inform a faction attack a workshop
-            // alliance / horde attacking workshop
-            _wg->SendWarning(_teamControl == TEAM_ALLIANCE ? _staticInfo->TextIds.HordeAttack : _staticInfo->TextIds.AllianceAttack);
+            if (!init)
+            {
+                if (_teamControl == TEAM_ALLIANCE)
+                    _wg->SendWarning(_staticInfo->TextIds.HordeAttack); // workshop taken - horde
+                else
+                    _wg->SendWarning(_staticInfo->TextIds.AllianceAttack); // workshop taken - alliance
+            }                
 
             // Found associate graveyard and update it
             if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
@@ -2325,6 +2377,11 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
 
     if (!init)
         _wg->UpdateCounterVehicle(false);
+    else
+    {
+        if (BfCapturePoint* cp = _wg->GetCapturePoint(GetId()))
+            cp->SetInitialData(_teamControl);
+    }
 
     UpdateCreatureAndGo();
 }
@@ -2336,48 +2393,122 @@ void WintergraspWorkshop::UpdateCreatureAndGo()
         case BATTLEFIELD_WG_WORKSHOP_SE:
         {
             _wg->ShowCreatureByNPCType(WG_WORKSHOP_SE_GUARD, _teamControl);
-            _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, _wg->GetOtherTeam(_teamControl));
+            if (_teamControl != TEAM_NEUTRAL)
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, _wg->GetOtherTeam(_teamControl));
+            else
+            {
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+            }
             break;
         }
         case BATTLEFIELD_WG_WORKSHOP_SW:
         {
             _wg->ShowCreatureByNPCType(WG_WORKSHOP_SW_GUARD, _teamControl);
-            _wg->HideCreatureByNPCType(WG_WORKSHOP_SW_GUARD, _wg->GetOtherTeam(_teamControl));
+            if (_teamControl != TEAM_NEUTRAL)
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SW_GUARD, _wg->GetOtherTeam(_teamControl));
+            else
+            {
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+            }
             break;
         }
         case BATTLEFIELD_WG_WORKSHOP_NE:
         {
             _wg->ShowCreatureByNPCType(WG_WORKSHOP_NE_GUARD, _teamControl);
-            _wg->HideCreatureByNPCType(WG_WORKSHOP_NE_GUARD, _wg->GetOtherTeam(_teamControl));
+            if (_teamControl != TEAM_NEUTRAL)
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_NE_GUARD, _wg->GetOtherTeam(_teamControl));
+            else
+            {
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+            }
             break;
         }
         case BATTLEFIELD_WG_WORKSHOP_NW:
         {
             _wg->ShowCreatureByNPCType(WG_WORKSHOP_NW_GUARD, _teamControl);
-            _wg->HideCreatureByNPCType(WG_WORKSHOP_NW_GUARD, _wg->GetOtherTeam(_teamControl));
+            if (_teamControl != TEAM_NEUTRAL)
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_NW_GUARD, _wg->GetOtherTeam(_teamControl));
+            else
+            {
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+            }
             break;
         }
         case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST:
         {
             _wg->ShowCreatureByNPCType(WG_WORKSHOP_KEEP_WEST_GUARD, _teamControl);
-            _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_WEST_GUARD, _wg->GetOtherTeam(_teamControl));
+            if (_teamControl != TEAM_NEUTRAL)
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_WEST_GUARD, _wg->GetOtherTeam(_teamControl));
+            else
+            {
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+            }
             break;
         }
         case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST:
         {
             _wg->ShowCreatureByNPCType(WG_WORKSHOP_KEEP_EAST_GUARD, _teamControl);
-            _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST_GUARD, _wg->GetOtherTeam(_teamControl));
+            if (_teamControl != TEAM_NEUTRAL)
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST_GUARD, _wg->GetOtherTeam(_teamControl));
+            else
+            {
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_ALLIANCE);
+                _wg->HideCreatureByNPCType(WG_WORKSHOP_SE_GUARD, TEAM_HORDE);
+            }
             break;
         }
     }
 
-    if (!m_GameObjectList[_wg->GetOtherTeam(_teamControl)].empty())
-        for (ObjectGuid guid : m_GameObjectList[_wg->GetOtherTeam(_teamControl)])
-            if (GameObject* go = _wg->GetGameObject(guid))
-                go->SetRespawnTime(RESPAWN_ONE_DAY);
+    switch (_teamControl)
+    {
+        case TEAM_NEUTRAL:
+        {
+            if (!m_GOList[TEAM_HORDE].empty())
+                for (ObjectGuid guid : m_GOList[TEAM_HORDE])
+                    if (GameObject* go = _wg->GetGameObject(guid))
+                        go->SetRespawnTime(RESPAWN_ONE_DAY);
 
-    if (!m_GameObjectList[_teamControl].empty())
-        for (ObjectGuid guid : m_GameObjectList[_teamControl])
+            if (!m_GOList[TEAM_ALLIANCE].empty())
+                for (ObjectGuid guid : m_GOList[TEAM_ALLIANCE])
+                    if (GameObject* go = _wg->GetGameObject(guid))
+                        go->SetRespawnTime(RESPAWN_ONE_DAY);
+            break;
+        }
+        case TEAM_ALLIANCE:
+        {
+            if (!m_GOList[TEAM_HORDE].empty())
+                for (ObjectGuid guid : m_GOList[TEAM_HORDE])
+                    if (GameObject* go = _wg->GetGameObject(guid))
+                        go->SetRespawnTime(RESPAWN_ONE_DAY);
+
+            if (!m_GOList[TEAM_NEUTRAL].empty())
+                for (ObjectGuid guid : m_GOList[TEAM_NEUTRAL])
+                    if (GameObject* go = _wg->GetGameObject(guid))
+                        go->SetRespawnTime(RESPAWN_ONE_DAY);
+            break;
+        }
+        case TEAM_HORDE:
+        {
+            if (!m_GOList[TEAM_ALLIANCE].empty())
+                for (ObjectGuid guid : m_GOList[TEAM_ALLIANCE])
+                    if (GameObject* go = _wg->GetGameObject(guid))
+                        go->SetRespawnTime(RESPAWN_ONE_DAY);
+
+            if (!m_GOList[TEAM_NEUTRAL].empty())
+                for (ObjectGuid guid : m_GOList[TEAM_NEUTRAL])
+                    if (GameObject* go = _wg->GetGameObject(guid))
+                        go->SetRespawnTime(RESPAWN_ONE_DAY);
+            break;
+        }
+    }
+
+    if (!m_GOList[_teamControl].empty())
+        for (ObjectGuid guid : m_GOList[_teamControl])
             if (GameObject* go = _wg->GetGameObject(guid))
                 go->SetRespawnTime(RESPAWN_IMMEDIATELY);
 }
