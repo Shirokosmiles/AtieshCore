@@ -157,7 +157,7 @@ Channel* ChannelMgr::GetSystemChannel(uint32 channelId, AreaTableEntry const* zo
         return nullptr;
 
     uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
-    if (channelEntry->flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
+    if (channelEntry->Flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
         zoneId = 0;
 
     std::pair<uint32, uint32> key = std::make_pair(channelId, zoneId);
@@ -215,7 +215,7 @@ Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Playe
         if (!channelEntry)
             return nullptr;
         uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
-        if (channelEntry->flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
+        if (channelEntry->Flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
             zoneId = 0;
 
         std::pair<uint32, uint32> key = std::make_pair(channelId, zoneId);
@@ -259,7 +259,7 @@ void ChannelMgr::LeftChannel(uint32 channelId, AreaTableEntry const* zoneEntry)
     if (!channelEntry)
         return;
     uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
-    if (channelEntry->flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
+    if (channelEntry->Flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
         zoneId = 0;
 
     std::pair<uint32, uint32> key = std::make_pair(channelId, zoneId);

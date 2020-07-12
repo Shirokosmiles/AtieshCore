@@ -583,14 +583,14 @@ bool BattlegroundEY::SetupBattleground()
     }
 
     WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(EY_GRAVEYARD_MAIN_ALLIANCE);
-    if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_ALLIANCE, Position(sg->x, sg->y, sg->z, 3.124139f), TEAM_ALLIANCE))
+    if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_ALLIANCE, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, 3.124139f), TEAM_ALLIANCE))
     {
         TC_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. The battleground was not created.");
         return false;
     }
 
     sg = sWorldSafeLocsStore.LookupEntry(EY_GRAVEYARD_MAIN_HORDE);
-    if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_HORDE, Position(sg->x, sg->y, sg->z, 3.193953f), TEAM_HORDE))
+    if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_HORDE, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, 3.193953f), TEAM_HORDE))
     {
         TC_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. The battleground was not created.");
         return false;
@@ -825,7 +825,7 @@ void BattlegroundEY::EventTeamCapturedPoint(Player* player, EYBattlegroundPoints
 
     WorldSafeLocsEntry const* sg = nullptr;
     sg = sWorldSafeLocsStore.LookupEntry(m_CapturingPointTypes[Point].GraveYardId);
-    if (!sg || !AddSpiritGuide(Point, Position(sg->x, sg->y, sg->z, 3.124139f), GetTeamIndexByTeamId(Team)))
+    if (!sg || !AddSpiritGuide(Point, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, 3.124139f), GetTeamIndexByTeamId(Team)))
         TC_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. point: %u, team: %u, graveyard_id: %u",
             Point, Team, m_CapturingPointTypes[Point].GraveYardId);
 
@@ -965,7 +965,7 @@ WorldSafeLocsEntry const* BattlegroundEY::GetClosestGraveyard(Player* player)
     float plr_y = player->GetPositionY();
     float plr_z = player->GetPositionZ();
 
-    distance = (entry->x - plr_x)*(entry->x - plr_x) + (entry->y - plr_y)*(entry->y - plr_y) + (entry->z - plr_z)*(entry->z - plr_z);
+    distance = (entry->Loc.X - plr_x)*(entry->Loc.X - plr_x) + (entry->Loc.Y - plr_y)*(entry->Loc.Y - plr_y) + (entry->Loc.Z - plr_z)*(entry->Loc.Z - plr_z);
     nearestDistance = distance;
 
     for (uint8 i = 0; i < EY_POINTS_MAX; ++i)
@@ -977,7 +977,7 @@ WorldSafeLocsEntry const* BattlegroundEY::GetClosestGraveyard(Player* player)
                 TC_LOG_ERROR("bg.battleground", "BattlegroundEY: Graveyard %u could not be found.", m_CapturingPointTypes[i].GraveYardId);
             else
             {
-                distance = (entry->x - plr_x)*(entry->x - plr_x) + (entry->y - plr_y)*(entry->y - plr_y) + (entry->z - plr_z)*(entry->z - plr_z);
+                distance = (entry->Loc.X - plr_x)*(entry->Loc.X - plr_x) + (entry->Loc.Y - plr_y)*(entry->Loc.Y - plr_y) + (entry->Loc.Z - plr_z)*(entry->Loc.Z - plr_z);
                 if (distance < nearestDistance)
                 {
                     nearestDistance = distance;

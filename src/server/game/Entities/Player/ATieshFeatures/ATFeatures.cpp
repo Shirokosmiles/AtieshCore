@@ -227,19 +227,19 @@ uint8 Player::GetMostPointsTalentTree() const
         if (!talentInfo)
             continue;
 
-        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
 
         if (!talentTabInfo)
             continue;
 
-        if (talentTabInfo->tabpage < 3)
+        if (talentTabInfo->OrderIndex < 3)
         {
             for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
             {
-                PlayerTalentMap::iterator plrTalent = m_talents[m_activeSpec]->find(talentInfo->RankID[rank]);
+                PlayerTalentMap::iterator plrTalent = m_talents[m_activeSpec]->find(talentInfo->SpellRank[rank]);
                 if (plrTalent != m_talents[m_activeSpec]->end())
                     if (plrTalent->second->state != PLAYERSPELL_REMOVED)
-                        specPoints[talentTabInfo->tabpage] += rank;
+                        specPoints[talentTabInfo->OrderIndex] += rank;
             }
         }
     }

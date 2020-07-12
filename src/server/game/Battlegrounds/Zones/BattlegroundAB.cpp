@@ -780,10 +780,10 @@ WorldSafeLocsEntry const* BattlegroundAB::GetClosestGraveyard(Player* player)
             if (!entry)
                 continue;
 
-            float distSq = (entry->x - plr_x) * (entry->x - plr_x) + (entry->y - plr_y) * (entry->y - plr_y);
-            if (minDistSq > distSq)
+            float dist = (entry->Loc.X - plr_x) * (entry->Loc.X - plr_x) + (entry->Loc.Y - plr_y) * (entry->Loc.Y - plr_y);
+            if (minDistSq > dist)
             {
-                minDistSq = distSq;
+                minDistSq = dist;
                 good_entry = entry;
             }
         }

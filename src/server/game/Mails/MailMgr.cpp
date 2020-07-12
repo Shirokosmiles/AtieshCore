@@ -1311,7 +1311,7 @@ void MailMgr::HandleMailCreateTextItem(Player* player, uint32 mailID)
             {
                 MailTemplateEntry const* mailTemplateEntry = sMailTemplateStore.LookupEntry(itr->second.mailTemplateId);
                 ASSERT(mailTemplateEntry);
-                bodyItem->SetText(mailTemplateEntry->content[player->GetSession()->GetSessionDbcLocale()]);
+                bodyItem->SetText(mailTemplateEntry->Body[player->GetSession()->GetSessionDbcLocale()]);
             }
             else
                 bodyItem->SetText(itr->second.body);

@@ -211,8 +211,8 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
                     char const* bgName = bg->GetName().c_str();
                     uint32 MinPlayers = bg->GetMinPlayersPerTeam() * 2;
                     uint32 qPlayers = 0;
-                    uint32 q_min_level = bracketEntry->minLevel;
-                    uint32 q_max_level = bracketEntry->maxLevel;
+                    uint32 q_min_level = bracketEntry->MinLevel;
+                    uint32 q_max_level = bracketEntry->MaxLevel;
                     for (GroupsQueueType::const_iterator itr = m_QueuedGroups[bracketId][BG_QUEUE_CROSSFACTION].begin(); itr != m_QueuedGroups[bracketId][BG_QUEUE_CROSSFACTION].end(); ++itr)
                         if (!(*itr)->IsInvitedToBGInstanceGUID)
                             qPlayers += (*itr)->Players.size();
@@ -236,8 +236,8 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
                     uint32 MinPlayers = bg->GetMinPlayersPerTeam();
                     uint32 qHorde = 0;
                     uint32 qAlliance = 0;
-                    uint32 q_min_level = bracketEntry->minLevel;
-                    uint32 q_max_level = bracketEntry->maxLevel;
+                    uint32 q_min_level = bracketEntry->MinLevel;
+                    uint32 q_max_level = bracketEntry->MaxLevel;
                     GroupsQueueType::const_iterator itr;
                     for (itr = m_QueuedGroups[bracketId][BG_QUEUE_NORMAL_ALLIANCE].begin(); itr != m_QueuedGroups[bracketId][BG_QUEUE_NORMAL_ALLIANCE].end(); ++itr)
                         if (!(*itr)->IsInvitedToBGInstanceGUID)

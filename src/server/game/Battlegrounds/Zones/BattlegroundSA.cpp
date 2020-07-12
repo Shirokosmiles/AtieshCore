@@ -564,7 +564,7 @@ bool BattlegroundSA::ResetObjs()
             graveyardTeam = Attackers;
 
         GraveyardStatus[i] = graveyardTeam;
-        if (!AddSpiritGuide(i + BG_SA_MAXNPC, Position(sg->x, sg->y, sg->z, BG_SA_GYOrientation[i]), graveyardTeam))
+        if (!AddSpiritGuide(i + BG_SA_MAXNPC, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, BG_SA_GYOrientation[i]), graveyardTeam))
         {
             TC_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn GY: %u", i);
             return false;
@@ -1062,7 +1062,7 @@ WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
 
     closest = sWorldSafeLocsStore.LookupEntry(safeloc);
     ASSERT(closest);
-    nearest = player->GetExactDistSq(closest->x, closest->y, closest->z);
+    nearest = player->GetExactDistSq(closest->Loc.X, closest->Loc.Y, closest->Loc.Z);
 
     for (uint32 i = BG_SA_RIGHT_CAPTURABLE_GY; i < BG_SA_MAX_GY; ++i)
     {
@@ -1071,7 +1071,7 @@ WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
 
         ret = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
         ASSERT(ret);
-        dist = player->GetExactDistSq(ret->x, ret->y, ret->z);
+        dist = player->GetExactDistSq(ret->Loc.X, ret->Loc.Y, ret->Loc.Z);
         if (dist < nearest)
         {
             closest = ret;
@@ -1210,7 +1210,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
         return;
     }
 
-    AddSpiritGuide(i + BG_SA_MAXNPC, Position(sg->x, sg->y, sg->z, BG_SA_GYOrientation[i]), GraveyardStatus[i]);
+    AddSpiritGuide(i + BG_SA_MAXNPC, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, BG_SA_GYOrientation[i]), GraveyardStatus[i]);
     uint32 npc = 0;
     uint32 flag = 0;
 

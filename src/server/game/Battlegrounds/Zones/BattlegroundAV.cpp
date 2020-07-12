@@ -2136,7 +2136,7 @@ WorldSafeLocsEntry const* BattlegroundAV::GetClosestGraveyard(Player* player)
     player->GetPosition(x, y);
 
     pGraveyard = sWorldSafeLocsStore.LookupEntry(BG_AV_GraveyardIds[AV_CPLACE_SPIRIT_MAIN_ALLIANCE + GetTeamIndexByTeamId(player->GetTeam())]);
-    minDist = (pGraveyard->x - x) * (pGraveyard->x - x) + (pGraveyard->y - y) * (pGraveyard->y - y);
+    minDist = (pGraveyard->Loc.X - x) * (pGraveyard->Loc.X - x) + (pGraveyard->Loc.Y - y) * (pGraveyard->Loc.Y - y);
 
     for (uint32 i = BG_AV_NODES_AID_STATION; i <= BG_AV_NODES_FROSTWOLF_HUT; ++i)
     {
@@ -2145,7 +2145,7 @@ WorldSafeLocsEntry const* BattlegroundAV::GetClosestGraveyard(Player* player)
             entry = sWorldSafeLocsStore.LookupEntry(BG_AV_GraveyardIds[i]);
             if (entry)
             {
-                dist = (entry->x - x) * (entry->x - x) + (entry->y - y) * (entry->y - y);
+                dist = (entry->Loc.X - x)*(entry->Loc.X - x)+(entry->Loc.Y - y)*(entry->Loc.Y - y);
                 if (dist < minDist)
                 {
                     minDist = dist;

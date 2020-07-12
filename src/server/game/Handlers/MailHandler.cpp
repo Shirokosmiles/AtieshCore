@@ -505,9 +505,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
     if (!CanOpenMailBox(mailbox))
         return;
 
-    Player* player = _player;
-
-    sMailMgr->HandleMailCreateTextItem(player, mailId);    
+    sMailMgr->HandleMailCreateTextItem(_player, mailId);
 }
 
 /// @todo Fix me! ... this void has probably bad condition, but good data are sent
