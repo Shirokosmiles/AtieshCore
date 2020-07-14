@@ -892,17 +892,17 @@ struct ItemBagFamilyEntry
 struct ItemDisplayInfoEntry
 {
     uint32 ID;                                              // 0
-    //char* ModelName[2];                                     // 1-2
-    //char* ModelTexture[2];                                  // 3-4
+    char* ModelName[2];                                     // 1-2
+    char* ModelTexture[2];                                  // 3-4
     char* InventoryIcon[2];                                 // 5-6
-    //uint32 GeosetGroup[3];                                  // 7-9
-    //uint32 Flags;                                           // 10
-    //uint32 SpellVisualID;                                   // 11
-    //uint32 GroupSoundIndex;                                 // 12
-    //uint32 HelmetGeosetVisID[2];                            // 13-14
-    //char* Texture[8];                                       // 15-22
-    //int32 ItemVisual;                                       // 23
-    //uint32 ParticleColorID;                                 // 24
+    uint32 GeosetGroup[3];                                  // 7-9
+    uint32 Flags;                                           // 10
+    uint32 SpellVisualID;                                   // 11
+    uint32 GroupSoundIndex;                                 // 12
+    uint32 HelmetGeosetVisID[2];                            // 13-14
+    char* Texture[8];                                       // 15-22
+    int32 ItemVisual;                                       // 23
+    uint32 ParticleColorID;                                 // 24
 };
 
 /*
