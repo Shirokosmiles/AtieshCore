@@ -1406,7 +1406,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
     }
 }
 
-void BattlefieldWG::OnCreatureRemove(Creature* creature)
+void BattlefieldWG::OnCreatureRemove(Creature* /*creature*/)
 {
 /* possibly can be used later
     if (IsWarTime())
@@ -1439,7 +1439,7 @@ void BattlefieldWG::OnCreatureRemove(Creature* creature)
     }*/
 }
 
-void BattlefieldWG::OnGameObjectCreate(GameObject* go)
+void BattlefieldWG::OnGameObjectCreate(GameObject* /*go*/)
 {
     /*
     uint8 workshopId = 0;

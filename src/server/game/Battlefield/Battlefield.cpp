@@ -1278,7 +1278,7 @@ bool BfCapturePoint::Update(uint32 diff)
     }
 
     float oldValue = m_value;
-    TeamId oldTeam = m_team;
+    //TeamId oldTeam = m_team;
 
     m_OldState = m_State;
 
