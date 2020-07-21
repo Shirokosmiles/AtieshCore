@@ -35,13 +35,11 @@ void LfgPlayerData::SetState(LfgState state)
             m_Roles = 0;
             m_SelectedDungeons.clear();
             m_Comment.clear();
-            [[fallthrough]];
-        case LFG_STATE_DUNGEON:
-            m_OldState = state;
-            [[fallthrough]];
-        default:
-            m_State = state;
+            break;
     }
+
+    m_OldState = state;
+    m_State = state;
 }
 
 void LfgPlayerData::RestoreState()

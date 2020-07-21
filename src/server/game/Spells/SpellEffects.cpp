@@ -3866,7 +3866,8 @@ void Spell::EffectActivateObject(SpellEffIndex effIndex)
         case GameObjectActions::OpenAndUnlock:
             if (Unit* unitCaster = m_caster->ToUnit())
                 gameObjTarget->UseDoorOrButton(0, false, unitCaster);
-            [[fallthrough]];
+            gameObjTarget->ApplyModFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED, action == GameObjectActions::Lock);
+            break;
         case GameObjectActions::Unlock:
         case GameObjectActions::Lock:
             gameObjTarget->ApplyModFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED, action == GameObjectActions::Lock);

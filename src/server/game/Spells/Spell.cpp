@@ -3484,7 +3484,20 @@ void Spell::cancel()
     {
         case SPELL_STATE_PREPARING:
             CancelGlobalCooldown();
-            [[fallthrough]];
+            if (Player* tmpPlayer = m_caster->ToPlayer())
+            {
+                if (tmpPlayer->HaveSpectators())
+                {
+                    if (!tmpPlayer->IsSpectator())
+                    {
+                        SpectatorAddonMsg msg;
+                        msg.SetPlayer(tmpPlayer->GetName());
+                        msg.CancelSpell(m_spellInfo->Id);
+                        tmpPlayer->SendSpectatorAddonMsgToBG(msg);
+                    }
+                }
+            }
+            break;
         case SPELL_STATE_DELAYED:
             if (Player* tmpPlayer = m_caster->ToPlayer())
             {
@@ -6106,7 +6119,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                     case SUMMON_CATEGORY_PET:
                         if (!m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET) && unitCaster->GetPetGUID())
                             return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-                        [[fallthrough]]; // check both GetPetGUID() and GetCharmGUID for SUMMON_CATEGORY_PET
+                        break; // check both GetPetGUID() and GetCharmGUID for SUMMON_CATEGORY_PET
                     case SUMMON_CATEGORY_PUPPET:
                         if (unitCaster->GetCharmedGUID())
                             return SPELL_FAILED_ALREADY_HAVE_CHARM;
@@ -7235,7 +7248,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                         return SPELL_FAILED_DONT_REPORT;
                     }
                 }
-                [[fallthrough]];
+                break;
             case SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC:
             {
                 Item* targetItem = m_targets.GetItemTarget();
@@ -8655,7 +8668,7 @@ bool WorldObjectSpellTargetCheck::operator()(WorldObject* target) const
                     return false;
                 if (refUnit->GetClass() != unitTarget->GetClass())
                     return false;
-                [[fallthrough]];
+                break;
             case TARGET_CHECK_RAID:
                 if (!refUnit)
                     return false;

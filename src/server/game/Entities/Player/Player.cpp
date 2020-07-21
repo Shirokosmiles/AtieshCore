@@ -5971,7 +5971,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
                 break;
             case ITEM_SUBCLASS_WEAPON_FIST:
                 UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
-                [[fallthrough]];
+                break;
             default:
                 UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
                 break;
@@ -9529,11 +9529,11 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
         }
         break;
     case 4197: // Wintergrasp
+    {
         if (battlefield && battlefield->GetBattleId() == BATTLEFIELD_WG)
-        {
             battlefield->FillInitialWorldStates(packet);
-            break;
-        }
+        break;
+    }
     default:
         break;
     }
@@ -14459,7 +14459,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                             GetName().c_str(), GetGUID().ToString().c_str(), menu->GetGossipMenu().GetMenuId(), creature->GetName().c_str(), creature->GetEntry());
                         canTalk = false;
                     }
-                    [[fallthrough]];
+                    break;
                 }
                 case GOSSIP_OPTION_GOSSIP:
                 case GOSSIP_OPTION_SPIRITGUIDE:

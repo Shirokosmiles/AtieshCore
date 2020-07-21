@@ -7244,10 +7244,10 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                     {
                         case 911: // Shatter (Rank 3)
                             modChance += 16.f;
-                            [[fallthrough]];
+                            break;
                         case 910: // Shatter (Rank 2)
                             modChance += 17.f;
-                            [[fallthrough]];
+                            break;
                         case 849: // Shatter (Rank 1)
                             modChance += 17.f;
                             if (!HasAuraState(AURA_STATE_FROZEN, spellInfo, caster))
@@ -7369,7 +7369,7 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                         break;
                 }
             }
-            [[fallthrough]]; // Calculate critical strike chance for both Ranged and Melee spells
+            break; // Calculate critical strike chance for both Ranged and Melee spells
         }
         case SPELL_DAMAGE_CLASS_RANGED:
             if (caster)
