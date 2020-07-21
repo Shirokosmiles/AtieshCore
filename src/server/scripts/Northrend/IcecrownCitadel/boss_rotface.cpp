@@ -118,7 +118,7 @@ class boss_rotface : public CreatureScript
                 _Reset();
 
                 infectionStage = 0;
-                infectionCooldown = 14000;
+                infectionCooldown = 14000ms;
 
                 if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_GREEN_PLAGUE_MONSTER_ENTRANCE)))
                     go->SetGoState(GO_STATE_ACTIVE);
@@ -360,6 +360,7 @@ class npc_big_ooze : public CreatureScript
                         case EVENT_STICKY_OOZE:
                             DoCastVictim(SPELL_STICKY_OOZE);
                             events.ScheduleEvent(EVENT_STICKY_OOZE, 15s);
+                            break;
                         default:
                             break;
                     }

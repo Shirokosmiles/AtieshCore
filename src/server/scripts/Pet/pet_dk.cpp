@@ -95,7 +95,7 @@ public:
 
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
-            _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 100);
+            _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 100ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -127,7 +127,7 @@ public:
                         }
                         else
                         {
-                            _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 100);
+                            _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 100ms);
                             break;
                         }
 
@@ -137,7 +137,7 @@ public:
 
                         if (!target)
                         {
-                            _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 400);
+                            _events.ScheduleEvent(EVENT_MOVE_AT_TARGET, 400ms);
                             break;
                         }
 
@@ -156,7 +156,7 @@ public:
                         init.MoveTo(x, y, z);
                         init.SetFly();
                         int32 traveltime = init.Launch();
-                        _events.ScheduleEvent(EVENT_START_COMBAT, traveltime);
+                        _events.ScheduleEvent(EVENT_START_COMBAT, Milliseconds(traveltime));
                         break;
                     }
                     case EVENT_START_COMBAT:
@@ -228,7 +228,7 @@ public:
             Unit* owner = me->GetOwner();
             if (!owner || owner != caster)
                 return;
-            _events.ScheduleEvent(EVENT_COMBAT_OUT, 0);
+            _events.ScheduleEvent(EVENT_COMBAT_OUT, 0s);
         }
 
     private:
@@ -311,7 +311,7 @@ class npc_pet_dk_rune_weapon : public CreatureScript
                 DoCast(me, SPELL_PET_SCALING__MASTER_SPELL_06__SPELL_HIT_EXPERTISE_SPELL_PENETRATION, true);
                 DoCast(me, SPELL_DK_PET_SCALING_03, true);
 
-                _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6 * IN_MILLISECONDS);
+                _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6s);
                 _engageTimer = 1 * IN_MILLISECONDS;
 
                 me->GetThreatManager().RegisterRedirectThreat(SPELL_FAKE_AGGRO_RADIUS_8_YARD, summoner->GetGUID(), 100);
@@ -387,12 +387,12 @@ class npc_pet_dk_rune_weapon : public CreatureScript
                             // Cast every second
                             if (Unit* victim = me->GetVictim())
                                 DoCast(victim, SPELL_AGGRO_8_YD_PBAE, true);
-                            _events.ScheduleEvent(EVENT_SPELL_CAST_1, 1 * IN_MILLISECONDS);
+                            _events.ScheduleEvent(EVENT_SPELL_CAST_1, 1s);
                             break;
                         case EVENT_SPELL_CAST_2:
                             // Cast every 6 seconds
                             DoCast(me, SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
-                            _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6 * IN_MILLISECONDS);
+                            _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6s);
                             break;
                         default:
                             break;
@@ -409,7 +409,7 @@ class npc_pet_dk_rune_weapon : public CreatureScript
                 {
                     me->GetMotionMaster()->MoveChase(who);
                     DoCast(who, SPELL_AGGRO_8_YD_PBAE, true);
-                    _events.RescheduleEvent(EVENT_SPELL_CAST_1, 1 * IN_MILLISECONDS);
+                    _events.RescheduleEvent(EVENT_SPELL_CAST_1, 1s);
                 }
             }
 

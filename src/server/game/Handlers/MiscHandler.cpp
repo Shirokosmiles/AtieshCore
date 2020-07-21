@@ -57,11 +57,9 @@
 #include <cstdarg>
 #include <zlib.h>
 
-void WorldSession::HandleRepopRequestOpcode(WorldPacket& recvData)
+void WorldSession::HandleRepopRequest(WorldPackets::Misc::RepopRequest& /*packet*/)
 {
     TC_LOG_DEBUG("network", "WORLD: Recvd CMSG_REPOP_REQUEST Message");
-
-    recvData.read_skip<uint8>();
 
     if (GetPlayer()->IsAlive() || GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         return;
@@ -621,12 +619,9 @@ void WorldSession::HandleHearthAndResurrect(WorldPackets::Battleground::HearthAn
     _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
 }
 
-void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recvData)
+void WorldSession::HandleReclaimCorpse(WorldPackets::Misc::ReclaimCorpse& /*packet*/)
 {
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_RECLAIM_CORPSE");
-
-    ObjectGuid guid;
-    recvData >> guid;
 
     if (_player->IsAlive())
         return;
@@ -657,25 +652,20 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recvData)
     _player->SpawnCorpseBones();
 }
 
-void WorldSession::HandleResurrectResponseOpcode(WorldPacket& recvData)
+void WorldSession::HandleResurrectResponse(WorldPackets::Misc::ResurrectResponse& packet)
 {
     TC_LOG_DEBUG("network", "WORLD: Received CMSG_RESURRECT_RESPONSE");
-
-    ObjectGuid guid;
-    uint8 status;
-    recvData >> guid;
-    recvData >> status;
 
     if (GetPlayer()->IsAlive())
         return;
 
-    if (status == 0)
+    if (packet.Response == 0)
     {
         GetPlayer()->ClearResurrectRequestData();           // reject
         return;
     }
 
-    if (!GetPlayer()->IsResurrectRequestedBy(guid))
+    if (!GetPlayer()->IsResurrectRequestedBy(packet.Resurrecter))
         return;
 
     GetPlayer()->ResurrectUsingRequestData();

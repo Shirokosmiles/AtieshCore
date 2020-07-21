@@ -347,7 +347,7 @@ void TheLightOfDawnEvent::BroadcastPacketToPlayersInArea(WorldPacket const* data
 void TheLightOfDawnEvent::StartTheLightOfDawnEvent()
 {
     SetupInitialStates();
-    events.ScheduleEvent(EVENT_START_PREPARE, 0);
+    events.ScheduleEvent(EVENT_START_PREPARE, 0s);
 }
 
 void TheLightOfDawnEvent::StopTheLightOfDawnEvent()
@@ -357,10 +357,10 @@ void TheLightOfDawnEvent::StopTheLightOfDawnEvent()
 
 void TheLightOfDawnEvent::SummonScorgeArmy()
 {
-    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_1, 500);
-    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_2, 1000);
-    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_3, 1500);
-    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_4, 2000);
+    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_1, 500ms);
+    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_2, 1s);
+    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_3, 1500ms);
+    events.ScheduleEvent(EVENT_BEFORE_FIGHT_SPAWN_SCOURGE_4, 2s);
 }
 
 void TheLightOfDawnEvent::SummonDefenseArmy()

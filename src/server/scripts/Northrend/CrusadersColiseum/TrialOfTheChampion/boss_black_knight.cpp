@@ -183,8 +183,8 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_CLAW, 3000);
-            events.ScheduleEvent(EVENT_LEAP, 2000);
+            events.ScheduleEvent(EVENT_CLAW, 3s);
+            events.ScheduleEvent(EVENT_LEAP, 2s);
             DoZoneInCombat();
         }
 
@@ -226,14 +226,14 @@ public:
                             AddThreat(target, 10.0f);
                             me->AI()->AttackStart(target);
                         }
-                        events.ScheduleEvent(EVENT_CLAW, urand(12000, 15000));
+                        events.ScheduleEvent(EVENT_CLAW, randtime(12s, 15s));
                         break;
                     case EVENT_LEAP:
                         if (me->GetEntry() == NPC_RISEN_ARELAS || me->GetEntry() == NPC_RISEN_JAEREN)
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f, true))
                                 DoCast(target, SPELL_LEAP);
-                            events.ScheduleEvent(EVENT_LEAP, urand(8000, 10000));
+                            events.ScheduleEvent(EVENT_LEAP, randtime(8s, 10s));
                         }
                         break;
                     default:
@@ -293,17 +293,17 @@ public:
             if (uiPhase == PHASE_GHOST)
             {
                 // Phase 3
-                events.ScheduleEvent(EVENT_DEATH_BITE, 5000);
-                events.ScheduleEvent(EVENT_MARKED_DEATH, 20000);
+                events.ScheduleEvent(EVENT_DEATH_BITE, 5s);
+                events.ScheduleEvent(EVENT_MARKED_DEATH, 20s);
             }
             else
             {
                 // Phase 1 and 2
-                events.ScheduleEvent(EVENT_ICY_TOUCH, 6000);
+                events.ScheduleEvent(EVENT_ICY_TOUCH, 6s);
                 if (uiPhase == PHASE_UNDEAD)
                 {
                     // Phase 1 only
-                    events.ScheduleEvent(EVENT_DEATH_RESPITE, 8000);
+                    events.ScheduleEvent(EVENT_DEATH_RESPITE, 8s);
 
                     // Raising announcer as a ghoul
                     if (Creature* announcer = instance->GetCreature(DATA_ANNOUNCER))
@@ -317,8 +317,8 @@ public:
                 else
                 {
                     // Phase 2 only
-                    events.ScheduleEvent(EVENT_DESECRATION, 5000);
-                    events.ScheduleEvent(EVENT_GHOUL_EXPLODE, 8000);
+                    events.ScheduleEvent(EVENT_DESECRATION, 5s);
+                    events.ScheduleEvent(EVENT_GHOUL_EXPLODE, 8s);
 
                     // Army of the Dead
                     // disabling movement temporarily so the spell wont get interrupted
@@ -442,38 +442,38 @@ public:
                 {
                     case EVENT_ICY_TOUCH:
                         DoCastVictim(SPELL_ICY_TOUCH);
-                        events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 1000);
+                        events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 1s);
                         break;
                     case EVENT_PLAGUE_STRIKE:
                         DoCastVictim(SPELL_PLAGUE_STRIKE);
-                        events.ScheduleEvent(EVENT_OBLITERATE, 5000);
+                        events.ScheduleEvent(EVENT_OBLITERATE, 5s);
                         break;
                     case EVENT_OBLITERATE:
                         DoCastVictim(SPELL_OBLITERATE);
-                        events.ScheduleEvent(EVENT_ICY_TOUCH, urand(5000, 8000));
+                        events.ScheduleEvent(EVENT_ICY_TOUCH, randtime(5s, 8s));
                         break;
                     case EVENT_DEATH_RESPITE:
                         // TODO: fixing this later
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 50.0f, true))
                             DoCast(target, SPELL_DEATH_RESPITE);
-                        events.ScheduleEvent(EVENT_DEATH_RESPITE, urand(15000, 16000));
+                        events.ScheduleEvent(EVENT_DEATH_RESPITE, randtime(15s, 16s));
                         break;
                     case EVENT_DESECRATION:
                         DoCastVictim(SPELL_DESECRATION);
-                        events.ScheduleEvent(EVENT_DESECRATION, urand(15000, 16000));
+                        events.ScheduleEvent(EVENT_DESECRATION, randtime(15s, 16s));
                         break;
                     case EVENT_GHOUL_EXPLODE:
                         DoCastAOE(SPELL_GHOUL_EXPLODE);
-                        events.ScheduleEvent(EVENT_GHOUL_EXPLODE, urand(15000, 16000));
+                        events.ScheduleEvent(EVENT_GHOUL_EXPLODE, randtime(15s, 16s));
                         break;
                     case EVENT_DEATH_BITE:
                         DoCastAOE(SPELL_DEATH_BITE);
-                        events.ScheduleEvent(EVENT_DEATH_BITE, 3000);
+                        events.ScheduleEvent(EVENT_DEATH_BITE, 3s);
                         break;
                     case EVENT_MARKED_DEATH:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f))
                             DoCast(target, SPELL_MARKED_DEATH);
-                        events.ScheduleEvent(EVENT_MARKED_DEATH, urand(13000, 15000));
+                        events.ScheduleEvent(EVENT_MARKED_DEATH, randtime(13s, 15s));
                         break;
                     default:
                         break;

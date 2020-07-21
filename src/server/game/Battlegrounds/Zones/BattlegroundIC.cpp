@@ -375,7 +375,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                 for (uint32 i = BG_IC_GO_DOODAD_ND_WINTERORC_WALL_GATEFX_DOOR01; i <= BG_IC_GO_DOODAD_ND_WINTERORC_WALL_GATEFX_DOOR03; ++i)
                     DoorClose(i);
 
-                _events.ScheduleEvent(EVENT_DESPAWN_FAKE_DOORS, DESPAWN_FAKE_DOORS_TIME);
+                _events.ScheduleEvent(EVENT_DESPAWN_FAKE_DOORS, Milliseconds(DESPAWN_FAKE_DOORS_TIME));
                 break;
             case EVENT_DESPAWN_FAKE_DOORS:
                 // [13] UpdateType: Values
@@ -422,7 +422,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                         }
                     }
                 }
-                _events.Repeat(DOCKS_UPDATE_TIME);
+                _events.Repeat(Milliseconds(DOCKS_UPDATE_TIME));
                 break;
             }
             case EVENT_RESPAWN_WORKSHOP_VEHICLES:
@@ -454,7 +454,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                         }
                     }
                 }
-                _events.Repeat(WORKSHOP_UPDATE_TIME);
+                _events.Repeat(Milliseconds(WORKSHOP_UPDATE_TIME));
                 break;
             }
             case EVENT_UPDATE_RESOURCES:
@@ -468,7 +468,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                         UpdateWorldState((currentNode->faction == TEAM_ALLIANCE ? BG_IC_WS_ALLIANCE_REINFORCEMENTS : BG_IC_WS_HORDE_REINFORCEMENTS), factionReinforcements[currentNode->faction]);
                     }
                 }
-                _events.Repeat(IC_RESOURCE_TIME);
+                _events.Repeat(Milliseconds(IC_RESOURCE_TIME));
                 break;
         }
     }
@@ -528,7 +528,7 @@ void BattlegroundIC::StartingEventOpenDoors()
         DoorOpen(i);
 
     // schedule door close in 30 sec
-    _events.ScheduleEvent(EVENT_CLOSE_DOORS, CLOSE_DOORS_TIME);
+    _events.ScheduleEvent(EVENT_CLOSE_DOORS, Milliseconds(CLOSE_DOORS_TIME));
 
     for (uint8 i = BG_IC_GO_TELEPORTER_1_1; i < BG_IC_GO_TELEPORTER_1_1 + MAX_FORTRESS_TELEPORTERS_SPAWNS; ++i)
         if (GameObject* teleporter = GetBGObject(i, false))
@@ -702,7 +702,7 @@ bool BattlegroundIC::SetupBattleground()
         if (GameObject* seaforiumBomb = GetBGObject(i, false))
             seaforiumBomb->SetRespawnTime(BG_IC_ObjSpawnlocs[i].SpawnTime);
 
-    _events.ScheduleEvent(EVENT_UPDATE_RESOURCES, IC_RESOURCE_TIME);
+    _events.ScheduleEvent(EVENT_UPDATE_RESOURCES, Milliseconds(IC_RESOURCE_TIME));
     return true;
 }
 
@@ -1051,7 +1051,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint const* node, bool recapture
         case BG_IC_GO_DOCKS_BANNER_A:
         case BG_IC_GO_DOCKS_BANNER_H:
             // no contested entries here because when that happens it's a recapture, and existing vehicle spawns shouldn't be affected
-            _events.RescheduleEvent(EVENT_RESPAWN_DOCK_VEHICLES, DOCKS_UPDATE_TIME);
+            _events.RescheduleEvent(EVENT_RESPAWN_DOCK_VEHICLES, Milliseconds(DOCKS_UPDATE_TIME));
 
             // we must del opposing faction vehicles when the node is captured (unused ones)
             for (uint8 i = (node->faction == TEAM_ALLIANCE ? BG_IC_NPC_GLAIVE_THROWER_1_H : BG_IC_NPC_GLAIVE_THROWER_1_A); i <= (node->faction == TEAM_ALLIANCE ? BG_IC_NPC_GLAIVE_THROWER_2_H : BG_IC_NPC_GLAIVE_THROWER_2_A); ++i)
@@ -1107,7 +1107,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint const* node, bool recapture
         case BG_IC_GO_WORKSHOP_BANNER_CONT_A:
         case BG_IC_GO_WORKSHOP_BANNER_CONT_H:
         {
-            _events.RescheduleEvent(EVENT_RESPAWN_WORKSHOP_VEHICLES, WORKSHOP_UPDATE_TIME);
+            _events.RescheduleEvent(EVENT_RESPAWN_WORKSHOP_VEHICLES, Milliseconds(WORKSHOP_UPDATE_TIME));
 
             if (!recapture)
             {

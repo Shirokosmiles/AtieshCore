@@ -528,7 +528,7 @@ struct boss_sister_svalna : public BossAI
                             founded = true;
 
                     if (founded)
-                        events.ScheduleEvent(EVENT_AETHER_SHIELD, 0);
+                        events.ScheduleEvent(EVENT_AETHER_SHIELD, 0s);
                     else
                         events.ScheduleEvent(EVENT_CHECK_LIST, 1s);
                     break;
@@ -1225,7 +1225,7 @@ struct npc_frostwing_ymirjar_vrykul : public ScriptedAI
         {
             case NPC_YMIRJAR_FROSTBINDER:
                 me->RemoveAurasDueToSpell(SPELL_ARCTIC_CHILL);
-            /* fallthrough */
+                [[fallthrough]];
             case NPC_YMIRJAR_DEATHBRINGER:
                 _OOCevents.ScheduleEvent(EVENT_YMIRJAR_SPIRIT_STREAM, 10s, 20s);
                 break;

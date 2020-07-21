@@ -1591,7 +1591,7 @@ void Player::setDeathState(DeathState s)
 
         ClearResurrectRequestData();
 
-        //FIXME: is pet dismissed at dying or releasing spirit? if second, add setDeathState(DEAD) to HandleRepopRequestOpcode and define pet unsummon here with (s == DEAD)
+        //FIXME: is pet dismissed at dying or releasing spirit? if second, add setDeathState(DEAD) to HandleRepopRequest and define pet unsummon here with (s == DEAD)
         RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
 
         // save value before aura remove in Unit::setDeathState
@@ -4612,9 +4612,9 @@ void Player::SetMovement(PlayerMovementType pType)
 */
 void Player::BuildPlayerRepop()
 {
-    WorldPacket data(SMSG_PRE_RESURRECT, GetPackGUID().size());
-    data << GetPackGUID();
-    SendDirectMessage(&data);
+    WorldPackets::Misc::PreRessurect packet;
+    packet.PlayerGUID = GetGUID();
+    GetSession()->SendPacket(packet.Write());
 
     if (GetRace() == RACE_NIGHTELF)
         CastSpell(this, 20584, true);
@@ -4670,12 +4670,9 @@ void Player::BuildPlayerRepop()
 
 void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 {
-    WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4*4);          // remove spirit healer position
-    data << uint32(-1);
-    data << float(0);
-    data << float(0);
-    data << float(0);
-    SendDirectMessage(&data);
+    WorldPackets::Misc::DeathReleaseLoc packet;
+    packet.MapID = -1;
+    GetSession()->SendPacket(packet.Write());
 
     // remove death flag + set aura
     SetAnimationTier(AnimationTier::Ground);
@@ -5134,10 +5131,10 @@ void Player::RepopAtGraveyard()
         TeleportTo(ClosestGraveyard->Continent, ClosestGraveyard->Loc.X, ClosestGraveyard->Loc.Y, ClosestGraveyard->Loc.Z, GetOrientation(), shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
         if (isDead()) // don't send if alive, it's used in TeleportTo()
         {
-            WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4 * 4); // show spirit healer position on minimap
-            data << ClosestGraveyard->Continent;
-            data << TaggedPosition<Position::XYZ>(ClosestGraveyard->Loc.X, ClosestGraveyard->Loc.Y, ClosestGraveyard->Loc.Z);
-            SendDirectMessage(&data);
+            WorldPackets::Misc::DeathReleaseLoc packet;
+            packet.MapID = ClosestGraveyard->Continent;
+            packet.Loc = Position(ClosestGraveyard->Loc.X, ClosestGraveyard->Loc.Y, ClosestGraveyard->Loc.Z);
+            GetSession()->SendPacket(packet.Write());
         }
     }
     else if (GetPositionZ() < GetMap()->GetMinHeight(GetPositionX(), GetPositionY()))
@@ -5946,19 +5943,15 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return false;
 }
 
-void Player::UpdateWeaponSkill(WeaponAttackType attType)
+void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
 {
-    Unit* victim = GetVictim();
-    if (!victim)
-        return;
-
     if (IsInFeralForm())
         return;                                             // always maximized SKILL_FERAL_COMBAT in fact
 
     if (GetShapeshiftForm() == FORM_TREE)
         return;                                             // use weapon but not skill up
 
-    if (victim && victim->GetTypeId() == TYPEID_UNIT && (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_SKILLGAIN))
+    if (victim->GetTypeId() == TYPEID_UNIT && (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_SKILLGAIN))
         return;
 
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
@@ -5978,7 +5971,7 @@ void Player::UpdateWeaponSkill(WeaponAttackType attType)
                 break;
             case ITEM_SUBCLASS_WEAPON_FIST:
                 UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
-                /* fallthrough */
+                [[fallthrough]];
             default:
                 UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
                 break;
@@ -6017,7 +6010,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
         if (defense)
             UpdateDefense();
         else
-            UpdateWeaponSkill(attType);
+            UpdateWeaponSkill(victim, attType);
     }
     else
         return;
@@ -12342,6 +12335,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
             case EQUIPMENT_SLOT_OFFHAND:
             case EQUIPMENT_SLOT_RANGED:
                 RecalculateRating(CR_ARMOR_PENETRATION);
+                break;
             default:
                 break;
         }
@@ -12515,6 +12509,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                         case EQUIPMENT_SLOT_OFFHAND:
                         case EQUIPMENT_SLOT_RANGED:
                             RecalculateRating(CR_ARMOR_PENETRATION);
+                            break;
                         default:
                             break;
                     }
@@ -12647,6 +12642,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
                     case EQUIPMENT_SLOT_OFFHAND:
                     case EQUIPMENT_SLOT_RANGED:
                         RecalculateRating(CR_ARMOR_PENETRATION);
+                        break;
                     default:
                         break;
                 }
@@ -14463,8 +14459,8 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                             GetName().c_str(), GetGUID().ToString().c_str(), menu->GetGossipMenu().GetMenuId(), creature->GetName().c_str(), creature->GetEntry());
                         canTalk = false;
                     }
+                    [[fallthrough]];
                 }
-                /* fallthrough */
                 case GOSSIP_OPTION_GOSSIP:
                 case GOSSIP_OPTION_SPIRITGUIDE:
                 case GOSSIP_OPTION_INNKEEPER:
@@ -19998,6 +19994,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction& trans)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
                 stmt->setUInt32(0, item->GetGUID().GetCounter());
                 trans->Append(stmt);
+                break;
             case ITEM_UNCHANGED:
                 break;
         }
@@ -23115,7 +23112,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
     if (pItem->GetTemplate()->HasFlag(ITEM_FLAG_NO_EQUIP_COOLDOWN))
         return;
 
-    std::chrono::steady_clock::time_point now = GameTime::GetGameTimeSteadyPoint();
+    TimePoint now = GameTime::Now();
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
         _Spell const& spellData = pItem->GetTemplate()->Spells[i];
@@ -24421,9 +24418,9 @@ int32 Player::CalculateCorpseReclaimDelay(bool load) const
 
 void Player::SendCorpseReclaimDelay(uint32 delay) const
 {
-    WorldPacket data(SMSG_CORPSE_RECLAIM_DELAY, 4);
-    data << uint32(delay);
-    SendDirectMessage(&data);
+    WorldPackets::Misc::CorpseReclaimDelay packet;
+    packet.Remaining = delay;
+    GetSession()->SendPacket(packet.Write());
 }
 
 Player* Player::GetNextRandomRaidMember(float radius)
@@ -25252,6 +25249,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
                     break;
                 case SKILL_RANGE_LEVEL:
                     max = GetMaxSkillValueForLevel();
+                    break;
                 default:
                     break;
             }

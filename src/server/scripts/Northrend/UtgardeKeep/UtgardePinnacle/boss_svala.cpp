@@ -249,14 +249,14 @@ class boss_svala : public CreatureScript
                         case EVENT_INTRO_SVALA_TALK_0:
                         {
                             Talk(SAY_SVALA_INTRO_0);
-                            events.ScheduleEvent(EVENT_INTRO_ARTHAS_TALK_0, 8.1 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_INTRO_ARTHAS_TALK_0, 8100ms);
                             break;
                         }
                         case EVENT_INTRO_ARTHAS_TALK_0:
                         {
                             if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
                                 arthas->AI()->Talk(SAY_DIALOG_OF_ARTHAS_1);
-                            events.ScheduleEvent(EVENT_INTRO_TRANSFORM_0, 10 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_INTRO_TRANSFORM_0, 10s);
                             break;
                         }
                         case EVENT_INTRO_TRANSFORM_0:
@@ -279,14 +279,14 @@ class boss_svala : public CreatureScript
                                     (*itr)->GetMotionMaster()->MovePoint(1, spectatorWP[0]);
                                 }
                             }
-                            events.ScheduleEvent(EVENT_INTRO_TRANSFORM_1, 4.2 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_INTRO_TRANSFORM_1, 4200ms);
                             break;
                         }
                         case EVENT_INTRO_TRANSFORM_1:
                         {
                             me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, false);
                             me->SetHover(true);
-                            events.ScheduleEvent(EVENT_INTRO_TRANSFORM_2, 6.2 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_INTRO_TRANSFORM_2, 6200ms);
                             break;
                         }
                         case EVENT_INTRO_TRANSFORM_2:
@@ -300,20 +300,20 @@ class boss_svala : public CreatureScript
                             me->RemoveAllAuras();
                             me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            events.ScheduleEvent(EVENT_INTRO_SVALA_TALK_1, 6 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_INTRO_SVALA_TALK_1, 6s);
                             break;
                         }
                         case EVENT_INTRO_SVALA_TALK_1:
                         {
                             Talk(SAY_SVALA_INTRO_1);
-                            events.ScheduleEvent(EVENT_INTRO_ARTHAS_TALK_1, 12 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_INTRO_ARTHAS_TALK_1, 12s);
                             break;
                         }
                         case EVENT_INTRO_ARTHAS_TALK_1:
                         {
                             if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
                                 arthas->AI()->Talk(SAY_DIALOG_OF_ARTHAS_2);
-                            events.ScheduleEvent(EVENT_INTRO_SVALA_TALK_2, 9 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_INTRO_SVALA_TALK_2, 9s);
                             break;
                         }
                         case EVENT_INTRO_SVALA_TALK_2:
@@ -322,7 +322,7 @@ class boss_svala : public CreatureScript
                             me->SetFacingTo(1.58f);
                             if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
                                 arthas->SetVisible(false);
-                            events.ScheduleEvent(EVENT_INTRO_DESPAWN_ARTHAS, 3 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_INTRO_DESPAWN_ARTHAS, 3s);
                             break;
                         }
                         case EVENT_INTRO_DESPAWN_ARTHAS:
@@ -340,8 +340,8 @@ class boss_svala : public CreatureScript
                             //_introCompleted = true;
                             SetPhase(NORMAL);
                             DoZoneInCombat();
-                            events.ScheduleEvent(EVENT_SINISTER_STRIKE, 7 * IN_MILLISECONDS);
-                            events.ScheduleEvent(EVENT_CALL_FLAMES, urand(10 * IN_MILLISECONDS, 20 * IN_MILLISECONDS));
+                            events.ScheduleEvent(EVENT_SINISTER_STRIKE, 7s);
+                            events.ScheduleEvent(EVENT_CALL_FLAMES, randtime(10s, 20s));
                             break;
                         }
                         // PHASE NORMAL
@@ -355,7 +355,7 @@ class boss_svala : public CreatureScript
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                                 DoCast(target, SPELL_CALL_FLAMES);
-                            events.ScheduleEvent(EVENT_CALL_FLAMES, urand(10 * IN_MILLISECONDS, 20 * IN_MILLISECONDS));
+                            events.ScheduleEvent(EVENT_CALL_FLAMES, randtime(10s, 20s));
                             break;
                         }
                         // PHASE SACRIFICING
@@ -381,8 +381,8 @@ class boss_svala : public CreatureScript
 
                                 DoTeleportPlayer(sacrificeTarget, 296.632f, -346.075f, 90.63f, 4.6f);
 
-                                events.ScheduleEvent(EVENT_FINISH_RITUAL_1, 25 * IN_MILLISECONDS);
-                                events.ScheduleEvent(EVENT_START_RITUAL, 1 * IN_MILLISECONDS);
+                                events.ScheduleEvent(EVENT_FINISH_RITUAL_1, 25s);
+                                events.ScheduleEvent(EVENT_START_RITUAL, 1s);
                             }
                             break;
                         }                        
@@ -395,7 +395,7 @@ class boss_svala : public CreatureScript
                                 DoCast(me, SPELL_RITUAL_OF_THE_SWORD);
                             }
                             
-                            events.ScheduleEvent(EVENT_SPAWN_RITUAL_CHANNELERS, 0);
+                            events.ScheduleEvent(EVENT_SPAWN_RITUAL_CHANNELERS, 0s);
                             break;
                         }                        
                         case EVENT_SPAWN_RITUAL_CHANNELERS:
@@ -403,13 +403,13 @@ class boss_svala : public CreatureScript
                             DoCast(me, SPELL_RITUAL_CHANNELER_1, true);
                             DoCast(me, SPELL_RITUAL_CHANNELER_2, true);
                             DoCast(me, SPELL_RITUAL_CHANNELER_3, true);
-                            events.ScheduleEvent(EVENT_RITUAL_STRIKE, 1 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_RITUAL_STRIKE, 1s);
                             break;
                         }
                         case EVENT_RITUAL_STRIKE:
                         {
                             DoCast(me, SPELL_RITUAL_STRIKE_TRIGGER, true);
-                            events.ScheduleEvent(EVENT_RITUAL_DISARM, 200);
+                            events.ScheduleEvent(EVENT_RITUAL_DISARM, 200ms);
                             break;
                         }
                         case EVENT_RITUAL_DISARM:
@@ -421,7 +421,7 @@ class boss_svala : public CreatureScript
                         {
                             me->SetControlled(false, UNIT_STATE_ROOT);
                             me->GetMotionMaster()->MoveFall(0);
-                            events.ScheduleEvent(EVENT_FINISH_RITUAL_2, 4 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_FINISH_RITUAL_2, 4s);
                         }
                         case EVENT_FINISH_RITUAL_2:
                         {
@@ -430,8 +430,8 @@ class boss_svala : public CreatureScript
                             // Return in NORMAL PHASE
                             SetPhase(NORMAL);
                             DoZoneInCombat();
-                            events.ScheduleEvent(EVENT_SINISTER_STRIKE, 7 * IN_MILLISECONDS);
-                            events.ScheduleEvent(EVENT_CALL_FLAMES, urand(10 * IN_MILLISECONDS, 20 * IN_MILLISECONDS));
+                            events.ScheduleEvent(EVENT_SINISTER_STRIKE, 7s);
+                            events.ScheduleEvent(EVENT_CALL_FLAMES, randtime(10s, 20s));
                             break;
                         }
                         default:
@@ -448,7 +448,7 @@ class boss_svala : public CreatureScript
                     {
                         _sacrificed = true;
                         SetPhase(SACRIFICING);
-                        events.ScheduleEvent(EVENT_RITUAL_PREPARATION, 0);
+                        events.ScheduleEvent(EVENT_RITUAL_PREPARATION, 0s);
                     }
                 }
             }

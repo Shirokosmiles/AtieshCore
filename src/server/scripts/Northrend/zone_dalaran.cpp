@@ -98,7 +98,7 @@ public:
             }
 
             if (checkdist)
-                _events.ScheduleEvent(1, 1000);
+                _events.ScheduleEvent(1, 1s);
         }
 
         void Reset() override { }
@@ -137,7 +137,7 @@ public:
                                     }
                                 }
 
-                        _events.ScheduleEvent(1, 1000);
+                        _events.ScheduleEvent(1, 1s);
                         break;
                     }
                 }
@@ -369,7 +369,7 @@ public:
                 case EVENT_CAST_TELEPORT:
                 {
                     DoCast(SPELL_TELEPORT);
-                    events.ScheduleEvent(EVENT_GO_FLY_POINT_1, 100);
+                    events.ScheduleEvent(EVENT_GO_FLY_POINT_1, 100ms);
                     break;
                 }
                 case EVENT_GO_FLY_POINT_1:
@@ -422,7 +422,7 @@ public:
             Player* player = caster->ToPlayer();
 
             if (spellInfo->Id == SPELL_PASSENGER_BOARDED)
-                events.ScheduleEvent(EVENT_GO_FLY, 100);
+                events.ScheduleEvent(EVENT_GO_FLY, 100ms);
 
             playerGuid = player->GetGUID();
         }
@@ -435,25 +435,25 @@ public:
                 {
                     case POINT_TELEPORT:
                     {
-                        events.ScheduleEvent(EVENT_CAST_TELEPORT, 100);
+                        events.ScheduleEvent(EVENT_CAST_TELEPORT, 100ms);
                         break;
                     }
                     case POINT_PATH_1:
                     {
                         DoCast(SPELL_SUMMON_PATROL);
-                        events.ScheduleEvent(EVENT_GO_FLY_POINT_2, 100);
+                        events.ScheduleEvent(EVENT_GO_FLY_POINT_2, 100ms);
                         break;
                     }
                     case POINT_PATH_2:
                     {
                         if (Player* player = me->GetMap()->GetPlayer(playerGuid))
                             player->_ExitVehicle();
-                        events.ScheduleEvent(EVENT_GO_FLY_POINT_3, 100);
+                        events.ScheduleEvent(EVENT_GO_FLY_POINT_3, 100ms);
                         break;
                     }
                     case POINT_PATH_3:
                     {
-                        events.ScheduleEvent(EVENT_DESPAWN_ME, 3000);
+                        events.ScheduleEvent(EVENT_DESPAWN_ME, 3s);
                         break;
                     }
                     default:

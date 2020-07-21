@@ -755,11 +755,11 @@ public: npc_sky_captain_cryoflight() : CreatureScript("npc_sky_captain_cryofligh
                 if (movementType == POINT_MOTION_TYPE)
                 {
                     if (pointId == POINT_3)
-                        _events.ScheduleEvent(EVENT_DROPPLAYER, 100);
+                        _events.ScheduleEvent(EVENT_DROPPLAYER, 100ms);
                     else if (pointId == POINT_1)
-                        _events.ScheduleEvent(EVENT_FLY_AT_2, 100);
+                        _events.ScheduleEvent(EVENT_FLY_AT_2, 100ms);
                     else if (pointId == POINT_2)
-                        _events.ScheduleEvent(EVENT_FLY_AT_3, 100);
+                        _events.ScheduleEvent(EVENT_FLY_AT_3, 100ms);
                 }
             }
 
@@ -782,7 +782,7 @@ public: npc_sky_captain_cryoflight() : CreatureScript("npc_sky_captain_cryofligh
                             me->CastSpell(_player, 45472, true); //parachute
                         }
 
-                        _events.ScheduleEvent(EVENT_FLY_AT_2, 100);
+                        _events.ScheduleEvent(EVENT_FLY_AT_2, 100ms);
                         break;
                     }
                     case EVENT_FLY_AT_NPC:

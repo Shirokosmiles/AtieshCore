@@ -357,7 +357,7 @@ struct boss_grand_championAI : BossAI
             // After that time, they will start attacking a random player
             // if group wipes during actual fight, grand champions will be attackable immediately when reached home position
             uiPhase = 4;
-            events.ScheduleEvent(EVENT_START_ATTACK_REAL, 15000);
+            events.ScheduleEvent(EVENT_START_ATTACK_REAL, 15s);
             bHome = false;
         }
         else if (MountedPhaseDone && !bHome)
@@ -373,7 +373,7 @@ struct boss_grand_championAI : BossAI
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveIdle();
             Talk(EMOTE_TRAMPLE, me);
-            events.ScheduleEvent(EVENT_TRAMPLE, spellInfo->GetDuration());
+            events.ScheduleEvent(EVENT_TRAMPLE, Milliseconds(spellInfo->GetDuration()));
         }
     }
 
@@ -419,7 +419,7 @@ struct boss_grand_championAI : BossAI
                     }
                 }
                 if (foundPlr)
-                    events.ScheduleEvent(EVENT_START_ATTACK_JOUST, 2000); // slight delay before attacking
+                    events.ScheduleEvent(EVENT_START_ATTACK_JOUST, 2s); // slight delay before attacking
                 else
                     SetGrandChampionToEvadeMode(me);
             }
@@ -510,7 +510,7 @@ struct boss_grand_championAI : BossAI
                     mount->GetMotionMaster()->MovePoint(1, announcer->GetHomePosition());
                 }
             }
-            events.ScheduleEvent(EVENT_WALK_TO_MOUNT, 3000); // slight delay before we go for new mount
+            events.ScheduleEvent(EVENT_WALK_TO_MOUNT, 3s); // slight delay before we go for new mount
             return;
         }
         else if (damage >= me->GetHealth() && LookingForMount)
@@ -669,7 +669,7 @@ struct boss_grand_championAI : BossAI
             instance->SetData(DATA_REMOVE_VEHICLES, 0);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             uiPhase = 5;
-            events.ScheduleEvent(EVENT_EVADE_MODE, 2000); // minor delay before entering to evade mode to correct movement
+            events.ScheduleEvent(EVENT_EVADE_MODE, 2s); // minor delay before entering to evade mode to correct movement
         }
 
         if (!bDone && GrandChampionsDefeated())
@@ -677,7 +677,7 @@ struct boss_grand_championAI : BossAI
             // Grand Champions encounter is now over
             bDone = true;
             uiPhase = 6;
-            events.ScheduleEvent(EVENT_DESPAWN, 2000); // minor delay before giving loot chest
+            events.ScheduleEvent(EVENT_DESPAWN, 2s); // minor delay before giving loot chest
         }
     }
 };
@@ -707,10 +707,10 @@ public:
         void Initialize()
         {
             castedPennant = false;
-            events.ScheduleEvent(EVENT_BUFF_FLAG, 2000);
-            events.ScheduleEvent(EVENT_BUFF_SHIELD, 5000);
-            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 5000);
-            events.ScheduleEvent(EVENT_SHIELD_BREAKER, 8000);
+            events.ScheduleEvent(EVENT_BUFF_FLAG, 2s);
+            events.ScheduleEvent(EVENT_BUFF_SHIELD, 5s);
+            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 5s);
+            events.ScheduleEvent(EVENT_SHIELD_BREAKER, 8s);
         }
 
         InstanceScript* instance;
@@ -961,7 +961,7 @@ public:
                 {
                     case EVENT_BUFF_SHIELD:
                         DoCastShield();
-                        events.ScheduleEvent(EVENT_BUFF_SHIELD, 7000);
+                        events.ScheduleEvent(EVENT_BUFF_SHIELD, 7s);
                         break;
                     case EVENT_BUFF_FLAG:
                         if (IsGrandChampionVehicle())
@@ -1042,7 +1042,7 @@ public:
                                 }
                             }
                         }
-                        events.ScheduleEvent(EVENT_MOUNT_CHARGE, 7000);
+                        events.ScheduleEvent(EVENT_MOUNT_CHARGE, 7s);
                         break;
                     }
                     case EVENT_SHIELD_BREAKER:
@@ -1060,7 +1060,7 @@ public:
                                     }
                                 }
                             }
-                            events.ScheduleEvent(EVENT_SHIELD_BREAKER, 4000);
+                            events.ScheduleEvent(EVENT_SHIELD_BREAKER, 4s);
                         }
                         break;
                     default:
@@ -1098,10 +1098,10 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            events.ScheduleEvent(EVENT_BLADESTORM, urand(15000, 20000));
-            events.ScheduleEvent(EVENT_INTERCEPT, 7000);
-            events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(8000, 12000));
-            events.ScheduleEvent(EVENT_ROLLING_THROW, 30000);
+            events.ScheduleEvent(EVENT_BLADESTORM, randtime(15s, 20s));
+            events.ScheduleEvent(EVENT_INTERCEPT, 7s);
+            events.ScheduleEvent(EVENT_MORTAL_STRIKE, randtime(8s, 12s));
+            events.ScheduleEvent(EVENT_ROLLING_THROW, 30s);
             boss_grand_championAI::JustEngagedWith(who);
         }
 
@@ -1152,17 +1152,17 @@ public:
                                 }
                             }
                         }
-                        events.ScheduleEvent(EVENT_INTERCEPT, 7000);
+                        events.ScheduleEvent(EVENT_INTERCEPT, 7s);
                         break;
                     }
                     case EVENT_BLADESTORM:
                         DoCastVictim(SPELL_BLADESTORM);
-                        events.ScheduleEvent(EVENT_BLADESTORM, urand(15000, 20000));
+                        events.ScheduleEvent(EVENT_BLADESTORM, randtime(15s, 20s));
                         break;
                     case EVENT_MORTAL_STRIKE:
                         if (!me->HasAura(SPELL_BLADESTORM))
                             DoCastVictim(SPELL_MORTAL_STRIKE);
-                        events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(8000, 12000));
+                        events.ScheduleEvent(EVENT_MORTAL_STRIKE, randtime(8s, 12s));
                         break;
                     case EVENT_ROLLING_THROW:
                         // TODO: FIXME
@@ -1170,7 +1170,7 @@ public:
                         // without hackfix caster jumps forward, when caster should jump backwards and player jump forwards
                         if (!me->HasAura(SPELL_BLADESTORM))
                             DoCastVictim(SPELL_ROLLING_THROW);
-                        events.ScheduleEvent(EVENT_ROLLING_THROW, 30000);
+                        events.ScheduleEvent(EVENT_ROLLING_THROW, 30s);
                         break;
                     default:
                         break;
@@ -1203,10 +1203,10 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            events.ScheduleEvent(EVENT_FIREBALL, 2000);
-            events.ScheduleEvent(EVENT_POLYMORPH, 8000);
-            events.ScheduleEvent(EVENT_BLASTWAVE, 12000);
-            events.ScheduleEvent(EVENT_HASTE, 22000);
+            events.ScheduleEvent(EVENT_FIREBALL, 2s);
+            events.ScheduleEvent(EVENT_POLYMORPH, 8s);
+            events.ScheduleEvent(EVENT_BLASTWAVE, 12s);
+            events.ScheduleEvent(EVENT_HASTE, 22s);
             boss_grand_championAI::JustEngagedWith(who);
         }
 
@@ -1236,11 +1236,11 @@ public:
                         {
                             DoCast(target, SPELL_POLYMORPH);
                             if (me->HasAura(SPELL_HASTE))
-                                events.ScheduleEvent(EVENT_FIREBALL, 2000);
+                                events.ScheduleEvent(EVENT_FIREBALL, 2s);
                             else
-                                events.ScheduleEvent(EVENT_FIREBALL, 3000);
+                                events.ScheduleEvent(EVENT_FIREBALL, 3s);
                         }
-                        events.ScheduleEvent(EVENT_POLYMORPH, 8000);
+                        events.ScheduleEvent(EVENT_POLYMORPH, 8s);
                         break;
                     case EVENT_BLASTWAVE:
                         if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0))
@@ -1249,23 +1249,23 @@ public:
                             {
                                 me->InterruptNonMeleeSpells(true);
                                 DoCastAOE(SPELL_BLAST_WAVE);
-                                events.ScheduleEvent(EVENT_FIREBALL, 1500);
+                                events.ScheduleEvent(EVENT_FIREBALL, 1500ms);
                             }
                         }
-                        events.ScheduleEvent(EVENT_BLASTWAVE, 13000);
+                        events.ScheduleEvent(EVENT_BLASTWAVE, 13s);
                         break;
                     case EVENT_HASTE:
                         me->InterruptNonMeleeSpells(true);
                         DoCast(me, SPELL_HASTE);
-                        events.ScheduleEvent(EVENT_FIREBALL, 1500);
-                        events.ScheduleEvent(EVENT_HASTE, 22000);
+                        events.ScheduleEvent(EVENT_FIREBALL, 1500ms);
+                        events.ScheduleEvent(EVENT_HASTE, 22s);
                         break;
                     case EVENT_FIREBALL:
                         DoCastVictim(SPELL_FIREBALL);
                         if (me->HasAura(SPELL_HASTE))
-                            events.ScheduleEvent(EVENT_FIREBALL, 3000);
+                            events.ScheduleEvent(EVENT_FIREBALL, 3s);
                         else
-                            events.ScheduleEvent(EVENT_FIREBALL, 4000);
+                            events.ScheduleEvent(EVENT_FIREBALL, 4s);
                         break;
                     default:
                         break;
@@ -1313,11 +1313,11 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            events.ScheduleEvent(EVENT_DEF_CHECK, 5000);
-            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 16000);
-            events.ScheduleEvent(EVENT_HEALING_WAVE, 12000);
-            events.ScheduleEvent(EVENT_EARTH_SHIELD, 5000);
-            events.ScheduleEvent(EVENT_HEX_MENDING, 7000);
+            events.ScheduleEvent(EVENT_DEF_CHECK, 5s);
+            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 16s);
+            events.ScheduleEvent(EVENT_HEALING_WAVE, 12s);
+            events.ScheduleEvent(EVENT_EARTH_SHIELD, 5s);
+            events.ScheduleEvent(EVENT_HEX_MENDING, 7s);
             boss_grand_championAI::JustEngagedWith(who);
         }
 
@@ -1326,15 +1326,15 @@ public:
             if (interrupt)
                 me->InterruptNonMeleeSpells(true);
             isDefensive = false;
-            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 1000);
+            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 1s);
         }
 
         void EnterDefensiveMode()
         {
             me->InterruptNonMeleeSpells(true);
             isDefensive = true;
-            events.ScheduleEvent(EVENT_EARTH_SHIELD, 1000);
-            events.ScheduleEvent(EVENT_HEALING_WAVE, 1500);
+            events.ScheduleEvent(EVENT_EARTH_SHIELD, 1s);
+            events.ScheduleEvent(EVENT_HEALING_WAVE, 1500ms);
         }
 
         Unit* FindChampionWithLowestHp(float range)
@@ -1408,14 +1408,14 @@ public:
                             else
                                 EnterCombatMode(true);
                         }
-                        events.ScheduleEvent(EVENT_DEF_CHECK, 5000);
+                        events.ScheduleEvent(EVENT_DEF_CHECK, 5s);
                         break;
                     case EVENT_CHAIN_LIGHTNING:
                         if (!isDefensive)
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                                 DoCast(target, SPELL_CHAIN_LIGHTNING);
-                            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 16000);
+                            events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 16s);
                         }
                         break;
                     case EVENT_HEALING_WAVE:
@@ -1428,9 +1428,9 @@ public:
                                 DoCast(pFriend, SPELL_HEALING_WAVE);
                         }
                         if (isDefensive)
-                            events.ScheduleEvent(EVENT_HEALING_WAVE, 4000);
+                            events.ScheduleEvent(EVENT_HEALING_WAVE, 4s);
                         else
-                            events.ScheduleEvent(EVENT_HEALING_WAVE, 12000);
+                            events.ScheduleEvent(EVENT_HEALING_WAVE, 12s);
                         break;
                     case EVENT_EARTH_SHIELD:
                         if (Unit* pFriend = FindChampionWithLowestHp(40.0f))
@@ -1450,11 +1450,11 @@ public:
                                 earthShieldTarget = pFriend->GetGUID();
                             }
                         }
-                        events.ScheduleEvent(EVENT_EARTH_SHIELD, urand(30000, 35000));
+                        events.ScheduleEvent(EVENT_EARTH_SHIELD, randtime(30s, 35s));
                         break;
                     case EVENT_HEX_MENDING:
                         DoCastVictim(SPELL_HEX_OF_MENDING);
-                        events.ScheduleEvent(EVENT_HEX_MENDING, urand(20000, 25000));
+                        events.ScheduleEvent(EVENT_HEX_MENDING, randtime(20s, 25s));
                         break;
                     default:
                         break;
@@ -1488,9 +1488,9 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            events.ScheduleEvent(EVENT_MULTI_SHOT, 7500);
-            events.ScheduleEvent(EVENT_LIGHTNING_ARROWS, 15000);
-            events.ScheduleEvent(EVENT_DISENGAGE, urand(25000, 35000));
+            events.ScheduleEvent(EVENT_MULTI_SHOT, 7500ms);
+            events.ScheduleEvent(EVENT_LIGHTNING_ARROWS, 15s);
+            events.ScheduleEvent(EVENT_DISENGAGE, randtime(25s, 35s));
             boss_grand_championAI::JustEngagedWith(who);
         }
 
@@ -1524,7 +1524,7 @@ public:
                                 DoCast(me, SPELL_DISENGAGE);
                             }
                         }
-                        events.ScheduleEvent(EVENT_DISENGAGE, urand(25000, 35000));
+                        events.ScheduleEvent(EVENT_DISENGAGE, randtime(25s, 35s));
                         break;
                     case EVENT_LIGHTNING_ARROWS:
                         if (!me->HasAura(SPELL_LIGHTNING_ARROWS_AURA) && !me->IsWithinDist(me->GetVictim(), 2.0f))
@@ -1532,7 +1532,7 @@ public:
                             me->InterruptNonMeleeSpells(true);
                             DoCastAOE(SPELL_LIGHTNING_ARROWS);
                         }
-                        events.ScheduleEvent(EVENT_LIGHTNING_ARROWS, urand(20000, 30000));
+                        events.ScheduleEvent(EVENT_LIGHTNING_ARROWS, randtime(20s, 30s));
                         break;
                     case EVENT_MULTI_SHOT:
                         if (me->IsInRange(me->GetVictim(), 5.0f, 30.0f, false) && !me->HasAura(SPELL_LIGHTNING_ARROWS))
@@ -1540,7 +1540,7 @@ public:
                             me->InterruptNonMeleeSpells(true);
                             DoCastVictim(SPELL_MULTI_SHOT);
                         }
-                        events.ScheduleEvent(EVENT_MULTI_SHOT, 8000);
+                        events.ScheduleEvent(EVENT_MULTI_SHOT, 8s);
                         break;
                     default:
                         break;
@@ -1577,10 +1577,10 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            events.ScheduleEvent(EVENT_DEADLY_POISON, 500);
-            events.ScheduleEvent(EVENT_EVISCERATE, 8000);
-            events.ScheduleEvent(EVENT_FAN_OF_KNIVES, 14000);
-            events.ScheduleEvent(EVENT_POISON_BOTTLE, 19000);
+            events.ScheduleEvent(EVENT_DEADLY_POISON, 500ms);
+            events.ScheduleEvent(EVENT_EVISCERATE, 8s);
+            events.ScheduleEvent(EVENT_FAN_OF_KNIVES, 14s);
+            events.ScheduleEvent(EVENT_POISON_BOTTLE, 19s);
             boss_grand_championAI::JustEngagedWith(who);
         }
 
@@ -1605,11 +1605,11 @@ public:
                     case EVENT_DEADLY_POISON:
                         if (!me->HasAura(SPELL_DEADLY_POISON))
                             DoCast(me, SPELL_DEADLY_POISON);
-                        events.ScheduleEvent(EVENT_DEADLY_POISON, 30000);
+                        events.ScheduleEvent(EVENT_DEADLY_POISON, 30s);
                         break;
                     case EVENT_EVISCERATE:
                         DoCastVictim(SPELL_EVISCERATE);
-                        events.ScheduleEvent(EVENT_EVISCERATE, 8000);
+                        events.ScheduleEvent(EVENT_EVISCERATE, 8s);
                         break;
                     case EVENT_FAN_OF_KNIVES:
                         if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0))
@@ -1617,12 +1617,12 @@ public:
                             if (me->IsWithinDist(target, 8.0f, false)) // 8 yards is minimum range
                                 DoCastAOE(SPELL_FAN_OF_KNIVES);
                         }
-                        events.ScheduleEvent(EVENT_FAN_OF_KNIVES, 14000);
+                        events.ScheduleEvent(EVENT_FAN_OF_KNIVES, 14s);
                         break;
                     case EVENT_POISON_BOTTLE:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                             DoCast(target, SPELL_POISON_BOTTLE);
-                        events.ScheduleEvent(EVENT_POISON_BOTTLE, 19000);
+                        events.ScheduleEvent(EVENT_POISON_BOTTLE, 19s);
                         break;
                     default:
                         break;

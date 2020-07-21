@@ -318,18 +318,18 @@ public:
         void NextStep(uint32 uiTimerStep, uint32 currentEvent, bool bNextStep = true, uint8 uiPhaseStep = 0)
         {
             if (bNextStep)
-                events.ScheduleEvent(currentEvent + 1, uiTimerStep);
+                events.ScheduleEvent(currentEvent + 1, Milliseconds(uiTimerStep));
             else
             {
                 if (uiPhaseStep > 0)
-                    events.ScheduleEvent(uiPhaseStep, uiTimerStep);
+                    events.ScheduleEvent(uiPhaseStep, Milliseconds(uiTimerStep));
             }
         }
 
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_CHEER_RND, 120000);
+            events.ScheduleEvent(EVENT_CHEER_RND, 120s);
         }
 
         void SetData(uint32 uiType, uint32 uiData) override
@@ -803,7 +803,7 @@ public:
                                 }
                             }
                         }
-                        events.ScheduleEvent(EVENT_CHEER_RND, 120000);
+                        events.ScheduleEvent(EVENT_CHEER_RND, 120s);
                         break;
                     // Phases below happen in Grand Champions encounter
                     case EVENT_INTRODUCE:

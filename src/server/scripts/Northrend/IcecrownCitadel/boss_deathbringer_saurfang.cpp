@@ -922,7 +922,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                         {
                             guard->AI()->DoAction(ACTION_DESPAWN);
                         });
-                        _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_1, 500);
+                        _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_1, 500ms);
                         // temp until outro fully done - to put deathbringer on respawn timer (until next reset)
                         if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                             deathbringer->DespawnOrUnsummon(5000);
@@ -995,73 +995,73 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                             break;
                         case EVENT_OUTRO_ALLIANCE_1:
                             Talk(SAY_OUTRO_ALLIANCE_1);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_2, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_2, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_2:
                             Talk(SAY_OUTRO_ALLIANCE_2);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_3, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_3, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_3:
                             Talk(SAY_OUTRO_ALLIANCE_3);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_4, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_4, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_4:
                             Talk(SAY_OUTRO_ALLIANCE_4);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_5, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_5, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_5:
                             Talk(SAY_OUTRO_ALLIANCE_5);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_6, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_6, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_6:
                             Talk(SAY_OUTRO_ALLIANCE_6);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_7, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_7, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_7:
                             Talk(SAY_OUTRO_ALLIANCE_7);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_8, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_8, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_8:
                             //Talk(SAY_OUTRO_ALLIANCE_8);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_9, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_9, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_9:
                             Talk(SAY_OUTRO_ALLIANCE_9);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_10, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_10, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_10:
                             Talk(SAY_OUTRO_ALLIANCE_10);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_11, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_11, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_11:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_12, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_12, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_12:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_13, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_13, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_13:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_14, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_14, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_14:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_15, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_15, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_15:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_16, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_16, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_16:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_17, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_17, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_17:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_18, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_18, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_18:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_19, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_19, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_19:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_20, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_20, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_20:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_21, 2500);
+                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_21, 2500ms);
                             break;
                         case EVENT_OUTRO_ALLIANCE_21:
                             Talk(SAY_OUTRO_ALLIANCE_21);

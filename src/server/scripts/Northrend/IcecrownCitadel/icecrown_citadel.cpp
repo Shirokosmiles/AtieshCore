@@ -1618,8 +1618,8 @@ public:
             {
                 case ACTION_PUTRICIDE_BUG_LEAP:
                     //me->GetMotionMaster()->MoveCharge(4357.353027f, 3115.832764f, 374.922791f);
-                    _events.ScheduleEvent(EVENT_START_LEAP_AND_DROP, 2500);
-                    _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 10000);
+                    _events.ScheduleEvent(EVENT_START_LEAP_AND_DROP, 2500ms);
+                    _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 10s);
                     break;
                 default:
                     break;
@@ -1643,17 +1643,17 @@ public:
                         else
                             me->GetMotionMaster()->MoveRandom(125.f);
 
-                        _events.ScheduleEvent(EVENT_END_LEAP, 1500);
+                        _events.ScheduleEvent(EVENT_END_LEAP, 1500ms);
                         break;
                     case EVENT_END_LEAP:
                         if (Player* rplayer = me->SelectNearestPlayer(125.0f))
                             DoCast(rplayer, SPELL_RANDOM_LEAP, true);
-                        _events.ScheduleEvent(EVENT_END_LEAP, 3500);
+                        _events.ScheduleEvent(EVENT_END_LEAP, 3500ms);
                         break;
                     case EVENT_FLESH_EATING_BITE:
                         if (Player* rplayer = me->SelectNearestPlayer(5.0f))
                             DoCast(rplayer, SPELL_FLESH_EATING_BITE, true);
-                        _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 7500);
+                        _events.ScheduleEvent(EVENT_FLESH_EATING_BITE, 7500ms);
                         break;
                     default:
                         break;
@@ -1691,10 +1691,10 @@ public:
             {
             case ACTION_PUTRICIDE_STALKERS:
                 GetCreatureListWithEntryInGrid(stalkers, me, NPC_INVISIBLE_STALKER, 35.0f);
-                _events.ScheduleEvent(EVENT_SUMMON_FLESH_EATING_BUG, 2000);
+                _events.ScheduleEvent(EVENT_SUMMON_FLESH_EATING_BUG, 2s);
                 break;
             case ACTION_PUTRICIDE_TRAP:
-                _events.ScheduleEvent(EVENT_PUTRICIDE_TRAP, 3000);
+                _events.ScheduleEvent(EVENT_PUTRICIDE_TRAP, 3s);
                 break;
             }
         }
@@ -1710,7 +1710,7 @@ public:
                 case EVENT_PUTRICIDE_TRAP:
                     DoCast(SPELL_GIANT_SWARM);
                     _instance->SetData(DATA_PUTRICIDE_TRAP, IN_PROGRESS);
-                    _events.ScheduleEvent(EVENT_END_TRAP, 50000);
+                    _events.ScheduleEvent(EVENT_END_TRAP, 50s);
                     break;
                 case EVENT_SUMMON_FLESH_EATING_BUG:
                     if (!stalkers.empty())
@@ -1720,7 +1720,7 @@ public:
                                 (*itr)->AI()->DoCast(SPELL_SUMMON_PLAGUE_INSECT);
 
                         if (_instance->GetData(DATA_PUTRICIDE_TRAP) == IN_PROGRESS)
-                            _events.ScheduleEvent(EVENT_SUMMON_FLESH_EATING_BUG, 2500);
+                            _events.ScheduleEvent(EVENT_SUMMON_FLESH_EATING_BUG, 2500ms);
                     }
                     break;
                 case EVENT_END_TRAP:
