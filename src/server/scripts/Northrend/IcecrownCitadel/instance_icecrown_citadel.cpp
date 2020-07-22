@@ -504,14 +504,18 @@ class instance_icecrown_citadel : public InstanceMapScript
             {
                 switch (go->GetEntry())
                 {
+                    case GO_ORANGE_PLAGUE_MONSTER_ENTRANCE:
+                        PutricideNormalGateGUIDs[0] = go->GetGUID();
+                        AddDoor(go, true);
+                        break;
+                    case GO_GREEN_PLAGUE_MONSTER_ENTRANCE:
+                        PutricideNormalGateGUIDs[1] = go->GetGUID();
+                        AddDoor(go, true);
+                        break;
                     case GO_DOODAD_ICECROWN_ICEWALL02:
                     case GO_ICEWALL:
                     case GO_LORD_MARROWGAR_S_ENTRANCE:
-                    case GO_ORATORY_OF_THE_DAMNED_ENTRANCE:
-                    case GO_ORANGE_PLAGUE_MONSTER_ENTRANCE:
-                        PutricideNormalGateGUIDs[0] = go->GetGUID();
-                    case GO_GREEN_PLAGUE_MONSTER_ENTRANCE:
-                        PutricideNormalGateGUIDs[1] = go->GetGUID();
+                    case GO_ORATORY_OF_THE_DAMNED_ENTRANCE:                    
                     case GO_CRIMSON_HALL_DOOR:
                     case GO_BLOOD_ELF_COUNCIL_DOOR:
                     case GO_BLOOD_ELF_COUNCIL_DOOR_RIGHT:
