@@ -422,6 +422,7 @@ class boss_svala : public CreatureScript
                             me->SetControlled(false, UNIT_STATE_ROOT);
                             me->GetMotionMaster()->MoveFall(0);
                             events.ScheduleEvent(EVENT_FINISH_RITUAL_2, 4s);
+                            break;
                         }
                         case EVENT_FINISH_RITUAL_2:
                         {
