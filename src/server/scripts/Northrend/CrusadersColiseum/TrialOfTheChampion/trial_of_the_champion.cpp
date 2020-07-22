@@ -749,7 +749,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_CHEER_RND:
-                        if (events.GetNextEventTime() == 0 && !me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && !me->isMoving() && !me->HasAura(66804))
+                        if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && !me->isMoving() && !me->HasAura(66804))
                         {
                             // Every 2 minutes a random player is being cheered by his/her race's spectators
                             // cheer should only occur during fights

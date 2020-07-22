@@ -616,7 +616,7 @@ public:
     {
         npc_mammothAI(Creature* creature) : ScriptedAI(creature) { }        
 
-        void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override
+        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_RIDE_SHATTERTUSK_MAMMOTH)
             {
