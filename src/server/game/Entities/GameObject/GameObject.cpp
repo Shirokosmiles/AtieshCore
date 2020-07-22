@@ -519,23 +519,21 @@ void GameObject::Update(uint32 diff)
 
                         m_lootState = GO_READY;                 // can be successfully open with some chance
                     }
-                    break;
+                    return;
                 }
                 case GAMEOBJECT_TYPE_CHEST:
-                {
                     if (m_restockTime > GameTime::GetGameTime())
-                        break;
+                        return;
                     // If there is no restock timer, or if the restock timer passed, the chest becomes ready to loot
                     m_restockTime = 0;
                     m_lootState = GO_READY;
                     AddToObjectUpdateIfNeeded();
                     break;
-                }
                 default:
                     m_lootState = GO_READY;                         // for other GOis same switched without delay to GO_READY
                     break;
             }
-            break;
+            [[fallthrough]];
         }
         case GO_READY:
         {

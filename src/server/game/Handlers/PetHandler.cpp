@@ -316,9 +316,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     if (pet->ToPet())
                         pet->ToPet()->ClearCastWhenWillAvailable();
                     // no break;
-                    if (pet->GetTypeId() == TYPEID_UNIT)
-                        pet->ToCreature()->SetReactState(ReactStates(spellid));
-                    break;
+                    [[fallthrough]];
                 case REACT_DEFENSIVE: // recovery
                 case REACT_AGGRESSIVE: // activete
                     if (pet->GetTypeId() == TYPEID_UNIT)

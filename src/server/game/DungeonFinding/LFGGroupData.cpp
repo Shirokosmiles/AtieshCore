@@ -40,15 +40,14 @@ void LfgGroupData::SetState(LfgState state)
         case LFG_STATE_NONE:
             m_Dungeon = 0;
             m_KicksLeft = LFG_GROUP_MAX_KICKS;
-            break;
-        /*case LFG_STATE_FINISHED_DUNGEON:
+            [[fallthrough]];
+        case LFG_STATE_FINISHED_DUNGEON:
         case LFG_STATE_DUNGEON:
             m_OldState = state;
-            break;*/
+            [[fallthrough]];
+        default:
+            m_State = state;
     }
-
-    m_OldState = state;
-    m_State = state;
 }
 
 void LfgGroupData::RestoreState()

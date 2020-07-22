@@ -185,8 +185,7 @@ void AppenderConsole::_write(LogMessage const* message)
                index = 0;
                break;
             case LOG_LEVEL_ERROR:
-                index = 1;
-                break;
+                [[fallthrough]];
             default:
                index = 1;
                break;
