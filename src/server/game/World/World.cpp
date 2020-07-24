@@ -2608,13 +2608,13 @@ void World::Update(uint32 diff)
     }
 
     sSpecialEventMgr->Update(diff);
-    sWorldUpdateTime.RecordUpdateTimeDuration("SpecialEventMgr");
+    //sWorldUpdateTime.RecordUpdateTimeDuration("SpecialEventMgr");
 
     sMailMgr->Update(diff);
-    sWorldUpdateTime.RecordUpdateTimeDuration("MailMgr");
+    //sWorldUpdateTime.RecordUpdateTimeDuration("MailMgr");
 
     sMailExternalMgr->Update(diff);
-    sWorldUpdateTime.RecordUpdateTimeDuration("MailExternalMgr");
+    //sWorldUpdateTime.RecordUpdateTimeDuration("MailExternalMgr");
 
     ///- Delete all characters which have been deleted X days before
     if (m_timers[WUPDATE_DELETECHARS].Passed())
