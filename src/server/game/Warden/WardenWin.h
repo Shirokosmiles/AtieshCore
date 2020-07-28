@@ -18,7 +18,12 @@
 #ifndef _WARDEN_WIN_H
 #define _WARDEN_WIN_H
 
+#include "Cryptography/ARC4.h"
+#include "Cryptography/BigNumber.h"
+#include "ByteBuffer.h"
+
 #include "Warden.h"
+#include <list>
 
 #pragma pack(push, 1)
 
@@ -63,7 +68,7 @@ class WardenWin : public Warden
         WardenWin();
         ~WardenWin();
 
-        void Init(WorldSession* session, BigNumber* K) override;
+        void Init(WorldSession* session, std::array<uint8, 40> const& K) override;
         ClientWardenModule* GetModuleForClient() override;
         void InitializeModule() override;
         void HandleHashResult(ByteBuffer &buff) override;

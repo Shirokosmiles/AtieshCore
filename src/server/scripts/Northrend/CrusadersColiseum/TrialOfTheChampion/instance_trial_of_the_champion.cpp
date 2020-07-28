@@ -205,7 +205,7 @@ class instance_trial_of_the_champion : public InstanceMapScript
                                 announcer->GetMotionMaster()->MovePoint(1, announcerWaitPos);
                                 announcer->AI()->SetData(DATA_GRAND_CHAMPIONS_DONE, 0);
 
-                                DoRespawnGameObject(GetObjectGuid(DATA_CHAMPION_S_CACHE), 1 * DAY);
+                                DoRespawnGameObject(GetObjectGuid(DATA_CHAMPION_S_CACHE), Hours(24));
                                 if (GameObject* cache = GetGameObject(DATA_CHAMPION_S_CACHE))
                                     cache->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                             }
@@ -251,7 +251,7 @@ class instance_trial_of_the_champion : public InstanceMapScript
                                         break;
                                 }
 
-                                DoRespawnGameObject(GetObjectGuid(dataType), 1 * DAY);
+                                DoRespawnGameObject(GetObjectGuid(dataType), Hours(24));
                                 if (GameObject* cache = GetGameObject(dataType))
                                     cache->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                             }

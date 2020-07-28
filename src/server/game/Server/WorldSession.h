@@ -36,7 +36,6 @@
 #include <unordered_map>
 #include <boost/circular_buffer.hpp>
 
-class BigNumber;
 class Creature;
 class GameObject;
 class InstanceSave;
@@ -451,7 +450,7 @@ class TC_GAME_API WorldSession
         void SetPlayer(Player* player);
         uint8 Expansion() const { return m_expansion; }
 
-        void InitWarden(uint16 build, BigNumber* k, std::string const& os);
+        void InitWarden(std::array<uint8, 40> const& k, uint16 build, std::string const& os);
 
         /// Session in auth.queue currently
         void SetInQueue(bool state) { m_inQueue = state; }

@@ -22,6 +22,7 @@
 #include "BigNumber.h"
 #include "ByteBuffer.h"
 #include "Common.h"
+#include "CryptoHash.h"
 #include "Optional.h"
 #include "Socket.h"
 #include "QueryResult.h"
@@ -85,8 +86,7 @@ typedef struct AUTH_LOGON_PROOF_C
 {
     uint8   cmd;
     uint8   A[32];
-    uint8   M1[20];
-    uint8   crc_hash[20];
+    Trinity::Crypto::SHA1::Digest M1, crc_hash;
     uint8   number_of_keys;
     uint8   securityFlags;
 } sAuthLogonProof_C;
@@ -96,7 +96,7 @@ typedef struct AUTH_LOGON_PROOF_S
 {
     uint8   cmd;
     uint8   error;
-    uint8   M2[20];
+    Trinity::Crypto::SHA1::Digest M2;
     uint32  AccountFlags;
     uint32  SurveyId;
     uint16  LoginFlags;
@@ -107,7 +107,7 @@ typedef struct AUTH_LOGON_PROOF_S_OLD
 {
     uint8   cmd;
     uint8   error;
-    uint8   M2[20];
+    Trinity::Crypto::SHA1::Digest M2;
     uint32  unk2;
 } sAuthLogonProof_S_Old;
 static_assert(sizeof(sAuthLogonProof_S_Old) == (1 + 1 + 20 + 4));
@@ -116,8 +116,7 @@ typedef struct AUTH_RECONNECT_PROOF_C
 {
     uint8   cmd;
     uint8   R1[16];
-    uint8   R2[20];
-    uint8   R3[20];
+    Trinity::Crypto::SHA1::Digest R2, R3;
     uint8   number_of_keys;
 } sAuthReconnectProof_C;
 static_assert(sizeof(sAuthReconnectProof_C) == (1 + 16 + 20 + 20 + 1));
@@ -205,12 +204,12 @@ private:
 
     void SetVSFields(const std::string& rI);
 
-    bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
+    bool VerifyVersion(uint8 const* a, int32 aLength, Trinity::Crypto::SHA1::Digest const& versionProof, bool isReconnect);
 
     BigNumber N, s, g, v;
     BigNumber b, B;
-    BigNumber K;
-    BigNumber _reconnectProof;
+    std::array<uint8, 40> sessionKey;
+    std::array<uint8, 16> _reconnectProof;
 
     AuthStatus _status;
     AccountInfo _accountInfo;

@@ -15,21 +15,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AccountMgr.h"
+#include "ByteBuffer.h"
 #include "Common.h"
 #include "GameTime.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "ByteBuffer.h"
 #include <openssl/sha.h>
-#include "World.h"
 #include "Util.h"
 #include "Warden.h"
-#include "AccountMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
-Warden::Warden() : _session(nullptr), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
+Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
                    _module(nullptr), _state(WardenState::STATE_INITIAL)
 {
     memset(_inputKey, 0, sizeof(_inputKey));
@@ -174,12 +174,12 @@ void Warden::Update()
 
 void Warden::DecryptData(uint8* buffer, uint32 length)
 {
-    _inputCrypto.UpdateData(length, buffer);
+    _inputCrypto.UpdateData(buffer, length);
 }
 
 void Warden::EncryptData(uint8* buffer, uint32 length)
 {
-    _outputCrypto.UpdateData(length, buffer);
+    _outputCrypto.UpdateData(buffer, length);
 }
 
 void Warden::SetNewState(WardenState::Value state)

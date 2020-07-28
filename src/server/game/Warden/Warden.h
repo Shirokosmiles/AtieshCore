@@ -18,15 +18,14 @@
 #ifndef _WARDEN_BASE_H
 #define _WARDEN_BASE_H
 
-#include <map>
-#include "Cryptography/ARC4.h"
-#include "Cryptography/BigNumber.h"
+#include "ARC4.h"
 #include "ByteBuffer.h"
 #include "WardenCheckMgr.h"
 #include "Database/DatabaseEnv.h"
 
 // the default client version with info in warden_checks; for other version checks, see warden_build_specific
 #define DEFAULT_CLIENT_BUILD  12340
+#include <array>
 
 enum WardenOpcodes
 {
@@ -137,7 +136,7 @@ class TC_GAME_API Warden
         Warden();
         virtual ~Warden();
 
-        virtual void Init(WorldSession* session, BigNumber* k) = 0;
+        virtual void Init(WorldSession* session, std::array<uint8, 40> const& K) = 0;
         virtual ClientWardenModule* GetModuleForClient() = 0;
         virtual void InitializeModule();
         virtual void RequestHash();
@@ -166,8 +165,8 @@ class TC_GAME_API Warden
         uint8 _inputKey[16];
         uint8 _outputKey[16];
         uint8 _seed[16];
-        ARC4 _inputCrypto;
-        ARC4 _outputCrypto;
+        Trinity::Crypto::ARC4 _inputCrypto;
+        Trinity::Crypto::ARC4 _outputCrypto;
         uint32 _checkTimer;                          // Timer for sending check requests
         uint32 _clientResponseTimer;                 // Timer for client response delay
         uint32 _previousTimestamp;
