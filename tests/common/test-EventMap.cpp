@@ -15,7 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER
 #include "catch2/catch.hpp"
+
 #include "EventMap.h"
 
 enum EVENTS
@@ -54,7 +56,7 @@ TEST_CASE("Schedule an event", "[EventMap]")
 
         REQUIRE(id == 0);
         REQUIRE_FALSE(eventMap.Empty());
-        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 900);
+        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 900ms);
     }
 
     SECTION("Event has reached its delay")
@@ -64,25 +66,51 @@ TEST_CASE("Schedule an event", "[EventMap]")
 
         REQUIRE(id == EVENT_1);
         REQUIRE(eventMap.Empty());
-        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == std::numeric_limits<uint32>::max());
+        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == Milliseconds::max());
+    }
+
+    SECTION("Event is past it's execution time")
+    {
+        eventMap.Update(2000);
+
+        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == -1s);
     }
 }
 
-// TODO: The semantics of this case are not well defined.
-//       Document them first, check consumers and adapt test
-//       accordingly.
-TEST_CASE("Schedule existing event", "[EventMap][!mayfail]")
+TEST_CASE("Schedule existing event", "[EventMap]")
 {
     EventMap eventMap;
 
-    eventMap.ScheduleEvent(EVENT_1, 1s);
-    eventMap.ScheduleEvent(EVENT_1, 1s);
+    SECTION("Same time")
+    {
+        eventMap.ScheduleEvent(EVENT_1, 1s);
+        eventMap.ScheduleEvent(EVENT_1, 1s);
 
-    eventMap.Update(1000);
-    uint32 id = eventMap.ExecuteEvent();
+        eventMap.Update(1000);
+        uint32 id = eventMap.ExecuteEvent();
+        REQUIRE(id == EVENT_1);
 
-    REQUIRE(id == EVENT_1);
-    REQUIRE(eventMap.Empty());
+        id = eventMap.ExecuteEvent();
+        REQUIRE(id == EVENT_1);
+
+        REQUIRE(eventMap.Empty());
+    }
+
+    SECTION("Different time")
+    {
+        eventMap.ScheduleEvent(EVENT_1, 1s);
+        eventMap.ScheduleEvent(EVENT_1, 2s);
+
+        eventMap.Update(1000);
+        uint32 id = eventMap.ExecuteEvent();
+        REQUIRE(id == EVENT_1);
+
+        eventMap.Update(1000);
+        id = eventMap.ExecuteEvent();
+        REQUIRE(id == EVENT_1);
+
+        REQUIRE(eventMap.Empty());
+    }
 }
 
 TEST_CASE("Cancel a scheduled event", "[EventMap]")
@@ -144,6 +172,41 @@ TEST_CASE("Reschedule a non-scheduled event", "[EventMap]")
     id = eventMap.ExecuteEvent();
 
     REQUIRE(id == EVENT_1);
+}
+
+TEST_CASE("Repeat an event (empty map)", "[EventMap]")
+{
+    EventMap eventMap;
+
+    eventMap.Repeat(1s);
+    eventMap.Update(1s);
+
+    uint32 id = eventMap.ExecuteEvent();
+    REQUIRE(id == 0);
+}
+
+TEST_CASE("Repeat an event (populated map)", "[EventMap]")
+{
+    EventMap eventMap;
+    eventMap.ScheduleEvent(EVENT_1, 1s);
+
+    SECTION("Scheduled event with delay not reached")
+    {
+        eventMap.Update(500ms);
+        eventMap.Repeat(1s);
+
+        uint32 id = eventMap.ExecuteEvent();
+        REQUIRE(id == 0);
+    }
+
+    SECTION("Scheduled event with delay not reached")
+    {
+        eventMap.Update(1s);
+        eventMap.Repeat(1s);
+
+        uint32 id = eventMap.ExecuteEvent();
+        REQUIRE(id == EVENT_1);
+    }
 }
 
 TEST_CASE("Schedule event with phase", "[EventMap]")
@@ -269,14 +332,14 @@ TEST_CASE("Delay all events", "[EventMap]")
     EventMap eventMap;
     eventMap.ScheduleEvent(EVENT_1, 1s);
 
-    REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 1000);
+    REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 1s);
 
     SECTION("Without timer update")
     {
         eventMap.DelayEvents(1s);
 
-        // Timer hasn't ticked yet, so maximum delay is 0ms
-        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 1000);
+        // 1s (init) + 1s (delay) = 2s
+        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 2s);
     }
 
     SECTION("With timer update smaller than delay")
@@ -284,7 +347,8 @@ TEST_CASE("Delay all events", "[EventMap]")
         eventMap.Update(500);
         eventMap.DelayEvents(1s);
 
-        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 1000);
+        // 1s (init) + 1s (delay) - 500ms (tick) = 1500ms
+        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 1500ms);
     }
 
     SECTION("With timer update larger than delay")
@@ -293,7 +357,7 @@ TEST_CASE("Delay all events", "[EventMap]")
         eventMap.DelayEvents(1s);
 
         // 1s (init) + 1s (delay) - 2s (tick) = 0s
-        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 0);
+        REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 0s);
     }
 }
 
@@ -307,9 +371,9 @@ TEST_CASE("Delay grouped events", "[EventMap]")
     eventMap.Update(2000);
     eventMap.DelayEvents(3s, GROUP_1);
 
-    REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 2000);
-    REQUIRE(eventMap.GetTimeUntilEvent(EVENT_2) == 0);
-    REQUIRE(eventMap.GetTimeUntilEvent(EVENT_3) == 4000);
+    REQUIRE(eventMap.GetTimeUntilEvent(EVENT_1) == 2s);
+    REQUIRE(eventMap.GetTimeUntilEvent(EVENT_2) == 0s);
+    REQUIRE(eventMap.GetTimeUntilEvent(EVENT_3) == 4s);
 }
 
 TEST_CASE("Reset map", "[EventMap]")

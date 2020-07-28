@@ -285,7 +285,7 @@ void ScriptedAI::ForceCombatStopForCreatureEntry(std::vector<uint32> creatureEnt
 
 Creature* ScriptedAI::DoSpawnCreature(uint32 entry, float offsetX, float offsetY, float offsetZ, float angle, uint32 type, Milliseconds despawntime)
 {
-    return me->SummonCreature(entry, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, angle, TempSummonType(type), despawntime.count());
+    return me->SummonCreature(entry, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, angle, TempSummonType(type), despawntime);
 }
 
 bool ScriptedAI::HealthBelowPct(uint32 pct) const
@@ -612,7 +612,7 @@ void BossAI::_DespawnAtEvade(Seconds delayToRespawn /*= 30s*/, Creature* who /*=
         return;
     }
 
-    who->DespawnOrUnsummon(0, delayToRespawn);
+    who->DespawnOrUnsummon(0s, delayToRespawn);
 
     if (instance && who == me)
         instance->SetBossState(_bossId, FAIL);

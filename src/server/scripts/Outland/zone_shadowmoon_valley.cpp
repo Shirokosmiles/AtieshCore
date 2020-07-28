@@ -91,7 +91,7 @@ public:
 
         void SummonInfernal()
         {
-            if (Creature* infernal = me->SummonCreature(NPC_INFERNAL_ATTACKER, me->GetPositionX(), me->GetPositionY(), ground + 0.05f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000))
+            if (Creature* infernal = me->SummonCreature(NPC_INFERNAL_ATTACKER, me->GetPositionX(), me->GetPositionY(), ground + 0.05f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1min))
                 infernalGUID = infernal->GetGUID();
             else
                 infernalGUID = ObjectGuid::Empty;
@@ -422,7 +422,7 @@ public:
                     PlayerGUID.Clear();
                 }
 
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
         }
 
@@ -1284,7 +1284,7 @@ void npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI::SummonNextWave()
 
     for (uint8 i = 0; i < count; ++i)
     {
-        Creature* Spawn = me->SummonCreature(WavesInfo[WaveCount].CreatureId, SpawnLocation[locIndex + i], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+        Creature* Spawn = me->SummonCreature(WavesInfo[WaveCount].CreatureId, SpawnLocation[locIndex + i], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1min);
         ++LiveCount;
 
         if (Spawn)

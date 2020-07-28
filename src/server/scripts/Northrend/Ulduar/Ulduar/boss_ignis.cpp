@@ -263,7 +263,7 @@ class boss_ignis : public CreatureScript
                         case EVENT_SCORCH:
                             Talk(SAY_SCORCH);
                             if (Unit* target = me->GetVictim())
-                                me->SummonCreature(NPC_GROUND_SCORCH, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 45000);
+                                me->SummonCreature(NPC_GROUND_SCORCH, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 45s);
                             DoCast(SPELL_SCORCH);
                             events.ScheduleEvent(EVENT_SCORCH, 25s);
                             break;
@@ -332,7 +332,7 @@ class npc_iron_construct : public CreatureScript
                         if (ignis->AI())
                             ignis->AI()->DoAction(ACTION_REMOVE_BUFF);
 
-                    me->DespawnOrUnsummon(1000);
+                    me->DespawnOrUnsummon(1s);
                 }
             }
 

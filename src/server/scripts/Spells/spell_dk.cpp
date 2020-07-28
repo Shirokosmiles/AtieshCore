@@ -2954,7 +2954,7 @@ public:
             if (Creature* ghoul = ObjectAccessor::GetCreature(*player, ghoulGuid))
             {
                 ghoul->RemoveCharmedBy(player);
-                ghoul->DespawnOrUnsummon(1000);
+                ghoul->DespawnOrUnsummon(1s);
             }
 
             player->RemoveAura(SPELL_GHOUL_FRENZY);

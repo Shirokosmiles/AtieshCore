@@ -391,7 +391,7 @@ class boss_sapphiron : public CreatureScript
                                     CastDrain();
                                 if (Creature* cBuffet = ObjectAccessor::GetCreature(*me, _buffet))
                                 {
-                                    cBuffet->DespawnOrUnsummon(1 * IN_MILLISECONDS);
+                                    cBuffet->DespawnOrUnsummon(1s);
                                     _buffet.Clear();
                                 }
                                 me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
@@ -568,7 +568,7 @@ class spell_sapphiron_icebolt : public SpellScriptLoader
                 return;
             float x, y, z;
             GetTarget()->GetPosition(x, y, z);
-            if (GameObject* block = GetTarget()->SummonGameObject(GO_ICEBLOCK, x, y, z, 0.f, QuaternionData(), 25))
+            if (GameObject* block = GetTarget()->SummonGameObject(GO_ICEBLOCK, x, y, z, 0.f, QuaternionData(), 25s))
                 _block = block->GetGUID();
         }
 
@@ -605,7 +605,7 @@ class spell_sapphiron_summon_blizzard : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
-                    if (Creature* blizzard = GetCaster()->SummonCreature(NPC_BLIZZARD, *target, TEMPSUMMON_TIMED_DESPAWN, urandms(25, 30)))
+                    if (Creature* blizzard = GetCaster()->SummonCreature(NPC_BLIZZARD, *target, TEMPSUMMON_TIMED_DESPAWN, randtime(25s, 30s)))
                     {
                         blizzard->CastSpell(nullptr, blizzard->m_spells[0], TRIGGERED_NONE);
                         if (Creature* creatureCaster = GetCaster()->ToCreature())

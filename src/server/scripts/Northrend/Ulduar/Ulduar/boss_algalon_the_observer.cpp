@@ -243,7 +243,7 @@ class ActivateLivingConstellation : public BasicEvent
                 return true;    // delete event
 
             _owner->CastSpell(nullptr, SPELL_TRIGGER_3_ADDS, TRIGGERED_FULL_MASK);
-            _owner->m_Events.AddEvent(this, execTime + urand(45000, 50000));
+            _owner->m_Events.AddEvent(this, Milliseconds(execTime) + randtime(45s, 50s));
             return false;
         }
 
@@ -275,7 +275,7 @@ class SummonUnleashedDarkMatter : public BasicEvent
         bool Execute(uint64 execTime, uint32 /*diff*/) override
         {
             _caster->CastSpell(nullptr, SPELL_SUMMON_UNLEASHED_DARK_MATTER, TRIGGERED_FULL_MASK);
-            _caster->m_Events.AddEvent(this, execTime + 30000);
+            _caster->m_Events.AddEvent(this, Milliseconds(execTime) + 30s);
             return false;
         }
 
@@ -834,7 +834,7 @@ struct npc_black_hole : public ScriptedAI
         if (spellInfo->Id == SPELL_DESPAWN_BLACK_HOLE)
         {
             _summons.DespawnAll();
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
     }
 
@@ -856,7 +856,7 @@ struct npc_collapsing_star : public PassiveAI
         if (Creature* algalon = _instance->GetCreature(BOSS_ALGALON))
             algalon->AI()->JustSummoned(summon);
 
-        me->DespawnOrUnsummon(1);
+        me->DespawnOrUnsummon(1ms);
     }
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage) override

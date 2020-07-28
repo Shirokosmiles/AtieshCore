@@ -186,7 +186,8 @@ public:
                 switch (eventId)
                 {
                     case EVENT_IMPALE:
-                        if (events.GetTimeUntilEvent(EVENT_LOCUST) < 5 * IN_MILLISECONDS) break; // don't chain impale tank -> locust swarm
+                        if (events.GetTimeUntilEvent(EVENT_LOCUST) < 5s)
+                            break; // don't chain impale tank -> locust swarm
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_IMPALE);
                         else
@@ -202,7 +203,7 @@ public:
                                 {
                                     creatureTarget->CastSpell(creatureTarget, SPELL_SUMMON_CORPSE_SCARABS_MOB, me->GetGUID());
                                     creatureTarget->AI()->Talk(EMOTE_SCARAB);
-                                    creatureTarget->DespawnOrUnsummon(2000);
+                                    creatureTarget->DespawnOrUnsummon(2s, 0s);
                                 }
                         }
                         events.Repeat(randtime(Seconds(40), Seconds(60)));

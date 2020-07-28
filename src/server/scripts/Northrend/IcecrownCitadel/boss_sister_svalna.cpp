@@ -338,7 +338,7 @@ struct boss_sister_svalna : public BossAI
         _JustDied();
         Talk(SAY_SVALNA_DEATH);
 
-        uint64 delay = 1;
+        Milliseconds delay = 1ms;
         for (uint8 itr = 0; itr < 4; ++itr)
         {
             if (Creature* crusader = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CAPTAIN_ARNATH + itr)))
@@ -346,7 +346,7 @@ struct boss_sister_svalna : public BossAI
                 if (crusader->IsAlive() && crusader->GetEntry() == crusader->GetCreatureData()->id)
                 {
                     crusader->m_Events.AddEvent(new CaptainSurviveTalk(crusader), crusader->m_Events.CalculateTime(delay));
-                    delay += 6000;
+                    delay += 6s;
                 }
             }
         }
@@ -1432,7 +1432,7 @@ struct npc_impaling_spear : public CreatureAI
         {
             _vehicleCheckTimer = 500;
             if (!me->GetVehicle())
-                me->DespawnOrUnsummon(100);
+                me->DespawnOrUnsummon(100ms);
         }
         else
             _vehicleCheckTimer -= diff;
@@ -1494,7 +1494,7 @@ class spell_svalna_remove_spear : public SpellScript
         {
             if (Unit* vehicle = target->GetVehicleBase())
                 vehicle->RemoveAurasDueToSpell(SPELL_IMPALING_SPEAR);
-            target->DespawnOrUnsummon(1);
+            target->DespawnOrUnsummon(1ms);
         }
     }
 
