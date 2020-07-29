@@ -312,7 +312,7 @@ void DalaranGEvent::SpawnGOLight()
         if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
         {
             QuaternionData rotation = QuaternionData::fromEulerAnglesZYX(player->GetOrientation(), 0.f, 0.f);
-            player->SummonGameObject(182483, DalaranCraterPoint, rotation, GetDurationTimer());
+            player->SummonGameObject(182483, DalaranCraterPoint, rotation, Minutes(GetDurationTimer()));
         }
     }    
 }

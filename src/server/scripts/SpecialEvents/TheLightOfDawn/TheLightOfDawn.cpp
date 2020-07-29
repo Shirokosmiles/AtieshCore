@@ -576,7 +576,7 @@ void TheLightOfDawnEvent::Update(uint32 diff)
                     while (AbominationsCount < ENCOUNTER_ABOMINATION_NUMBER)
                     {
                         spawnpos = Darion->GetNearPosition(frand(10.f, 200.f), frand(0, 6.14f));
-                        if (Unit* temp = Darion->SummonCreature(NPC_RAMPAGING_ABOMINATION, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                        if (Unit* temp = Darion->SummonCreature(NPC_RAMPAGING_ABOMINATION, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300s))
                         {
                             temp->SetWalk(false);
                             temp->SetFaction(FACTION_UNDEAD_SCOURGE_3);
@@ -595,7 +595,7 @@ void TheLightOfDawnEvent::Update(uint32 diff)
                     while (BehemothsCount < ENCOUNTER_BEHEMOTH_NUMBER)
                     {
                         spawnpos = Darion->GetNearPosition(frand(10.f, 200.f), frand(0, 6.14f));
-                        if (Unit* temp = Darion->SummonCreature(NPC_FLESH_BEHEMOTH, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                        if (Unit* temp = Darion->SummonCreature(NPC_FLESH_BEHEMOTH, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300s))
                         {
                             temp->SetWalk(false);
                             temp->SetFaction(FACTION_UNDEAD_SCOURGE_3);
@@ -614,7 +614,7 @@ void TheLightOfDawnEvent::Update(uint32 diff)
                     while (GhoulsCount < ENCOUNTER_GHOUL_NUMBER)
                     {
                         spawnpos = Darion->GetNearPosition(frand(10.f, 200.f), frand(0, 6.14f));
-                        if (Unit* temp = Darion->SummonCreature(NPC_ACHERUS_GHOUL, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                        if (Unit* temp = Darion->SummonCreature(NPC_ACHERUS_GHOUL, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300s))
                         {
                             temp->SetWalk(false);
                             temp->SetFaction(FACTION_UNDEAD_SCOURGE_3);
@@ -633,7 +633,7 @@ void TheLightOfDawnEvent::Update(uint32 diff)
                     while (WarriorsCount < ENCOUNTER_WARRIOR_NUMBER)
                     {
                         spawnpos = Darion->GetNearPosition(frand(10.f, 200.f), frand(0, 6.14f));
-                        if (Unit* temp = Darion->SummonCreature(NPC_WARRIOR_OF_THE_FROZEN_WASTES, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                        if (Unit* temp = Darion->SummonCreature(NPC_WARRIOR_OF_THE_FROZEN_WASTES, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300s))
                         {
                             temp->SetWalk(false);
                             temp->SetFaction(FACTION_UNDEAD_SCOURGE_3);

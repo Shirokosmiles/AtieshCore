@@ -492,7 +492,7 @@ public:
             WorldObject* obj = nullptr;
             if (me)
                 obj = me;
-            obj->SummonGameObject(190488, Position(5832.7f, 436.761f, 669.141f, 1.61251f), rot, 1000*60*2, GOSummonType(GO_SUMMON_TIMED_OR_CORPSE_DESPAWN));
+            obj->SummonGameObject(190488, Position(5832.7f, 436.761f, 669.141f, 1.61251f), rot, Minutes(2), GOSummonType(GO_SUMMON_TIMED_OR_CORPSE_DESPAWN));
             return true;
         }
 

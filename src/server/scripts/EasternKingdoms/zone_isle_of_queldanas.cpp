@@ -170,7 +170,7 @@ public:
                 if (Creature* auric = me->FindNearestCreature(NPC_AURIC, 100.0f, true))      // Auric
                     uiAuric = auric->GetGUID();
 
-                if (GameObject* quelDelar = me->SummonGameObject(GO_QUEL_DANAR, 1683.99f, 620.231f, 29.3599f, 0.410932f, QuaternionData(), 0))
+                if (GameObject* quelDelar = me->SummonGameObject(GO_QUEL_DANAR, 1683.99f, 620.231f, 29.3599f, 0.410932f, QuaternionData(), 0s))
                 {
                     uiQuelDelar = quelDelar->GetGUID();
                     quelDelar->SetFlag(GAMEOBJECT_FLAGS, 5);
@@ -293,7 +293,7 @@ public:
                 if (Creature* rommath = ObjectAccessor::GetCreature(*me, uiRommath))
                     rommath->GetMotionMaster()->MovePoint(0, rommath->GetHomePosition());
                 if (Creature* theron = ObjectAccessor::GetCreature(*me, uiTheron))
-                    theron->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+                    theron->DespawnOrUnsummon(Seconds(5));
                 break;
             default:
                 break;
