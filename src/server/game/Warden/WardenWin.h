@@ -68,7 +68,7 @@ class WardenWin : public Warden
         WardenWin();
         ~WardenWin();
 
-        void Init(WorldSession* session, std::array<uint8, 40> const& K) override;
+        void Init(WorldSession* session, SessionKey const& K) override;
         ClientWardenModule* GetModuleForClient() override;
         void InitializeModule() override;
         void HandleHashResult(ByteBuffer &buff) override;

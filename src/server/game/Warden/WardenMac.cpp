@@ -36,7 +36,7 @@ WardenMac::WardenMac() : Warden() { }
 
 WardenMac::~WardenMac() { }
 
-void WardenMac::Init(WorldSession* pClient, std::array<uint8, 40> const& K)
+void WardenMac::Init(WorldSession* pClient, SessionKey const& K)
 {
     _session = pClient;
     // Generate Warden Key
