@@ -14412,8 +14412,8 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     break;
                 case GOSSIP_OPTION_VENDOR:
                 {
-                    VendorItemData const* vendorItems = creature->GetVendorItems();
-                    if (!vendorItems || vendorItems->Empty())
+                    VendorItemData const* vendorItems = itr->second.ActionMenuID ? nullptr : creature->GetVendorItems();
+                    if (!itr->second.ActionMenuID && (!vendorItems || vendorItems->Empty()))
                     {
                         TC_LOG_ERROR("sql.sql", "Creature %s (%s DB GUID: %u) has UNIT_NPC_FLAG_VENDOR set, but has an empty trading item list.", creature->GetName().c_str(), creature->GetGUID().ToString().c_str(), creature->GetSpawnId());
                         canTalk = false;
@@ -14632,7 +14632,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             break;
         case GOSSIP_OPTION_VENDOR:
         case GOSSIP_OPTION_ARMORER:
-            GetSession()->SendListInventory(guid);
+            GetSession()->SendListInventory(guid, menuItemData->GossipActionMenuId);
             break;
         case GOSSIP_OPTION_STABLEPET:
             GetSession()->SendStablePet(guid);
@@ -21756,202 +21756,11 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         return false;
     }
 
-    VendorItemData const* vItems = creature->GetVendorItems();
+    uint32 currentVendor = GetSession()->GetCurrentVendor();
+    if (currentVendor && vendorguid != PlayerTalkClass->GetGossipMenu().GetSenderGUID())
+        return false; // Cheating
 
-    switch (creature->GetEntry())
-    {
-        case 190016: // Enchants-Gems
-        {
-            VendorItemData const* vItemsMETA = sObjectMgr->GetNpcVendorItemList(400000);
-            if (vItemsMETA && vItemsMETA->HasItem(item))
-            {
-                vItems = vItemsMETA;
-                break;
-            }
-            VendorItemData const* vItemsYELLOW = sObjectMgr->GetNpcVendorItemList(400001);
-            if (vItemsYELLOW && vItemsYELLOW->HasItem(item))
-            {
-                vItems = vItemsYELLOW;
-                break;
-            }
-            VendorItemData const* vItemsRED = sObjectMgr->GetNpcVendorItemList(400002);
-            if (vItemsRED && vItemsRED->HasItem(item))
-            {
-                vItems = vItemsRED;
-                break;
-            }
-            VendorItemData const* vItemsBLUE = sObjectMgr->GetNpcVendorItemList(400003);
-            if (vItemsBLUE && vItemsBLUE->HasItem(item))
-            {
-                vItems = vItemsBLUE;
-                break;
-            }
-            VendorItemData const* vItemsPURPLE = sObjectMgr->GetNpcVendorItemList(400004);
-            if (vItemsPURPLE && vItemsPURPLE->HasItem(item))
-            {
-                vItems = vItemsPURPLE;
-                break;
-            }
-            VendorItemData const* vItemsORANGE = sObjectMgr->GetNpcVendorItemList(400005);
-            if (vItemsORANGE && vItemsORANGE->HasItem(item))
-            {
-                vItems = vItemsORANGE;
-                break;
-            }
-            VendorItemData const* vItemsGREEN = sObjectMgr->GetNpcVendorItemList(400006);
-            if (vItemsGREEN && vItemsGREEN->HasItem(item))
-            {
-                vItems = vItemsGREEN;
-                break;
-            }
-            VendorItemData const* vItemsRAINBOW = sObjectMgr->GetNpcVendorItemList(400007);
-            if (vItemsRAINBOW && vItemsRAINBOW->HasItem(item))
-            {
-                vItems = vItemsRAINBOW;
-                break;
-            }
-
-            VendorItemData const* vItemsPG = sObjectMgr->GetNpcVendorItemList(400021);
-            if (vItemsPG && vItemsPG->HasItem(item))
-            {
-                vItems = vItemsPG;
-                break;
-            }
-            VendorItemData const* vItemsWG = sObjectMgr->GetNpcVendorItemList(400022);
-            if (vItemsWG && vItemsWG->HasItem(item))
-            {
-                vItems = vItemsWG;
-                break;
-            }
-            VendorItemData const* vItemsHG = sObjectMgr->GetNpcVendorItemList(400023);
-            if (vItemsHG && vItemsHG->HasItem(item))
-            {
-                vItems = vItemsHG;
-                break;
-            }
-            VendorItemData const* vItemsRG = sObjectMgr->GetNpcVendorItemList(400024);
-            if (vItemsRG && vItemsRG->HasItem(item))
-            {
-                vItems = vItemsRG;
-                break;
-            }
-            VendorItemData const* vItemsPrG = sObjectMgr->GetNpcVendorItemList(400025);
-            if (vItemsPrG && vItemsPrG->HasItem(item))
-            {
-                vItems = vItemsPrG;
-                break;
-            }
-            VendorItemData const* vItemsDKG = sObjectMgr->GetNpcVendorItemList(400026);
-            if (vItemsDKG && vItemsDKG->HasItem(item))
-            {
-                vItems = vItemsDKG;
-                break;
-            }
-            VendorItemData const* vItemsSG = sObjectMgr->GetNpcVendorItemList(400027);
-            if (vItemsSG && vItemsSG->HasItem(item))
-            {
-                vItems = vItemsSG;
-                break;
-            }
-            VendorItemData const* vItemsMG = sObjectMgr->GetNpcVendorItemList(400028);
-            if (vItemsMG && vItemsMG->HasItem(item))
-            {
-                vItems = vItemsMG;
-                break;
-            }
-            VendorItemData const* vItemsWlG = sObjectMgr->GetNpcVendorItemList(400029);
-            if (vItemsWlG && vItemsWlG->HasItem(item))
-            {
-                vItems = vItemsWlG;
-                break;
-            }
-            VendorItemData const* vItemsDG = sObjectMgr->GetNpcVendorItemList(400030);
-            if (vItemsDG && vItemsDG->HasItem(item))
-            {
-                vItems = vItemsDG;
-                break;
-            }
-            break;
-        }
-        case 190014: // Reagents
-        {
-            VendorItemData const* vItemsTradeGoods = sObjectMgr->GetNpcVendorItemList(400050);
-            if (vItemsTradeGoods && vItemsTradeGoods->HasItem(item))
-            {
-                vItems = vItemsTradeGoods;
-                break;
-            }
-            VendorItemData const* vItemsAlchemy = sObjectMgr->GetNpcVendorItemList(400051);
-            if (vItemsAlchemy && vItemsAlchemy->HasItem(item))
-            {
-                vItems = vItemsAlchemy;
-                break;
-            }
-            VendorItemData const* vItemsBlacksmithing = sObjectMgr->GetNpcVendorItemList(400052);
-            if (vItemsBlacksmithing && vItemsBlacksmithing->HasItem(item))
-            {
-                vItems = vItemsBlacksmithing;
-                break;
-            }
-            VendorItemData const* vItemsLeatherworking = sObjectMgr->GetNpcVendorItemList(400053);
-            if (vItemsLeatherworking && vItemsLeatherworking->HasItem(item))
-            {
-                vItems = vItemsLeatherworking;
-                break;
-            }
-            VendorItemData const* vItemsDevices = sObjectMgr->GetNpcVendorItemList(400054);
-            if (vItemsDevices && vItemsDevices->HasItem(item))
-            {
-                vItems = vItemsDevices;
-                break;
-            }
-            VendorItemData const* vItemsEngineering = sObjectMgr->GetNpcVendorItemList(400055);
-            if (vItemsEngineering && vItemsEngineering->HasItem(item))
-            {
-                vItems = vItemsEngineering;
-                break;
-            }
-            VendorItemData const* vItemsEnchanting = sObjectMgr->GetNpcVendorItemList(400056);
-            if (vItemsEnchanting && vItemsEnchanting->HasItem(item))
-            {
-                vItems = vItemsEnchanting;
-                break;
-            }
-            VendorItemData const* vItemsInscription = sObjectMgr->GetNpcVendorItemList(400057);
-            if (vItemsInscription && vItemsInscription->HasItem(item))
-            {
-                vItems = vItemsInscription;
-                break;
-            }
-            VendorItemData const* vItemsTailoring = sObjectMgr->GetNpcVendorItemList(400058);
-            if (vItemsTailoring && vItemsTailoring->HasItem(item))
-            {
-                vItems = vItemsTailoring;
-                break;
-            }
-            VendorItemData const* vItemsMeat = sObjectMgr->GetNpcVendorItemList(400059);
-            if (vItemsMeat && vItemsMeat->HasItem(item))
-            {
-                vItems = vItemsMeat;
-                break;
-            }
-            VendorItemData const* vItemsJewelcrafting = sObjectMgr->GetNpcVendorItemList(400060);
-            if (vItemsJewelcrafting && vItemsJewelcrafting->HasItem(item))
-            {
-                vItems = vItemsJewelcrafting;
-                break;
-            }
-            VendorItemData const* vItemsMisc = sObjectMgr->GetNpcVendorItemList(400061);
-            if (vItemsMisc && vItemsMisc->HasItem(item))
-            {
-                vItems = vItemsMisc;
-                break;
-            }
-            break;
-        }
-        default:
-            break;
-    }
+    VendorItemData const* vItems = currentVendor ? sObjectMgr->GetNpcVendorItemList(currentVendor) : creature->GetVendorItems();
 
     if (!vItems || vItems->Empty())
     {

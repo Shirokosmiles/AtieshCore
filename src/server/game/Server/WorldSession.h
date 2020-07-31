@@ -1265,7 +1265,7 @@ class TC_GAME_API WorldSession
         rbac::RBACData* _RBACData;
         uint32 expireTime;
         bool forceExit;
-        uint32 m_currentVendorEntry;
+        uint32 m_currentVendorEntry = 0;
         ObjectGuid m_currentBankerGUID;
 
         boost::circular_buffer<std::pair<int64, uint32>> _timeSyncClockDeltaQueue; // first member: clockDelta. Second member: latency of the packet exchange that was used to compute that clockDelta.
