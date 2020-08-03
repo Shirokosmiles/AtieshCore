@@ -439,6 +439,8 @@ class BattlefieldWG : public Battlefield
 
         GuidVector m_KeepHordeGameObjectList;
         GuidVector m_KeepAllianceGameObjectList;
+        GuidVector m_KeepHordeNPCList;
+        GuidVector m_KeepAllianceNPCList;
 };
 
 enum WintergraspGameObjectBuildingType

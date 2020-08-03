@@ -592,6 +592,8 @@ BattlefieldWG::~BattlefieldWG()
     m_CreatureMap.clear();
     m_KeepHordeGameObjectList.clear();
     m_KeepAllianceGameObjectList.clear();
+    m_KeepHordeNPCList.clear();
+    m_KeepAllianceNPCList.clear();
 }
 
 bool BattlefieldWG::SetupBattlefield()
@@ -894,12 +896,12 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
             itr->second.inWar = false;
         }
 
-        if (!endByTimer)
+        /*if (!endByTimer)
             if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
             {
                 player->RemoveAurasDueToSpell(m_DefenderTeam == TEAM_ALLIANCE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player->GetGUID());
                 player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player);
-            }
+            }*/
     }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
@@ -1021,6 +1023,20 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                     registered = true;
             }
 
+            // KE workshop
+            if (creature->GetScriptName() == "wg_ke_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_KEEP_EAST, TEAM_HORDE))
+                    registered = true;
+            }
+
+            // KW workshop
+            if (creature->GetScriptName() == "wg_kw_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_KEEP_WEST, TEAM_HORDE))
+                    registered = true;
+            }
+
             if (!registered)
                 TC_LOG_ERROR("system", "NPC_WINTERGRASP_TOWER_CANNON not registered for GUID : %u", creature->GetSpawnId());
             break;
@@ -1053,6 +1069,20 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             if (creature->GetScriptName() == "wg_nw_workshop_mechanic")
             {
                 if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            // KE workshop
+            if (creature->GetScriptName() == "wg_ke_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_KEEP_EAST, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            // KW workshop
+            if (creature->GetScriptName() == "wg_kw_workshop_mechanic")
+            {
+                if (AddCreatureInHolderByGUID(creature, WG_WORKSHOP_KEEP_WEST, TEAM_ALLIANCE))
                     registered = true;
             }
 
@@ -1533,6 +1563,44 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                 TC_LOG_ERROR("system", "BATTLEFIELD_WG_NPC_GUARD_H not registered for GUID : %u", creature->GetSpawnId());
             break;
         }
+        // Alliance keep not guard NPC
+        case 30488:
+        case 30489:
+        case 31036:
+        case 31051:
+        case 31052:
+        case 31054:
+        case 31108:
+        case 31109:
+        case 31153:        
+        case 32294:
+        case 39172:
+        {
+            m_KeepAllianceNPCList.push_back(creature->GetGUID());
+            if (GetDefenderTeam() == TEAM_HORDE)
+                HideNpc(creature);
+            else if (GetDefenderTeam() == TEAM_ALLIANCE)
+                ShowNpc(creature, true);
+            break;
+        }
+        // Horde keep not guard NPC        
+        case 31053:
+        case 31091:
+        case 31101:
+        case 31102:
+        case 31106:
+        case 31107:
+        case 31151:
+        case 32296:
+        case 39173:
+        {
+            m_KeepHordeNPCList.push_back(creature->GetGUID());
+            if (GetDefenderTeam() == TEAM_HORDE)
+                ShowNpc(creature, true);
+            else if (GetDefenderTeam() == TEAM_ALLIANCE)
+                HideNpc(creature);
+            break;
+        }
     }
 
     // untested code - not sure if it is valid.
@@ -1590,6 +1658,8 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             }
         }
     }
+
+    creature->SetPhaseMask(1, true);
 }
 
 void BattlefieldWG::OnCreatureRemove(Creature* /*creature*/)
@@ -1625,8 +1695,9 @@ void BattlefieldWG::OnCreatureRemove(Creature* /*creature*/)
     }*/
 }
 
-void BattlefieldWG::OnGameObjectCreate(GameObject* /*go*/)
+void BattlefieldWG::OnGameObjectCreate(GameObject* go)
 {
+    go->SetPhaseMask(1, true);
     /*
     uint8 workshopId = 0;
 
@@ -1808,10 +1879,10 @@ void BattlefieldWG::OnPlayerLeaveWar(Player* player)
         RemoveAurasFromPlayer(player);
     }
 
-    player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROLS_FACTORY_PHASE_SHIFT);
+    /*player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROLS_FACTORY_PHASE_SHIFT);
     player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROLS_FACTORY_PHASE_SHIFT);
     player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROL_PHASE_SHIFT);
-    player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);
+    player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);*/
     UpdateTenacity();
 }
 
@@ -1819,11 +1890,11 @@ void BattlefieldWG::OnPlayerLeaveZone(Player* player)
 {
     if (!m_isActive)
         RemoveAurasFromPlayer(player);
-
+    /*
     player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROLS_FACTORY_PHASE_SHIFT);
     player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROLS_FACTORY_PHASE_SHIFT);
     player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROL_PHASE_SHIFT);
-    player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);
+    player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);*/
 }
 
 void BattlefieldWG::OnPlayerEnterZone(Player* player)
@@ -2407,6 +2478,15 @@ void BattlefieldWG::UpdateAllGOforKeep()
         for (ObjectGuid guid : m_KeepHordeGameObjectList)
             if (GameObject* go = GetGameObject(guid))
                 go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+
+        // Show Alliance NPC (vendor and etc)
+        for (ObjectGuid guid : m_KeepHordeNPCList)
+            if (Creature* cr = GetCreature(guid))
+                ShowNpc(cr, true);
+
+        for (ObjectGuid guid : m_KeepAllianceNPCList)
+            if (Creature* cr = GetCreature(guid))
+                HideNpc(cr);
     }
     else
     {
@@ -2417,6 +2497,14 @@ void BattlefieldWG::UpdateAllGOforKeep()
         for (ObjectGuid guid : m_KeepAllianceGameObjectList)
             if (GameObject* go = GetGameObject(guid))
                 go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+
+        for (ObjectGuid guid : m_KeepAllianceNPCList)
+            if (Creature* cr = GetCreature(guid))
+                ShowNpc(cr, true);
+
+        for (ObjectGuid guid : m_KeepHordeNPCList)
+            if (Creature* cr = GetCreature(guid))
+                HideNpc(cr);
     }
 }
 

@@ -75,7 +75,7 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         void RegisterZoneIdForEvent(uint32 zoneId);
         uint32 GetEventId() const { return _eventId; }
         // Battle timer
-        uint32 GetTimer() const { return _timer.GetExpiry(); }
+        uint32 GetTimer() const { return _timer.GetExpiry().count(); }
 
         // Functions for each Event Scripts
         virtual bool SetupSpecialEvent(bool enabled, bool active, bool repeatable, uint32 id, uint32 cooldownTimer, uint32 durationTimer, std::string comment);
@@ -135,7 +135,7 @@ class TC_GAME_API SpecialEvent : public ZoneScript
     protected:
         // constant information
         uint32 _eventId;
-        TimeTrackerSmall _timer;
+        TimeTracker _timer;
         // from database
         bool _active;
         bool _enabled;

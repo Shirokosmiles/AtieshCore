@@ -97,9 +97,9 @@ private:
     uint32 possibleDistance;
     DalaranPhase phaseStage;
     // timers
-    TimeTrackerSmall prepareTimer;
-    TimeTrackerSmall combatTimer;
-    TimeTrackerSmall playersTimer;
+    TimeTracker prepareTimer;
+    TimeTracker combatTimer;
+    TimeTracker playersTimer;
 
     uint32 m_DurationTimer;
     uint32 m_TeleporterTimer;

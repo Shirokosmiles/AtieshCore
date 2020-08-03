@@ -31,7 +31,7 @@ MailExternalMgr* MailExternalMgr::instance()
 
 void MailExternalMgr::Initialize()
 {
-    _timer.Reset(MINUTE);    // upd only 1 time in minute
+    _timer.Reset(MINUTE * 1000);    // upd only 1 time in minute
 }
 
 void MailExternalMgr::Update(uint32 diff)

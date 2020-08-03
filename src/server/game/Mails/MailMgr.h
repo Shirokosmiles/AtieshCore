@@ -104,7 +104,7 @@ public:
     void HandleMailCreateTextItem(Player* player, uint32 mailID);
     bool HandleQueryNextMailTime(Player* player, WorldPacket& data);
 
-    time_t GetMailMgrExpiryTimer() { return _ExpTimer.GetExpiry(); }
+    time_t GetMailMgrExpiryTimer() { return _ExpTimer.GetExpiry().count(); }
 
     MailMap const& GetMailMap() const { return m_mails; }
 
