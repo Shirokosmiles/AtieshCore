@@ -1,4 +1,4 @@
-DELETE FROM `creature` WHERE `guid` between 300000 and 300710;
+DELETE FROM `creature` WHERE `guid` between 300000 and 300714;
 DELETE FROM `creature` WHERE `id` = 30739 AND map = 571;
 DELETE FROM `creature` WHERE `id` = 30740 AND map = 571;
 DELETE FROM `creature` WHERE `id` = 30400 AND map = 571;
@@ -27,6 +27,7 @@ DELETE FROM `gameobject` WHERE `guid` = 75189;
 DELETE FROM `gameobject` WHERE `guid` = 67249;
 DELETE FROM `gameobject` WHERE `guid` = 75191;
 DELETE FROM `gameobject` WHERE `guid` = 75182;
+DELETE FROM `gameobject` WHERE `guid` = 75183;
 DELETE FROM `gameobject` WHERE `guid` = 75188;
 DELETE FROM `gameobject` WHERE `guid` = 74700;
 DELETE FROM `gameobject` WHERE `guid` = 75170;
@@ -262,7 +263,6 @@ DELETE FROM `gameobject` WHERE `guid` = 71408;
 -- keep GO the westest
 DELETE FROM `gameobject` WHERE `guid` = 71403;
 DELETE FROM `gameobject` WHERE `guid` = 71406;
-
 
 SET @CGUID := 300000;
 INSERT INTO `creature`(`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
@@ -1102,35 +1102,6 @@ INSERT INTO `creature`(`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `ph
 (@CGUID+713, 30499, 571, 0, 0, 1, 1, 0, 0, 5390.05, 2974.65, 415.141, 1.43343, 300, 0, 0, 6986, 0, 0, 0, 0, 0, 'wg_ke_workshop_mechanic', 0),
 (@CGUID+714, 30499, 571, 0, 0, 1, 1, 0, 0, 5388.26, 2707.6, 414.969, 1.58265, 300, 0, 0, 6986, 0, 0, 0, 0, 0, 'wg_kw_workshop_mechanic', 0);
 
---  east Vehicle Shop
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_evs_guard' WHERE `guid` = 88407;
-
---  east Bridge
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_east_bridge_guard' WHERE `guid` = 88392;
-
---  middle Bridge
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_middle_bridge_guard' WHERE `guid` = 131277;
-
---  west Bridge
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_west_bridge_guard' WHERE `guid` = 131274;
-
---  keep NE
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_keep_NE_guard' WHERE `guid` = 88375;
-
---  keep NW
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_keep_NW_guard' WHERE `guid` = 88378;
-
---  NW inside
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_keep_NW_guard' WHERE `guid` = 88400;
-
---  keep SE
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_keep_SE_guard' WHERE `guid` = 88371;
-
---  keep SW
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_keep_SW_guard' WHERE `guid` = 88381;
-
---  fortress gate
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_keep_fortress_gate_guard' WHERE `guid` = 88394;
-
---  fortress
---  UPDATE `creature` SET `phaseMask` = 1, `ScriptName` = 'wg_keep_fortress_guard' WHERE `guid` = 88398;
+UPDATE `creature` SET `ScriptName` = '' WHERE `ScriptName` = 'npc_wg_give_promotion_credit';
+UPDATE `spell_area` SET `autocast` = 0 WHERE `spell` = 56618;
+UPDATE `spell_area` SET `autocast` = 0 WHERE `spell` = 56617;

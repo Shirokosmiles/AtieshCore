@@ -229,8 +229,8 @@ enum WintergraspNpcs
     NPC_TAUNKA_SPIRIT_GUIDE                         = 31841, // Horde spirit guide for Wintergrasp
     NPC_DWARVEN_SPIRIT_GUIDE                        = 31842, // Alliance spirit guide for Wintergrasp
 
-    NPC_WORKSHOP_MECHANIC_HORDE                     = 30499, // Horde mechanic for Wintergrasp
-    NPC_WORKSHOP_MECHANIC_ALLIANCE                  = 30400, // Alliance mechanic for Wintergrasp
+    NPC_WORKSHOP_MECHANIC_ALLIANCE                  = 30499, // Alliance mechanic for Wintergrasp
+    NPC_WORKSHOP_MECHANIC_HORDE                     = 30400, // Horde mechanic for Wintergrasp
 
     NPC_WINTERGRASP_SIEGE_ENGINE_ALLIANCE           = 28312,
     NPC_WINTERGRASP_SIEGE_ENGINE_HORDE              = 32627,

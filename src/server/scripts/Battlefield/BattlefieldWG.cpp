@@ -680,7 +680,7 @@ bool BattlefieldWG::SetupBattlefield()
     {
         if (WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i))
         {
-            if (workshop->GetId() < BATTLEFIELD_WG_WORKSHOP_NE)
+            if (workshop->GetId() < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
                 workshop->InitialWorkshopAndCapturePoint(GetAttackerTeam(), workshop->GetId());
             else
                 workshop->InitialWorkshopAndCapturePoint(GetDefenderTeam(), workshop->GetId());
@@ -1749,6 +1749,11 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
         // Allow to Skin non-released corpse
         victim->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
     }
+    else if (victim->GetTypeId() == TYPEID_UNIT)
+    {
+        if (victim->ToCreature() && victim->ToCreature()->GetCreatureType() == CREATURE_TYPE_HUMANOID)
+            HandlePromotion(killer, victim);
+    }
 
     /// @todoRecent PvP activity worldstate
 }
@@ -1904,7 +1909,7 @@ void BattlefieldWG::OnPlayerEnterZone(Player* player)
     if (!m_isActive)
         RemoveAurasFromPlayer(player);
 
-    player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player);
+    //player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player);
     // Send worldstate to player
     SendInitWorldStatesTo(player);
 }
@@ -3094,8 +3099,8 @@ void WintergraspWorkshop::UpdateCreatureAndGo()
 
 void WintergraspWorkshop::UpdateGraveyardAndWorkshop()
 {
-    if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_NE)
-        GiveControlTo(_wg->GetAttackerTeam(), true);        
+    if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+        GiveControlTo(_wg->GetAttackerTeam(), true);
     else
         GiveControlTo(_wg->GetDefenderTeam(), true);
 }
