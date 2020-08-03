@@ -286,6 +286,9 @@ class boss_krik_thir : public CreatureScript
                             events.Repeat(Seconds(15));
                             break;
                     }
+
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        return;
                 }
 
                 DoMeleeAttackIfReady();
@@ -461,6 +464,9 @@ class npc_watcher_gashra : public CreatureScript
                         default:
                             break;
                     }
+
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        return;
                 }
 
                 DoMeleeAttackIfReady();
@@ -536,6 +542,9 @@ class npc_watcher_narjil : public CreatureScript
                         default:
                             break;
                     }
+
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        return;
                 }
 
                 DoMeleeAttackIfReady();
@@ -611,6 +620,9 @@ class npc_watcher_silthik : public CreatureScript
                         default:
                             break;
                     }
+
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        return;
                 }
 
                 DoMeleeAttackIfReady();
@@ -671,6 +683,9 @@ class npc_anub_ar_warrior : public CreatureScript
                         default:
                             break;
                     }
+
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        return;
                 }
 
                 DoMeleeAttackIfReady();
@@ -730,6 +745,9 @@ class npc_anub_ar_skirmisher : public CreatureScript
                         default:
                             break;
                     }
+
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        return;
                 }
 
                 DoMeleeAttackIfReady();
@@ -798,6 +816,9 @@ class npc_anub_ar_shadowcaster : public CreatureScript
                         default:
                             break;
                     }
+
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        return;
                 }
 
                 DoMeleeAttackIfReady();

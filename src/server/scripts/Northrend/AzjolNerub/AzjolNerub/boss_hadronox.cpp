@@ -304,6 +304,7 @@ public:
                 return;
 
             while (uint32 eventId = events.ExecuteEvent())
+            {
                 switch (eventId)
                 {
                     case EVENT_LEECH_POISON:
@@ -349,6 +350,9 @@ public:
                         break;
                 }
 
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -387,7 +391,7 @@ public:
 
 struct npc_hadronox_crusherPackAI : public ScriptedAI
 {
-    npc_hadronox_crusherPackAI(Creature* creature, Position const* positions) : ScriptedAI(creature), _instance(creature->GetInstanceScript()), _positions(positions), _myPack(SummonGroups(0)) { }
+    npc_hadronox_crusherPackAI(Creature* creature, Position const* positions) : ScriptedAI(creature), _instance(creature->GetInstanceScript()), _positions(positions), _myPack(SummonGroups(0)), _doFacing(false) { }
 
     void DoAction(int32 action) override
     {
@@ -398,12 +402,18 @@ struct npc_hadronox_crusherPackAI : public ScriptedAI
                 case SUMMON_GROUP_CRUSHER_1:
                 case SUMMON_GROUP_CRUSHER_2:
                 case SUMMON_GROUP_CRUSHER_3:
-                    me->GetMotionMaster()->MovePoint(0, _positions[_myPack - SUMMON_GROUP_CRUSHER_1]);
+                    me->GetMotionMaster()->MovePoint(ACTION_PACK_WALK, _positions[_myPack - SUMMON_GROUP_CRUSHER_1]);
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == ACTION_PACK_WALK)
+            _doFacing = true;
     }
 
     void EnterEvadeMode(EvadeReason /*why*/) override
@@ -462,6 +472,12 @@ struct npc_hadronox_crusherPackAI : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        if (_doFacing)
+        {
+            _doFacing = false;
+            me->SetFacingTo(_positions[_myPack - SUMMON_GROUP_CRUSHER_1].GetOrientation());
+        }
+
         if (!UpdateVictim())
             return;
 
@@ -478,6 +494,7 @@ struct npc_hadronox_crusherPackAI : public ScriptedAI
         EventMap _events;
         Position const* const _positions;
         SummonGroups _myPack;
+        bool _doFacing;
 
 };
 
@@ -1099,19 +1116,19 @@ class spell_hadronox_web_doors : public SpellScriptLoader
 class achievement_hadronox_denied : public AchievementCriteriaScript
 {
     public:
-    achievement_hadronox_denied() : AchievementCriteriaScript("achievement_hadronox_denied") { }
+        achievement_hadronox_denied() : AchievementCriteriaScript("achievement_hadronox_denied") { }
 
-    bool OnCheck(Player* /*player*/, Unit* target) override
-    {
-        if (!target)
+        bool OnCheck(Player* /*player*/, Unit* target) override
+        {
+            if (!target)
+                return false;
+
+            if (Creature* cTarget = target->ToCreature())
+                if (!cTarget->AI()->GetData(DATA_HADRONOX_WEBBED_DOORS))
+                    return true;
+
             return false;
-
-        if (Creature* cTarget = target->ToCreature())
-            if (!cTarget->AI()->GetData(DATA_HADRONOX_WEBBED_DOORS))
-                return true;
-
-        return false;
-    }
+        }
 };
 
 void AddSC_boss_hadronox()
