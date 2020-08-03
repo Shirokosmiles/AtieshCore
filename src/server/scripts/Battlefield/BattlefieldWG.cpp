@@ -1564,6 +1564,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             break;
         }
         // Alliance keep not guard NPC
+        case 15351:
         case 30488:
         case 30489:
         case 31036:
@@ -1583,7 +1584,8 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                 ShowNpc(creature, true);
             break;
         }
-        // Horde keep not guard NPC        
+        // Horde keep not guard NPC
+        case 15350:
         case 31053:
         case 31091:
         case 31101:
