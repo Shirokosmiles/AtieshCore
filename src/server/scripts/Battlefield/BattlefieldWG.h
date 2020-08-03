@@ -61,8 +61,9 @@ enum NPCtype
     NW_TOWER_GUARD,
     SE_TOWER_GUARD,
     SW_TOWER_GUARD,
-    FORTRESS_GATE_GUARD,
     VAULT_GATE_GUARD,
+
+    VAULT_GATE_OTHER_NPC,
 
     FORTRESS_GATE_TURRET,
     VAULT_GATE_TURRET,
@@ -415,6 +416,8 @@ class BattlefieldWG : public Battlefield
         void HideCreatureTurretByNPCType(uint8 npcType);
 
         void UpdateAllGuardsAndTurretsBeforeBattle();
+        void InitAllGOforKeep();
+        void UpdateAllGOforKeep();
 
     protected:
         bool m_isRelicInteractible;
@@ -433,6 +436,9 @@ class BattlefieldWG : public Battlefield
         ObjectGuid m_titansRelicGUID;
 
         CreatureHolderContainer m_CreatureMap;
+
+        GuidVector m_KeepHordeGameObjectList;
+        GuidVector m_KeepAllianceGameObjectList;
 };
 
 enum WintergraspGameObjectBuildingType
@@ -585,7 +591,7 @@ private:
     StaticWintergraspTowerInfo const* _staticTowerInfo;
 
     // GameObject associations
-    GuidVector m_GameObjectList[3];
+    GuidVector m_GameObjectList[3];    
 
 public:
     BfWGGameObjectBuilding(BattlefieldWG* wg, WintergraspGameObjectBuildingType type, uint32 worldState);

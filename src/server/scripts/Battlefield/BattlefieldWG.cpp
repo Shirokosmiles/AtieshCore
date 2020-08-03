@@ -86,7 +86,6 @@ uint32 const NPCMechanicFaction[] = { 1732, 1735 };
     SE_TOWER_GUARD,
     SW_TOWER_GUARD,
     FORTRESS_GATE_GUARD,
-    VAULT_GATE_GUARD,
 
     FORTRESS_GATE_TURRET,
     VAULT_GATE_TURRET,
@@ -284,6 +283,59 @@ WintergraspGameObjectWorkshopData const WGworkshopData[WG_MAX_WORKSHOPGO] =
     { { 4948.52f, 3342.34f, 376.875f, 4.40057f }, { 0.f, 0.f, 0.808329f, -0.588731f }, 192627 }
 };
 
+struct WintergraspGameObjectKeepData
+{
+    Position Pos;
+    QuaternionData Rot;
+    uint32 entry;
+};
+uint8 const WG_MAX_KEEPGO_HORDE = 11;
+WintergraspGameObjectKeepData const WGKeepHordeData[WG_MAX_KEEPGO_HORDE] =
+{
+    { { 5371.9f, 2805.48f, 409.307f, 0.0610866f }, { 0.f, 0.f, 0.0305386f, 0.999534f }, 193160 },   // GO east keep vault
+    { { 5376.62f, 2875.1f, 409.255f, 1.59698f }, { 0.f, 0.f, 0.716303f, 0.697789f }, 193161 },      // GO west keep vault
+    // horde hoodo master
+    { { 5294.6f, 2786.85f, 409.888f, -2.35619f }, { 0.f, 0.f, -0.923879f, 0.382686f }, 193139 },
+    { { 5294.24f, 2786.42f, 409.174f, 0.0174525f }, { 0.f, 0.f, 0.00872614f, 0.999962f }, 193142 },
+    { { 5295.87f, 2787.77f, 409.192f, 2.15548f }, { 0.f, 0.f, 0.88089f, 0.47332f }, 193145 },
+    { { 5293.21f, 2787.03f, 409.219f, 3.03687f }, { 0.f, 0.f, 0.998629f, 0.0523374f }, 193141 },
+    { { 5293.56f, 2787.31f, 410.56f, 0.261798f }, { 0.f, 0.f, 0.130525f, 0.991445f }, 193146 },
+    { { 5294.38f, 2785.04f, 409.175f, -2.33874f }, { 0.f, 0.f, -0.920505f, 0.390732f }, 193140 },
+    { { 5293.03f, 2785.63f, 409.225f, -1.29154f }, { 0.f, 0.f, -0.601814f, 0.798637f }, 193144 },
+    { { 5291.71f, 2785.87f, 409.282f, -2.03331f }, { 0.f, 0.f, -0.850353f, 0.526213f }, 193143 },
+    // the westest - blacksmith forge
+    { { 5293.35f, 2923.71f, 409.845f, -1.87623f }, { 0.f, 0.f, -0.806445f, 0.591309f }, 193127 }
+};
+
+uint8 const WG_MAX_KEEPGO_ALLIANCE = 21;
+WintergraspGameObjectKeepData const WGKeepAllianceData[WG_MAX_KEEPGO_ALLIANCE] =
+{
+    { { 5378.92f, 2805.44f, 409.239f, 1.53589f }, { 0.f, 0.f, 0.694658f, 0.71934f }, 193164 },     // GO east keep
+    { { 5378.07f, 2813.62f, 409.239f, 1.55334f }, { 0.f, 0.f, 0.700908f, 0.713252f }, 193163 },    // GO east keep
+    { { 5378.45f, 2876.67f, 409.239f, 1.54462f }, { 0.f, 0.f, 0.697792f, 0.716301f }, 193165 },    // GO west keep
+    { { 5377.55f, 2870.92f, 409.239f, -0.549777f }, { 0.f, 0.f, -0.27144f, 0.962455f }, 193162 },  // GO west keep
+    // alliance kaylana
+    { { 5294.09f, 2894.19f, 409.164f, -0.733038f }, { 0.f, 0.f, -0.358368f, 0.93358f }, 193130 },
+    { { 5293.74f, 2894.48f, 409.183f, -2.72271f }, { 0.f, 0.f, -0.978147f, 0.207914f }, 193138 },
+    { { 5295.19f, 2895.38f, 409.143f, -0.349065f }, { 0.f, 0.f, -0.173648f, 0.984808f }, 193131 },
+    { { 5293.12f, 2895.23f, 409.209f, -0.98611f }, { 0.f, 0.f, -0.473319f, 0.880891f }, 193128 },
+    { { 5295.39f, 2895.06f, 410.669f, 0.689403f }, { 0.f, 0.f, 0.0167089f, 0.0073185f }, 193133 },
+    { { 5294.98f, 2895.34f, 410.658f, -2.73143f }, { 0.f, 0.f, -0.979044f, 0.203647f }, 193135 },
+    { { 5295.56f, 2895.24f, 410.628f, -2.11185f }, { 0.f, 0.f, -0.870356f, 0.492423f }, 193137 },
+    { { 5294.53f, 2895.57f, 410.659f, -1.92859f }, { 0.0222769f, -0.035924f, -0.82086f, 0.569563f }, 193132 },
+    { { 5293.23f, 2895.46f, 410.413f, -0.802851f }, { 0.f, 0.f, -0.390731f, 0.920505f }, 193136 },
+    { { 5295.14f, 2895.68f, 410.619f, -2.22529f }, { 0.f, 0.f, -0.896872f, 0.442291f }, 193134 },
+    { { 5292.91f, 2895.54f, 410.42f, -0.122171f }, { 0.f, 0.f, -0.0610475f, 0.998135f }, 193129 },
+    // the eastest - boweyr
+    { { 5293.38f, 2750.9f, 409.235f, -0.0610866f }, { 0.f, 0.f, -0.0305386f, 0.999534f }, 193159 },
+    { { 5292.43f, 2748.62f, 409.131f, 0.253072f }, { 0.f, 0.f, 0.126199f, 0.992005f }, 193158 },
+    { { 5292.24f, 2753.59f, 409.087f, -0.35779f }, { 0.f, 0.f, -0.177942f, 0.984041f }, 193157 },
+    { { 5293.38f, 2746.06f, 409.221f, -0.0698117f }, { 0.f, 0.f, -0.0348988f, 0.999391f }, 193155 },
+    { { 5293.65f, 2755.68f, 409.191f, -0.436332f }, { 0.f, 0.f, -0.216439f, 0.976296f }, 193156 },
+    // the westest - blacksmith forge
+    { { 5293.66f, 2924.44f, 409.293f, 1.20427f }, { 0.f, 0.f, 0.566403f, 0.824128f }, 193124 }
+};
+
 // *********************************************************
 // **********Tower Element(GameObject, Creature)************
 // *********************************************************
@@ -345,6 +397,90 @@ WintergraspTowerData const AttackTowers[WG_MAX_ATTACKTOWERS] =
     }
 };
 
+uint8 const WG_MAX_DEFENSETOWERS = 4;
+// 192414 : 0 in sql, 1 in header
+// 192278 : 0 in sql, 3 in header
+WintergraspTowerData const DefenseTowers[WG_MAX_DEFENSETOWERS] =
+{
+    // NW
+    {
+        190221,
+        {
+            // outside
+            { { 5352.15f, 3054.77f, 444.61f, 1.57952f }, { 0.f, 0.f,  0.710184f, 0.704016f }, 192376, 192310 },     // banner on noth side
+            { { 5280.89f, 3064.95f, 431.976f, 1.55334f }, { 0.f, 0.f,  0.700908f, 0.713252f }, 192488, 192487 },    // banner on west side
+            { { 5262.54f, 3047.93f, 431.965f, 3.12412f }, { 0.f, 0.f,  0.999962f, 0.00873622f }, 192488, 192487 },  // banner on south side
+            { { 5272.55f, 2976.54f, 444.493f, 3.13286f }, { 0.f, 0.f,  0.99999f, 0.00436634f }, 192374, 192309 },   // banner on east side
+            // inside (NW workshop)
+            { { 5392.64f, 3036.97f, 433.649f, -1.51843f }, { 0.f, 0.f,  -0.688352f, 0.725377f }, 192361, 192326 },
+            { { 5352.38f, 3036.95f, 435.111f, -1.56207f }, { 0.f, 0.f,  -0.704015f, 0.710185f }, 192360, 192325 },
+            { { 5290.51f, 2976.56f, 435.087f, 0.00872424f }, { 0.f, 0.f,  0.00436211f, 0.99999f }, 192373, 192324 },
+            { { 5322.89f, 2917.14f, 445.154f, 1.56207f }, { 0.f, 0.f,  0.704015f, 0.710185f }, 192372, 192322 },
+            { { 5364.28f, 2917.26f, 445.332f, 1.58825f }, { 0.f, 0.f,  0.713251f, 0.700909f }, 192371, 192323 },
+            { { 5398.04f, 2873.01f, 455.204f, 3.13286f }, { 0.f, 0.f,  0.99999f, 0.00436634f }, 192338, 192304 },
+            { { 5364.3f, 2899.22f, 435.691f, -1.55334f }, { 0.f, 0.f,  -0.700908f, 0.713252f }, 192359, 192319 },
+            { { 5322.25f, 2898.95f, 435.643f, -1.57952f }, { 0.f, 0.f,  -0.710184f, 0.704016f }, 192358, 192318 },
+            { { 5288.85f, 2861.82f, 435.59f, 0.0261791f }, { 0.f, 0.f,  0.0130892f, 0.999914f }, 192354, 192321 },
+            { { 5372.42f, 2862.48f, 409.366f, 3.14159f }, { 0.f, 0.f,  1.f, 0.00000126759f }, 192284, 192287 }
+        }
+    },
+    // SW
+    {
+        190373,
+        {
+            // outside
+            { { 5235.13f, 2942.12f, 444.279f, 1.58825f }, { 0.f, 0.f,  0.713251f, 0.700909f }, 192375, 192308 },
+            { { 5162.91f, 2952.6f, 433.368f, 1.5708f }, { 0.f, 0.f,  0.707108f, 0.707106f }, 192488, 192487 },
+            { { 5145.11f, 2934.95f, 433.255f, -3.10665f }, { 0.f, 0.f,  -0.999847f, 0.0174704f }, 192488, 192487 },
+            { { 5158.81f, 2883.13f, 431.618f, 3.14159f }, { 0.f, 0.f,  1.f, 0.00000126759f }, 192488, 192487 },
+            { { 5154.35f, 2862.08f, 445.01f, 3.14159f }, { 0.f, 0.f,  1.f, 0.00000126759f }, 192336, 192292 },
+            { { 5154.37f, 2853.23f, 409.183f, 3.14159f }, { 0.f, 0.f,  1.f, 0.00000126759f }, 192255, 192252 },
+            // inside
+            { { 5172.34f, 2862.58f, 435.658f, 0.f }, { 0.f, 0.f,  0.f, 1.f }, 192353, 192327 },
+            { { 5235.32f, 2924.31f, 434.898f, -1.56207f }, { 0.f, 0.f,  -0.704015f, 0.710185f }, 192357, 192329 },
+            { { 5270.55f, 2861.68f, 444.917f, -3.12412f }, { 0.f, 0.f,  -0.999962f, 0.00873622f }, 192350, 192306 },
+        }
+    },
+    // SE
+    {
+        190377,
+        {
+            // outside
+            { { 5154.42f, 2828.93f, 409.189f, 3.14159f }, { 0.f, 0.f,  1.0f, 0.00000126759f }, 192254, 192253 },
+            { { 5155.22f, 2820.63f, 444.979f, -3.11539f }, { 0.f, 0.f,  -0.999914f, 0.0131009f }, 192349, 192299 },
+            { { 5160.34f, 2798.61f, 430.769f, 3.14159f }, { 0.f, 0.f,  1.f, 0.00000126759f }, 192488, 192487 },
+            { { 5146.04f, 2747.3f, 433.527f, 3.12412f }, { 0.f, 0.f,  0.999962f, 0.00873622f }, 192488, 192487 },
+            { { 5163.85f, 2729.68f, 433.328f, -1.6057f }, { 0.f, 0.f,  -0.719339f, 0.694659f }, 192488, 192487 },
+            { { 5236.31f, 2739.22f, 444.993f, -1.6057f }, { 0.f, 0.f,  -0.719339f, 0.694659f }, 192366, 192312 },
+            // inside
+            { { 5271.16f, 2820.11f, 445.109f, -3.13286f }, { 0.f, 0.f,  -0.99999f, 0.00436634f }, 192351, 192307 },
+            { { 5237.02f, 2757.36f, 435.626f, 1.55334f }, { 0.f, 0.f,  0.700908f, 0.713252f }, 192356, 192330 },
+            { { 5173.13f, 2820.96f, 435.658f, 0.0261791f }, { 0.f, 0.f,  0.0130892f, 0.999914f }, 192352, 192328 }
+        }
+    },
+    // NE
+    {
+        190378,
+        {
+            // outside
+            { { 5271.63f, 2704.83f, 445.183f, -3.12412f }, { 0.f, 0.f,  -0.999962f, 0.00873622f }, 192367, 192313 },
+            { { 5260.82f, 2631.82f, 433.181f, 3.12412f }, { 0.f, 0.f,  0.999962f, 0.00873622f }, 192488, 192487 },
+            { { 5278.43f, 2613.83f, 433.294f, -1.62316f }, { 0.f, 0.f,  -0.725376f, 0.688353f }, 192488, 192487 },
+            { { 5350.9f, 2622.48f, 444.649f, -1.56207f }, { 0.f, 0.f,  -0.704015f, 0.710185f }, 192364, 192314 },
+            // inside
+            { { 5392.28f, 2639.84f, 435.208f, 1.52716f }, { 0.f, 0.f,  0.691512f, 0.722365f }, 192370, 192333 },
+            { { 5350.94f, 2640.43f, 435.264f, 1.56207f }, { 0.f, 0.f,  0.704015f, 0.710185f }, 192369, 192332 },
+            { { 5289.78f, 2704.62f, 435.714f, 0.00872424f }, { 0.f, 0.f,  0.00436211f, 0.99999f }, 192368, 192331 },
+            { { 5322.17f, 2763.2f, 444.974f, -1.56207f }, { 0.f, 0.f,  -0.704015f, 0.710185f }, 192362, 192334 },
+            { { 5363.72f, 2763.25f, 445.023f, -1.54462f }, { 0.f, 0.f,  -0.697792f, 0.716301f }, 192363, 192335 },
+            { { 5397.31f, 2809.26f, 455.102f, 3.13286f }, { 0.f, 0.f,  0.99999f, 0.00436634f }, 192339, 192305 },
+            { { 5363.39f, 2781.28f, 435.634f, 1.58825f }, { 0.f, 0.f,  0.713251f, 0.700909f }, 192379, 192317 },
+            { { 5322.01f, 2781.13f, 435.673f, 1.57952f }, { 0.f, 0.f,  0.710184f, 0.704016f }, 192378, 192316 },
+            { { 5289.05f, 2820.23f, 435.674f, 0.f }, { 0.f, 0.f,  0.f, 1.f }, 192355, 192320 },
+            { { 5371.45f, 2820.79f, 409.427f, 3.12412f }, { 0.f, 0.f,  0.999962f, 0.00873622f }, 192285, 192286 }
+        }
+    }
+};
 // *********************************************************
 // *****************WorkShop Data & Element*****************
 // *********************************************************
@@ -454,6 +590,8 @@ BattlefieldWG::~BattlefieldWG()
         delete building;
 
     m_CreatureMap.clear();
+    m_KeepHordeGameObjectList.clear();
+    m_KeepAllianceGameObjectList.clear();
 }
 
 bool BattlefieldWG::SetupBattlefield()
@@ -582,6 +720,7 @@ bool BattlefieldWG::SetupBattlefield()
         }
     }
 
+    InitAllGOforKeep();
     UpdateCounterVehicle(true);
     return true;
 }
@@ -622,11 +761,10 @@ void BattlefieldWG::OnBattleStart()
 
     // Rebuild all wall
     for (BfWGGameObjectBuilding* building : BuildingsInZone)
-    {
         building->Rebuild();
-    }
 
     UpdateAllGuardsAndTurretsBeforeBattle();
+    UpdateAllGOforKeep();
 
     SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF, 0);
@@ -1133,37 +1271,61 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             }
 
             // DEFENDER SIDE SECTION
-            if (creature->GetScriptName() == "wg_keep_NE_guard")
+            if (creature->GetScriptName() == "wg_ne_standing_guard")
             {
                 if (AddCreatureInHolderByGUID(creature, NE_TOWER_GUARD, TEAM_ALLIANCE))
                     registered = true;
             }
 
-            if (creature->GetScriptName() == "wg_keep_NW_guard")
+            if (creature->GetScriptName() == "wg_ne_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, NE_TOWER_GUARD, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_nw_standing_guard")
             {
                 if (AddCreatureInHolderByGUID(creature, NW_TOWER_GUARD, TEAM_ALLIANCE))
                     registered = true;
             }
 
-            if (creature->GetScriptName() == "wg_keep_SE_guard")
+            if (creature->GetScriptName() == "wg_nw_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, NW_TOWER_GUARD, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_se_standing_guard")
             {
                 if (AddCreatureInHolderByGUID(creature, SE_TOWER_GUARD, TEAM_ALLIANCE))
                     registered = true;
             }
 
-            if (creature->GetScriptName() == "wg_keep_SW_guard")
+            if (creature->GetScriptName() == "wg_se_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, SE_TOWER_GUARD, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_sw_standing_guard")
             {
                 if (AddCreatureInHolderByGUID(creature, SW_TOWER_GUARD, TEAM_ALLIANCE))
                     registered = true;
             }
 
-            if (creature->GetScriptName() == "wg_keep_fortress_gate_guard")
+            if (creature->GetScriptName() == "wg_sw_roaming_guard")
             {
-                if (AddCreatureInHolderByGUID(creature, FORTRESS_GATE_GUARD, TEAM_ALLIANCE))
+                if (AddCreatureInHolderByGUID(creature, SW_TOWER_GUARD, TEAM_ALLIANCE))
                     registered = true;
             }
 
-            if (creature->GetScriptName() == "wg_keep_fortress_guard")
+            if (creature->GetScriptName() == "wg_vault_standing_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, VAULT_GATE_GUARD, TEAM_ALLIANCE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_vault_roaming_guard")
             {
                 if (AddCreatureInHolderByGUID(creature, VAULT_GATE_GUARD, TEAM_ALLIANCE))
                     registered = true;
@@ -1307,37 +1469,61 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             }
 
             // DEFENDER SIDE SECTION
-            if (creature->GetScriptName() == "wg_keep_NE_guard")
+            if (creature->GetScriptName() == "wg_ne_standing_guard")
             {
                 if (AddCreatureInHolderByGUID(creature, NE_TOWER_GUARD, TEAM_HORDE))
                     registered = true;
             }
 
-            if (creature->GetScriptName() == "wg_keep_NW_guard")
+            if (creature->GetScriptName() == "wg_ne_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, NE_TOWER_GUARD, TEAM_HORDE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_nw_standing_guard")
             {
                 if (AddCreatureInHolderByGUID(creature, NW_TOWER_GUARD, TEAM_HORDE))
                     registered = true;
             }
 
-            if (creature->GetScriptName() == "wg_keep_SE_guard")
+            if (creature->GetScriptName() == "wg_nw_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, NW_TOWER_GUARD, TEAM_HORDE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_se_standing_guard")
             {
                 if (AddCreatureInHolderByGUID(creature, SE_TOWER_GUARD, TEAM_HORDE))
                     registered = true;
             }
 
-            if (creature->GetScriptName() == "wg_keep_SW_guard")
+            if (creature->GetScriptName() == "wg_se_roaming_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, SE_TOWER_GUARD, TEAM_HORDE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_sw_standing_guard")
             {
                 if (AddCreatureInHolderByGUID(creature, SW_TOWER_GUARD, TEAM_HORDE))
                     registered = true;
             }
 
-            if (creature->GetScriptName() == "wg_keep_fortress_gate_guard")
+            if (creature->GetScriptName() == "wg_sw_roaming_guard")
             {
-                if (AddCreatureInHolderByGUID(creature, FORTRESS_GATE_GUARD, TEAM_HORDE))
+                if (AddCreatureInHolderByGUID(creature, SW_TOWER_GUARD, TEAM_HORDE))
                     registered = true;
             }
 
-            if (creature->GetScriptName() == "wg_keep_fortress_guard")
+            if (creature->GetScriptName() == "wg_vault_standing_guard")
+            {
+                if (AddCreatureInHolderByGUID(creature, VAULT_GATE_GUARD, TEAM_HORDE))
+                    registered = true;
+            }
+
+            if (creature->GetScriptName() == "wg_vault_roaming_guard")
             {
                 if (AddCreatureInHolderByGUID(creature, VAULT_GATE_GUARD, TEAM_HORDE))
                     registered = true;
@@ -1978,7 +2164,10 @@ void BattlefieldWG::UpdateStatusForCreature(Creature* creature, uint8 npcType)
                     if (!building->IsAlive())
                         HideNpc(creature);
                     else
+                    {
                         creature->SetFaction(WintergraspFaction[building->GetTeamController()]);
+                        ShowNpc(creature, true);
+                    }
                 }
             }
             break;
@@ -2004,7 +2193,6 @@ void BattlefieldWG::UpdateStatusForCreature(Creature* creature, uint8 npcType)
         case NW_TOWER_GUARD:
         case SE_TOWER_GUARD:
         case SW_TOWER_GUARD:
-        case FORTRESS_GATE_GUARD:
         case VAULT_GATE_GUARD:        
         {
             for (BfWGGameObjectBuilding* building : BuildingsInZone)
@@ -2157,11 +2345,79 @@ void BattlefieldWG::UpdateAllGuardsAndTurretsBeforeBattle()
     ShowCreatureByNPCType(WG_WORKSHOP_NW, GetDefenderTeam()); // workshop on north should be owned by defender team by default
     HideCreatureByNPCType(WG_WORKSHOP_NW, GetAttackerTeam());
 
+    // KEEP
     ShowCreatureByNPCType(WG_WORKSHOP_KEEP_WEST, GetDefenderTeam());
     HideCreatureByNPCType(WG_WORKSHOP_KEEP_WEST, GetAttackerTeam());
 
     ShowCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, GetDefenderTeam());
     HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, GetAttackerTeam());
+    
+    ShowCreatureByNPCType(NE_TOWER_GUARD, GetDefenderTeam());
+    HideCreatureByNPCType(NE_TOWER_GUARD, GetAttackerTeam());
+
+    ShowCreatureByNPCType(NW_TOWER_GUARD, GetDefenderTeam());
+    HideCreatureByNPCType(NW_TOWER_GUARD, GetAttackerTeam());
+
+    ShowCreatureByNPCType(SE_TOWER_GUARD, GetDefenderTeam());
+    HideCreatureByNPCType(SE_TOWER_GUARD, GetAttackerTeam());
+
+    ShowCreatureByNPCType(SW_TOWER_GUARD, GetDefenderTeam());
+    HideCreatureByNPCType(SW_TOWER_GUARD, GetAttackerTeam());
+
+    ShowCreatureByNPCType(VAULT_GATE_GUARD, GetDefenderTeam());
+    HideCreatureByNPCType(VAULT_GATE_GUARD, GetAttackerTeam());
+    // turrets
+    UpdateCreatureTurretByNPCType(FORTRESS_GATE_TURRET, GetDefenderTeam());
+    UpdateCreatureTurretByNPCType(VAULT_GATE_TURRET, GetDefenderTeam());
+    UpdateCreatureTurretByNPCType(NE_TOWER_TURRET, GetDefenderTeam());
+    UpdateCreatureTurretByNPCType(NW_TOWER_TURRET, GetDefenderTeam());
+    UpdateCreatureTurretByNPCType(SE_TOWER_TURRET, GetDefenderTeam());
+    UpdateCreatureTurretByNPCType(SW_TOWER_TURRET, GetDefenderTeam());
+}
+
+void BattlefieldWG::InitAllGOforKeep()
+{
+    // Spawn associate gameobjects
+    // In this case we keep GO for horde and alliance by separataly (because count of GO for 1 faction != count for another)
+    // for horde
+    for (int8 i = 0; i < WG_MAX_KEEPGO_HORDE; i++)
+    {
+        if (GameObject* go = SpawnGameObject(WGKeepHordeData[i].entry, WGKeepHordeData[i].Pos, WGKeepHordeData[i].Rot))
+            m_KeepHordeGameObjectList.push_back(go->GetGUID());
+    }
+
+    // for alliance
+    for (int8 i = 0; i < WG_MAX_KEEPGO_ALLIANCE; i++)
+    {
+        if (GameObject* go = SpawnGameObject(WGKeepAllianceData[i].entry, WGKeepAllianceData[i].Pos, WGKeepAllianceData[i].Rot))
+            m_KeepAllianceGameObjectList.push_back(go->GetGUID());
+    }
+
+    UpdateAllGOforKeep();
+}
+
+void BattlefieldWG::UpdateAllGOforKeep()
+{
+    if (GetDefenderTeam() == TEAM_HORDE)
+    {
+        for (ObjectGuid guid : m_KeepAllianceGameObjectList)
+            if (GameObject* go = GetGameObject(guid))
+                go->SetRespawnTime(RESPAWN_ONE_DAY);
+
+        for (ObjectGuid guid : m_KeepHordeGameObjectList)
+            if (GameObject* go = GetGameObject(guid))
+                go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+    }
+    else
+    {
+        for (ObjectGuid guid : m_KeepHordeGameObjectList)
+            if (GameObject* go = GetGameObject(guid))
+                go->SetRespawnTime(RESPAWN_ONE_DAY);
+
+        for (ObjectGuid guid : m_KeepAllianceGameObjectList)
+            if (GameObject* go = GetGameObject(guid))
+                go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+    }
 }
 
 WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl) : BfCapturePoint(battlefield)
@@ -2416,7 +2672,7 @@ void BfWGGameObjectBuilding::Init(GameObject* go)
 
     if (towerId >= BATTLEFIELD_WG_TOWER_SHADOWSIGHT) // Attacker towers
     {
-        // Spawn associate gameobjects
+        // Spawn associate gameobjects        
         for (WintergraspGameObjectData const& gobData : AttackTowers[towerId - 4].GameObject)
         {
             if (GameObject* goHorde = _wg->SpawnGameObject(gobData.HordeEntry, gobData.Pos, gobData.Rot))
@@ -2426,6 +2682,18 @@ void BfWGGameObjectBuilding::Init(GameObject* go)
                 m_GameObjectList[TEAM_ALLIANCE].push_back(goAlliance->GetGUID());
         }
     }
+    else if (towerId != -1) // 0 - 3
+    {
+        // Spawn associate gameobjects
+        for (WintergraspGameObjectData const& gobData : DefenseTowers[towerId].GameObject)
+        {
+            if (GameObject* goHorde = _wg->SpawnGameObject(gobData.HordeEntry, gobData.Pos, gobData.Rot))
+                m_GameObjectList[TEAM_HORDE].push_back(goHorde->GetGUID());
+
+            if (GameObject* goAlliance = _wg->SpawnGameObject(gobData.AllianceEntry, gobData.Pos, gobData.Rot))
+                m_GameObjectList[TEAM_ALLIANCE].push_back(goAlliance->GetGUID());
+        }
+    }    
 
     if (towerId >= 0)
     {
@@ -2437,15 +2705,32 @@ void BfWGGameObjectBuilding::Init(GameObject* go)
 
 void BfWGGameObjectBuilding::UpdateGo()
 {
-    if (!m_GameObjectList[_wg->GetDefenderTeam()].empty())
-        for (ObjectGuid guid : m_GameObjectList[_wg->GetDefenderTeam()])
-            if (GameObject* go = _wg->GetGameObject(guid))
-                go->SetRespawnTime(RESPAWN_ONE_DAY);
+    if (_staticTowerInfo && _staticTowerInfo->TowerId < BATTLEFIELD_WG_TOWER_SHADOWSIGHT)
+    {
+        // for defense towers we should hide attackerteam and set visible defense team
+        if (!m_GameObjectList[_wg->GetAttackerTeam()].empty())
+            for (ObjectGuid guid : m_GameObjectList[_wg->GetAttackerTeam()])
+                if (GameObject* go = _wg->GetGameObject(guid))
+                    go->SetRespawnTime(RESPAWN_ONE_DAY);
 
-    if (!m_GameObjectList[_wg->GetAttackerTeam()].empty())
-        for (ObjectGuid guid : m_GameObjectList[_wg->GetAttackerTeam()])
-            if (GameObject* go = _wg->GetGameObject(guid))
-                go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+        if (!m_GameObjectList[_wg->GetDefenderTeam()].empty())
+            for (ObjectGuid guid : m_GameObjectList[_wg->GetDefenderTeam()])
+                if (GameObject* go = _wg->GetGameObject(guid))
+                    go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+    }
+    else
+    {
+        // for all others hide defesnse and set visible attacker
+        if (!m_GameObjectList[_wg->GetDefenderTeam()].empty())
+            for (ObjectGuid guid : m_GameObjectList[_wg->GetDefenderTeam()])
+                if (GameObject* go = _wg->GetGameObject(guid))
+                    go->SetRespawnTime(RESPAWN_ONE_DAY);
+
+        if (!m_GameObjectList[_wg->GetAttackerTeam()].empty())
+            for (ObjectGuid guid : m_GameObjectList[_wg->GetAttackerTeam()])
+                if (GameObject* go = _wg->GetGameObject(guid))
+                    go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+    }
 }
 
 void BfWGGameObjectBuilding::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
