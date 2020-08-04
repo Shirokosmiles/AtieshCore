@@ -4278,8 +4278,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         72452  // Defiling Horror
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_60_YARDS); // 60yd
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_60_YARDS); // 60yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_60_YARDS); // 60yd
     });
 
     // Achievement Check
@@ -4363,8 +4362,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         72769  // Scent of Blood (Deathbringer Saurfang)
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS);
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS);
     });
 
     // Scent of Blood (Deathbringer Saurfang)
@@ -4539,15 +4537,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Defile
     ApplySpellFix({ 72754, 73708, 73709, 73710 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
     });
 
     // Val'kyr Target Search
     ApplySpellFix({ 69030 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
         spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
     });
 
@@ -4630,8 +4626,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Fury of Frostmourne
     ApplySpellFix({ 72350 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
     });
 
     ApplySpellFix(

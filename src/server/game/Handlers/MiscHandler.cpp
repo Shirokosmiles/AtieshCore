@@ -1347,7 +1347,7 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recvData)
                 if (!groupGuy)
                     continue;
 
-                if (!groupGuy->IsInMap(groupGuy))
+                if (!groupGuy->IsInWorld())
                     return;
 
                 if (groupGuy->GetMap()->IsNonRaidDungeon())
@@ -1405,7 +1405,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recvData)
                 if (!groupGuy)
                     continue;
 
-                if (!groupGuy->IsInMap(groupGuy))
+                if (!groupGuy->IsInWorld())
                     return;
 
                 if (groupGuy->GetMap()->IsRaid())
