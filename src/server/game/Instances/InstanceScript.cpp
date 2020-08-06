@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceCharMgr.h"
 #include "InstanceScript.h"
 #include "AreaBoundary.h"
 #include "Creature.h"
@@ -358,10 +359,23 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
             }
 
             if (state == DONE)
+            {
                 for (GuidSet::iterator i = bossInfo->minion.begin(); i != bossInfo->minion.end(); ++i)
                     if (Creature* minion = instance->GetCreature(*i))
                         if (minion->isWorldBoss() && minion->IsAlive())
                             return false;
+
+                Map::PlayerList const& lPlayers = instance->GetPlayers();
+                std::list<ObjectGuid::LowType> playerIDs;
+                if (!lPlayers.isEmpty())
+                {
+                    for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                        if (Player* player = itr->GetSource())
+                            playerIDs.push_back(player->GetGUID().GetCounter());
+                }
+                sInstanceCharMgr->HandleDoneEncounterInInstance(playerIDs, instance->GetId(), instance->GetDifficulty(), id, 1);
+                playerIDs.clear();
+            }
 
             bossInfo->state = state;
             SaveToDB();

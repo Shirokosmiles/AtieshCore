@@ -27,6 +27,7 @@
 #include "GridNotifiersImpl.h"
 #include "GridStates.h"
 #include "Group.h"
+#include "InstanceCharMgr.h"
 #include "InstanceScript.h"
 #include "Log.h"
 #include "MapInstanced.h"
@@ -3918,6 +3919,9 @@ bool InstanceMap::AddPlayerToMap(Player* player)
                         ASSERT(playerBind->save == mapSave);
                 }
             }
+
+            // init char instance history
+            sInstanceCharMgr->HandlePlayerEnterInInstance(player, GetId(), Difficulty(GetSpawnMode()));
         }
 
         // for normal instances cancel the reset schedule when the

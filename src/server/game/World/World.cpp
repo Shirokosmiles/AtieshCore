@@ -49,6 +49,7 @@
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
+#include "InstanceCharMgr.h"
 #include "InstanceSaveMgr.h"
 #include "IPLocation.h"
 #include "Language.h"
@@ -2301,6 +2302,10 @@ void World::SetInitialWorldSettings()
     ///- Initialize Special Events
     TC_LOG_INFO("server.loading", "Starting SpecialEvents System");
     sSpecialEventMgr->InitSpecialEvents();
+
+    ///- Initialize Special Events
+    TC_LOG_INFO("server.loading", "Starting Instance Character manager history System");
+    sInstanceCharMgr->Initialize();
 
     ///- Initialize Mails
     TC_LOG_INFO("server.loading", "Starting Mail System");

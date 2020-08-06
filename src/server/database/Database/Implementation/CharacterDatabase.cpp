@@ -272,6 +272,10 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     // Instance saves
     PrepareStatement(CHAR_INS_INSTANCE_SAVE, "INSERT INTO instance (id, map, resettime, difficulty, completedEncounters, completedEncountersCount, data) VALUES (?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_INSTANCE_DATA, "UPDATE instance SET completedEncounters=?, completedEncountersCount=?, data=? WHERE id=?", CONNECTION_ASYNC);
+    // Instance WEB saves
+    PrepareStatement(CHAR_INS_INSTANCE_WEB_SAVE, "INSERT INTO character_instance_completed (guid, map, difficulty, data) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UPD_INSTANCE_WEB_DATA, "UPDATE character_instance_completed SET data=? WHERE guid=?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_INSTANCE_WEB_DATA, "DELETE FROM character_instance_completed WHERE guid = ?", CONNECTION_ASYNC);
 
     // Game event saves
     PrepareStatement(CHAR_DEL_GAME_EVENT_SAVE, "DELETE FROM game_event_save WHERE eventEntry = ?", CONNECTION_ASYNC);
