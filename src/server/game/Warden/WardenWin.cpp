@@ -400,7 +400,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
                     continue;
                 }
 
-                std::vector<uint8> result = rs->Result.ToByteVector();
+                std::vector<uint8> result = rs->Result.ToByteVector(0, false);
                 if (memcmp(buff.contents() + buff.rpos(), result.data(), rd->Length) != 0)
                 {
                     TC_LOG_WARN("warden", "RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
