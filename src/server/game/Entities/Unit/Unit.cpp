@@ -389,6 +389,7 @@ Unit::Unit(bool isWorldObject) :
     _instantCast = false;
     _isJumping = false;
     _isCharging = false;
+    _isIgnoringCombat = false;
 }
 
 ////////////////////////////////////////////////////////////

@@ -1728,6 +1728,11 @@ class TC_GAME_API Unit : public WorldObject
 
         float GetCollisionHeight() const override;
 
+        // returns if the unit is ignoring any combat interaction
+        bool IsIgnoringCombat() const { return _isIgnoringCombat; }
+        // enables/disables combat interaction of this unit.
+        void SetIgnoringCombat(bool apply) { _isIgnoringCombat = apply; }
+
         std::string GetDebugInfo() const override;
 
         void SetNeedToDismountAfterRoots() { needtodismount = true; }
@@ -1885,6 +1890,8 @@ class TC_GAME_API Unit : public WorldObject
         bool needtodismount;
 
         PositionUpdateInfo _positionUpdateInfo;
+
+        bool _isIgnoringCombat;
 };
 
 namespace Trinity
