@@ -122,6 +122,9 @@ bool Player::CheckOnFlyHack()
     }
     else
     {
+        if (HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+            return true;
+
         float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz + GetCollisionHeight() + 0.5f, true, 50.0f); // smart flyhacks -> SimpleFly
         float diff = pz - z;
         if (diff > 6.8f)

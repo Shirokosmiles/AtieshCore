@@ -39,19 +39,20 @@ typedef std::unordered_map<uint32, PlayersData> PlayersDataContainer;
 enum TheLightOfDawnPhase
 {
     PHASE_IDLE  = 1,
-    PHASE_START = 2
+    PHASE_INTRO = 2,
+    PHASE_FIGHT = 3,
+    PHASE_OUTRO = 4,
 };
 
 enum TheLightOfDawnEncounters
 {
     // Light
     ENCOUNTER_DEFENDER_NUMBER         = 30, // how many of defender
-    ENCOUNTER_EARTHSHATTER_NUMBER     = 20, // how many of earthshatter
     // Scourge
-    ENCOUNTER_ABOMINATION_NUMBER      = 13, // how many of abomination
-    ENCOUNTER_BEHEMOTH_NUMBER         = 7,  // how many of behemoth
+    ENCOUNTER_ABOMINATION_NUMBER      = 10, // how many of abomination
+    ENCOUNTER_BEHEMOTH_NUMBER         = 3,  // how many of behemoth
     ENCOUNTER_GHOUL_NUMBER            = 60, // how many of ghoul
-    ENCOUNTER_WARRIOR_NUMBER          = 12, // how many of warrior
+    ENCOUNTER_WARRIOR_NUMBER          = 25, // how many of warrior
 };
 
 class TC_GAME_API TheLightOfDawnEvent : public SpecialEvent
@@ -102,6 +103,14 @@ public:
     GameObject* GetGameObject(ObjectGuid guid);
 
     void OnCreatureCreate(Creature* creature) override;
+    void OnUnitDeath(Unit* unit) override;
+
+    void SummonAbomination();
+    void SummonBehemoth();
+    void SummonGhoul();
+    void SummonWarriorOfFrozenWastes();
+
+    void SummonDawnDefender();
 
 private:
     TheLightOfDawnPhase phaseStage;
@@ -125,11 +134,11 @@ private:
     ObjectGuid KorfaxGUID;
     ObjectGuid MaxwellGUID;
     ObjectGuid EligorGUID;
+    ObjectGuid LeonidGUID;
     ObjectGuid RayneGUID;
-    ObjectGuid DefenderGUID[ENCOUNTER_DEFENDER_NUMBER];
-    ObjectGuid EarthshatterGUID[ENCOUNTER_EARTHSHATTER_NUMBER];
-    uint32 DefendersCount;
-    uint32 EarthshattersCount;
+    ObjectGuid ZverenhoffGUID;
+    ObjectGuid RimblatGUID;
+    GuidUnorderedSet DefenderGUID;    //ENCOUNTER_DEFENDER_NUMBER
 
     // Scourge
     ObjectGuid Darion_Mograine;
@@ -137,14 +146,11 @@ private:
     ObjectGuid OrbazGUID;
     ObjectGuid ThassarianGUID;
     ObjectGuid LichKingGUID;
-    ObjectGuid AbominationGUID[ENCOUNTER_ABOMINATION_NUMBER];
-    ObjectGuid BehemothGUID[ENCOUNTER_BEHEMOTH_NUMBER];
-    ObjectGuid GhoulGUID[ENCOUNTER_GHOUL_NUMBER];
-    ObjectGuid WarriorGUID[ENCOUNTER_WARRIOR_NUMBER];
-    uint32 AbominationsCount;
-    uint32 BehemothsCount;
-    uint32 GhoulsCount;
-    uint32 WarriorsCount;
+
+    GuidUnorderedSet AbominationGUID; //ENCOUNTER_ABOMINATION_NUMBER
+    GuidUnorderedSet BehemothGUID;    //ENCOUNTER_BEHEMOTH_NUMBER
+    GuidUnorderedSet GhoulGUID;       //ENCOUNTER_GHOUL_NUMBER
+    GuidUnorderedSet WarriorGUID;     //ENCOUNTER_WARRIOR_NUMBER
 };
 
 #endif // _TLODEVENT_H

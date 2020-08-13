@@ -17,6 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "GameObject.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Map.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
@@ -141,9 +143,358 @@ class spell_teleport_leaders_blessing : public SpellScript
     }
 };
 
+enum ScorgeSpells
+{
+    // ABOMINATION
+    SPELL_ABOMINATION_CLEAVE = 53633,
+    SPELL_ABOMINATION_HOOK   = 50335,
+
+    // GHOUL
+    SPELL_GHOUL_GHOULPLOSION = 53632,
+
+    // Warrior of frozen wastes
+    SPELL_WARRIOR_CLEAVE     = 53631,
+
+    // Behemoth
+    SPELL_BEHEMOTH_THUNDER   = 36706,
+    SPELL_BEHEMOTH_STOMP     = 53634
+};
+
+uint32 GetScorgeTargetEntry()
+{
+    uint32 targetEntry[8] = { 29174, // NPC_DEFENDER_OF_THE_LIGHT
+        29176,                      // NPC_KORFAX_CHAMPION_OF_THE_LIGHT
+        29177,                      // NPC_COMMANDER_ELIGOR_DAWNBRINGER
+        29178,                      // NPC_LORD_MAXWELL_TYROSUS
+        29179,                      // NPC_LEONID_BARTHALOMEW_THE_REVERED
+        29180,                      // NPC_DUKE_NICHOLAS_ZVERENHOFF
+        29181,                      // NPC_RAYNE
+        29182 };                    // NPC_RIMBLAT_EARTHSHATTER
+
+    return targetEntry[urand(0, 7)];
+}
+
+Unit* GetVictimInDistance(Unit* owner, float mindistance, float maxdistance)
+{
+    Unit* victim = nullptr;
+
+    std::list<Unit*> targets;
+    Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(owner, owner, maxdistance);
+    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(owner, targets, u_check);
+    Cell::VisitAllObjects(owner, searcher, maxdistance);
+    if (!targets.empty())
+    {
+        Position ownerpos = owner->GetPosition();
+        for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+            if ((*iter)->GetDistance(ownerpos) >= mindistance &&
+                (*iter)->GetDistance(ownerpos) <= maxdistance)
+            {
+                victim = (*iter);
+                break;
+            }
+    }
+
+    return victim;
+}
+
+enum AbominationEvent
+{
+    EVENT_CLEAVE = 1,
+    EVENT_HOOK   = 2
+};
+
+class npc_scorge_abomination : public CreatureScript
+{
+public:
+    npc_scorge_abomination() : CreatureScript("npc_scorge_abomination") { }
+
+    struct npc_scorge_abominationAI : public ScriptedAI
+    {
+        npc_scorge_abominationAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+            events.Reset();
+        }
+
+        void Reset() override
+        {
+            events.Reset();            
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            events.ScheduleEvent(EVENT_HOOK, 0s);
+            events.ScheduleEvent(EVENT_CLEAVE, 4s);
+        }
+
+        void EnterEvadeMode(EvadeReason why) override {}
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!me || !me->IsAlive())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_HOOK:
+                        if (Unit* victim = GetVictimInDistance(me, 8.f, 40.f))
+                            DoCast(victim, SPELL_ABOMINATION_HOOK);
+                        events.ScheduleEvent(SPELL_ABOMINATION_HOOK, 10s);
+                        break;
+                    case EVENT_CLEAVE:
+                        if (Unit* victim = GetVictimInDistance(me, 0.f, 5.f))
+                            DoCast(victim, SPELL_ABOMINATION_CLEAVE);
+                        events.ScheduleEvent(EVENT_CLEAVE, 10s);
+                        break;
+                }
+            }
+
+            if (UpdateVictim())
+                DoMeleeAttackIfReady();
+            else
+            {
+                if (Creature* target = me->FindNearestCreature(GetScorgeTargetEntry(), 40.0f))
+                    AttackStart(target);
+            }
+        }
+    private:
+        EventMap events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_scorge_abominationAI(creature);
+    }
+};
+
+enum GhoulEvent
+{
+    EVENT_KABOOM = 1
+};
+
+class npc_scorge_ghoul : public CreatureScript
+{
+public:
+    npc_scorge_ghoul() : CreatureScript("npc_scorge_ghoul") { }
+
+    struct npc_scorge_ghoulAI : public ScriptedAI
+    {
+        npc_scorge_ghoulAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+            events.Reset();
+        }
+
+        void Reset() override
+        {
+            events.Reset();
+        }
+
+        void EnterEvadeMode(EvadeReason why) override {}
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            events.ScheduleEvent(EVENT_KABOOM, randtime(10s, 20s));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!me || !me->IsAlive())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_KABOOM:
+                        if (Unit* victim = GetVictimInDistance(me, 0.f, 5.f))
+                            DoCast(victim, SPELL_GHOUL_GHOULPLOSION);
+                        events.ScheduleEvent(EVENT_KABOOM, 10s);
+                        break;
+                }
+            }
+
+            if (UpdateVictim())
+                DoMeleeAttackIfReady();
+            else
+            {
+                if (Creature* target = me->FindNearestCreature(GetScorgeTargetEntry(), 15.0f))
+                    AttackStart(target);
+            }
+        }
+    private:
+        EventMap events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_scorge_ghoulAI(creature);
+    }
+};
+
+enum WarriorEvent
+{
+    EVENT_WARRIOR_CLEAVE = 1
+};
+
+class npc_scorge_warrior_of_frozen_wastes : public CreatureScript
+{
+public:
+    npc_scorge_warrior_of_frozen_wastes() : CreatureScript("npc_scorge_warrior_of_frozen_wastes") { }
+
+    struct npc_scorge_warrior_of_frozen_wastesAI : public ScriptedAI
+    {
+        npc_scorge_warrior_of_frozen_wastesAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+            events.Reset();
+        }
+
+        void Reset() override
+        {
+            events.Reset();
+        }
+
+        void EnterEvadeMode(EvadeReason why) override {}
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            events.ScheduleEvent(EVENT_WARRIOR_CLEAVE, 5s);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!me || !me->IsAlive())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_WARRIOR_CLEAVE:
+                        DoCastVictim(SPELL_WARRIOR_CLEAVE);
+                        events.ScheduleEvent(EVENT_WARRIOR_CLEAVE, 10s);
+                        break;
+                }
+            }
+
+            if (UpdateVictim())
+                DoMeleeAttackIfReady();
+            else
+            {
+                if (Creature* target = me->FindNearestCreature(GetScorgeTargetEntry(), 15.0f))
+                    AttackStart(target);
+            }
+        }
+    private:
+        EventMap events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_scorge_warrior_of_frozen_wastesAI(creature);
+    }
+};
+
+enum BehemothEvent
+{
+    EVENT_BEHEMOTH_THUNDER = 1,
+    EVENT_BEHEMOTH_STOMP   = 2
+};
+
+class npc_scorge_behemoth : public CreatureScript
+{
+public:
+    npc_scorge_behemoth() : CreatureScript("npc_scorge_behemoth") { }
+
+    struct npc_scorge_behemothAI : public ScriptedAI
+    {
+        npc_scorge_behemothAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+            events.Reset();
+        }
+
+        void Reset() override
+        {
+            events.Reset();
+        }
+
+        void EnterEvadeMode(EvadeReason why) override {}
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            events.ScheduleEvent(EVENT_BEHEMOTH_THUNDER, 3s);
+            events.ScheduleEvent(EVENT_BEHEMOTH_STOMP, 7s);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!me || !me->IsAlive())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_BEHEMOTH_THUNDER:
+                        DoCastVictim(SPELL_BEHEMOTH_THUNDER);
+                        events.ScheduleEvent(EVENT_BEHEMOTH_THUNDER, 10s);
+                        break;
+                    case EVENT_BEHEMOTH_STOMP:
+                        DoCastVictim(SPELL_BEHEMOTH_STOMP);
+                        events.ScheduleEvent(EVENT_BEHEMOTH_STOMP, randtime(10s, 20s));
+                        break;
+                }
+            }
+
+            if (UpdateVictim())
+                DoMeleeAttackIfReady();
+            else
+            {
+                if (Creature* target = me->FindNearestCreature(GetScorgeTargetEntry(), 10.0f))
+                    AttackStart(target);
+            }
+        }
+    private:
+        EventMap events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_scorge_behemothAI(creature);
+    }
+};
+
 void AddSC_the_scarlet_enclave_c5()
 {
     new npc_highlord_darion_mograine();
     new npc_the_lich_king_tirion_dawn();
+    new npc_scorge_abomination();
+    new npc_scorge_ghoul();
+    new npc_scorge_warrior_of_frozen_wastes();
+    new npc_scorge_behemoth();
     RegisterSpellScript(spell_teleport_leaders_blessing);
 }
