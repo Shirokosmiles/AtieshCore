@@ -21,11 +21,8 @@
 #include "ARC4.h"
 #include "AuthDefines.h"
 #include "ByteBuffer.h"
+#include "Optional.h"
 #include "WardenCheckMgr.h"
-#include "Database/DatabaseEnv.h"
-
-// the default client version with info in warden_checks; for other version checks, see warden_build_specific
-#define DEFAULT_CLIENT_BUILD  12340
 #include <array>
 
 enum WardenOpcodes
@@ -47,28 +44,16 @@ enum WardenOpcodes
     WARDEN_SMSG_HASH_REQUEST                    = 5
 };
 
-enum WardenCheckType
-{
-    MEM_CHECK               = 0xF3, // 243: byte moduleNameIndex + uint Offset + byte Len (check to ensure memory isn't modified)
-    PAGE_CHECK_A            = 0xB2, // 178: uint Seed + byte[20] SHA1 + uint Addr + byte Len (scans all pages for specified hash)
-    PAGE_CHECK_B            = 0xBF, // 191: uint Seed + byte[20] SHA1 + uint Addr + byte Len (scans only pages starts with MZ+PE headers for specified hash)
-    MPQ_CHECK               = 0x98, // 152: byte fileNameIndex (check to ensure MPQ file isn't modified)
-    LUA_STR_CHECK           = 0x8B, // 139: byte luaNameIndex (check to ensure LUA string isn't used)
-    DRIVER_CHECK            = 0x71, // 113: uint Seed + byte[20] SHA1 + byte driverNameIndex (check to ensure driver isn't loaded)
-    TIMING_CHECK            = 0x57, //  87: empty (check to ensure GetTickCount() isn't detoured)
-    PROC_CHECK              = 0x7E, // 126: uint Seed + byte[20] SHA1 + byte moluleNameIndex + byte procNameIndex + uint Offset + byte Len (check to ensure proc isn't detoured)
-    MODULE_CHECK            = 0xD9  // 217: uint Seed + byte[20] SHA1 (check to ensure module isn't injected)
-};
-
 #pragma pack(push, 1)
 
 struct WardenModuleUse
 {
     uint8 Command;
-    uint8 ModuleId[16];
-    uint8 ModuleKey[16];
+    std::array<uint8, 16> ModuleId;
+    std::array<uint8, 16> ModuleKey;
     uint32 Size;
 };
+static_assert(sizeof(WardenModuleUse) == (1 + 16 + 16 + 4));
 
 struct WardenModuleTransfer
 {
@@ -76,57 +61,23 @@ struct WardenModuleTransfer
     uint16 DataSize;
     uint8 Data[500];
 };
+static_assert(sizeof(WardenModuleTransfer) == (1 + 2 + 500));
 
 struct WardenHashRequest
 {
     uint8 Command;
-    uint8 Seed[16];
+    std::array<uint8, 16> Seed;
 };
-
-namespace WardenState
-{
-    enum Value
-    {
-        STATE_INITIAL,
-        STATE_REQUESTED_MODULE,
-        STATE_SENT_MODULE,
-        STATE_REQUESTED_HASH,
-        STATE_INITIALIZE_MODULE,
-        STATE_REQUESTED_DATA,
-        STATE_RESTING
-    };
-
-    inline const char* to_string(WardenState::Value value)
-    {
-        switch (value)
-        {
-            case WardenState::STATE_INITIAL:
-                return "STATE_INITIAL";
-            case WardenState::STATE_REQUESTED_MODULE:
-                return "STATE_REQUESTED_MODULE";
-            case WardenState::STATE_SENT_MODULE:
-                return "STATE_SENT_MODULE";
-            case WardenState::STATE_REQUESTED_HASH:
-                return "STATE_REQUESTED_HASH";
-            case WardenState::STATE_INITIALIZE_MODULE:
-                return "STATE_INITIALIZE_MODULE";
-            case WardenState::STATE_REQUESTED_DATA:
-                return "STATE_REQUESTED_DATA";
-            case WardenState::STATE_RESTING:
-                return "STATE_RESTING";
-        }
-        return "UNDEFINED STATE";
-    }
-};
+static_assert(sizeof(WardenHashRequest) == (1 + 16));
 
 #pragma pack(pop)
 
 struct ClientWardenModule
 {
-    uint8 Id[16];
-    uint8 Key[16];
-    uint32 CompressedSize;
-    uint8* CompressedData;
+    std::array<uint8, 16> Id;
+    std::array<uint8, 16> Key;
+    uint8 const* CompressedData;
+    size_t CompressedSize;
 };
 
 class WorldSession;
@@ -138,41 +89,41 @@ class TC_GAME_API Warden
         virtual ~Warden();
 
         virtual void Init(WorldSession* session, SessionKey const& K) = 0;
-        virtual ClientWardenModule* GetModuleForClient() = 0;
-        virtual void InitializeModule();
-        virtual void RequestHash();
-        virtual void HandleHashResult(ByteBuffer &buff) = 0;
-        virtual void RequestData();
-        virtual void HandleData(ByteBuffer &buff);
+        void Update(uint32 diff);
+        void HandleData(ByteBuffer& buff);
 
-        void SendModuleToClient();
-        void RequestModule();
-        void Update();
+    protected:
         void DecryptData(uint8* buffer, uint32 length);
         void EncryptData(uint8* buffer, uint32 length);
 
-    void SetNewState(WardenState::Value state);
+        virtual void InitializeModule() = 0;
+        virtual void RequestHash() = 0;
+        virtual void HandleHashResult(ByteBuffer& buff) = 0;
+        virtual void HandleCheckResult(ByteBuffer& buff) = 0;
+        virtual void InitializeModuleForClient(ClientWardenModule& module) = 0;
+        virtual void RequestChecks() = 0;
+
+        void MakeModuleForClient();
+        void SendModuleToClient();
+        void RequestModule();
 
         static bool IsValidCheckSum(uint32 checksum, const uint8 *data, const uint16 length);
         static uint32 BuildChecksum(const uint8 *data, uint32 length);
 
-        // If no check is passed, the default action from config is executed
-        std::string Penalty(WardenCheck* check = nullptr);
-
-    protected:
-        void LogPositiveToDB(WardenCheck* check);
+        // If nullptr is passed, the default action from config is executed
+        char const* ApplyPenalty(WardenCheck const* check);
 
         WorldSession* _session;
-        uint8 _inputKey[16];
-        uint8 _outputKey[16];
-        uint8 _seed[16];
+        std::array<uint8, 16> _inputKey = {};
+        std::array<uint8, 16> _outputKey = {};
+        std::array<uint8, 16> _seed = {};
         Trinity::Crypto::ARC4 _inputCrypto;
         Trinity::Crypto::ARC4 _outputCrypto;
         uint32 _checkTimer;                          // Timer for sending check requests
         uint32 _clientResponseTimer;                 // Timer for client response delay
-        uint32 _previousTimestamp;
-        ClientWardenModule* _module;
-        WardenState::Value _state;
+        bool _dataSent;
+        Optional<ClientWardenModule> _module;
+        bool _initialized;
 };
 
 #endif
