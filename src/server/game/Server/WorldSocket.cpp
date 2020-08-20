@@ -597,7 +597,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     // Initialize Warden system only if it is enabled by config
     bool wardenActive = sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED);
     if (wardenActive)
-        _worldSession->InitWarden(account.SessionKey, uint16(authSession->Build), account.OS);
+        _worldSession->InitWarden(account.SessionKey, account.OS);
 
     _queryProcessor.AddCallback(_worldSession->LoadPermissionsAsync().WithPreparedCallback(std::bind(&WorldSocket::LoadSessionPermissionsCallback, this, std::placeholders::_1)));
     AsyncRead();
