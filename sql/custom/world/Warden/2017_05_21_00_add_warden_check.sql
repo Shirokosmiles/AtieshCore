@@ -804,11 +804,13 @@ INSERT INTO `warden` VALUES
 (784, 12340, 243, '', '', 8054762, 2, '7506', 'Collision WMD'),
 (785, 12340, 243, '', '', 9995315, 5, '75440FB75E', 'Multi-Jump Patch'),
 (786, 12340, 217, '', 'WPESPY.DLL', 0, 0, '', 'WPE PRO - injected dll'),
-
 (787, 12340, 243, '', '', 7541344, 7, '558BEC81ECB402', 'Loot while mounted'),
-(788, 12340, 243, '', '', 7262448, 6, '558BEC535657', 'CMovement :rocessMoveEvent'),
-(789, 12340, 243, '', '', 5213856, 5, '558BEC83EC', 'Render Disable/ESP'),
-(790, 12340, 243, '', '', 7271984, 5, '558BECD9EE', 'CMovement:: OnMoveStopAscendPacket'),
+
+-- 788 - 790 reserved for TC Warden antiPQR
+(788, 12340, 139, 'forceinsecure() return issecure()', NULL, NULL, NULL, 'Detects naive Lua unlockers'),
+(789, 12340, 139, 'return not not PQR_IsMoving', NULL, NULL, NULL, 'Detects PQR'),
+(790, 12340, 139, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find("|cffffd200PQR|r") then return true end end', NULL, NULL, NULL, 'Detects PQR'),
+
 (791, 12340, 243, '', '', 8233936, 5, 'B9601AD300', 'Warden::Tic k'),
 (792, 12340, 243, '', '', 7278032, 5, '558BECD9EE', 'CMovement:: OnJump'),
 (793, 12340, 243, '', '', 4618640, 6, '558BEC83EC50', 'Auth Bypass'),
@@ -863,4 +865,8 @@ INSERT INTO `warden` VALUES
 (840, 12340, 217, '', 'OHACK.DLL', 0, 0, '', 'OHack'),
 (841, 12340, 217, '', 'EWTDLL.DLL', 0, 0, '', 'EWT'),
 
-(842, 12340, 217, '', '@exe', 0, 0, '', NULL);
+(842, 12340, 217, '', '@exe', 0, 0, '', NULL),
+
+(843, 12340, 243, '', '', 7262448, 6, '558BEC535657', 'CMovement :rocessMoveEvent'),
+(844, 12340, 243, '', '', 5213856, 5, '558BEC83EC', 'Render Disable/ESP'),
+(845, 12340, 243, '', '', 7271984, 5, '558BECD9EE', 'CMovement:: OnMoveStopAscendPacket');

@@ -1138,8 +1138,8 @@ void AddSC_zuldrak()
     new npc_storm_cloud();
     new npc_body_rabbit();
     new npc_body_basilisk();
-    RegisterAuraScript(spell_scourge_disguise);
-    RegisterAuraScript(spell_scourge_disguise_instability);
-    RegisterAuraScript(spell_scourge_disguise_expiring);
+    RegisterSpellScript(spell_scourge_disguise);
+    RegisterSpellScript(spell_scourge_disguise_instability);
+    RegisterSpellScript(spell_scourge_disguise_expiring);
     RegisterSpellScript(spell_drop_disguise);
 }
