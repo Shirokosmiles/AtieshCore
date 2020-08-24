@@ -230,13 +230,6 @@ public:
         if (player->IsPremium())
             handler->PSendSysMessage(LANG_PLAYER_VIP_TIME_EXIST, (secsToTimeString(player->GetPremiumUnsetdate() - GameTime::GetGameTime(), TimeFormat::ShortText)).c_str());
 
-        if (sWorld->getBoolConfig(CONFIG_VIP_ALL_DISABLED))
-        {
-            handler->PSendSysMessage("The VIP commands are disabled");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         handler->PSendSysMessage("The next VIP commands are available for you:");
         if (sWorld->getBoolConfig(CONFIG_VIP_DEBUFF))
             handler->PSendSysMessage(" .vip debuff");
