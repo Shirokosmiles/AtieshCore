@@ -19,6 +19,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "World.h"
+#include "Util.h"
 
 WorldConfig* WorldConfig::instance()
 {
@@ -26,7 +27,7 @@ WorldConfig* WorldConfig::instance()
     return &instance;
 }
 
-void WorldConfig::AddOption(std::string const& optionName, WorldConfigType type, uint32 IDinTypeGroup, std::string const& defaultValue, std::string const& value)
+void WorldConfig::AddOption(std::string const& /*optionName*/, WorldConfigType type, uint32 IDinTypeGroup, std::string const& defaultValue, std::string const& value)
 {
     switch (type)
     {
@@ -179,6 +180,8 @@ void WorldConfig::RecheckAndFixDependancy()
                 }
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -320,7 +323,9 @@ void WorldConfig::RecheckAndFixDependancy()
                 }
                 break;
             }
-        }        
+            default:
+                break;
+        }
     }
 
     // for int
@@ -706,6 +711,8 @@ void WorldConfig::RecheckAndFixDependancy()
                 }
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -755,22 +762,10 @@ void WorldConfig::RecheckAndFixDependancy()
                 }
                 break;
             }
+            default:
+                break;
         }
     }
-
-    // for string
-    /*
-    for (uint32 i = 0; i < WorldStringConfigs::STRING_CONFIG_VALUE_COUNT; i++)
-    {
-        float value = sWorld->getIntConfig(WorldIntConfigs(i));
-        switch (WorldStringConfigs(i))
-        {
-            case WorldStringConfigs::CONFIG_RESPAWN_WARNING_MESSAGE:
-            {                
-                break;
-            }
-        }
-    }*/
 
     TC_LOG_INFO("server.loading", ">> RecheckAndFixDependancy handled in %u ms", GetMSTimeDiffToNow(oldMSTime));
     TC_LOG_INFO("server.loading", "");
