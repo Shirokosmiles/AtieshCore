@@ -17,6 +17,9 @@
 
 #include "WorldConfigMgr.h"
 #include "DatabaseEnv.h"
+#include "GridDefines.h"
+#include "ObjectDefines.h"
+#include "ObjectMgr.h"
 #include "Log.h"
 #include "World.h"
 #include "Util.h"
@@ -331,7 +334,7 @@ void WorldConfig::RecheckAndFixDependancy()
     // for int
     for (uint32 i = 0; i < WorldIntConfigs::INT_CONFIG_VALUE_COUNT; i++)
     {
-        float value = sWorld->getIntConfig(WorldIntConfigs(i));
+        uint32 value = sWorld->getIntConfig(WorldIntConfigs(i));
         switch (WorldIntConfigs(i))
         {
             case WorldIntConfigs::CONFIG_COMPRESSION:
@@ -719,7 +722,7 @@ void WorldConfig::RecheckAndFixDependancy()
     // for bool
     for (uint32 i = 0; i < WorldBoolConfigs::BOOL_CONFIG_VALUE_COUNT; i++)
     {
-        float value = sWorld->getBoolConfig(WorldBoolConfigs(i));
+        bool value = sWorld->getBoolConfig(WorldBoolConfigs(i));
         switch (WorldBoolConfigs(i))
         {
             case WorldBoolConfigs::CONFIG_BASEMAP_LOAD_GRIDS:
