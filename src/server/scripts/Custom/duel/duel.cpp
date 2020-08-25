@@ -25,7 +25,7 @@ public:
 
     void OnDuelStart(Player* firstplayer, Player* secondplayer) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_DUEL_IN_SPECIAL_PHASE))
+        if (!sWorld->getBoolConfig(CONFIG_DUEL_IN_SPECIAL_PHASE) || firstplayer->GetZoneId() == 4197)    // on Wintergrasp only in base phase)
             return;
 
         firstplayer->SetPhaseMask(uint32(PHASEMASK_DUEL), false);
@@ -45,7 +45,7 @@ public:
 
     void OnDuelEnd(Player* firstplayer, Player* secondplayer, DuelCompleteType /*type*/) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_DUEL_IN_SPECIAL_PHASE))
+        if (!sWorld->getBoolConfig(CONFIG_DUEL_IN_SPECIAL_PHASE) || firstplayer->GetZoneId() == 4197)    // on Wintergrasp only in base phase)
             return;
 
         uint32 newPhasePlr1 = firstplayer->GetNormalPhase();

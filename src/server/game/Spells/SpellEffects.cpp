@@ -3741,7 +3741,11 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
     Map* map = caster->GetMap();
     uint32 duelflagphasemask = caster->GetPhaseMask();
     if (sWorld->getBoolConfig(CONFIG_DUEL_IN_SPECIAL_PHASE))
-        duelflagphasemask = uint32(PHASEMASK_DUEL);
+    {
+        if (caster->GetZoneId() != 4197)    // on Wintergrasp only in base phase
+            duelflagphasemask = uint32(PHASEMASK_DUEL);
+    }
+
     QuaternionData rot = QuaternionData::fromEulerAnglesZYX(pos.GetOrientation(), 0.f, 0.f);
     if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobject_id, map, duelflagphasemask, pos, rot, 0, GO_STATE_READY))
     {
