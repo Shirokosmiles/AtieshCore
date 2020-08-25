@@ -48,7 +48,18 @@ void WorldConfig::AddOption(WorldConfigType type, uint32 IDinTypeGroup, std::str
         AddRateOption(IDinTypeGroup, value.empty() ? std::stof(defaultValue) : std::stof(value));
         break;
     case WorldConfigType::GAME_CONFIG_TYPE_STRINGS:
-        AddStringOption(IDinTypeGroup, value.empty() ? defaultValue : value);
+        if (!value.empty())
+        {
+            TC_LOG_ERROR("config", "> Test not empty 1");
+            AddStringOption(IDinTypeGroup, value.empty() ? defaultValue : value);
+            TC_LOG_ERROR("config", "> Test not empty  end 1");
+        }
+        else
+        {
+            TC_LOG_ERROR("config", "> Test 1");
+            AddStringOption(IDinTypeGroup, defaultValue);
+            TC_LOG_ERROR("config", "> Test 1");
+        }
         break;
     default:
         ABORT();
@@ -103,7 +114,7 @@ void WorldConfig::Load()
             continue;
         }
 
-        AddOption(_type, IDinTypeGroup, defaultValue.empty() ? "" : defaultValue, customValue);
+        AddOption(_type, IDinTypeGroup, defaultValue, customValue);
 
         count++;
 
