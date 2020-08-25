@@ -48,8 +48,12 @@ void WorldConfig::AddOption(std::string const& /*optionName*/, WorldConfigType t
         AddRateOption(IDinTypeGroup, value.empty() ? std::stof(defaultValue) : std::stof(value));
         break;
     case WorldConfigType::GAME_CONFIG_TYPE_STRINGS:
-        AddStringOption(IDinTypeGroup, value.empty() ? defaultValue : value);
+    {
+        std::string defvalStr = defaultValue.empty() ? "" : defaultValue;
+        std::string valStr = value.empty() ? "" : value;
+        AddStringOption(IDinTypeGroup, valStr == "" ? defvalStr : valStr);
         break;
+    }
     default:
         ABORT();
         break;
