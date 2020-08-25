@@ -853,7 +853,7 @@ class TC_GAME_API World
             return index < INT_CONFIG_VALUE_COUNT ? m_int_configs[index] : 0;
         }
 
-        bool setStringConfig(WorldStringConfigs index, std::string const& value)
+        bool setStringConfig(WorldStringConfigs index, std::string value)
         {
             bool result = false;
             if (index < STRING_CONFIG_VALUE_COUNT)
