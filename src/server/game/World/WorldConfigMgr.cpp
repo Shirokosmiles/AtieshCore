@@ -48,12 +48,8 @@ void WorldConfig::AddOption(WorldConfigType type, uint32 IDinTypeGroup, std::str
         AddRateOption(IDinTypeGroup, value.empty() ? std::stof(defaultValue) : std::stof(value));
         break;
     case WorldConfigType::GAME_CONFIG_TYPE_STRINGS:
-    {
-        std::string defvalStr = defaultValue.empty() ? "" : defaultValue;
-        std::string valStr = value.empty() ? "" : value;
-        AddStringOption(IDinTypeGroup, valStr == "" ? defvalStr : valStr);
+        AddStringOption(IDinTypeGroup, value.empty() ? defaultValue : value);
         break;
-    }
     default:
         ABORT();
         break;
@@ -96,7 +92,9 @@ void WorldConfig::Load()
         std::string const& optionName   = fields[0].GetString();
         std::string const& optionType   = fields[1].GetString();
         uint32 IDinTypeGroup            = fields[2].GetUInt32();
-        std::string const& defaultValue = fields[3].GetString();
+        std::string defaultValue        = "";
+        if (!fields[3].GetString().empty())
+            defaultValue = fields[3].GetString();
         std::string const& customValue  = fields[4].GetString();
 
         auto _type = GetTypeString(optionType);
