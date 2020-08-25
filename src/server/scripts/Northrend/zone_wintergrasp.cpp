@@ -797,6 +797,8 @@ class go_wg_vehicle_teleporter : public GameObjectScript
                                 result = true;
                             break;
                         }
+                        default:
+                            break;
                     }                        
                 }
 

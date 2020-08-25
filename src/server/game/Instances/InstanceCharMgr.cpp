@@ -143,7 +143,7 @@ std::string InstanceCharMgr::GetUpdatedData(std::string const data, uint8 encoun
     uint8 index = 0;
     bool corrected = false;
     bool correctedSecondStage = false;
-    for (int8 i = 0; i < data.length(); i++)
+    for (uint8 i = 0; i < (uint8)data.length(); i++)
     {
         // stage 1 - encounter = 1
         if (encounterID == 0)

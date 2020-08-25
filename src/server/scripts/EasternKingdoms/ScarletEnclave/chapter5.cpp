@@ -227,7 +227,7 @@ public:
             events.ScheduleEvent(EVENT_CLEAVE, 4s);
         }
 
-        void EnterEvadeMode(EvadeReason why) override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
 
         void UpdateAI(uint32 diff) override
         {
@@ -297,7 +297,7 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode(EvadeReason why) override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
 
         void JustEngagedWith(Unit* /*who*/) override
         {
@@ -367,7 +367,7 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode(EvadeReason why) override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
 
         void JustEngagedWith(Unit* /*who*/) override
         {
@@ -437,7 +437,7 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode(EvadeReason why) override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
 
         void JustEngagedWith(Unit* /*who*/) override
         {
