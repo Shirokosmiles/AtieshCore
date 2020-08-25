@@ -4,6 +4,50 @@ DELETE FROM `creature` WHERE `id` = 30740 AND map = 571;
 DELETE FROM `creature` WHERE `id` = 30400 AND map = 571;
 DELETE FROM `creature` WHERE `id` = 30499 AND map = 571;
 
+-- remove all towers and builds from DB
+-- Walls
+DELETE FROM `gameobject` WHERE `id` = 190219 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190220 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191795 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191796 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191799 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191800 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191801 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191802 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191803 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191804 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191806 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191807 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191808 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191809 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190369 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190370 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190371 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190372 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190374 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190376 AND map = 571;
+
+-- Walls Tower of keep
+DELETE FROM `gameobject` WHERE `id` = 190221 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190373 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190377 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190378 AND map = 571;
+
+-- Wall
+DELETE FROM `gameobject` WHERE `id` = 191797 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191798 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191805 AND map = 571;
+
+-- South tower
+DELETE FROM `gameobject` WHERE `id` = 190356 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190357 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 190358 AND map = 571;
+
+-- fortress and vault
+DELETE FROM `gameobject` WHERE `id` = 190375 AND map = 571;
+DELETE FROM `gameobject` WHERE `id` = 191810 AND map = 571;
+-- end remove buildings from DB
+
 -- west tower banner
 DELETE FROM `gameobject` WHERE `guid` = 66682;
 DELETE FROM `gameobject` WHERE `guid` = 75176;
