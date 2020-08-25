@@ -31,7 +31,7 @@ WorldConfig* WorldConfig::instance()
     return &instance;
 }
 
-void WorldConfig::AddOption(std::string const& /*optionName*/, WorldConfigType type, uint32 IDinTypeGroup, std::string const& defaultValue, std::string const& value)
+void WorldConfig::AddOption(WorldConfigType type, uint32 IDinTypeGroup, std::string const& defaultValue, std::string const& value)
 {
     switch (type)
     {
@@ -107,7 +107,7 @@ void WorldConfig::Load()
             continue;
         }
 
-        AddOption(optionName, _type, IDinTypeGroup, defaultValue, customValue);
+        AddOption(_type, IDinTypeGroup, defaultValue, customValue);
 
         count++;
 

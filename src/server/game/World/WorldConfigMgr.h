@@ -43,7 +43,7 @@ public:
 
 private:
     // Add config options
-    void AddOption(std::string const& optionName, WorldConfigType type, uint32 IDinTypeGroup, std::string const& defaultValue, std::string const& value);
+    void AddOption(WorldConfigType type, uint32 IDinTypeGroup, std::string const& /*defaultValue*/, std::string const& /*value*/);
 
     void AddBoolOption(uint32 IDinTypeGroup, bool value = false);
     void AddIntOption(uint32 IDinTypeGroup, uint32 value = 0);
