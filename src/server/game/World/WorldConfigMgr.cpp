@@ -91,10 +91,8 @@ void WorldConfig::Load()
 
         std::string const& optionName   = fields[0].GetString();
         std::string const& optionType   = fields[1].GetString();
-        uint32 IDinTypeGroup            = fields[2].GetUInt32();
-        std::string defaultValue        = "";
-        if (!fields[3].GetString().empty())
-            defaultValue = fields[3].GetString();
+        uint32 const& IDinTypeGroup     = fields[2].GetUInt32();
+        std::string const& defaultValue = fields[3].GetString();
         std::string const& customValue  = fields[4].GetString();
 
         auto _type = GetTypeString(optionType);
@@ -105,7 +103,7 @@ void WorldConfig::Load()
             continue;
         }
 
-        AddOption(_type, IDinTypeGroup, defaultValue, customValue);
+        AddOption(_type, IDinTypeGroup, defaultValue.empty() ? "" : defaultValue, customValue);
 
         count++;
 
