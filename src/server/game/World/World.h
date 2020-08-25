@@ -781,7 +781,7 @@ class TC_GAME_API World
 
         void UpdateSessions(uint32 diff);
         /// Set a server rate (see #Rates)
-        bool setRate(Rates rate, float value)
+        bool setRate(Rates rate, float const& value)
         {
             bool result = false;
             if (rate < MAX_RATES)
@@ -797,7 +797,7 @@ class TC_GAME_API World
         float getRate(Rates rate) const { return rate_values[rate]; }
 
         /// Set a server configuration element (see #WorldConfigs)
-        bool setBoolConfig(WorldBoolConfigs index, bool value)
+        bool setBoolConfig(WorldBoolConfigs index, bool const& value)
         {
             bool result = false;
             if (index < BOOL_CONFIG_VALUE_COUNT)
@@ -816,7 +816,7 @@ class TC_GAME_API World
         }
 
         /// Set a server configuration element (see #WorldConfigs)
-        bool setFloatConfig(WorldFloatConfigs index, float value)
+        bool setFloatConfig(WorldFloatConfigs index, float const& value)
         {
             bool result = false;
             if (index < FLOAT_CONFIG_VALUE_COUNT)
@@ -835,7 +835,7 @@ class TC_GAME_API World
         }
 
         /// Set a server configuration element (see #WorldConfigs)
-        bool setIntConfig(WorldIntConfigs index, uint32 value)
+        bool setIntConfig(WorldIntConfigs index, uint32 const& value)
         {
             bool result = false;
             if (index < INT_CONFIG_VALUE_COUNT)
@@ -853,7 +853,7 @@ class TC_GAME_API World
             return index < INT_CONFIG_VALUE_COUNT ? m_int_configs[index] : 0;
         }
 
-        bool setStringConfig(WorldStringConfigs index, std::string value)
+        bool setStringConfig(WorldStringConfigs index, std::string const& value)
         {
             bool result = false;
             if (index < STRING_CONFIG_VALUE_COUNT)

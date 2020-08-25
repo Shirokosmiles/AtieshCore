@@ -45,11 +45,11 @@ private:
     // Add config options
     void AddOption(WorldConfigType type, uint32 IDinTypeGroup, std::string const& defaultValue, std::string const& value);
 
-    void AddBoolOption(uint32 IDinTypeGroup, bool value = false);
-    void AddIntOption(uint32 IDinTypeGroup, uint32 value = 0);
-    void AddFloatOption(uint32 IDinTypeGroup, float value = 1.0f);
-    void AddRateOption(uint32 IDinTypeGroup, float value = 1.0f);
-    void AddStringOption(uint32 IDinTypeGroup, std::string value = "");
+    void AddBoolOption(uint32 IDinTypeGroup, bool const& value);
+    void AddIntOption(uint32 IDinTypeGroup, uint32 const& value);
+    void AddFloatOption(uint32 IDinTypeGroup, float const& value);
+    void AddRateOption(uint32 IDinTypeGroup, float const& value);
+    void AddStringOption(uint32 IDinTypeGroup, std::string const& value);
 };
 
 #define sWorldConfig WorldConfig::instance()

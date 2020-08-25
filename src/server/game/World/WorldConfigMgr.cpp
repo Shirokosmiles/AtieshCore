@@ -713,7 +713,7 @@ void WorldConfig::RecheckAndFixDependancy()
     TC_LOG_INFO("server.loading", ">> RecheckAndFixDependancy handled in %u ms", GetMSTimeDiffToNow(oldMSTime));
 }
 
-void WorldConfig::AddBoolOption(uint32 IDinTypeGroup, bool value /*= false*/)
+void WorldConfig::AddBoolOption(uint32 IDinTypeGroup, bool const& value)
 {
     if (!sWorld->setBoolConfig(WorldBoolConfigs(IDinTypeGroup), value))
     {
@@ -722,7 +722,7 @@ void WorldConfig::AddBoolOption(uint32 IDinTypeGroup, bool value /*= false*/)
     }
 }
 
-void WorldConfig::AddIntOption(uint32 IDinTypeGroup, uint32 value /*= 0*/)
+void WorldConfig::AddIntOption(uint32 IDinTypeGroup, uint32 const& value)
 {
     if (!sWorld->setIntConfig(WorldIntConfigs(IDinTypeGroup), value))
     {
@@ -731,7 +731,7 @@ void WorldConfig::AddIntOption(uint32 IDinTypeGroup, uint32 value /*= 0*/)
     }
 }
 
-void WorldConfig::AddFloatOption(uint32 IDinTypeGroup, float value /*= 1.0f*/)
+void WorldConfig::AddFloatOption(uint32 IDinTypeGroup, float const& value)
 {
     if (!sWorld->setFloatConfig(WorldFloatConfigs(IDinTypeGroup), value))
     {
@@ -740,7 +740,7 @@ void WorldConfig::AddFloatOption(uint32 IDinTypeGroup, float value /*= 1.0f*/)
     }
 }
 
-void WorldConfig::AddRateOption(uint32 IDinTypeGroup, float value /*= 1.0f*/)
+void WorldConfig::AddRateOption(uint32 IDinTypeGroup, float const& value)
 {
     if (!sWorld->setRate(Rates(IDinTypeGroup), value))
     {
@@ -749,7 +749,7 @@ void WorldConfig::AddRateOption(uint32 IDinTypeGroup, float value /*= 1.0f*/)
     }
 }
 
-void WorldConfig::AddStringOption(uint32 IDinTypeGroup, std::string value /*= ""*/)
+void WorldConfig::AddStringOption(uint32 IDinTypeGroup, std::string const& value)
 {
     if (!sWorld->setStringConfig(WorldStringConfigs(IDinTypeGroup), value))
     {
