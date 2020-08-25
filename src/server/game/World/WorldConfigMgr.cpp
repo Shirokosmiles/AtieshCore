@@ -50,15 +50,15 @@ void WorldConfig::AddOption(WorldConfigType type, uint32 IDinTypeGroup, std::str
     case WorldConfigType::GAME_CONFIG_TYPE_STRINGS:
         if (!value.empty())
         {
-            TC_LOG_ERROR("config", "> Test not empty 1");
+            TC_LOG_ERROR("config", "> Test (%u) not empty 1", IDinTypeGroup);
             AddStringOption(IDinTypeGroup, value.empty() ? defaultValue : value);
-            TC_LOG_ERROR("config", "> Test not empty  end 1");
+            TC_LOG_ERROR("config", "> Test (%u) not empty  end 1", IDinTypeGroup);
         }
         else
         {
-            TC_LOG_ERROR("config", "> Test 1");
+            TC_LOG_ERROR("config", "> Test (%u) 1", IDinTypeGroup);
             AddStringOption(IDinTypeGroup, defaultValue);
-            TC_LOG_ERROR("config", "> Test 1");
+            TC_LOG_ERROR("config", "> Test (%u) 1", IDinTypeGroup);
         }
         break;
     default:
