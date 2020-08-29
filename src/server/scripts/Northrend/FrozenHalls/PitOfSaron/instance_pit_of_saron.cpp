@@ -50,24 +50,13 @@ class instance_pit_of_saron : public InstanceMapScript
                 SetHeaders(DataHeader);
                 SetBossNumber(EncounterCount);
                 LoadDoorData(Doors);
-                _teamInInstance = instance->ToInstanceMap()->GetPlayersTeam();
+                _teamInInstance = instance->ToInstanceMap()->GetTeamInInstance();
                 _cavernActive = 0;
                 _shardsHit = 0;
             }
 
             void OnPlayerEnter(Player* player) override
             {
-                if (Group* group = player->GetGroup())
-                {
-                    Player* gleader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
-                    if (gleader)
-                        _teamInInstance = gleader->GetCFSTeam();
-                    else
-                        _teamInInstance = player->GetCFSTeam();
-                }
-                else
-                    _teamInInstance = player->GetCFSTeam();
-
                 //TC_LOG_ERROR("server", "Pit Of Saron: _teamInInstance = %u", _teamInInstance);
                 //TC_LOG_ERROR("server", "Pit Of Saron: player->GetCFSTeam() = %u", player->GetCFSTeam());
                 //TC_LOG_ERROR("server", "Pit Of Saron: player->GetTeam() = %u", player->GetTeam());
@@ -75,14 +64,6 @@ class instance_pit_of_saron : public InstanceMapScript
 
             void OnCreatureCreate(Creature* creature) override
             {
-                if (!_teamInInstance)
-                {
-                    Map::PlayerList const& players = instance->GetPlayers();
-                    if (!players.isEmpty())
-                        if (Player* player = players.begin()->GetSource())
-                            _teamInInstance = player->GetCFSTeam();
-                }
-
                 switch (creature->GetEntry())
                 {
                     case NPC_GARFROST:
@@ -183,14 +164,6 @@ class instance_pit_of_saron : public InstanceMapScript
 
             uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
             {
-                if (!_teamInInstance)
-                {
-                    Map::PlayerList const& players = instance->GetPlayers();
-                    if (!players.isEmpty())
-                        if (Player* player = players.begin()->GetSource())
-                            _teamInInstance = player->GetCFSTeam();
-                }
-
                 uint32 entry = data->id;
                 switch (entry)
                 {

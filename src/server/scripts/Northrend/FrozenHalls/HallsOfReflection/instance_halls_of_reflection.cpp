@@ -89,7 +89,7 @@ class instance_halls_of_reflection : public InstanceMapScript
                 SetHeaders(DataHeader);
                 SetBossNumber(EncounterCount);
 
-                _teamInInstance           = instance->ToInstanceMap()->GetPlayersTeam();
+                _teamInInstance = map->ToInstanceMap()->GetTeamInInstance();
                 _waveCount                = 0;
                 _introState               = NOT_STARTED;
                 _frostswornGeneralState   = NOT_STARTED;
@@ -100,9 +100,6 @@ class instance_halls_of_reflection : public InstanceMapScript
 
             void OnPlayerEnter(Player* player) override
             {
-                if (!_teamInInstance)
-                    _teamInInstance = player->GetTeam();
-
                 if (GetBossState(DATA_MARWYN) == DONE)
                 {
                     SpawnGunship();
@@ -200,14 +197,6 @@ class instance_halls_of_reflection : public InstanceMapScript
 
             uint32 GetGameObjectEntry(ObjectGuid::LowType /*guidLow*/, uint32 entry) override
             {
-                if (!_teamInInstance)
-                {
-                    Map::PlayerList const& players = instance->GetPlayers();
-                    if (!players.isEmpty())
-                        if (Player* player = players.begin()->GetSource())
-                            _teamInInstance = player->GetTeam();
-                }
-
                 switch (entry)
                 {
                     case GO_THE_CAPTAIN_CHEST_ALLIANCE_NORMAL:
@@ -380,14 +369,6 @@ class instance_halls_of_reflection : public InstanceMapScript
                 // don't spawn gunship twice
                 if (GunshipGUID)
                     return;
-
-                if (!_teamInInstance)
-                {
-                    Map::PlayerList const& players = instance->GetPlayers();
-                    if (!players.isEmpty())
-                        if (Player* player = players.begin()->GetSource())
-                            _teamInInstance = player->GetTeam();
-                }
 
                 if (Transport* gunship = sTransportMgr->CreateTransport(_teamInInstance == HORDE ? GO_ORGRIMS_HAMMER : GO_THE_SKYBREAKER, 0, instance))
                     gunship->EnableMovement(GetBossState(DATA_THE_LICH_KING_ESCAPE) == DONE);

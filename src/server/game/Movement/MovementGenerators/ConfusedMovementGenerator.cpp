@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "Random.h"
 #include "VMapFactory.h"
+#include "VMapManager2.h"
 
 template<class T>
 ConfusedMovementGenerator<T>::ConfusedMovementGenerator() : _timer(0), _x(0.f), _y(0.f), _z(0.f)

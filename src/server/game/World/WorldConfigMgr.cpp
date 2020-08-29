@@ -23,7 +23,7 @@
 #include "Log.h"
 #include "Player.h"
 #include "World.h"
-#include "Util.h"
+#include "StringConvert.h"
 
 WorldConfig* WorldConfig::instance()
 {
@@ -36,8 +36,12 @@ void WorldConfig::AddOption(WorldConfigType type, uint32 IDinTypeGroup, std::str
     switch (type)
     {
     case WorldConfigType::GAME_CONFIG_TYPE_BOOL:
-        AddBoolOption(IDinTypeGroup, value.empty() ? StringToBool(defaultValue) : StringToBool(value));
+    {
+        Optional<bool> boolValDefault = Trinity::StringTo<bool>(defaultValue);
+        Optional<bool> boolVal = Trinity::StringTo<bool>(value);
+        AddBoolOption(IDinTypeGroup, value.empty() ? *boolValDefault : *boolVal);
         break;
+    }
     case WorldConfigType::GAME_CONFIG_TYPE_INT:
         AddIntOption(IDinTypeGroup, value.empty() ? (uint32)std::stoi(defaultValue) : (uint32)std::stoi(value));
         break;
