@@ -606,11 +606,11 @@ AuctionHouseBot.ItemsPerCycle.Normal = 20
 
 #
 #    AuctionHouseBot.BuyPrice.Seller
-#       Description: Should the Seller use BuyPrice or SellPrice to determine Bid Prices
-#       Default:     1 - (use SellPrice)
-#                    0 - (use BuyPrice)
+#       Description: Should the Seller use the items BuyPrice or SellPrice to determine Bid Prices
+#       Default:     0 - (use BuyPrice - results in higher prices)
+#                    1 - (use SellPrice - results in lower prices)
 
-AuctionHouseBot.BuyPrice.Seller = 1
+AuctionHouseBot.BuyPrice.Seller = 0
 
 #
 #    AuctionHouseBot.BidPrice.*
