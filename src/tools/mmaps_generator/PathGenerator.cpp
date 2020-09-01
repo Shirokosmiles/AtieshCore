@@ -264,7 +264,7 @@ int main(int argc, char** argv)
     int tileX = -1, tileY = -1;
     bool skipLiquid = false,
          skipContinents = false,
-         skipJunkMaps = true,
+         skipJunkMaps = false,
          skipBattlegrounds = false,
          debugOutput = false,
          silent = false,
