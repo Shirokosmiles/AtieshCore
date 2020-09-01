@@ -525,7 +525,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (plrMover && !sWorld->isMapDisabledForAC(plrMover->GetMapId()))
     {
-        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED) && plrMover && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
+        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED) && plrMover && !movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
         {
             if (!plrMover->IsJumpingbyOpcode() && !plrMover->UnderACKmount() && !plrMover->IsFlying())
             {
@@ -541,7 +541,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             }
         }
 
-        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED) && plrMover && !plrMover->IsCanFlybyServer() && !plrMover->UnderACKmount() && movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY) && !plrMover->IsInWater())
+        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED) && plrMover && !movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !plrMover->IsCanFlybyServer() && !plrMover->UnderACKmount() && movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY) && !plrMover->IsInWater())
         {
             TC_LOG_INFO("anticheat", "MovementHandler::Fake_flying mode (using MOVEMENTFLAG_FLYING flag doesn't restricted) by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
             sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FLYING, plrMover->GetName().c_str());
