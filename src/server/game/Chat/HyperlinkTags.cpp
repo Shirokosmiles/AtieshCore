@@ -58,13 +58,17 @@ class HyperlinkDataTokenizer
 bool Trinity::Hyperlinks::LinkTags::achievement::StoreTo(AchievementLinkData& val, std::string_view text)
 {
     HyperlinkDataTokenizer t(text);
+
     uint32 achievementId;
     if (!t.TryConsumeTo(achievementId))
         return false;
     val.Achievement = sAchievementMgr->GetAchievement(achievementId);
-    if (!(val.Achievement && t.TryConsumeTo(val.CharacterId) && t.TryConsumeTo(val.IsFinished) &&
-        t.TryConsumeTo(val.Month) && t.TryConsumeTo(val.Day)))
+
+    if (!(val.Achievement && t.TryConsumeTo(val.CharacterId) && t.TryConsumeTo(val.IsFinished) && t.TryConsumeTo(val.Month) && t.TryConsumeTo(val.Day)))
         return false;
+    if ((12 < val.Month) || (31 < val.Day))
+        return false;
+
     int8 year;
     if (!t.TryConsumeTo(year))
         return false;
@@ -77,8 +81,7 @@ bool Trinity::Hyperlinks::LinkTags::achievement::StoreTo(AchievementLinkData& va
     else
         val.Year = 0;
 
-    return (t.TryConsumeTo(val.Criteria[0]) &&
-        t.TryConsumeTo(val.Criteria[1]) && t.TryConsumeTo(val.Criteria[2]) && t.TryConsumeTo(val.Criteria[3]) && t.IsEmpty());
+    return (t.TryConsumeTo(val.Criteria[0]) && t.TryConsumeTo(val.Criteria[1]) && t.TryConsumeTo(val.Criteria[2]) && t.TryConsumeTo(val.Criteria[3]) && t.IsEmpty());
 }
 
 bool Trinity::Hyperlinks::LinkTags::enchant::StoreTo(SpellInfo const*& val, std::string_view text)
@@ -110,9 +113,47 @@ bool Trinity::Hyperlinks::LinkTags::item::StoreTo(ItemLinkData& val, std::string
     if (!t.TryConsumeTo(itemId))
         return false;
     val.Item = sObjectMgr->GetItemTemplate(itemId);
-    return val.Item && t.TryConsumeTo(val.EnchantId) && t.TryConsumeTo(val.GemEnchantId[0]) && t.TryConsumeTo(val.GemEnchantId[1]) &&
-        t.TryConsumeTo(val.GemEnchantId[2]) && t.TryConsumeTo(dummy) && t.TryConsumeTo(val.RandomPropertyId) && t.TryConsumeTo(val.RandomPropertySeed) &&
-        t.TryConsumeTo(val.RenderLevel) && t.IsEmpty() && !dummy;
+
+    int randomPropertyId;
+    if (!(val.Item && t.TryConsumeTo(val.EnchantId) && t.TryConsumeTo(val.GemEnchantId[0]) && t.TryConsumeTo(val.GemEnchantId[1]) &&
+        t.TryConsumeTo(val.GemEnchantId[2]) && t.TryConsumeTo(dummy) && t.TryConsumeTo(randomPropertyId) && t.TryConsumeTo(val.RandomSuffixBaseAmount) &&
+        t.TryConsumeTo(val.RenderLevel) && t.IsEmpty() && !dummy))
+        return false;
+
+    if (randomPropertyId < 0)
+    {
+        if (!val.Item->RandomSuffix)
+            return false;
+        if (ItemRandomSuffixEntry const* suffixEntry = sItemRandomSuffixStore.LookupEntry(-randomPropertyId))
+        {
+            val.RandomSuffix = suffixEntry;
+            val.RandomProperty = nullptr;
+        }
+        else
+            return false;
+    }
+    else if (randomPropertyId > 0)
+    {
+        if (!val.Item->RandomProperty)
+            return false;
+        if (ItemRandomPropertiesEntry const* propEntry = sItemRandomPropertiesStore.LookupEntry(randomPropertyId))
+        {
+            val.RandomSuffix = nullptr;
+            val.RandomProperty = propEntry;
+        }
+        else
+            return false;
+    }
+    else
+    {
+        val.RandomSuffix = nullptr;
+        val.RandomProperty = nullptr;
+    }
+
+    if ((val.RandomSuffix && !val.RandomSuffixBaseAmount) || (val.RandomSuffixBaseAmount && !val.RandomSuffix))
+        return false;
+
+    return true;
 }
 
 bool Trinity::Hyperlinks::LinkTags::quest::StoreTo(QuestLinkData& val, std::string_view text)
@@ -142,11 +183,23 @@ bool Trinity::Hyperlinks::LinkTags::talent::StoreTo(TalentLinkData& val, std::st
         return false;
     if (rank < -1 || rank >= MAX_TALENT_RANK)
         return false;
+    val.Talent = sTalentStore.LookupEntry(talentId);
     val.Rank = rank+1;
-    if (!(val.Talent = sTalentStore.LookupEntry(talentId)))
+    if (!val.Talent)
         return false;
-    if (val.Rank > 0 && !val.Talent->SpellRank[val.Rank - 1])
-        return false;
+    if (val.Rank > 0)
+    {
+        uint32 const spellId = val.Talent->SpellRank[val.Rank - 1];
+        if (!spellId)
+            return false;
+        val.Spell = sSpellMgr->GetSpellInfo(spellId);
+        if (!val.Spell)
+            return false;
+    }
+    else
+    {
+        val.Spell = nullptr;
+    }
     return true;
 }
 
