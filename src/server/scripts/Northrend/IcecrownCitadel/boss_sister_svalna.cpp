@@ -151,7 +151,6 @@ enum ICCSisterSvalnaTimedEventIds
     EVENT_SVALNA_COMBAT,
     EVENT_IMPALING_SPEAR,
     EVENT_AETHER_SHIELD,
-    EVENT_CHECK_LIST,
 
     // Captain Arnath
     EVENT_ARNATH_FLASH_HEAL,
@@ -330,7 +329,6 @@ struct boss_sister_svalna : public BossAI
         _Reset();
         me->SetReactState(REACT_DEFENSIVE);
         _isEventInProgress = false;
-        _spearTarget = ObjectGuid::Empty;
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -358,9 +356,9 @@ struct boss_sister_svalna : public BossAI
         if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
             crok->AI()->Talk(SAY_CROK_COMBAT_SVALNA);
         DoCastSelf(SPELL_DIVINE_SURGE, true);
-        events.ScheduleEvent(EVENT_SVALNA_COMBAT, 1s);
-        events.ScheduleEvent(EVENT_IMPALING_SPEAR, 1s, 5s);
-        //events.ScheduleEvent(EVENT_AETHER_SHIELD, 100s, 110s);
+        events.ScheduleEvent(EVENT_SVALNA_COMBAT, 9s);
+        events.ScheduleEvent(EVENT_IMPALING_SPEAR, 40s, 50s);
+        events.ScheduleEvent(EVENT_AETHER_SHIELD, 100s, 110s);
     }
 
     void KilledUnit(Unit* victim) override
@@ -501,38 +499,15 @@ struct boss_sister_svalna : public BossAI
                 case EVENT_SVALNA_COMBAT:
                     me->SetReactState(REACT_DEFENSIVE);
                     Talk(SAY_SVALNA_AGGRO);
-                    if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
-                    {
-                        crok->AI()->Talk(SAY_CROK_COMBAT_SVALNA);
-                        crok->SetReactState(REACT_AGGRESSIVE);
-                    }
                     break;
                 case EVENT_IMPALING_SPEAR:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_IMPALING_SPEAR))
                     {
                         DoCast(me, SPELL_AETHER_SHIELD);
                         DoCast(target, SPELL_IMPALING_SPEAR);
-                        _spearTarget = target->GetGUID();
-                        events.ScheduleEvent(EVENT_CHECK_LIST, 1s);
                     }
                     events.ScheduleEvent(EVENT_IMPALING_SPEAR, 20s, 25s);
                     break;
-                case EVENT_AETHER_SHIELD:
-                    me->RemoveAura(SPELL_AETHER_SHIELD);
-                    break;
-                case EVENT_CHECK_LIST:
-                {
-                    bool founded = false;
-                    if (Player* target = ObjectAccessor::GetPlayer(*me, _spearTarget))
-                        if (!target->IsAlive() || !target->HasAura(SPELL_IMPALING_SPEAR))
-                            founded = true;
-
-                    if (founded)
-                        events.ScheduleEvent(EVENT_AETHER_SHIELD, 0s);
-                    else
-                        events.ScheduleEvent(EVENT_CHECK_LIST, 1s);
-                    break;
-                }
                 default:
                     break;
             }
@@ -545,7 +520,6 @@ struct boss_sister_svalna : public BossAI
     }
 
 private:
-    ObjectGuid _spearTarget;
     bool _isEventInProgress;
 };
 
@@ -1528,7 +1502,7 @@ void AddSC_boss_sister_svalna()
     RegisterIcecrownCitadelCreatureAI(npc_captain_rupert);
     RegisterIcecrownCitadelCreatureAI(npc_frostwing_ymirjar_vrykul);
     RegisterIcecrownCitadelCreatureAI(npc_impaling_spear);
-    new spell_trigger_spell_from_caster("spell_svalna_caress_of_death", SPELL_IMPALING_SPEAR_KILL);
+    RegisterSpellScriptWithArgs(spell_trigger_spell_from_caster, "spell_svalna_caress_of_death", SPELL_IMPALING_SPEAR_KILL);
     RegisterSpellScript(spell_svalna_revive_champion);
     RegisterSpellScript(spell_svalna_remove_spear);
     new at_icc_start_frostwing_gauntlet();

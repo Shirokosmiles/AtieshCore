@@ -22,6 +22,7 @@
 
 #define SPEED_CHARGE 42.0f // assume it is 25 yard per 0.6 second
 
+// EnumUtils: DESCRIBE THIS
 enum MovementGeneratorType : uint8
 {
     IDLE_MOTION_TYPE                = 0,     // IdleMovementGenerator.h
@@ -45,7 +46,7 @@ enum MovementGeneratorType : uint8
     FORMATION_MOTION_TYPE           = 18,    // FormationMovementGenerator.h
     JUMP_MOTION_TYPE                = 19,    // JumpMovementGenerator.h
     CHARGE_MOTION_TYPE              = 20,    // ChargeMovementGenerator.h
-    MAX_MOTION_TYPE                          // limit
+    MAX_MOTION_TYPE                          // SKIP
 };
 
 enum MovementGeneratorMode : uint8

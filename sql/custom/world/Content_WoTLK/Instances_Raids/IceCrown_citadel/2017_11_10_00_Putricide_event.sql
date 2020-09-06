@@ -1,5 +1,10 @@
 UPDATE `creature_template` SET `ScriptName`='npc_flesh_eating_insect' WHERE  `entry`=37782;
 UPDATE `creature_template` SET `ScriptName`='npc_putricide_trap' WHERE  `entry`=38879;
+
+DELETE FROM `creature_template_movement` where `CreatureId` IN (37782);
+INSERT INTO `creature_template_movement`(`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`) VALUES 
+(37782, 1, 1, 0, 0, 2, 2);
+
 DELETE FROM `spell_script_names` where `spell_id` IN (70484,70485,70475);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES 
 (70484, 'spell_icc_summon_plagued_insect'),

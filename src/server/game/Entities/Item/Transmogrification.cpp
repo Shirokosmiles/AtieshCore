@@ -207,26 +207,29 @@ std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) c
 
     if (int32 itemRandPropId = item->GetItemRandomPropertyId())
     {
-        char* const* suffix = NULL;
+        std::array<char const*, 16> const* suffix = nullptr;
         if (itemRandPropId < 0)
         {
-            const ItemRandomSuffixEntry* itemRandEntry = sItemRandomSuffixStore.LookupEntry(-item->GetItemRandomPropertyId());
+            ItemRandomSuffixEntry const* itemRandEntry = sItemRandomSuffixStore.LookupEntry(-item->GetItemRandomPropertyId());
             if (itemRandEntry)
-                suffix = itemRandEntry->Name;
+                suffix = &itemRandEntry->Name;
         }
         else
         {
-            const ItemRandomPropertiesEntry* itemRandEntry = sItemRandomPropertiesStore.LookupEntry(item->GetItemRandomPropertyId());
+            ItemRandomPropertiesEntry const* itemRandEntry = sItemRandomPropertiesStore.LookupEntry(item->GetItemRandomPropertyId());
             if (itemRandEntry)
-                suffix = itemRandEntry->Name;
+                suffix = &itemRandEntry->Name;
         }
         if (suffix)
         {
-            std::string test(suffix[(name != temp->Name1) ? loc_idx : DEFAULT_LOCALE]);
-            if (!test.empty())
+            // dbc local name
+            if (suffix)
             {
+                // Append the suffix (ie: of the Monkey) to the name using localization
+                // or default enUS if localization is invalid
                 name += ' ';
-                name += test;
+                int locdbc_idx = session->GetSessionDbcLocale();
+                name += (*suffix)[locdbc_idx >= 0 ? locdbc_idx : LOCALE_enUS];
             }
         }
     }

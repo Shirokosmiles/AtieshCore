@@ -24,6 +24,7 @@
 #include "ObjectMgr.h"
 #include "Item.h"
 #include "Language.h"
+#include "Log.h"
 
 struct Teleport
 {
@@ -2415,14 +2416,15 @@ public:
         bool LearnAllRecipesInProfession(Player *pPlayer, SkillType skill)
         {
             ChatHandler handler(pPlayer->GetSession());
-            char* skill_name;
+            std::string skill_name;
 
             SkillLineEntry const *SkillInfo = sSkillLineStore.LookupEntry(skill);
             skill_name = SkillInfo->DisplayName[handler.GetSessionDbcLocale()];
 
             if (!SkillInfo)
             {
-                //TC_LOG_ERROR("server.loading", "Profession NPC: received non-valid skill ID (LearnAllRecipesInProfession)");
+                TC_LOG_ERROR("server", "Profession NPC: received non-valid SkillType (LearnAllRecipesInProfession)");
+                return false;
             }
 
             LearnSkillRecipesHelper(pPlayer, SkillInfo->ID);

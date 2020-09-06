@@ -504,7 +504,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                     case GO_DOODAD_ICECROWN_ICEWALL02:
                     case GO_ICEWALL:
                     case GO_LORD_MARROWGAR_S_ENTRANCE:
-                    case GO_ORATORY_OF_THE_DAMNED_ENTRANCE:                    
+                    case GO_ORATORY_OF_THE_DAMNED_ENTRANCE:
                     case GO_CRIMSON_HALL_DOOR:
                     case GO_BLOOD_ELF_COUNCIL_DOOR:
                     case GO_BLOOD_ELF_COUNCIL_DOOR_RIGHT:

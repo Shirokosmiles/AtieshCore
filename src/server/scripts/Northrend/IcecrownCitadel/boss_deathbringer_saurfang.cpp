@@ -20,14 +20,11 @@
 #include "InstanceScript.h"
 #include "Map.h"
 #include "MotionMaster.h"
-#include "MoveSpline.h"
-#include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "World.h"
 
 enum ScriptTexts
 {
@@ -260,9 +257,6 @@ class boss_deathbringer_saurfang : public CreatureScript
             {
                 ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
                 _fallenChampionCastCount = 0;
-                FightWonValue = 100000;
-                float healthMultiplier = sWorld->getRate(RATE_VAS_MAXHP_PERCENT);
-                FightWonValue = CalculatePct(FightWonValue, healthMultiplier);
             }
 
             void Reset() override
@@ -270,7 +264,6 @@ class boss_deathbringer_saurfang : public CreatureScript
                 if (_dead)
                     return;
                 _Reset();
-                events.Reset();
                 events.SetPhase(PHASE_COMBAT);
                 _frenzied = false;
                 _dead = false;
@@ -460,9 +453,6 @@ class boss_deathbringer_saurfang : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (!me || !me->IsAlive())
-                    return;
-
                 if (!UpdateVictim() && !(events.IsInPhase(PHASE_INTRO_A) || events.IsInPhase(PHASE_INTRO_H)))
                     return;
 
@@ -617,8 +607,9 @@ class boss_deathbringer_saurfang : public CreatureScript
                 return BossAI::CanAIAttack(target);
             }
 
+            static uint32 const FightWonValue;
+
         private:
-            uint32 FightWonValue;
             uint32 _fallenChampionCastCount;
             bool _introDone;
             bool _frenzied;   // faster than iterating all auras to find Frenzy
@@ -630,6 +621,8 @@ class boss_deathbringer_saurfang : public CreatureScript
             return GetIcecrownCitadelAI<boss_deathbringer_saurfangAI>(creature);
         }
 };
+
+uint32 const boss_deathbringer_saurfang::boss_deathbringer_saurfangAI::FightWonValue = 100000;
 
 class npc_high_overlord_saurfang_icc : public CreatureScript
 {
@@ -728,12 +721,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                 if (spellInfo->Id == SPELL_GRIP_OF_AGONY)
                 {
                     me->SetDisableGravity(true);
-                    //me->GetMotionMaster()->MovePoint(POINT_CHOKE, chokePos[0], false, me->GetOrientation(), true);
-
-                    Movement::MoveSplineInit init(me);
-                    init.MoveTo(chokePos[0].GetPositionX(), chokePos[0].GetPositionY(), chokePos[0].GetPositionZ(), false, true);
-                    init.SetFly();
-                    init.Launch();
+                    me->GetMotionMaster()->MovePoint(POINT_CHOKE, chokePos[0]);
                 }
             }
 
@@ -784,9 +772,6 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (!me || !me->IsAlive())
-                    return;
-
                 _events.Update(diff);
                 while (uint32 eventId = _events.ExecuteEvent())
                 {
@@ -922,7 +907,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                         {
                             guard->AI()->DoAction(ACTION_DESPAWN);
                         });
-                        _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_1, 500ms);
+
                         // temp until outro fully done - to put deathbringer on respawn timer (until next reset)
                         if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                             deathbringer->DespawnOrUnsummon(5s);
@@ -943,11 +928,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 if (spellInfo->Id == SPELL_GRIP_OF_AGONY)
                 {
                     me->SetDisableGravity(true);
-                    //me->GetMotionMaster()->MovePoint(POINT_CHOKE, chokePos[0], false, me->GetOrientation(), true);
-                    Movement::MoveSplineInit init(me);
-                    init.MoveTo(chokePos[0].GetPositionX(), chokePos[0].GetPositionY(), chokePos[0].GetPositionZ(), false, true);
-                    init.SetFly();
-                    init.Launch();
+                    me->GetMotionMaster()->MovePoint(POINT_CHOKE, chokePos[0]);
                 }
             }
 
@@ -973,9 +954,6 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (!me || !me->IsAlive())
-                    return;
-
                 _events.Update(diff);
                 while (uint32 eventId = _events.ExecuteEvent())
                 {
@@ -992,79 +970,6 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                                 guard->AI()->DoAction(ACTION_CHARGE);
                             });
                             me->GetMotionMaster()->MoveCharge(chargePos[0].GetPositionX(), chargePos[0].GetPositionY(), chargePos[0].GetPositionZ(), 8.5f, POINT_CHARGE);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_1:
-                            Talk(SAY_OUTRO_ALLIANCE_1);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_2, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_2:
-                            Talk(SAY_OUTRO_ALLIANCE_2);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_3, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_3:
-                            Talk(SAY_OUTRO_ALLIANCE_3);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_4, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_4:
-                            Talk(SAY_OUTRO_ALLIANCE_4);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_5, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_5:
-                            Talk(SAY_OUTRO_ALLIANCE_5);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_6, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_6:
-                            Talk(SAY_OUTRO_ALLIANCE_6);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_7, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_7:
-                            Talk(SAY_OUTRO_ALLIANCE_7);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_8, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_8:
-                            //Talk(SAY_OUTRO_ALLIANCE_8);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_9, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_9:
-                            Talk(SAY_OUTRO_ALLIANCE_9);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_10, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_10:
-                            Talk(SAY_OUTRO_ALLIANCE_10);
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_11, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_11:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_12, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_12:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_13, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_13:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_14, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_14:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_15, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_15:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_16, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_16:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_17, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_17:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_18, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_18:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_19, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_19:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_20, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_20:
-                            _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_21, 2500ms);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_21:
-                            Talk(SAY_OUTRO_ALLIANCE_21);
                             break;
                     }
                 }
@@ -1105,11 +1010,7 @@ class npc_saurfang_event : public CreatureScript
                 if (spellInfo->Id == SPELL_GRIP_OF_AGONY)
                 {
                     me->SetDisableGravity(true);
-                    //me->GetMotionMaster()->MovePoint(POINT_CHOKE, chokePos[_index], false, me->GetOrientation(), true);
-                    Movement::MoveSplineInit init(me);
-                    init.MoveTo(chokePos[_index].GetPositionX(), chokePos[_index].GetPositionY(), chokePos[_index].GetPositionZ(), false, true);
-                    init.SetFly();
-                    init.Launch();
+                    me->GetMotionMaster()->MovePoint(POINT_CHOKE, chokePos[_index]);
                 }
             }
 
