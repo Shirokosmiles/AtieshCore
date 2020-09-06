@@ -13584,7 +13584,7 @@ bool Unit::SetWalk(bool enable)
     return true;
 }
 
-bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/, bool updateAnimationTier /*= true*/)
+bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
 {
     if (disable == IsGravityDisabled())
         return false;
