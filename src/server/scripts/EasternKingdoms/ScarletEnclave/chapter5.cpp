@@ -162,7 +162,8 @@ enum ScorgeSpells
 
 uint32 GetScorgeTargetEntry()
 {
-    uint32 targetEntry[8] = { 29174, // NPC_DEFENDER_OF_THE_LIGHT
+    uint32 targetEntry[8] =
+    {   29174,                      // NPC_DEFENDER_OF_THE_LIGHT
         29176,                      // NPC_KORFAX_CHAMPION_OF_THE_LIGHT
         29177,                      // NPC_COMMANDER_ELIGOR_DAWNBRINGER
         29178,                      // NPC_LORD_MAXWELL_TYROSUS
