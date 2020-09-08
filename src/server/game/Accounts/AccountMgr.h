@@ -66,7 +66,7 @@ class TC_GAME_API AccountMgr
         static bool CheckPassword(uint32 accountId, std::string password);
         static bool CheckEmail(uint32 accountId, std::string newEmail);
 
-        static uint32 GetId(std::string const& username);
+        static uint32 GetId(std::string_view username);
         static uint32 GetCoins(uint32 accountId);
         static uint32 GetGuidOfOnlineCharacter(uint32 accountId);
         static time_t GetVIPunsetDate(uint32 accountId);
