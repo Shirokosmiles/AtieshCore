@@ -8431,7 +8431,7 @@ void ObjectMgr::LoadReservedPlayersNames()
     TC_LOG_INFO("server.loading", ">> Loaded %u reserved player names in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
-bool ObjectMgr::IsReservedName(const std::string& name) const
+bool ObjectMgr::IsReservedName(std::string_view name) const
 {
     std::wstring wstr;
     if (!Utf8toWStr (name, wstr))
@@ -8523,7 +8523,7 @@ bool isValidString(const std::wstring& wstr, uint32 strictMask, bool numericOrSp
     return false;
 }
 
-ResponseCodes ObjectMgr::CheckPlayerName(std::string const& name, LocaleConstant locale, bool create /*= false*/)
+ResponseCodes ObjectMgr::CheckPlayerName(std::string_view name, LocaleConstant locale, bool create /*= false*/)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -8548,7 +8548,7 @@ ResponseCodes ObjectMgr::CheckPlayerName(std::string const& name, LocaleConstant
     return ValidateName(wname, locale);
 }
 
-bool ObjectMgr::IsValidCharterName(const std::string& name)
+bool ObjectMgr::IsValidCharterName(std::string_view name)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -8566,7 +8566,7 @@ bool ObjectMgr::IsValidCharterName(const std::string& name)
     return isValidString(wname, strictMask, true);
 }
 
-bool ObjectMgr::IsValidChannelName(const std::string& name)
+bool ObjectMgr::IsValidChannelName(std::string_view name)
 {
     if (name.size() > MAX_CHANNEL_NAME)
         return false;
@@ -8584,7 +8584,7 @@ bool ObjectMgr::IsValidChannelName(const std::string& name)
     return isValidChatString(wname);
 }
 
-bool ObjectMgr::IsValidChannelText(const std::string& name)
+bool ObjectMgr::IsValidChannelText(std::string_view name)
 {
     if (name.size() > 255)
         return false;
@@ -8656,7 +8656,7 @@ bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg, bool withNast
     return true;
 }
 
-PetNameInvalidReason ObjectMgr::CheckPetName(const std::string& name, LocaleConstant locale)
+PetNameInvalidReason ObjectMgr::CheckPetName(std::string_view name, LocaleConstant locale)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -8958,7 +8958,7 @@ void ObjectMgr::LoadGameTele()
     TC_LOG_INFO("server.loading", ">> Loaded %u GameTeleports in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
-GameTele const* ObjectMgr::GetGameTele(const std::string& name) const
+GameTele const* ObjectMgr::GetGameTele(std::string_view name) const
 {
     // explicit name case
     std::wstring wname;
@@ -8981,7 +8981,7 @@ GameTele const* ObjectMgr::GetGameTele(const std::string& name) const
     return alt;
 }
 
-GameTele const* ObjectMgr::GetGameTeleExactName(const std::string& name) const
+GameTele const* ObjectMgr::GetGameTeleExactName(std::string_view name) const
 {
     // explicit name case
     std::wstring wname;
@@ -9033,7 +9033,7 @@ bool ObjectMgr::AddGameTele(GameTele& tele)
     return true;
 }
 
-bool ObjectMgr::DeleteGameTele(const std::string& name)
+bool ObjectMgr::DeleteGameTele(std::string_view name)
 {
     // explicit name case
     std::wstring wname;
@@ -9793,7 +9793,7 @@ uint32 ObjectMgr::GetScriptId(std::string const& name)
         return 0;
 
     ScriptNameContainer::const_iterator itr = std::lower_bound(_scriptNamesStore.begin(), _scriptNamesStore.end(), name);
-    if (itr == _scriptNamesStore.end() || *itr != name)
+    if (itr == _scriptNamesStore.end() || (*itr != name))
         return 0;
 
     return uint32(itr - _scriptNamesStore.begin());

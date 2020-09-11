@@ -846,6 +846,18 @@ Guild* Player::GetGuild() const
     return guildId ? sGuildMgr->GetGuildById(guildId) : nullptr;
 }
 
+void Guild::ItemBroadcastToGuild(Player* player, std::string const& msg) const
+{
+    if (player)
+    {
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, LANG_UNIVERSAL, player, nullptr, msg);
+        for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
+            if (Player* player = itr->second.FindPlayer())
+                player->SendDirectMessage(&data);
+    }
+}
+
 void Guild::UpdateLevelAndExp()
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_LEVELANDEXP);
@@ -942,7 +954,7 @@ void Guild::CastGuildLevelAuras(uint32 level)
 
         for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
         {
-            if (Player* player = itr->second->FindConnectedPlayer())
+            if (Player* player = itr->second.FindConnectedPlayer())
                 player->CastSpell(player, gspellAuras->spellauraId);
         }
     }
@@ -957,7 +969,7 @@ void Guild::RemoveGuildLevelAuras()
         GuildSpellAuras const* gspellAuras = &itr->second;
         for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
         {
-            if (Player* player = itr->second->FindConnectedPlayer())
+            if (Player* player = itr->second.FindConnectedPlayer())
                 player->RemoveAurasDueToSpell(gspellAuras->spellauraId);
         }
     }
@@ -967,7 +979,7 @@ void Guild::UpdateQueryStateForPlayers()
 {
     for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
-        if (Player* player = itr->second->FindConnectedPlayer())
+        if (Player* player = itr->second.FindConnectedPlayer())
         {
             if (player->IsInWorld())
             {
@@ -985,7 +997,7 @@ void Guild::UpdateGuildWarFlag(bool startGW)
 {
     for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
-        if (Player* player = itr->second->FindConnectedPlayer())
+        if (Player* player = itr->second.FindConnectedPlayer())
             if (player->IsInWorld())
             {
                 if (startGW)
@@ -1011,7 +1023,7 @@ void Guild::RemoveHigherGuildLevelAuras(uint32 level)
 
         for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
         {
-            if (Player * player = itr->second->FindConnectedPlayer())
+            if (Player * player = itr->second.FindConnectedPlayer())
                 player->RemoveAurasDueToSpell(gspellAuras->spellauraId);
         }
     }
@@ -1151,7 +1163,7 @@ void Guild::BroadcastToGuildLevelUp(uint32 level, std::string const& playerName)
 {
     for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
-        if (Player * player = itr->second->FindConnectedPlayer())
+        if (Player* player = itr->second.FindConnectedPlayer())
         {
             if (playerName != "")
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_LVL_UP_BY, level, playerName);
@@ -1165,7 +1177,7 @@ void Guild::BroadcastToGuildLevelDown(uint32 level, uint32 lost, std::string con
 {
     for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
-        if (Player * player = itr->second->FindConnectedPlayer())
+        if (Player * player = itr->second.FindConnectedPlayer())
             ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_SANCTION_LVL, playerName, lost, level);
     }
 }
@@ -1174,7 +1186,7 @@ void Guild::BroadcastToGuildExp(uint32 level, std::string const& playerName) con
 {
     for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
-        if (Player * player = itr->second->FindConnectedPlayer())
+        if (Player * player = itr->second.FindConnectedPlayer())
         {
             if (playerName != "")
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_EXP_UP_BY, level, playerName);
@@ -1188,7 +1200,7 @@ void Guild::BroadcastToGuildEnteredInGWWith(std::string const& guildName) const
 {
     for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
-        if (Player * player = itr->second->FindConnectedPlayer())
+        if (Player * player = itr->second.FindConnectedPlayer())
             ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_START_WAR, guildName);
     }
 }
@@ -1197,7 +1209,7 @@ void Guild::BroadcastToGuildEndedGWWith(std::string const& guildName, std::strin
 {
     for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
-        if (Player * player = itr->second->FindConnectedPlayer())
+        if (Player * player = itr->second.FindConnectedPlayer())
             ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_END_WAR, guildName, winnername, ratingChange);
     }
 }

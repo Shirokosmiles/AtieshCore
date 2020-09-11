@@ -543,7 +543,7 @@ public:
     {
         npc_arena_spectatorAI(Creature* creature) : ScriptedAI(creature) {}
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             WorldSession* session = player->GetSession();
             LoadAllArenas();
@@ -566,7 +566,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 uiAction) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 uiAction) override
         {
             WorldSession* session = player->GetSession();
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(uiAction);
@@ -574,7 +574,7 @@ public:
 
             if (action == NPC_SPECTATOR_ACTION_MAIN_MENU)
             {
-                GossipHello(player);
+                OnGossipHello(player);
                 return true;
             }
 

@@ -309,13 +309,13 @@ public:
             SetEquipmentSlots(false, 40348);
         }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             Custom_GetMenu(player, me, 1);
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId) override
         {
             //uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
             uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
@@ -356,7 +356,7 @@ public:
     {
         npc_reagentAI(Creature* creature) : ScriptedAI(creature) {}
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_elemental_eternal_shadow:25:25:-15:0|tHousehold goods", GOSSIP_SENDER_MAIN, 1);
             AddGossipItemFor(player, 0, "|TInterface\\icons\\trade_alchemy:25:25:-15:0|tReagents for Alchemy", GOSSIP_SENDER_MAIN, 2);
@@ -375,7 +375,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId) override
         {
             //uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
             uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
@@ -628,7 +628,7 @@ public:
     {
         npc_enchantmentAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             AddGossipItemFor(player,7, "|TInterface\\icons\\Inv_misc_dust_infinite:20:20:-15:0|t[Enchanting]", GOSSIP_SENDER_MAIN, 1001);
             AddGossipItemFor(player,7, "|TInterface\\icons\\Inv_jewelcrafting_starofelune_01:20:20:-15:0|t[Sockets]", GOSSIP_SENDER_MAIN, 1002);
@@ -637,7 +637,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 uiAction) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 uiAction) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(uiAction);
             player->PlayerTalkClass->ClearMenus();
@@ -783,7 +783,7 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendNotification("You should be equiped by two-hand weapon");
-                        GossipHello(player);
+                        OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)
@@ -802,7 +802,7 @@ public:
                     else
                     {
                         player->GetSession()->SendNotification("You should be equiped by two-hand weapon");
-                        GossipHello(player);
+                        OnGossipHello(player);
                     }
                 }
                 break;
@@ -812,7 +812,7 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendNotification("You should be equiped by shield");
-                        GossipHello(player);
+                        OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_SHIELD)
@@ -830,7 +830,7 @@ public:
                     else
                     {
                         player->GetSession()->SendNotification("You should be equiped by shield");
-                        GossipHello(player);
+                        OnGossipHello(player);
                     }
                 }
                 break;
@@ -994,7 +994,7 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendNotification("You need equiped off-hand item");
-                        GossipHello(player);
+                        OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
@@ -1021,7 +1021,7 @@ public:
                     else
                     {
                         player->GetSession()->SendNotification("You need equiped off-hand weapon");
-                        GossipHello(player);
+                        OnGossipHello(player);
                     }
                 }
                 break;
@@ -1038,67 +1038,67 @@ public:
                 break;
             case 100:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_AGILITY_1H);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 101:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_SPIRIT);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 102:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_BLADE_WARD);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 103:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_BLOOD_DRAINING);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 104:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_BERSERKING);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 105:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_ACCURACY);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 106:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_BLACK_MAGIC);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 107:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_BATTLEMASTER);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 108:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_ICEBREAKER);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 109:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_LIFEWARD);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 110:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_TITANGUARD);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 111:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_POTENCY);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 112:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_MIGHTY_SPELL_POWER);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 113:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_2WEP_MONGOOSE);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 114:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_EXECUTIONER);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 701:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_WEP_STRYJA);
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
             case 115:
                 {
@@ -1106,18 +1106,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a 2H weapon equipped.");
-                        GossipHello(player);
+                        OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_2WEP_GREATER_SPELL_POWER);
-                        GossipHello(player);
+                        OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("You don't have a Two-Handed weapon equipped.");
-                        GossipHello(player);
+                        OnGossipHello(player);
                     }
                 }
                 break;
@@ -1127,18 +1127,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a 2H weapon equipped.");
-                        GossipHello(player);
+                        OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_2WEP_AGILITY);
-                        GossipHello(player);
+                        OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("You don't have a Two-Handed weapon equipped.");
-                        GossipHello(player);
+                        OnGossipHello(player);
                     }
                 }
                 break;
@@ -1148,18 +1148,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a 2H weapon equipped.");
-                        GossipHello(player);
+                        OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND), ENCHANT_2WEP_MASSACRE);
-                        GossipHello(player);
+                        OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("You don't have a Two-Handed weapon equipped.");
-                        GossipHello(player);
+                        OnGossipHello(player);
                     }
                 }
                 break;
@@ -1169,18 +1169,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_SHIELD)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_SHIELD_DEFENSE);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("You don't have a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1190,18 +1190,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_SHIELD)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_SHIELD_INTELLECT);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("You don't have a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1212,19 +1212,19 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
 
                     if (item->GetTemplate()->InventoryType == INVTYPE_SHIELD)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_SHIELD_RESILIENCE);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("You don't have a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1234,19 +1234,19 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
 
                     if (item->GetTemplate()->InventoryType == INVTYPE_SHIELD)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_SHIELD_TITANIUM_PLATING);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("You don't have a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1256,18 +1256,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_SHIELD)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_SHIELD_STAMINA);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("You don't have a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1277,332 +1277,332 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_SHIELD)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_SHIELD_TOUGHSHIELD);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("You don't have a shield equipped.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
             case 124:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_BLISSFUL_MENDING);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 125:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_BURNING_MYSTERIES);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 126:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_DOMINANCE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 127:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_SAVAGE_GLADIATOR);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 128:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_STALWART_PROTECTOR);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 129:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_TORMENT);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 130:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_TRIUMPH);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 131:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_ECLIPSED_MOON);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 132:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_FLAME_SOUL);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 133:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_FLEEING_SHADOW);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 134:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_FROSTY_SOUL);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 135:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HEAD), ENCHANT_HEAD_TOXIC_WARDING);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 136:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_MASTERS_AXE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 137:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_MASTERS_CRAG);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 411:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_KRIT);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 138:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_MASTERS_PINNACLE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 139:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_MASTERS_STORM);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 140:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_GREATER_AXE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 141:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_GREATER_CRAG);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 142:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_GREATER_GLADIATOR);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 143:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_GREATER_PINNACLE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 144:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_GREATER_STORM);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 145:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_DOMINANCE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 146:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_SHOULDERS), ENCHANT_SHOULDER_TRIUMPH);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 147:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_SPRINGY_ARACHNOWEAVE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 148:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_SHADOW_ARMOR);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 149:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_DARKGLOW_EMBROIDERY);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 150:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_LIGHTWEAVE_EMBROIDERY);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 151:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_SWORDGUARD_EMBROIDERY);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 351:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_SPINADVA);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 350:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_SPINA);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 152:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_WISDOM);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 153:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_TITANWEAVE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 154:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_SPELL_PIERCING);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 155:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_MIGHTY_ARMOR);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 156:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_MAJOR_AGILITY);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 157:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_BACK), ENCHANT_CLOAK_GREATER_SPEED);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 158:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_CHEST), ENCHANT_CHEST_POWERFUL_STATS);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 159:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_CHEST), ENCHANT_CHEST_SUPER_HEALTH);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 160:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_CHEST), ENCHANT_CHEST_GREATER_MAINA_REST);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 161:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_CHEST), ENCHANT_CHEST_EXCEPTIONAL_RESIL);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 162:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_CHEST), ENCHANT_CHEST_GREATER_DEFENSE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 163:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_MAJOR_STAMINA);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 601:
                 AdvancedEnchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), PRISMATIC_ENCHANTMENT_SLOT, ENCHANT_ZAPYASTIE_SOCKET); // Socket Belt		
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 164:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_SUPERIOR_SP);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 165:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_GREATER_ASSUALT);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 166:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_MAJOR_SPIRT);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 167:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_EXPERTISE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 169:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_INTELLECT);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 170:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_FURL_ARCANE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 171:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_FURL_FIRE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 172:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_FURL_FROST);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 173:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_FURL_NATURE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 174:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_FURL_SHADOW);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 175:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_FURL_ATTACK);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 176:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_FURL_STAMINA);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 177:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), ENCHANT_BRACERS_FURL_SPELLPOWER);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 178:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HANDS), ENCHANT_GLOVES_GREATER_BLASTING);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 179:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HANDS), ENCHANT_GLOVES_ARMSMAN);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 180:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HANDS), ENCHANT_GLOVES_CRUSHER);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 181:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HANDS), ENCHANT_GLOVES_AGILITY);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 182:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HANDS), ENCHANT_GLOVES_PRECISION);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 600:
                 AdvancedEnchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HANDS), PRISMATIC_ENCHANTMENT_SLOT, ENCHANT_KISTIRYK_SOCKET); // Socket Belt
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 168:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HANDS), ENCHANT_GLOVES_SPD);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 184:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_LEGS), ENCHANT_LEG_EARTHEN);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 185:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_LEGS), ENCHANT_LEG_FROSTHIDE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 186:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_LEGS), ENCHANT_LEG_ICESCALE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 187:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_LEGS), ENCHANT_LEG_BRILLIANT_SPELLTHREAD);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 188:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_LEGS), ENCHANT_LEG_SAPPHIRE_SPELLTHREAD);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 189:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_LEGS), ENCHANT_LEG_DRAGONSCALE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 190:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_LEGS), ENCHANT_LEG_WYRMSCALE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 191:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET), ENCHANT_BOOTS_GREATER_ASSULT);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 192:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET), ENCHANT_BOOTS_TUSKARS_VITLIATY);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 193:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET), ENCHANT_BOOTS_SUPERIOR_AGILITY);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 194:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET), ENCHANT_BOOTS_GREATER_SPIRIT);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 195:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET), ENCHANT_BOOTS_GREATER_VITALITY);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 196:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET), ENCHANT_BOOTS_ICEWALKER);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 197:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET), ENCHANT_BOOTS_GREATER_FORTITUDE);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 198:
                 item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET);
@@ -1615,32 +1615,32 @@ public:
                 if (item->GetTemplate()->ItemLevel>150)
                 {
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET), ENCHANT_BOOTS_NITRO_BOOTS);
-                    GossipHello(player);
+                   OnGossipHello(player);
                 }
                 else
                 {
                     player->GetSession()->SendAreaTriggerMessage("You can't enchant this item");
-                    GossipHello(player);
+                   OnGossipHello(player);
                 }
                 break;
             case 202:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FINGER1), ENCHANT_RING_ASSULT);
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FINGER2), ENCHANT_RING_ASSULT);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 203:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FINGER1), ENCHANT_RING_GREATER_SP);
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FINGER2), ENCHANT_RING_GREATER_SP);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 204:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FINGER1), ENCHANT_RING_STAMINA);
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FINGER2), ENCHANT_RING_STAMINA);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 220:
                 AdvancedEnchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WAIST), PRISMATIC_ENCHANTMENT_SLOT, ENCHANT_WAIST_SOCKET);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 221:
                 item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WAIST);
@@ -1653,12 +1653,12 @@ public:
                 if (item->GetTemplate()->ItemLevel>150)
                 {
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WAIST), ENCHANT_BOMBA);
-                    GossipHello(player);
+                   OnGossipHello(player);
                 }
                 else
                 {
                     player->GetSession()->SendAreaTriggerMessage("You can't enchant this item");
-                    GossipHello(player);
+                   OnGossipHello(player);
                 }
                 break;
             case 299: // 
@@ -1672,21 +1672,21 @@ public:
                 if (item->GetTemplate()->ItemLevel>150)
                 {
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WAIST), ENCHANT_VZRIV);
-                    GossipHello(player);
+                   OnGossipHello(player);
                 }
                 else
                 {
                     player->GetSession()->SendAreaTriggerMessage("You can't enchant this item");
-                    GossipHello(player);
+                   OnGossipHello(player);
                 }
                 break;
             case 222:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HANDS), ENCHANT_GLOVES_HAST);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 223:
                 Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_HANDS), ENCHANT_GLOVES_RAKETA);
-                GossipHello(player);
+               OnGossipHello(player);
                 break;
             case 205:
                 {
@@ -1694,18 +1694,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_BLADE_WARD);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1716,18 +1716,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_AGILITY_1H);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1738,18 +1738,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_SPIRIT);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1760,18 +1760,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_BERSERKING);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1781,18 +1781,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_ACCURACY);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1802,18 +1802,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_BLACK_MAGIC);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1823,18 +1823,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_BATTLEMASTER);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1845,18 +1845,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_ICEBREAKER);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1866,18 +1866,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_LIFEWARD);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1887,18 +1887,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_TITANGUARD);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1908,18 +1908,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_POTENCY);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1930,18 +1930,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_MIGHTY_SPELL_POWER);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1952,18 +1952,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_2WEP_MONGOOSE);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1974,18 +1974,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_EXECUTIONER);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -1995,18 +1995,18 @@ public:
                     if (!item)
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                         return false;
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND), ENCHANT_WEP_BLOOD_DRAINING);
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                     else
                     {
                         player->GetSession()->SendAreaTriggerMessage("This enchant needs a one-hand weapon equipped in the off-hand.");
-                        GossipHello(player);
+                       OnGossipHello(player);
                     }
                 }
                 break;
@@ -2061,7 +2061,7 @@ public:
             creature->CastSpell(creature, 43897, true);
         }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             ClearGossipMenuFor(player);
 
@@ -2072,7 +2072,7 @@ public:
             return true;
         }
       
-        bool GossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId) override
         {
             uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
             uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);

@@ -121,7 +121,7 @@ uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32
 }
 
 //does not clear ram
-void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabaseTransaction& trans)
+void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabaseTransaction trans)
 {
     Item* pItem = GetAItem(auction->itemGUIDLow);
     if (!pItem)
@@ -226,7 +226,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction)
 }
 
 //does not clear ram
-void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDatabaseTransaction& trans)
+void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDatabaseTransaction trans)
 {
     //return an item in auction to its owner by mail
     Item* pItem = GetAItem(auction->itemGUIDLow);
@@ -890,7 +890,7 @@ uint32 AuctionEntry::GetAuctionOutBid() const
     return outbid ? outbid : 1;
 }
 
-void AuctionEntry::DeleteFromDB(CharacterDatabaseTransaction& trans) const
+void AuctionEntry::DeleteFromDB(CharacterDatabaseTransaction trans) const
 {
     CharacterDatabasePreparedStatement* stmt;
 
@@ -903,7 +903,7 @@ void AuctionEntry::DeleteFromDB(CharacterDatabaseTransaction& trans) const
     trans->Append(stmt);
 }
 
-void AuctionEntry::SaveToDB(CharacterDatabaseTransaction& trans) const
+void AuctionEntry::SaveToDB(CharacterDatabaseTransaction trans) const
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AUCTION);
     stmt->setUInt32(0, Id);

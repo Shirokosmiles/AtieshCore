@@ -95,8 +95,8 @@ struct TC_GAME_API AuctionEntry
     uint32 GetAuctionCut() const;
     uint32 GetAuctionOutBid() const;
     bool BuildAuctionInfo(WorldPacket & data, Item* sourceItem = nullptr) const;
-    void DeleteFromDB(CharacterDatabaseTransaction& trans) const;
-    void SaveToDB(CharacterDatabaseTransaction& trans) const;
+    void DeleteFromDB(CharacterDatabaseTransaction trans) const;
+    void SaveToDB(CharacterDatabaseTransaction trans) const;
     bool LoadFromDB(Field* fields);
     std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
     static std::string BuildAuctionMailBody(ObjectGuid::LowType lowGuid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut);
@@ -176,10 +176,10 @@ class TC_GAME_API AuctionHouseMgr
         }
 
         //auction messages
-        void SendAuctionWonMail(AuctionEntry* auction, CharacterDatabaseTransaction& trans);
+        void SendAuctionWonMail(AuctionEntry* auction, CharacterDatabaseTransaction trans);
         void SendAuctionSalePendingMail(AuctionEntry* auction);
         void SendAuctionSuccessfulMail(AuctionEntry* auction);
-        void SendAuctionExpiredMail(AuctionEntry* auction, CharacterDatabaseTransaction& trans);
+        void SendAuctionExpiredMail(AuctionEntry* auction, CharacterDatabaseTransaction trans);
         void SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder);
         void SendAuctionCancelledToBidderMail(AuctionEntry* auction);
 

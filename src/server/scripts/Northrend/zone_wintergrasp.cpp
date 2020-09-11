@@ -126,7 +126,7 @@ class wg_se_workshop_mechanic : public CreatureScript
         {
             wg_se_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
 
-            bool GossipHello(Player* player) override
+            bool OnGossipHello(Player* player) override
             {
                 if (me->IsQuestGiver())
                     player->PrepareQuestMenu(me->GetGUID());
@@ -149,7 +149,7 @@ class wg_se_workshop_mechanic : public CreatureScript
                 return true;
             }
 
-            bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+            bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
             {
                 uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
                 CloseGossipMenuFor(player);
@@ -208,7 +208,7 @@ public:
     {
         wg_sw_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             if (me->IsQuestGiver())
                 player->PrepareQuestMenu(me->GetGUID());
@@ -231,7 +231,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             CloseGossipMenuFor(player);
@@ -290,7 +290,7 @@ public:
     {
         wg_ne_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             if (me->IsQuestGiver())
                 player->PrepareQuestMenu(me->GetGUID());
@@ -313,7 +313,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             CloseGossipMenuFor(player);
@@ -372,7 +372,7 @@ public:
     {
         wg_nw_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             if (me->IsQuestGiver())
                 player->PrepareQuestMenu(me->GetGUID());
@@ -395,7 +395,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             CloseGossipMenuFor(player);
@@ -454,7 +454,7 @@ public:
     {
         wg_ke_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             if (me->IsQuestGiver())
                 player->PrepareQuestMenu(me->GetGUID());
@@ -477,7 +477,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             CloseGossipMenuFor(player);
@@ -536,7 +536,7 @@ public:
     {
         wg_kw_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             if (me->IsQuestGiver())
                 player->PrepareQuestMenu(me->GetGUID());
@@ -559,7 +559,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             CloseGossipMenuFor(player);
@@ -624,7 +624,7 @@ class npc_wg_spirit_guide : public CreatureScript
                     DoCast(me, SPELL_CHANNEL_SPIRIT_HEAL);
             }
 
-            bool GossipHello(Player* player) override
+            bool OnGossipHello(Player* player) override
             {
                 if (me->IsQuestGiver())
                     player->PrepareQuestMenu(me->GetGUID());
@@ -642,7 +642,7 @@ class npc_wg_spirit_guide : public CreatureScript
                 return true;
             }
 
-            bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+            bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
             {
                 uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
                 CloseGossipMenuFor(player);
@@ -704,7 +704,7 @@ class npc_wg_queue : public CreatureScript
                 DoMeleeAttackIfReady();
             }
 
-            bool GossipHello(Player* player) override
+            bool OnGossipHello(Player* player) override
             {
                 if (me->IsQuestGiver())
                     player->PrepareQuestMenu(me->GetGUID());
@@ -733,7 +733,7 @@ class npc_wg_queue : public CreatureScript
                 return true;
             }
 
-            bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 /*gossipListId*/) override
+            bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 /*gossipListId*/) override
             {
                 CloseGossipMenuFor(player);
 

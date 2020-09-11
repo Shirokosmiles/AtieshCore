@@ -54,14 +54,14 @@ public:
     {
         landro_longshotAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Do you desire something special?", GOSSIP_SENDER_MAIN, PROMOTION);
             player->PlayerTalkClass->SendGossipMenu(WELCOME, me->GetGUID());
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 MenuID = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             player->PlayerTalkClass->ClearMenus();
@@ -92,7 +92,7 @@ public:
             return true;
         }
 
-        bool GossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 gossipListId, char const* code) override
+        bool OnGossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 gossipListId, char const* code) override
         {
             if (!player)
                 return false;;

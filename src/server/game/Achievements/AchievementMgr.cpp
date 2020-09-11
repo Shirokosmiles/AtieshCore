@@ -549,7 +549,7 @@ void AchievementMgr::DeleteFromDB(ObjectGuid guid)
     CharacterDatabase.CommitTransaction(trans);
 }
 
-void AchievementMgr::SaveToDB(CharacterDatabaseTransaction& trans)
+void AchievementMgr::SaveToDB(CharacterDatabaseTransaction trans)
 {
     if (!m_completedAchievements.empty())
     {

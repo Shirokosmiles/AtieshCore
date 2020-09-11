@@ -483,7 +483,7 @@ public:
     {
         npc_archimage_PentarusAI(Creature* creature) : ScriptedAI(creature) {}
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 /*gossipListId*/) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 /*gossipListId*/) override
         {
             CloseGossipMenuFor(player);
             player->CastSpell(player, 50860);

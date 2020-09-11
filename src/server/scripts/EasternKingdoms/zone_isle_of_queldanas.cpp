@@ -322,7 +322,7 @@ public:
     {
         npc_sunwell_warderAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             player->PrepareGossipMenu(me, 0);
             if (player->HasItemCount(49879, 1) || player->HasItemCount(49889, 1))
@@ -331,7 +331,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*uiSender*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*uiSender*/, uint32 gossipListId) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             player->PlayerTalkClass->ClearMenus();
@@ -366,7 +366,7 @@ public:
     {
         go_dalaran_portal_sunwellAI(GameObject* go) : GameObjectAI(go) { }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             player->PrepareGossipMenu(me, 0);
             player->SetCanEnterInInstanceOrRaidCustom(false);

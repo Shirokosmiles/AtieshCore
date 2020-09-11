@@ -57,7 +57,7 @@ public:
 
     Guild* GetGuildByLeader(ObjectGuid guid) const;
     Guild* GetGuildById(ObjectGuid::LowType guildId) const;
-    Guild* GetGuildByName(std::string const& guildName) const;
+    Guild* GetGuildByName(std::string_view guildName) const;
     std::string GetGuildNameById(ObjectGuid::LowType guildId) const;
 
     void LoadGuilds();

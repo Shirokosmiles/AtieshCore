@@ -1268,7 +1268,7 @@ public:
             UpdateVictim();
         }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             // @TODO: MOVE THIS HORRIBLE STUFF TO DB
 
@@ -1330,7 +1330,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 uiAction) override
+        bool OnGossipSelect(Player* player, uint32 /*sender*/, uint32 uiAction) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(uiAction);
             ClearGossipMenuFor(player);

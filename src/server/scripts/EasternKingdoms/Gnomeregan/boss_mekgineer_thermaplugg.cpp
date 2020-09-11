@@ -319,7 +319,7 @@ public:
     {
         go_buttonAI(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()), _face_id(GetFace()) {};
 
-        bool GossipHello(Player* /*player*/) override
+        bool OnGossipHello(Player* /*player*/) override
         {
             if (GameObject* gnomeFace = _instance->GetGameObject(_face_id))
             {
