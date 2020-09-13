@@ -927,5 +927,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     if (incHighest)
         sObjectMgr->GetGenerator<HighGuid::Player>().Generate();
 
+    sWorld->UpdateRealmCharCount(account);
+
     return DUMP_SUCCESS;
 }
