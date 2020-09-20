@@ -42,11 +42,11 @@ public:
         {
             { "start",      rbac::RBAC_PERM_COMMAND_EVENT_START,      true, &HandleEventStartCommand,      "" },
             { "stop",       rbac::RBAC_PERM_COMMAND_EVENT_STOP,       true, &HandleEventStopCommand,       "" },
-            { "info",       rbac::RBAC_PERM_COMMAND_EVENT,            true, &HandleEventInfoCommand,       "" },
+            { "info",       rbac::RBAC_PERM_COMMAND_EVENT_INFO,       true, &HandleEventInfoCommand,       "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "specialevent", rbac::RBAC_PERM_COMMAND_EVENT, false, nullptr, "", specialeventCommandTable },
+            { "specialevent", rbac::RBAC_PERM_COMMAND_EVENT_INFO, false, nullptr, "", specialeventCommandTable },
         };
         return commandTable;
     }
