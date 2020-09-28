@@ -1384,6 +1384,8 @@ bool MailMgr::HandleQueryNextMailTime(Player* player, WorldPacket& data)
         }
     }
 
+    sentSenders.clear();
+
     data.put<uint32>(4, count);
 
     return true;
