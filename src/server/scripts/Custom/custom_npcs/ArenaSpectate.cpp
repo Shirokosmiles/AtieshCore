@@ -31,6 +31,10 @@
 #include "ScriptMgr.h"
 #include "ScriptedGossip.h"
 
+#if TRINITY_COMPILER == TRINITY_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 #define GTS session->GetTrinityString
 
 enum ClassTalents

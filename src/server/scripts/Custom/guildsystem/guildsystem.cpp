@@ -22,6 +22,10 @@
 #include "RBAC.h"
 #include "WorldSession.h"
 
+#if TRINITY_COMPILER == TRINITY_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 class GuildSystem_player : public PlayerScript
 {
 public:
