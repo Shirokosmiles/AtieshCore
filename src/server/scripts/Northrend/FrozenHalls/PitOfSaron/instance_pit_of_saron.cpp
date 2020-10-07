@@ -55,13 +55,6 @@ class instance_pit_of_saron : public InstanceMapScript
                 _shardsHit = 0;
             }
 
-            void OnPlayerEnter(Player* player) override
-            {
-                //TC_LOG_ERROR("server", "Pit Of Saron: _teamInInstance = %u", _teamInInstance);
-                //TC_LOG_ERROR("server", "Pit Of Saron: player->GetCFSTeam() = %u", player->GetCFSTeam());
-                //TC_LOG_ERROR("server", "Pit Of Saron: player->GetTeam() = %u", player->GetTeam());
-            }
-
             void OnCreatureCreate(Creature* creature) override
             {
                 switch (creature->GetEntry())

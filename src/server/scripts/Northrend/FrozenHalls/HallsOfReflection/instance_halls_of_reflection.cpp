@@ -98,7 +98,7 @@ class instance_halls_of_reflection : public InstanceMapScript
                 events.Reset();
             }
 
-            void OnPlayerEnter(Player* player) override
+            void OnPlayerEnter(Player* /*player*/) override
             {
                 if (GetBossState(DATA_MARWYN) == DONE)
                 {
