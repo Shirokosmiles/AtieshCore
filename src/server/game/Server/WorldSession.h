@@ -169,15 +169,17 @@ namespace WorldPackets
 
     namespace Mail
     {
-        class MailCreateTextItem;
-        class MailDelete;
-        class MailGetList;
-        class MailMarkAsRead;
+        /*        
         class MailQueryNextMailTime;
+        */
+        class SendMailClient;
+        class MailMarkAsRead;
+        class MailDelete;
         class MailReturnToSender;
         class MailTakeItem;
         class MailTakeMoney;
-        class SendMail;
+        class MailGetList;
+        class MailCreateTextItem;
     }
 
     namespace Misc
@@ -879,7 +881,7 @@ class TC_GAME_API WorldSession
         void HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyBankSlot);
 
         void HandleGetMailList(WorldPackets::Mail::MailGetList& getList);
-        void HandleSendMail(WorldPackets::Mail::SendMail& sendMail);
+        void HandleSendMail(WorldPackets::Mail::SendMailClient& sendMail);
         void HandleMailTakeMoney(WorldPackets::Mail::MailTakeMoney& takeMoney);
         void HandleMailTakeItem(WorldPackets::Mail::MailTakeItem& takeItem);
         void HandleMailMarkAsRead(WorldPackets::Mail::MailMarkAsRead& markAsRead);

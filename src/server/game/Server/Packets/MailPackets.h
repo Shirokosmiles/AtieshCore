@@ -28,79 +28,15 @@ namespace WorldPackets
 {
     namespace Mail
     {
-        struct MailAttachedItem
-        {
-            MailAttachedItem(::Item const* item, uint8 pos);
-
-            static constexpr std::size_t GetPacketSize()
-            {
-                return sizeof(uint8) + sizeof(int32) + sizeof(int32) + MAX_INSPECTED_ENCHANTMENT_SLOT * (sizeof(int32) + sizeof(int32) + sizeof(int32))
-                    + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(uint32) + sizeof(int32) + sizeof(bool);
-            }
-
-            uint8 Position = 0;
-            int32 AttachID = 0;
-            int32 ItemID = 0;
-            int32 RandomPropertiesSeed = 0;
-            int32 RandomPropertiesID = 0;
-            int32 Count = 0;
-            int32 Charges = 0;
-            uint32 MaxDurability = 0;
-            int32 Durability = 0;
-            bool Unlocked = false;
-            std::array<uint32, MAX_INSPECTED_ENCHANTMENT_SLOT> EnchantmentID = { };
-            std::array<uint32, MAX_INSPECTED_ENCHANTMENT_SLOT> EnchantmentDuration = { };
-            std::array<uint32, MAX_INSPECTED_ENCHANTMENT_SLOT> EnchantmentCharges = { };
-        };
-
-        class MailGetList final : public ClientPacket
+        // SMSG
+        class ShowMailbox final : public ServerPacket
         {
         public:
-            MailGetList(WorldPacket&& packet) : ClientPacket(CMSG_GET_MAIL_LIST, std::move(packet)) { }
+            ShowMailbox() : ServerPacket(SMSG_SHOW_MAILBOX, 16) { }
 
-            void Read() override;
+            WorldPacket const* Write() override;
 
-            ObjectGuid Mailbox;
-        };
-
-        class MailCreateTextItem final : public ClientPacket
-        {
-        public:
-            MailCreateTextItem(WorldPacket&& packet) : ClientPacket(CMSG_MAIL_CREATE_TEXT_ITEM, std::move(packet)) { }
-
-            void Read() override;
-
-            ObjectGuid Mailbox;
-            uint32 MailID = 0;
-        };
-
-        class SendMail final : public ClientPacket
-        {
-        public:
-            struct StructSendMail
-            {
-                struct MailAttachment
-                {
-                    uint8 AttachPosition = 0;
-                    ObjectGuid ItemGUID;
-                };
-
-                ObjectGuid Mailbox;
-                int32 StationeryID = 0;
-                int32 PackageID = 0;
-                int32 SendMoney = 0;
-                int32 Cod = 0;
-                std::string Target;
-                String<255, Strings::NoHyperlinks> Subject;
-                String<7999, Strings::NoHyperlinks> Body;
-                Array<MailAttachment, MAX_MAIL_ITEMS> Attachments;
-            };
-
-            SendMail(WorldPacket&& packet) : ClientPacket(CMSG_SEND_MAIL, std::move(packet)) { }
-
-            void Read() override;
-
-            StructSendMail Info;
+            ObjectGuid PostmasterGUID;
         };
 
         class MailCommandResult final : public ServerPacket
@@ -118,16 +54,39 @@ namespace WorldPackets
             uint32 QtyInInventory = 0;
         };
 
-        class MailReturnToSender final : public ClientPacket
+        class NotifyReceivedMail : ServerPacket
         {
         public:
-            MailReturnToSender(WorldPacket&& packet) : ClientPacket(CMSG_MAIL_RETURN_TO_SENDER, std::move(packet)) { }
+            NotifyReceivedMail() : ServerPacket(SMSG_RECEIVED_MAIL, 4) { }
+
+            WorldPacket const* Write() override;
+
+            float Delay = 0.0f;
+        };
+
+        // CMSG
+        class SendMailClient final : public ClientPacket
+        {
+        public:
+            SendMailClient(WorldPacket&& packet) : ClientPacket(CMSG_SEND_MAIL, std::move(packet)) { }
 
             void Read() override;
 
+            struct MailAttachment
+            {
+                uint8 AttachPosition = 0;
+                ObjectGuid ItemGUID;
+            };
+
             ObjectGuid Mailbox;
-            int32 MailID = 0;
-            ObjectGuid SenderGUID;
+            int32 StationeryID = 0;
+            int32 PackageID = 0;
+            int32 SendMoney = 0;
+            int32 Cod = 0;
+            std::string Target;
+            String<255, Strings::NoHyperlinks> Subject;
+            String<7999, Strings::NoHyperlinks> Body;
+            Array<MailAttachment, MAX_MAIL_ITEMS> Attachments;
         };
 
         class MailMarkAsRead final : public ClientPacket
@@ -153,6 +112,18 @@ namespace WorldPackets
             int32 DeleteReason = 0;
         };
 
+        class MailReturnToSender final : public ClientPacket
+        {
+        public:
+            MailReturnToSender(WorldPacket&& packet) : ClientPacket(CMSG_MAIL_RETURN_TO_SENDER, std::move(packet)) { }
+
+            void Read() override;
+
+            ObjectGuid Mailbox;
+            int32 MailID = 0;
+            ObjectGuid SenderGUID;
+        };
+
         class MailTakeItem final : public ClientPacket
         {
         public:
@@ -176,24 +147,25 @@ namespace WorldPackets
             int32 MailID = 0;
         };
 
-        class NotifyReceivedMail : ServerPacket
+        class MailGetList final : public ClientPacket
         {
         public:
-            NotifyReceivedMail() : ServerPacket(SMSG_RECEIVED_MAIL, 4) { }
+            MailGetList(WorldPacket&& packet) : ClientPacket(CMSG_GET_MAIL_LIST, std::move(packet)) { }
 
-            WorldPacket const* Write() override;
+            void Read() override;
 
-            float Delay = 0.0f;
+            ObjectGuid Mailbox;
         };
 
-        class ShowMailbox final : public ServerPacket
+        class MailCreateTextItem final : public ClientPacket
         {
         public:
-            ShowMailbox() : ServerPacket(SMSG_SHOW_MAILBOX, 16) { }
+            MailCreateTextItem(WorldPacket&& packet) : ClientPacket(CMSG_MAIL_CREATE_TEXT_ITEM, std::move(packet)) { }
 
-            WorldPacket const* Write() override;
+            void Read() override;
 
-            ObjectGuid PostmasterGUID;
+            ObjectGuid Mailbox;
+            uint32 MailID = 0;
         };
     }
 }

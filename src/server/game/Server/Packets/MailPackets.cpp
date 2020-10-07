@@ -21,88 +21,12 @@
 #include "Player.h"
 #include "World.h"
 
-WorldPackets::Mail::MailAttachedItem::MailAttachedItem(::Item const* item, uint8 pos)
+// SMSG
+WorldPacket const* WorldPackets::Mail::ShowMailbox::Write()
 {
-    Position = pos;
-    AttachID = item->GetGUID().GetCounter();
-    ItemID = item->GetEntry();
-    RandomPropertiesID = item->GetItemRandomPropertyId();
-    RandomPropertiesSeed = item->GetItemSuffixFactor();
-    Count = item->GetCount();
-    Charges = item->GetSpellCharges();
-    MaxDurability = item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
-    Durability = item->GetInt32Value(ITEM_FIELD_DURABILITY);
-    Unlocked = !item->IsLocked();
+    _worldPacket << PostmasterGUID;
 
-    for (uint8 j = 0; j < MAX_INSPECTED_ENCHANTMENT_SLOT; j++)
-    {
-        EnchantmentSlot slot = EnchantmentSlot(j);
-        EnchantmentID[slot] = item->GetEnchantmentId(slot);
-        EnchantmentDuration[slot] = item->GetEnchantmentDuration(slot);
-        EnchantmentCharges[slot] = item->GetEnchantmentCharges(slot);
-    }
-}
-
-ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::Mail::MailAttachedItem const& att)
-{
-    data << uint8(att.Position);
-    data << int32(att.AttachID);
-    data << int32(att.ItemID);
-    for (uint8 i = 0; i < MAX_INSPECTED_ENCHANTMENT_SLOT; i++)
-    {
-        data << int32(att.EnchantmentID[i]);
-        data << int32(att.EnchantmentDuration[i]);
-        data << int32(att.EnchantmentCharges[i]);
-    }
-    data << int32(att.RandomPropertiesID);
-    data << int32(att.RandomPropertiesSeed);
-    data << int32(att.Count);
-    data << int32(att.Charges);
-    data << uint32(att.MaxDurability);
-    data << int32(att.Durability);
-    data << bool(att.Unlocked);
-
-    return data;
-}
-
-void WorldPackets::Mail::MailGetList::Read()
-{
-    _worldPacket >> Mailbox;
-}
-
-void WorldPackets::Mail::MailCreateTextItem::Read()
-{
-    _worldPacket >> Mailbox;
-    _worldPacket >> MailID;
-}
-
-void WorldPackets::Mail::SendMail::Read()
-{
-    _worldPacket >> Info.Mailbox;
-    _worldPacket >> Info.Target;
-    _worldPacket >> Info.Subject;
-    _worldPacket >> Info.Body;
-    _worldPacket >> Info.StationeryID;
-    _worldPacket >> Info.PackageID;
-    Info.Attachments.resize(_worldPacket.read<uint8>());
-
-    for (auto& att : Info.Attachments)
-    {
-        _worldPacket >> att.AttachPosition;
-        _worldPacket >> att.ItemGUID;
-    }
-
-    _worldPacket >> Info.SendMoney;
-    _worldPacket >> Info.Cod;
-    _worldPacket.read_skip<uint64>();
-    _worldPacket.read_skip<uint8>();
-}
-
-void WorldPackets::Mail::MailReturnToSender::Read()
-{
-    _worldPacket >> Mailbox;
-    _worldPacket >> MailID;
-    _worldPacket >> SenderGUID;
+    return &_worldPacket;
 }
 
 WorldPacket const* WorldPackets::Mail::MailCommandResult::Write()
@@ -126,6 +50,36 @@ WorldPacket const* WorldPackets::Mail::MailCommandResult::Write()
     return &_worldPacket;
 }
 
+WorldPacket const* WorldPackets::Mail::NotifyReceivedMail::Write()
+{
+    _worldPacket << float(Delay);
+
+    return &_worldPacket;
+}
+
+// CMSG
+void WorldPackets::Mail::SendMailClient::Read()
+{
+    _worldPacket >> Mailbox;
+    _worldPacket >> Target;
+    _worldPacket >> Subject;
+    _worldPacket >> Body;
+    _worldPacket >> StationeryID;
+    _worldPacket >> PackageID;
+    Attachments.resize(_worldPacket.read<uint8>());
+
+    for (auto& att : Attachments)
+    {
+        _worldPacket >> att.AttachPosition;
+        _worldPacket >> att.ItemGUID;
+    }
+
+    _worldPacket >> SendMoney;
+    _worldPacket >> Cod;
+    _worldPacket.read_skip<uint64>();
+    _worldPacket.read_skip<uint8>();
+}
+
 void WorldPackets::Mail::MailMarkAsRead::Read()
 {
     _worldPacket >> Mailbox;
@@ -137,6 +91,13 @@ void WorldPackets::Mail::MailDelete::Read()
     _worldPacket >> Mailbox;
     _worldPacket >> MailID;
     _worldPacket >> DeleteReason;
+}
+
+void WorldPackets::Mail::MailReturnToSender::Read()
+{
+    _worldPacket >> Mailbox;
+    _worldPacket >> MailID;
+    _worldPacket >> SenderGUID;
 }
 
 void WorldPackets::Mail::MailTakeItem::Read()
@@ -152,16 +113,13 @@ void WorldPackets::Mail::MailTakeMoney::Read()
     _worldPacket >> MailID;
 }
 
-WorldPacket const* WorldPackets::Mail::NotifyReceivedMail::Write()
+void WorldPackets::Mail::MailGetList::Read()
 {
-    _worldPacket << float(Delay);
-
-    return &_worldPacket;
+    _worldPacket >> Mailbox;
 }
 
-WorldPacket const* WorldPackets::Mail::ShowMailbox::Write()
+void WorldPackets::Mail::MailCreateTextItem::Read()
 {
-    _worldPacket << PostmasterGUID;
-
-    return &_worldPacket;
+    _worldPacket >> Mailbox;
+    _worldPacket >> MailID;
 }
