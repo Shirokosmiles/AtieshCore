@@ -32,6 +32,7 @@ EndScriptData */
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "ItemEnchantmentMgr.h"
+#include "ItemShopMgr.h"
 #include "Language.h"
 #include "LFGMgr.h"
 #include "Log.h"
@@ -167,6 +168,7 @@ public:
             { "vehicle_accessory",             rbac::RBAC_PERM_COMMAND_RELOAD_VEHICLE_ACCESORY,                 true,  &HandleReloadVehicleAccessoryCommand,           "" },
             { "vehicle_template_accessory",    rbac::RBAC_PERM_COMMAND_RELOAD_VEHICLE_TEMPLATE_ACCESSORY,       true,  &HandleReloadVehicleTemplateAccessoryCommand,   "" },
             { "promotion_codes",               rbac::RBAC_PERM_RELOAD_PROMO_CODE_TABLE,                         true,  &HandleReloadPromoCodeCommand,                  "" },
+            { "item_shop",                     rbac::RBAC_PERM_COMMAND_RELOAD_ITEM_TEMPLATE_LOCALE,             true,  &HandleReloadItemShopCommand,                   "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -1193,6 +1195,14 @@ public:
         TC_LOG_INFO("misc", "Reloading promotion_codes table...");
         sPromotionCodeMgr->ReloadCodes();
         handler->SendGlobalGMSysMessage("Promotion codes reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadItemShopCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        TC_LOG_INFO("misc", "Reloading item_shop table...");
+        sItemShopMgr->Reload();
+        handler->SendGlobalGMSysMessage("Items from shop reloaded.");
         return true;
     }
 };

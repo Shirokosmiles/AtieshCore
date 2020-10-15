@@ -41,6 +41,9 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_UPD_PROMO_CODE_USED, "UPDATE promotion_codes SET count_of_exists = ? WHERE id = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_INS_PROMO_CODE_HISTORY, "INSERT INTO promotion_codes_history (id, codeID, code, accountID, playerID, use_time, use_unix_time) VALUES (?, ?, ?, ?, ?, NOW(), ?)", CONNECTION_ASYNC);
 
+    PrepareStatement(WORLD_INS_ITEM_FROM_SHOP, "INSERT INTO item_shop (id, entryID, groupName, coinCost) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_DEL_ITEM_FROM_SHOP, "DELETE FROM item_shop WHERE entryID = ? AND groupName = ?", CONNECTION_ASYNC);
+
     PrepareStatement(WORLD_INS_NPC_VENDOR, "INSERT INTO npc_vendor (entry, item, maxcount, incrtime, extendedcost) VALUES(?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_DEL_NPC_VENDOR, "DELETE FROM npc_vendor WHERE entry = ? AND item = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_SEL_NPC_VENDOR_REF, "SELECT item, maxcount, incrtime, ExtendedCost FROM npc_vendor WHERE entry = ? ORDER BY slot ASC", CONNECTION_SYNCH);

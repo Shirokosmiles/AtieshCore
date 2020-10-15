@@ -53,6 +53,7 @@
 #include "GuildMgr.h"
 #include "InstanceCharMgr.h"
 #include "InstanceSaveMgr.h"
+#include "ItemShopMgr.h"
 #include "IPLocation.h"
 #include "Language.h"
 #include "LFGMgr.h"
@@ -1245,6 +1246,10 @@ void World::SetInitialWorldSettings()
     ///- Initialize PromoCodes data
     TC_LOG_INFO("server.loading", "Loading Promo Codes...");
     sPromotionCodeMgr->Initialize();
+
+    ///- Initialize PromoCodes data
+    TC_LOG_INFO("server.loading", "Loading ItemShop items...");
+    sItemShopMgr->Initialize();
 
     ///- Initialize Warden
     TC_LOG_INFO("server.loading", "Loading Warden Checks...");
