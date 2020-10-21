@@ -15,7 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DatabaseEnv.h"
 #include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Mail.h"
 #include "MailMgr.h"
@@ -93,13 +95,14 @@ void MailExternalMgr::_DoUpdate()
 
         sMailMgr->SendMailWithItemsByGUID(receiver_guid, receiver_guid, MAIL_NORMAL, subject, body, money, itemlist);
         itemlist.clear();
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXTERNAL_MAIL);
-        stmt->setUInt32(0, id);
-        trans->Append(stmt);
+
+        CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXTERNAL_MAIL);
+        stmt2->setUInt32(0, id);
+        trans->Append(stmt2);
 
         TC_LOG_DEBUG("mailexternal", "External Mail> Mail sent");
     } while (result->NextRow());
 
     CharacterDatabase.CommitTransaction(trans);
-    TC_LOG_DEBUG("mailexternal", "External Mail> All Mails Sent...");    
+    TC_LOG_DEBUG("mailexternal", "External Mail> All Mails Sent...");
 }

@@ -72,7 +72,6 @@ BaseTable const BaseTables[] =
 {
     { "character_pet",           "id",      "owner",      GUID_TYPE_PET           },
     { "item_instance",           "guid",    "owner_guid", GUID_TYPE_ITEM          },
-
     { "character_equipmentsets", "setguid", "guid",       GUID_TYPE_EQUIPMENT_SET }
 };
 

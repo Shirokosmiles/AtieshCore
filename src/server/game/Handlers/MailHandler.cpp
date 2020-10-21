@@ -251,8 +251,6 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMailClient& sendMail)
 
         bool needItemDelay = false;
 
-        //MailDraft draft(mailInfo.Subject, mailInfo.Body);
-
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
         std::list<Item*> maillist;
@@ -260,7 +258,7 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMailClient& sendMail)
         {
             bool log = HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE);
             if (!sendMail.Attachments.empty())
-            {                
+            {
                 for (Item* item : items)
                 {
                     if (log)
@@ -347,7 +345,7 @@ void WorldSession::HandleMailReturnToSender(WorldPackets::Mail::MailReturnToSend
         case 0:
             _player->SendMailResult(returnToSender.MailID, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
             break;
-        case 1: break;
+        case 1:
             _player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
             break;
         case 2:
@@ -382,7 +380,7 @@ void WorldSession::HandleMailTakeItem(WorldPackets::Mail::MailTakeItem& takeItem
             break;
         default:
             break;
-    }    
+    }
 }
 
 void WorldSession::HandleMailTakeMoney(WorldPackets::Mail::MailTakeMoney& takeMoney)

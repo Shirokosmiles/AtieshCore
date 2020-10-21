@@ -307,7 +307,6 @@ void AuctionHouseMgr::LoadAuctionItems()
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 auction items. DB table `auctionhouse` or `item_instance` is empty!");
-
         return;
     }
 
@@ -340,7 +339,6 @@ void AuctionHouseMgr::LoadAuctionItems()
     while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u auction items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-
 }
 
 void AuctionHouseMgr::LoadAuctions()
@@ -353,7 +351,6 @@ void AuctionHouseMgr::LoadAuctions()
     if (!resultAuctions)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 auctions. DB table `auctionhouse` is empty.");
-
         return;
     }
 
@@ -662,15 +659,14 @@ void AuctionHouseObject::BuildListAllLots(Player* player, uint32& totalcount)
     for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
     {
         AuctionEntry* Aentry = itr->second;
-        if (Aentry && Aentry->bidders.find(player->GetGUID()) != Aentry->bidders.end())
-            ++totalcount;
-    }
+        if (Aentry)
+        {
+            if (Aentry->owner == player->GetGUID().GetCounter())
+                ++totalcount;
 
-    for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
-    {
-        AuctionEntry* Aentry = itr->second;
-        if (Aentry && Aentry->owner == player->GetGUID().GetCounter())
-            ++totalcount;
+            if (Aentry->bidders.find(player->GetGUID()) != Aentry->bidders.end())
+                ++totalcount;
+        }
     }
 }
 
@@ -863,7 +859,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data, Item* sourceItem) const
     data << uint32(item->GetItemSuffixFactor());                    // SuffixFactor
     data << uint32(item->GetCount());                               // item->count
     data << uint32(item->GetSpellCharges());                        // item->charge FFFFFFF
-    data << uint32(0);                                              // Unknown
+    data << uint32(item->GetUInt32Value(ITEM_FIELD_FLAGS));         // item flags
     data << uint64(owner);                                          // Auction->owner
     data << uint32(startbid);                                       // Auction->startbid (not sure if useful)
     data << uint32(bid ? GetAuctionOutBid() : 0);
