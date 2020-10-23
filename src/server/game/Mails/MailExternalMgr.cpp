@@ -75,14 +75,14 @@ void MailExternalMgr::_DoUpdate()
         if (itemId)
         {
             if (!sObjectMgr->GetItemTemplate(itemId))
-                TC_LOG_DEBUG("mailexternal", "External Mail> Item entry %u from `mail_external` doesn't exist in DB, skipped.", itemId);
+                TC_LOG_ERROR("mailexternal", "External Mail> Item entry %u from `mail_external` doesn't exist in DB, skipped.", itemId);
             else
             {
                 if (Item* mailItem = Item::CreateItem(itemId, itemCount))
                 {
                     itemlist.push_back(mailItem);
                     mailItem->SaveToDB(trans);
-                    TC_LOG_INFO("server", "External Mail> Adding %u of item with id %u for player_id %u", itemCount, itemId, receiver_guid);
+                    TC_LOG_INFO("mailexternal", "External Mail> Adding %u of item with id %u for player_id %u", itemCount, itemId, receiver_guid);
                 }
             }
         }
