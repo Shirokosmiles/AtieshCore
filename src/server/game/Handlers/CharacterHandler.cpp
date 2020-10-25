@@ -721,23 +721,22 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
         return;
     }
 
-    LoginQueryHolder *holder = new LoginQueryHolder(GetAccountId(), playerGuid);
+    std::shared_ptr<LoginQueryHolder> holder = std::make_shared<LoginQueryHolder>(GetAccountId(), playerGuid);
     if (!holder->Initialize())
     {
-        delete holder;                                      // delete all unprocessed queries
         m_playerLoading = false;
         return;
     }
 
-    AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder)).AfterComplete([this](SQLQueryHolderBase* holder)
+    AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder)).AfterComplete([this](SQLQueryHolderBase const& holder)
     {
-        HandlePlayerLogin(static_cast<LoginQueryHolder*>(holder));
+        HandlePlayerLogin(static_cast<LoginQueryHolder const&>(holder));
     });
 }
 
-void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
+void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 {
-    ObjectGuid playerGuid = holder->GetGuid();
+    ObjectGuid playerGuid = holder.GetGuid();
 
     Player* pCurrChar = new Player(this);
      // for send server info and strings (config)
@@ -749,7 +748,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         SetPlayer(nullptr);
         KickPlayer("WorldSession::HandlePlayerLogin Player::LoadFromDB failed"); // disconnect client, player no set to session and it will not deleted or saved at kick
         delete pCurrChar;                                   // delete it manually
-        delete holder;                                      // delete all unprocessed queries
         m_playerLoading = false;
         return;
     }
@@ -763,7 +761,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     SendPacket(loginVerifyWorld.Write());
 
     // load player specific part before send times
-    LoadAccountData(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACCOUNT_DATA), PER_CHARACTER_CACHE_MASK);
+    LoadAccountData(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACCOUNT_DATA), PER_CHARACTER_CACHE_MASK);
     SendAccountDataTimes(PER_CHARACTER_CACHE_MASK);
 
     SendFeatureSystemStatus();
@@ -778,7 +776,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     }
 
     //QueryResult* result = CharacterDatabase.PQuery("SELECT guildid, rank FROM guild_member WHERE guid = '%u'", pCurrChar->GetGUID().GetCounter());
-    if (PreparedQueryResult resultGuild = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_GUILD))
+    if (PreparedQueryResult resultGuild = holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_GUILD))
     {
         Field* fields = resultGuild->Fetch();
         pCurrChar->SetInGuild(fields[0].GetUInt32());
@@ -869,7 +867,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     sSocialMgr->SendFriendStatus(pCurrChar, FRIEND_ONLINE, pCurrChar->GetGUID(), true);
 
     // Place character in world (and load zone) before some object loading
-    pCurrChar->LoadCorpse(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION));
+    pCurrChar->LoadCorpse(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION));
 
     // setting Ghost+speed if dead
     if (pCurrChar->m_deathState == DEAD)
@@ -1071,8 +1069,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
 
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
-
-    delete holder;
 
     if (pCurrChar->GetTeam() != pCurrChar->GetCFSTeam())
         pCurrChar->FitPlayerInTeam(pCurrChar->GetBattleground() && !pCurrChar->GetBattleground()->isArena() ? true : false, pCurrChar->GetBattleground());
