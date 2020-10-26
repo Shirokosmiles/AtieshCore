@@ -47,7 +47,6 @@ void GuildMgr::RemoveGuild(ObjectGuid::LowType guildId)
 // Atiesh Features
 std::string GuildMgr::GetGuildNameByIdWithLvl(ObjectGuid::LowType guildId) const
 {
-    std::string glvl = "";
     if (Guild * guild = GetGuildById(guildId))
         return GetGuildNameWithGLvl(guild->GetName(), guild->GetGuildLevel());
 
