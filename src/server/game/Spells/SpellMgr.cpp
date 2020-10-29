@@ -5013,6 +5013,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_DECREASE_SPEED;
     });
 
+    // Headless Horseman Climax - Return Head (Hallow End)
+    // Headless Horseman Climax - Body Regen (confuse only - removed on death)
+    // Headless Horseman Climax - Head Is Dead
+    ApplySpellFix({ 42401, 43105, 42428 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
+    });
+
     // Waylay (triger)
     ApplySpellFix({ 51693 }, [](SpellInfo* spellInfo)
     {
