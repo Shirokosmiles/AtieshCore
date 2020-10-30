@@ -95,15 +95,15 @@ void LoadAllArenas()
         if (!arenas || arenas->m_Battlegrounds.empty())
             continue;
 
-		for (BattlegroundContainer::const_iterator itr = arenas->m_Battlegrounds.begin(); itr != arenas->m_Battlegrounds.end(); ++itr)
+        for (BattlegroundContainer::const_iterator itr = arenas->m_Battlegrounds.begin(); itr != arenas->m_Battlegrounds.end(); ++itr)
         {
             Battleground* arena = itr->second;
-						
+
             if (!arena->GetPlayersSize())
                 continue;
-						
-			if (!arena->isRated())
-				continue;
+
+            if (!arena->isRated())
+                continue;
                 
             ratedArenas.push_back(arena);
         }
@@ -322,7 +322,7 @@ class arena_spectator_commands : public CommandScript
                             handler->PSendSysMessage("Teams:");
                             handler->PSendSysMessage("Team GOLD : %s vs Team GREEN : %s", firstTeam->GetName().c_str(), secondTeam->GetName().c_str());
                             handler->PSendSysMessage("Rating %u (MMR %u) - Rating %u (MMR %u)", firstTeam->GetRating(), firstTeam->GetAverageMMR(firstTeamMember->GetGroup()),
-                                                                        secondTeam->GetRating(), secondTeam->GetAverageMMR(secondTeamMember->GetGroup()));
+                            secondTeam->GetRating(), secondTeam->GetAverageMMR(secondTeamMember->GetGroup()));
                         }
                     }
                 }
@@ -434,8 +434,7 @@ class arena_spectator_commands : public CommandScript
                     player->SetViewpoint(player->GetViewpoint(), false);
 
                 player->SetViewpoint(target, true);
-
-            	return true;
+                return true;
             } // Prevent Crash if not Exist Player 
             else
                 return false;

@@ -115,7 +115,7 @@ public:
                         std::list<Unit*> targets;
                         Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
                         Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-						Cell::VisitAllObjects(me, searcher, 30.0f);
+                        Cell::VisitAllObjects(me, searcher, 30.0f);
                         if (!targets.empty())
                         {
                             for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)

@@ -211,7 +211,7 @@ std::string SpectatorAddonMsg::GetMsgData()
         }
 
     if (msg != "")
-        addonData = "ARENASPEC	" + msg;
+        addonData = "ARENASPEC " + msg;
 
     return addonData;
 }

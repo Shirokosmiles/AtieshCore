@@ -1,4 +1,4 @@
-/*
++/*
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -23,13 +23,6 @@
 #include "Player.h"
 #include "WorldPacket.h"
 #include "WorldStatePackets.h"
-
-/*
-192392	618	0	0	3	1	0	763,4324	-294,4195	28,27668	3,141593	0	0	-1	0
-192391	618	0	0	3	1	0	763,4324	-274,0582	28,2767	3,141593	0	0	-1	0
-194577	618	0	0	3	1	0	763,579	-306,1461	26,66522	3,141593	0	0	-1	0
-194576	618	0	0	3	1	0	763,6646	-261,873	26,68659	0	0	0	0	1
-*/
 
 BattlegroundGOSpawnPoint const BG_RV_GameObjects[BG_RV_OBJECT_MAX] =
 {

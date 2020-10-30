@@ -51,7 +51,7 @@ public:
     {
         static std::vector<ChatCommand> vipCommandTable =
         {
-			{ "debuff",           rbac::RBAC_PERM_COMMAND_VIP_DEBUFF,       false, &HandleVipDebuffCommand,        "" },
+            { "debuff",           rbac::RBAC_PERM_COMMAND_VIP_DEBUFF,       false, &HandleVipDebuffCommand,        "" },
             { "bank",             rbac::RBAC_PERM_COMMAND_VIP_BANK,         false, &HandleVipBankCommand,          "" },
             { "mail",             rbac::RBAC_PERM_COMMAND_VIP_MAIL,         false, &HandlePremiumMailCommand,      "" },
             { "repair",           rbac::RBAC_PERM_COMMAND_VIP_REPAIR,       false, &HandleVipRepairCommand,        "" },
@@ -266,614 +266,614 @@ public:
         return true;
     }
 
-	static bool HandleVipDebuffCommand(ChatHandler* handler, const char* /*args*/)
-	{
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_DEBUFF))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		player->RemoveAurasDueToSpell(15007); // Resurrection Sickness
-		player->RemoveAurasDueToSpell(26013); // Deserter
-		return true;
-	}
-
-	static bool HandleVipBankCommand(ChatHandler* handler, const char* /*args*/)
-	{
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_BANK))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		handler->GetSession()->SendShowBank(player->GetGUID());
-		return true;
-	}
-
-	static bool HandlePremiumMailCommand(ChatHandler* handler, char const* /*args*/)
-	{
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_MAIL))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		handler->GetSession()->SendShowMailBox(player->GetGUID());
-		return true;
-	}
-
-	static bool HandleVipRepairCommand(ChatHandler* handler, const char* /*args*/)
-	{
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_REPAIR))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		player->DurabilityRepairAll(false, 0, false);
-		handler->PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink(player).c_str());
-		return true;
-	}
-
-	static bool HandleVipResetTalentsCommand(ChatHandler* handler, const char* /*args*/)
-	{
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_RESET_TALENTS))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		player->ResetTalents(true);
-		player->SendTalentsInfoData(false);
-		handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(player).c_str());
-		return true;
-	}
-
-	static bool HandleVipTaxiCommand(ChatHandler* handler, const char* /*args*/)
-	{
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_TAXI))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		player->SetTaxiCheater(true);
-		handler->PSendSysMessage(LANG_YOU_GIVE_TAXIS, handler->GetNameLink(player).c_str());
-		if (handler->needReportToTarget(player))
-			ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_ADDED, handler->GetNameLink().c_str());
-		return true;
-	}
-
-	static bool HandleVipHomeCommand(ChatHandler* handler, const char* /*args*/)
-	{
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_HOME))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		player->GetSpellHistory()->ResetCooldown(8690, true);
-		player->CastSpell(player, 8690, false);
-		return true;
-	}
-
-	static bool HandleChangeRaceCommand(ChatHandler* handler, const char* /*args*/)
-	{
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_CHANGE_RACE))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
-		handler->SendSysMessage(LANG_VIP_CHANGE_RACE);
-		return true;
-	}
-
-	static bool HandleCustomizeCommand(ChatHandler* handler, const char* /*args*/)
-	{
-
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_CUSTOMIZE))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		player->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
-		handler->SendSysMessage(LANG_VIP_CHANGE_CUSTOMIZE);
-		return true;
-	}
-
-	static bool HandleVipCapitalCommand(ChatHandler* handler, const char* /*args*/)
-	{
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_CAPITAL))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->GetCFSTeam() == HORDE)
-			player->CastSpell(player, 3567, true);
-		else
-			player->CastSpell(player, 3561, true);
-		return true;
-	}
-
-	static bool HandleVipAppearCommand(ChatHandler* handler, char const* args)
-	{
-		Player* player = handler->GetSession()->GetPlayer();
-
-		if (!player->IsPremium())
-		{
-			handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (!sWorld->getBoolConfig(CONFIG_VIP_APPEAR))
-		{
-			handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (player->IsInCombat())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
+    static bool HandleVipDebuffCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_DEBUFF))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        player->RemoveAurasDueToSpell(15007); // Resurrection Sickness
+        player->RemoveAurasDueToSpell(26013); // Deserter
+        return true;
+    }
+
+    static bool HandleVipBankCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_BANK))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        handler->GetSession()->SendShowBank(player->GetGUID());
+        return true;
+    }
+
+    static bool HandlePremiumMailCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_MAIL))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        handler->GetSession()->SendShowMailBox(player->GetGUID());
+        return true;
+    }
+
+    static bool HandleVipRepairCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_REPAIR))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        player->DurabilityRepairAll(false, 0, false);
+        handler->PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink(player).c_str());
+        return true;
+    }
+
+    static bool HandleVipResetTalentsCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_RESET_TALENTS))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        player->ResetTalents(true);
+        player->SendTalentsInfoData(false);
+        handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(player).c_str());
+        return true;
+    }
+
+    static bool HandleVipTaxiCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_TAXI))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        player->SetTaxiCheater(true);
+        handler->PSendSysMessage(LANG_YOU_GIVE_TAXIS, handler->GetNameLink(player).c_str());
+        if (handler->needReportToTarget(player))
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_ADDED, handler->GetNameLink().c_str());
+        return true;
+    }
+
+    static bool HandleVipHomeCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_HOME))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        player->GetSpellHistory()->ResetCooldown(8690, true);
+        player->CastSpell(player, 8690, false);
+        return true;
+    }
+
+    static bool HandleChangeRaceCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_CHANGE_RACE))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
+        handler->SendSysMessage(LANG_VIP_CHANGE_RACE);
+        return true;
+    }
+
+    static bool HandleCustomizeCommand(ChatHandler* handler, const char* /*args*/)
+    {
+
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_CUSTOMIZE))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        player->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
+        handler->SendSysMessage(LANG_VIP_CHANGE_CUSTOMIZE);
+        return true;
+    }
+
+    static bool HandleVipCapitalCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_CAPITAL))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->GetCFSTeam() == HORDE)
+            player->CastSpell(player, 3567, true);
+        else
+            player->CastSpell(player, 3561, true);
+        return true;
+    }
+
+    static bool HandleVipAppearCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!player->IsPremium())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_VIP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_APPEAR))
+        {
+            handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (player->IsInCombat())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         if (player->IsMounted())
         {
@@ -882,148 +882,148 @@ public:
             return false;
         }
 
-		if (player->IsInFlight())
-		{
-			handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
+        if (player->IsInFlight())
+        {
+            handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-		if (player->GetMap()->IsBattlegroundOrArena())
-		{
-			handler->SendSysMessage(LANG_VIP_BG);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
+        if (player->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendSysMessage(LANG_VIP_BG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-		if (player->HasStealthAura())
-		{
-			handler->SendSysMessage(LANG_VIP_STEALTH);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
+        if (player->HasStealthAura())
+        {
+            handler->SendSysMessage(LANG_VIP_STEALTH);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-		if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-		{
-			handler->SendSysMessage(LANG_VIP_DEAD);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
+        if (player->isDead() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        {
+            handler->SendSysMessage(LANG_VIP_DEAD);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-		Player* target;
-		ObjectGuid targetGuid;
-		std::string targetName;
-		if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
-			return false;
+        Player* target;
+        ObjectGuid targetGuid;
+        std::string targetName;
+        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+            return false;
 
 
-		if (target == player || targetGuid == player->GetGUID())
-		{
-			handler->SendSysMessage(LANG_CANT_TELEPORT_SELF);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
+        if (target == player || targetGuid == player->GetGUID())
+        {
+            handler->SendSysMessage(LANG_CANT_TELEPORT_SELF);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-		if (player->GetGroup())
-		{
-			// check online security
-			if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
-				return false;
+        if (player->GetGroup())
+        {
+            // check online security
+            if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
+                return false;
 
-			std::string chrNameLink = handler->playerLink(targetName);
+            std::string chrNameLink = handler->playerLink(targetName);
 
-			Map* map = target->GetMap();
-			if (target->IsInCombat())
-			{
-				handler->SendSysMessage(LANG_YOU_IN_COMBAT);
-				handler->SetSentErrorMessage(true);
-				return false;
-			}
+            Map* map = target->GetMap();
+            if (target->IsInCombat())
+            {
+                handler->SendSysMessage(LANG_YOU_IN_COMBAT);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
 
-			if (target->IsInFlight())
-			{
-				handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
-				handler->SetSentErrorMessage(true);
-				return false;
-			}
+            if (target->IsInFlight())
+            {
+                handler->SendSysMessage(LANG_YOU_IN_FLIGHT);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
 
-			if (target->GetMap()->IsBattlegroundOrArena() || target->GetAreaId() == 616)
-			{
-				handler->SendSysMessage(LANG_VIP_BG);
-				handler->SetSentErrorMessage(true);
-				return false;
-			}
+            if (target->GetMap()->IsBattlegroundOrArena() || target->GetAreaId() == 616)
+            {
+                handler->SendSysMessage(LANG_VIP_BG);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
 
-			if (target->HasStealthAura())
-			{
-				handler->SendSysMessage(LANG_VIP_STEALTH);
-				handler->SetSentErrorMessage(true);
-				return false;
-			}
+            if (target->HasStealthAura())
+            {
+                handler->SendSysMessage(LANG_VIP_STEALTH);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
 
-			if (target->isDead() || target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-			{
-				handler->SendSysMessage(LANG_VIP_DEAD);
-				handler->SetSentErrorMessage(true);
-				return false;
-			}
+            if (target->isDead() || target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+            {
+                handler->SendSysMessage(LANG_VIP_DEAD);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
 
-			if (player->GetGroup())
-			{
-				// we are in group, we can go only if we are in the player group
-				if (player->GetGroup() != target->GetGroup())
-				{
-					handler->SendSysMessage(LANG_VIP_GROUP);
-					handler->SetSentErrorMessage(true);
-					return false;
-				}
-			}
+            if (player->GetGroup())
+            {
+                // we are in group, we can go only if we are in the player group
+                if (player->GetGroup() != target->GetGroup())
+                {
+                    handler->SendSysMessage(LANG_VIP_GROUP);
+                    handler->SetSentErrorMessage(true);
+                    return false;
+                }
+            }
 
-			// if the player or the player's group is bound to another instance
-			// the player will not be bound to another one
-			InstancePlayerBind* bind = player->GetBoundInstance(target->GetMapId(), target->GetDifficulty(map->IsRaid()));
-			if (!bind)
-			{
-				Group* group = player->GetGroup();
-				// if no bind exists, create a solo bind
-				InstanceGroupBind* gBind = group ? group->GetBoundInstance(target) : NULL;                // if no bind exists, create a solo bind
-				if (!gBind)
-					if (InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(target->GetInstanceId()))
-						player->BindToInstance(save, !save->CanReset());
-			}
+            // if the player or the player's group is bound to another instance
+            // the player will not be bound to another one
+            InstancePlayerBind* bind = player->GetBoundInstance(target->GetMapId(), target->GetDifficulty(map->IsRaid()));
+            if (!bind)
+            {
+                Group* group = player->GetGroup();
+                // if no bind exists, create a solo bind
+                InstanceGroupBind* gBind = group ? group->GetBoundInstance(target) : NULL;                // if no bind exists, create a solo bind
+                if (!gBind)
+                    if (InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(target->GetInstanceId()))
+                        player->BindToInstance(save, !save->CanReset());
+            }
 
-			if (map->IsRaid())
-				player->SetRaidDifficulty(target->GetRaidDifficulty());
-			else
-				player->SetDungeonDifficulty(target->GetDungeonDifficulty());
+            if (map->IsRaid())
+                player->SetRaidDifficulty(target->GetRaidDifficulty());
+            else
+                player->SetDungeonDifficulty(target->GetDungeonDifficulty());
 
-			handler->PSendSysMessage(LANG_APPEARING_AT, chrNameLink.c_str());
+            handler->PSendSysMessage(LANG_APPEARING_AT, chrNameLink.c_str());
 
-			// stop flight if need
-			if (player->IsInFlight())
+            // stop flight if need
+            if (player->IsInFlight())
                 player->FinishTaxiFlight();
-			else
-				player->SaveRecallPosition();
-			// to point to see at target with same orientation
-			float x, y, z;
-			target->GetContactPoint(player, x, y, z);
-			player->TeleportTo(target->GetMapId(), x, y, z, player->GetAbsoluteAngle(target), TELE_TO_GM_MODE);
-			player->SetPhaseMask(target->GetPhaseMask(), true);
-		}
-		else
-		{
-			// check offline security
-			if (handler->HasLowerSecurity(NULL, targetGuid))
-				return false;
+            else
+                player->SaveRecallPosition();
+            // to point to see at target with same orientation
+            float x, y, z;
+            target->GetContactPoint(player, x, y, z);
+            player->TeleportTo(target->GetMapId(), x, y, z, player->GetAbsoluteAngle(target), TELE_TO_GM_MODE);
+            player->SetPhaseMask(target->GetPhaseMask(), true);
+        }
+        else
+        {
+            // check offline security
+            if (handler->HasLowerSecurity(NULL, targetGuid))
+                return false;
 
-			std::string nameLink = handler->playerLink(targetName);
+            std::string nameLink = handler->playerLink(targetName);
 
-			handler->SendSysMessage(LANG_PLAYER_NOT_EXIST_OR_OFFLINE);
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-		return true;
-	}
+            handler->SendSysMessage(LANG_PLAYER_NOT_EXIST_OR_OFFLINE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        return true;
+    }
 
     static bool HandleCoinCommand(ChatHandler* handler, char const* /*args*/)
     {

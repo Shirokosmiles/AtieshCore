@@ -38,7 +38,7 @@ struct Teleport
 };
 typedef struct Teleport Data;
 
-//	{menu_id, next_menu_id, icon, name, cost, level, faction, map, x, y, z, o}
+//{menu_id, next_menu_id, icon, name, cost, level, faction, map, x, y, z, o}
 Data Tele[] = // key = i & Key
 {
     { 1, 0, 2, "|TInterface/ICONS/Spell_Arcane_TeleportStormWind:25|t Stormwind", 0, 0, 2, 0, -8842.09f, 626.358f, 94.0867f, 3.61363f },
@@ -215,17 +215,17 @@ Data Tele[] = // key = i & Key
 // TextIDs from npc_text
 enum eEnums
 {
-    TEXT_MAIN_H = 300000,			//Horde main menu text               "?? ????!"
-    TEXT_MAIN_A = 300001,			//Alliance main menu text            "?? ??????!"
-    TEXT_DUNGEON = 300002,			//Dungeon teleport menu texts        "????? ?????????? ?? ?????? ????????????"
-    TEXT_RAID = 300003,			//Raid teleport menu text            "?????? ????????? ??? ?????? ????????? ??????????. ???? ?? ????? ?????, ????? ?? ??????? ????????."
-    TEXT_AREA = 300004,			//Area teleport location menu texts  "???? ?? ?? ?????? ????????????"
+    TEXT_MAIN_H  = 300000,   //Horde main menu text
+    TEXT_MAIN_A  = 300001,   //Alliance main menu text
+    TEXT_DUNGEON = 300002,   //Dungeon teleport menu texts
+    TEXT_RAID    = 300003,   //Raid teleport menu text
+    TEXT_AREA    = 300004,   //Area teleport location menu texts
 
     TELEPORT_COUNT = sizeof Tele / sizeof(*Tele),
 };
 
-#define ARE_YOU_SURE	"Are you sure you want appear in "
-#define ERROR_COMBAT	"|cffff0000in combat!|r"
+#define ARE_YOU_SURE "Are you sure you want appear in "
+#define ERROR_COMBAT "|cffff0000in combat!|r"
 
 bool Custom_FactCheck(uint32 Fact, unsigned char Key)
 {
@@ -930,7 +930,7 @@ public:
                 player->PlayerTalkClass->SendGossipMenu(100009, me->GetGUID());
                 return true;
                 break;
-            case 9: //Enchant Gloves		
+            case 9: //Enchant Gloves
                 if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) == 450)
                 {
 
@@ -1465,7 +1465,7 @@ public:
                OnGossipHello(player);
                 break;
             case 601:
-                AdvancedEnchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), PRISMATIC_ENCHANTMENT_SLOT, ENCHANT_ZAPYASTIE_SOCKET); // Socket Belt		
+                AdvancedEnchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WRISTS), PRISMATIC_ENCHANTMENT_SLOT, ENCHANT_ZAPYASTIE_SOCKET); // Socket Belt
                OnGossipHello(player);
                 break;
             case 164:

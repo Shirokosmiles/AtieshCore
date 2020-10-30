@@ -1726,21 +1726,21 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool IsJumpingbyOpcode() const { return m_isjumping; }
         void SetCanFlybyServer(bool canfly) { m_canfly = canfly; }
         bool IsCanFlybyServer() const { return m_canfly; }
-		
-		bool UnderACKmount() const { return m_ACKmounted; }
+
+        bool UnderACKmount() const { return m_ACKmounted; }
         bool UnderACKRootUpd() const { return m_rootUpd; }
-		void SetUnderACKmount();
+        void SetUnderACKmount();
         void SetRootACKUpd(uint32 delay);
 
-		// should only be used by packet handlers to validate and apply incoming MovementInfos from clients. Do not use internally to modify m_movementInfo
-		void UpdateMovementInfo(MovementInfo const& movementInfo);
-		bool CheckMovementInfo(MovementInfo const& movementInfo, bool jump); // ASH
-		bool CheckOnFlyHack(); // AFH
+        // should only be used by packet handlers to validate and apply incoming MovementInfos from clients. Do not use internally to modify m_movementInfo
+        void UpdateMovementInfo(MovementInfo const& movementInfo);
+        bool CheckMovementInfo(MovementInfo const& movementInfo, bool jump); // ASH
+        bool CheckOnFlyHack(); // AFH
 
-		void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }
-		void SetLastMoveServerTimestamp(uint32 timestamp) { lastMoveServerTimestamp = timestamp; }
-		uint32 GetLastMoveClientTimestamp() const { return lastMoveClientTimestamp; }
-		uint32 GetLastMoveServerTimestamp() const { return lastMoveServerTimestamp; }
+        void SetLastMoveClientTimestamp(uint32 timestamp) { lastMoveClientTimestamp = timestamp; }
+        void SetLastMoveServerTimestamp(uint32 timestamp) { lastMoveServerTimestamp = timestamp; }
+        uint32 GetLastMoveClientTimestamp() const { return lastMoveClientTimestamp; }
+        uint32 GetLastMoveServerTimestamp() const { return lastMoveServerTimestamp; }
 
         std::string GetDescriptionACForLogs(uint8 type, float param1 = 0.f, float param2 = 0.f) const;
         std::string GetPositionACForLogs() const;
@@ -1751,16 +1751,16 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetSuccessfullyLanded() { m_antiNoFallDmgLastChance = false; m_antiNoFallDmg = false; }
         void ResetFallingData(float z);
         void UpdateFallInformationIfNeed(float newZ) { m_lastFallZ = newZ; }
-		// Ingore group/raid-party for some quests in Instances
-		bool CanEnterInInstanceOrRaidCustom() const { return m_customAccessInZone; }
-		void SetCanEnterInInstanceOrRaidCustom(bool access) { m_customAccessInZone = access; }
+        // Ingore group/raid-party for some quests in Instances
+        bool CanEnterInInstanceOrRaidCustom() const { return m_customAccessInZone; }
+        void SetCanEnterInInstanceOrRaidCustom(bool access) { m_customAccessInZone = access; }
 
-		// Vanish can be visible near 0.3-0.4 sec after using. Also 0.15 sec vanish will evade CC too, but break vanish.
-		uint32 GetVanishTimer() const { return m_vanishTimer; }
+        // Vanish can be visible near 0.3-0.4 sec after using. Also 0.15 sec vanish will evade CC too, but break vanish.
+        uint32 GetVanishTimer() const { return m_vanishTimer; }
         uint32 GetBreakbleVanishTimer() const { return m_breakblevanishTimer; }
-		bool UnderVisibleVanish() const { return m_visiblevanish; }
+        bool UnderVisibleVanish() const { return m_visiblevanish; }
         bool UnderBreakbleVanish() const { return m_breakablevanish; }
-		void SetVanishTimer();
+        void SetVanishTimer();
         void StopVanish(); // set Fade Delay time = Breakable time, player will not under vanish, but this 0.15 sec can evade spells
 
         // VIP
