@@ -766,16 +766,13 @@ void MailMgr::AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowTy
 
 void MailMgr::RemoveMailItem(ObjectGuid::LowType itemGuidLow, CharacterDatabaseTransaction& trans)
 {
-    uint32 id;
-    uint32 MailId;
-    ObjectGuid::LowType playerId;
+    uint32 id = 0;
     for (MailItemMap::const_iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
     {
         if (itr->second.item_guid == itemGuidLow)
         {
             id = itr->first;
-            playerId = itr->second.receiver_guid;
-            MailId = itr->second.messageID;
+            break;
         }
     }
 

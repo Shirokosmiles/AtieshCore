@@ -272,7 +272,6 @@ bool PromotionCodeMgr::CheckedEnteredCodeByPlayer(std::string const& code, Playe
 uint32 PromotionCodeMgr::_TryToRewardForCode(std::string const& code, Player* player, uint32 collection)
 {
     uint32 result = 0;
-    bool foundedNotCorrectCollection = false;
     for (PromotionCodesContainer::const_iterator itr = _promoCodesStore.begin(); itr != _promoCodesStore.end(); ++itr)
     {
         if (itr->second.code == code && itr->second.exist_count)
@@ -284,10 +283,7 @@ uint32 PromotionCodeMgr::_TryToRewardForCode(std::string const& code, Player* pl
                     continue;
 
                 if (collection && collection != itr->second.collection)
-                {
-                    foundedNotCorrectCollection = true;                    
                     continue;
-                }
             }
             //code exist and count > 0, need to reward a player
             result = itr->first;
