@@ -22,6 +22,7 @@
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "ObjectMgr.h"
+#include "Log.h"
 
 SpectatorAddonMsg::SpectatorAddonMsg()
 {

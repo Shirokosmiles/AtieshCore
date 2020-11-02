@@ -18,6 +18,7 @@
 #ifndef PROMOTIONCODE_MGR_H
 #define PROMOTIONCODE_MGR_H
 
+#include "ObjectGuid.h"
 #include <unordered_map>
 
 struct PromotionCodes

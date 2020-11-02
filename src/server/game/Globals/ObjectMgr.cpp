@@ -8618,8 +8618,8 @@ bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg, bool withNast
     {
         if (player)
         {
-            TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing an invalid UTF8 sequence - blocked", player->GetName().c_str(),
-                player->GetGUID().GetCounter());
+            TC_LOG_ERROR("network", "Player %s (GUID: %s) sent a message containing an invalid UTF8 sequence - blocked", player->GetName().c_str(),
+                player->GetGUID().ToString().c_str());
         }
         return false;
     }

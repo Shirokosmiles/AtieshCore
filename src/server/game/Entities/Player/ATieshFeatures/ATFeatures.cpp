@@ -29,6 +29,7 @@
 #include "ScriptMgr.h"
 #include "Player.h"
 #include "Language.h"
+#include "Log.h"
 
  // Vanish System
 void Player::SetVanishTimer()
@@ -84,16 +85,16 @@ void Player::InstallItemPresentBySlot(uint32 entry)
 
 void Player::InstallItemPresent(uint32 entry, uint32 itemId, uint32 count)
 {
-    TC_LOG_DEBUG("entities.player", "Player (Guid: %u) %s: installing itempresent (Entry: %u) for item %u",
-        GetGUID().GetCounter(), GetName().c_str(), entry, itemId);
+    TC_LOG_DEBUG("entities.player", "Player (Guid: %s) %s: installing itempresent (Entry: %u) for item %u",
+        GetGUID().ToString().c_str(), GetName().c_str(), entry, itemId);
 
     ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
     if (!itemTemplate)
         return;
 
     if (!AddItem(itemId, count))
-        TC_LOG_DEBUG("entities.player", "Player (Guid: %u) %s: did not received itempresent (Entry: %u) for item %u",
-            GetGUID().GetCounter(), GetName().c_str(), entry, itemId);
+        TC_LOG_DEBUG("entities.player", "Player (Guid: %s) %s: did not received itempresent (Entry: %u) for item %u",
+            GetGUID().ToString().c_str(), GetName().c_str(), entry, itemId);
 }
 
 // VIP system

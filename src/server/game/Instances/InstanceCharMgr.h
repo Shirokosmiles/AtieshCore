@@ -19,6 +19,7 @@
 #define _INSTANCE_CHAR_H
 
 #include "Common.h"
+#include "DatabaseEnvFwd.h"
 #include "ObjectGuid.h"
 
 class Player;
