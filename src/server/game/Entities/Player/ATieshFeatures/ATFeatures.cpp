@@ -27,6 +27,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "ScriptMgr.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Language.h"
 #include "Log.h"

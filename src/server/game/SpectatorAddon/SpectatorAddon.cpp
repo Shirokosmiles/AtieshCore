@@ -21,6 +21,7 @@
 #include "Item.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Log.h"
 

@@ -18,6 +18,7 @@
 #include "DatabaseEnv.h"
 #include "ItemShopMgr.h"
 #include "Timer.h"
+#include "Log.h"
 
 ItemShopMgr* ItemShopMgr::instance()
 {
