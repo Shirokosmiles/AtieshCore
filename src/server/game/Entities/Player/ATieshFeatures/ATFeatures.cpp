@@ -19,6 +19,7 @@
 #include "AuctionHouseMgr.h"
 #include "Battleground.h"
 #include "Chat.h"
+#include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "Item.h"
 #include "GameTime.h"
