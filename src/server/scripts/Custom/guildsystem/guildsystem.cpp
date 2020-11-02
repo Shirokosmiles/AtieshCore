@@ -283,12 +283,15 @@ public:
         }
 
         char* value = strtok((char*)args, " ");
-        uint32 addedlvl = 1;
+        int32 addedlvl = 1;
         if (value)
             addedlvl = atoi(value);
 
-        targetGuild->AddGuildLevel(addedlvl, nullptr);
-        handler->PSendSysMessage(LANG_GSYSTEM_GM_RECEIVED_LEVEL, targetGuild->GetName().c_str(), addedlvl, targetGuild->GetGuildLevel());
+        if (addedlvl < 0)
+            return false;
+
+        targetGuild->AddGuildLevel(uint32(addedlvl), nullptr);
+        handler->PSendSysMessage(LANG_GSYSTEM_GM_RECEIVED_LEVEL, targetGuild->GetName().c_str(), uint32(addedlvl), targetGuild->GetGuildLevel());
         return true;
     }
 
@@ -309,7 +312,7 @@ public:
         }
 
         char* value = strtok((char*)args, " ");
-        uint32 removedlvl = 1;
+        int32 removedlvl = 1;
         if (value)
             removedlvl = atoi(value);
 
@@ -335,12 +338,15 @@ public:
         }
 
         char* value = strtok((char*)args, " ");
-        uint32 addedExp = 1;
+        int32 addedExp = 1;
         if (value)
             addedExp = atoi(value);
 
-        targetGuild->AddGuildExp(addedExp, nullptr);
-        handler->PSendSysMessage(LANG_GSYSTEM_GM_RECEIVED_EXP, targetGuild->GetName().c_str(), addedExp, targetGuild->GetGuildExperience());
+        if (addedExp < 0)
+            return false;
+
+        targetGuild->AddGuildExp(uint32(addedExp), nullptr);
+        handler->PSendSysMessage(LANG_GSYSTEM_GM_RECEIVED_EXP, targetGuild->GetName().c_str(), uint32(addedExp), targetGuild->GetGuildExperience());
         return true;
     }
 
