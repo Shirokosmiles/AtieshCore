@@ -249,7 +249,7 @@ void BattlegroundWS::StartingEventCloseDoors()
     for (uint32 i = BG_WS_OBJECT_DOOR_A_1; i <= BG_WS_OBJECT_DOOR_H_4; ++i)
     {
         SpawnBGObject(i, BG_WSG_GameObjects[i].SpawnTime);
-        DoorClose(i);        
+        DoorClose(i);
     }
 
     for (uint32 i = BG_WS_OBJECT_A_FLAG; i <= BG_WS_OBJECT_BERSERKBUFF_2; ++i)

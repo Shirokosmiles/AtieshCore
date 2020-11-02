@@ -381,7 +381,7 @@ WintergraspTowerData const AttackTowers[WG_MAX_ATTACKTOWERS] =
             { { 4349.9f, 2885.56f, 406.105f, 1.6057f }, { 0.f, 0.f,  0.719339f, 0.694659f }, 192366, 192429 },               // Flag big on west side
             { { 4517.75f, 2717.07f, 387.812f, -1.54462f }, { 0.f, 0.f, -0.697792f, 0.716301f }, 192449, 192415 },            // Flag big on east side
             { { 4434.285f, 2883.906f, 405.5880f, 0.8290324f }, { 0.f, 0.f,  0.40274720f, 0.91531130f }, 192366, 192429 },    // Flag big on north side
-            { { 4464.124f, 2855.453f, 406.1106f, 0.8290324f }, { 0.f, 0.f,  0.40274720f, 0.91531130f }, 192366, 192429 }     // Flag big on north side            
+            { { 4464.124f, 2855.453f, 406.1106f, 0.8290324f }, { 0.f, 0.f,  0.40274720f, 0.91531130f }, 192366, 192429 }     // Flag big on north side
         }
     },
     // East Tower
@@ -504,7 +504,7 @@ StaticWintergraspWorkshopInfo const WorkshopData[WG_MAX_WORKSHOP] =
     { BATTLEFIELD_WG_WORKSHOP_SE, WS_BATTLEFIELD_WG_WORKSHOP_SE, { BATTLEFIELD_WG_TEXT_EASTSPARK_CAPTURE_ALLIANCE,     BATTLEFIELD_WG_TEXT_EASTSPARK_ATTACK_ALLIANCE,     BATTLEFIELD_WG_TEXT_EASTSPARK_CAPTURE_HORDE,     BATTLEFIELD_WG_TEXT_EASTSPARK_ATTACK_HORDE     } },
     { BATTLEFIELD_WG_WORKSHOP_SW, WS_BATTLEFIELD_WG_WORKSHOP_SW, { BATTLEFIELD_WG_TEXT_WESTSPARK_CAPTURE_ALLIANCE,     BATTLEFIELD_WG_TEXT_WESTSPARK_ATTACK_ALLIANCE,     BATTLEFIELD_WG_TEXT_WESTSPARK_CAPTURE_HORDE,     BATTLEFIELD_WG_TEXT_WESTSPARK_ATTACK_HORDE     } },
     { BATTLEFIELD_WG_WORKSHOP_NE, WS_BATTLEFIELD_WG_WORKSHOP_NE, { BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_ALLIANCE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_ALLIANCE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_HORDE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_HORDE   } },
-    { BATTLEFIELD_WG_WORKSHOP_NW, WS_BATTLEFIELD_WG_WORKSHOP_NW, { BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_ALLIANCE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_ALLIANCE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_HORDE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_HORDE } },    
+    { BATTLEFIELD_WG_WORKSHOP_NW, WS_BATTLEFIELD_WG_WORKSHOP_NW, { BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_ALLIANCE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_ALLIANCE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_HORDE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_HORDE } },
     // KEEP WORKSHOPS - It can't be taken, so it doesn't have a textids
     { BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, WS_BATTLEFIELD_WG_WORKSHOP_K_W, { 0, 0, 0, 0 } },
     { BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WS_BATTLEFIELD_WG_WORKSHOP_K_E, { 0, 0, 0, 0 } }
@@ -1136,7 +1136,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             {
                 if (AddCreatureInHolderByGUID(creature, SE_TOWER_TURRET))
                     registered = true;
-            }            
+            }
 
             // SW
             if (creature->GetScriptName() == "npc_wg_SW_cannon")
@@ -1157,7 +1157,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             {
                 if (AddCreatureInHolderByGUID(creature, NW_TOWER_TURRET))
                     registered = true;
-            }            
+            }
 
             creature->SetReactState(REACT_PASSIVE);
             if (!registered)
@@ -1573,7 +1573,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
         case 31054:
         case 31108:
         case 31109:
-        case 31153:        
+        case 31153:
         case 32294:
         case 39172:
         {
@@ -2227,7 +2227,7 @@ void BattlefieldWG::UpdateStatusForCreature(Creature* creature, uint8 npcType)
         // Turret sector
         case WEST_TOWER_TURRET:
         case MIDDLE_TOWER_TURRET:
-        case EAST_TOWER_TURRET:        
+        case EAST_TOWER_TURRET:
         case FORTRESS_GATE_TURRET:
         case VAULT_GATE_TURRET:
         case NE_TOWER_TURRET:
@@ -2266,12 +2266,12 @@ void BattlefieldWG::UpdateStatusForCreature(Creature* creature, uint8 npcType)
         // Guard sector
         case WEST_TOWER_GUARD:
         case MIDDLE_TOWER_GUARD:
-        case EAST_TOWER_GUARD:        
+        case EAST_TOWER_GUARD:
         case NE_TOWER_GUARD:
         case NW_TOWER_GUARD:
         case SE_TOWER_GUARD:
         case SW_TOWER_GUARD:
-        case VAULT_GATE_GUARD:        
+        case VAULT_GATE_GUARD:
         {
             for (BfWGGameObjectBuilding* building : BuildingsInZone)
             {
@@ -2374,7 +2374,7 @@ void BattlefieldWG::HideCreatureTurretByNPCType(uint8 npcType)
         {
             if (Creature* creature = GetCreature(itr->second.m_GUID))
             {
-                ShowNpc(creature, true);                
+                ShowNpc(creature, true);
             }
             itr->second.m_isActive = false;
         }
@@ -2429,7 +2429,7 @@ void BattlefieldWG::UpdateAllGuardsAndTurretsBeforeBattle()
 
     ShowCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, GetDefenderTeam());
     HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, GetAttackerTeam());
-    
+
     ShowCreatureByNPCType(NE_TOWER_GUARD, GetDefenderTeam());
     HideCreatureByNPCType(NE_TOWER_GUARD, GetAttackerTeam());
 
@@ -2584,7 +2584,7 @@ void BfWGGameObjectBuilding::Rebuild()
             // Update worldstate
             _state = WintergraspGameObjectState(BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT - (_teamControl * 3));
             _wg->SendUpdateWorldState(_worldState, _state);
-        }        
+        }
         build->SetFaction(WintergraspFaction[_teamControl]);
         UpdateGo();
     }
@@ -2767,7 +2767,7 @@ void BfWGGameObjectBuilding::Init(GameObject* go)
 
     if (towerId >= BATTLEFIELD_WG_TOWER_SHADOWSIGHT) // Attacker towers
     {
-        // Spawn associate gameobjects        
+        // Spawn associate gameobjects
         for (WintergraspGameObjectData const& gobData : AttackTowers[towerId - 4].GameObject)
         {
             if (GameObject* goHorde = _wg->SpawnGameObject(gobData.HordeEntry, gobData.Pos, gobData.Rot))
@@ -2788,12 +2788,12 @@ void BfWGGameObjectBuilding::Init(GameObject* go)
             if (GameObject* goAlliance = _wg->SpawnGameObject(gobData.AllianceEntry, gobData.Pos, gobData.Rot))
                 m_GameObjectList[TEAM_ALLIANCE].push_back(goAlliance->GetGUID());
         }
-    }    
+    }
 
     if (towerId >= 0)
     {
         ASSERT(towerId < WG_MAX_TOWER);
-        _staticTowerInfo = &TowerData[towerId];        
+        _staticTowerInfo = &TowerData[towerId];
         UpdateGo();
     }
 }
@@ -2911,7 +2911,7 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
                     _wg->SendWarning(_staticInfo->TextIds.HordeAttack); // workshop taken - horde
                 else
                     _wg->SendWarning(_staticInfo->TextIds.AllianceAttack); // workshop taken - alliance
-            }                
+            }
 
             // Found associate graveyard and update it
             if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
@@ -2957,7 +2957,7 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
             _teamControl = teamId;
             break;
         }
-    }    
+    }
 
     if (!init)
         _wg->UpdateCounterVehicle(false);

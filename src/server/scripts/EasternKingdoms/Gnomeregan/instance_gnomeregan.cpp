@@ -41,7 +41,7 @@ ObjectData const gameObjectData[] =
     { GO_THE_FINAL_CHAMBER, DATA_THE_FINAL_CHAMBER },
     { 0,                    0                      }
 };
- 
+
 class instance_gnomeregan : public InstanceMapScript
 {
 public:

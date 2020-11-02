@@ -1134,7 +1134,7 @@ bool Guild::Create(Player* pLeader, std::string_view name)
     stmt->setUInt64(++index, m_bankMoney);
     stmt->setUInt32(++index, m_guildLevel);
     stmt->setUInt32(++index, m_guildExp);
-    stmt->setUInt32(++index, m_guildFaction); 
+    stmt->setUInt32(++index, m_guildFaction);
     stmt->setUInt32(++index, m_guildRating);
     trans->Append(stmt);
 

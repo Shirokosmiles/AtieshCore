@@ -2924,7 +2924,7 @@ bool Map::IsSwimmable(uint32 phaseMask, float x, float y, float z, float radius,
     if (liquid_ptr->level - liquid_ptr->depth_level > radius)
         return true;
     }
-    
+
     return false;
 }
 

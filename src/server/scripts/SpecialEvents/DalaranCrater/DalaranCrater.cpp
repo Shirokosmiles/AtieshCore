@@ -65,9 +65,9 @@ void DalaranGEvent::Update(uint32 diff)
     if (IsActiveDalaranEvent())
     {
         // Timers for Players (distance / mapid ) and their Damage if out of range
-        bool combatphases = GetPhase() > PREPARE_PHASE_0 && GetPhase() != BATTLE_ENDED;        
+        bool combatphases = GetPhase() > PREPARE_PHASE_0 && GetPhase() != BATTLE_ENDED;
         if (combatphases)
-        {            
+        {
             playersTimer.Update(diff);
             if (playersTimer.Passed())
             {
@@ -103,7 +103,7 @@ void DalaranGEvent::Update(uint32 diff)
                     sWorld->SendWorldText(LANG_DALARAN_CRATER_SUCCESS_STOP_ANNOUNCE, _winnername.c_str());
                     StopFightEvent();
                 }
-            }            
+            }
         }
 
         // Timers for state Combat ( 1-2-3 phases for others handlers)
@@ -134,7 +134,7 @@ void DalaranGEvent::Update(uint32 diff)
                 }
                 default:
                     break;
-            }                
+            }
         }
 
         if (m_DurationTimer > 0)
@@ -221,7 +221,7 @@ void DalaranGEvent::Update(uint32 diff)
 }
 
 void DalaranGEvent::OnSpecialEventStart()
-{    
+{
     SetPhase(PREPARE_PHASE_60);
 }
 
@@ -293,7 +293,7 @@ void DalaranGEvent::StopFightEvent()
     m_DurationTimer = 0;
     m_TeleporterTimer = 45 * IN_MILLISECONDS;
     alivePlayerCount = 0;
-    sWorld->SendWorldText(LANG_DALARAN_CRATER_PREPARE_TO_RETURN_PLAYERS);    
+    sWorld->SendWorldText(LANG_DALARAN_CRATER_PREPARE_TO_RETURN_PLAYERS);
 
     if (!sWorld->IsFFAPvPRealm())
     {
@@ -314,7 +314,7 @@ void DalaranGEvent::SpawnGOLight()
             QuaternionData rotation = QuaternionData::fromEulerAnglesZYX(player->GetOrientation(), 0.f, 0.f);
             player->SummonGameObject(182483, DalaranCraterPoint, rotation, Minutes(GetDurationTimer()));
         }
-    }    
+    }
 }
 
 void DalaranGEvent::TeleportAllPlayersInZone()
@@ -345,7 +345,7 @@ void DalaranGEvent::TeleportAllPlayersInZone()
             player->CastSpell(player, 59200, true);
 
             ++alivePlayerCount;
-        }        
+        }
     }
 
     if (!playerList.empty())

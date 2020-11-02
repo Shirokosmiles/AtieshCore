@@ -59,7 +59,7 @@ void SpectatorAddonMsg::CreateAura(ObjectGuid _caster, uint32 _spellId, bool _is
 {
     if (!CanSandAura(_spellId))
         return;
-        
+
     aCaster     = _caster;
     aSpellId    = _spellId;
     aIsDebuff   = _isDebuff;

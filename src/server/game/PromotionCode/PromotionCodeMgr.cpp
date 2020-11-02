@@ -346,9 +346,9 @@ bool PromotionCodeMgr::_AddCodeInHistory(uint32 id, std::string const& code, Pla
     // use next
     ++new_id;
 
-    PromoHistory ph;   
+    PromoHistory ph;
     ph.codeId = id;
-    ph.code = code;    
+    ph.code = code;
     ph.accountId = player->GetSession()->GetAccountId();
     ph.playerGUID = player->GetGUID().GetCounter();
     ph.time = GameTime::GetGameTime();

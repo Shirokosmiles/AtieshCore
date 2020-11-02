@@ -32,7 +32,7 @@ void SpecialEvent::Update(uint32 diff)
 
     _timer.Update(diff);
     if (_timer.Passed())
-    {        
+    {
         if (IsActiveTime())     // Event ends on time
             EndSpecialEvent(true);
         else                    // time to start for new Event

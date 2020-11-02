@@ -1540,7 +1540,7 @@ class TC_GAME_API ObjectMgr
         GuildSpellAurasContainer const& GetGuildSpellAurasMap() const { return _guildSpellAurasStore; }
         //Guild Spell Auras end
 
-        //Player Auto Learn start        
+        //Player Auto Learn start
         PlayerAutoLearnContainer const& GetPlayerAutoLearnMap() const { return _playerAutoLearnStore; }
         //Player Auto Learn end
 

@@ -585,7 +585,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS))
             {
                 uint32 charCount = AccountMgr::GetCharactersCount(GetAccountId());
- 
+
                 if (charCount <= sWorld->getIntConfig(CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS))
                     newChar->SetAtLoginFlag(AT_LOGIN_START_MONEY);  // First login with bonus
             }
@@ -901,7 +901,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         pCurrChar->ResetTalents(true);
         pCurrChar->SendTalentsInfoData(false);              // original talents send already in to SendInitialPacketsBeforeAddToMap, resend reset state
         SendNotification(LANG_RESET_TALENTS);
-    }    
+    }
 
     bool firstLogin = pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST);
     if (firstLogin)
@@ -1005,7 +1005,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             // send bonus announce
             chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus / GOLD, (moneybonus%GOLD) / SILVER, moneybonus%SILVER);
 
-            pCurrChar->ModifyMoney(moneybonus);            
+            pCurrChar->ModifyMoney(moneybonus);
         }
 
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_START_MONEY);

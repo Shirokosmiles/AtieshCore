@@ -903,7 +903,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // Cross BG
         void SendChatMessage(const char *format, ...);
         void SendBattleGroundChat(uint32 msgtype, std::string message);
-        /// Constructs the player Chat data for the specific functions to use 
+        /// Constructs the player Chat data for the specific functions to use
         void BuildPlayerChat(WorldPacket* data, uint8 msgtype, std::string const& text, uint32 language) const;
 
         void FitPlayerInTeam(bool action, Battleground* pBattleGround = NULL);                          // void FitPlayerInTeam(bool action, Battleground* bg = NULL);
@@ -2097,8 +2097,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         /*********************************************************/
         /***                 VARIOUS SYSTEMS                   ***/
         /*********************************************************/
-        // only changed for direct client control (possess, vehicle etc.), not stuff you control using pet commands        
-        WorldObject* m_seer;        
+        // only changed for direct client control (possess, vehicle etc.), not stuff you control using pet commands
+        WorldObject* m_seer;
         void HandleFall(MovementInfo const& movementInfo);
 
         bool CanFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const;
@@ -2642,7 +2642,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // VIP
         bool m_vip;                 // Used for VIP func
         uint32 m_premiumTimer;
-        uint32 m_coins;             // Coins for ingame store        
+        uint32 m_coins;             // Coins for ingame store
         time_t m_unsetdate;         // time (unixtime) of unsetdate vip previlegies
 
         // others

@@ -705,7 +705,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
                     // Items sold out are not displayed in list
                     leftInStock = !item->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(item);
                     if (!_player->IsGameMaster() && !leftInStock)
-                        continue;                
+                        continue;
 
                     if (!sConditionMgr->IsObjectMeetingVendorItemConditions(vendor->GetEntry(), item->item, _player, vendor))
                     {

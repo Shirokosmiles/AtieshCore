@@ -1155,7 +1155,7 @@ public:
         void Reset() override
         {
             Initialize();
-        }       
+        }
     };
 
     GameObjectAI* GetAI(GameObject* go) const override
@@ -1191,7 +1191,7 @@ public:
         Player* clicker;
 
         bool GossipHello(Player* player) override
-        {           
+        {
             switch (me->GetEntry())
             {
                 case 194914:
@@ -1199,7 +1199,7 @@ public:
                     instance->SetData(DATA_MIMIRON_TRAM, 0);
                     break;
                 case 194912:
-                case 194437:                    
+                case 194437:
                     instance->SetData(DATA_MIMIRON_TRAM, 1);
                     break;
             }
@@ -1235,7 +1235,7 @@ public:
                         break;
                     case EVENT_BUTTON_RDY:
                         me->SetGoState(GO_STATE_READY); //animation of button
-                        
+
                         if (GameObject* turn1 = instance->GetGameObject(DATA_MIMIRON_TRAM_TURNOUT_1))
                             turn1->SetGoState(GO_STATE_ACTIVE);
 

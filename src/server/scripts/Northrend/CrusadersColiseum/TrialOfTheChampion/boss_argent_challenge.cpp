@@ -1055,7 +1055,7 @@ class spell_eadric_radiance : public SpellScriptLoader
                     if (!target->IsWithinDist(caster, 40.f))
                         return true;
 
-                    return !target->isInFront(caster, 2.5f); 
+                    return !target->isInFront(caster, 2.5f);
                 });
             }
 

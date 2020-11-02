@@ -216,7 +216,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
                     for (GroupsQueueType::const_iterator itr = m_QueuedGroups[bracketId][BG_QUEUE_CROSSFACTION].begin(); itr != m_QueuedGroups[bracketId][BG_QUEUE_CROSSFACTION].end(); ++itr)
                         if (!(*itr)->IsInvitedToBGInstanceGUID)
                             qPlayers += (*itr)->Players.size();
-                    
+
                     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY))
                     {
                         ChatHandler(leader->GetSession()).PSendSysMessage("Queue status for %s (Lvl: %u to %u) Queued players: %u (Need at least %u more)", bgName, q_min_level, q_max_level, qPlayers, MinPlayers - qPlayers);
@@ -245,7 +245,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
                     for (itr = m_QueuedGroups[bracketId][BG_QUEUE_NORMAL_HORDE].begin(); itr != m_QueuedGroups[bracketId][BG_QUEUE_NORMAL_HORDE].end(); ++itr)
                         if (!(*itr)->IsInvitedToBGInstanceGUID)
                             qHorde += (*itr)->Players.size();
-                    
+
                     // Show queue status to player only (when joining queue)
                     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY))
                     {

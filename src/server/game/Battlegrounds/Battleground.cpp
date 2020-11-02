@@ -673,7 +673,7 @@ void Battleground::RewardReputationToTeam(uint32 a_faction_id, uint32 h_faction_
         {
             if (itr->second.OfflineRemoveTime)
                  continue;
-            
+
             if (Player* player = ObjectAccessor::FindPlayer(itr->first))
             {
                 uint32 team = player->GetTeam();

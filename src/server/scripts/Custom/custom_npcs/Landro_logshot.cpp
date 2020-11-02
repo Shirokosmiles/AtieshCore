@@ -86,9 +86,9 @@ public:
                     else
                         AddGossipItemFor(player, 0, OptionText, GOSSIP_SENDER_MAIN, MenuID + index, "", ActionMenuID, true);
                 }
-            }            
+            }
 
-            player->PlayerTalkClass->SendGossipMenu(PROMOTION_MENU_TEXT, me->GetGUID());            
+            player->PlayerTalkClass->SendGossipMenu(PROMOTION_MENU_TEXT, me->GetGUID());
             return true;
         }
 

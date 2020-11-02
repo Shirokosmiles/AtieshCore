@@ -769,7 +769,7 @@ public:
                                             uint32 spectatorEntry = SpectatorData[RACE_HUMAN];
                                             uint32 specId = urand(0, 4);
                                             if (plr->GetTeam() == ALLIANCE)
-                                            {                                                
+                                            {
                                                 switch (specId)
                                                 {
                                                     case 0: spectatorEntry = SpectatorData[RACE_HUMAN]; break;

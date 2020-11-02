@@ -1730,7 +1730,7 @@ public:
                     me->RemoveAura(SPELL_GIANT_SWARM);
                     me->CastStop();
                     _instance->SetData(DATA_PUTRICIDE_TRAP, DONE);
-                    
+
                     Map::PlayerList const &players = me->GetMap()->ToInstanceMap()->GetPlayers();
                     if (!players.isEmpty())
                     {

@@ -1393,7 +1393,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             uint32 phasemask = unitCaster->GetPhaseMask();
             float destx, desty, ground;
             float destz = unitCaster->GetPositionZ();
-       
+
             Position pos;
             Position lastpos;
             pos = unitCaster->GetPosition();
@@ -1443,7 +1443,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         {
                             if (!(beforewaterz != 0.0f))
                                 beforewaterz = prevZ;
-                            tstZ = beforewaterz;                            
+                            tstZ = beforewaterz;
                             srange = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX));
                             //TC_LOG_ERROR("server", "(start was from land) step in water , number of cycle = %i , distance of step = %f, total path = %f, Z = %f", j, srange, totalpath, tstZ);
                         }
@@ -1452,19 +1452,19 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     {
                         prevZ = pos.GetPositionZ();
                         tstZ = pos.GetPositionZ();
-                        srange = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX));                     
+                        srange = sqrt((tstY - prevY)*(tstY - prevY) + (tstX - prevX)*(tstX - prevX));
 
                         inwater = true;
                         if (inwater && (fabs(tstZ - ground) < 2.0f))
                         {
                             wcol = true;
                             //TC_LOG_ERROR("server", "step in water with collide and use standart check (for continue way after possible collide), number of cycle = %i ", j);
-                        }                            
+                        }
 
                         // if (j < 2)
                         //    TC_LOG_ERROR("server", "(start in water) step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
                         // else
-                        //    TC_LOG_ERROR("server", "step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);                   
+                        //    TC_LOG_ERROR("server", "step in water, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
                     }
 
                     if ((!map->IsInWater(phasemask, tstX, tstY, tstZ) && tstZ != beforewaterz) || wcol)  // second safety check z for blink way if on the ground
@@ -1491,26 +1491,26 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         {
                             tstZ = tstZ1;
                             srange = srange1;
-                        }                            
+                        }
                         else if (srange3 < srange2)
                         {
                             tstZ = tstZ3;
                             srange = srange3;
-                        }                            
+                        }
                         else
                         {
                             tstZ = tstZ2;
                             srange = srange2;
                         }
-                        
+
                         //TC_LOG_ERROR("server", "step on ground, number of cycle = %i , distance of step = %f, total path = %f", j, srange, totalpath);
                     }
 
                     destx = tstX;
                     desty = tstY;
                     destz = tstZ;
-                                        
-                    totalpath += srange;                                            
+
+                    totalpath += srange;
 
                     if (totalpath > distance)
                     {
@@ -1560,7 +1560,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                         if (inwater && destz < prevZ && !wcol)
                             destz = prevZ;
-                        //TC_LOG_ERROR("server", "(collision) destZ rewrited in prevZ");                         
+                        //TC_LOG_ERROR("server", "(collision) destZ rewrited in prevZ");
 
                         break;
                     }
@@ -1585,7 +1585,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     destx = destx - (0.6 * cos(pos.GetOrientation()));
                     desty = desty - (0.6 * sin(pos.GetOrientation()));
                 }
-                                
+
                 lastpos.Relocate(destx, desty, z, pos.GetOrientation());
                 dest = SpellDestination(lastpos);
                 //float range = sqrt((desty - pos.GetPositionY())*(desty - pos.GetPositionY()) + (destx - pos.GetPositionX())*(destx - pos.GetPositionX()));
@@ -6562,11 +6562,11 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell, WorldObject* _caster)
         SPELL_AURA_MOD_DISARM,
         SPELL_AURA_MOD_POSSESS
     };
-    
+
     uint32 delayForStuns = urand(130, 225);
     uint32 delayForFears = urand(100, 225);
     uint32 NOdelayForInstantSpells = 0;
-    
+
     for (uint8 i = 0; i < sizeof(auraWithCCD); ++i)
         if (_spell->HasAura(auraWithCCD[i]))
         {
@@ -6588,7 +6588,7 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell, WorldObject* _caster)
                     break;
             }
         }
-    
+
     return 0;
 }
 

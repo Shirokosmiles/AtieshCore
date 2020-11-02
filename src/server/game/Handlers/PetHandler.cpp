@@ -439,7 +439,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     {
                         haspositiveeffect = true;
                         break;
-                    }                        
+                    }
                 }
 
                 if (pet->isPossessed() || pet->IsVehicle()) /// @todo: confirm this check
@@ -447,7 +447,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 else if (unit_target && GetPlayer()->IsFriendlyTo(unit_target) && !haspositiveeffect)
                     spell->SendPetCastResult(SPELL_FAILED_TARGET_FRIENDLY);
                 else
-                    spell->SendPetCastResult(SPELL_FAILED_DONT_REPORT);                
+                    spell->SendPetCastResult(SPELL_FAILED_DONT_REPORT);
 
                 if (!pet->GetSpellHistory()->HasCooldown(spellid))
                     pet->GetSpellHistory()->ResetCooldown(spellid, true);
@@ -466,7 +466,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 bool tempspellIsPositive = false;
 
                 if (!GetPlayer()->IsFriendlyTo(unit_target))
-                {                    
+                {
                     // only place where pet can be player
                     Unit* TargetUnit = ObjectAccessor::GetUnit(*_player, guid2);
                     if (!TargetUnit)

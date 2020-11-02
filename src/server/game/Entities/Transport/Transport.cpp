@@ -325,7 +325,7 @@ void Transport::RemovePassenger(WorldObject* passenger)
         erased = _passengers.erase(passenger) > 0;
 
     if (erased || _staticPassengers.erase(passenger)) // static passenger can remove itself in case of grid unload
-    {   
+    {
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(this, plr);
@@ -357,7 +357,7 @@ void Transport::RemovePassenger(WorldObject* passenger)
                     CalculatePassengerPosition(x, y, z, &o);
                     crt->SetHomePosition(x, y, z, o);
 
-                    GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);                    
+                    GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);
                 }
 
                 sScriptMgr->OnRemovePassengerPetOrTotem(this, crt);

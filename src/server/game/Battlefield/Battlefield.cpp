@@ -508,7 +508,7 @@ void Battlefield::PlayerAcceptInviteToQueue(Player* player)
                     player->GetSession()->SendBattlefieldQueueInviteResponse(m_BattleId, m_ZoneId, false, false);
                 }
             }
-            
+
             break;
         }
 }
@@ -560,7 +560,7 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
                     OnPlayerJoinWar(player);                               //for scripting
                 }
             }
-            
+
             break;
         }
 }

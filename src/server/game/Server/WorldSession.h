@@ -169,9 +169,6 @@ namespace WorldPackets
 
     namespace Mail
     {
-        /*        
-        class MailQueryNextMailTime;
-        */
         class SendMailClient;
         class MailMarkAsRead;
         class MailDelete;

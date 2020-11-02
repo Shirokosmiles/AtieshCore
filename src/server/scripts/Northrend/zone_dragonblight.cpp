@@ -696,7 +696,7 @@ enum SkyCaptainCryOfLight
 {
     EVENT_FLY_AT_NPC              = 1,
     EVENT_FLY_AT_2                = 2,
-    EVENT_FLY_AT_3                = 3,    
+    EVENT_FLY_AT_3                = 3,
     EVENT_DROPPLAYER              = 4,
     EVENT_RETURN_RESPAWN          = 5,
 
@@ -743,7 +743,7 @@ public: npc_sky_captain_cryoflight() : CreatureScript("npc_sky_captain_cryofligh
                             if (npcpassenger)
                                 if (Creature* creature = npcpassenger->ToCreature())
                                     creature->AI()->Talk(1, player);
-                            //Talk(26924); // This is your stop, pal. Safe landing!                            
+                            //Talk(26924); // This is your stop, pal. Safe landing!
                             _events.ScheduleEvent(EVENT_RETURN_RESPAWN, 5s);
                         }
                     }
@@ -840,7 +840,7 @@ public: npc_sky_captain_cryoflight() : CreatureScript("npc_sky_captain_cryofligh
 enum DestructiveWard
 {
     SPELL_SUMMON_SKELETON             = 48715,
-    SPELL_SUMMON_SMOLDERING_CONSTRUCT = 48718,    
+    SPELL_SUMMON_SMOLDERING_CONSTRUCT = 48718,
     SPELL_DESTRUCTIVE_PULSE           = 48733,
     SPELL_DESTRUCTIVE_BARRAGE         = 48734,
     SPELL_POWERUP                     = 48735,
@@ -930,7 +930,7 @@ public: npc_destructive_ward_kill() : CreatureScript("npc_destructive_ward_kill"
                     DoCastSelf(SPELL_POWERUP);
                     Talk(1);
                     DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
-                    _events.ScheduleEvent(EVENT_DESTRUCTIVE_BARRAGE, 1s);                        
+                    _events.ScheduleEvent(EVENT_DESTRUCTIVE_BARRAGE, 1s);
                     break;
                 case EVENT_DESTRUCTIVE_BARRAGE:
                     DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);

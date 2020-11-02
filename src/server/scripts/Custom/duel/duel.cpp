@@ -30,7 +30,7 @@ public:
 
         firstplayer->SetPhaseMask(uint32(PHASEMASK_DUEL), false);
         if (Pet* pet1 = firstplayer->GetPet())
-            pet1->SetPhaseMask(uint32(PHASEMASK_DUEL), false);        
+            pet1->SetPhaseMask(uint32(PHASEMASK_DUEL), false);
 
         secondplayer->SetPhaseMask(uint32(PHASEMASK_DUEL), false);
         if (Pet* pet2 = secondplayer->GetPet())

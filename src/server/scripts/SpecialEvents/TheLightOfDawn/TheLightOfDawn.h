@@ -71,7 +71,7 @@ public:
 
     void DoPlaySoundToAll(uint32 soundId);
     void BroadcastPacketToPlayersInArea(WorldPacket const* data) const;
-    
+
     void StartTheLightOfDawnEvent();
     void StopTheLightOfDawnEvent();
 

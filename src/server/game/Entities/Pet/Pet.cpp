@@ -302,13 +302,13 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     SynchronizeLevelWithOwner();
 
     // Set pet's position after setting level, its size depends on it
-    float px, py, pz;    
+    float px, py, pz;
 
     if (owner->GetTransport())
         owner->GetPosition(px, py, pz);
     else
         owner->GetClosePoint(px, py, pz, GetCombatReach(), PET_FOLLOW_DIST, GetFollowAngle());
-    
+
     Relocate(px, py, pz + 1.0f, owner->GetOrientation());
     if (!IsPositionValid())
     {
@@ -1211,7 +1211,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             float bonus = owner->GetRatingBonusValue(CR_HASTE_MELEE) +
                                 GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) +
                                 GetOwner()->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
-                            
+
                             ApplyCastTimePercentMod(bonus, true);
                         }
                     }

@@ -720,7 +720,7 @@ class TC_GAME_API Guild
         int32 LostAgainst(uint32 Own_Rating, uint32 Opponent_Rating);
 
         void ItemBroadcastToGuild(Player* player, std::string const& msg) const;
-        void UpdateLevelAndExp();        
+        void UpdateLevelAndExp();
         void UpdateGuildWarFlag(bool startGW);
         void CastGuildLevelAuras(uint32 level);
         void RemoveGuildLevelAuras();

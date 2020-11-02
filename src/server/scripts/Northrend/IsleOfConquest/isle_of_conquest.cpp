@@ -261,7 +261,7 @@ class spell_ioc_gunship_portal : public SpellScriptLoader
                 ASSERT(gunship);
 
                 Position newPosition = GetHitCreature()->GetPosition(); // contains absolute coords
-                
+
                 ///@workaround: Player::TeleportTo implementation is incorrect
                 if (caster->GetVehicle())
                     caster->ExitVehicle();

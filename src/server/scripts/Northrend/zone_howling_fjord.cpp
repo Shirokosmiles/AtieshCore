@@ -687,7 +687,7 @@ public:
 
             switch (_events.ExecuteEvent())
             {
-            case EVENT_KNEEL_STAND:                
+            case EVENT_KNEEL_STAND:
                 me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
                 _events.ScheduleEvent(EVENT_JUST_STAND, 3s);
                 break;

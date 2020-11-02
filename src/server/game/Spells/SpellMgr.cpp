@@ -4384,7 +4384,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(1); // 10 seconds
     });
 
-    // Putrice-pre event leap spell 
+    // Putrice-pre event leap spell
     ApplySpellFix({ 70485 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS);
@@ -4832,7 +4832,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
     });
 
-    ApplySpellFix({ 47496 }, [](SpellInfo* spellInfo) // Corpse explosion Correct fix 
+    ApplySpellFix({ 47496 }, [](SpellInfo* spellInfo) // Corpse explosion Correct fix
     {
         spellInfo->AttributesEx4 |= SPELL_ATTR4_FIXED_DAMAGE;
         spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_RESISTANCES;

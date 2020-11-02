@@ -286,7 +286,7 @@ inline bool isNormalCharacter(wchar_t wchar)
     if (isCyrillicCharacter(wchar))
         return true;
     if (isEastAsianCharacter(wchar))
-        return true;    
+        return true;
 
     return false;
 }

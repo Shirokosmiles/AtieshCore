@@ -139,7 +139,7 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         // from database
         bool _active;
         bool _enabled;
-        bool _Repeatable;        
+        bool _Repeatable;
         uint32 _EventTime;      // length of the event
         uint32 _noEventTime;    // time between two events
         std::string _comment;

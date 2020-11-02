@@ -104,7 +104,7 @@ void LoadAllArenas()
 
             if (!arena->isRated())
                 continue;
-                
+
             ratedArenas.push_back(arena);
         }
     }
@@ -183,14 +183,14 @@ class arena_spectator_commands : public CommandScript
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
-                
+
                 if (target->GetTypeId() != TYPEID_PLAYER)
                 {
                     handler->PSendSysMessage(LANG_SPECTATE_NON_PLAYER);
                     handler->SetSentErrorMessage(true);
                     return false;
-                } 
-                
+                }
+
                 if (target == player || target_guid == player->GetGUID())
                 {
                     handler->PSendSysMessage(LANG_SPECTATE_YOUSELF);
@@ -247,7 +247,7 @@ class arena_spectator_commands : public CommandScript
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
-                
+
                 if (target->HasAura(32728) || target->HasAura(32727))
                 {
                     handler->PSendSysMessage(LANG_SPECTATE_WAIT_START);
@@ -268,8 +268,8 @@ class arena_spectator_commands : public CommandScript
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
-                
-                if (/*player->IsInvitedForBattlegroundQueueType() || */player->InBattlegroundQueue()) // Prevent Crash 
+
+                if (/*player->IsInvitedForBattlegroundQueueType() || */player->InBattlegroundQueue()) // Prevent Crash
                 {
                     handler->PSendSysMessage(LANG_SPECTATE_QUEUE);
                     handler->SetSentErrorMessage(true);
@@ -378,14 +378,14 @@ class arena_spectator_commands : public CommandScript
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
-                
+
                 if (target->GetTypeId() != TYPEID_PLAYER)
                 {
                     handler->PSendSysMessage(LANG_SPECTATE_NON_PLAYER);
                     handler->SetSentErrorMessage(true);
                     return false;
-                }          
-                
+                }
+
                 if (!player->IsSpectator())
                 {
                     handler->PSendSysMessage(LANG_SPECTATE_NOT_SPECTATOR);
@@ -406,7 +406,7 @@ class arena_spectator_commands : public CommandScript
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
-                
+
                 if (target && (target->HasAuraType(SPELL_AURA_MOD_STEALTH) || target->HasAuraType(SPELL_AURA_MOD_INVISIBILITY)))
                 {
                     handler->PSendSysMessage(LANG_SPECTATE_TARGET_INVISEBLE);
@@ -435,7 +435,7 @@ class arena_spectator_commands : public CommandScript
 
                 player->SetViewpoint(target, true);
                 return true;
-            } // Prevent Crash if not Exist Player 
+            } // Prevent Crash if not Exist Player
             else
                 return false;
         }
@@ -473,7 +473,7 @@ class arena_spectator_commands : public CommandScript
                 {
                     if (tmpPlayer->IsSpectator())
                         continue;
-                        
+
                     if (tmpPlayer->IsGameMaster())
                         continue;
 
@@ -554,14 +554,14 @@ public:
             arenasQueueTotal[0] = GetSpecificArenasCount(ARENA_TYPE_2v2);
             arenasQueueTotal[1] = GetSpecificArenasCount(ARENA_TYPE_3v3);
             arenasQueueTotal[2] = GetSpecificArenasCount(ARENA_TYPE_5v5);
-            
+
             std::stringstream Gossip2s;
-            Gossip2s << GTS(LANG_SPECTATE_MENU_2VS2) << arenasQueueTotal[0] << ")"/* << arenasQueuePlaying[0] << ")"*/;            
+            Gossip2s << GTS(LANG_SPECTATE_MENU_2VS2) << arenasQueueTotal[0] << ")"/* << arenasQueuePlaying[0] << ")"*/;
             std::stringstream Gossip3s;
             Gossip3s << GTS(LANG_SPECTATE_MENU_3VS3) << arenasQueueTotal[1] << ")"/* << arenasQueuePlaying[1] << ")"*/;
             std::stringstream Gossip3ss;
             Gossip3ss << GTS(LANG_SPECTATE_MENU_5VS5) << arenasQueueTotal[2] << ")"/* << arenasQueuePlaying[2] << ")"*/;
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, Gossip2s.str(), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_2V2_GAMES);            
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, Gossip2s.str(), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_2V2_GAMES);
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, Gossip3s.str(), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_3V3_GAMES);
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, Gossip3ss.str(), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_5V5_GAMES);
             //player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_CHAT, "Spectate Specific Player", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_SPECIFIC, "", 0, true);

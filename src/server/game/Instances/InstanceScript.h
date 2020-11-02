@@ -251,8 +251,8 @@ class TC_GAME_API InstanceScript : public ZoneScript
 
         // Used only during loading
         void SetCompletedEncountersMask(uint32 newMask, uint32 Count)
-        { 
-            completedEncounters = newMask; 
+        {
+            completedEncounters = newMask;
             completedEncountersCount = Count;
         }
 

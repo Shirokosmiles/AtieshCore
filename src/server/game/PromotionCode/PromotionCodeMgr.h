@@ -76,7 +76,7 @@ class TC_GAME_API PromotionCodeMgr
         PromotionCodes const* GetPromoCode(std::string const& name, uint32& id) const;
         PromotionCodesContainer const& GetPromotionCodesMap() const { return _promoCodesStore; }
         bool AddPromoCode(PromotionCodes& data);
-        bool DeletePromoCode(std::string const& name);        
+        bool DeletePromoCode(std::string const& name);
         //Promo codes end
 
         bool CheckedEnteredCodeByPlayer(std::string const& code, Player* player, uint32 collection = 0);
@@ -91,7 +91,7 @@ class TC_GAME_API PromotionCodeMgr
         bool _AddCodeInHistory(uint32 id, std::string const& code, Player* player);
         bool _CanUseCode(std::string const& code, ObjectGuid::LowType plrGUID);
 
-    private:        
+    private:
         PromotionCodesContainer _promoCodesStore;
         PromotionHistoryContainer _promoHistoryStore;
 };

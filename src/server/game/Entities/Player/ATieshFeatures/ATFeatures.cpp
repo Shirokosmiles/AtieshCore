@@ -472,8 +472,8 @@ void Player::RewardPVPCap()
                 }
                 case CLASS_MAGE:
                 {
-                    // spell A8: 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, back 51334, 51348, 51330, 51346, 51332, ring 51336, neck 51335, 51349, 51331, 51347, 51333, 
-                    // spell A7: 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, back 42078, 42080, 42076, 42079, 42077, ring 42118, neck 42044, 42046, 42043, 42047, 42045, 
+                    // spell A8: 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, back 51334, 51348, 51330, 51346, 51332, ring 51336, neck 51335, 51349, 51331, 51347, 51333,
+                    // spell A7: 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, back 42078, 42080, 42076, 42079, 42077, ring 42118, neck 42044, 42046, 42043, 42047, 42045,
                     uint32 item_list_1[26] = { 51465, 51467, 51463, 51464, 51466, 51329, 51327, 51328, 51367, 51365, 51366, 51339, 51337, 51338, 51334, 51348, 51330, 51346, 51332, 51336, 51335, 51349, 51331, 51347, 51333, uint32((GetCFSTeam() == ALLIANCE ? 51377 : 51378)) };
                     uint32 item_list_2[25] = { 41947, 41966, 41954, 41972, 41960, 41910, 41899, 41904, 41894, 41882, 41886, 49181, 49179, 49183, 42078, 42080, 42076, 42079, 42077, 42118, 42044, 42046, 42043, 42047, 42045 };
                     uint32 item_list_3[5] = { 41946, 41965, 41953, 41971, 41959 };
@@ -1123,13 +1123,13 @@ bool Guild::CanStartGuildWarByCount(WorldSession* session, std::string& msg, boo
     {
         msg = NotEnough(session, minCount, gcount, defendGuild);
         return false;
-    }  
+    }
 
     return true;
 }
 
 bool Guild::CanStartGuildWarByTimer(WorldSession* session, std::string& msg)
-{    
+{
     time_t dateLastWarStart = sGuildMgr->GetTimeOfLastWarStart(GetId());
     time_t dateLastWarEnd = sGuildMgr->GetTimeOfLastWarEnd(GetId());
     time_t now = GameTime::GetGameTime();
@@ -1150,7 +1150,7 @@ bool Guild::CanStartGuildWarByTimer(WorldSession* session, std::string& msg)
         time_t deltaEnd = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_END);
         time_t timeOfPossible = dateLastWarEnd + deltaEnd;
         if (timeOfPossible > now)
-        {            
+        {
             msg = NotEnoughTimer(session, timeOfPossible);
             return false;
         }

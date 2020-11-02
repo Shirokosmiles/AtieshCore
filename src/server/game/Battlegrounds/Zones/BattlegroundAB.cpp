@@ -284,7 +284,7 @@ void BattlegroundAB::StartingEventCloseDoors()
     for (uint32 door = BG_AB_OBJECT_GATE_A; door <= BG_AB_OBJECT_GATE_H; ++door)
     {
         SpawnBGObject(door, RESPAWN_IMMEDIATELY);
-        DoorClose(door);        
+        DoorClose(door);
     }
 
     // Starting base spirit guides

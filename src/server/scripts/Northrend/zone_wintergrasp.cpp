@@ -799,7 +799,7 @@ class go_wg_vehicle_teleporter : public GameObjectScript
                         }
                         default:
                             break;
-                    }                        
+                    }
                 }
 
                 return result;

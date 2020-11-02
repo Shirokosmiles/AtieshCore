@@ -414,7 +414,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                         if (crMover->GetTransport() && crMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
                             crMover->GetTransport()->RemovePassenger(crMover);
                     }
-                }                
+                }
 
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
                 {

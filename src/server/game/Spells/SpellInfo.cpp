@@ -3488,7 +3488,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             switch (spellInfo->Id)
             {
                 // Slice and Dice. Prevents breaking Stealth
-                case 5171:      // Slice and Dice (Rank 1) 
+                case 5171:      // Slice and Dice (Rank 1)
                 case 6774:      // Slice and Dice (Rank 2)
                 // Envenom must be considered as a positive effect even though it deals damage
                 case 32645:     // Envenom (Rank 1)

@@ -180,7 +180,6 @@ bool GuildMgr::StartNewWar(GuildWars& data)
         attackerName = GetGuildNameById(data.attackerGuildId);
         defenderName = GetGuildNameById(data.defenderGuildId);
     }
-    
 
     GuildWarsHistory gwh;
     gwh.attackerGuildId = data.attackerGuildId;

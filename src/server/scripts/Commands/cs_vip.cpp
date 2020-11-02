@@ -64,7 +64,7 @@ public:
             { "app",              rbac::RBAC_PERM_COMMAND_VIP_ARPPEAR,      false, &HandleVipAppearCommand,        "" },
             { "set",              rbac::RBAC_PERM_COMMAND_VIP_SET,          true, &HandleSetVipCommand,            "" },
             { "del",              rbac::RBAC_PERM_COMMAND_VIP_REMOVE,       true, &HandleDelVipCommand,            "" },
-            { "",                 rbac::RBAC_PERM_COMMAND_VIP,              false, &HandleVipCommand,              "" },            
+            { "",                 rbac::RBAC_PERM_COMMAND_VIP,              false, &HandleVipCommand,              "" },
         };
         static std::vector<ChatCommand> coinCommandTable =
         {
@@ -91,9 +91,9 @@ public:
         char* accID = strtok(nullptr, " ");
 
         bool accidExist = false;
-        // .vip set days accountID , where accid not required (if target exist)        
+        // .vip set days accountID , where accid not required (if target exist)
         if (!days)
-        {            
+        {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
             return false;
@@ -109,7 +109,7 @@ public:
             accountID = target->GetSession()->GetAccountId();
 
         uint32 days_bonus = atoul(days);
-        
+
         time_t current_time = GameTime::GetGameTime();
         time_t unsetdate = current_time + 24 * 60 * 60 * days_bonus;
 
@@ -137,7 +137,7 @@ public:
                     p->SetPremiumUnsetdate(unsetdate);
                     handler->PSendSysMessage("VIP privileges has been set for Account: %u Character:[%s] (online) (GUID: %u), for %u days", accountID, p->GetName().c_str(), p->GetGUID().GetCounter(), days_bonus);
                 }
-            }                
+            }
             else
                 handler->PSendSysMessage("VIP privileges has been set for Account: %u, for %u days, no characters online", accountID, days_bonus);
         }
@@ -204,7 +204,7 @@ public:
             }
             else
                 handler->PSendSysMessage("VIP privileges were removed for Account: %u, no characters online", accountID);
-        }            
+        }
         else
         {
             handler->PSendSysMessage("VIP privileges were removed for Account: %u (IP: %s) Character:[%s] (GUID: %u)",
@@ -1102,7 +1102,7 @@ public:
                     p->SetCoins(coinCount);
             }
         }
-        
+
         AccountMgr::SetCoins(accountID, coinCount);
         handler->PSendSysMessage("The AccountID %u has received %i coins, and now have a %u coins", accountID, coinAdded, coinCount);
         return true;

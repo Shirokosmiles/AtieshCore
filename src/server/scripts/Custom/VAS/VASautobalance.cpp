@@ -80,7 +80,7 @@ public:
         if (unit->GetCharmerOrOwner())
             if (unit->ToPet() || unit->ToTotem() || unit->IsSummon())
                 return;
-                
+
         uint32 maxhealth = unit->GetMaxHealth();
         float healthMultiplier = sWorld->getRate(RATE_VAS_MAXHP_PERCENT);
         uint32 newmaxhealth = CalculatePct(maxhealth, healthMultiplier);

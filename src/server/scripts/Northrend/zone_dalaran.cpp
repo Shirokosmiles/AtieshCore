@@ -356,7 +356,7 @@ public:
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
-                {                
+                {
                 case EVENT_GO_FLY:
                 {
                     DoCastSelf(SPELL_GO_FLY_TRIGGER);

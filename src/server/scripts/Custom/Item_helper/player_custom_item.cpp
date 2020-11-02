@@ -384,7 +384,7 @@ public:
                         player->GetSession()->SendTrainerList(nullptr);
                         break;
                     }
-                    case 5: // Teleport 
+                    case 5: // Teleport
                     {
                         CloseGossipMenuFor(player);
                         player->TeleportTo(0, -8831.966797f, 632.503906f, 94.210480f, 4.61f);
@@ -1410,10 +1410,10 @@ public:
                             CloseGossipMenuFor(player);
                             player->LearnSpell(5011, false); // Crossbows
                             player->LearnSpell(200, false); // Polearms
-                            player->LearnSpell(15590, false); 
+                            player->LearnSpell(15590, false);
                             player->LearnSpell(264, false);
-                            player->LearnSpell(266, false); 
-                            player->LearnSpell(227, false); 
+                            player->LearnSpell(266, false);
+                            player->LearnSpell(227, false);
                             ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                             break;
                         case CLASS_PALADIN:
@@ -1430,7 +1430,7 @@ public:
                             break;
                         case CLASS_PRIEST:
                             CloseGossipMenuFor(player);
-                            player->LearnSpell(1180, false); 
+                            player->LearnSpell(1180, false);
                             ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                             break;
                         case CLASS_HUNTER:
@@ -1438,47 +1438,47 @@ public:
                             player->LearnSpell(5011, false); // Crossbows
                             player->LearnSpell(202, false); // Dual - handed sword
                             player->LearnSpell(200, false); // Polearms
-                            player->LearnSpell(15590, false); 
-                            player->LearnSpell(264, false); 
-                            player->LearnSpell(2567, false); 
-                            player->LearnSpell(227, false); 
+                            player->LearnSpell(15590, false);
+                            player->LearnSpell(264, false);
+                            player->LearnSpell(2567, false);
+                            player->LearnSpell(227, false);
                             ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                             break;
                         case CLASS_MAGE:
                             CloseGossipMenuFor(player);
-                            player->LearnSpell(1180, false); 
+                            player->LearnSpell(1180, false);
                             player->LearnSpell(201, false); // One - handed sword
                             ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                             break;
                         case CLASS_SHAMAN:
                             CloseGossipMenuFor(player);
-                            player->LearnSpell(199, false); 
+                            player->LearnSpell(199, false);
                             player->LearnSpell(197, false); // Two-handed axes
-                            player->LearnSpell(1180, false); 
-                            player->LearnSpell(15590, false); 
+                            player->LearnSpell(1180, false);
+                            player->LearnSpell(15590, false);
                             player->LearnSpell(196, false); // One - handed axes
                             ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                             break;
                         case CLASS_ROGUE:
                             CloseGossipMenuFor(player);
                             player->LearnSpell(5011, false); // Crossbows
-                            player->LearnSpell(198, false); 
-                            player->LearnSpell(15590, false); 
-                            player->LearnSpell(264, false); 
+                            player->LearnSpell(198, false);
+                            player->LearnSpell(15590, false);
+                            player->LearnSpell(264, false);
                             player->LearnSpell(201, false); // One - handed sword
-                            player->LearnSpell(266, false); 
+                            player->LearnSpell(266, false);
                             player->LearnSpell(196, false); // One - handed axes
                             ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                             break;
                         case CLASS_DEATH_KNIGHT:
                             CloseGossipMenuFor(player);
-                            player->LearnSpell(199, false); 
-                            player->LearnSpell(198, false); 
+                            player->LearnSpell(199, false);
+                            player->LearnSpell(198, false);
                             ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
                             break;
                         case CLASS_DRUID:
                             CloseGossipMenuFor(player);
-                            player->LearnSpell(199, false); 
+                            player->LearnSpell(199, false);
                             player->LearnSpell(200, false); // Polearms
                             player->LearnSpell(15590, false);
                             ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_SKILLS_WEAPON_CONFIRM);
@@ -1680,7 +1680,7 @@ public:
                     {
                         player->InstallItemPresentBySlot(1);
                         player->SetCanReceiveStartPack(0);
-                        player->PlayerTalkClass->SendCloseGossip();                    
+                        player->PlayerTalkClass->SendCloseGossip();
                         break;
                     }
                     case 84: // CLASS_PALADIN start-pack
@@ -1841,7 +1841,7 @@ public:
                         {
                             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GTS(LANG_GSYSTEM_GUILD_WAR_DECLARE), GOSSIP_SENDER_MAIN, 106, GTS(LANG_GSYSTEM_GUILD_WAR_DECLARE_SURE), 0, true);
                             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GTS(LANG_GSYSTEM_GUILD_WAR_ADMIT), GOSSIP_SENDER_MAIN, 107, GTS(LANG_GSYSTEM_GUILD_WAR_ADMIT_SURE), 0, true);
-                        }                    
+                        }
 
                         AddGossipItemFor(player, 0, GTS(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 3);
                         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());

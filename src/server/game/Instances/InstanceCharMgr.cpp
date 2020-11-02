@@ -178,7 +178,7 @@ std::string InstanceCharMgr::GetUpdatedData(std::string const data, uint8 encoun
                     saveStream << data[i];
                     continue;
                 }
-            
+
                 if (index != encounterID)
                     saveStream << data[i];
                 else
@@ -197,7 +197,7 @@ std::string InstanceCharMgr::GetUpdatedData(std::string const data, uint8 encoun
                     correctedSecondStage = true;
             }
 
-            if (correctedSecondStage)            
+            if (correctedSecondStage)
                 saveStream << data[i];
         }
     }
@@ -212,7 +212,7 @@ void InstanceCharMgr::HandleDoneEncounterInInstance(std::list<ObjectGuid::LowTyp
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
         std::string data = "";
-        
+
         for (InstanceCharContainer::iterator itr = m_instanceCharStore.begin(); itr != m_instanceCharStore.end(); ++itr)
         {
             for (std::list<ObjectGuid::LowType>::const_iterator itr2 = plrlist.begin(); itr2 != plrlist.end(); ++itr2)

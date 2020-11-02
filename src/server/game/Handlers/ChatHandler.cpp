@@ -59,7 +59,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     {
         recvData.rfinish();
         return;
-    }        
+    }
 
     uint32 type;
     uint32 lang;
@@ -287,7 +287,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
         }
     }
-        
+
     if (lang == LANG_ADDON)
     {
         // GS Reguest
@@ -366,7 +366,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
     }
 
-    bool senderinbattleground = sender->InBattleground() && !sender->InArena();   
+    bool senderinbattleground = sender->InBattleground() && !sender->InArena();
 
     TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received : sender = %s, type = %u, lang = %u, to = %s, channel = %s, text : %s", sender->GetName().c_str(), type, lang, to.c_str(), channel.c_str(), msg.c_str());
     switch (type)
@@ -415,7 +415,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             else
                 sender->TextEmote(msg);
             break;
-        } 
+        }
         case CHAT_MSG_YELL:
         {
             // Prevent cheating
@@ -437,7 +437,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             else
                 sender->Yell(msg, Language(lang));
             break;
-        } 
+        }
         case CHAT_MSG_WHISPER:
         {
             if (!normalizePlayerName(to))
@@ -446,7 +446,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 recvData.rfinish();
                 return;
             }
-            
+
             if (Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to))
             {
                 bool receiverinbattleground = receiver && receiver->InBattleground();

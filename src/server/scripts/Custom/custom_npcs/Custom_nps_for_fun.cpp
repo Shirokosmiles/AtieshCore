@@ -66,7 +66,7 @@ Data Tele[] = // key = i & Key
     { 1, 4, 9, "|TInterface/ICONS/Achievement_Dungeon_Naxxramas_Normal:25|t WotLK instances", 0, 69, 0, 0, 0, 0, 0, 0 },
     { 1, 5, 9, "|TInterface/ICONS/Achievement_Dungeon_Naxxramas_25man:25|t Raids", 0, 57, 0, 0, 0, 0, 0, 0 },
     //{ 1, 10, 9, "|TInterface/ICONS/Spell_fire_felfireward:25|t ?????? ?????????", 0, 80, 0, 0, 0, 0, 0, 0 },
-    
+
     { 2, 0, 2, "|TInterface/ICONS/Achievement_Boss_Mekgineer_Thermaplugg:25|t Gnomeregan |cffff0000(24-34)|r", 0, 25, 2, 0, -5163.54f, 925.423f, 257.181f, 1.57423f },
     { 2, 0, 2, "|TInterface/ICONS/Achievement_Boss_EdwinVancleef:25|t The Deadmines |cffff0000(15-21)|r", 0, 17, 2, 0, -11209.6f, 1666.54f, 24.6974f, 1.42053f },
     { 2, 0, 2, "|TInterface/ICONS/Achievement_Boss_Bazil_Thredd:25|t The Stockade |cffff0000(20-30)|r", 0, 22, 2, 0, -8799.15f, 832.718f, 97.6348f, 6.04085f },
@@ -369,7 +369,7 @@ public:
             AddGossipItemFor(player, 0, "|TInterface\\icons\\trade_tailoring:25:25:-15:0|tReagents for Tailoring", GOSSIP_SENDER_MAIN, 9);
             AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_misc_herb_icethorn:25:25:-15:0|tCooking Reagents", GOSSIP_SENDER_MAIN, 10);
             AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_misc_gem_01:25:25:-15:0|tReagents for Jeweler", GOSSIP_SENDER_MAIN, 11);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_elemental_eternal_shadow:25:25:-15:0|tMiscellaneous Goods", GOSSIP_SENDER_MAIN, 12);            
+            AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_elemental_eternal_shadow:25:25:-15:0|tMiscellaneous Goods", GOSSIP_SENDER_MAIN, 12);
             AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|tClose", GOSSIP_SENDER_MAIN, 100);
             player->PlayerTalkClass->SendGossipMenu(DEFAULT_GOSSIP_MESSAGE, me->GetGUID());
             return true;
@@ -558,12 +558,12 @@ enum Enchants
     ENCHANT_VZRIV = 3599,
     ENCHANT_BOMBA = 3601,
     ENCHANT_WAIST_SOCKET = 3729,
-    ENCHANT_KISTIRYK_SOCKET = 3723, 
+    ENCHANT_KISTIRYK_SOCKET = 3723,
     ENCHANT_ZAPYASTIE_SOCKET = 3717,
-    
-    ENCHANT_SPINA = 3859, // ??????????? ????????
-    ENCHANT_SPINADVA = 3605 // ?????????? ?????????
-    
+
+    ENCHANT_SPINA = 3859,
+    ENCHANT_SPINADVA = 3605
+
 };
 
 void AdvancedEnchant(Player* player, Item* item, EnchantmentSlot slot, uint32 socketGem)
@@ -873,7 +873,7 @@ public:
                 break;
             case 6: // Enchant Cloak
                 if (player->HasSkill(SKILL_TAILORING) && player->GetSkillValue(SKILL_TAILORING) == 450)
-                {                    
+                {
                     AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tDarkglow Embroidery [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 149);
                     AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tLightweave Embroidery [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 150);
                     AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tSwordguard Embroidery [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 151);
@@ -904,7 +904,7 @@ public:
                 player->PlayerTalkClass->SendGossipMenu(100008, me->GetGUID());
                 return true;
                 break;
-            case 8: //Enchant Bracers            
+            case 8: //Enchant Bracers
                 if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetSkillValue(SKILL_LEATHERWORKING) == 450)
                 {
                     AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 arcan resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 170);
@@ -1025,7 +1025,7 @@ public:
                     }
                 }
                 break;
-            case 15: //Enchant poyas                        
+            case 15: //Enchant poyas
                 AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tAdd slot for socket", GOSSIP_SENDER_MAIN, 220);
                 if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) == 450)
                 {
@@ -1661,7 +1661,7 @@ public:
                    OnGossipHello(player);
                 }
                 break;
-            case 299: // 
+            case 299:
                 item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_WAIST);
                 if (!item)
                 {
@@ -2053,7 +2053,7 @@ class ultimate_trainer_npc : public CreatureScript
 {
 public:
     ultimate_trainer_npc() : CreatureScript("ultimate_trainer_npc") { }
-    
+
     struct ultimate_trainer_npcAI : public ScriptedAI
     {
         ultimate_trainer_npcAI(Creature* creature) : ScriptedAI(creature)
@@ -2071,7 +2071,7 @@ public:
             SendGossipMenuFor(player, 68, me->GetGUID());
             return true;
         }
-      
+
         bool OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId) override
         {
             uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
@@ -2221,7 +2221,7 @@ public:
                             break;
                         }
 
-                        CompleteLearnProfession(player, me, SKILL_ALCHEMY);                        
+                        CompleteLearnProfession(player, me, SKILL_ALCHEMY);
                         break;
                     }
                     case 101:
@@ -2372,7 +2372,7 @@ public:
 
                         CompleteLearnProfession(player, me, SKILL_FISHING);
                         break;
-                    }                
+                    }
                 }
             }
             return true;

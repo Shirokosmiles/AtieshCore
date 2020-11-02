@@ -90,7 +90,7 @@ public:
     void InvitePlayerToQueue(Player* player);
     void RemovePlayerFromQueue(Player* player);
 
-private:   
+private:
     bool activeFight;
     bool registration;
 

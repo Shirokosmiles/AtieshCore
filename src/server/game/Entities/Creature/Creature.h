@@ -159,7 +159,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         {
             return 1.0f;
         }
-        
+
         uint32 GetShieldBlockValue() const override;
 
         SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType /*attackType*/ = BASE_ATTACK, uint8 /*damageIndex*/ = 0) const override { return m_meleeDamageSchoolMask; }

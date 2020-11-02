@@ -975,7 +975,7 @@ public: npc_body_rabbit() : CreatureScript("npc_body_rabbit") {}
             {
                 if (spellInfo->Id == SPELL_CREATE_ZULDRAK_RAT_COVER)
                     player->CastSpell(player, SPELL_CREATE_LOOT_RAT);
-            }            
+            }
 
             me->DespawnOrUnsummon();
         }

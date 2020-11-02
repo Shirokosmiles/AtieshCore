@@ -593,7 +593,7 @@ private:
     StaticWintergraspTowerInfo const* _staticTowerInfo;
 
     // GameObject associations
-    GuidVector m_GameObjectList[3];    
+    GuidVector m_GameObjectList[3];
 
 public:
     BfWGGameObjectBuilding(BattlefieldWG* wg, WintergraspGameObjectBuildingType type, uint32 worldState);

@@ -84,7 +84,7 @@ public:
 
     void LeftInGuildWar(Guild* guild, int32 ratingChange, std::string const& guildName, std::string const& winnerguildName) override
     {
-        guild->BroadcastToGuildEndedGWWith(guildName, winnerguildName, ratingChange);        
+        guild->BroadcastToGuildEndedGWWith(guildName, winnerguildName, ratingChange);
     }
 
     void OnAddMember(Guild* guild, Player* player, uint8& /*plRank*/) override
@@ -578,7 +578,7 @@ public:
             handler->PSendSysMessage(LANG_GSYSTEM_GW_NOT_ENEMY, guildName.c_str());
             return true;
         }
-                
+
         sGuildMgr->StopWarBetween(ownGuild->GetId(), targetGuild->GetId(), targetGuild->GetId());
         handler->PSendSysMessage(LANG_GSYSTEM_GW_STOP, guildName.c_str());
 

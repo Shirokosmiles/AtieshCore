@@ -8651,7 +8651,7 @@ bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg, bool withNast
             auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
             msg.erase(end, msg.end());
         }
-    }    
+    }
 
     return true;
 }

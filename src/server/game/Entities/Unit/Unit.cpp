@@ -1255,7 +1255,7 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
         {
             // Script Hook For CalculateMeleeDamage -- Allow scripts to change the Damage pre class mitigation calculations
             sScriptMgr->ModifyMeleeDamage(ASSERT_NOTNULL(victim), ASSERT_NOTNULL(attacker), damage);
-        }        
+        }
 
         // Calculate armor reduction
         if (Unit::IsDamageReducedByArmor(SpellSchoolMask(damageInfo->Damages[i].DamageSchoolMask)))
@@ -11492,7 +11492,7 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
         {
             if (Player* killedPlr = victim->ToPlayer())
             {
-                sScriptMgr->OnPVPKill(killerPlr, killedPlr); 
+                sScriptMgr->OnPVPKill(killerPlr, killedPlr);
                 if (killerPlr->IsInGuildWarWith(killedPlr))
                     sScriptMgr->OnGuildKillGuildEnemyEvent(killerPlr->GetGuild(), killerPlr);
             }
@@ -13844,7 +13844,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                                     fromDiffFaction = true;
                             }
                 }
-                
+
                 if (IsControlledByPlayer() && target != this && ConfigAccessGroups && IsInRaidWith(target))
                 {
                     FactionTemplateEntry const* ft1 = GetFactionTemplateEntry();
@@ -14102,7 +14102,7 @@ void Unit::RaidInfoByMe(Unit* victim)
     int8 tanks = 0;
     int8 healers = 0;
     int8 damagers = 0;
-    uint32 GS = 0;    
+    uint32 GS = 0;
 
     group->CalculateRolesAndAnnounce(ppl, lives, tanks, healers, damagers, GS);
 
@@ -14171,7 +14171,7 @@ void Unit::RaidInfoByMe(Unit* victim)
         {
             std::string combattimeSec = secsToTimeString(victim->ToCreature()->GetCombatTime());
             sWorld->SendWorldText(LANG_GROUP_TEXT_ANNOUNCE_4, combattimeSec.c_str());
-        }        
+        }
     }
     //'|cffff0000Status:|r |cffe6cc80(%u / %u) boss completed|r'
 }

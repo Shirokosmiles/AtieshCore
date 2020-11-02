@@ -75,7 +75,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
             recvPacket.rfinish();
             return;
         }
-        
+
     }
 
     if (!password.empty())

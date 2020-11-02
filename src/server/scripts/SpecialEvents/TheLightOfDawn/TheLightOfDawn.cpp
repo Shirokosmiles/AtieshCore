@@ -427,7 +427,7 @@ void TheLightOfDawnEvent::SummonDefenseArmy()
         Position spawnposEl = { 2277.664307f, -5294.874512f, 83.866936f, 0.98f };
         if (Unit* temp = Darion->SummonCreature(NPC_COMMANDER_ELIGOR_DAWNBRINGER, spawnposEl.GetPositionX(), spawnposEl.GetPositionY(), spawnposEl.GetPositionZ(), spawnposEl.GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
             EligorGUID = temp->GetGUID();
-        
+
         // spawn Leonid Barthalomew
         Position spawnposLe = { 2282.226074f, -5317.552246f, 88.573433f, 1.48f };
         if (Unit* temp = Darion->SummonCreature(NPC_LEONID_BARTHALOMEW_THE_REVERED, spawnposLe.GetPositionX(), spawnposLe.GetPositionY(), spawnposLe.GetPositionZ(), spawnposLe.GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
@@ -523,7 +523,7 @@ bool TheLightOfDawnEvent::SetupSpecialEvent(bool enabled, bool active, bool repe
     // override Setup for Set time of first run in cooldownTimer
     if (!SpecialEvent::SetupSpecialEvent(enabled, active, repeatable, id, cooldownTimer, durationTimer, comment))
         return false;
-    
+
     _mapId = MAPID_THE_SCARLET_ENCLAVE;
     _map = sMapMgr->FindMap(_mapId, 0);
     if (!_map)
@@ -618,7 +618,7 @@ void TheLightOfDawnEvent::Update(uint32 diff)
 
                 show_timer       = false;
                 show_event_begin = true;
-                UpdateWorldState(WORLD_STATE_BATTLE_TIMER_SHOW, show_timer);                
+                UpdateWorldState(WORLD_STATE_BATTLE_TIMER_SHOW, show_timer);
                 UpdateWorldState(WORLD_STATE_BATTLE_BEGIN, show_event_begin);
 
                 if (Creature* Darion = GetCreature(Darion_Mograine))
@@ -1036,7 +1036,7 @@ void TheLightOfDawnEvent::SummonWarriorOfFrozenWastes()
 void TheLightOfDawnEvent::SummonDawnDefender()
 {
     if (Creature* Darion = GetCreature(Darion_Mograine))
-    { 
+    {
         Position spawnpos = Darion->GetNearPosition(frand(10.f, 75.f), frand(0, 6.14f));
         if (Unit* temp = Darion->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, spawnpos.GetPositionX(), spawnpos.GetPositionY(), spawnpos.GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300s))
         {

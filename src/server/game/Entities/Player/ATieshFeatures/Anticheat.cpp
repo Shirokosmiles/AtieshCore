@@ -243,7 +243,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 
         // calculate distance - don't use func, because x,z can be offset transport coords
         distance = sqrt((npos.GetPositionY() - y) * (npos.GetPositionY() - y) + (npos.GetPositionX() - x) * (npos.GetPositionX() - x));
-        
+
         if (!jump && !CanFly() && !isSwimming() && !transportflag)
         {
             float diffz = fabs(movementInfo.pos.GetPositionZ() - z);

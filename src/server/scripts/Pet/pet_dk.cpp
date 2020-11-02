@@ -41,7 +41,7 @@ enum DeathKnightSpells
     SPELL_DK_SUMMON_GARGOYLE_2      = 50514,
     SPELL_DK_DISMISS_GARGOYLE       = 50515,
     SPELL_DK_SANCTUARY              = 54661,
- 
+
     // Dancing Rune Weapon
     SPELL_DK_DANCING_RUNE_WEAPON        = 49028,
     SPELL_COPY_WEAPON                   = 63416,
@@ -56,14 +56,14 @@ enum DeathKnightSpells
     // Main Spells
     SPELL_BLOOD_STRIKE                  = 49926,
     SPELL_PLAGUE_STRIKE                 = 49917,
-     
+
     SPELL_DISMISS_RUNEBLADE             = 50707, // Right now despawn is done by its duration,
     // Gargoyle attack
     SPELL_ATTACK_GARGOYLE               = 51963
 };
 
 enum GargoyleState
-{    
+{
     EVENT_MOVE_AT_TARGET    = 1,
     EVENT_START_COMBAT      = 2,
     EVENT_COMBAT_OUT        = 3
@@ -102,7 +102,7 @@ public:
         {
             if (!me || !me->IsAlive())
                 return;
-            
+
             _events.Update(diff);
 
             while (uint32 _eventId = _events.ExecuteEvent())

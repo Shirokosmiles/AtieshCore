@@ -228,7 +228,7 @@ public:
                 if (inCombat)
                 {
                     inCombat = false;
-                    _events.ScheduleEvent(EVENT_ID_RETURN_FOLLOW, 2s);                    
+                    _events.ScheduleEvent(EVENT_ID_RETURN_FOLLOW, 2s);
                 }
             }
         }

@@ -60,9 +60,8 @@ class TC_GAME_API ItemShopMgr
 
     protected:
         void _LoadItemsFromShop();
-        
 
-    private:        
+    private:
         ItemShopContainer _itemShopStore;
 };
 

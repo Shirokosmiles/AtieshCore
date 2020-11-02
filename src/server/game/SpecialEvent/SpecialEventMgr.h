@@ -58,7 +58,7 @@ class TC_GAME_API SpecialEventMgr
 
         // event sector
         void AddEvent(uint32 eventId, SpecialEvent* handle);
-        
+
         SpecialEvent* GetSpecialEventByEventId(uint32 eventId) const;
         SpecialEvent* GetSpecialEventByZoneId(uint32 zoneId) const;
 

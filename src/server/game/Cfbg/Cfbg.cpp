@@ -91,7 +91,7 @@ void Player::SetFakeRaceAndMorph()
                         m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_ORC : FAKE_F_ORC;
                         m_FakeRace = RACE_ORC;
                         break;
-                }                
+                }
             }
             else
             {
@@ -120,7 +120,7 @@ void Player::SetFakeRaceAndMorph()
                         m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
                         m_FakeRace = RACE_UNDEAD_PLAYER;
                         break;
-                }                
+                }
             }
             else // HUMAN, GNOME, DRAENEI
             {
@@ -138,7 +138,7 @@ void Player::SetFakeRaceAndMorph()
                         m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_HUMAN : FAKE_F_HUMAN;
                         m_FakeRace = RACE_HUMAN;
                         break;
-                }                
+                }
             }
 
             break;
@@ -162,7 +162,7 @@ void Player::SetFakeRaceAndMorph()
                         m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_UNDEAD : FAKE_F_UNDEAD;
                         m_FakeRace = RACE_UNDEAD_PLAYER;
                         break;
-                }                
+                }
             }
             else // HUMAN, GNOME
             {
@@ -205,7 +205,7 @@ void Player::SetFakeRaceAndMorph()
                         m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
                         m_FakeRace = RACE_TROLL;
                         break;
-                }                
+                }
             }
             else // HUMAN, DWARF, GNOME, NELF
             {
@@ -227,7 +227,7 @@ void Player::SetFakeRaceAndMorph()
                         m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
                         m_FakeRace = RACE_DWARF;
                         break;
-                }                
+                }
             }
 
             break;
@@ -256,7 +256,7 @@ void Player::SetFakeRaceAndMorph()
                         m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DRAENEI : FAKE_F_DRAENEI;
                         m_FakeRace = RACE_DRAENEI;
                         break;
-                }                
+                }
             }
 
             break;
@@ -281,7 +281,7 @@ void Player::SetFakeRaceAndMorph()
                         m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
                         m_FakeRace = RACE_TROLL;
                         break;
-                }                
+                }
             }
             else // HUMAN, DWARF, DRENEI, NELF
             {
@@ -331,7 +331,7 @@ void Player::SetFakeRaceAndMorph()
                         m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_TROLL : FAKE_F_TROLL;
                         m_FakeRace = RACE_TROLL;
                         break;
-                }                
+                }
             }
             else // DWARF, DRENEI, NELF
             {
@@ -350,7 +350,7 @@ void Player::SetFakeRaceAndMorph()
                         m_FakeMorph = GetGender() == GENDER_MALE ? FAKE_M_DWARF : FAKE_F_DWARF;
                         m_FakeRace = RACE_DWARF;
                         break;
-                }                
+                }
             }
 
             break;
@@ -414,7 +414,7 @@ void Player::SetFakeRaceAndMorph()
         {
             random = urand(0, 4);
             if (GetCFSTeam() == ALLIANCE)
-            {                
+            {
                 switch (random)
                 {
                     case 4:
@@ -489,7 +489,7 @@ void Player::SendBattleGroundChat(uint32 msgtype, std::string message)
                 {
                     WorldPacket data(SMSG_MESSAGECHAT, 200);
 
-                    if (GetTeam() == pPlayer->GetTeam()) 
+                    if (GetTeam() == pPlayer->GetTeam())
                     {
                         if (pPlayer->IsPlayingNative())
                             language = pPlayer->GetTeam() == ALLIANCE ? LANG_COMMON : LANG_ORCISH;
@@ -691,7 +691,7 @@ void Player::BuildPlayerChat(WorldPacket* data, uint8 msgtype, const std::string
     *data << uint8(msgtype);
     *data << uint32(language);
     *data << uint64(GetGUID());
-    *data << uint32(0);                                      // constant unknown time 
+    *data << uint32(0);                                      // constant unknown time
     *data << uint64(GetGUID());
     *data << uint32(text.length() + 1);
     *data << text;
@@ -706,7 +706,7 @@ void Player::UpdateFakeQueryName(Battleground* pBattleGround)
         WorldPacket data1(SMSG_INVALIDATE_PLAYER, 8);
         data1 << itr->first;
         GetSession()->SendPacket(&data1);
-        
+
         if (Player* pPlayer = ObjectAccessor::FindPlayer(itr->first))
         {
             GetSession()->SendNameQueryOpcode(pPlayer->GetGUID()); // Send namequery answer instantly if player is available

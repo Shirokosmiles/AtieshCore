@@ -614,7 +614,7 @@ public:
 
     struct npc_mammothAI : public ScriptedAI
     {
-        npc_mammothAI(Creature* creature) : ScriptedAI(creature) { }        
+        npc_mammothAI(Creature* creature) : ScriptedAI(creature) { }
 
         void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
         {
@@ -623,7 +623,7 @@ public:
                 me->StopMoving();
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveIdle();
-            }            
+            }
         }
     };
 

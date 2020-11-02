@@ -570,7 +570,7 @@ void World::LoadConfigSettings(bool reload)
     bool enableLOS = m_bool_configs[CONFIG_VMAP_ENABLE_LOS];
     bool enableHeight = m_bool_configs[CONFIG_VMAP_ENABLE_HEIGHT_CALCULATION];
     if (!enableHeight)
-        TC_LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");    
+        TC_LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
 
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableLineOfSightCalc(enableLOS);
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);

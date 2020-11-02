@@ -219,7 +219,7 @@ public:
 
         void Reset() override
         {
-            events.Reset();            
+            events.Reset();
         }
 
         void JustEngagedWith(Unit* /*who*/) override

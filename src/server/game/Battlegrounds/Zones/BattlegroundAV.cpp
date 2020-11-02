@@ -1337,7 +1337,7 @@ void BattlegroundAV::StartingEventCloseDoors()
     for (uint32 i = BG_AV_OBJECT_DOOR_A; i <= BG_AV_GHOST_GATE_H; ++i)
     {
         SpawnBGObject(i, BG_AV_GameObjects[i].SpawnTime);
-        DoorClose(i);        
+        DoorClose(i);
     }
 }
 
@@ -1358,7 +1358,7 @@ void BattlegroundAV::StartingEventOpenDoors()
         SpawnBGObject(i, RESPAWN_ONE_DAY);
 
     for (uint32 i = BG_AV_OBJECT_DOOR_A; i <= BG_AV_GHOST_GATE_H; ++i)
-        DoorOpen(i);    
+        DoorOpen(i);
 
     // Achievement: The Alterac Blitz
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, BG_AV_EVENT_START_BATTLE);
@@ -2210,7 +2210,7 @@ bool BattlegroundAV::SetupBattleground()
 
     SpawnBGObject(BG_AV_OBJECT_DOOR_A, RESPAWN_IMMEDIATELY);
     SpawnBGObject(BG_AV_OBJECT_DOOR_H, RESPAWN_IMMEDIATELY);
-    
+
     //creatures
     TC_LOG_DEBUG("bg.battleground", "BG_AV start poputlating nodes");
     for (BG_AV_Nodes n = BG_AV_NODES_AID_STATION; n < BG_AV_NODES_MAX; ++n)

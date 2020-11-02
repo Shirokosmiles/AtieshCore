@@ -1152,7 +1152,7 @@ enum TrinityStrings
     LANG_GM_ANNOUNCE_COLOR                = 6615,
 
     LANG_GM_SILENCE                       = 6616,  // "Silence is ON for %s" - Spell 1852
-    // 6617-6625 for Anticheat reserved    
+    // 6617-6625 for Anticheat reserved
 
     LANG_WORLD_CLOSED                     = 7523,
     LANG_WORLD_OPENED                     = 7524,
@@ -1229,7 +1229,7 @@ enum TrinityStrings
     LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE     = 11021,
     // Anticheat
     LANG_GM_ANNOUNCE_ASH                  = 6617,  // AntiSpeedHack
-    LANG_GM_ANNOUNCE_AFH_CANFLYWRONG      = 6618,  // AntiFlyHack - flying without canfly 
+    LANG_GM_ANNOUNCE_AFH_CANFLYWRONG      = 6618,  // AntiFlyHack - flying without canfly
     LANG_GM_ANNOUNCE_AFK_SWIMMING         = 6619,  // AntiFlyHack - flying swimming not in water
     LANG_GM_ANNOUNCE_AFH                  = 6620,  // AntiFlyHack
     LANG_GM_ANNOUNCE_DOUBLE_JUMP          = 6621,  // Double jump (client can't sent second packet of jump (only hack))
@@ -1278,7 +1278,7 @@ enum TrinityStrings
     LANG_BG_IC_REFINERY                 = 1222,
     LANG_BG_IC_QUARRY                   = 1223,
     LANG_BG_IC_HANGAR                   = 1224,
-    // 11022 - 11109 free 
+    // 11022 - 11109 free
     // Vip Commands
     LANG_PLAYER_NOT_VIP                   = 11110,
     LANG_VIP_COMMAND_DISABLED             = 11111,

@@ -384,7 +384,7 @@ void AccountMgr::SetCoins(uint32 accountId, uint32 coins)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_COINS);
     stmt->setUInt32(0, coins);
-    stmt->setUInt32(1, accountId);    
+    stmt->setUInt32(1, accountId);
     LoginDatabase.Execute(stmt);
 }
 
@@ -399,7 +399,7 @@ void AccountMgr::UpdateVipStatus(uint32 accountId, time_t unsetdata)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_PREMIUM);
     stmt->setUInt64(0, unsetdata);
-    stmt->setUInt32(1, accountId);    
+    stmt->setUInt32(1, accountId);
     LoginDatabase.Execute(stmt);
 }
 

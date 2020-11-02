@@ -356,7 +356,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_pvpcap = 0;
     m_receivedStartPack = 0;
     m_auctionlots = 0;
-    m_pvpcapReceived = false;    
+    m_pvpcapReceived = false;
     m_walking = false;
 
     spectatorFlag = false;
@@ -1337,7 +1337,7 @@ void Player::Update(uint32 p_time)
                     if (hours < 1)
                     {
                         time_t minutes = diff % HOUR / MINUTE;
-                        //time_t unsetsec = diff % 60;            
+                        //time_t unsetsec = diff % 60;
                         if (minutes == 5)
                             ChatHandler(GetSession()).PSendSysMessage(GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_NEAR_END));
                         if (minutes < 5)
@@ -6742,7 +6742,7 @@ void Player::RewardReputation(Unit* victim, float rate)
 
     uint32 repfaction1 = Rep->RepFaction1;
     uint32 repfaction2 = Rep->RepFaction2;
-    
+
     if (!IsPlayingNative())
     {
         if (GetCFSTeam() == ALLIANCE)
@@ -9535,7 +9535,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
         break;
     case 4197: // Wintergrasp
         if (battlefield && battlefield->GetBattleId() == BATTLEFIELD_WG)
-            battlefield->FillInitialWorldStates(packet);            
+            battlefield->FillInitialWorldStates(packet);
         break;
     default:
         break;
@@ -14317,7 +14317,7 @@ void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, 
         SendDirectMessage(&data);
 
     if (sWorld->getBoolConfig(CONFIG_LOOT_GUILD_ENABLED) && GetSession() && GetGuild())
-    {   
+    {
         ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(item->GetEntry());
         if (itemProto && itemProto->Quality >= ITEM_QUALITY_EPIC)
         {

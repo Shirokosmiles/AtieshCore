@@ -3609,7 +3609,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     break;
                 }
                 // Hand Over Mammoth
-                case 51660: 
+                case 51660:
                 {
                     if (Creature* caster = m_caster->ToCreature())
                         caster->DespawnOrUnsummon();

@@ -336,7 +336,7 @@ class boss_svala : public CreatureScript
                             me->SetCanFly(false);
                             me->SetDisableGravity(false);
                             me->SetHover(false);
-                            
+
                             //_introCompleted = true;
                             SetPhase(NORMAL);
                             DoZoneInCombat();
@@ -385,7 +385,7 @@ class boss_svala : public CreatureScript
                                 events.ScheduleEvent(EVENT_START_RITUAL, 1s);
                             }
                             break;
-                        }                        
+                        }
                         case EVENT_START_RITUAL:
                         {
                             if (Player* victim = ObjectAccessor::GetPlayer(*me, instance->GetGuidData(DATA_SACRIFICED_PLAYER)))
@@ -394,10 +394,10 @@ class boss_svala : public CreatureScript
                                 DoCast(victim, SPELL_RITUAL_PREPARATION);
                                 DoCast(me, SPELL_RITUAL_OF_THE_SWORD);
                             }
-                            
+
                             events.ScheduleEvent(EVENT_SPAWN_RITUAL_CHANNELERS, 0s);
                             break;
-                        }                        
+                        }
                         case EVENT_SPAWN_RITUAL_CHANNELERS:
                         {
                             DoCast(me, SPELL_RITUAL_CHANNELER_1, true);
