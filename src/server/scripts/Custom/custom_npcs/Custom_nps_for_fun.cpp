@@ -20,6 +20,7 @@
 #include "Chat.h"
 #include "Creature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellMgr.h"
 #include "WorldSession.h"
 #include "ObjectMgr.h"

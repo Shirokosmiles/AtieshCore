@@ -26,6 +26,7 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "Map.h"
 #include "trial_of_the_champion.h"
 
 ObjectData const creatureData[] =

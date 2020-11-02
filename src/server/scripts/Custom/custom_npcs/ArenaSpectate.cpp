@@ -25,6 +25,7 @@
 #include "CreatureTextMgr.h"
 #include "Chat.h"
 #include "Language.h"
+#include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
 #include "RBAC.h"

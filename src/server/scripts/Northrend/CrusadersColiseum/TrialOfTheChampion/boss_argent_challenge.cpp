@@ -24,6 +24,7 @@ SDCategory: Trial of the Champion
 EndScriptData */
 
 #include "Player.h"
+#include "InstanceScript.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"

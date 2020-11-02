@@ -22,6 +22,7 @@
 #include "ScriptMgr.h"
 #include "RBAC.h"
 #include "Player.h"
+#include "Map.h"
 #include "WorldSession.h"
 
 #if TRINITY_COMPILER == TRINITY_COMPILER_GNU

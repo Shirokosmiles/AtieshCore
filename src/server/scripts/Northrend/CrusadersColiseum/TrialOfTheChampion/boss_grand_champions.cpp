@@ -26,6 +26,7 @@ EndScriptData */
 
 #include "GridNotifiers.h"
 #include "Player.h"
+#include "InstanceScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptMgr.h"
