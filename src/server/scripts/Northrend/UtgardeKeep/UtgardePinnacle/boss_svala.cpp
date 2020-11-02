@@ -24,6 +24,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "TemporarySummon.h"
+#include "Player.h"
 #include "utgarde_pinnacle.h"
 
 enum Spells
@@ -391,7 +392,7 @@ class boss_svala : public CreatureScript
                             if (Player* victim = ObjectAccessor::GetPlayer(*me, instance->GetGuidData(DATA_SACRIFICED_PLAYER)))
                             {
                                 Talk(SAY_SACRIFICE_PLAYER);
-                                DoCast(victim, SPELL_RITUAL_PREPARATION);
+                                DoCast(victim->ToUnit(), SPELL_RITUAL_PREPARATION);
                                 DoCast(me, SPELL_RITUAL_OF_THE_SWORD);
                             }
 

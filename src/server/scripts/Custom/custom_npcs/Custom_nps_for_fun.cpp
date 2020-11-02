@@ -18,6 +18,7 @@
 
 #include "AchievementMgr.h"
 #include "Chat.h"
+#include "Creature.h"
 #include "ScriptedGossip.h"
 #include "SpellMgr.h"
 #include "WorldSession.h"
@@ -25,6 +26,7 @@
 #include "Item.h"
 #include "Language.h"
 #include "Log.h"
+#include "Player.h"
 
 struct Teleport
 {

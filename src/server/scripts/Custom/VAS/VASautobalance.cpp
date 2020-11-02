@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Creature.h"
 #include "Util.h"
 #include "Unit.h"
+#include "ScriptMgr.h"
 #include "MapManager.h"
 #include "World.h"
 

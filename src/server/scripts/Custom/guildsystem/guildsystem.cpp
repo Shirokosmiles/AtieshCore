@@ -19,7 +19,9 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"
+#include "ScriptMgr.h"
 #include "RBAC.h"
+#include "Player.h"
 #include "WorldSession.h"
 
 #if TRINITY_COMPILER == TRINITY_COMPILER_GNU

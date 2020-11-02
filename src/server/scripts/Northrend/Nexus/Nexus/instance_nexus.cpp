@@ -19,6 +19,7 @@
 #include "Creature.h"
 #include "GameObject.h"
 #include "Group.h"
+#include "ObjectAccessor.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "nexus.h"
@@ -35,21 +36,7 @@ class instance_nexus : public InstanceMapScript
             {
                 SetHeaders(DataHeader);
                 SetBossNumber(EncounterCount);
-                _teamInInstance = 0;
-            }
-
-            void OnPlayerEnter(Player* player) override
-            {
-                if (Group* group = player->GetGroup())
-                {
-                    Player* gleader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
-                    if (gleader)
-                        _teamInInstance = gleader->GetCFSTeam();
-                    else
-                        _teamInInstance = player->GetCFSTeam();
-                }
-                else
-                    _teamInInstance = player->GetCFSTeam();
+                _teamInInstance = map->ToInstanceMap()->GetTeamInInstance();
             }
 
             void OnCreatureCreate(Creature* creature) override
@@ -184,7 +171,7 @@ class instance_nexus : public InstanceMapScript
             ObjectGuid AnomalusContainmentSphere;
             ObjectGuid OrmoroksContainmentSphere;
             ObjectGuid TelestrasContainmentSphere;
-            uint32 _teamInInstance;
+            Team _teamInInstance;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override

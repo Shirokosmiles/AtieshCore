@@ -16,6 +16,7 @@
  */
 
 #include "Chat.h"
+#include "Creature.h"
 #include "DBCStores.h"
 #include "TheLightOfDawn.h"
 #include "Group.h"

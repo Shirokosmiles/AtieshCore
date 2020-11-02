@@ -28,6 +28,8 @@
 #include "Pet.h"
 #include "Player.h"
 #include "RBAC.h"
+#include "Map.h"
+#include "MotionMaster.h"
 #include "ScriptMgr.h"
 #include "ScriptedGossip.h"
 

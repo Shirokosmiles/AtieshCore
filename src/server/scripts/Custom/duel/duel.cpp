@@ -16,6 +16,8 @@
  */
 
 #include "Pet.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 
 class PhasedDueling : public PlayerScript

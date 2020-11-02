@@ -21,6 +21,7 @@
 #include "Group.h"
 #include "forge_of_souls.h"
 #include "InstanceScript.h"
+#include "ObjectAccessor.h"
 #include "Map.h"
 #include "Player.h"
 

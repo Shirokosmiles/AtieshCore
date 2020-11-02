@@ -22,6 +22,7 @@
 #include "ObjectGuid.h"
 #include "SpecialEvent.h"
 #include "Position.h"
+#include "EventMap.h"
 #include "World.h"
 #include "ZoneScript.h"
 
