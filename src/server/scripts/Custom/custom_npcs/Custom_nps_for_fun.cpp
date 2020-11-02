@@ -19,6 +19,7 @@
 #include "AchievementMgr.h"
 #include "Chat.h"
 #include "Creature.h"
+#include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
 #include "SpellMgr.h"

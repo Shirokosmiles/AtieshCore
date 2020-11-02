@@ -31,8 +31,9 @@
 #include "RBAC.h"
 #include "Map.h"
 #include "MotionMaster.h"
-#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 #if TRINITY_COMPILER == TRINITY_COMPILER_GNU
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
