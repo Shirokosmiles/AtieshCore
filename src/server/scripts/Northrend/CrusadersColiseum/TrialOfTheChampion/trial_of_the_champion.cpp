@@ -20,6 +20,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "MotionMaster.h"
 #include "trial_of_the_champion.h"
 #include "Vehicle.h"
 #include "Player.h"

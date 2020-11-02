@@ -29,6 +29,7 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "trial_of_the_champion.h"
+#include "MotionMaster.h"
 
 enum Yells
 {

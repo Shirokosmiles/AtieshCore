@@ -24,6 +24,7 @@ SDComment: Cosmetic things missing
 SDCategory: Trial Of the Champion
 EndScriptData */
 
+#include "Creature.h"
 #include "GridNotifiers.h"
 #include "Player.h"
 #include "InstanceScript.h"

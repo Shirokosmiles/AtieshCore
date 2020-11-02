@@ -30,6 +30,7 @@ EndScriptData */
 #include "ScriptedEscortAI.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "MotionMaster.h"
 #include "trial_of_the_champion.h"
 
 enum Yells
