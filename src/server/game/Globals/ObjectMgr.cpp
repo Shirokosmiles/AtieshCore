@@ -8639,8 +8639,8 @@ bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg, bool withNast
             {
                 if (player)
                 {
-                    TC_LOG_ERROR("network", "Player %s (GUID: %u) sent a message containing invalid character %u - blocked", player->GetName().c_str(),
-                        player->GetGUID().GetCounter(), uint8(c));
+                    TC_LOG_ERROR("network", "Player %s (GUID: %s) sent a message containing invalid character %u - blocked", player->GetName().c_str(),
+                        player->GetGUID().ToString().c_str(), uint8(c));
                 }
                 return false;
             }
