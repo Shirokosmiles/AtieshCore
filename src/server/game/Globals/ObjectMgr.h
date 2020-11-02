@@ -174,6 +174,7 @@ struct GameTele
 
 typedef std::unordered_map<uint32, GameTele> GameTeleContainer;
 
+// AT-features section
 struct GuildSpellAuras
 {
     uint32 spellauraId;
@@ -191,6 +192,19 @@ struct PlayerAutoLearn
 };
 
 typedef std::unordered_map<uint32, PlayerAutoLearn> PlayerAutoLearnContainer;
+
+struct ItemPresent
+{
+    ItemPresent(uint32 entry, uint32 itemId, uint32 count) :
+        ItemPresentSlot(entry), ItemId(itemId), Count(count) { }
+    uint32 ItemPresentSlot;
+    uint32 ItemId;
+    uint32 Count;
+};
+
+typedef std::vector<ItemPresent> ItemPresentList;
+typedef std::map<uint32, ItemPresentList> ItemPresentContainer;
+// END AT section
 
 enum ScriptsType
 {

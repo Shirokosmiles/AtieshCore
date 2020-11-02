@@ -26,18 +26,6 @@
 
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
 
-struct ItemPresent
-{
-    ItemPresent(uint32 entry, uint32 itemId, uint32 count) :
-        ItemPresentSlot(entry), ItemId(itemId), Count(count) { }
-    uint32 ItemPresentSlot;
-    uint32 ItemId;
-    uint32 Count;
-};
-
-typedef std::vector<ItemPresent> ItemPresentList;
-typedef std::map<uint32, ItemPresentList> ItemPresentContainer;
-
 enum SpellEffIndex : uint8
 {
     EFFECT_0 = 0,

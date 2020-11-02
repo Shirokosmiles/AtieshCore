@@ -93,7 +93,7 @@ void Transmogrification::LoadPlayerSets(Player* player)
                 break;
             if (slot >= EQUIPMENT_SLOT_END)
             {
-                TC_LOG_ERROR("custom.transmog", "Item entry (FakeEntry: %u, playerGUID: %u, slot: %u, presetId: %u) has invalid slot, ignoring.", entry, player->GetGUID().GetCounter(), uint32(slot), uint32(PresetID));
+                TC_LOG_ERROR("custom.transmog", "Item entry (FakeEntry: %u, playerGUID: %u, slot: %u, presetId: %u) has invalid slot, ignoring.", entry, player->GetGUID().ToString().c_str(), uint32(slot), uint32(PresetID));
                 continue;
             }
             if (sObjectMgr->GetItemTemplate(entry))
@@ -101,14 +101,14 @@ void Transmogrification::LoadPlayerSets(Player* player)
                 player->presetMap[PresetID].slotMap[slot] = entry;
             }
             else
-                TC_LOG_ERROR("custom.transmog", "Item entry (FakeEntry: %u, playerGUID: %u, slot: %u, presetId: %u) does not exist, ignoring.", entry, player->GetGUID().GetCounter(), uint32(slot), uint32(PresetID));
+                TC_LOG_ERROR("custom.transmog", "Item entry (FakeEntry: %u, playerGUID: %u, slot: %u, presetId: %u) does not exist, ignoring.", entry, player->GetGUID().ToString().c_str(), uint32(slot), uint32(PresetID));
         }
 
         if (player->presetMap[PresetID].slotMap.empty())
         {
             // Should never happen
             player->presetMap.erase(PresetID);
-            CharacterDatabase.PExecute("DELETE FROM `custom_transmogrification_sets` WHERE Owner = %u AND PresetID = %u", player->GetGUID().GetCounter(), uint32(PresetID));
+            CharacterDatabase.PExecute("DELETE FROM `custom_transmogrification_sets` WHERE Owner = %u AND PresetID = %u", player->GetGUID().ToString().c_str(), uint32(PresetID));
             return;
         }
 
