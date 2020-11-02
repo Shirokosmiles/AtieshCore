@@ -23,11 +23,13 @@ SDComment:
 SDCategory: Trial of the Champion
 EndScriptData */
 
+#include "Creature.h"
 #include "Player.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "ObjectAccessor.h"
 #include "trial_of_the_champion.h"
 #include "MotionMaster.h"
 

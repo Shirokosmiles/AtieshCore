@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureAI.h"
 #include "Chat.h"
 #include "Creature.h"
 #include "DBCStores.h"

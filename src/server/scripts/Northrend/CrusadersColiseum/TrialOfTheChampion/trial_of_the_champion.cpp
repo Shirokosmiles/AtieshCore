@@ -16,10 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Creature.h"
+#include "GameObject.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ObjectAccessor.h"
 #include "MotionMaster.h"
 #include "trial_of_the_champion.h"
 #include "Vehicle.h"
