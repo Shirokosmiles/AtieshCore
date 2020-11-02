@@ -1016,7 +1016,7 @@ public: npc_body_basilisk() : CreatureScript("npc_body_basilisk") {}
                 {
                     if (spellInfo->Id == SPELL_CLICK_BASILISK)
                         player->CastSpell(player, SPELL_CREATE_LOOT_BASILISK);
-                }                
+                }
 
                 me->DespawnOrUnsummon();
             }
