@@ -34,6 +34,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "Object.h"
 #include "ObjectAccessor.h"
 #include "Vehicle.h"
 #include "MotionMaster.h"

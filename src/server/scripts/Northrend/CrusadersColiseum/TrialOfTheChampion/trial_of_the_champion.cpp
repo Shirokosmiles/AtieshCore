@@ -22,6 +22,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "Object.h"
 #include "ObjectAccessor.h"
 #include "MotionMaster.h"
 #include "TemporarySummon.h"

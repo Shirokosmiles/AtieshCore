@@ -26,6 +26,7 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "SpecialEventMgr.h"
+#include "ScriptMgr.h"
 #include "RBAC.h"
 #include "MapManager.h"
 #include "MiscPackets.h"

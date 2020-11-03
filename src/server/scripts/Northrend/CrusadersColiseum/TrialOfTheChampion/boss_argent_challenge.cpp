@@ -30,6 +30,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "Object.h"
 #include "ObjectAccessor.h"
 #include "TemporarySummon.h"
 #include "trial_of_the_champion.h"
