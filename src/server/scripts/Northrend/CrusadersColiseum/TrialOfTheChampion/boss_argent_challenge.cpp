@@ -34,6 +34,7 @@ EndScriptData */
 #include "ObjectAccessor.h"
 #include "TemporarySummon.h"
 #include "trial_of_the_champion.h"
+#include "Map.h"
 #include "MotionMaster.h"
 
 enum Yells

@@ -24,6 +24,7 @@
 #include "ScriptedGossip.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
+#include "Map.h"
 #include "MotionMaster.h"
 #include "TemporarySummon.h"
 #include "trial_of_the_champion.h"

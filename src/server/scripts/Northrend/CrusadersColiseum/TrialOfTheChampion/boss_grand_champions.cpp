@@ -37,6 +37,7 @@ EndScriptData */
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "Vehicle.h"
+#include "Map.h"
 #include "MotionMaster.h"
 #include "TemporarySummon.h"
 #include "trial_of_the_champion.h"
