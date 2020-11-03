@@ -25,6 +25,7 @@ EndScriptData */
 
 #include "Creature.h"
 #include "Player.h"
+#include "Unit.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -32,6 +33,7 @@ EndScriptData */
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "ObjectAccessor.h"
+#include "Map.h"
 #include "MotionMaster.h"
 #include "trial_of_the_champion.h"
 

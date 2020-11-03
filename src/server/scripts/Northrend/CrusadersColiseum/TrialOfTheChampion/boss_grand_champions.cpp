@@ -27,6 +27,7 @@ EndScriptData */
 #include "Creature.h"
 #include "GridNotifiers.h"
 #include "Player.h"
+#include "Unit.h"
 #include "InstanceScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
@@ -35,6 +36,7 @@ EndScriptData */
 #include "SpellScript.h"
 #include "ObjectAccessor.h"
 #include "Vehicle.h"
+#include "MotionMaster.h"
 #include "TemporarySummon.h"
 #include "trial_of_the_champion.h"
 

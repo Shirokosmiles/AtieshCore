@@ -29,6 +29,7 @@
 #include "RBAC.h"
 #include "MapManager.h"
 #include "MiscPackets.h"
+#include "MotionMaster.h"
 #include "TemporarySummon.h"
 #include "Language.h"
 #include "Log.h"
