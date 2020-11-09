@@ -18,6 +18,7 @@
 #ifndef TRINITY_HYPERLINKS_H
 #define TRINITY_HYPERLINKS_H
 
+#include "DBCStoresMgr.h"
 #include "ObjectGuid.h"
 #include "StringConvert.h"
 #include <array>
@@ -26,7 +27,6 @@
 #include <type_traits>
 #include <utility>
 
-struct AchievementEntry;
 struct GlyphPropertiesEntry;
 struct GlyphSlotEntry;
 struct ItemRandomPropertiesEntry;
@@ -41,7 +41,7 @@ namespace Trinity::Hyperlinks
 
     struct AchievementLinkData
     {
-        AchievementEntry const* Achievement;
+        AchievementDBC const* Achievement;
         ObjectGuid CharacterId;
         bool IsFinished;
         uint8 Year;

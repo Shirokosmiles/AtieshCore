@@ -44,7 +44,7 @@ DBCStorage <AreaPOIEntry> sAreaPOIStore(AreaPOIEntryfmt);
 
 static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
-DBCStorage <AchievementEntry> sAchievementStore(Achievementfmt);
+//DBCStorage <AchievementEntry> sAchievementStore(Achievementfmt);
 DBCStorage <AchievementCriteriaEntry> sAchievementCriteriaStore(AchievementCriteriafmt);
 DBCStorage <AreaTriggerEntry> sAreaTriggerStore(AreaTriggerEntryfmt);
 DBCStorage <AuctionHouseEntry> sAuctionHouseStore(AuctionHouseEntryfmt);
@@ -399,7 +399,7 @@ void LoadDBCStores(const std::string& dataPath)
 
 #define LOAD_DBC_EXT(store, file, dbtable, dbformat, dbpk) LoadDBC(availableDbcLocales, bad_dbc_files, store, dbcPath, file, dbtable, dbformat, dbpk)
 
-    LOAD_DBC_EXT(sAchievementStore,     "Achievement.dbc",      "achievement_dbc",      CustomAchievementfmt,     CustomAchievementIndex);
+    //LOAD_DBC_EXT(sAchievementStore,     "Achievement.dbc",      "achievement_dbc",      CustomAchievementfmt,     CustomAchievementIndex);
     LOAD_DBC_EXT(sSpellStore,           "Spell.dbc",            "spell_dbc",            CustomSpellEntryfmt,      CustomSpellEntryIndex);
     LOAD_DBC_EXT(sSpellDifficultyStore, "SpellDifficulty.dbc",  "spelldifficulty_dbc",  CustomSpellDifficultyfmt, CustomSpellDifficultyIndex);
 

@@ -114,7 +114,7 @@ struct LinkValidator<LinkTags::achievement>
         if (text.empty())
             return false;
         for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
-            if (text == data.Achievement->Title[i])
+            if (text == data.Achievement->Title[i][i])
                 return true;
         return false;
     }

@@ -25320,7 +25320,7 @@ void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 mis
     m_achievementMgr->UpdateAchievementCriteria(type, miscValue1, miscValue2, ref);
 }
 
-void Player::CompletedAchievement(AchievementEntry const* entry)
+void Player::CompletedAchievement(AchievementDBC const* entry)
 {
     m_achievementMgr->CompletedAchievement(entry);
 }

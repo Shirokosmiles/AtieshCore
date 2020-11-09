@@ -27,7 +27,7 @@
 
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
-
+/*
 struct AchievementEntry
 {
     uint32 ID;                                              // 0
@@ -47,7 +47,7 @@ struct AchievementEntry
     //uint32 Reward_lang_mask;                              // 59
     uint32 MinimumCriteria;                                 // 60 - need this count of completed criterias (own or referenced achievement criterias)
     uint32 SharesCriteria;                                  // 61 - referenced achievement (counting of all completed criterias)
-};
+};*/
 
 struct AchievementCriteriaEntry
 {

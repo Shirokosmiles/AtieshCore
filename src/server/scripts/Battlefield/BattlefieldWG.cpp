@@ -925,9 +925,9 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 // *******************************************************
 void BattlefieldWG::DoCompleteOrIncrementAchievement(uint32 achievement, Player* player, uint8 /*incrementNumber*/)
 {
-    AchievementEntry const* achievementEntry = sAchievementMgr->GetAchievement(achievement);
+    AchievementDBC const* AchievementDBC = sAchievementMgr->GetAchievement(achievement);
 
-    if (!achievementEntry)
+    if (!AchievementDBC)
         return;
 
     switch (achievement)
@@ -940,7 +940,7 @@ void BattlefieldWG::DoCompleteOrIncrementAchievement(uint32 achievement, Player*
         default:
         {
             if (player)
-                player->CompletedAchievement(achievementEntry);
+                player->CompletedAchievement(AchievementDBC);
             break;
         }
     }

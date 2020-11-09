@@ -43,6 +43,7 @@
 #include "CreatureTextMgr.h"
 #include "SpecialEventMgr.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GameObjectModel.h"
@@ -659,10 +660,13 @@ void World::SetInitialWorldSettings()
     uint32 server_type = IsFFAPvPRealm() ? uint32(REALM_TYPE_PVP) : getIntConfig(CONFIG_GAME_TYPE);
     uint32 realm_zone = getIntConfig(CONFIG_REALM_ZONE);
 
-    LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realm.Id.Realm);      // One-time query
+    LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realm.Id.Realm);      // One-time query    
 
-    ///- Load the DBC files
     TC_LOG_INFO("server.loading", "Initialize data stores...");
+    ///- Load the DBC files
+    /// TC_LOG_INFO("server.loading", "Loading SpellInfo store...");
+    sDBCStoresMgr->Initialize();
+
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
 

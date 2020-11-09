@@ -21,6 +21,7 @@
 #include "DatabaseEnvFwd.h"
 #include "DBCEnums.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Duration.h"
 #include "ObjectGuid.h"
 #include <string>
@@ -32,7 +33,7 @@ class WorldObject;
 class WorldPacket;
 
 typedef std::vector<AchievementCriteriaEntry const*> AchievementCriteriaEntryList;
-typedef std::vector<AchievementEntry const*>         AchievementEntryList;
+typedef std::vector<AchievementDBC const*>         AchievementEntryList;
 
 typedef std::unordered_map<uint32, AchievementCriteriaEntryList> AchievementCriteriaListByAchievement;
 typedef std::unordered_map<uint32, AchievementCriteriaEntryList> AchievementCriteriaListByMiscValue;
@@ -282,7 +283,7 @@ class TC_GAME_API AchievementMgr
         void SaveToDB(CharacterDatabaseTransaction trans);
         void ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete);
         void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, WorldObject* ref = nullptr);
-        void CompletedAchievement(AchievementEntry const* entry);
+        void CompletedAchievement(AchievementDBC const* entry);
         void CheckAllAchievementCriteria();
         void SendAllAchievementData() const;
         void SendRespondInspectAchievements(Player* player) const;
@@ -293,19 +294,19 @@ class TC_GAME_API AchievementMgr
         void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);   // used for quest and scripted timed achievements
 
     private:
-        void SendAchievementEarned(AchievementEntry const* achievement) const;
+        void SendAchievementEarned(AchievementDBC const* achievement) const;
         void SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const;
         CriteriaProgress* GetCriteriaProgress(AchievementCriteriaEntry const* entry);
         void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype = PROGRESS_SET);
         void RemoveCriteriaProgress(AchievementCriteriaEntry const* entry);
-        void CompletedCriteriaFor(AchievementEntry const* achievement);
-        bool IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement);
-        bool IsCompletedAchievement(AchievementEntry const* entry);
-        bool CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref);
+        void CompletedCriteriaFor(AchievementDBC const* achievement);
+        bool IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementDBC const* achievement);
+        bool IsCompletedAchievement(AchievementDBC const* entry);
+        bool CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementDBC const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref);
         void BuildAllDataPacket(WorldPacket* data) const;
 
         bool ConditionsSatisfied(AchievementCriteriaEntry const* criteria) const;
-        bool RequirementsSatisfied(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref) const;
+        bool RequirementsSatisfied(AchievementCriteriaEntry const* criteria, AchievementDBC const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref) const;
 
         Player* m_player;
         CriteriaProgressMap m_criteriaProgress;
@@ -350,13 +351,13 @@ class TC_GAME_API AchievementGlobalMgr
             return itr != m_AchievementListByReferencedId.end() ? &itr->second : nullptr;
         }
 
-        AchievementReward const* GetAchievementReward(AchievementEntry const* achievement) const
+        AchievementReward const* GetAchievementReward(AchievementDBC const* achievement) const
         {
             AchievementRewards::const_iterator iter = m_achievementRewards.find(achievement->ID);
             return iter != m_achievementRewards.end() ? &iter->second : nullptr;
         }
 
-        AchievementRewardLocale const* GetAchievementRewardLocale(AchievementEntry const* achievement) const
+        AchievementRewardLocale const* GetAchievementRewardLocale(AchievementDBC const* achievement) const
         {
             AchievementRewardLocales::const_iterator iter = m_achievementRewardLocales.find(achievement->ID);
             return iter != m_achievementRewardLocales.end() ? &iter->second : nullptr;
@@ -368,8 +369,8 @@ class TC_GAME_API AchievementGlobalMgr
             return iter != m_criteriaDataMap.end() ? &iter->second : nullptr;
         }
 
-        bool IsRealmCompleted(AchievementEntry const* achievement) const;
-        void SetRealmCompleted(AchievementEntry const* achievement);
+        bool IsRealmCompleted(AchievementDBC const* achievement) const;
+        void SetRealmCompleted(AchievementDBC const* achievement);
 
         void LoadAchievementCriteriaList();
         void LoadAchievementCriteriaData();
@@ -377,7 +378,7 @@ class TC_GAME_API AchievementGlobalMgr
         void LoadCompletedAchievements();
         void LoadRewards();
         void LoadRewardLocales();
-        AchievementEntry const* GetAchievement(uint32 achievementId) const;
+        AchievementDBC const* GetAchievement(uint32 achievementId) const;
         AchievementCriteriaEntry const* GetAchievementCriteria(uint32 achievementId) const;
     private:
         AchievementCriteriaDataMap m_criteriaDataMap;
