@@ -45,7 +45,7 @@ DBCStorage <AreaPOIEntry> sAreaPOIStore(AreaPOIEntryfmt);
 static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
 //DBCStorage <AchievementEntry> sAchievementStore(Achievementfmt);
-DBCStorage <AchievementCriteriaEntry> sAchievementCriteriaStore(AchievementCriteriafmt);
+//DBCStorage <AchievementCriteriaEntry> sAchievementCriteriaStore(AchievementCriteriafmt);
 DBCStorage <AreaTriggerEntry> sAreaTriggerStore(AreaTriggerEntryfmt);
 DBCStorage <AuctionHouseEntry> sAuctionHouseStore(AuctionHouseEntryfmt);
 DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEntryfmt);
@@ -281,7 +281,7 @@ void LoadDBCStores(const std::string& dataPath)
 #define LOAD_DBC(store, file) LoadDBC(availableDbcLocales, bad_dbc_files, store, dbcPath, file)
 
     LOAD_DBC(sAreaTableStore,                     "AreaTable.dbc");
-    LOAD_DBC(sAchievementCriteriaStore,           "Achievement_Criteria.dbc");
+    //LOAD_DBC(sAchievementCriteriaStore,           "Achievement_Criteria.dbc");
     LOAD_DBC(sAreaTriggerStore,                   "AreaTrigger.dbc");
     LOAD_DBC(sAreaGroupStore,                     "AreaGroup.dbc");
     LOAD_DBC(sAreaPOIStore,                       "AreaPOI.dbc");

@@ -46,7 +46,7 @@
 #include "World.h"
 #include "WorldSession.h"
 
-bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
+bool AchievementCriteriaData::IsValid(AchievementCriteriaDBC const* criteria)
 {
     if (dataType >= MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE)
     {
@@ -426,7 +426,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Wo
         }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPPED_ITEM:
         {
-            AchievementCriteriaEntry const* entry = ASSERT_NOTNULL(sAchievementMgr->GetAchievementCriteria(criteria_id));
+            AchievementCriteriaDBC const* entry = ASSERT_NOTNULL(sAchievementMgr->GetAchievementCriteria(criteria_id));
 
             uint32 itemId = (entry->Type == ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM ? miscvalue2 : miscvalue1);
             ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
@@ -520,7 +520,7 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condi
     if (!achievementCriteriaList)
         return;
 
-    for (AchievementCriteriaEntry const* achievementCriteria : *achievementCriteriaList)
+    for (AchievementCriteriaDBC const* achievementCriteria : *achievementCriteriaList)
     {
         AchievementDBC const* achievement = sAchievementMgr->GetAchievement(achievementCriteria->AchievementID);
         if (!achievement)
@@ -636,7 +636,7 @@ void AchievementMgr::LoadFromDB(PreparedQueryResult achievementResult, PreparedQ
             uint32 counter = fields[1].GetUInt32();
             time_t date    = time_t(fields[2].GetUInt32());
 
-            AchievementCriteriaEntry const* criteria = sAchievementMgr->GetAchievementCriteria(id);
+            AchievementCriteriaDBC const* criteria = sAchievementMgr->GetAchievementCriteria(id);
             if (!criteria)
             {
                 // Removing non-existing criteria data for all characters
@@ -716,7 +716,7 @@ void AchievementMgr::SendAchievementEarned(AchievementDBC const* achievement) co
     GetPlayer()->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
 
-void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const
+void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaDBC const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const
 {
     WorldPacket data(SMSG_CRITERIA_UPDATE, 8+4+8);
     data << uint32(entry->ID);
@@ -770,7 +770,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
         , m_player->GetGUID().ToString().c_str(), AchievementGlobalMgr::GetCriteriaTypeString(type), type, miscValue1, miscValue2);
 
     AchievementCriteriaEntryList const& achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByType(type, miscValue1);
-    for (AchievementCriteriaEntry const* achievementCriteria : achievementCriteriaList)
+    for (AchievementCriteriaDBC const* achievementCriteria : achievementCriteriaList)
     {
         AchievementDBC const* achievement = sAchievementMgr->GetAchievement(achievementCriteria->AchievementID);
         if (!achievement)
@@ -1148,7 +1148,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     }
 }
 
-bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementDBC const* achievement)
+bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaDBC const* achievementCriteria, AchievementDBC const* achievement)
 {
     if (!achievement)
         return false;
@@ -1304,7 +1304,7 @@ bool AchievementMgr::IsCompletedAchievement(AchievementDBC const* entry)
     // Oddly, the target count is NOT countained in the achievement, but in each individual criteria
     if (entry->Flags & ACHIEVEMENT_FLAG_SUMM)
     {
-        for (AchievementCriteriaEntry const* criteria : *cList)
+        for (AchievementCriteriaDBC const* criteria : *cList)
         {
             CriteriaProgress const* progress = GetCriteriaProgress(criteria);
             if (!progress)
@@ -1321,7 +1321,7 @@ bool AchievementMgr::IsCompletedAchievement(AchievementDBC const* entry)
 
     // Default case - need complete all or
     bool completed_all = true;
-    for (AchievementCriteriaEntry const* criteria : *cList)
+    for (AchievementCriteriaDBC const* criteria : *cList)
     {
         bool completed = IsCompletedCriteria(criteria, entry);
 
@@ -1343,7 +1343,7 @@ bool AchievementMgr::IsCompletedAchievement(AchievementDBC const* entry)
     return false;
 }
 
-CriteriaProgress* AchievementMgr::GetCriteriaProgress(AchievementCriteriaEntry const* entry)
+CriteriaProgress* AchievementMgr::GetCriteriaProgress(AchievementCriteriaDBC const* entry)
 {
     CriteriaProgressMap::iterator iter = m_criteriaProgress.find(entry->ID);
 
@@ -1353,7 +1353,7 @@ CriteriaProgress* AchievementMgr::GetCriteriaProgress(AchievementCriteriaEntry c
     return &(iter->second);
 }
 
-void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype)
+void AchievementMgr::SetCriteriaProgress(AchievementCriteriaDBC const* entry, uint32 changeValue, ProgressType ptype)
 {
     // Don't allow to cheat - doing timed achievements without timer active
     TimedAchievementMap::iterator timedIter = m_timedAchievements.find(entry->ID);
@@ -1421,7 +1421,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     SendCriteriaUpdate(entry, progress, timeElapsed, timedCompleted);
 }
 
-void AchievementMgr::RemoveCriteriaProgress(AchievementCriteriaEntry const* entry)
+void AchievementMgr::RemoveCriteriaProgress(AchievementCriteriaDBC const* entry)
 {
     if (!entry)
         return;
@@ -1446,7 +1446,7 @@ void AchievementMgr::UpdateTimedAchievements(uint32 timeDiff)
             // Time is up, remove timer and reset progress
             if (itr->second <= timeDiff)
             {
-                AchievementCriteriaEntry const* entry = sAchievementMgr->GetAchievementCriteria(itr->first);
+                AchievementCriteriaDBC const* entry = sAchievementMgr->GetAchievementCriteria(itr->first);
                 RemoveCriteriaProgress(entry);
                 m_timedAchievements.erase(itr++);
             }
@@ -1461,7 +1461,7 @@ void AchievementMgr::UpdateTimedAchievements(uint32 timeDiff)
 
 void AchievementMgr::StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost /*= 0*/)
 {
-    for (AchievementCriteriaEntry const* criteria : sAchievementMgr->GetTimedAchievementCriteriaByType(type))
+    for (AchievementCriteriaDBC const* criteria : sAchievementMgr->GetTimedAchievementCriteriaByType(type))
     {
         if (criteria->StartAsset != entry)
             continue;
@@ -1483,7 +1483,7 @@ void AchievementMgr::StartTimedAchievement(AchievementCriteriaTimedTypes type, u
 
 void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
 {
-    for (AchievementCriteriaEntry const* criteria : sAchievementMgr->GetTimedAchievementCriteriaByType(type))
+    for (AchievementCriteriaDBC const* criteria : sAchievementMgr->GetTimedAchievementCriteriaByType(type))
     {
         if (criteria->StartAsset != entry)
             continue;
@@ -1635,7 +1635,7 @@ bool AchievementMgr::HasAchieved(uint32 achievementId) const
     return m_completedAchievements.find(achievementId) != m_completedAchievements.end();
 }
 
-bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementDBC const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref)
+bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaDBC const* criteria, AchievementDBC const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref)
 {
     if (DisableMgr::IsDisabledFor(DISABLE_TYPE_ACHIEVEMENT_CRITERIA, criteria->ID, nullptr))
     {
@@ -1685,7 +1685,7 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
     return true;
 }
 
-bool AchievementMgr::ConditionsSatisfied(AchievementCriteriaEntry const* criteria) const
+bool AchievementMgr::ConditionsSatisfied(AchievementCriteriaDBC const* criteria) const
 {
     for (auto AdditionalRequirement : criteria->AdditionalRequirements)
     {
@@ -1710,7 +1710,7 @@ bool AchievementMgr::ConditionsSatisfied(AchievementCriteriaEntry const* criteri
     return true;
 }
 
-bool AchievementMgr::RequirementsSatisfied(AchievementCriteriaEntry const* achievementCriteria, AchievementDBC const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref) const
+bool AchievementMgr::RequirementsSatisfied(AchievementCriteriaDBC const* achievementCriteria, AchievementDBC const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref) const
 {
     switch (AchievementCriteriaTypes(achievementCriteria->Type))
     {
@@ -2312,16 +2312,16 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
 {
     uint32 oldMSTime = getMSTime();
 
-    if (sAchievementCriteriaStore.GetNumRows() == 0)
+    if (sDBCStoresMgr->GetNumRows(AchievementCriteria) == 0)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 achievement criteria.");
         return;
     }
 
     uint32 loaded = 0;
-    for (uint32 entryId = 0; entryId < sAchievementCriteriaStore.GetNumRows(); ++entryId)
+    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(AchievementCriteria); ++entryId)
     {
-        AchievementCriteriaEntry const* criteria = sAchievementMgr->GetAchievementCriteria(entryId);
+        AchievementCriteriaDBC const* criteria = sAchievementMgr->GetAchievementCriteria(entryId);
         if (!criteria)
             continue;
 
@@ -2433,7 +2433,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
         Field* fields = result->Fetch();
         uint32 criteria_id = fields[0].GetUInt32();
 
-        AchievementCriteriaEntry const* criteria = sAchievementMgr->GetAchievementCriteria(criteria_id);
+        AchievementCriteriaDBC const* criteria = sAchievementMgr->GetAchievementCriteria(criteria_id);
 
         if (!criteria)
         {
@@ -2471,9 +2471,9 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
     while (result->NextRow());
 
     // post loading checks
-    for (uint32 entryId = 0; entryId < sAchievementCriteriaStore.GetNumRows(); ++entryId)
+    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(AchievementCriteria); ++entryId)
     {
-        AchievementCriteriaEntry const* criteria = sAchievementMgr->GetAchievementCriteria(entryId);
+        AchievementCriteriaDBC const* criteria = sAchievementMgr->GetAchievementCriteria(entryId);
         if (!criteria)
             continue;
 
@@ -2750,7 +2750,7 @@ AchievementDBC const* AchievementGlobalMgr::GetAchievement(uint32 achievementId)
     return sDBCStoresMgr->GetAchievementDBC(achievementId);
 }
 
-AchievementCriteriaEntry const* AchievementGlobalMgr::GetAchievementCriteria(uint32 criteriaId) const
+AchievementCriteriaDBC const* AchievementGlobalMgr::GetAchievementCriteria(uint32 criteriaId) const
 {
-    return sAchievementCriteriaStore.LookupEntry(criteriaId);
+    return sDBCStoresMgr->GetAchievementCriteriaDBC(criteriaId);
 }

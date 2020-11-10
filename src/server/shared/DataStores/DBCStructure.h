@@ -49,7 +49,7 @@ struct AchievementEntry
     uint32 SharesCriteria;                                  // 61 - referenced achievement (counting of all completed criterias)
 };*/
 
-struct AchievementCriteriaEntry
+/*struct AchievementCriteriaEntry
 {
     uint32 ID;                                              // 0
     uint32 AchievementID;                                   // 1
@@ -171,7 +171,7 @@ struct AchievementCriteriaEntry
     uint32 StartAsset;                                      // 28 Always appears with timed events, used internally to start the achievement, store
     uint32 StartTimer;                                      // 29 time limit in seconds
     //uint32 UiOrder;                                       // 30
-};
+};*/
 
 struct AreaTableEntry
 {

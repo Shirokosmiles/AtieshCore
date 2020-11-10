@@ -32,7 +32,7 @@ class Player;
 class WorldObject;
 class WorldPacket;
 
-typedef std::vector<AchievementCriteriaEntry const*> AchievementCriteriaEntryList;
+typedef std::vector<AchievementCriteriaDBC const*> AchievementCriteriaEntryList;
 typedef std::vector<AchievementDBC const*>         AchievementEntryList;
 
 typedef std::unordered_map<uint32, AchievementCriteriaEntryList> AchievementCriteriaListByAchievement;
@@ -217,7 +217,7 @@ struct AchievementCriteriaData
         ScriptId = _scriptId;
     }
 
-    bool IsValid(AchievementCriteriaEntry const* criteria);
+    bool IsValid(AchievementCriteriaDBC const* criteria);
     bool Meets(uint32 criteria_id, Player const* source, WorldObject const* target, uint32 miscValue1 = 0, uint32 miscValue2 = 0) const;
 };
 
@@ -295,18 +295,18 @@ class TC_GAME_API AchievementMgr
 
     private:
         void SendAchievementEarned(AchievementDBC const* achievement) const;
-        void SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const;
-        CriteriaProgress* GetCriteriaProgress(AchievementCriteriaEntry const* entry);
-        void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype = PROGRESS_SET);
-        void RemoveCriteriaProgress(AchievementCriteriaEntry const* entry);
+        void SendCriteriaUpdate(AchievementCriteriaDBC const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const;
+        CriteriaProgress* GetCriteriaProgress(AchievementCriteriaDBC const* entry);
+        void SetCriteriaProgress(AchievementCriteriaDBC const* entry, uint32 changeValue, ProgressType ptype = PROGRESS_SET);
+        void RemoveCriteriaProgress(AchievementCriteriaDBC const* entry);
         void CompletedCriteriaFor(AchievementDBC const* achievement);
-        bool IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementDBC const* achievement);
+        bool IsCompletedCriteria(AchievementCriteriaDBC const* achievementCriteria, AchievementDBC const* achievement);
         bool IsCompletedAchievement(AchievementDBC const* entry);
-        bool CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementDBC const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref);
+        bool CanUpdateCriteria(AchievementCriteriaDBC const* criteria, AchievementDBC const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref);
         void BuildAllDataPacket(WorldPacket* data) const;
 
-        bool ConditionsSatisfied(AchievementCriteriaEntry const* criteria) const;
-        bool RequirementsSatisfied(AchievementCriteriaEntry const* criteria, AchievementDBC const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref) const;
+        bool ConditionsSatisfied(AchievementCriteriaDBC const* criteria) const;
+        bool RequirementsSatisfied(AchievementCriteriaDBC const* criteria, AchievementDBC const* achievement, uint32 miscValue1, uint32 miscValue2, WorldObject const* ref) const;
 
         Player* m_player;
         CriteriaProgressMap m_criteriaProgress;
@@ -363,7 +363,7 @@ class TC_GAME_API AchievementGlobalMgr
             return iter != m_achievementRewardLocales.end() ? &iter->second : nullptr;
         }
 
-        AchievementCriteriaDataSet const* GetCriteriaDataSet(AchievementCriteriaEntry const* achievementCriteria) const
+        AchievementCriteriaDataSet const* GetCriteriaDataSet(AchievementCriteriaDBC const* achievementCriteria) const
         {
             AchievementCriteriaDataMap::const_iterator iter = m_criteriaDataMap.find(achievementCriteria->ID);
             return iter != m_criteriaDataMap.end() ? &iter->second : nullptr;
@@ -379,7 +379,7 @@ class TC_GAME_API AchievementGlobalMgr
         void LoadRewards();
         void LoadRewardLocales();
         AchievementDBC const* GetAchievement(uint32 achievementId) const;
-        AchievementCriteriaEntry const* GetAchievementCriteria(uint32 achievementId) const;
+        AchievementCriteriaDBC const* GetAchievementCriteria(uint32 achievementId) const;
     private:
         AchievementCriteriaDataMap m_criteriaDataMap;
 
