@@ -19,6 +19,7 @@
 #include "CreatureTextMgr.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameEventMgr.h"
 #include "InstanceScript.h"
 #include "Log.h"
@@ -763,7 +764,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Map entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.respawn.map);
                     return false;
                 }
-                if (e.event.respawn.type == SMART_SCRIPT_RESPAWN_CONDITION_AREA && !sAreaTableStore.LookupEntry(e.event.respawn.area))
+                if (e.event.respawn.type == SMART_SCRIPT_RESPAWN_CONDITION_AREA && !sDBCStoresMgr->GetAreaTableDBC(e.event.respawn.area))
                 {
                     TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Area entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.respawn.area);
                     return false;
@@ -1545,7 +1546,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         }
         case SMART_ACTION_OVERRIDE_LIGHT:
         {
-            AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(e.action.overrideLight.zoneId);
+            AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(e.action.overrideLight.zoneId);
             if (!areaEntry)
             {
                 TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent zoneId %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.overrideLight.zoneId);
@@ -1574,7 +1575,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         }
         case SMART_ACTION_OVERRIDE_WEATHER:
         {
-            AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(e.action.overrideWeather.zoneId);
+            AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(e.action.overrideWeather.zoneId);
             if (!areaEntry)
             {
                 TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent zoneId %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.overrideWeather.zoneId);

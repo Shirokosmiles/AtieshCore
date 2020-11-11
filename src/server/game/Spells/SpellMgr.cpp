@@ -731,7 +731,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player || !player->IsAlive())
                 return false;
 
-            AreaTableEntry const* pArea = sAreaTableStore.LookupEntry(player->GetAreaId());
+            AreaTableDBC const* pArea = sDBCStoresMgr->GetAreaTableDBC(player->GetAreaId());
             if (!(pArea && pArea->Flags & AREA_FLAG_NO_FLY_ZONE))
                 return false;
             if (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY))
@@ -2442,7 +2442,7 @@ void SpellMgr::LoadSpellAreas()
             }
         }
 
-        if (spellArea.areaId && !sAreaTableStore.LookupEntry(spellArea.areaId))
+        if (spellArea.areaId && !sDBCStoresMgr->GetAreaTableDBC(spellArea.areaId))
         {
             TC_LOG_ERROR("sql.sql", "The spell %u listed in `spell_area` has a wrong area (%u) requirement.", spell, spellArea.areaId);
             continue;

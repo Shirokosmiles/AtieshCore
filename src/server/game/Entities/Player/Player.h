@@ -36,7 +36,7 @@
 
 struct AccessRequirement;
 struct AchievementDBC;
-struct AreaTableEntry;
+struct AreaTableDBC;
 struct AreaTriggerEntry;
 struct BarberShopStyleEntry;
 struct CharacterCustomizeInfo;
@@ -1839,7 +1839,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         void SetMovement(PlayerMovementType pType);
 
-        bool CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone) const;
+        bool CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableDBC const* zone) const;
 
         void JoinedChannel(Channel* c);
         void LeftChannel(Channel* c);

@@ -22,6 +22,7 @@
 #include "CinematicMgr.h"
 #include "Common.h"
 #include "Creature.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "G3DPosition.hpp"
@@ -1073,7 +1074,7 @@ void WorldObject::UpdatePositionData()
 void WorldObject::ProcessPositionDataChanged(PositionFullTerrainStatus const& data)
 {
     m_zoneId = m_areaId = data.areaId;
-    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(m_areaId))
+    if (AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(m_areaId))
         if (area->ParentAreaID)
             m_zoneId = area->ParentAreaID;
     m_outdoors = data.outdoors;

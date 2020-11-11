@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "Language.h"
 #include "Log.h"
@@ -403,11 +404,11 @@ std::string Player::GetPositionACForLogs() const
     uint32 areaId = GetAreaId();
     std::string areaName = "Unknown";
     std::string zoneName = "Unknown";
-    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId))
+    if (AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(areaId))
     {
         int locale = GetSession()->GetSessionDbcLocale();
         areaName = area->AreaName[locale];
-        if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->ParentAreaID))
+        if (AreaTableDBC const* zone = sDBCStoresMgr->GetAreaTableDBC(area->ParentAreaID))
             zoneName = zone->AreaName[locale];
     }
 

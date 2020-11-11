@@ -20,6 +20,7 @@
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GroupMgr.h"
 #include "Language.h"
 #include "LFG.h"
@@ -424,10 +425,10 @@ public:
                 phase = (!p->IsGameMaster() ? p->GetPhaseMask() : -1);
                 uint32 locale = handler->GetSessionDbcLocale();
 
-                AreaTableEntry const* area = sAreaTableStore.LookupEntry(p->GetAreaId());
+                AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(p->GetAreaId());
                 if (area)
                 {
-                    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->ParentAreaID);
+                    AreaTableDBC const* zone = sDBCStoresMgr->GetAreaTableDBC(area->ParentAreaID);
                     if (zone)
                         zoneName = zone->AreaName[locale];
                 }

@@ -52,7 +52,7 @@ class Warden;
 class WorldPacket;
 class WorldSocket;
 struct AddonInfo;
-struct AreaTableEntry;
+struct AreaTableDBC;
 struct AuctionEntry;
 struct DeclinedName;
 struct ItemTemplate;

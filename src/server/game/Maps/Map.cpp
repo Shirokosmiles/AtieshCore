@@ -21,6 +21,7 @@
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicTree.h"
+#include "DBCStoresMgr.h"
 #include "GameObjectModel.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
@@ -2374,12 +2375,12 @@ inline ZLiquidStatus GridMap::GetLiquidStatus(float x, float y, float z, uint8 R
         uint32 liqTypeIdx = liquidEntry->SoundBank;
         if (entry < 21)
         {
-            if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(getArea(x, y)))
+            if (AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(getArea(x, y)))
             {
                 uint32 overrideLiquid = area->LiquidTypeID[liquidEntry->SoundBank];
                 if (!overrideLiquid && area->ParentAreaID)
                 {
-                    area = sAreaTableStore.LookupEntry(area->ParentAreaID);
+                    area = sDBCStoresMgr->GetAreaTableDBC(area->ParentAreaID);
                     if (area)
                         overrideLiquid = area->LiquidTypeID[liquidEntry->SoundBank];
                 }
@@ -2625,7 +2626,7 @@ uint32 Map::GetAreaId(uint32 phaseMask, float x, float y, float z) const
 uint32 Map::GetZoneId(uint32 phaseMask, float x, float y, float z) const
 {
     uint32 areaId = GetAreaId(phaseMask, x, y, z);
-    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId))
+    if (AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(areaId))
         if (area->ParentAreaID)
             return area->ParentAreaID;
 
@@ -2635,7 +2636,7 @@ uint32 Map::GetZoneId(uint32 phaseMask, float x, float y, float z) const
 void Map::GetZoneAndAreaId(uint32 phaseMask, uint32& zoneid, uint32& areaid, float x, float y, float z) const
 {
     areaid = zoneid = GetAreaId(phaseMask, x, y, z);
-    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaid))
+    if (AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(areaid))
         if (area->ParentAreaID)
             zoneid = area->ParentAreaID;
 }
@@ -2669,12 +2670,12 @@ ZLiquidStatus Map::GetLiquidStatus(uint32 phaseMask, float x, float y, float z, 
 
                 if (liquid_type && liquid_type < 21)
                 {
-                    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(GetAreaId(phaseMask, x, y, z)))
+                    if (AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(GetAreaId(phaseMask, x, y, z)))
                     {
                         uint32 overrideLiquid = area->LiquidTypeID[liquidFlagType];
                         if (!overrideLiquid && area->ParentAreaID)
                         {
-                            area = sAreaTableStore.LookupEntry(area->ParentAreaID);
+                            area = sDBCStoresMgr->GetAreaTableDBC(area->ParentAreaID);
                             if (area)
                                 overrideLiquid = area->LiquidTypeID[liquidFlagType];
                         }
@@ -2801,14 +2802,14 @@ void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, fl
     {
         data.outdoors = true;
         data.areaId = gridAreaId;
-        if (AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(data.areaId))
+        if (AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(data.areaId))
             data.outdoors = (areaEntry->Flags & (AREA_FLAG_INSIDE | AREA_FLAG_OUTSIDE)) != AREA_FLAG_INSIDE;
     }
 
     if (!data.areaId)
         data.areaId = i_mapEntry->AreaTableID;
 
-    AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(data.areaId);
+    AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(data.areaId);
 
     // liquid processing
     data.liquidStatus = LIQUID_MAP_NO_WATER;
@@ -2827,7 +2828,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, fl
             uint32 overrideLiquid = areaEntry->LiquidTypeID[liquidFlagType];
             if (!overrideLiquid && areaEntry->ParentAreaID)
             {
-                AreaTableEntry const* zoneEntry = sAreaTableStore.LookupEntry(areaEntry->ParentAreaID);
+                AreaTableDBC const* zoneEntry = sDBCStoresMgr->GetAreaTableDBC(areaEntry->ParentAreaID);
                 if (zoneEntry)
                     overrideLiquid = zoneEntry->LiquidTypeID[liquidFlagType];
             }

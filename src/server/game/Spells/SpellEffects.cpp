@@ -24,6 +24,7 @@
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DynamicObject.h"
+#include "DBCStoresMgr.h"
 #include "Formulas.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
@@ -3735,14 +3736,14 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
         return;
 
     // Players can only fight a duel in zones with this flag
-    AreaTableEntry const* casterAreaEntry = sAreaTableStore.LookupEntry(caster->GetAreaId());
+    AreaTableDBC const* casterAreaEntry = sDBCStoresMgr->GetAreaTableDBC(caster->GetAreaId());
     if (casterAreaEntry && !(casterAreaEntry->Flags & AREA_FLAG_ALLOW_DUELS))
     {
         SendCastResult(SPELL_FAILED_NO_DUELING);            // Dueling isn't allowed here
         return;
     }
 
-    AreaTableEntry const* targetAreaEntry = sAreaTableStore.LookupEntry(target->GetAreaId());
+    AreaTableDBC const* targetAreaEntry = sDBCStoresMgr->GetAreaTableDBC(target->GetAreaId());
     if (targetAreaEntry && !(targetAreaEntry->Flags & AREA_FLAG_ALLOW_DUELS))
     {
         SendCastResult(SPELL_FAILED_NO_DUELING);            // Dueling isn't allowed here

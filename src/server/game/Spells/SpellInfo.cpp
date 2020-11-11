@@ -20,6 +20,7 @@
 #include "Corpse.h"
 #include "Creature.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Item.h"
 #include "ItemTemplate.h"
 #include "Log.h"
@@ -1541,9 +1542,9 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     {
         if (strict)
         {
-            AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(area_id);
+            AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(area_id);
             if (!areaEntry)
-                areaEntry = sAreaTableStore.LookupEntry(zone_id);
+                areaEntry = sDBCStoresMgr->GetAreaTableDBC(zone_id);
 
             if (!areaEntry || !areaEntry->IsFlyable() || !player->CanFlyInZone(map_id, zone_id, this))
                 return SPELL_FAILED_INCORRECT_AREA;

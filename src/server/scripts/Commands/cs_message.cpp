@@ -28,6 +28,7 @@ EndScriptData */
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -75,10 +76,10 @@ public:
             }
         }
 
-        AreaTableEntry const* zoneEntry = nullptr;
-        for (uint32 i = 0; i < sAreaTableStore.GetNumRows(); ++i)
+        AreaTableDBC const* zoneEntry = nullptr;
+        for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(AreaTable); ++i)
         {
-            AreaTableEntry const* entry = sAreaTableStore.LookupEntry(i);
+            AreaTableDBC const* entry = sDBCStoresMgr->GetAreaTableDBC(i);
             if (!entry)
                 continue;
 

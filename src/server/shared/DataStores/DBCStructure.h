@@ -173,7 +173,7 @@ struct AchievementEntry
     //uint32 UiOrder;                                       // 30
 };*/
 
-struct AreaTableEntry
+/*struct AreaTableEntry
 {
     uint32 ID;                                              // 0
     uint32 ContinentID;                                     // 1
@@ -213,7 +213,7 @@ struct AreaTableEntry
         return false;
     }
 };
-
+*/
 #define MAX_GROUP_AREA_IDS 6
 
 struct AreaGroupEntry

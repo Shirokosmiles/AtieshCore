@@ -247,8 +247,8 @@ public:
         uint32 mapId = object->GetMapId();
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
-        AreaTableEntry const* zoneEntry = sAreaTableStore.LookupEntry(zoneId);
-        AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaId);
+        AreaTableDBC const* zoneEntry = sDBCStoresMgr->GetAreaTableDBC(zoneId);
+        AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(areaId);
 
         float zoneX = object->GetPositionX();
         float zoneY = object->GetPositionY();
@@ -1008,7 +1008,7 @@ public:
 
         uint32 zoneId = player->GetZoneId();
 
-        AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(zoneId);
+        AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(zoneId);
         if (!areaEntry || areaEntry->ParentAreaID !=0)
         {
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDWRONGZONE, graveyardId, zoneId);
@@ -1094,7 +1094,7 @@ public:
             return false;
         }
 
-        AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId);
+        AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(areaId);
         if (!area)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
@@ -1128,7 +1128,7 @@ public:
             return false;
         }
 
-        AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId);
+        AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(areaId);
         if (!area)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
@@ -1774,16 +1774,16 @@ public:
 
         // Position data
         MapEntry const* map = sMapStore.LookupEntry(mapId);
-        AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId);
+        AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(areaId);
         if (area)
         {
-            zoneName = area->AreaName[locale];
+            zoneName = area->AreaName[locale].c_str();
 
-            AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->ParentAreaID);
+            AreaTableDBC const* zone = sDBCStoresMgr->GetAreaTableDBC(area->ParentAreaID);
             if (zone)
             {
                 areaName = zoneName;
-                zoneName = zone->AreaName[locale];
+                zoneName = zone->AreaName[locale].c_str();
             }
         }
 

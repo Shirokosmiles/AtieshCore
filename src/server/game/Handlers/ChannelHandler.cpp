@@ -21,6 +21,7 @@
 #include "Channel.h"
 #include "ChannelMgr.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "Player.h"
@@ -106,7 +107,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     TC_LOG_DEBUG("chat.system", "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s",
         GetPlayerInfo().c_str(), channelId, unknown1, unknown2, channelName.c_str(), password.c_str());
 
-    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetPlayer()->GetZoneId());
+    AreaTableDBC const* zone = sDBCStoresMgr->GetAreaTableDBC(GetPlayer()->GetZoneId());
     if (channelId)
     {
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(channelId);
@@ -190,7 +191,7 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL %s Channel: %s, channelId: %u",
         GetPlayerInfo().c_str(), channelName.c_str(), channelId);
 
-    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetPlayer()->GetZoneId());
+    AreaTableDBC const* zone = sDBCStoresMgr->GetAreaTableDBC(GetPlayer()->GetZoneId());
     if (channelId)
     {
         TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler AreaTableEntry");

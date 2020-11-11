@@ -40,6 +40,7 @@
 #include "ConditionMgr.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "DisableMgr.h"
 #include "Formulas.h"
 #include "GameEventMgr.h"
@@ -5101,7 +5102,7 @@ void Player::RepopAtGraveyard()
     // note: this can be called also when the player is alive
     // for example from WorldSession::HandleMovementOpcodes
 
-    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetAreaId());
+    AreaTableDBC const* zone = sDBCStoresMgr->GetAreaTableDBC(GetAreaId());
 
     bool shouldResurrect = false;
     // Such zones are considered unreachable as a ghost and the player must be automatically revived
@@ -5148,7 +5149,7 @@ void Player::RepopAtGraveyard()
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
 }
 
-bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone) const
+bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableDBC const* zone) const
 {
     if (sWorld->getBoolConfig(CONFIG_ALLOWED_LFG_CHANNEL) && channel->Flags & CHANNEL_DBC_FLAG_LFG)
         return true;
@@ -5196,7 +5197,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
     if (GetSession()->PlayerLoading() && !IsBeingTeleportedFar())
         return;                                              // The client handles it automatically after loading, but not after teleporting
 
-    AreaTableEntry const* current_zone = sAreaTableStore.LookupEntry(newZone);
+    AreaTableDBC const* current_zone = sDBCStoresMgr->GetAreaTableDBC(newZone);
     if (!current_zone)
         return;
 
@@ -6549,7 +6550,7 @@ void Player::CheckAreaExploreAndOutdoor()
     if (!areaId)
         return;
 
-    AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaId);
+    AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(areaId);
     if (!areaEntry)
     {
         TC_LOG_ERROR("entities.player", "Player '%s' (%s) discovered unknown area (x: %f y: %f z: %f map: %u)",
@@ -7153,7 +7154,7 @@ void Player::UpdateArea(uint32 newArea)
     // so apply them accordingly
     m_areaUpdateId = newArea;
 
-    AreaTableEntry const* area = sAreaTableStore.LookupEntry(newArea);
+    AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(newArea);
     bool oldFFAPvPArea = pvpInfo.IsInFFAPvPArea;
     pvpInfo.IsInFFAPvPArea = area && (area->Flags & AREA_FLAG_ARENA);
     UpdatePvPState(true);
@@ -7211,7 +7212,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     // zone changed, so area changed as well, update it
     UpdateArea(newArea);
 
-    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(newZone);
+    AreaTableDBC const* zone = sDBCStoresMgr->GetAreaTableDBC(newZone);
     if (!zone)
         return;
 
@@ -26786,11 +26787,11 @@ std::string Player::GetMapAreaAndZoneString() const
     uint32 areaId = GetAreaId();
     std::string areaName = "Unknown";
     std::string zoneName = "Unknown";
-    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId))
+    if (AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(areaId))
     {
         int locale = GetSession()->GetSessionDbcLocale();
         areaName = area->AreaName[locale];
-        if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->ParentAreaID))
+        if (AreaTableDBC const* zone = sDBCStoresMgr->GetAreaTableDBC(area->ParentAreaID))
             zoneName = zone->AreaName[locale];
     }
 

@@ -106,9 +106,9 @@ public:
         wstrToLower(wNamePart);
 
         // Search in AreaTable.dbc
-        for (uint32 i = 0; i < sAreaTableStore.GetNumRows(); ++i)
+        for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(AreaTable); ++i)
         {
-            AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(i);
+            AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(i);
             if (areaEntry)
             {
                 uint8 locale = handler->GetSessionDbcLocale();

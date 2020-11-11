@@ -27,6 +27,7 @@
 #include "Creature.h"
 #include "CreatureAIImpl.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "LootMgr.h"
 #include "Map.h"
 #include "ObjectMgr.h"
@@ -3119,7 +3120,7 @@ class spell_item_nitro_boosts : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         Unit* caster = GetCaster();
-        AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(caster->GetAreaId());
+        AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(caster->GetAreaId());
         bool success = true;
         if (areaEntry && areaEntry->IsFlyable() && !caster->GetMap()->IsDungeon())
             success = roll_chance_i(95); // nitro boosts can only fail in flying-enabled locations on 3.3.5

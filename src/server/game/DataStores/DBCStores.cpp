@@ -38,7 +38,7 @@ typedef std::map<uint32, uint32> AreaFlagByMapID;
 typedef std::tuple<int16, int8, int32> WMOAreaTableKey;
 typedef std::map<WMOAreaTableKey, WMOAreaTableEntry const*> WMOAreaInfoByTripple;
 
-DBCStorage <AreaTableEntry> sAreaTableStore(AreaTableEntryfmt);
+//DBCStorage <AreaTableEntry> sAreaTableStore(AreaTableEntryfmt);
 DBCStorage <AreaGroupEntry> sAreaGroupStore(AreaGroupEntryfmt);
 DBCStorage <AreaPOIEntry> sAreaPOIStore(AreaPOIEntryfmt);
 
@@ -280,7 +280,7 @@ void LoadDBCStores(const std::string& dataPath)
 
 #define LOAD_DBC(store, file) LoadDBC(availableDbcLocales, bad_dbc_files, store, dbcPath, file)
 
-    LOAD_DBC(sAreaTableStore,                     "AreaTable.dbc");
+    //LOAD_DBC(sAreaTableStore,                     "AreaTable.dbc");
     //LOAD_DBC(sAchievementCriteriaStore,           "Achievement_Criteria.dbc");
     LOAD_DBC(sAreaTriggerStore,                   "AreaTrigger.dbc");
     LOAD_DBC(sAreaGroupStore,                     "AreaGroup.dbc");
@@ -651,7 +651,7 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     // Check loaded DBC files proper version
-    if (!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a
+    if (/*!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a*/
         !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
         !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.5a
         !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a

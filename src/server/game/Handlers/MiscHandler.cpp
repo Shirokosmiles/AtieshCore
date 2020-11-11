@@ -28,6 +28,7 @@
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
@@ -363,7 +364,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
             continue;
 
         std::string aname;
-        if (AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(playerZoneId))
+        if (AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(playerZoneId))
             aname = areaEntry->AreaName[GetSessionDbcLocale()];
 
         bool s_show = true;
@@ -610,7 +611,7 @@ void WorldSession::HandleHearthAndResurrect(WorldPackets::Battleground::HearthAn
     if (_player->IsInFlight())
         return;
 
-    AreaTableEntry const* atEntry = sAreaTableStore.LookupEntry(_player->GetAreaId());
+    AreaTableDBC const* atEntry = sDBCStoresMgr->GetAreaTableDBC(_player->GetAreaId());
     if (!atEntry || !(atEntry->Flags & AREA_FLAG_CAN_HEARTH_AND_RESURRECT))
         return;
 

@@ -22,13 +22,18 @@
 #include "DBCStoresMgrStructure.h"
 #include <unordered_map>
 
-typedef std::unordered_map<uint32 /*mailId*/, AchievementDBC> AchievementDBCMap;
-typedef std::unordered_map<uint32 /*mailId*/, AchievementCriteriaDBC> AchievementCriteriaDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, AchievementDBC> AchievementDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, AchievementCriteriaDBC> AchievementCriteriaDBCMap;
+
+typedef std::unordered_map<uint32 /*guid*/, AreaTableDBC> AreaTableDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, AreaGroupDBC> AreaGroupDBCMap;
 
 enum DBCFileName : uint8
 {
     Achievement = 1,
-    AchievementCriteria
+    AchievementCriteria,
+    AreaTable,
+    AreaGroup,
 };
 
 class TC_GAME_API DBCStoresMgr
@@ -62,15 +67,40 @@ public:
         return nullptr;
     }
 
+    AreaTableDBC const* GetAreaTableDBC(uint32 id) const
+    {
+        for (AreaTableDBCMap::const_iterator itr = _areaTableMap.begin(); itr != _areaTableMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
+    AreaGroupDBC const* GetAreaGroupDBC(uint32 id) const
+    {
+        for (AreaGroupDBCMap::const_iterator itr = _areaGroupMap.begin(); itr != _areaGroupMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
     uint32 GetNumRows(DBCFileName type);
+    AreaTableDBCMap const& GetAreaTableDBCMap() const { return _areaTableMap; }
 
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
+    void _Load_AreaTable();
+    void _Load_AreaGroup();
 
 private:
     AchievementDBCMap _achievementMap;
     AchievementCriteriaDBCMap _achievementCriteriaMap;
+    AreaTableDBCMap _areaTableMap;
+    AreaGroupDBCMap _areaGroupMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

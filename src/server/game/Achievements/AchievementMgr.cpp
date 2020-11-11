@@ -162,7 +162,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaDBC const* criteria)
             return true;
         }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA:
-            if (!sAreaTableStore.LookupEntry(area.id))
+            if (!sDBCStoresMgr->GetAreaTableDBC(area.id))
             {
                 TC_LOG_ERROR("sql.sql", "Table `achievement_criteria_data` (Entry: %u Type: %u) for data type ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA (%u) contains a wrong area id in value1 (%u), ignored.",
                     criteria->ID, criteria->Type, dataType, area.id);
@@ -1891,7 +1891,7 @@ bool AchievementMgr::RequirementsSatisfied(AchievementCriteriaDBC const* achieve
             bool matchFound = false;
             for (uint32 j : worldOverlayEntry->AreaID)
             {
-                AreaTableEntry const* area = sAreaTableStore.LookupEntry(j);
+                AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(j);
                 if (!area)
                     break;
 

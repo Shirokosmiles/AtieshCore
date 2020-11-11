@@ -24,6 +24,7 @@
 #include "ConditionMgr.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "DisableMgr.h"
 #include "DynamicObject.h"
 #include "G3DPosition.hpp"
@@ -6424,7 +6425,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                         if (battlefield && !battlefield->CanFlyIn())
                             return SPELL_FAILED_NOT_HERE;
                     }
-                    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(m_originalCaster->GetAreaId()))
+                    if (AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(m_originalCaster->GetAreaId()))
                     {
                         if (area->Flags & AREA_FLAG_NO_FLY_ZONE)
                             return SPELL_FAILED_NOT_HERE;

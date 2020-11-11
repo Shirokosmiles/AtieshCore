@@ -159,3 +159,53 @@ struct AchievementCriteriaDBC
     uint32 StartTimer;                                      // 29 time limit in seconds
     //uint32 UiOrder;                                       // 30
 };
+
+struct AreaTableDBC
+{
+    uint32 ID;                                              // 0
+    uint32 ContinentID;                                     // 1
+    uint32 ParentAreaID;                                    // 2 if 0 then it's zone, else it's zone id of this area
+    uint32 AreaBit;                                         // 3
+    uint32 Flags;                                           // 4
+    //uint32 SoundProviderPref;                             // 5
+    //uint32 SoundProviderPrefUnderwater;                   // 6
+    //uint32 AmbienceID;                                    // 7
+    //uint32 ZoneMusic;                                     // 8
+    //uint32 IntroSound;                                    // 9
+    int32 ExplorationLevel;                                 // 10
+    std::string AreaName[TOTAL_LOCALES];                    // 11-19
+    //uint32 AreaName_lang_mask;                            // 27
+    uint32 FactionGroupMask;                                // 28
+    uint32 LiquidTypeID[4];                                 // 29-32 liquid override by type
+    //float MinElevation;                                   // 33
+    //float AmbientMultiplier;                              // 34
+    //uint32 LightID;                                       // 35
+
+    // helpers
+    bool IsSanctuary() const
+    {
+        if (ContinentID == 609)
+            return true;
+        return (Flags & AREA_FLAG_SANCTUARY) != 0;
+    }
+
+    bool IsFlyable() const
+    {
+        if (Flags & AREA_FLAG_OUTLAND)
+        {
+            if (!(Flags & AREA_FLAG_NO_FLY_ZONE))
+                return true;
+        }
+
+        return false;
+    }
+};
+
+#define MAX_GROUP_AREA_IDS 6
+
+struct AreaGroupDBC
+{
+    uint32 ID;                                              // 0
+    uint32 AreaID[MAX_GROUP_AREA_IDS];                      // 1-6
+    uint32 NextAreaID;                                      // 7 index of next group
+};

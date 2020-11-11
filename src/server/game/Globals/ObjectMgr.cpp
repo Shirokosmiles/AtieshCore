@@ -3307,7 +3307,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.ItemSet = 0;
         }
 
-        if (itemTemplate.Area && !sAreaTableStore.LookupEntry(itemTemplate.Area))
+        if (itemTemplate.Area && !sDBCStoresMgr->GetAreaTableDBC(itemTemplate.Area))
             TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has wrong Area (%u)", entry, itemTemplate.Area);
 
         if (itemTemplate.Map && !sMapStore.LookupEntry(itemTemplate.Map))
@@ -4800,7 +4800,7 @@ void ObjectMgr::LoadQuests()
         // client quest log visual (area case)
         if (qinfo->_zoneOrSort > 0)
         {
-            if (!sAreaTableStore.LookupEntry(qinfo->_zoneOrSort))
+            if (!sDBCStoresMgr->GetAreaTableDBC(qinfo->_zoneOrSort))
             {
                 TC_LOG_ERROR("sql.sql", "Quest %u has `ZoneOrSort` = %u (zone case) but zone with this id does not exist.",
                     qinfo->GetQuestId(), qinfo->_zoneOrSort);
@@ -6753,7 +6753,7 @@ void ObjectMgr::LoadGraveyardZones()
             continue;
         }
 
-        AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(zoneId);
+        AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(zoneId);
         if (!areaEntry)
         {
             TC_LOG_ERROR("sql.sql", "Table `graveyard_zone` has a record for non-existing Zone (ID: %u), skipped.", zoneId);
@@ -8807,7 +8807,7 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
         uint32 entry  = fields[0].GetUInt32();
         int32 skill   = fields[1].GetInt16();
 
-        AreaTableEntry const* fArea = sAreaTableStore.LookupEntry(entry);
+        AreaTableDBC const* fArea = sDBCStoresMgr->GetAreaTableDBC(entry);
         if (!fArea)
         {
             TC_LOG_ERROR("sql.sql", "AreaId %u defined in `skill_fishing_base_level` does not exist", entry);

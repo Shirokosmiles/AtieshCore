@@ -28,12 +28,14 @@ DBCStoresMgr::~DBCStoresMgr()
 {
     _achievementMap.clear();
     _achievementCriteriaMap.clear();
+    _areaTableMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
 {
     _Load_Achievement();
     _Load_AchievementCriteria();
+    _Load_AreaTable();
 }
 
 uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
@@ -51,6 +53,16 @@ uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
         case AchievementCriteria:
         {
             result = _achievementCriteriaMap.size();
+            break;
+        }
+        case AreaTable:
+        {
+            result = _areaTableMap.size();
+            break;
+        }
+        case AreaGroup:
+        {
+            result = _areaGroupMap.size();
             break;
         }
     }
@@ -153,6 +165,80 @@ void DBCStoresMgr::_Load_AchievementCriteria()
         achc.StartTimer = fields[21].GetUInt32();
 
         _achievementCriteriaMap[id] = achc;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_achievement_criteria in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load AreaTable.dbc
+void DBCStoresMgr::_Load_AreaTable()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _areaTableMap.clear();
+    //                                                0     1    2       3       4       5       6           7          8            9          10          11          12          13          14          15         16       17      18       19       20
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, field1, field2, field3, field4, field10, title_enUS, title_koKR, title_frFR, title_deDE, title_zhCN, title_zhTW, title_esES, title_esMX, title_ruRU, field28, field29, field30, field31, field32 FROM dbc_areatable");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areatable. DB table `dbc_areatable` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        AreaTableDBC at;
+        at.ID               = fields[1].GetUInt32();
+        at.ContinentID      = fields[2].GetUInt32();
+        at.ParentAreaID     = fields[3].GetUInt32();
+        at.AreaBit          = fields[4].GetUInt32();
+        at.Flags            = fields[5].GetUInt32();
+        at.ExplorationLevel = fields[6].GetInt32();
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            at.AreaName[i] = fields[7 + i].GetString();
+
+        at.FactionGroupMask = fields[16].GetUInt32();
+        at.LiquidTypeID[0]  = fields[17].GetUInt32();
+        at.LiquidTypeID[1]  = fields[18].GetUInt32();
+        at.LiquidTypeID[2]  = fields[19].GetUInt32();
+        at.LiquidTypeID[3]  = fields[20].GetUInt32();
+
+        _areaTableMap[id] = at;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_areatable in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load AreaGroup.dbc
+void DBCStoresMgr::_Load_AreaGroup()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _areaGroupMap.clear();
+    //                                                0     1    2
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, field1 FROM dbc_achievement_criteria");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievement_criteria. DB table `dbc_achievement_criteria` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        //AreaGroupDBC ag;
+        
 
         ++count;
     } while (result->NextRow());
