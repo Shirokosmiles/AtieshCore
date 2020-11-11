@@ -39,8 +39,8 @@ typedef std::tuple<int16, int8, int32> WMOAreaTableKey;
 typedef std::map<WMOAreaTableKey, WMOAreaTableEntry const*> WMOAreaInfoByTripple;
 
 //DBCStorage <AreaTableEntry> sAreaTableStore(AreaTableEntryfmt);
-DBCStorage <AreaGroupEntry> sAreaGroupStore(AreaGroupEntryfmt);
-DBCStorage <AreaPOIEntry> sAreaPOIStore(AreaPOIEntryfmt);
+//DBCStorage <AreaGroupEntry> sAreaGroupStore(AreaGroupEntryfmt);
+//DBCStorage <AreaPOIEntry> sAreaPOIStore(AreaPOIEntryfmt);
 
 static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
@@ -283,8 +283,8 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sAreaTableStore,                     "AreaTable.dbc");
     //LOAD_DBC(sAchievementCriteriaStore,           "Achievement_Criteria.dbc");
     LOAD_DBC(sAreaTriggerStore,                   "AreaTrigger.dbc");
-    LOAD_DBC(sAreaGroupStore,                     "AreaGroup.dbc");
-    LOAD_DBC(sAreaPOIStore,                       "AreaPOI.dbc");
+    //LOAD_DBC(sAreaGroupStore,                     "AreaGroup.dbc");
+    //LOAD_DBC(sAreaPOIStore,                       "AreaPOI.dbc");
     LOAD_DBC(sAuctionHouseStore,                  "AuctionHouse.dbc");
     LOAD_DBC(sBankBagSlotPricesStore,             "BankBagSlotPrices.dbc");
     LOAD_DBC(sBannedAddOnsStore,                  "BannedAddOns.dbc");

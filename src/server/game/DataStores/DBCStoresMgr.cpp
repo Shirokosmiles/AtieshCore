@@ -29,6 +29,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _achievementMap.clear();
     _achievementCriteriaMap.clear();
     _areaTableMap.clear();
+    _areaGroupMap.clear();
+    _areaPOIMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -36,6 +38,9 @@ void DBCStoresMgr::Initialize()
     _Load_Achievement();
     _Load_AchievementCriteria();
     _Load_AreaTable();
+    _Load_AreaGroup();
+    // unused
+    //_Load_AreaPOI();
 }
 
 uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
@@ -63,6 +68,11 @@ uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
         case AreaGroup:
         {
             result = _areaGroupMap.size();
+            break;
+        }
+        case AreaPOI:
+        {
+            result = _areaPOIMap.size();
             break;
         }
     }
@@ -223,11 +233,11 @@ void DBCStoresMgr::_Load_AreaGroup()
     uint32 oldMSTime = getMSTime();
 
     _areaGroupMap.clear();
-    //                                                0     1    2
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, field1 FROM dbc_achievement_criteria");
+    //                                                0     1     2        3        4        5        6        7         8
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, AreaID1, AreaID2, AreaID3, AreaID4, AreaID5, AreaID6, NextAreaID FROM dbc_areagroup");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievement_criteria. DB table `dbc_achievement_criteria` is empty.");
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areagroup. DB table `dbc_areagroup` is empty.");
         return;
     }
 
@@ -237,11 +247,60 @@ void DBCStoresMgr::_Load_AreaGroup()
         Field* fields = result->Fetch();
 
         uint32 id = fields[0].GetUInt32();
-        //AreaGroupDBC ag;
-        
+        AreaGroupDBC ag;
+        ag.ID = fields[1].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_GROUP_AREA_IDS; i++)
+            ag.AreaID[i] = fields[2 + i].GetUInt32();
+
+        ag.NextAreaID = fields[8].GetUInt32();
+        _areaGroupMap[id] = ag;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_achievement_criteria in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_areagroup in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load AreaPOI.dbc
+void DBCStoresMgr::_Load_AreaPOI()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _areaPOIMap.clear();
+    //                                                0     1       2        3      4      5      6       7      8      9      10     11       12      13    14    15       16         17          18
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Importance, Icon1, Icon2, Icon3, Icon4, Icon15, Icon6, Icon7, Icon8, Icon9, FactionID, posX, posY, posZ, ContinentID, AreaID, WorldStateID FROM dbc_areapoi");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areapoi. DB table `dbc_areapoi` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        AreaPOIDBC ap;
+        ap.ID         = fields[1].GetUInt32();
+        ap.Importance = fields[2].GetUInt32();
+
+        for (uint8 i = 0; i < 9; i++)
+            ap.Icon[i] = fields[3 + i].GetUInt32();
+
+        ap.FactionID    = fields[12].GetUInt32();
+        ap.Pos.X        = fields[13].GetUInt32();
+        ap.Pos.Y        = fields[14].GetUInt32();
+        ap.Pos.Z        = fields[15].GetUInt32();
+        ap.ContinentID  = fields[16].GetUInt32();
+        ap.AreaID       = fields[17].GetUInt32();
+        ap.WorldStateID = fields[18].GetUInt32();
+
+        _areaPOIMap[id] = ap;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_areapoi in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

@@ -209,3 +209,21 @@ struct AreaGroupDBC
     uint32 AreaID[MAX_GROUP_AREA_IDS];                      // 1-6
     uint32 NextAreaID;                                      // 7 index of next group
 };
+
+struct AreaPOIDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Importance;                                      // 1
+    uint32 Icon[9];                                         // 2-10
+    uint32 FactionID;                                       // 11
+    DBCPosition3D Pos;                                      // 12-14
+    uint32 ContinentID;                                     // 15
+    //uint32 Flags;                                         // 16
+    uint32 AreaID;                                          // 17
+    //char const* Name[16];                                 // 18-33
+    //uint32 Name_lang_mask;                                // 34
+    //char const* Description[16];                          // 35-50
+    //uint32 Description_lang_mask;                         // 51
+    uint32 WorldStateID;                                    // 52
+    //uint32 WorldMapLink;                                  // 53
+};
