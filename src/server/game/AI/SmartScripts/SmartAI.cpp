@@ -19,6 +19,7 @@
 #include "Creature.h"
 #include "CreatureGroups.h"
 #include "DBCStructure.h"
+#include "DBCStoresMgrStructure.h"
 #include "GameObject.h"
 #include "Group.h"
 #include "Log.h"
@@ -1121,7 +1122,7 @@ class SmartTrigger : public AreaTriggerScript
 
         SmartTrigger() : AreaTriggerScript("SmartTrigger") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger) override
+        bool OnTrigger(Player* player, AreaTriggerDBC const* trigger) override
         {
             if (!player->IsAlive())
                 return false;

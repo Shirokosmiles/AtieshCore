@@ -179,7 +179,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
                 }
                 case SMART_SCRIPT_TYPE_AREATRIGGER:
                 {
-                    if (!sAreaTriggerStore.LookupEntry((uint32)temp.entryOrGuid))
+                    if (!sDBCStoresMgr->GetAreaTriggerDBC((uint32)temp.entryOrGuid))
                     {
                         TC_LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: AreaTrigger entry (%u) does not exist, skipped loading.", uint32(temp.entryOrGuid));
                         continue;
@@ -647,7 +647,7 @@ bool SmartAIMgr::IsEmoteValid(SmartScriptHolder const& e, uint32 entry)
 
 bool SmartAIMgr::IsAreaTriggerValid(SmartScriptHolder const& e, uint32 entry)
 {
-    if (!sAreaTriggerStore.LookupEntry(entry))
+    if (!sDBCStoresMgr->GetAreaTriggerDBC(entry))
     {
         TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent AreaTrigger entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
         return false;

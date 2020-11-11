@@ -28,14 +28,16 @@ typedef std::unordered_map<uint32 /*guid*/, AchievementCriteriaDBC> AchievementC
 typedef std::unordered_map<uint32 /*guid*/, AreaTableDBC> AreaTableDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, AreaGroupDBC> AreaGroupDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, AreaPOIDBC> AreaPOIDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, AreaTriggerDBC> AreaTriggerDBCMap;
 
 enum DBCFileName : uint8
 {
-    Achievement = 1,
-    AchievementCriteria,
-    AreaTable,
-    AreaGroup,
-    AreaPOI,
+    Achievement_ENUM         = 1,
+    AchievementCriteria_ENUM,
+    AreaTable_ENUM,
+    AreaGroup_ENUM,
+    AreaPOI_ENUM,
+    AreaTrigger_ENUM,
 };
 
 class TC_GAME_API DBCStoresMgr
@@ -100,6 +102,16 @@ public:
         return nullptr;
     }
 
+    AreaTriggerDBC const* GetAreaTriggerDBC(uint32 id) const
+    {
+        for (AreaTriggerDBCMap::const_iterator itr = _areaTriggerMap.begin(); itr != _areaTriggerMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
     uint32 GetNumRows(DBCFileName type);    
 
 protected:
@@ -108,6 +120,7 @@ protected:
     void _Load_AreaTable();
     void _Load_AreaGroup();
     void _Load_AreaPOI();
+    void _Load_AreaTrigger();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -115,6 +128,7 @@ private:
     AreaTableDBCMap _areaTableMap;
     AreaGroupDBCMap _areaGroupMap;
     AreaPOIDBCMap _areaPOIMap;
+    AreaTriggerDBCMap _areaTriggerMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

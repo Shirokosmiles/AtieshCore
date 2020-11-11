@@ -77,7 +77,7 @@ public:
         }
 
         AreaTableDBC const* zoneEntry = nullptr;
-        for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(AreaTable); ++i)
+        for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(AreaTable_ENUM); ++i)
         {
             AreaTableDBC const* entry = sDBCStoresMgr->GetAreaTableDBC(i);
             if (!entry)

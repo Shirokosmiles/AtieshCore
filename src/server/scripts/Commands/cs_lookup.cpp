@@ -106,7 +106,7 @@ public:
         wstrToLower(wNamePart);
 
         // Search in AreaTable.dbc
-        for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(AreaTable); ++i)
+        for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(AreaTable_ENUM); ++i)
         {
             AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(i);
             if (areaEntry)

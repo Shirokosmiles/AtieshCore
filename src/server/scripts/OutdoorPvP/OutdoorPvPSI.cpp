@@ -17,6 +17,7 @@
 
 #include "OutdoorPvPSI.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "Map.h"
@@ -163,7 +164,7 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
         {
             case ALLIANCE:
             {
-                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(SI_AREATRIGGER_A);
+                AreaTriggerDBC const* atEntry = sDBCStoresMgr->GetAreaTriggerDBC(SI_AREATRIGGER_A);
                 if (atEntry)
                 {
                     // 5.0f is safe-distance
@@ -192,7 +193,7 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
             }
             case HORDE:
             {
-                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(SI_AREATRIGGER_H);
+                AreaTriggerDBC const* atEntry = sDBCStoresMgr->GetAreaTriggerDBC(SI_AREATRIGGER_H);
                 if (atEntry)
                 {
                     // 5.0f is safe-distance

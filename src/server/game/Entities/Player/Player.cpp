@@ -1268,7 +1268,7 @@ void Player::Update(uint32 p_time)
             // On zone update tick check if we are still in an inn if we are supposed to be in one
             if (HasRestFlag(REST_FLAG_IN_TAVERN))
             {
-                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(GetInnTriggerId());
+                AreaTriggerDBC const* atEntry = sDBCStoresMgr->GetAreaTriggerDBC(GetInnTriggerId());
                 if (!atEntry || !IsInAreaTriggerRadius(atEntry))
                     RemoveRestFlag(REST_FLAG_IN_TAVERN);
             }
@@ -2582,7 +2582,7 @@ void Player::SetInWater(bool apply)
     RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 }
 
-bool Player::IsInAreaTriggerRadius(AreaTriggerEntry const* trigger) const
+bool Player::IsInAreaTriggerRadius(AreaTriggerDBC const* trigger) const
 {
     if (!trigger || GetMapId() != trigger->ContinentID)
         return false;

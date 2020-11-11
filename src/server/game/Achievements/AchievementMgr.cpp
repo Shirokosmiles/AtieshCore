@@ -2312,14 +2312,14 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
 {
     uint32 oldMSTime = getMSTime();
 
-    if (sDBCStoresMgr->GetNumRows(AchievementCriteria) == 0)
+    if (sDBCStoresMgr->GetNumRows(AchievementCriteria_ENUM) == 0)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 achievement criteria.");
         return;
     }
 
     uint32 loaded = 0;
-    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(AchievementCriteria); ++entryId)
+    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(AchievementCriteria_ENUM); ++entryId)
     {
         AchievementCriteriaDBC const* criteria = sAchievementMgr->GetAchievementCriteria(entryId);
         if (!criteria)
@@ -2387,7 +2387,7 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
 {
     uint32 oldMSTime = getMSTime();
 
-    if (sDBCStoresMgr->GetNumRows(Achievement) == 0)
+    if (sDBCStoresMgr->GetNumRows(Achievement_ENUM) == 0)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 achievement references.");
         return;
@@ -2395,7 +2395,7 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
 
     uint32 count = 0;
 
-    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(Achievement); ++entryId)
+    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(Achievement_ENUM); ++entryId)
     {
         AchievementDBC const* achievement = sAchievementMgr->GetAchievement(entryId);
         if (!achievement || !achievement->SharesCriteria)
@@ -2471,7 +2471,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
     while (result->NextRow());
 
     // post loading checks
-    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(AchievementCriteria); ++entryId)
+    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(AchievementCriteria_ENUM); ++entryId)
     {
         AchievementCriteriaDBC const* criteria = sAchievementMgr->GetAchievementCriteria(entryId);
         if (!criteria)
@@ -2553,7 +2553,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     // Populate _allCompletedAchievements with all realm first achievement ids to make multithreaded access safer
     // while it will not prevent races, it will prevent crashes that happen because std::unordered_map key was added
     // instead the only potential race will happen on value associated with the key
-    for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(Achievement); ++i)
+    for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(Achievement_ENUM); ++i)
         if (AchievementDBC const* achievement = sDBCStoresMgr->GetAchievementDBC(i))
             if (achievement->Flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
                 _allCompletedAchievements[achievement->ID] = SystemTimePoint::min();

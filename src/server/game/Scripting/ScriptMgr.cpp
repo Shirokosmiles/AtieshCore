@@ -1652,7 +1652,7 @@ GameObjectAI* ScriptMgr::GetGameObjectAI(GameObject* gameobject)
     return tmpscript->GetAI(gameobject);
 }
 
-bool ScriptMgr::OnAreaTrigger(Player* player, AreaTriggerEntry const* trigger)
+bool ScriptMgr::OnAreaTrigger(Player* player, AreaTriggerDBC const* trigger)
 {
     ASSERT(player);
     ASSERT(trigger);
@@ -2370,7 +2370,7 @@ AreaTriggerScript::AreaTriggerScript(char const* name)
     ScriptRegistry<AreaTriggerScript>::Instance()->AddScript(this);
 }
 
-bool OnlyOnceAreaTriggerScript::OnTrigger(Player* player, AreaTriggerEntry const* trigger)
+bool OnlyOnceAreaTriggerScript::OnTrigger(Player* player, AreaTriggerDBC const* trigger)
 {
     uint32 const triggerId = trigger->ID;
     InstanceScript* instance = player->GetInstanceScript();
@@ -2383,7 +2383,7 @@ bool OnlyOnceAreaTriggerScript::OnTrigger(Player* player, AreaTriggerEntry const
     return true;
 }
 void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(InstanceScript* script, uint32 triggerId) { script->ResetAreaTriggerDone(triggerId); }
-void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(Player const* player, AreaTriggerEntry const* trigger) { if (InstanceScript* instance = player->GetInstanceScript()) ResetAreaTriggerDone(instance, trigger->ID); }
+void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(Player const* player, AreaTriggerDBC const* trigger) { if (InstanceScript* instance = player->GetInstanceScript()) ResetAreaTriggerDone(instance, trigger->ID); }
 
 BattlefieldScript::BattlefieldScript(char const* name)
         : ScriptObject(name)

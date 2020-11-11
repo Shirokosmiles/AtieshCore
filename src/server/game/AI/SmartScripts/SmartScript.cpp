@@ -21,6 +21,7 @@
 #include "Creature.h"
 #include "CreatureTextMgr.h"
 #include "CreatureTextMgrImpl.h"
+#include "DBCStoresMgrStructure.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "GossipDef.h"
@@ -3777,7 +3778,7 @@ void SmartScript::RaisePriority(SmartScriptHolder& e)
     }
 }
 
-void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTriggerEntry const* at)
+void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTriggerDBC const* at)
 {
     if (e.empty())
     {
@@ -3833,7 +3834,7 @@ void SmartScript::GetScript()
     }
 }
 
-void SmartScript::OnInitialize(WorldObject* obj, AreaTriggerEntry const* at)
+void SmartScript::OnInitialize(WorldObject* obj, AreaTriggerDBC const* at)
 {
     if (obj)//handle object based scripts
     {

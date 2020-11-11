@@ -37,7 +37,7 @@
 struct AccessRequirement;
 struct AchievementDBC;
 struct AreaTableDBC;
-struct AreaTriggerEntry;
+struct AreaTriggerDBC;
 struct BarberShopStyleEntry;
 struct CharacterCustomizeInfo;
 struct CharTitlesEntry;
@@ -948,7 +948,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         bool IsInWater() const override { return m_isInWater; }
         bool IsFalling() { return GetPositionZ() < m_lastFallZ; }
-        bool IsInAreaTriggerRadius(AreaTriggerEntry const* trigger) const;
+        bool IsInAreaTriggerRadius(AreaTriggerDBC const* trigger) const;
 
         void SendInitialPacketsBeforeAddToMap();
         void SendInitialPacketsAfterAddToMap();

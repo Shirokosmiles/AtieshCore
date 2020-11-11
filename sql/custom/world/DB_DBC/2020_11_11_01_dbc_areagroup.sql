@@ -3,18 +3,17 @@
 -- ----------------------------
 DROP TABLE IF EXISTS `dbc_areagroup`;
 CREATE TABLE `dbc_areagroup`  (
-  `guid` int(10) NOT NULL AUTO_INCREMENT,
-  `ID` int(4) NOT NULL DEFAULT 0,
-  `AreaID1` int(4) NULL DEFAULT 0,
-  `AreaID2` int(4) NULL DEFAULT 0,
-  `AreaID3` int(4) NULL DEFAULT 0,
-  `AreaID4` int(4) NULL DEFAULT 0,
-  `AreaID5` int(4) NULL DEFAULT 0,
-  `AreaID6` int(4) NULL DEFAULT 0,
-  `NextAreaID` int(4) NULL DEFAULT 0,
-  PRIMARY KEY (`guid`) USING BTREE,
-  UNIQUE INDEX `ID`(`ID`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 292 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Fixed;
+  `guid` int(11) NOT NULL AUTO_INCREMENT,
+  `ID` int(11) NOT NULL DEFAULT 0,
+  `AreaID_1` int(11) NOT NULL DEFAULT 0,
+  `AreaID_2` int(11) NOT NULL DEFAULT 0,
+  `AreaID_3` int(11) NOT NULL DEFAULT 0,
+  `AreaID_4` int(11) NOT NULL DEFAULT 0,
+  `AreaID_5` int(11) NOT NULL DEFAULT 0,
+  `AreaID_6` int(11) NOT NULL DEFAULT 0,
+  `NextAreaID` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`guid`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 292 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Fixed;
 
 -- ----------------------------
 -- Records of dbc_areagroup

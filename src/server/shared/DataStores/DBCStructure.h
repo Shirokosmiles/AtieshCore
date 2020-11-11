@@ -28,7 +28,7 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct AreaTriggerEntry
+/*struct AreaTriggerEntry
 {
     uint32 ID;                                              // 0
     uint32 ContinentID;                                     // 1
@@ -38,7 +38,7 @@ struct AreaTriggerEntry
     float BoxWidth;                                         // 7
     float BoxHeight;                                        // 8
     float BoxYaw;                                           // 9
-};
+};*/
 
 struct AuctionHouseEntry
 {

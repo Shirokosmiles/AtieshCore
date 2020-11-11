@@ -227,3 +227,15 @@ struct AreaPOIDBC
     uint32 WorldStateID;                                    // 52
     //uint32 WorldMapLink;                                  // 53
 };
+
+struct AreaTriggerDBC
+{
+    uint32 ID;                                              // 0
+    uint32 ContinentID;                                     // 1
+    DBCPosition3D Pos;                                      // 2-4
+    float Radius;                                           // 5
+    float BoxLength;                                        // 6
+    float BoxWidth;                                         // 7
+    float BoxHeight;                                        // 8
+    float BoxYaw;                                           // 9
+};
