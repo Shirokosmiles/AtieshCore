@@ -33,6 +33,7 @@ typedef std::unordered_map<uint32 /*guid*/, AreaTriggerDBC> AreaTriggerDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, AuctionHouseDBC> AuctionHouseDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, BankBagSlotPricesDBC> BankBagSlotPricesDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, BannedAddOnsDBC> BannedAddOnsDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, BarberShopStyleDBC> BarberShopStyleDBCMap;
 
 enum DBCFileName : uint8
 {
@@ -149,6 +150,16 @@ public:
         return nullptr;
     }
 
+    BarberShopStyleDBC const* GetBarberShopStyleDBC(uint32 id) const
+    {
+        for (BarberShopStyleDBCMap::const_iterator itr = _barberShopStyleMap.begin(); itr != _barberShopStyleMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
     uint32 GetNumRows(DBCFileName type);    
 
 protected:
@@ -161,6 +172,7 @@ protected:
     void _Load_AuctionHouse();
     void _Load_BankBagSlotPrices();
     void _Load_BannedAddOns();
+    void _Load_BarberShopStyle();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -172,6 +184,7 @@ private:
     AuctionHouseDBCMap _auctionHouseMap;
     BankBagSlotPricesDBCMap _bankBagSlotPricesMap;
     BannedAddOnsDBCMap _bannedAddonsMap;
+    BarberShopStyleDBCMap _barberShopStyleMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

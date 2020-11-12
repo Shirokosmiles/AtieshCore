@@ -1,5 +1,5 @@
 -- ----------------------------
--- Table structure for dbс_auctionhouse
+-- Table structure for dbc_auctionhouse
 -- ----------------------------
 DROP TABLE IF EXISTS `dbc_auctionhouse`;
 CREATE TABLE `dbc_auctionhouse`  (
@@ -29,9 +29,9 @@ CREATE TABLE `dbc_auctionhouse`  (
 ) ENGINE = MyISAM AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of dbс_auctionhouse
+-- Records of dbc_auctionhouse
 -- ----------------------------
-INSERT INTO `dbс_auctionhouse` VALUES 
+INSERT INTO `dbc_auctionhouse` VALUES 
 (1, 1, 1, 5, 5, 'Stormwind Auction House', '', '', 'Hôtel des ventes de Hurlevent', 'Auktionshaus von Sturmwind', '', '暴风城拍卖行', '', '', 'Casa de subastas: Ventormenta', '', 'Аукционный дом Штормграда', '', '', '', '', 16712190),
 (2, 2, 3, 5, 5, 'Alliance Auction House', '', '', 'Hôtel des ventes de l\\\'Alliance', 'Auktionshaus der Allianz', '', '联盟拍卖行', '', '', 'Casa de subastas: Alianza', '', 'Аукционный дом Альянса', '', '', '', '', 16712190),
 (3, 3, 4, 5, 5, 'Darnassus Auction House', '', '', 'Hôtel des ventes de Darnassus', 'Auktionshaus von Darnassus', '', '达纳苏斯拍卖行', '', '', 'Casa de subastas: Darnassus', '', 'Аукционный дом Дарнаса', '', '', '', '', 16712190),

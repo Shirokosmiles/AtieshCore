@@ -38,7 +38,7 @@ struct AccessRequirement;
 struct AchievementDBC;
 struct AreaTableDBC;
 struct AreaTriggerDBC;
-struct BarberShopStyleEntry;
+struct BarberShopStyleDBC;
 struct CharacterCustomizeInfo;
 struct CharTitlesEntry;
 struct ChatChannelsEntry;
@@ -968,7 +968,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 GetChatTag() const;
         std::string autoReplyMsg;
 
-        uint32 GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 newfacialhair, BarberShopStyleEntry const* newSkin = nullptr) const;
+        uint32 GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 newfacialhair, BarberShopStyleDBC const* newSkin = nullptr) const;
 
         PlayerSocial* GetSocial() { return m_social; }
         void RemoveSocial();

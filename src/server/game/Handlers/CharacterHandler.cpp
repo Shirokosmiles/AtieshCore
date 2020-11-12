@@ -1334,17 +1334,17 @@ void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
     uint32 Hair, Color, FacialHair, SkinColor;
     recvData >> Hair >> Color >> FacialHair >> SkinColor;
 
-    BarberShopStyleEntry const* bs_hair = sBarberShopStyleStore.LookupEntry(Hair);
+    BarberShopStyleDBC const* bs_hair = sDBCStoresMgr->GetBarberShopStyleDBC(Hair);
 
     if (!bs_hair || bs_hair->Type != 0 || bs_hair->Race != _player->GetRace() || bs_hair->Sex != _player->GetNativeGender())
         return;
 
-    BarberShopStyleEntry const* bs_facialHair = sBarberShopStyleStore.LookupEntry(FacialHair);
+    BarberShopStyleDBC const* bs_facialHair = sDBCStoresMgr->GetBarberShopStyleDBC(FacialHair);
 
     if (!bs_facialHair || bs_facialHair->Type != 2 || bs_facialHair->Race != _player->GetRace() || bs_facialHair->Sex != _player->GetNativeGender())
         return;
 
-    BarberShopStyleEntry const* bs_skinColor = sBarberShopStyleStore.LookupEntry(SkinColor);
+    BarberShopStyleDBC const* bs_skinColor = sDBCStoresMgr->GetBarberShopStyleDBC(SkinColor);
 
     if (bs_skinColor && (bs_skinColor->Type != 3 || bs_skinColor->Race != _player->GetRace() || bs_skinColor->Sex != _player->GetNativeGender()))
         return;

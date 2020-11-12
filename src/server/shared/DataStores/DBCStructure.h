@@ -28,20 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct BarberShopStyleEntry
-{
-    uint32 ID;                                              // 0
-    uint32 Type;                                            // 1 value 0 -> hair, value 2 -> facialhair
-    //char const* DisplayName[16];                          // 2-17
-    //uint32 DisplayName_lang_mask;                         // 18
-    //uint32 Description[16];                               // 19-34, all empty
-    //uint32 Description_lang_mask;                         // 35
-    //float CostModifier;                                   // 36
-    uint32 Race;                                            // 37
-    uint32 Sex;                                             // 38
-    uint32 Data;                                            // 39 real ID to hair/facial hair
-};
-
 struct BattlemasterListEntry
 {
     uint32 ID;                                              // 0

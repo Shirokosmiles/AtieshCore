@@ -35,6 +35,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _auctionHouseMap.clear();
     _bankBagSlotPricesMap.clear();
     _bannedAddonsMap.clear();
+    _barberShopStyleMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -48,6 +49,8 @@ void DBCStoresMgr::Initialize()
     _Load_AreaTrigger();
     _Load_AuctionHouse();
     _Load_BankBagSlotPrices();
+    _Load_BannedAddOns();
+    _Load_BarberShopStyle();
 }
 
 uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
@@ -413,7 +416,7 @@ void DBCStoresMgr::_Load_BankBagSlotPrices()
 
     _bankBagSlotPricesMap.clear();
     //                                                0     1    2
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Coast FROM dbc_bankbagslotprices");
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Cost FROM dbc_bankbagslotprices");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_bankbagslotprices. DB table `dbc_bankbagslotprices` is empty.");
@@ -444,8 +447,8 @@ void DBCStoresMgr::_Load_BannedAddOns()
     uint32 oldMSTime = getMSTime();
 
     _bannedAddonsMap.clear();
-    //                                                0     1    2
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Coast FROM dbc_bannedaddons");
+    //                                                0     1
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID FROM dbc_bannedaddons");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_bannedaddons. DB table `dbc_bannedaddons` is empty.");
@@ -467,4 +470,39 @@ void DBCStoresMgr::_Load_BannedAddOns()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_bannedaddons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load BarberShopStyle.dbc
+void DBCStoresMgr::_Load_BarberShopStyle()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _barberShopStyleMap.clear();
+    //                                                0     1    2    3     4    5
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Type, Race, Sex, Data FROM dbc_barbershopstyle");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_barbershopstyle. DB table `dbc_barbershopstyle` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        BarberShopStyleDBC bs;
+        bs.ID   = fields[1].GetUInt32();
+        bs.Type = fields[2].GetUInt32();
+        bs.Race = fields[3].GetUInt32();
+        bs.Sex  = fields[4].GetUInt32();
+        bs.Data = fields[5].GetUInt32();
+
+        _barberShopStyleMap[id] = bs;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_barbershopstyle in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
