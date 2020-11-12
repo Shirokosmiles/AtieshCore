@@ -49,7 +49,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <AreaTriggerEntry> sAreaTriggerStore(AreaTriggerEntryfmt);
 //DBCStorage <AuctionHouseEntry> sAuctionHouseStore(AuctionHouseEntryfmt);
 //DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEntryfmt);
-DBCStorage <BannedAddOnsEntry> sBannedAddOnsStore(BannedAddOnsfmt);
+//DBCStorage <BannedAddOnsEntry> sBannedAddOnsStore(BannedAddOnsfmt);
 DBCStorage <BattlemasterListEntry> sBattlemasterListStore(BattlemasterListEntryfmt);
 DBCStorage <BarberShopStyleEntry> sBarberShopStyleStore(BarberShopStyleEntryfmt);
 DBCStorage <CharacterFacialHairStylesEntry> sCharacterFacialHairStylesStore(CharacterFacialHairStylesfmt);
@@ -287,7 +287,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sAreaPOIStore,                       "AreaPOI.dbc");
     //LOAD_DBC(sAuctionHouseStore,                  "AuctionHouse.dbc");
     //LOAD_DBC(sBankBagSlotPricesStore,             "BankBagSlotPrices.dbc");
-    LOAD_DBC(sBannedAddOnsStore,                  "BannedAddOns.dbc");
+    //LOAD_DBC(sBannedAddOnsStore,                  "BannedAddOns.dbc");
     LOAD_DBC(sBattlemasterListStore,              "BattlemasterList.dbc");
     LOAD_DBC(sBarberShopStyleStore,               "BarberShopStyle.dbc");
     LOAD_DBC(sCharacterFacialHairStylesStore,     "CharacterFacialHairStyles.dbc");

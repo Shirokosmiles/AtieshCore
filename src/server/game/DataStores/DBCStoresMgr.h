@@ -32,6 +32,7 @@ typedef std::unordered_map<uint32 /*guid*/, AreaTriggerDBC> AreaTriggerDBCMap;
 
 typedef std::unordered_map<uint32 /*guid*/, AuctionHouseDBC> AuctionHouseDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, BankBagSlotPricesDBC> BankBagSlotPricesDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, BannedAddOnsDBC> BannedAddOnsDBCMap;
 
 enum DBCFileName : uint8
 {
@@ -43,6 +44,7 @@ enum DBCFileName : uint8
     AreaTrigger_ENUM,
     AuctionHouse_ENUM,
     BankBagSlotPrices_ENUM,
+    BannedAddOns_ENUM,
 };
 
 class TC_GAME_API DBCStoresMgr
@@ -137,6 +139,16 @@ public:
         return nullptr;
     }
 
+    BannedAddOnsDBC const* GetBannedAddOnsDBC(uint32 id) const
+    {
+        for (BannedAddOnsDBCMap::const_iterator itr = _bannedAddonsMap.begin(); itr != _bannedAddonsMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
     uint32 GetNumRows(DBCFileName type);    
 
 protected:
@@ -148,6 +160,7 @@ protected:
     void _Load_AreaTrigger();
     void _Load_AuctionHouse();
     void _Load_BankBagSlotPrices();
+    void _Load_BannedAddOns();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -158,6 +171,7 @@ private:
     AreaTriggerDBCMap _areaTriggerMap;
     AuctionHouseDBCMap _auctionHouseMap;
     BankBagSlotPricesDBCMap _bankBagSlotPricesMap;
+    BannedAddOnsDBCMap _bannedAddonsMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

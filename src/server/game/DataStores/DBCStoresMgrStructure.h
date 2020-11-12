@@ -255,3 +255,12 @@ struct BankBagSlotPricesDBC
     uint32 ID;                                              // 0
     uint32 Cost;                                            // 1
 };
+
+struct BannedAddOnsDBC
+{
+    uint32 ID;                                              // 0
+    //uint32 NameMD5[4];                                    // 1-4
+    //uint32 VersionMD5[4];                                 // 5-8
+    //uint32 LastModified;                                  // 9
+    //uint32 Flags;                                         // 10
+};

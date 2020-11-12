@@ -34,6 +34,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _areaTriggerMap.clear();
     _auctionHouseMap.clear();
     _bankBagSlotPricesMap.clear();
+    _bannedAddonsMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -94,6 +95,11 @@ uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
         case BankBagSlotPrices_ENUM:
         {
             result = _bankBagSlotPricesMap.size();
+            break;
+        }
+        case BannedAddOns_ENUM:
+        {
+            result = _bannedAddonsMap.size();
             break;
         }
     }
@@ -410,7 +416,7 @@ void DBCStoresMgr::_Load_BankBagSlotPrices()
     QueryResult result = WorldDatabase.Query("SELECT guid, ID, Coast FROM dbc_bankbagslotprices");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_auctionhouse. DB table `dbc_bankbagslotprices` is empty.");
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_bankbagslotprices. DB table `dbc_bankbagslotprices` is empty.");
         return;
     }
 
@@ -430,4 +436,35 @@ void DBCStoresMgr::_Load_BankBagSlotPrices()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_bankbagslotprices in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load BannedAddOns.dbc
+void DBCStoresMgr::_Load_BannedAddOns()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _bannedAddonsMap.clear();
+    //                                                0     1    2
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Coast FROM dbc_bannedaddons");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_bannedaddons. DB table `dbc_bannedaddons` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        BannedAddOnsDBC ba;
+        ba.ID = fields[1].GetUInt32();
+
+        _bannedAddonsMap[id] = ba;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_bannedaddons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

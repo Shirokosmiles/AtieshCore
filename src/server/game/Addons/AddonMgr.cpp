@@ -17,7 +17,7 @@
 
 #include "AddonMgr.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "Timer.h"
 #include <openssl/md5.h>
@@ -69,7 +69,7 @@ void LoadFromDB()
     if (result)
     {
         uint32 count = 0;
-        uint32 dbcMaxBannedAddon = sBannedAddOnsStore.GetNumRows();
+        uint32 dbcMaxBannedAddon = sDBCStoresMgr->GetNumRows(BannedAddOns_ENUM);
 
         do
         {

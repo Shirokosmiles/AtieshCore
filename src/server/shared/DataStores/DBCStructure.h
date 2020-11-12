@@ -28,15 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct BannedAddOnsEntry
-{
-    uint32 ID;                                              // 0
-    //uint32 NameMD5[4];                                    // 1-4
-    //uint32 VersionMD5[4];                                 // 5-8
-    //uint32 LastModified;                                  // 9
-    //uint32 Flags;                                         // 10
-};
-
 struct BarberShopStyleEntry
 {
     uint32 ID;                                              // 0
