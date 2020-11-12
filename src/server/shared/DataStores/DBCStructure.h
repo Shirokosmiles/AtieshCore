@@ -28,28 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-/*struct AreaTriggerEntry
-{
-    uint32 ID;                                              // 0
-    uint32 ContinentID;                                     // 1
-    DBCPosition3D Pos;                                      // 2-4
-    float Radius;                                           // 5
-    float BoxLength;                                        // 6
-    float BoxWidth;                                         // 7
-    float BoxHeight;                                        // 8
-    float BoxYaw;                                           // 9
-};*/
-
-struct AuctionHouseEntry
-{
-    uint32 ID;                                              // 0
-    uint32 FactionID;                                       // 1 id of faction.dbc for player factions associated with city
-    uint32 DepositRate;                                     // 2 1/3 from real
-    uint32 ConsignmentRate;                                 // 3
-    //char const* Name[16];                                 // 4-19
-    //uint32 Name_lang_mask;                                // 20
-};
-
 struct BankBagSlotPricesEntry
 {
     uint32 ID;                                              // 0

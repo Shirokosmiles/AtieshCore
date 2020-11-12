@@ -22,6 +22,7 @@
 #include "Creature.h"
 #include "DatabaseEnv.h"
 #include "DBCStructure.h"
+#include "DBCStoresMgrStructure.h"
 #include "GameTime.h"
 #include "Item.h"
 #include "Language.h"
@@ -65,7 +66,7 @@ void WorldSession::SendAuctionHello(ObjectGuid guid, Creature* unit)
         return;
     }
 
-    AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit->GetFaction());
+    AuctionHouseDBC const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit->GetFaction());
     if (!ahEntry)
         return;
 
@@ -175,7 +176,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         return;
     }
 
-    AuctionHouseEntry const* auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(creature->GetFaction());
+    AuctionHouseDBC const* auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(creature->GetFaction());
     if (!auctionHouseEntry)
     {
         TC_LOG_DEBUG("network", "WORLD: HandleAuctionSellItem - Unit (%s) has wrong faction.", auctioneer.ToString().c_str());
@@ -293,7 +294,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             return;
         }
 
-        AuctionHouseEntry const* AHEntry = sAuctionMgr->GetAuctionHouseEntry(auctioneerInfo->faction);
+        AuctionHouseDBC const* AHEntry = sAuctionMgr->GetAuctionHouseEntry(auctioneerInfo->faction);
         AH->houseId = AHEntry->ID;
     }
 

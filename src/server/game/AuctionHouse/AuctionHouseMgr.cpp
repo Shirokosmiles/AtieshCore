@@ -23,6 +23,7 @@
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "Item.h"
 #include "Language.h"
@@ -87,7 +88,7 @@ AuctionHouseObject* AuctionHouseMgr::GetAuctionsMapByHouseId(uint8 auctionHouseI
     }
 }
 
-uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count)
+uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseDBC const* entry, uint32 time, Item* pItem, uint32 count)
 {
     uint32 MSV = pItem->GetTemplate()->SellPrice;
 
@@ -548,7 +549,7 @@ void AuctionHouseMgr::Update()
     mNeutralAuctions.Update();
 }
 
-AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTemplateId)
+AuctionHouseDBC const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTemplateId)
 {
     uint32 houseid = AUCTIONHOUSE_NEUTRAL; // goblin auction house
 
@@ -568,12 +569,12 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTem
             houseid = AUCTIONHOUSE_NEUTRAL; // goblin auction house
     }
 
-    return sAuctionHouseStore.LookupEntry(houseid);
+    return sDBCStoresMgr->GetAuctionHouseDBC(houseid);
 }
 
-AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntryFromHouse(uint8 houseId)
+AuctionHouseDBC const* AuctionHouseMgr::GetAuctionHouseEntryFromHouse(uint8 houseId)
 {
-    return (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION)) ? sAuctionHouseStore.LookupEntry(AUCTIONHOUSE_NEUTRAL) : sAuctionHouseStore.LookupEntry(houseId);
+    return (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION)) ? sDBCStoresMgr->GetAuctionHouseDBC(AUCTIONHOUSE_NEUTRAL) : sDBCStoresMgr->GetAuctionHouseDBC(houseId);
 }
 
 void AuctionHouseObject::AddAuction(AuctionEntry* auction)

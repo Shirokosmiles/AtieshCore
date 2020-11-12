@@ -20,6 +20,7 @@
 #include "Containers.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "Item.h"
 #include "Log.h"
@@ -846,7 +847,7 @@ void AuctionBotSeller::AddNewAuctions(SellerConfiguration& config)
             break;
     }
 
-    AuctionHouseEntry const* ahEntry = sAuctionHouseStore.LookupEntry(houseid);
+    AuctionHouseDBC const* ahEntry = sDBCStoresMgr->GetAuctionHouseDBC(houseid);
 
     AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(config.GetHouseType());
 

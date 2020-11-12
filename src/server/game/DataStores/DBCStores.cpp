@@ -47,7 +47,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <AchievementEntry> sAchievementStore(Achievementfmt);
 //DBCStorage <AchievementCriteriaEntry> sAchievementCriteriaStore(AchievementCriteriafmt);
 //DBCStorage <AreaTriggerEntry> sAreaTriggerStore(AreaTriggerEntryfmt);
-DBCStorage <AuctionHouseEntry> sAuctionHouseStore(AuctionHouseEntryfmt);
+//DBCStorage <AuctionHouseEntry> sAuctionHouseStore(AuctionHouseEntryfmt);
 DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEntryfmt);
 DBCStorage <BannedAddOnsEntry> sBannedAddOnsStore(BannedAddOnsfmt);
 DBCStorage <BattlemasterListEntry> sBattlemasterListStore(BattlemasterListEntryfmt);
@@ -285,7 +285,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sAreaTriggerStore,                   "AreaTrigger.dbc");
     //LOAD_DBC(sAreaGroupStore,                     "AreaGroup.dbc");
     //LOAD_DBC(sAreaPOIStore,                       "AreaPOI.dbc");
-    LOAD_DBC(sAuctionHouseStore,                  "AuctionHouse.dbc");
+    //LOAD_DBC(sAuctionHouseStore,                  "AuctionHouse.dbc");
     LOAD_DBC(sBankBagSlotPricesStore,             "BankBagSlotPrices.dbc");
     LOAD_DBC(sBannedAddOnsStore,                  "BannedAddOns.dbc");
     LOAD_DBC(sBattlemasterListStore,              "BattlemasterList.dbc");

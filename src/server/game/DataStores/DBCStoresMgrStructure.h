@@ -239,3 +239,13 @@ struct AreaTriggerDBC
     float BoxHeight;                                        // 8
     float BoxYaw;                                           // 9
 };
+
+struct AuctionHouseDBC
+{
+    uint32 ID;                                              // 0
+    uint32 FactionID;                                       // 1 id of faction.dbc for player factions associated with city
+    uint32 DepositRate;                                     // 2 1/3 from real
+    uint32 ConsignmentRate;                                 // 3
+    //char const* Name[16];                                 // 4-19
+    //uint32 Name_lang_mask;                                // 20
+};

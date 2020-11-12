@@ -32,6 +32,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _areaGroupMap.clear();
     _areaPOIMap.clear();
     _areaTriggerMap.clear();
+    _auctionHouseMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -43,6 +44,7 @@ void DBCStoresMgr::Initialize()
     // unused
     //_Load_AreaPOI();
     _Load_AreaTrigger();
+    _Load_AuctionHouse();
 }
 
 uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
@@ -80,6 +82,11 @@ uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
         case AreaTrigger_ENUM:
         {
             result = _areaTriggerMap.size();
+            break;
+        }
+        case AuctionHouse_ENUM:
+        {
+            result = _auctionHouseMap.size();
             break;
         }
     }
@@ -350,4 +357,38 @@ void DBCStoresMgr::_Load_AreaTrigger()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_areatrigger in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load AuctionHouse.dbc
+void DBCStoresMgr::_Load_AuctionHouse()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _auctionHouseMap.clear();
+    //                                                0     1       2          3               4
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, FactionID, DepositRate, ConsignmentRate FROM dbc_auctionhouse");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_auctionhouse. DB table `dbc_auctionhouse` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        AuctionHouseDBC ah;
+        ah.ID              = fields[1].GetUInt32();
+        ah.FactionID       = fields[2].GetUInt32();
+        ah.DepositRate     = fields[3].GetUInt32();
+        ah.ConsignmentRate = fields[4].GetUInt32();
+
+        _auctionHouseMap[id] = ah;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_auctionhouse in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
