@@ -32,6 +32,7 @@
 #include "Containers.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "DisableMgr.h"
 #include "Formulas.h"
 #include "GameEventMgr.h"
@@ -542,7 +543,7 @@ void BattlegroundMgr::LoadBattlegroundTemplates()
             continue;
 
         // can be overwrite by values from DB
-        BattlemasterListEntry const* bl = sBattlemasterListStore.LookupEntry(bgTypeId);
+        BattlemasterListDBC const* bl = sDBCStoresMgr->GetBattlemasterListDBC(bgTypeId);
         if (!bl)
         {
             TC_LOG_ERROR("bg.battleground", "Battleground ID %u could not be found in BattlemasterList.dbc. The battleground was not created.", bgTypeId);
@@ -904,7 +905,7 @@ void BattlegroundMgr::LoadBattleMastersEntry()
         }
 
         uint32 bgTypeId  = fields[1].GetUInt32();
-        if (!sBattlemasterListStore.LookupEntry(bgTypeId))
+        if (!sDBCStoresMgr->GetBattlemasterListDBC(bgTypeId))
         {
             TC_LOG_ERROR("sql.sql", "Table `battlemaster_entry` contains entry %u for a non-existing battleground type %u, ignored.", entry, bgTypeId);
             continue;

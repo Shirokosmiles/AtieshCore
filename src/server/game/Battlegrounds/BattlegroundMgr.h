@@ -24,7 +24,7 @@
 #include "BattlegroundQueue.h"
 #include <unordered_map>
 
-struct BattlemasterListEntry;
+struct BattlemasterListDBC;
 
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef std::set<uint32> BattlegroundClientIdsContainer;
@@ -56,7 +56,7 @@ struct BattlegroundTemplate
     float MaxStartDistSq;
     uint8 Weight;
     uint32 ScriptId;
-    BattlemasterListEntry const* BattlemasterEntry;
+    BattlemasterListDBC const* BattlemasterEntry;
 
     bool IsArena() const;
 };

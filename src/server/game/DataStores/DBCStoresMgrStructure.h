@@ -278,3 +278,17 @@ struct BarberShopStyleDBC
     uint32 Sex;                                             // 38
     uint32 Data;                                            // 39 real ID to hair/facial hair
 };
+
+struct BattlemasterListDBC
+{
+    uint32 ID;                                              // 0
+    int32 MapID[8];                                         // 1-8
+    uint32 InstanceType;                                    // 9 map type (3 - BG, 4 - arena)
+    //uint32 GroupsAllowed;                                 // 10
+    std::string Name[TOTAL_LOCALES];                        // 11-26
+    //uint32 Name_lang_mask;                                // 27
+    uint32 MaxGroupSize;                                    // 28 used for checking if queue as group
+    uint32 HolidayWorldState;                               // 29
+    //uint32 MinLevel;                                      // 30
+    //uint32 MaxLevel;                                      // 31
+};

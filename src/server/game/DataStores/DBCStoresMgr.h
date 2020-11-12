@@ -24,16 +24,15 @@
 
 typedef std::unordered_map<uint32 /*guid*/, AchievementDBC> AchievementDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, AchievementCriteriaDBC> AchievementCriteriaDBCMap;
-
 typedef std::unordered_map<uint32 /*guid*/, AreaTableDBC> AreaTableDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, AreaGroupDBC> AreaGroupDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, AreaPOIDBC> AreaPOIDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, AreaTriggerDBC> AreaTriggerDBCMap;
-
 typedef std::unordered_map<uint32 /*guid*/, AuctionHouseDBC> AuctionHouseDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, BankBagSlotPricesDBC> BankBagSlotPricesDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, BannedAddOnsDBC> BannedAddOnsDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, BarberShopStyleDBC> BarberShopStyleDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, BattlemasterListDBC> BattlemasterListDBCMap;
 
 enum DBCFileName : uint8
 {
@@ -46,6 +45,7 @@ enum DBCFileName : uint8
     AuctionHouse_ENUM,
     BankBagSlotPrices_ENUM,
     BannedAddOns_ENUM,
+    BattlemasterList_ENUM,
 };
 
 class TC_GAME_API DBCStoresMgr
@@ -160,6 +160,16 @@ public:
         return nullptr;
     }
 
+    BattlemasterListDBC const* GetBattlemasterListDBC(uint32 id) const
+    {
+        for (BattlemasterListDBCMap::const_iterator itr = _battlemasterListMap.begin(); itr != _battlemasterListMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
     uint32 GetNumRows(DBCFileName type);    
 
 protected:
@@ -173,6 +183,7 @@ protected:
     void _Load_BankBagSlotPrices();
     void _Load_BannedAddOns();
     void _Load_BarberShopStyle();
+    void _Load_BattlemasterList();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -185,6 +196,7 @@ private:
     BankBagSlotPricesDBCMap _bankBagSlotPricesMap;
     BannedAddOnsDBCMap _bannedAddonsMap;
     BarberShopStyleDBCMap _barberShopStyleMap;
+    BattlemasterListDBCMap _battlemasterListMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

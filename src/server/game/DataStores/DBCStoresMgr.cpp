@@ -36,6 +36,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _bankBagSlotPricesMap.clear();
     _bannedAddonsMap.clear();
     _barberShopStyleMap.clear();
+    _battlemasterListMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -51,6 +52,7 @@ void DBCStoresMgr::Initialize()
     _Load_BankBagSlotPrices();
     _Load_BannedAddOns();
     _Load_BarberShopStyle();
+    _Load_BattlemasterList();
 }
 
 uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
@@ -103,6 +105,11 @@ uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
         case BannedAddOns_ENUM:
         {
             result = _bannedAddonsMap.size();
+            break;
+        }
+        case BattlemasterList_ENUM:
+        {
+            result = _battlemasterListMap.size();
             break;
         }
     }
@@ -505,4 +512,46 @@ void DBCStoresMgr::_Load_BarberShopStyle()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_barbershopstyle in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load BattlemasterList.dbc
+void DBCStoresMgr::_Load_BattlemasterList()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _battlemasterListMap.clear();
+    //                                                0     1    2          3        4        5        6        7       8       9           10              11              12              13              14              15              16              17              18              19              20              21
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, MapID_1, MapID_2, MapID_3, MapID_4, MapID_5, MapID_6, MapID_7, MapID_8, InstanceType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MaxGroupSize, HolidayWorldState FROM dbc_battlemasterlist");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_battlemasterlist. DB table `dbc_battlemasterlist` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        BattlemasterListDBC bl;
+        bl.ID = fields[1].GetUInt32();
+
+        for (uint8 i = 0; i < 8; i++)
+            bl.MapID[i] = fields[2 + i].GetInt32();
+
+        bl.InstanceType = fields[10].GetUInt32();
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            bl.Name[i] = fields[11 + i].GetInt32();
+
+        bl.MaxGroupSize      = fields[20].GetUInt32();
+        bl.HolidayWorldState = fields[21].GetUInt32();
+
+        _battlemasterListMap[id] = bl;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_battlemasterlist in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

@@ -19,6 +19,7 @@
 #include "BattlegroundMgr.h"
 #include "CreatureAI.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "DatabaseEnv.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
@@ -1586,7 +1587,7 @@ void GameEventMgr::UpdateWorldStates(uint16 event_id, bool Activate)
         BattlegroundTypeId bgTypeId = BattlegroundMgr::WeekendHolidayIdToBGType(event.holiday_id);
         if (bgTypeId != BATTLEGROUND_TYPE_NONE)
         {
-            BattlemasterListEntry const* bl = sBattlemasterListStore.LookupEntry(bgTypeId);
+            BattlemasterListDBC const* bl = sDBCStoresMgr->GetBattlemasterListDBC(bgTypeId);
             if (bl && bl->HolidayWorldState)
             {
                 WorldPackets::WorldState::UpdateWorldState worldstate;

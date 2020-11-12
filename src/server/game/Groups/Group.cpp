@@ -21,6 +21,7 @@
 #include "Common.h"
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "Formulas.h"
 #include "GameObject.h"
 #include "GroupMgr.h"
@@ -1962,7 +1963,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
     if (isLFGGroup())
         return ERR_LFG_CANT_USE_BATTLEGROUND;
 
-    BattlemasterListEntry const* bgEntry = sBattlemasterListStore.LookupEntry(bgOrTemplate->GetTypeID());
+    BattlemasterListDBC const* bgEntry = sDBCStoresMgr->GetBattlemasterListDBC(bgOrTemplate->GetTypeID());
     if (!bgEntry)
         return ERR_GROUP_JOIN_BATTLEGROUND_FAIL;            // shouldn't happen
 

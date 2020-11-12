@@ -50,7 +50,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <AuctionHouseEntry> sAuctionHouseStore(AuctionHouseEntryfmt);
 //DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEntryfmt);
 //DBCStorage <BannedAddOnsEntry> sBannedAddOnsStore(BannedAddOnsfmt);
-DBCStorage <BattlemasterListEntry> sBattlemasterListStore(BattlemasterListEntryfmt);
+//DBCStorage <BattlemasterListEntry> sBattlemasterListStore(BattlemasterListEntryfmt);
 //DBCStorage <BarberShopStyleEntry> sBarberShopStyleStore(BarberShopStyleEntryfmt);
 DBCStorage <CharacterFacialHairStylesEntry> sCharacterFacialHairStylesStore(CharacterFacialHairStylesfmt);
 std::unordered_map<uint32, CharacterFacialHairStylesEntry const*> sCharFacialHairMap;
@@ -288,7 +288,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sAuctionHouseStore,                  "AuctionHouse.dbc");
     //LOAD_DBC(sBankBagSlotPricesStore,             "BankBagSlotPrices.dbc");
     //LOAD_DBC(sBannedAddOnsStore,                  "BannedAddOns.dbc");
-    LOAD_DBC(sBattlemasterListStore,              "BattlemasterList.dbc");
+    //LOAD_DBC(sBattlemasterListStore,              "BattlemasterList.dbc");
     //LOAD_DBC(sBarberShopStyleStore,               "BarberShopStyle.dbc");
     LOAD_DBC(sCharacterFacialHairStylesStore,     "CharacterFacialHairStyles.dbc");
     LOAD_DBC(sCharSectionsStore,                  "CharSections.dbc");
