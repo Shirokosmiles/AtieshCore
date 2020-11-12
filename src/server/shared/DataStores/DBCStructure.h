@@ -28,12 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct BankBagSlotPricesEntry
-{
-    uint32 ID;                                              // 0
-    uint32 Cost;                                            // 1
-};
-
 struct BannedAddOnsEntry
 {
     uint32 ID;                                              // 0

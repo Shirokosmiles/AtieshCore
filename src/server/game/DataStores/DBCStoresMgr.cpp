@@ -33,6 +33,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _areaPOIMap.clear();
     _areaTriggerMap.clear();
     _auctionHouseMap.clear();
+    _bankBagSlotPricesMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -45,6 +46,7 @@ void DBCStoresMgr::Initialize()
     //_Load_AreaPOI();
     _Load_AreaTrigger();
     _Load_AuctionHouse();
+    _Load_BankBagSlotPrices();
 }
 
 uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
@@ -87,6 +89,11 @@ uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
         case AuctionHouse_ENUM:
         {
             result = _auctionHouseMap.size();
+            break;
+        }
+        case BankBagSlotPrices_ENUM:
+        {
+            result = _bankBagSlotPricesMap.size();
             break;
         }
     }
@@ -391,4 +398,36 @@ void DBCStoresMgr::_Load_AuctionHouse()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_auctionhouse in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load BankBagSlotPrices.dbc
+void DBCStoresMgr::_Load_BankBagSlotPrices()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _bankBagSlotPricesMap.clear();
+    //                                                0     1    2
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Coast FROM dbc_bankbagslotprices");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_auctionhouse. DB table `dbc_bankbagslotprices` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        BankBagSlotPricesDBC bsp;
+        bsp.ID   = fields[1].GetUInt32();
+        bsp.Cost = fields[2].GetUInt32();
+
+        _bankBagSlotPricesMap[id] = bsp;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_bankbagslotprices in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

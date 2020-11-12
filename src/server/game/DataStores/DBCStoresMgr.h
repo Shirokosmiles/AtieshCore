@@ -31,6 +31,7 @@ typedef std::unordered_map<uint32 /*guid*/, AreaPOIDBC> AreaPOIDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, AreaTriggerDBC> AreaTriggerDBCMap;
 
 typedef std::unordered_map<uint32 /*guid*/, AuctionHouseDBC> AuctionHouseDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, BankBagSlotPricesDBC> BankBagSlotPricesDBCMap;
 
 enum DBCFileName : uint8
 {
@@ -41,6 +42,7 @@ enum DBCFileName : uint8
     AreaPOI_ENUM,
     AreaTrigger_ENUM,
     AuctionHouse_ENUM,
+    BankBagSlotPrices_ENUM,
 };
 
 class TC_GAME_API DBCStoresMgr
@@ -125,6 +127,16 @@ public:
         return nullptr;
     }
 
+    BankBagSlotPricesDBC const* GetBankBagSlotPricesDBC(uint32 id) const
+    {
+        for (BankBagSlotPricesDBCMap::const_iterator itr = _bankBagSlotPricesMap.begin(); itr != _bankBagSlotPricesMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
     uint32 GetNumRows(DBCFileName type);    
 
 protected:
@@ -135,6 +147,7 @@ protected:
     void _Load_AreaPOI();
     void _Load_AreaTrigger();
     void _Load_AuctionHouse();
+    void _Load_BankBagSlotPrices();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -144,6 +157,7 @@ private:
     AreaPOIDBCMap _areaPOIMap;
     AreaTriggerDBCMap _areaTriggerMap;
     AuctionHouseDBCMap _auctionHouseMap;
+    BankBagSlotPricesDBCMap _bankBagSlotPricesMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

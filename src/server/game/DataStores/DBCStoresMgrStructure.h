@@ -249,3 +249,9 @@ struct AuctionHouseDBC
     //char const* Name[16];                                 // 4-19
     //uint32 Name_lang_mask;                                // 20
 };
+
+struct BankBagSlotPricesDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Cost;                                            // 1
+};
