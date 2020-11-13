@@ -5149,7 +5149,7 @@ void Player::RepopAtGraveyard()
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
 }
 
-bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableDBC const* zone) const
+bool Player::CanJoinConstantChannelInZone(ChatChannelsDBC const* channel, AreaTableDBC const* zone) const
 {
     if (sWorld->getBoolConfig(CONFIG_ALLOWED_LFG_CHANNEL) && channel->Flags & CHANNEL_DBC_FLAG_LFG)
         return true;
@@ -5205,60 +5205,60 @@ void Player::UpdateLocalChannels(uint32 newZone)
     if (!cMgr)
         return;
 
-    for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
+    ChatChannelsDBCMap const& charChannelMap = sDBCStoresMgr->GetChatChannelsDBCMap();
+    for (ChatChannelsDBCMap::const_iterator itr = charChannelMap.begin(); itr != charChannelMap.end(); ++itr)
     {
-        ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(i);
-        if (!channelEntry)
-            continue;
-
-        Channel* usedChannel = nullptr;
-        for (Channel* channel : m_channels)
+        if (ChatChannelsDBC const* channelEntry = &itr->second)
         {
-            if (channel->GetChannelId() == i)
+            Channel* usedChannel = nullptr;
+            for (Channel* channel : m_channels)
             {
-                usedChannel = channel;
-                break;
-            }
-        }
-
-        Channel* removeChannel = nullptr;
-        Channel* joinChannel = nullptr;
-        bool sendRemove = true;
-
-        if (CanJoinConstantChannelInZone(channelEntry, current_zone))
-        {
-            if (!(channelEntry->Flags & CHANNEL_DBC_FLAG_GLOBAL))
-            {
-                if (channelEntry->Flags & CHANNEL_DBC_FLAG_CITY_ONLY && usedChannel)
-                    continue;                            // Already on the channel, as city channel names are not changing
-
-                joinChannel = cMgr->GetSystemChannel(channelEntry->ID, current_zone);
-                if (usedChannel)
+                if (channel->GetChannelId() == channelEntry->ID)
                 {
-                    if (joinChannel != usedChannel)
-                    {
-                        removeChannel = usedChannel;
-                        sendRemove = false;              // Do not send leave channel, it already replaced at client
-                    }
-                    else
-                        joinChannel = nullptr;
+                    usedChannel = channel;
+                    break;
                 }
             }
+
+            Channel* removeChannel = nullptr;
+            Channel* joinChannel = nullptr;
+            bool sendRemove = true;
+
+            if (CanJoinConstantChannelInZone(channelEntry, current_zone))
+            {
+                if (!(channelEntry->Flags & CHANNEL_DBC_FLAG_GLOBAL))
+                {
+                    if (channelEntry->Flags & CHANNEL_DBC_FLAG_CITY_ONLY && usedChannel)
+                        continue;                            // Already on the channel, as city channel names are not changing
+
+                    joinChannel = cMgr->GetSystemChannel(channelEntry->ID, current_zone);
+                    if (usedChannel)
+                    {
+                        if (joinChannel != usedChannel)
+                        {
+                            removeChannel = usedChannel;
+                            sendRemove = false;              // Do not send leave channel, it already replaced at client
+                        }
+                        else
+                            joinChannel = nullptr;
+                    }
+                }
+                else
+                    joinChannel = cMgr->GetSystemChannel(channelEntry->ID);
+            }
             else
-                joinChannel = cMgr->GetSystemChannel(channelEntry->ID);
-        }
-        else
-            removeChannel = usedChannel;
+                removeChannel = usedChannel;
 
-        if (joinChannel)
-            joinChannel->JoinChannel(this);          // Changed Channel: ... or Joined Channel: ...
+            if (joinChannel)
+                joinChannel->JoinChannel(this);          // Changed Channel: ... or Joined Channel: ...
 
-        if (removeChannel)
-        {
-            removeChannel->LeaveChannel(this, sendRemove);                                      // Leave old channel
+            if (removeChannel)
+            {
+                removeChannel->LeaveChannel(this, sendRemove);                                      // Leave old channel
 
-            LeftChannel(removeChannel);                                                         // Remove from player's channel list
-            cMgr->LeftChannel(removeChannel->GetChannelId(), removeChannel->GetZoneEntry());    // Delete if empty
+                LeftChannel(removeChannel);                                                         // Remove from player's channel list
+                cMgr->LeftChannel(removeChannel->GetChannelId(), removeChannel->GetZoneEntry());    // Delete if empty
+            }
         }
     }
 }
@@ -9549,15 +9549,18 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
 
 void Player::SendBGWeekendWorldStates() const
 {
-    for (uint32 i = 1; i < sDBCStoresMgr->GetNumRows(BattlemasterList_ENUM); ++i)
+    BattlemasterListDBCMap const& blMap = sDBCStoresMgr->GetBattlemasterListDBCMap();
+    for (BattlemasterListDBCMap::const_iterator itr = blMap.begin(); itr != blMap.end(); ++itr)
     {
-        BattlemasterListDBC const* bl = sDBCStoresMgr->GetBattlemasterListDBC(i);
-        if (bl && bl->HolidayWorldState)
+        if (BattlemasterListDBC const* bl = &itr->second)
         {
-            if (BattlegroundMgr::IsBGWeekend((BattlegroundTypeId)bl->ID))
-                SendUpdateWorldState(bl->HolidayWorldState, 1);
-            else
-                SendUpdateWorldState(bl->HolidayWorldState, 0);
+            if (bl && bl->HolidayWorldState)
+            {
+                if (BattlegroundMgr::IsBGWeekend((BattlegroundTypeId)bl->ID))
+                    SendUpdateWorldState(bl->HolidayWorldState, 1);
+                else
+                    SendUpdateWorldState(bl->HolidayWorldState, 0);
+            }
         }
     }
 }
@@ -9565,12 +9568,12 @@ void Player::SendBGWeekendWorldStates() const
 void Player::SendBattlefieldWorldStates() const
 {
     /// Send misc stuff that needs to be sent on every login, like the battle timers.
-        if (Battlefield* wg = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
-        {
-            SendUpdateWorldState(WS_BATTLEFIELD_WG_ACTIVE, wg->IsWarTime() ? 0 : 1);
-            uint32 timer = wg->IsWarTime() ? 0 : (wg->GetTimer() / 1000); // 0 - Time to next battle
-            SendUpdateWorldState(WS_BATTLEFIELD_WG_TIME_NEXT_BATTLE, uint32(GameTime::GetGameTime() + timer));
-        }
+    if (Battlefield* wg = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
+    {
+        SendUpdateWorldState(WS_BATTLEFIELD_WG_ACTIVE, wg->IsWarTime() ? 0 : 1);
+        uint32 timer = wg->IsWarTime() ? 0 : (wg->GetTimer() / 1000); // 0 - Time to next battle
+        SendUpdateWorldState(WS_BATTLEFIELD_WG_TIME_NEXT_BATTLE, uint32(GameTime::GetGameTime() + timer));
+    }
 }
 
 uint32 Player::GetXPRestBonus(uint32 xp)

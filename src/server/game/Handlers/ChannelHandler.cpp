@@ -110,7 +110,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     AreaTableDBC const* zone = sDBCStoresMgr->GetAreaTableDBC(GetPlayer()->GetZoneId());
     if (channelId)
     {
-        ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(channelId);
+        ChatChannelsDBC const* channel = sDBCStoresMgr->GetChatChannelsDBC(channelId);
         if (!channel)
         {
             recvPacket.rfinish();
@@ -195,7 +195,7 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     if (channelId)
     {
         TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler AreaTableEntry");
-        ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(channelId);
+        ChatChannelsDBC const* channel = sDBCStoresMgr->GetChatChannelsDBC(channelId);
         if (!channel)
         {
             TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL handler 3 return");

@@ -226,9 +226,12 @@ public:
 
         uint64 titles2 = titles;
 
-        for (uint32 i = 1; i < sDBCStoresMgr->GetNumRows(CharTitlesMap_ENUM); ++i)
-            if (CharTitlesDBC const* tEntry = sDBCStoresMgr->GetCharTitlesDBC(i))
+        CharTitlesDBCMap const& CharTitlesMap = sDBCStoresMgr->GetCharTitlesDBCMap();
+        for (CharTitlesDBCMap::const_iterator itr = CharTitlesMap.begin(); itr != CharTitlesMap.end(); ++itr)
+        {
+            if (CharTitlesDBC const* tEntry = &itr->second)
                 titles2 &= ~(uint64(1) << tEntry->MaskID);
+        }              
 
         titles &= ~titles2;                                     // remove non-existing titles
 

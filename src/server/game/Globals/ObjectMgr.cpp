@@ -3387,21 +3387,21 @@ void ObjectMgr::LoadItemTemplates()
 
     // Check if item templates for DBC referenced character start outfit are present
     std::set<uint32> notFoundOutfit;
-    for (uint32 i = 1; i < sDBCStoresMgr->GetNumRows(CharStartOutfit_ENUM); ++i)
+    CharStartOutfitDBCMap const& entryMap = sDBCStoresMgr->GetCharStartOutfitDBCMap();
+    for (CharStartOutfitDBCMap::const_iterator itr = entryMap.begin(); itr != entryMap.end(); ++itr)
     {
-        CharStartOutfitDBC const* entry = sDBCStoresMgr->GetCharStartOutfitDBC(i);
-        if (!entry)
-            continue;
-
-        for (uint8 j = 0; j < MAX_OUTFIT_ITEMS; ++j)
+        if (CharStartOutfitDBC const* entry = &itr->second)
         {
-            if (entry->ItemID[j] <= 0)
-                continue;
+            for (uint8 j = 0; j < MAX_OUTFIT_ITEMS; ++j)
+            {
+                if (entry->ItemID[j] <= 0)
+                    continue;
 
-            uint32 item_id = entry->ItemID[j];
+                uint32 item_id = entry->ItemID[j];
 
-            if (!GetItemTemplate(item_id))
-                notFoundOutfit.insert(item_id);
+                if (!GetItemTemplate(item_id))
+                    notFoundOutfit.insert(item_id);
+            }
         }
     }
 

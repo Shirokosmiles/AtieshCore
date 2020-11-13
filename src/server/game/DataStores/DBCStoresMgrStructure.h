@@ -370,3 +370,14 @@ struct CharTitlesDBC
     //uint32 Name1_lang_mask;                               // 35
     uint32 MaskID;                                          // 36 used in PLAYER_CHOSEN_TITLE and 1<<index in PLAYER__FIELD_KNOWN_TITLES
 };
+
+struct ChatChannelsDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Flags;                                           // 1
+    //uint32 FactionGroup;                                  // 2
+    std::string Name[TOTAL_LOCALES];                        // 3-18
+    //uint32 Name_lang_mask;                                // 19
+    //std::string Shortcut[TOTAL_LOCALES];                  // 20-35
+    //uint32 Shortcut_lang_mask;                            // 36
+};

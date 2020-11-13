@@ -41,6 +41,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _charSectionMap.clear();
     _charStartOutfitMap.clear();
     _charTitlesMap.clear();
+    _chatChannelsMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -61,88 +62,7 @@ void DBCStoresMgr::Initialize()
     _Load_CharSections();
     _Load_CharStartOutfit();
     _Load_CharTitles();
-}
-
-uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
-{
-    ASSERT(type);
-    uint32 result = 0;
-
-    switch (type)
-    {
-        case Achievement_ENUM:
-        {
-            result =_achievementMap.size();
-            break;
-        }
-        case AchievementCriteria_ENUM:
-        {
-            result = _achievementCriteriaMap.size();
-            break;
-        }
-        case AreaTable_ENUM:
-        {
-            result = _areaTableMap.size();
-            break;
-        }
-        case AreaGroup_ENUM:
-        {
-            result = _areaGroupMap.size();
-            break;
-        }
-        case AreaPOI_ENUM:
-        {
-            result = _areaPOIMap.size();
-            break;
-        }
-        case AreaTrigger_ENUM:
-        {
-            result = _areaTriggerMap.size();
-            break;
-        }
-        case AuctionHouse_ENUM:
-        {
-            result = _auctionHouseMap.size();
-            break;
-        }
-        case BankBagSlotPrices_ENUM:
-        {
-            result = _bankBagSlotPricesMap.size();
-            break;
-        }
-        case BannedAddOns_ENUM:
-        {
-            result = _bannedAddonsMap.size();
-            break;
-        }
-        case BattlemasterList_ENUM:
-        {
-            result = _battlemasterListMap.size();
-            break;
-        }
-        case CharacterFacialHairStyles_ENUM:
-        {
-            result = _characterFacialHairStyleMap.size();
-            break;
-        }
-        case CharSections_ENUM:
-        {
-            result = _charSectionMap.size();
-            break;
-        }
-        case CharStartOutfit_ENUM:
-        {
-            result = _charStartOutfitMap.size();
-            break;
-        }
-        case CharTitlesMap_ENUM:
-        {
-            result = _charTitlesMap.size();
-            break;
-        }
-    }
-
-    return result;
+    _Load_ChatChannels();
 }
 
 // load Achievement.dbc
@@ -729,4 +649,39 @@ void DBCStoresMgr::_Load_CharTitles()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chartitles in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ChatChannels.dbc
+void DBCStoresMgr::_Load_ChatChannels()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _chatChannelsMap.clear();
+    //                                                 0    1    2           3               4               5               6               7               8               9               10              11
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Flags, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_chatchannels");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chatchannels. DB table `dbc_chatchannels` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ChatChannelsDBC cc;
+        cc.ID = fields[1].GetUInt32();
+        cc.Flags = fields[1].GetUInt32();
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            cc.Name[i] = fields[3 + i].GetString();
+
+        _chatChannelsMap[id] = cc;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chatchannels in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

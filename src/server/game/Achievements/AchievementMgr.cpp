@@ -2312,72 +2312,73 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
 {
     uint32 oldMSTime = getMSTime();
 
-    if (sDBCStoresMgr->GetNumRows(AchievementCriteria_ENUM) == 0)
+    if (sDBCStoresMgr->GetAchievementCriteriaDBCSize() == 0)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 achievement criteria.");
         return;
     }
 
     uint32 loaded = 0;
-    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(AchievementCriteria_ENUM); ++entryId)
+
+    AchievementCriteriaDBCMap const& AchievementCriteria = sDBCStoresMgr->GetAchievementCriteriaDBCMap();
+    for (AchievementCriteriaDBCMap::const_iterator itr = AchievementCriteria.begin(); itr != AchievementCriteria.end(); ++itr)
     {
-        AchievementCriteriaDBC const* criteria = sAchievementMgr->GetAchievementCriteria(entryId);
-        if (!criteria)
-            continue;
-
-        ASSERT(criteria->Type < ACHIEVEMENT_CRITERIA_TYPE_TOTAL, "ACHIEVEMENT_CRITERIA_TYPE_TOTAL must be greater than or equal to %u but is currently equal to %u",
-            criteria->Type + 1, ACHIEVEMENT_CRITERIA_TYPE_TOTAL);
-
-        m_AchievementCriteriasByType[criteria->Type].push_back(criteria);
-        m_AchievementCriteriaListByAchievement[criteria->AchievementID].push_back(criteria);
-        if (IsAchievementCriteriaTypeStoredByMiscValue(AchievementCriteriaTypes(criteria->Type)))
+        if (AchievementCriteriaDBC const* criteria = &itr->second)
         {
-            if (criteria->Type != ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA)
-                m_AchievementCriteriasByMiscValue[criteria->Type][criteria->Asset.ID].push_back(criteria);
-            else
-            {
-                WorldMapOverlayEntry const* worldOverlayEntry = sWorldMapOverlayStore.LookupEntry(criteria->Asset.WorldMapOverlayID);
-                if (!worldOverlayEntry)
-                    break;
+            ASSERT(criteria->Type < ACHIEVEMENT_CRITERIA_TYPE_TOTAL, "ACHIEVEMENT_CRITERIA_TYPE_TOTAL must be greater than or equal to %u but is currently equal to %u",
+                criteria->Type + 1, ACHIEVEMENT_CRITERIA_TYPE_TOTAL);
 
-                for (uint8 j = 0; j < MAX_WORLD_MAP_OVERLAY_AREA_IDX; ++j)
+            m_AchievementCriteriasByType[criteria->Type].push_back(criteria);
+            m_AchievementCriteriaListByAchievement[criteria->AchievementID].push_back(criteria);
+            if (IsAchievementCriteriaTypeStoredByMiscValue(AchievementCriteriaTypes(criteria->Type)))
+            {
+                if (criteria->Type != ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA)
+                    m_AchievementCriteriasByMiscValue[criteria->Type][criteria->Asset.ID].push_back(criteria);
+                else
                 {
-                    if (worldOverlayEntry->AreaID[j])
+                    WorldMapOverlayEntry const* worldOverlayEntry = sWorldMapOverlayStore.LookupEntry(criteria->Asset.WorldMapOverlayID);
+                    if (!worldOverlayEntry)
+                        break;
+
+                    for (uint8 j = 0; j < MAX_WORLD_MAP_OVERLAY_AREA_IDX; ++j)
                     {
-                        bool valid = true;
-                        for (uint8 i = 0; i < j; ++i)
-                            if (worldOverlayEntry->AreaID[j] == worldOverlayEntry->AreaID[i])
-                                valid = false;
-                        if (valid)
-                            m_AchievementCriteriasByMiscValue[criteria->Type][worldOverlayEntry->AreaID[j]].push_back(criteria);
+                        if (worldOverlayEntry->AreaID[j])
+                        {
+                            bool valid = true;
+                            for (uint8 i = 0; i < j; ++i)
+                                if (worldOverlayEntry->AreaID[j] == worldOverlayEntry->AreaID[i])
+                                    valid = false;
+                            if (valid)
+                                m_AchievementCriteriasByMiscValue[criteria->Type][worldOverlayEntry->AreaID[j]].push_back(criteria);
+                        }
                     }
                 }
             }
-        }
 
-        for (uint32 i = 0; i < MAX_CRITERIA_REQUIREMENTS; ++i)
-        {
-            if (criteria->AdditionalRequirements[i].Type != ACHIEVEMENT_CRITERIA_CONDITION_NONE)
+            for (uint32 i = 0; i < MAX_CRITERIA_REQUIREMENTS; ++i)
             {
-                ASSERT(criteria->AdditionalRequirements[i].Type < ACHIEVEMENT_CRITERIA_CONDITION_MAX,
-                    "ACHIEVEMENT_CRITERIA_CONDITION_MAX must be greater than or equal to %u but is currently equal to %u",
-                    criteria->AdditionalRequirements[i].Type + 1, ACHIEVEMENT_CRITERIA_CONDITION_MAX);
+                if (criteria->AdditionalRequirements[i].Type != ACHIEVEMENT_CRITERIA_CONDITION_NONE)
+                {
+                    ASSERT(criteria->AdditionalRequirements[i].Type < ACHIEVEMENT_CRITERIA_CONDITION_MAX,
+                        "ACHIEVEMENT_CRITERIA_CONDITION_MAX must be greater than or equal to %u but is currently equal to %u",
+                        criteria->AdditionalRequirements[i].Type + 1, ACHIEVEMENT_CRITERIA_CONDITION_MAX);
 
-                if (i == 0
-                    || criteria->AdditionalRequirements[i].Type != criteria->AdditionalRequirements[i - 1].Type
-                    || criteria->AdditionalRequirements[i].Asset != criteria->AdditionalRequirements[i - 1].Asset)
-                    m_AchievementCriteriasByCondition[criteria->AdditionalRequirements[i].Type][criteria->AdditionalRequirements[i].Asset].push_back(criteria);
+                    if (i == 0
+                        || criteria->AdditionalRequirements[i].Type != criteria->AdditionalRequirements[i - 1].Type
+                        || criteria->AdditionalRequirements[i].Asset != criteria->AdditionalRequirements[i - 1].Asset)
+                        m_AchievementCriteriasByCondition[criteria->AdditionalRequirements[i].Type][criteria->AdditionalRequirements[i].Asset].push_back(criteria);
+                }
             }
-        }
 
-        if (criteria->StartTimer)
-        {
-            ASSERT(criteria->StartEvent < ACHIEVEMENT_TIMED_TYPE_MAX, "ACHIEVEMENT_TIMED_TYPE_MAX must be greater than or equal to %u but is currently equal to %u",
-                criteria->StartEvent + 1, ACHIEVEMENT_TIMED_TYPE_MAX);
-            m_AchievementCriteriasByTimedType[criteria->StartEvent].push_back(criteria);
-        }
+            if (criteria->StartTimer)
+            {
+                ASSERT(criteria->StartEvent < ACHIEVEMENT_TIMED_TYPE_MAX, "ACHIEVEMENT_TIMED_TYPE_MAX must be greater than or equal to %u but is currently equal to %u",
+                    criteria->StartEvent + 1, ACHIEVEMENT_TIMED_TYPE_MAX);
+                m_AchievementCriteriasByTimedType[criteria->StartEvent].push_back(criteria);
+            }
 
-        ++loaded;
+            ++loaded;
+        }
     }
 
     TC_LOG_INFO("server.loading", ">> Loaded %u achievement criteria in %u ms.", loaded, GetMSTimeDiffToNow(oldMSTime));
@@ -2387,7 +2388,7 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
 {
     uint32 oldMSTime = getMSTime();
 
-    if (sDBCStoresMgr->GetNumRows(Achievement_ENUM) == 0)
+    if (sDBCStoresMgr->GetAchievementDBCSize() == 0)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 achievement references.");
         return;
@@ -2395,14 +2396,17 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
 
     uint32 count = 0;
 
-    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(Achievement_ENUM); ++entryId)
+    AchievementDBCMap const& AchievementMap = sDBCStoresMgr->GetAchievementDBCMap();
+    for (AchievementDBCMap::const_iterator itr = AchievementMap.begin(); itr != AchievementMap.end(); ++itr)
     {
-        AchievementDBC const* achievement = sAchievementMgr->GetAchievement(entryId);
-        if (!achievement || !achievement->SharesCriteria)
-            continue;
+        if (AchievementDBC const* achievement = &itr->second)
+        {
+            if (!achievement->SharesCriteria)
+                continue;
 
-        m_AchievementListByReferencedId[achievement->SharesCriteria].push_back(achievement);
-        ++count;
+            m_AchievementListByReferencedId[achievement->SharesCriteria].push_back(achievement);
+            ++count;
+        }
     }
 
     // Once Bitten, Twice Shy (10 player) - Icecrown Citadel
@@ -2471,76 +2475,76 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
     while (result->NextRow());
 
     // post loading checks
-    for (uint32 entryId = 0; entryId < sDBCStoresMgr->GetNumRows(AchievementCriteria_ENUM); ++entryId)
+    AchievementCriteriaDBCMap const& AchievementCriteria = sDBCStoresMgr->GetAchievementCriteriaDBCMap();
+    for (AchievementCriteriaDBCMap::const_iterator itr = AchievementCriteria.begin(); itr != AchievementCriteria.end(); ++itr)
     {
-        AchievementCriteriaDBC const* criteria = sAchievementMgr->GetAchievementCriteria(entryId);
-        if (!criteria)
-            continue;
-
-        switch (criteria->Type)
+        if (AchievementCriteriaDBC const* criteria = &itr->second)
         {
-            case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
-            case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
-            case ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING:
-            case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
-            case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
-            case ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE:
-            case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL:
-            case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM:
-            case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT:
-            case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT:
-            case ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS:
-            case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
-            case ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL:
-            case ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN:
-            case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE:
-            case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-                // achievement requires db data
-                break;
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
+            switch (criteria->Type)
             {
-                AchievementDBC const* achievement = sAchievementMgr->GetAchievement(criteria->AchievementID);
-                if (!achievement)
-                    continue;
-
-                // There are many achievements with these criteria, use hardcoded check at this moment to pick a simple case
-                if (achievement->ID == 1282)
+                case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
+                case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
+                case ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING:
+                case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
+                case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
+                case ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE:
+                case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL:
+                case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM:
+                case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT:
+                case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT:
+                case ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS:
+                case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
+                case ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL:
+                case ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN:
+                case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE:
+                case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
+                    // achievement requires db data
                     break;
+                case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
+                {
+                    AchievementDBC const* achievement = sAchievementMgr->GetAchievement(criteria->AchievementID);
+                    if (!achievement)
+                        continue;
 
-                continue;
+                    // There are many achievements with these criteria, use hardcoded check at this moment to pick a simple case
+                    if (achievement->ID == 1282)
+                        break;
+
+                    continue;
+                }
+                case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA: // need skip generic cases
+                    if (criteria->AdditionalRequirements[0].Type != ACHIEVEMENT_CRITERIA_CONDITION_NO_LOSE)
+                        continue;
+                    break;
+                case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:        // need skip generic cases
+                    if (criteria->Quantity == 0)
+                        continue;
+                    break;
+                case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:        // skip statistics
+                    if (criteria->Quantity == 0)
+                        continue;
+                    break;
+                case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:       // need skip generic cases
+                    if (criteria->Quantity != 1)
+                        continue;
+                    break;
+                case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST:
+                case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:        // only Children's Week achievements
+                {
+                    AchievementDBC const* achievement = sAchievementMgr->GetAchievement(criteria->AchievementID);
+                    if (!achievement)
+                        continue;
+                    if (achievement->Category != CATEGORY_CHILDRENS_WEEK && achievement->ID != 1785)
+                        continue;
+                    break;
+                }
+                default:                                        // type not use DB data, ignore
+                    continue;
             }
-            case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA: // need skip generic cases
-                if (criteria->AdditionalRequirements[0].Type != ACHIEVEMENT_CRITERIA_CONDITION_NO_LOSE)
-                    continue;
-                break;
-            case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:        // need skip generic cases
-                if (criteria->Quantity == 0)
-                    continue;
-                break;
-            case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:        // skip statistics
-                if (criteria->Quantity == 0)
-                    continue;
-                break;
-            case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:       // need skip generic cases
-                if (criteria->Quantity != 1)
-                    continue;
-                break;
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST:
-            case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:        // only Children's Week achievements
-            {
-                AchievementDBC const* achievement = sAchievementMgr->GetAchievement(criteria->AchievementID);
-                if (!achievement)
-                    continue;
-                if (achievement->Category != CATEGORY_CHILDRENS_WEEK && achievement->ID != 1785)
-                    continue;
-                break;
-            }
-            default:                                        // type not use DB data, ignore
-                continue;
+
+            if (!GetCriteriaDataSet(criteria) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_ACHIEVEMENT_CRITERIA, criteria->ID, nullptr))
+                TC_LOG_ERROR("sql.sql", "Table `achievement_criteria_data` does not contain expected data for criteria (Entry: %u Type: %u) for achievement %u.", criteria->ID, criteria->Type, criteria->AchievementID);
         }
-
-        if (!GetCriteriaDataSet(criteria) && !DisableMgr::IsDisabledFor(DISABLE_TYPE_ACHIEVEMENT_CRITERIA, entryId, nullptr))
-            TC_LOG_ERROR("sql.sql", "Table `achievement_criteria_data` does not contain expected data for criteria (Entry: %u Type: %u) for achievement %u.", criteria->ID, criteria->Type, criteria->AchievementID);
     }
 
     TC_LOG_INFO("server.loading", ">> Loaded %u additional achievement criteria data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -2553,10 +2557,15 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     // Populate _allCompletedAchievements with all realm first achievement ids to make multithreaded access safer
     // while it will not prevent races, it will prevent crashes that happen because std::unordered_map key was added
     // instead the only potential race will happen on value associated with the key
-    for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(Achievement_ENUM); ++i)
-        if (AchievementDBC const* achievement = sDBCStoresMgr->GetAchievementDBC(i))
+    AchievementDBCMap const& AchievementMap = sDBCStoresMgr->GetAchievementDBCMap();
+    for (AchievementDBCMap::const_iterator itr = AchievementMap.begin(); itr != AchievementMap.end(); ++itr)
+    {
+        if (AchievementDBC const* achievement = &itr->second)
+        {
             if (achievement->Flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
                 _allCompletedAchievements[achievement->ID] = SystemTimePoint::min();
+        }
+    }
 
     QueryResult result = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
 

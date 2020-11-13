@@ -98,7 +98,7 @@ TC_GAME_API EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint
 //TC_GAME_API extern DBCStorage <BannedAddOnsEntry>            sBannedAddOnsStore;
 //TC_GAME_API extern DBCStorage <BarberShopStyleEntry>         sBarberShopStyleStore;
 //TC_GAME_API extern DBCStorage <BattlemasterListEntry>        sBattlemasterListStore;
-TC_GAME_API extern DBCStorage <ChatChannelsEntry>            sChatChannelsStore;
+//TC_GAME_API extern DBCStorage <ChatChannelsEntry>            sChatChannelsStore;
 //TC_GAME_API extern DBCStorage <CharacterFacialHairStylesEntry> sCharacterFacialHairStylesStore;
 //TC_GAME_API extern DBCStorage <CharSectionsEntry>            sCharSectionsStore;
 //TC_GAME_API extern DBCStorage <CharStartOutfitEntry>         sCharStartOutfitStore;

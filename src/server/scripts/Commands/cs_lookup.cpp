@@ -106,10 +106,10 @@ public:
         wstrToLower(wNamePart);
 
         // Search in AreaTable.dbc
-        for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(AreaTable_ENUM); ++i)
+        AreaTableDBCMap const& areatableMap = sDBCStoresMgr->GetAreaTableDBCMap();
+        for (AreaTableDBCMap::const_iterator itr = areatableMap.begin(); itr != areatableMap.end(); ++itr)
         {
-            AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(i);
-            if (areaEntry)
+            if (AreaTableDBC const* areaEntry = &itr->second)
             {
                 uint8 locale = handler->GetSessionDbcLocale();
                 std::string name = areaEntry->AreaName[locale];
@@ -144,7 +144,7 @@ public:
                     // send area in "id - [name]" format
                     std::ostringstream ss;
                     if (handler->GetSession())
-                        ss << areaEntry->ID << " - |cffffffff|Harea:" << areaEntry->ID << "|h[" << name << ' ' << localeNames[locale]<< "]|h|r";
+                        ss << areaEntry->ID << " - |cffffffff|Harea:" << areaEntry->ID << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
                     else
                         ss << areaEntry->ID << " - " << name << ' ' << localeNames[locale];
 
@@ -1246,14 +1246,18 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in CharTitles.dbc
-        for (uint32 id = 0; id < sDBCStoresMgr->GetNumRows(CharTitlesMap_ENUM); id++)
+        CharTitlesDBCMap const& CharTitlesMap = sDBCStoresMgr->GetCharTitlesDBCMap();
+        for (CharTitlesDBCMap::const_iterator itr = CharTitlesMap.begin(); itr != CharTitlesMap.end(); ++itr)
         {
-            CharTitlesDBC const* titleInfo = sDBCStoresMgr->GetCharTitlesDBC(id);
-            if (titleInfo)
+            if (CharTitlesDBC const* titleInfo = &itr->second)
             {
-                /// @todo: implement female support
                 uint8 locale = handler->GetSessionDbcLocale();
-                std::string name = titleInfo->Name[locale];
+                std::string name = "";
+                if (target)
+                    name = target->GetGender() > 0 ? titleInfo->Name1[locale] : titleInfo->Name[locale];
+                else
+                    name = titleInfo->Name[locale];
+
                 if (name.empty())
                     continue;
 
@@ -1293,14 +1297,15 @@ public:
 
                     // send title in "id (idx:idx) - [namedlink locale]" format
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_TITLE_LIST_CHAT, id, titleInfo->MaskID, id, titleNameStr, localeNames[locale], knownStr, activeStr);
+                        handler->PSendSysMessage(LANG_TITLE_LIST_CHAT, titleInfo->ID, titleInfo->MaskID, titleInfo->ID, titleNameStr, localeNames[locale], knownStr, activeStr);
                     else
-                        handler->PSendSysMessage(LANG_TITLE_LIST_CONSOLE, id, titleInfo->MaskID, titleNameStr, localeNames[locale], knownStr, activeStr);
+                        handler->PSendSysMessage(LANG_TITLE_LIST_CONSOLE, titleInfo->ID, titleInfo->MaskID, titleNameStr, localeNames[locale], knownStr, activeStr);
 
                     ++counter;
                 }
             }
         }
+
         if (counter == 0)  // if counter == 0 then we found nth
             handler->SendSysMessage(LANG_COMMAND_NOTITLEFOUND);
 

@@ -48,7 +48,7 @@ Channel::Channel(uint32 channelId, uint32 team /*= 0*/, AreaTableDBC const* zone
     _channelPassword(),
     _zoneEntry(zoneEntry)
 {
-    ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId);
+    ChatChannelsDBC const* channelEntry = sDBCStoresMgr->GetChatChannelsDBC(channelId);
     if (channelEntry->Flags & CHANNEL_DBC_FLAG_TRADE)              // for trade channel
         _channelFlags |= CHANNEL_FLAG_TRADE;
 
@@ -90,7 +90,7 @@ void Channel::GetChannelName(std::string& channelName, uint32 channelId, LocaleC
 {
     if (channelId)
     {
-        ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
+        ChatChannelsDBC const* channelEntry = sDBCStoresMgr->GetChatChannelsDBC(channelId);
         if (!channelEntry)
             return;
         if (!(channelEntry->Flags & CHANNEL_DBC_FLAG_GLOBAL))

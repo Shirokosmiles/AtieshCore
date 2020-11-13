@@ -59,7 +59,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <CharStartOutfitEntry> sCharStartOutfitStore(CharStartOutfitEntryfmt);
 //std::map<uint32, CharStartOutfitEntry const*> sCharStartOutfitMap;
 //DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
-DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
+//DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
 DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
 DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
 DBCStorage <CinematicCameraEntry> sCinematicCameraStore(CinematicCameraEntryfmt);
@@ -294,7 +294,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sCharSectionsStore,                  "CharSections.dbc");
     //LOAD_DBC(sCharStartOutfitStore,               "CharStartOutfit.dbc");
     //LOAD_DBC(sCharTitlesStore,                    "CharTitles.dbc");
-    LOAD_DBC(sChatChannelsStore,                  "ChatChannels.dbc");
+    //LOAD_DBC(sChatChannelsStore,                  "ChatChannels.dbc");
     LOAD_DBC(sChrClassesStore,                    "ChrClasses.dbc");
     LOAD_DBC(sChrRacesStore,                      "ChrRaces.dbc");
     LOAD_DBC(sCinematicCameraStore,               "CinematicCamera.dbc");

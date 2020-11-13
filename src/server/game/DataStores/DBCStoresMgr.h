@@ -37,24 +37,7 @@ typedef std::unordered_map<uint32 /*guid*/, CharacterFacialHairStylesDBC> Charac
 typedef std::unordered_map<uint32 /*guid*/, CharSectionsDBC> CharSectionsDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, CharStartOutfitDBC> CharStartOutfitDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, CharTitlesDBC> CharTitlesDBCMap;
-
-enum DBCFileName : uint8
-{
-    Achievement_ENUM         = 1,
-    AchievementCriteria_ENUM,
-    AreaTable_ENUM,
-    AreaGroup_ENUM,
-    AreaPOI_ENUM,
-    AreaTrigger_ENUM,
-    AuctionHouse_ENUM,
-    BankBagSlotPrices_ENUM,
-    BannedAddOns_ENUM,
-    BattlemasterList_ENUM,
-    CharacterFacialHairStyles_ENUM,
-    CharSections_ENUM,
-    CharStartOutfit_ENUM,
-    CharTitlesMap_ENUM,
-};
+typedef std::unordered_map<uint32 /*guid*/, ChatChannelsDBC> ChatChannelsDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -67,6 +50,8 @@ public:
 
     void Initialize();
 
+    AchievementDBCMap const& GetAchievementDBCMap() const { return _achievementMap; }
+    uint32 GetAchievementDBCSize() { return _achievementMap.size(); }
     AchievementDBC const* GetAchievementDBC(uint32 id) const
     {
         for (AchievementDBCMap::const_iterator itr = _achievementMap.begin(); itr != _achievementMap.end(); ++itr)
@@ -77,6 +62,8 @@ public:
         return nullptr;
     }
 
+    AchievementCriteriaDBCMap const& GetAchievementCriteriaDBCMap() const { return _achievementCriteriaMap; }
+    uint32 GetAchievementCriteriaDBCSize() { return _achievementCriteriaMap.size(); }
     AchievementCriteriaDBC const* GetAchievementCriteriaDBC(uint32 id) const
     {
         for (AchievementCriteriaDBCMap::const_iterator itr = _achievementCriteriaMap.begin(); itr != _achievementCriteriaMap.end(); ++itr)
@@ -148,6 +135,7 @@ public:
         return nullptr;
     }
 
+    uint32 GetBannedAddOnsSize() { return _bannedAddonsMap.size(); }
     BannedAddOnsDBC const* GetBannedAddOnsDBC(uint32 id) const
     {
         for (BannedAddOnsDBCMap::const_iterator itr = _bannedAddonsMap.begin(); itr != _bannedAddonsMap.end(); ++itr)
@@ -168,6 +156,7 @@ public:
         return nullptr;
     }
 
+    BattlemasterListDBCMap const& GetBattlemasterListDBCMap() const { return _battlemasterListMap; }
     BattlemasterListDBC const* GetBattlemasterListDBC(uint32 id) const
     {
         for (BattlemasterListDBCMap::const_iterator itr = _battlemasterListMap.begin(); itr != _battlemasterListMap.end(); ++itr)
@@ -204,6 +193,7 @@ public:
         return nullptr;
     }
 
+    CharStartOutfitDBCMap const& GetCharStartOutfitDBCMap() const { return _charStartOutfitMap; }
     CharStartOutfitDBC const* GetCharStartOutfitDBC(uint32 id)
     {
         for (CharStartOutfitDBCMap::const_iterator itr = _charStartOutfitMap.begin(); itr != _charStartOutfitMap.end(); ++itr)
@@ -226,6 +216,7 @@ public:
         return nullptr;
     }
 
+    CharTitlesDBCMap const& GetCharTitlesDBCMap() const { return _charTitlesMap; }
     CharTitlesDBC const* GetCharTitlesDBC(uint32 id)
     {
         for (CharTitlesDBCMap::const_iterator itr = _charTitlesMap.begin(); itr != _charTitlesMap.end(); ++itr)
@@ -236,7 +227,16 @@ public:
         return nullptr;
     }
 
-    uint32 GetNumRows(DBCFileName type);    
+    ChatChannelsDBCMap const& GetChatChannelsDBCMap() const { return _chatChannelsMap; }
+    ChatChannelsDBC const* GetChatChannelsDBC(uint32 id)
+    {
+        for (ChatChannelsDBCMap::const_iterator itr = _chatChannelsMap.begin(); itr != _chatChannelsMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
 
 protected:
     void _Load_Achievement();
@@ -254,6 +254,7 @@ protected:
     void _Load_CharSections();
     void _Load_CharStartOutfit();
     void _Load_CharTitles();
+    void _Load_ChatChannels();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -271,6 +272,7 @@ private:
     CharSectionsDBCMap _charSectionMap;
     CharStartOutfitDBCMap _charStartOutfitMap;
     CharTitlesDBCMap _charTitlesMap;
+    ChatChannelsDBCMap _chatChannelsMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

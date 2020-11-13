@@ -253,29 +253,31 @@ public:
         char const* knownStr = handler->GetTrinityString(LANG_KNOWN);
 
         // Search in CharTitles.dbc
-        for (uint32 id = 0; id < sDBCStoresMgr->GetNumRows(CharTitlesMap_ENUM); id++)
+        CharTitlesDBCMap const& CharTitlesMap = sDBCStoresMgr->GetCharTitlesDBCMap();
+        for (CharTitlesDBCMap::const_iterator itr = CharTitlesMap.begin(); itr != CharTitlesMap.end(); ++itr)
         {
-            CharTitlesDBC const* titleInfo = sDBCStoresMgr->GetCharTitlesDBC(id);
-
-            if (titleInfo && target->HasTitle(titleInfo))
+            if (CharTitlesDBC const* titleInfo = &itr->second)
             {
-                char const* name = target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[loc].c_str() : titleInfo->Name1[loc].c_str();
-                if (!*name)
-                    name = (target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[sWorld->GetDefaultDbcLocale()].c_str() : titleInfo->Name1[sWorld->GetDefaultDbcLocale()].c_str());
-                if (!*name)
-                    continue;
+                if (target->HasTitle(titleInfo))
+                {
+                    char const* name = target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[loc].c_str() : titleInfo->Name1[loc].c_str();
+                    if (!*name)
+                        name = (target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[sWorld->GetDefaultDbcLocale()].c_str() : titleInfo->Name1[sWorld->GetDefaultDbcLocale()].c_str());
+                    if (!*name)
+                        continue;
 
-                char const* activeStr = "";
-                if (target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->MaskID)
-                    activeStr = handler->GetTrinityString(LANG_ACTIVE);
+                    char const* activeStr = "";
+                    if (target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->MaskID)
+                        activeStr = handler->GetTrinityString(LANG_ACTIVE);
 
-                std::string titleName = Trinity::StringFormat(name, player->GetName().c_str());
+                    std::string titleName = Trinity::StringFormat(name, player->GetName().c_str());
 
-                // send title in "id (idx:idx) - [namedlink locale]" format
-                if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_TITLE_LIST_CHAT, id, titleInfo->MaskID, id, titleName.c_str(), localeNames[loc], knownStr, activeStr);
-                else
-                    handler->PSendSysMessage(LANG_TITLE_LIST_CONSOLE, id, titleInfo->MaskID, name, localeNames[loc], knownStr, activeStr);
+                    // send title in "id (idx:idx) - [namedlink locale]" format
+                    if (handler->GetSession())
+                        handler->PSendSysMessage(LANG_TITLE_LIST_CHAT, titleInfo->ID, titleInfo->MaskID, titleInfo->ID, titleName.c_str(), localeNames[loc], knownStr, activeStr);
+                    else
+                        handler->PSendSysMessage(LANG_TITLE_LIST_CONSOLE, titleInfo->ID, titleInfo->MaskID, name, localeNames[loc], knownStr, activeStr);
+                }
             }
         }
 

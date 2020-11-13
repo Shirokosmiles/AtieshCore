@@ -28,17 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct ChatChannelsEntry
-{
-    uint32 ID;                                              // 0
-    uint32 Flags;                                           // 1
-    //uint32 FactionGroup;                                  // 2
-    char const* Name[16];                                   // 3-18
-    //uint32 Name_lang_mask;                                // 19
-    //char const* Shortcut[16];                             // 20-35
-    //uint32 Shortcut_lang_mask;                            // 36
-};
-
 struct ChrClassesEntry
 {
     uint32 ID;                                              // 0

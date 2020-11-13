@@ -63,30 +63,31 @@ public:
     static bool HandleChannelSetOwnership(ChatHandler* handler, std::string channelName, bool grantOwnership)
     {
         uint32 channelId = 0;
-        for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
-        {
-            ChatChannelsEntry const* entry = sChatChannelsStore.LookupEntry(i);
-            if (!entry)
-                continue;
 
-            if (StringContainsStringI(entry->Name[handler->GetSessionDbcLocale()], channelName))
+        ChatChannelsDBCMap const& chnlMap = sDBCStoresMgr->GetChatChannelsDBCMap();
+        for (ChatChannelsDBCMap::const_iterator itr = chnlMap.begin(); itr != chnlMap.end(); ++itr)
+        {
+            if (ChatChannelsDBC const* entry = &itr->second)
             {
-                channelId = i;
-                break;
+                if (StringContainsStringI(entry->Name[handler->GetSessionDbcLocale()], channelName))
+                {
+                    channelId = entry->ID;
+                    break;
+                }
             }
         }
 
         AreaTableDBC const* zoneEntry = nullptr;
-        for (uint32 i = 0; i < sDBCStoresMgr->GetNumRows(AreaTable_ENUM); ++i)
+        AreaTableDBCMap const& areaMap = sDBCStoresMgr->GetAreaTableDBCMap();
+        for (AreaTableDBCMap::const_iterator itr = areaMap.begin(); itr != areaMap.end(); ++itr)
         {
-            AreaTableDBC const* entry = sDBCStoresMgr->GetAreaTableDBC(i);
-            if (!entry)
-                continue;
-
-            if (StringContainsStringI(entry->AreaName[handler->GetSessionDbcLocale()], channelName))
+            if (AreaTableDBC const* entry = &itr->second)
             {
-                zoneEntry = entry;
-                break;
+                if (StringContainsStringI(entry->AreaName[handler->GetSessionDbcLocale()], channelName))
+                {
+                    zoneEntry = entry;
+                    break;
+                }
             }
         }
 

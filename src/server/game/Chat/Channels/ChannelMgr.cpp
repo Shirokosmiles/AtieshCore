@@ -153,7 +153,7 @@ void ChannelMgr::SaveToDB()
 
 Channel* ChannelMgr::GetSystemChannel(uint32 channelId, AreaTableDBC const* zoneEntry)
 {
-    ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
+    ChatChannelsDBC const* channelEntry = sDBCStoresMgr->GetChatChannelsDBC(channelId);
     if (!channelEntry)
         return nullptr;
 
@@ -212,7 +212,7 @@ Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Playe
 
     if (channelId) // builtin
     {
-        ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
+        ChatChannelsDBC const* channelEntry = sDBCStoresMgr->GetChatChannelsDBC(channelId);
         if (!channelEntry)
             return nullptr;
         uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
@@ -256,7 +256,7 @@ Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Playe
 
 void ChannelMgr::LeftChannel(uint32 channelId, AreaTableDBC const* zoneEntry)
 {
-    ChatChannelsEntry const* channelEntry = sChatChannelsStore.LookupEntry(channelId);
+    ChatChannelsDBC const* channelEntry = sDBCStoresMgr->GetChatChannelsDBC(channelId);
     if (!channelEntry)
         return;
     uint32 zoneId = zoneEntry ? zoneEntry->ID : 0;
