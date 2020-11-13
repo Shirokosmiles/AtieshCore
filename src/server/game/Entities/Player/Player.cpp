@@ -6941,7 +6941,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
             //  [29..38] Other title and player name
             //  [39+]    Nothing
             uint32 victim_title = victim->GetUInt32Value(PLAYER_CHOSEN_TITLE);
-                                                        // Get Killer titles, CharTitlesEntry::MaskID
+                                                        // Get Killer titles, CharTitlesDBC::MaskID
             // Ranks:
             //  title[1..14]  -> rank[5..18]
             //  title[15..28] -> rank[5..18]
@@ -15422,7 +15422,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // title reward
     if (quest->GetCharTitleId())
     {
-        if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(quest->GetCharTitleId()))
+        if (CharTitlesDBC const* titleEntry = sDBCStoresMgr->GetCharTitlesDBC(quest->GetCharTitleId()))
             SetTitle(titleEntry);
     }
 
@@ -18701,7 +18701,7 @@ void Player::_LoadQuestStatusRewarded(PreparedQueryResult result)
                 // set rewarded title if any
                 if (quest->GetCharTitleId())
                 {
-                    if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(quest->GetCharTitleId()))
+                    if (CharTitlesDBC const* titleEntry = sDBCStoresMgr->GetCharTitlesDBC(quest->GetCharTitleId()))
                         SetTitle(titleEntry);
                 }
 
@@ -24668,12 +24668,12 @@ bool Player::HasTitle(uint32 bitIndex) const
     return HasFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag);
 }
 
-bool Player::HasTitle(CharTitlesEntry const* title) const
+bool Player::HasTitle(CharTitlesDBC const* title) const
 {
     return HasTitle(title->MaskID);
 }
 
-void Player::SetTitle(CharTitlesEntry const* title, bool lost)
+void Player::SetTitle(CharTitlesDBC const* title, bool lost)
 {
     uint32 fieldIndexOffset = title->MaskID / 32;
     uint32 flag = 1 << (title->MaskID % 32);

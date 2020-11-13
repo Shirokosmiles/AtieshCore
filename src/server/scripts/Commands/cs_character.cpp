@@ -253,15 +253,15 @@ public:
         char const* knownStr = handler->GetTrinityString(LANG_KNOWN);
 
         // Search in CharTitles.dbc
-        for (uint32 id = 0; id < sCharTitlesStore.GetNumRows(); id++)
+        for (uint32 id = 0; id < sDBCStoresMgr->GetNumRows(CharTitlesMap_ENUM); id++)
         {
-            CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
+            CharTitlesDBC const* titleInfo = sDBCStoresMgr->GetCharTitlesDBC(id);
 
             if (titleInfo && target->HasTitle(titleInfo))
             {
-                char const* name = target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[loc] : titleInfo->Name1[loc];
+                char const* name = target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[loc].c_str() : titleInfo->Name1[loc].c_str();
                 if (!*name)
-                    name = (target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[sWorld->GetDefaultDbcLocale()] : titleInfo->Name1[sWorld->GetDefaultDbcLocale()]);
+                    name = (target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[sWorld->GetDefaultDbcLocale()].c_str() : titleInfo->Name1[sWorld->GetDefaultDbcLocale()].c_str());
                 if (!*name)
                     continue;
 

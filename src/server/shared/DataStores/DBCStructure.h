@@ -28,17 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct CharTitlesEntry
-{
-    uint32 ID;                                              // 0, title ids, for example in Quest::GetCharTitleId()
-    //uint32 ConditionID;                                   // 1
-    char const* Name[16];                                   // 2-17 male
-    //uint32 Name_lang_mask;                                // 18
-    char const* Name1[16];                                  // 19-34 female
-    //uint32 Name1_lang_mask;                               // 35
-    uint32 MaskID;                                          // 36 used in PLAYER_CHOSEN_TITLE and 1<<index in PLAYER__FIELD_KNOWN_TITLES
-};
-
 struct ChatChannelsEntry
 {
     uint32 ID;                                              // 0

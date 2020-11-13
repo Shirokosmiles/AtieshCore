@@ -21,6 +21,7 @@
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Item.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
@@ -572,7 +573,7 @@ void Player::RewardTitleForRating(uint16 rating)
     if (!title)
         return;
 
-    if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(title))
+    if (CharTitlesDBC const* titleEntry = sDBCStoresMgr->GetCharTitlesDBC(title))
     {
         if (!HasTitle(titleEntry))
             SetTitle(titleEntry);
@@ -609,7 +610,7 @@ void Player::RewardTitleForKills(uint32 kills)
     if (!title)
         return;
 
-    if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(title))
+    if (CharTitlesDBC const* titleEntry = sDBCStoresMgr->GetCharTitlesDBC(title))
     {
         if (!HasTitle(titleEntry))
             SetTitle(titleEntry);

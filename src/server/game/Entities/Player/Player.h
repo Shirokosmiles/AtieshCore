@@ -40,7 +40,7 @@ struct AreaTableDBC;
 struct AreaTriggerDBC;
 struct BarberShopStyleDBC;
 struct CharacterCustomizeInfo;
-struct CharTitlesEntry;
+struct CharTitlesDBC;
 struct ChatChannelsEntry;
 struct CreatureTemplate;
 struct FactionEntry;
@@ -2273,8 +2273,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void CompletedAchievement(AchievementDBC const* entry);
 
         bool HasTitle(uint32 bitIndex) const;
-        bool HasTitle(CharTitlesEntry const* title) const;
-        void SetTitle(CharTitlesEntry const* title, bool lost = false);
+        bool HasTitle(CharTitlesDBC const* title) const;
+        void SetTitle(CharTitlesDBC const* title, bool lost = false);
 
         //bool isActiveObject() const { return true; }
         bool CanSeeSpellClickOn(Creature const* creature) const;

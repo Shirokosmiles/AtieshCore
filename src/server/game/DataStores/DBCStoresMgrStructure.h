@@ -358,3 +358,15 @@ struct CharStartOutfitDBC
     //int32 DisplayItemID[MAX_OUTFIT_ITEMS];                // 29-52 not required at server side
     //int32 InventoryType[MAX_OUTFIT_ITEMS];                // 53-76 not required at server side
 };
+
+// load CharTitles.dbc
+struct CharTitlesDBC
+{
+    uint32 ID;                                              // 0, title ids, for example in Quest::GetCharTitleId()
+    //uint32 ConditionID;                                   // 1
+    std::string Name[TOTAL_LOCALES];                        // 2-17 male
+    //uint32 Name_lang_mask;                                // 18
+    std::string Name1[TOTAL_LOCALES];                       // 19-34 female
+    //uint32 Name1_lang_mask;                               // 35
+    uint32 MaskID;                                          // 36 used in PLAYER_CHOSEN_TITLE and 1<<index in PLAYER__FIELD_KNOWN_TITLES
+};

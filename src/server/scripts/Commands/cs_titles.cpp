@@ -85,7 +85,7 @@ public:
         if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
 
-        CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
+        CharTitlesDBC const* titleInfo = sDBCStoresMgr->GetCharTitlesDBC(id);
         if (!titleInfo)
         {
             handler->PSendSysMessage(LANG_INVALID_TITLE_ID, id);
@@ -130,7 +130,7 @@ public:
         if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
 
-        CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
+        CharTitlesDBC const* titleInfo = sDBCStoresMgr->GetCharTitlesDBC(id);
         if (!titleInfo)
         {
             handler->PSendSysMessage(LANG_INVALID_TITLE_ID, id);
@@ -141,7 +141,7 @@ public:
         std::string tNameLink = handler->GetNameLink(target);
 
         char titleNameStr[80];
-        snprintf(titleNameStr, 80, target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[handler->GetSessionDbcLocale()] : titleInfo->Name1[handler->GetSessionDbcLocale()], target->GetName().c_str());
+        snprintf(titleNameStr, 80, target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[handler->GetSessionDbcLocale()].c_str() : titleInfo->Name1[handler->GetSessionDbcLocale()].c_str(), target->GetName().c_str());
 
         target->SetTitle(titleInfo);
         handler->PSendSysMessage(LANG_TITLE_ADD_RES, id, titleNameStr, tNameLink.c_str());
@@ -176,7 +176,7 @@ public:
         if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
             return false;
 
-        CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
+        CharTitlesDBC const* titleInfo = sDBCStoresMgr->GetCharTitlesDBC(id);
         if (!titleInfo)
         {
             handler->PSendSysMessage(LANG_INVALID_TITLE_ID, id);
@@ -189,7 +189,7 @@ public:
         std::string tNameLink = handler->GetNameLink(target);
 
         char titleNameStr[80];
-        snprintf(titleNameStr, 80, target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[handler->GetSessionDbcLocale()] : titleInfo->Name1[handler->GetSessionDbcLocale()], target->GetName().c_str());
+        snprintf(titleNameStr, 80, target->GetNativeGender() == GENDER_MALE ? titleInfo->Name[handler->GetSessionDbcLocale()].c_str() : titleInfo->Name1[handler->GetSessionDbcLocale()].c_str(), target->GetName().c_str());
 
         handler->PSendSysMessage(LANG_TITLE_REMOVE_RES, id, titleNameStr, tNameLink.c_str());
 
@@ -226,8 +226,8 @@ public:
 
         uint64 titles2 = titles;
 
-        for (uint32 i = 1; i < sCharTitlesStore.GetNumRows(); ++i)
-            if (CharTitlesEntry const* tEntry = sCharTitlesStore.LookupEntry(i))
+        for (uint32 i = 1; i < sDBCStoresMgr->GetNumRows(CharTitlesMap_ENUM); ++i)
+            if (CharTitlesDBC const* tEntry = sDBCStoresMgr->GetCharTitlesDBC(i))
                 titles2 &= ~(uint64(1) << tEntry->MaskID);
 
         titles &= ~titles2;                                     // remove non-existing titles

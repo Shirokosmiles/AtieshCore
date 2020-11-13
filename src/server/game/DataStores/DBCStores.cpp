@@ -58,7 +58,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //std::unordered_multimap<uint32, CharSectionsEntry const*> sCharSectionMap;
 //DBCStorage <CharStartOutfitEntry> sCharStartOutfitStore(CharStartOutfitEntryfmt);
 //std::map<uint32, CharStartOutfitEntry const*> sCharStartOutfitMap;
-DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
+//DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
 DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
 DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
 DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
@@ -293,7 +293,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sCharacterFacialHairStylesStore,     "CharacterFacialHairStyles.dbc");
     //LOAD_DBC(sCharSectionsStore,                  "CharSections.dbc");
     //LOAD_DBC(sCharStartOutfitStore,               "CharStartOutfit.dbc");
-    LOAD_DBC(sCharTitlesStore,                    "CharTitles.dbc");
+    //LOAD_DBC(sCharTitlesStore,                    "CharTitles.dbc");
     LOAD_DBC(sChatChannelsStore,                  "ChatChannels.dbc");
     LOAD_DBC(sChrClassesStore,                    "ChrClasses.dbc");
     LOAD_DBC(sChrRacesStore,                      "ChrRaces.dbc");
@@ -640,8 +640,8 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     // Check loaded DBC files proper version
-    if (/*!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a*/
-        !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
+    if (/*!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a
+        !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a*/
         !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.5a
         !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a
         !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a

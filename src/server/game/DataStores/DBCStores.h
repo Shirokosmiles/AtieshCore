@@ -102,7 +102,7 @@ TC_GAME_API extern DBCStorage <ChatChannelsEntry>            sChatChannelsStore;
 //TC_GAME_API extern DBCStorage <CharacterFacialHairStylesEntry> sCharacterFacialHairStylesStore;
 //TC_GAME_API extern DBCStorage <CharSectionsEntry>            sCharSectionsStore;
 //TC_GAME_API extern DBCStorage <CharStartOutfitEntry>         sCharStartOutfitStore;
-TC_GAME_API extern DBCStorage <CharTitlesEntry>              sCharTitlesStore;
+//TC_GAME_API extern DBCStorage <CharTitlesEntry>              sCharTitlesStore;
 TC_GAME_API extern DBCStorage <ChrClassesEntry>              sChrClassesStore;
 TC_GAME_API extern DBCStorage <ChrRacesEntry>                sChrRacesStore;
 TC_GAME_API extern DBCStorage <CinematicCameraEntry>         sCinematicCameraStore;

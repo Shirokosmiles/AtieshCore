@@ -36,6 +36,7 @@ typedef std::unordered_map<uint32 /*guid*/, BattlemasterListDBC> BattlemasterLis
 typedef std::unordered_map<uint32 /*guid*/, CharacterFacialHairStylesDBC> CharacterFacialHairStylesDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, CharSectionsDBC> CharSectionsDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, CharStartOutfitDBC> CharStartOutfitDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, CharTitlesDBC> CharTitlesDBCMap;
 
 enum DBCFileName : uint8
 {
@@ -52,6 +53,7 @@ enum DBCFileName : uint8
     CharacterFacialHairStyles_ENUM,
     CharSections_ENUM,
     CharStartOutfit_ENUM,
+    CharTitlesMap_ENUM,
 };
 
 class TC_GAME_API DBCStoresMgr
@@ -224,6 +226,16 @@ public:
         return nullptr;
     }
 
+    CharTitlesDBC const* GetCharTitlesDBC(uint32 id)
+    {
+        for (CharTitlesDBCMap::const_iterator itr = _charTitlesMap.begin(); itr != _charTitlesMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
     uint32 GetNumRows(DBCFileName type);    
 
 protected:
@@ -241,6 +253,7 @@ protected:
     void _Load_CharacterFacialHairStyles();
     void _Load_CharSections();
     void _Load_CharStartOutfit();
+    void _Load_CharTitles();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -257,6 +270,7 @@ private:
     CharacterFacialHairStylesDBCMap _characterFacialHairStyleMap;
     CharSectionsDBCMap _charSectionMap;
     CharStartOutfitDBCMap _charStartOutfitMap;
+    CharTitlesDBCMap _charTitlesMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

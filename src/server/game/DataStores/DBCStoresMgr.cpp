@@ -40,6 +40,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _characterFacialHairStyleMap.clear();
     _charSectionMap.clear();
     _charStartOutfitMap.clear();
+    _charTitlesMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -59,6 +60,7 @@ void DBCStoresMgr::Initialize()
     _Load_CharacterFacialHairStyles();
     _Load_CharSections();
     _Load_CharStartOutfit();
+    _Load_CharTitles();
 }
 
 uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
@@ -131,6 +133,11 @@ uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
         case CharStartOutfit_ENUM:
         {
             result = _charStartOutfitMap.size();
+            break;
+        }
+        case CharTitlesMap_ENUM:
+        {
+            result = _charTitlesMap.size();
             break;
         }
     }
@@ -683,4 +690,43 @@ void DBCStoresMgr::_Load_CharStartOutfit()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_charstartoutfit in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CharTitles.dbc
+void DBCStoresMgr::_Load_CharTitles()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _charTitlesMap.clear();
+    //                                                 0    1       2               3               4               5               6               7               8               9               10              11              12                13                14              15              16              17                  18              19             20
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name1_Lang_enUS, Name1_Lang_koKR, Name1_Lang_frFR, Name1_Lang_deDE, Name1_Lang_zhCN, Name1_Lang_zhTW, Name1_Lang_esES, Name1_Lang_esMX, Name1_Lang_ruRU, Mask_ID FROM dbc_chartitles");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chartitles. DB table `dbc_chartitles` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CharTitlesDBC ct;
+        ct.ID = fields[1].GetUInt32();
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            ct.Name[i] = fields[2 + i].GetString();
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            ct.Name1[i] = fields[11 + i].GetString();
+
+        ct.MaskID = fields[20].GetUInt32();
+
+        _charTitlesMap[id] = ct;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chartitles in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

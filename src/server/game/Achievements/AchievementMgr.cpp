@@ -281,7 +281,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaDBC const* criteria)
             }
             return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE:
-            if (!sCharTitlesStore.LookupEntry(known_title.title_id))
+            if (!sDBCStoresMgr->GetCharTitlesDBC(known_title.title_id))
             {
                 TC_LOG_ERROR("sql.sql", "Table `achievement_criteria_data` (Entry: %u Type: %u) for data type ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE (%u) contains an unknown title_id in value1 (%u), ignore.",
                     criteria->ID, criteria->Type, dataType, known_title.title_id);
@@ -451,7 +451,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Wo
         }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE:
         {
-            if (CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(known_title.title_id))
+            if (CharTitlesDBC const* titleInfo = sDBCStoresMgr->GetCharTitlesDBC(known_title.title_id))
                 return source->HasTitle(titleInfo->MaskID);
             return false;
         }
@@ -621,7 +621,7 @@ void AchievementMgr::LoadFromDB(PreparedQueryResult achievementResult, PreparedQ
             // title achievement rewards are retroactive
             if (AchievementReward const* reward = sAchievementMgr->GetAchievementReward(achievement))
                 if (uint32 titleId = reward->TitleId[Player::TeamForRace(GetPlayer()->GetRace()) == ALLIANCE ? 0 : 1])
-                    if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(titleId))
+                    if (CharTitlesDBC const* titleEntry = sDBCStoresMgr->GetCharTitlesDBC(titleId))
                         GetPlayer()->SetTitle(titleEntry);
 
         } while (achievementResult->NextRow());
@@ -1537,7 +1537,7 @@ void AchievementMgr::CompletedAchievement(AchievementDBC const* achievement)
     //! we explicitly check by ID. Maybe in the future we could move the achievement_reward
     //! condition fields to the condition system.
     if (uint32 titleId = reward->TitleId[achievement->ID == 1793 ? GetPlayer()->GetNativeGender() : (GetPlayer()->GetTeam() == ALLIANCE ? 0 : 1)])
-        if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(titleId))
+        if (CharTitlesDBC const* titleEntry = sDBCStoresMgr->GetCharTitlesDBC(titleId))
             GetPlayer()->SetTitle(titleEntry);
 
     // mail
@@ -2637,7 +2637,7 @@ void AchievementGlobalMgr::LoadRewards()
 
         if (reward.TitleId[0])
         {
-            CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(reward.TitleId[0]);
+            CharTitlesDBC const* titleEntry = sDBCStoresMgr->GetCharTitlesDBC(reward.TitleId[0]);
             if (!titleEntry)
             {
                 TC_LOG_ERROR("sql.sql", "Table `achievement_reward` (Entry: %u) contains an invalid title id (%u) in `title_A`, set to 0", id, reward.TitleId[0]);
@@ -2647,7 +2647,7 @@ void AchievementGlobalMgr::LoadRewards()
 
         if (reward.TitleId[1])
         {
-            CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(reward.TitleId[1]);
+            CharTitlesDBC const* titleEntry = sDBCStoresMgr->GetCharTitlesDBC(reward.TitleId[1]);
             if (!titleEntry)
             {
                 TC_LOG_ERROR("sql.sql", "Table `achievement_reward` (Entry: %u) contains an invalid title id (%u) in `title_H`, set to 0", id, reward.TitleId[1]);
