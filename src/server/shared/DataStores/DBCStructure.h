@@ -28,21 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-
-#define MAX_OUTFIT_ITEMS 24
-
-struct CharStartOutfitEntry
-{
-    //uint32 ID;                                            // 0
-    uint8 RaceID;                                           // 1
-    uint8 ClassID;                                          // 2
-    uint8 SexID;                                            // 3
-    //uint8 OutfitID;                                       // 4
-    int32 ItemID[MAX_OUTFIT_ITEMS];                         // 5-28
-    //int32 DisplayItemID[MAX_OUTFIT_ITEMS];                // 29-52 not required at server side
-    //int32 InventoryType[MAX_OUTFIT_ITEMS];                // 53-76 not required at server side
-};
-
 struct CharTitlesEntry
 {
     uint32 ID;                                              // 0, title ids, for example in Quest::GetCharTitleId()

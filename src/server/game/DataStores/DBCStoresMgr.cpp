@@ -39,6 +39,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _battlemasterListMap.clear();
     _characterFacialHairStyleMap.clear();
     _charSectionMap.clear();
+    _charStartOutfitMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -57,6 +58,7 @@ void DBCStoresMgr::Initialize()
     _Load_BattlemasterList();
     _Load_CharacterFacialHairStyles();
     _Load_CharSections();
+    _Load_CharStartOutfit();
 }
 
 uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
@@ -124,6 +126,11 @@ uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
         case CharSections_ENUM:
         {
             result = _charSectionMap.size();
+            break;
+        }
+        case CharStartOutfit_ENUM:
+        {
+            result = _charStartOutfitMap.size();
             break;
         }
     }
@@ -639,4 +646,41 @@ void DBCStoresMgr::_Load_CharSections()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_charsections in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CharStartOutfit.dbc
+void DBCStoresMgr::_Load_CharStartOutfit()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _charStartOutfitMap.clear();
+    //                                                 0    1     2      3         4      5         6         7         8         9         10        11        12        13        14          15        16          17        18          19         20         21        22          23         24         25        26          27        28
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, RaceID, ClassID, SexID, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, ItemID_11, ItemID_12, ItemID_13, ItemID_14, ItemID_15, ItemID_16, ItemID_17, ItemID_18, ItemID_19, ItemID_20, ItemID_21, ItemID_22, ItemID_23, ItemID_24 FROM dbc_charstartoutfit");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_charstartoutfit. DB table `dbc_charstartoutfit` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CharStartOutfitDBC cso;
+        cso.ID      = fields[1].GetUInt32();
+        cso.RaceID  = fields[2].GetUInt8();
+        cso.ClassID = fields[3].GetUInt8();
+        cso.SexID   = fields[4].GetUInt8();
+
+        for (uint8 i = 0; i < MAX_OUTFIT_ITEMS; i++)
+            cso.ItemID[i] = fields[5 + i].GetInt32();        
+
+        _charStartOutfitMap[id] = cso;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_charstartoutfit in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

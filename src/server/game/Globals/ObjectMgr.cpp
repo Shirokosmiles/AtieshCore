@@ -3387,9 +3387,9 @@ void ObjectMgr::LoadItemTemplates()
 
     // Check if item templates for DBC referenced character start outfit are present
     std::set<uint32> notFoundOutfit;
-    for (uint32 i = 1; i < sCharStartOutfitStore.GetNumRows(); ++i)
+    for (uint32 i = 1; i < sDBCStoresMgr->GetNumRows(CharStartOutfit_ENUM); ++i)
     {
-        CharStartOutfitEntry const* entry = sCharStartOutfitStore.LookupEntry(i);
+        CharStartOutfitDBC const* entry = sDBCStoresMgr->GetCharStartOutfitDBC(i);
         if (!entry)
             continue;
 
@@ -3796,7 +3796,7 @@ void ObjectMgr::PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint3
 
         for (uint32 gender = 0; gender < GENDER_NONE; ++gender)
         {
-            if (CharStartOutfitEntry const* entry = GetCharStartOutfitEntry(race_, class_, gender))
+            if (CharStartOutfitDBC const* entry = sDBCStoresMgr->GetCharStartOutfitDBCWithParam(uint8(race_), uint8(class_), uint8(gender)))
             {
                 bool found = false;
                 for (uint8 x = 0; x < MAX_OUTFIT_ITEMS; ++x)
@@ -3804,7 +3804,8 @@ void ObjectMgr::PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint3
                     if (entry->ItemID[x] > 0 && uint32(entry->ItemID[x]) == itemId)
                     {
                         found = true;
-                        const_cast<CharStartOutfitEntry*>(entry)->ItemID[x] = 0;
+                        TC_LOG_ERROR("sql.sql", "Item %u has founded in dbc, but const_cast!", itemId);
+                        const_cast<CharStartOutfitDBC*>(entry)->ItemID[x] = 0;
                         break;
                     }
                 }

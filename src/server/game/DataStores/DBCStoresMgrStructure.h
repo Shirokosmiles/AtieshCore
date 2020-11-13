@@ -204,9 +204,9 @@ struct AreaTableDBC
     }
 };
 
+// load AreaGroup.dbc
 #define MAX_GROUP_AREA_IDS 6
 
-// load AreaGroup.dbc
 struct AreaGroupDBC
 {
     uint32 ID;                                              // 0
@@ -314,6 +314,7 @@ struct CharacterFacialHairStylesDBC
     //uint32 Geoset[5];                                     // 4-8
 };
 
+// load CharSections.dbc
 enum CharSectionFlags
 {
     SECTION_FLAG_PLAYER       = 0x01,
@@ -329,7 +330,6 @@ enum CharSectionType : uint8
     SECTION_TYPE_UNDERWEAR    = 4
 };
 
-// load CharSections.dbc
 struct CharSectionsDBC
 {
     uint32 ID;                                             // 0
@@ -342,4 +342,19 @@ struct CharSectionsDBC
     uint8 ColorIndex;                                      // 9
 
     inline bool HasFlag(CharSectionFlags flag) const { return (Flags & flag) != 0; }
+};
+
+// load CharStartOutfit.dbc
+#define MAX_OUTFIT_ITEMS 24
+
+struct CharStartOutfitDBC
+{
+    uint32 ID;                                              // 0
+    uint8 RaceID;                                           // 1
+    uint8 ClassID;                                          // 2
+    uint8 SexID;                                            // 3
+    //uint8 OutfitID;                                       // 4
+    int32 ItemID[MAX_OUTFIT_ITEMS];                         // 5-28
+    //int32 DisplayItemID[MAX_OUTFIT_ITEMS];                // 29-52 not required at server side
+    //int32 InventoryType[MAX_OUTFIT_ITEMS];                // 53-76 not required at server side
 };

@@ -35,6 +35,7 @@ typedef std::unordered_map<uint32 /*guid*/, BarberShopStyleDBC> BarberShopStyleD
 typedef std::unordered_map<uint32 /*guid*/, BattlemasterListDBC> BattlemasterListDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, CharacterFacialHairStylesDBC> CharacterFacialHairStylesDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, CharSectionsDBC> CharSectionsDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, CharStartOutfitDBC> CharStartOutfitDBCMap;
 
 enum DBCFileName : uint8
 {
@@ -50,6 +51,7 @@ enum DBCFileName : uint8
     BattlemasterList_ENUM,
     CharacterFacialHairStyles_ENUM,
     CharSections_ENUM,
+    CharStartOutfit_ENUM,
 };
 
 class TC_GAME_API DBCStoresMgr
@@ -200,6 +202,28 @@ public:
         return nullptr;
     }
 
+    CharStartOutfitDBC const* GetCharStartOutfitDBC(uint32 id)
+    {
+        for (CharStartOutfitDBCMap::const_iterator itr = _charStartOutfitMap.begin(); itr != _charStartOutfitMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
+    CharStartOutfitDBC const* GetCharStartOutfitDBCWithParam(uint8 race, uint8 classID, uint8 gender)
+    {
+        for (CharStartOutfitDBCMap::const_iterator itr = _charStartOutfitMap.begin(); itr != _charStartOutfitMap.end(); ++itr)
+        {
+            if (itr->second.RaceID == race &&
+                itr->second.ClassID == classID &&
+                itr->second.SexID == gender)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
     uint32 GetNumRows(DBCFileName type);    
 
 protected:
@@ -216,6 +240,7 @@ protected:
     void _Load_BattlemasterList();
     void _Load_CharacterFacialHairStyles();
     void _Load_CharSections();
+    void _Load_CharStartOutfit();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -231,6 +256,7 @@ private:
     BattlemasterListDBCMap _battlemasterListMap;
     CharacterFacialHairStylesDBCMap _characterFacialHairStyleMap;
     CharSectionsDBCMap _charSectionMap;
+    CharStartOutfitDBCMap _charStartOutfitMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

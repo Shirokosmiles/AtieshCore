@@ -56,8 +56,8 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //std::unordered_map<uint32, CharacterFacialHairStylesEntry const*> sCharFacialHairMap;
 //DBCStorage <CharSectionsEntry> sCharSectionsStore(CharSectionsEntryfmt);
 //std::unordered_multimap<uint32, CharSectionsEntry const*> sCharSectionMap;
-DBCStorage <CharStartOutfitEntry> sCharStartOutfitStore(CharStartOutfitEntryfmt);
-std::map<uint32, CharStartOutfitEntry const*> sCharStartOutfitMap;
+//DBCStorage <CharStartOutfitEntry> sCharStartOutfitStore(CharStartOutfitEntryfmt);
+//std::map<uint32, CharStartOutfitEntry const*> sCharStartOutfitMap;
 DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
 DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
 DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
@@ -292,7 +292,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sBarberShopStyleStore,               "BarberShopStyle.dbc");
     //LOAD_DBC(sCharacterFacialHairStylesStore,     "CharacterFacialHairStyles.dbc");
     //LOAD_DBC(sCharSectionsStore,                  "CharSections.dbc");
-    LOAD_DBC(sCharStartOutfitStore,               "CharStartOutfit.dbc");
+    //LOAD_DBC(sCharStartOutfitStore,               "CharStartOutfit.dbc");
     LOAD_DBC(sCharTitlesStore,                    "CharTitles.dbc");
     LOAD_DBC(sChatChannelsStore,                  "ChatChannels.dbc");
     LOAD_DBC(sChrClassesStore,                    "ChrClasses.dbc");
@@ -404,9 +404,6 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC_EXT(sSpellDifficultyStore, "SpellDifficulty.dbc",  "spelldifficulty_dbc",  CustomSpellDifficultyfmt, CustomSpellDifficultyIndex);
 
 #undef LOAD_DBC_EXT
-
-    for (CharStartOutfitEntry const* outfit : sCharStartOutfitStore)
-        sCharStartOutfitMap[outfit->RaceID | (outfit->ClassID << 8) | (outfit->SexID << 16)] = outfit;
 
     for (EmotesTextSoundEntry const* entry : sEmotesTextSoundStore)
         sEmotesTextSoundMap[EmotesTextSoundKey(entry->EmotesTextID, entry->RaceID, entry->SexID)] = entry;
@@ -866,15 +863,6 @@ uint32 GetLiquidFlags(uint32 liquidType)
         return 1 << liq->SoundBank;
 
     return 0;
-}
-
-CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, uint8 gender)
-{
-    std::map<uint32, CharStartOutfitEntry const*>::const_iterator itr = sCharStartOutfitMap.find(race | (class_ << 8) | (gender << 16));
-    if (itr == sCharStartOutfitMap.end())
-        return nullptr;
-
-    return itr->second;
 }
 
 /// Returns LFGDungeonEntry for a specific map and difficulty. Will return first found entry if multiple dungeons use the same map (such as Scarlet Monastery)
