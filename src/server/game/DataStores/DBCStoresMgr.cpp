@@ -37,6 +37,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _bannedAddonsMap.clear();
     _barberShopStyleMap.clear();
     _battlemasterListMap.clear();
+    _characterFacialHairStyleMap.clear();
+    _charSectionMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -53,6 +55,8 @@ void DBCStoresMgr::Initialize()
     _Load_BannedAddOns();
     _Load_BarberShopStyle();
     _Load_BattlemasterList();
+    _Load_CharacterFacialHairStyles();
+    _Load_CharSections();
 }
 
 uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
@@ -110,6 +114,16 @@ uint32 DBCStoresMgr::GetNumRows(DBCFileName type)
         case BattlemasterList_ENUM:
         {
             result = _battlemasterListMap.size();
+            break;
+        }
+        case CharacterFacialHairStyles_ENUM:
+        {
+            result = _characterFacialHairStyleMap.size();
+            break;
+        }
+        case CharSections_ENUM:
+        {
+            result = _charSectionMap.size();
             break;
         }
     }
@@ -554,4 +568,75 @@ void DBCStoresMgr::_Load_BattlemasterList()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_battlemasterlist in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CharacterFacialHairStyles.dbc
+void DBCStoresMgr::_Load_CharacterFacialHairStyles()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _characterFacialHairStyleMap.clear();
+    //                                                 0    1     2      3         4
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, RaceID, SexID, VariationID FROM dbc_characterfacialhairstyles");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_characterfacialhairstyles. DB table `dbc_characterfacialhairstyles` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CharacterFacialHairStylesDBC cfhs;
+        cfhs.ID          = fields[1].GetUInt32();
+        cfhs.RaceID      = fields[2].GetUInt8();
+        cfhs.SexID       = fields[3].GetUInt8();
+        cfhs.VariationID = fields[4].GetUInt8();
+
+        _characterFacialHairStyleMap[id] = cfhs;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_characterfacialhairstyles in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CharSections.dbc
+void DBCStoresMgr::_Load_CharSections()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _charSectionMap.clear();
+    //                                                 0    1     2      3         4         5          6              7
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, RaceID, SexID, BaseSection, Flags, VariationIndex, ColorIndex FROM dbc_charsections");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_charsections. DB table `dbc_charsections` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CharSectionsDBC cs;
+        cs.ID             = fields[1].GetUInt32();
+        cs.RaceID         = fields[2].GetUInt8();
+        cs.SexID          = fields[3].GetUInt8();
+        cs.BaseSection    = fields[4].GetUInt8();
+        cs.Flags          = fields[5].GetUInt8();
+        cs.VariationIndex = fields[6].GetUInt8();
+        cs.ColorIndex     = fields[7].GetUInt8();
+
+        _charSectionMap[id] = cs;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_charsections in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

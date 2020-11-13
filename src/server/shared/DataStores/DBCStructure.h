@@ -28,42 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct CharacterFacialHairStylesEntry
-{
-    uint32 RaceID;                                          // 0
-    uint32 SexID;                                           // 1
-    uint32 VariationID;                                     // 2
-    //uint32 Geoset[5];                                     // 3-7
-};
-
-enum CharSectionFlags
-{
-    SECTION_FLAG_PLAYER       = 0x01,
-    SECTION_FLAG_DEATH_KNIGHT = 0x04
-};
-
-enum CharSectionType
-{
-    SECTION_TYPE_SKIN         = 0,
-    SECTION_TYPE_FACE         = 1,
-    SECTION_TYPE_FACIAL_HAIR  = 2,
-    SECTION_TYPE_HAIR         = 3,
-    SECTION_TYPE_UNDERWEAR    = 4
-};
-
-struct CharSectionsEntry
-{
-    //uint32 ID;                                            // 0
-    uint32 RaceID;                                          // 1
-    uint32 SexID;                                           // 2
-    uint32 BaseSection;                                     // 3
-    //char const* TextureName[3];                           // 4-6
-    uint32 Flags;                                           // 7
-    uint32 VariationIndex;                                  // 8
-    uint32 ColorIndex;                                      // 9
-
-    inline bool HasFlag(CharSectionFlags flag) const { return (Flags & flag) != 0; }
-};
 
 #define MAX_OUTFIT_ITEMS 24
 

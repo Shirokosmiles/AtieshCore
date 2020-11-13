@@ -52,10 +52,10 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <BannedAddOnsEntry> sBannedAddOnsStore(BannedAddOnsfmt);
 //DBCStorage <BattlemasterListEntry> sBattlemasterListStore(BattlemasterListEntryfmt);
 //DBCStorage <BarberShopStyleEntry> sBarberShopStyleStore(BarberShopStyleEntryfmt);
-DBCStorage <CharacterFacialHairStylesEntry> sCharacterFacialHairStylesStore(CharacterFacialHairStylesfmt);
-std::unordered_map<uint32, CharacterFacialHairStylesEntry const*> sCharFacialHairMap;
-DBCStorage <CharSectionsEntry> sCharSectionsStore(CharSectionsEntryfmt);
-std::unordered_multimap<uint32, CharSectionsEntry const*> sCharSectionMap;
+//DBCStorage <CharacterFacialHairStylesEntry> sCharacterFacialHairStylesStore(CharacterFacialHairStylesfmt);
+//std::unordered_map<uint32, CharacterFacialHairStylesEntry const*> sCharFacialHairMap;
+//DBCStorage <CharSectionsEntry> sCharSectionsStore(CharSectionsEntryfmt);
+//std::unordered_multimap<uint32, CharSectionsEntry const*> sCharSectionMap;
 DBCStorage <CharStartOutfitEntry> sCharStartOutfitStore(CharStartOutfitEntryfmt);
 std::map<uint32, CharStartOutfitEntry const*> sCharStartOutfitMap;
 DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
@@ -290,8 +290,8 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sBannedAddOnsStore,                  "BannedAddOns.dbc");
     //LOAD_DBC(sBattlemasterListStore,              "BattlemasterList.dbc");
     //LOAD_DBC(sBarberShopStyleStore,               "BarberShopStyle.dbc");
-    LOAD_DBC(sCharacterFacialHairStylesStore,     "CharacterFacialHairStyles.dbc");
-    LOAD_DBC(sCharSectionsStore,                  "CharSections.dbc");
+    //LOAD_DBC(sCharacterFacialHairStylesStore,     "CharacterFacialHairStyles.dbc");
+    //LOAD_DBC(sCharSectionsStore,                  "CharSections.dbc");
     LOAD_DBC(sCharStartOutfitStore,               "CharStartOutfit.dbc");
     LOAD_DBC(sCharTitlesStore,                    "CharTitles.dbc");
     LOAD_DBC(sChatChannelsStore,                  "ChatChannels.dbc");
@@ -404,14 +404,6 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC_EXT(sSpellDifficultyStore, "SpellDifficulty.dbc",  "spelldifficulty_dbc",  CustomSpellDifficultyfmt, CustomSpellDifficultyIndex);
 
 #undef LOAD_DBC_EXT
-
-    for (CharacterFacialHairStylesEntry const* entry : sCharacterFacialHairStylesStore)
-        if (entry->RaceID && ((1 << (entry->RaceID - 1)) & RACEMASK_ALL_PLAYABLE) != 0) // ignore nonplayable races
-            sCharFacialHairMap.insert({ entry->RaceID | (entry->SexID << 8) | (entry->VariationID << 16), entry });
-
-    for (CharSectionsEntry const* entry : sCharSectionsStore)
-        if (entry->RaceID && ((1 << (entry->RaceID - 1)) & RACEMASK_ALL_PLAYABLE) != 0) // ignore nonplayable races
-            sCharSectionMap.insert({ entry->BaseSection | (entry->SexID << 8) | (entry->RaceID << 16), entry });
 
     for (CharStartOutfitEntry const* outfit : sCharStartOutfitStore)
         sCharStartOutfitMap[outfit->RaceID | (outfit->ClassID << 8) | (outfit->SexID << 16)] = outfit;
@@ -874,27 +866,6 @@ uint32 GetLiquidFlags(uint32 liquidType)
         return 1 << liq->SoundBank;
 
     return 0;
-}
-
-CharacterFacialHairStylesEntry const* GetCharFacialHairEntry(uint8 race, uint8 gender, uint8 facialHairID)
-{
-    auto itr = sCharFacialHairMap.find(uint32(race) | uint32(gender << 8) | uint32(facialHairID << 16));
-    if (itr == sCharFacialHairMap.end())
-        return nullptr;
-
-    return itr->second;
-}
-
-CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color)
-{
-    uint32 const key = uint32(genType) | uint32(gender << 8) | uint32(race << 16);
-    for (auto const& section : Trinity::Containers::MapEqualRange(sCharSectionMap, key))
-    {
-        if (section.second->VariationIndex == type && section.second->ColorIndex == color)
-            return section.second;
-    }
-
-    return nullptr;
 }
 
 CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, uint8 gender)

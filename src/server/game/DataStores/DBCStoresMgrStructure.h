@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+ // load Achievement.dbc
 struct AchievementDBC
 {
     uint32 ID;                                              // 0
@@ -36,6 +37,7 @@ struct AchievementDBC
     uint32 SharesCriteria;                                  // 61 - referenced achievement (counting of all completed criterias)
 };
 
+// load Achievement_Criteria.dbc
 struct AchievementCriteriaDBC
 {
     uint32 ID;                                              // 0
@@ -160,6 +162,7 @@ struct AchievementCriteriaDBC
     //uint32 UiOrder;                                       // 30
 };
 
+// load AreaTable.dbc
 struct AreaTableDBC
 {
     uint32 ID;                                              // 0
@@ -203,6 +206,7 @@ struct AreaTableDBC
 
 #define MAX_GROUP_AREA_IDS 6
 
+// load AreaGroup.dbc
 struct AreaGroupDBC
 {
     uint32 ID;                                              // 0
@@ -210,6 +214,7 @@ struct AreaGroupDBC
     uint32 NextAreaID;                                      // 7 index of next group
 };
 
+// load AreaPOI.dbc
 struct AreaPOIDBC
 {
     uint32 ID;                                              // 0
@@ -228,6 +233,7 @@ struct AreaPOIDBC
     //uint32 WorldMapLink;                                  // 53
 };
 
+// load AreaTrigger.dbc
 struct AreaTriggerDBC
 {
     uint32 ID;                                              // 0
@@ -240,6 +246,7 @@ struct AreaTriggerDBC
     float BoxYaw;                                           // 9
 };
 
+// load AuctionHouse.dbc
 struct AuctionHouseDBC
 {
     uint32 ID;                                              // 0
@@ -250,12 +257,14 @@ struct AuctionHouseDBC
     //uint32 Name_lang_mask;                                // 20
 };
 
+// load BankBagSlotPrices.dbc
 struct BankBagSlotPricesDBC
 {
     uint32 ID;                                              // 0
     uint32 Cost;                                            // 1
 };
 
+// load BannedAddOns.dbc
 struct BannedAddOnsDBC
 {
     uint32 ID;                                              // 0
@@ -265,6 +274,7 @@ struct BannedAddOnsDBC
     //uint32 Flags;                                         // 10
 };
 
+// load BarberShopStyle.dbc
 struct BarberShopStyleDBC
 {
     uint32 ID;                                              // 0
@@ -279,6 +289,7 @@ struct BarberShopStyleDBC
     uint32 Data;                                            // 39 real ID to hair/facial hair
 };
 
+// load BattlemasterList.dbc
 struct BattlemasterListDBC
 {
     uint32 ID;                                              // 0
@@ -291,4 +302,44 @@ struct BattlemasterListDBC
     uint32 HolidayWorldState;                               // 29
     //uint32 MinLevel;                                      // 30
     //uint32 MaxLevel;                                      // 31
+};
+
+// load CharacterFacialHairStyles.dbc
+struct CharacterFacialHairStylesDBC
+{
+    uint32 ID;                                              // 0
+    uint8 RaceID;                                          // 1
+    uint8 SexID;                                           // 2
+    uint8 VariationID;                                     // 3
+    //uint32 Geoset[5];                                     // 4-8
+};
+
+enum CharSectionFlags
+{
+    SECTION_FLAG_PLAYER       = 0x01,
+    SECTION_FLAG_DEATH_KNIGHT = 0x04
+};
+
+enum CharSectionType : uint8
+{
+    SECTION_TYPE_SKIN         = 0,
+    SECTION_TYPE_FACE         = 1,
+    SECTION_TYPE_FACIAL_HAIR  = 2,
+    SECTION_TYPE_HAIR         = 3,
+    SECTION_TYPE_UNDERWEAR    = 4
+};
+
+// load CharSections.dbc
+struct CharSectionsDBC
+{
+    uint32 ID;                                             // 0
+    uint8 RaceID;                                          // 1
+    uint8 SexID;                                           // 2
+    uint8 BaseSection;                                     // 3
+    //char const* TextureName[3];                          // 4-6
+    uint8 Flags;                                           // 7
+    uint8 VariationIndex;                                  // 8
+    uint8 ColorIndex;                                      // 9
+
+    inline bool HasFlag(CharSectionFlags flag) const { return (Flags & flag) != 0; }
 };

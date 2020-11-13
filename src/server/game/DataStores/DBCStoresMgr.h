@@ -33,6 +33,8 @@ typedef std::unordered_map<uint32 /*guid*/, BankBagSlotPricesDBC> BankBagSlotPri
 typedef std::unordered_map<uint32 /*guid*/, BannedAddOnsDBC> BannedAddOnsDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, BarberShopStyleDBC> BarberShopStyleDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, BattlemasterListDBC> BattlemasterListDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, CharacterFacialHairStylesDBC> CharacterFacialHairStylesDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, CharSectionsDBC> CharSectionsDBCMap;
 
 enum DBCFileName : uint8
 {
@@ -46,6 +48,8 @@ enum DBCFileName : uint8
     BankBagSlotPrices_ENUM,
     BannedAddOns_ENUM,
     BattlemasterList_ENUM,
+    CharacterFacialHairStyles_ENUM,
+    CharSections_ENUM,
 };
 
 class TC_GAME_API DBCStoresMgr
@@ -170,6 +174,32 @@ public:
         return nullptr;
     }
 
+    CharacterFacialHairStylesDBC const* GetCharFacialHairDBC(uint8 race, uint8 gender, uint8 facialHairID)
+    {
+        for (CharacterFacialHairStylesDBCMap::const_iterator itr = _characterFacialHairStyleMap.begin(); itr != _characterFacialHairStyleMap.end(); ++itr)
+        {
+            if (itr->second.RaceID == race &&
+                itr->second.SexID == gender &&
+                itr->second.VariationID == facialHairID)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
+    CharSectionsDBC const* GetCharSectionsDBC(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color)
+    {
+        for (CharSectionsDBCMap::const_iterator itr = _charSectionMap.begin(); itr != _charSectionMap.end(); ++itr)
+        {
+            if (itr->second.RaceID == race &&
+                itr->second.BaseSection == genType &&
+                itr->second.SexID == gender &&                
+                itr->second.VariationIndex == type &&
+                itr->second.ColorIndex == color)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
     uint32 GetNumRows(DBCFileName type);    
 
 protected:
@@ -184,6 +214,8 @@ protected:
     void _Load_BannedAddOns();
     void _Load_BarberShopStyle();
     void _Load_BattlemasterList();
+    void _Load_CharacterFacialHairStyles();
+    void _Load_CharSections();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -197,6 +229,8 @@ private:
     BannedAddOnsDBCMap _bannedAddonsMap;
     BarberShopStyleDBCMap _barberShopStyleMap;
     BattlemasterListDBCMap _battlemasterListMap;
+    CharacterFacialHairStylesDBCMap _characterFacialHairStyleMap;
+    CharSectionsDBCMap _charSectionMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

@@ -24580,6 +24580,8 @@ uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 n
 
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;                               // max level in this dbc
+    else if (level == 1)
+        level++;
 
     uint8 hairstyle = GetHairStyleId();
     uint8 haircolor = GetHairColorId();
@@ -26953,7 +26955,7 @@ void Player::SendSupercededSpell(uint32 oldSpell, uint32 newSpell) const
 
 bool Player::ValidateAppearance(uint8 race, uint8 class_, uint8 gender, uint8 hairID, uint8 hairColor, uint8 faceID, uint8 facialHair, uint8 skinColor, bool create /*=false*/)
 {
-    auto validateCharSection = [class_, create](CharSectionsEntry const* entry) -> bool
+    auto validateCharSection = [class_, create](CharSectionsDBC const* entry) -> bool
     {
         if (!entry)
             return false;
@@ -26970,17 +26972,17 @@ bool Player::ValidateAppearance(uint8 race, uint8 class_, uint8 gender, uint8 ha
     };
 
     // For Skin type is always 0
-    CharSectionsEntry const* skinEntry = GetCharSectionEntry(race, SECTION_TYPE_SKIN, gender, 0, skinColor);
+    CharSectionsDBC const* skinEntry = sDBCStoresMgr->GetCharSectionsDBC(race, SECTION_TYPE_SKIN, gender, 0, skinColor);
     if (!validateCharSection(skinEntry))
         return false;
 
     // Skin Color defined as Face color, too
-    CharSectionsEntry const* faceEntry = GetCharSectionEntry(race, SECTION_TYPE_FACE, gender, faceID, skinColor);
+    CharSectionsDBC const* faceEntry = sDBCStoresMgr->GetCharSectionsDBC(race, SECTION_TYPE_FACE, gender, faceID, skinColor);
     if (!validateCharSection(faceEntry))
         return false;
 
     // Check Hair
-    CharSectionsEntry const* hairEntry = GetCharSectionEntry(race, SECTION_TYPE_HAIR, gender, hairID, hairColor);
+    CharSectionsDBC const* hairEntry = sDBCStoresMgr->GetCharSectionsDBC(race, SECTION_TYPE_HAIR, gender, hairID, hairColor);
     if (!validateCharSection(hairEntry))
         return false;
 
@@ -26988,12 +26990,12 @@ bool Player::ValidateAppearance(uint8 race, uint8 class_, uint8 gender, uint8 ha
     bool const excludeCheck = (race == RACE_TAUREN) || (race == RACE_DRAENEI) || (gender == GENDER_FEMALE && race != RACE_NIGHTELF && race != RACE_UNDEAD_PLAYER);
     if (!excludeCheck)
     {
-        CharSectionsEntry const* facialHairEntry = GetCharSectionEntry(race, SECTION_TYPE_FACIAL_HAIR, gender, facialHair, hairColor);
+        CharSectionsDBC const* facialHairEntry = sDBCStoresMgr->GetCharSectionsDBC(race, SECTION_TYPE_FACIAL_HAIR, gender, facialHair, hairColor);
         if (!validateCharSection(facialHairEntry))
             return false;
     }
 
-    CharacterFacialHairStylesEntry const* entry = GetCharFacialHairEntry(race, gender, facialHair);
+    CharacterFacialHairStylesDBC const* entry = sDBCStoresMgr->GetCharFacialHairDBC(race, gender, facialHair);
     if (!entry)
         return false;
 
