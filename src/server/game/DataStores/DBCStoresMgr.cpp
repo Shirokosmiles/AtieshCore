@@ -43,6 +43,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _charTitlesMap.clear();
     _chatChannelsMap.clear();
     _chrClassesMap.clear();
+    _chrRacesMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -65,6 +66,7 @@ void DBCStoresMgr::Initialize()
     _Load_CharTitles();
     _Load_ChatChannels();
     _Load_ChrClasses();
+    _Load_ChrRaces();
 }
 
 // load Achievement.dbc
@@ -725,4 +727,49 @@ void DBCStoresMgr::_Load_ChrClasses()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chrclasses in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ChrRaces.dbc
+void DBCStoresMgr::_Load_ChrRaces()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _chrRacesMap.clear();
+    //                                                 0    1     2       3            4               5               6               7               8               9                 10           11              12              13              14               15              16              17               18              19              20
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Flags, FactionID, MaleDisplayId, FemaleDisplayId, BaseLanguage, CreatureType, ResSicknessSpellID, CinematicSequenceID, Alliance, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Required_Expansion FROM dbc_chrraces");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrraces. DB table `dbc_chrraces` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ChrRacesDBC cr;
+        cr.ID                  = fields[1].GetUInt32();
+        cr.Flags               = fields[2].GetUInt32();
+        cr.FactionID           = fields[3].GetUInt32();
+        cr.MaleDisplayID       = fields[4].GetUInt32();
+        cr.FemaleDisplayID     = fields[5].GetUInt32();
+        cr.BaseLanguage        = fields[6].GetUInt32();
+        cr.CreatureType        = fields[7].GetUInt32();
+        cr.ResSicknessSpellID  = fields[8].GetUInt32();
+        cr.CinematicSequenceID = fields[9].GetUInt32();
+        cr.Alliance            = fields[10].GetUInt32();
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            cr.Name[i] = fields[11 + i].GetString();
+
+        cr.RequiredExpansion   = fields[20].GetUInt32();
+
+        _chrRacesMap[id] = cr;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chrraces in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

@@ -24,6 +24,7 @@
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameTime.h"
 #include "GitRevision.h"
@@ -313,7 +314,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         return;
     }
 
-    ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(createInfo->Race);
+    ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(createInfo->Race);
     if (!raceEntry)
     {
         TC_LOG_ERROR("network", "Race (%u) not found in DBC while creating new char for account (ID: %u): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
@@ -816,7 +817,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         {
             if (cEntry->CinematicSequenceID)
                 pCurrChar->SendCinematicStart(cEntry->CinematicSequenceID);
-            else if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->GetRace()))
+            else if (ChrRacesDBC const* rEntry = sDBCStoresMgr->GetChrRacesDBC(pCurrChar->GetRace()))
                 pCurrChar->SendCinematicStart(rEntry->CinematicSequenceID);
 
             // send new char string if not empty
@@ -2286,7 +2287,7 @@ void WorldSession::HandleOpeningCinematic(WorldPackets::Misc::OpeningCinematic& 
     {
         if (classEntry->CinematicSequenceID)
             _player->SendCinematicStart(classEntry->CinematicSequenceID);
-        else if (ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(_player->GetRace()))
+        else if (ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(_player->GetRace()))
             _player->SendCinematicStart(raceEntry->CinematicSequenceID);
     }
 }

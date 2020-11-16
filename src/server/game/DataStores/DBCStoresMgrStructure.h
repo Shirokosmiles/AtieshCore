@@ -401,3 +401,47 @@ struct ChrClassesDBC
     uint32 CinematicSequenceID;                             // 58 ID from CinematicSequences.dbc
     uint32 RequiredExpansion;                               // 59
 };
+
+// load ChrRaces.dbc
+enum ChrRacesAllianceType
+{
+    CHRRACES_ALLIANCE_TYPE_ALLIANCE     = 0,
+    CHRRACES_ALLIANCE_TYPE_HORDE        = 1,
+    CHRRACES_ALLIANCE_TYPE_NOT_PLAYABLE = 2,
+};
+
+enum ChrRacesFlags
+{
+    CHRRACES_FLAGS_NOT_PLAYABLE = 0x01,
+    CHRRACES_FLAGS_BARE_FEET    = 0x02,
+    CHRRACES_FLAGS_CAN_MOUNT    = 0x04
+};
+
+struct ChrRacesDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Flags;                                           // 1
+    uint32 FactionID;                                       // 2
+    //uint32 ExplorationSoundID;                            // 3
+    uint32 MaleDisplayID;                                   // 4
+    uint32 FemaleDisplayID;                                 // 5
+    //char const* ClientPrefix;                             // 6
+    uint32 BaseLanguage;                                    // 7 (7-Alliance 1-Horde)
+    uint32 CreatureType;                                    // 8
+    uint32 ResSicknessSpellID;                              // 9
+    //uint32 SplashSoundID;                                 // 10
+    //char const* ClientFileString;                         // 11
+    uint32 CinematicSequenceID;                             // 12 ID from CinematicSequences.dbc
+    uint32 Alliance;                                        // 13
+    std::string Name[TOTAL_LOCALES];                        // 14-29
+    //uint32 Name_lang_mask;                                // 30
+    //char const* NameFemale[16];                           // 31-46
+    //uint32 NameFemale_lang_mask;                          // 47
+    //char const* NameMale[16];                             // 48-63
+    //uint32 NameMale_lang_mask;                            // 64
+    //char const* FacialHairCustomization[2];               // 65-66
+    //char const* HairCustomization;                        // 67
+    uint32 RequiredExpansion;                               // 68
+
+    inline bool HasFlag(ChrRacesFlags flag) const { return (Flags & flag) != 0; }
+};

@@ -61,7 +61,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
 //DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
 //DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
-DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
+//DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
 DBCStorage <CinematicCameraEntry> sCinematicCameraStore(CinematicCameraEntryfmt);
 DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
 DBCStorage <CreatureDisplayInfoEntry> sCreatureDisplayInfoStore(CreatureDisplayInfofmt);
@@ -296,7 +296,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sCharTitlesStore,                    "CharTitles.dbc");
     //LOAD_DBC(sChatChannelsStore,                  "ChatChannels.dbc");
     //LOAD_DBC(sChrClassesStore,                    "ChrClasses.dbc");
-    LOAD_DBC(sChrRacesStore,                      "ChrRaces.dbc");
+    //LOAD_DBC(sChrRacesStore,                      "ChrRaces.dbc");
     LOAD_DBC(sCinematicCameraStore,               "CinematicCamera.dbc");
     LOAD_DBC(sCinematicSequencesStore,            "CinematicSequences.dbc");
     LOAD_DBC(sCreatureDisplayInfoStore,           "CreatureDisplayInfo.dbc");
@@ -699,12 +699,6 @@ WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid
         return i->second;
 
     return nullptr;
-}
-
-char const* GetRaceName(uint8 race, uint8 locale)
-{
-    ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race);
-    return raceEntry ? raceEntry->Name[locale] : nullptr;
 }
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)

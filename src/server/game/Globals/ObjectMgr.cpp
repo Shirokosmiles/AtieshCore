@@ -1727,7 +1727,7 @@ void ObjectMgr::LoadPlayerTotemModels()
             continue;
         }
 
-        ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race);
+        ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(race);
         if (!raceEntry)
         {
             TC_LOG_ERROR("sql.sql", "Race %u defined in `player_totem_model` does not exists, skipped.", uint32(race));
@@ -3853,7 +3853,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(current_race);
+                ChrRacesDBC const* rEntry = sDBCStoresMgr->GetChrRacesDBC(current_race);
                 if (!rEntry)
                 {
                     TC_LOG_ERROR("sql.sql", "Wrong race %u in `playercreateinfo` table, ignoring.", current_race);
@@ -4417,7 +4417,7 @@ void ObjectMgr::LoadPlayerInfo()
         for (uint8 race = 0; race < MAX_RACES; ++race)
         {
             // skip non existed races
-            if (!sChrRacesStore.LookupEntry(race))
+            if (!sDBCStoresMgr->GetChrRacesDBC(race))
                 continue;
 
             for (uint8 class_ = 0; class_ < MAX_CLASSES; ++class_)
@@ -9297,7 +9297,7 @@ void ObjectMgr::LoadTrainers()
                     }
                     break;
                 case Trainer::Type::Mount:
-                    if (requirement && !sChrRacesStore.LookupEntry(requirement))
+                    if (requirement && !sDBCStoresMgr->GetChrRacesDBC(requirement))
                     {
                         TC_LOG_ERROR("sql.sql", "Table `trainer` references non-existing race requirement %u for TrainerId %u, ignoring", requirement, trainerId);
                         continue;

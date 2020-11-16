@@ -9105,7 +9105,7 @@ uint32 Unit::GetCreatureType() const
             return ssEntry->CreatureType;
         else
         {
-            ChrRacesEntry const* raceEntry = sChrRacesStore.AssertEntry(GetRace());
+            ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(GetRace());
             return raceEntry->CreatureType;
         }
     }
@@ -9158,7 +9158,7 @@ bool Unit::IsInDisallowedMountForm() const
         return true;
 
     CreatureModelDataEntry const* model = sCreatureModelDataStore.LookupEntry(display->ModelID);
-    ChrRacesEntry const* race = sChrRacesStore.LookupEntry(displayExtra->DisplayRaceID);
+    ChrRacesDBC const* race = sDBCStoresMgr->GetChrRacesDBC(displayExtra->DisplayRaceID);
 
     if (model && !(model->HasFlag(CREATURE_MODEL_DATA_FLAGS_CAN_MOUNT)))
         if (race && !(race->HasFlag(CHRRACES_FLAGS_CAN_MOUNT)))

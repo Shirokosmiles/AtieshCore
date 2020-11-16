@@ -4733,7 +4733,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     //for each level they are above 10.
     //Characters level 20 and up suffer from ten minutes of sickness.
     int32 startLevel = sWorld->getIntConfig(CONFIG_DEATH_SICKNESS_LEVEL);
-    ChrRacesEntry const* raceEntry = sChrRacesStore.AssertEntry(GetRace());
+    ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(GetRace());
 
     if (int32(GetLevel()) >= startLevel)
     {
@@ -6619,7 +6619,7 @@ void Player::CheckAreaExploreAndOutdoor()
 
 uint32 Player::TeamForRace(uint8 race)
 {
-    if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race))
+    if (ChrRacesDBC const* rEntry = sDBCStoresMgr->GetChrRacesDBC(race))
     {
         switch (rEntry->BaseLanguage)
         {
@@ -6638,7 +6638,7 @@ void Player::SetFactionForRace(uint8 race)
 {
     SetBGTeam(TeamForRace(race));
 
-    ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
+    ChrRacesDBC const* rEntry = sDBCStoresMgr->GetChrRacesDBC(race);
     SetFaction(rEntry ? rEntry->FactionID : GetFaction());
 }
 
@@ -18224,7 +18224,7 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 continue;
             }
 
-            ChrRacesEntry const* raceEntry = sChrRacesStore.AssertEntry(GetRace());
+            ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(GetRace());
 
             // negative effects should continue counting down after logout
             if (remaintime != -1 && ((!spellInfo->IsPositive() && spellInfo->Id != raceEntry->ResSicknessSpellID) || spellInfo->HasAttribute(SPELL_ATTR4_FADES_WHILE_LOGGED_OUT))) // Resurrection sickness should not fade while logged out
