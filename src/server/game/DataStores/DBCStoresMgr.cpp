@@ -42,6 +42,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _charStartOutfitMap.clear();
     _charTitlesMap.clear();
     _chatChannelsMap.clear();
+    _chrClassesMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -63,6 +64,7 @@ void DBCStoresMgr::Initialize()
     _Load_CharStartOutfit();
     _Load_CharTitles();
     _Load_ChatChannels();
+    _Load_ChrClasses();
 }
 
 // load Achievement.dbc
@@ -684,4 +686,43 @@ void DBCStoresMgr::_Load_ChatChannels()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chatchannels in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ChrClasses.dbc
+void DBCStoresMgr::_Load_ChrClasses()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _chrClassesMap.clear();
+    //                                                 0    1       2               3               4               5               6               7               8               9               10              11              12              13                  14
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, DisplayPower, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, SpellClassSet, CinematicSequenceID, Required_Expansion  FROM dbc_chrclasses");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrclasses. DB table `dbc_chrclasses` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ChrClassesDBC cc;
+        cc.ID           = fields[1].GetUInt32();
+        cc.DisplayPower = fields[2].GetUInt32();
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            cc.Name[i] = fields[3 + i].GetString();
+
+        cc.SpellClassSet       = fields[12].GetUInt32();
+        cc.CinematicSequenceID = fields[13].GetUInt32();
+        cc.RequiredExpansion   = fields[14].GetUInt32();
+
+        _chrClassesMap[id] = cc;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chrclasses in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

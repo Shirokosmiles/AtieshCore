@@ -532,7 +532,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
 
     Relocate(info->positionX, info->positionY, info->positionZ, info->orientation);
 
-    ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(createInfo->Class);
+    ChrClassesDBC const* cEntry = sDBCStoresMgr->GetChrClassesDBC(createInfo->Class);
     if (!cEntry)
     {
         TC_LOG_ERROR("entities.player.cheat", "Player::Create: Possible hacking attempt: Account %u tried to create a character named '%s' with an invalid character class (%u) - refusing to do so (wrong DBC-files?)",
@@ -22991,7 +22991,7 @@ void Player::ResetSpells(bool myClassOnly)
 
     if (myClassOnly)
     {
-        ChrClassesEntry const* clsEntry = sChrClassesStore.LookupEntry(GetClass());
+        ChrClassesDBC const* clsEntry = sDBCStoresMgr->GetChrClassesDBC(GetClass());
         if (!clsEntry)
             return;
         family = clsEntry->SpellClassSet;

@@ -3866,7 +3866,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                if (!sChrClassesStore.LookupEntry(current_class))
+                if (!sDBCStoresMgr->GetChrClassesDBC(current_class))
                 {
                     TC_LOG_ERROR("sql.sql", "Wrong class %u in `playercreateinfo` table, ignoring.", current_class);
                     continue;
@@ -4326,7 +4326,7 @@ void ObjectMgr::LoadPlayerInfo()
         for (uint8 class_ = 0; class_ < MAX_CLASSES; ++class_)
         {
             // skip non existed classes
-            if (!sChrClassesStore.LookupEntry(class_))
+            if (!sDBCStoresMgr->GetChrClassesDBC(class_))
                 continue;
 
             auto& pClassInfo = _playerClassInfo[class_];
@@ -4423,7 +4423,7 @@ void ObjectMgr::LoadPlayerInfo()
             for (uint8 class_ = 0; class_ < MAX_CLASSES; ++class_)
             {
                 // skip non existed classes
-                if (!sChrClassesStore.LookupEntry(class_))
+                if (!sDBCStoresMgr->GetChrClassesDBC(class_))
                     continue;
 
                 auto& info = _playerInfo[race][class_];
@@ -9290,7 +9290,7 @@ void ObjectMgr::LoadTrainers()
             {
                 case Trainer::Type::Class:
                 case Trainer::Type::Pet:
-                    if (requirement && !sChrClassesStore.LookupEntry(requirement))
+                    if (requirement && !sDBCStoresMgr->GetChrClassesDBC(requirement))
                     {
                         TC_LOG_ERROR("sql.sql", "Table `trainer` references non-existing class requirement %u for TrainerId %u, ignoring", requirement, trainerId);
                         continue;

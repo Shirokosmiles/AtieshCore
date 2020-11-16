@@ -96,7 +96,7 @@ public:
 
     static bool HandleResetStatsOrLevelHelper(Player* player)
     {
-        ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(player->GetClass());
+        ChrClassesDBC const* classEntry = sDBCStoresMgr->GetChrClassesDBC(player->GetClass());
         if (!classEntry)
         {
             TC_LOG_ERROR("misc", "Class %u not found in DBC (Wrong DBC files?)", player->GetClass());

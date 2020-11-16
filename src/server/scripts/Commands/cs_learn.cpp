@@ -25,6 +25,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -153,7 +154,7 @@ public:
 
     static bool HandleLearnAllMySpellsCommand(ChatHandler* handler, char const* /*args*/)
     {
-        ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->GetClass());
+        ChrClassesDBC const* classEntry = sDBCStoresMgr->GetChrClassesDBC(handler->GetSession()->GetPlayer()->GetClass());
         if (!classEntry)
             return true;
         uint32 family = classEntry->SpellClassSet;

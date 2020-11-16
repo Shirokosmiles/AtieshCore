@@ -28,25 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct ChrClassesEntry
-{
-    uint32 ID;                                              // 0
-    //uint32 DamageBonusStat;                               // 1
-    uint32 DisplayPower;                                    // 2
-    //char const* PetNameToken;                             // 3
-    char const* Name[16];                                   // 4-19
-    //uint32 Name_lang_mask;                                // 20
-    //char const* NameFemale[16];                           // 21-36
-    //uint32 NameFemale_lang_mask;                          // 37
-    //char const* NameMale[16];                             // 38-53
-    //uint32 NameMale_lang_mask;                            // 54
-    //char const* Filename;                                 // 55
-    uint32 SpellClassSet;                                   // 56
-    //uint32 Flags;                                         // 57
-    uint32 CinematicSequenceID;                             // 58 ID from CinematicSequences.dbc
-    uint32 RequiredExpansion;                               // 59
-};
-
 enum ChrRacesAllianceType
 {
     CHRRACES_ALLIANCE_TYPE_ALLIANCE     = 0,

@@ -5553,7 +5553,7 @@ void Unit::UpdateDisplayPower()
         {
             if (GetTypeId() == TYPEID_PLAYER)
             {
-                ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(GetClass());
+                ChrClassesDBC const* cEntry = sDBCStoresMgr->GetChrClassesDBC(GetClass());
                 if (cEntry && cEntry->DisplayPower < MAX_POWERS)
                     displayPower = Powers(cEntry->DisplayPower);
             }

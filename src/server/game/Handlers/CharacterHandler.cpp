@@ -305,7 +305,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         }
     }
 
-    ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(createInfo->Class);
+    ChrClassesDBC const* classEntry = sDBCStoresMgr->GetChrClassesDBC(createInfo->Class);
     if (!classEntry)
     {
         TC_LOG_ERROR("network", "Class (%u) not found in DBC while creating new char for account (ID: %u): wrong DBC files or cheater?", createInfo->Class, GetAccountId());
@@ -812,7 +812,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     {
         pCurrChar->setCinematic(1);
 
-        if (ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(pCurrChar->GetClass()))
+        if (ChrClassesDBC const* cEntry = sDBCStoresMgr->GetChrClassesDBC(pCurrChar->GetClass()))
         {
             if (cEntry->CinematicSequenceID)
                 pCurrChar->SendCinematicStart(cEntry->CinematicSequenceID);
@@ -2282,7 +2282,7 @@ void WorldSession::HandleOpeningCinematic(WorldPackets::Misc::OpeningCinematic& 
     if (_player->GetUInt32Value(PLAYER_XP))
         return;
 
-    if (ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(_player->GetClass()))
+    if (ChrClassesDBC const* classEntry = sDBCStoresMgr->GetChrClassesDBC(_player->GetClass()))
     {
         if (classEntry->CinematicSequenceID)
             _player->SendCinematicStart(classEntry->CinematicSequenceID);

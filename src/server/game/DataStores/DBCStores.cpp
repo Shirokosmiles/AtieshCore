@@ -60,7 +60,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //std::map<uint32, CharStartOutfitEntry const*> sCharStartOutfitMap;
 //DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
 //DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
-DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
+//DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
 DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
 DBCStorage <CinematicCameraEntry> sCinematicCameraStore(CinematicCameraEntryfmt);
 DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
@@ -295,7 +295,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sCharStartOutfitStore,               "CharStartOutfit.dbc");
     //LOAD_DBC(sCharTitlesStore,                    "CharTitles.dbc");
     //LOAD_DBC(sChatChannelsStore,                  "ChatChannels.dbc");
-    LOAD_DBC(sChrClassesStore,                    "ChrClasses.dbc");
+    //LOAD_DBC(sChrClassesStore,                    "ChrClasses.dbc");
     LOAD_DBC(sChrRacesStore,                      "ChrRaces.dbc");
     LOAD_DBC(sCinematicCameraStore,               "CinematicCamera.dbc");
     LOAD_DBC(sCinematicSequencesStore,            "CinematicSequences.dbc");
@@ -705,12 +705,6 @@ char const* GetRaceName(uint8 race, uint8 locale)
 {
     ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race);
     return raceEntry ? raceEntry->Name[locale] : nullptr;
-}
-
-char const* GetClassName(uint8 class_, uint8 locale)
-{
-    ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(class_);
-    return classEntry ? classEntry->Name[locale] : nullptr;
 }
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)

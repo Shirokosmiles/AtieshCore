@@ -38,6 +38,7 @@ typedef std::unordered_map<uint32 /*guid*/, CharSectionsDBC> CharSectionsDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, CharStartOutfitDBC> CharStartOutfitDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, CharTitlesDBC> CharTitlesDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, ChatChannelsDBC> ChatChannelsDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, ChrClassesDBC> ChrClassesDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -238,6 +239,26 @@ public:
         return nullptr;
     }
 
+    ChrClassesDBC const* GetChrClassesDBC(uint32 id)
+    {
+        for (ChrClassesDBCMap::const_iterator itr = _chrClassesMap.begin(); itr != _chrClassesMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
+    char const* GetChrClassName(uint8 class_, uint8 locale)
+    {
+        for (ChrClassesDBCMap::const_iterator itr = _chrClassesMap.begin(); itr != _chrClassesMap.end(); ++itr)
+        {
+            if (itr->second.ID == class_)
+                return itr->second.Name[locale].c_str();
+        }
+        return nullptr;        
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -255,6 +276,7 @@ protected:
     void _Load_CharStartOutfit();
     void _Load_CharTitles();
     void _Load_ChatChannels();
+    void _Load_ChrClasses();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -273,6 +295,7 @@ private:
     CharStartOutfitDBCMap _charStartOutfitMap;
     CharTitlesDBCMap _charTitlesMap;
     ChatChannelsDBCMap _chatChannelsMap;
+    ChrClassesDBCMap _chrClassesMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()
