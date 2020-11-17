@@ -445,3 +445,23 @@ struct ChrRacesDBC
 
     inline bool HasFlag(ChrRacesFlags flag) const { return (Flags & flag) != 0; }
 };
+
+// load CinematicCamera.dbc
+struct CinematicCameraDBC
+{
+    uint32 ID;                                              // 0
+    std::string Model;                                      // 1 Model filename (translate .mdx to .m2)
+    uint32 SoundID;                                         // 2 Sound ID (voiceover for cinematic)
+    float OriginX;                                          // 3 Position X in map used for basis for M2 co-ordinates
+    float OriginY;                                          // 4 Position Y in map used for basis for M2 co-ordinates
+    float OriginZ;                                          // 5 Position Z in map used for basis for M2 co-ordinates
+    float OriginFacing;                                     // 6 Orientation in map used for basis for M2 co-ordinates
+};
+
+// load CinematicSequences.dbc
+struct CinematicSequencesDBC
+{
+    uint32 ID;                                              // 0
+    //uint32 SoundID;                                       // 1
+    uint32 Camera[8];                                       // 2-9 ID in CinematicCamera.dbc
+};

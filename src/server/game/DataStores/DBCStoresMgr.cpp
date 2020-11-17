@@ -44,6 +44,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _chatChannelsMap.clear();
     _chrClassesMap.clear();
     _chrRacesMap.clear();
+    _cinematicCameraMap.clear();
+    _cinematicSequencesMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -67,6 +69,8 @@ void DBCStoresMgr::Initialize()
     _Load_ChatChannels();
     _Load_ChrClasses();
     _Load_ChrRaces();
+    _Load_CinematicCamera();
+    _Load_CinematicSequences();
 }
 
 // load Achievement.dbc
@@ -772,4 +776,75 @@ void DBCStoresMgr::_Load_ChrRaces()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chrraces in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CinematicCamera.dbc
+void DBCStoresMgr::_Load_CinematicCamera()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _cinematicCameraMap.clear();
+    //                                                 0    1    2       3        4         5       6          7
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Model, SoundID, OriginX, OriginY, OriginZ, OriginFacing FROM dbc_cinematiccamera");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_cinematiccamera. DB table `dbc_cinematiccamera` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CinematicCameraDBC cc;
+        cc.ID           = fields[1].GetUInt32();
+        cc.Model        = fields[2].GetString();
+        cc.SoundID      = fields[3].GetUInt32();
+        cc.OriginX      = fields[4].GetFloat();
+        cc.OriginY      = fields[5].GetFloat();
+        cc.OriginZ      = fields[6].GetFloat();
+        cc.OriginFacing = fields[7].GetFloat();
+
+        _cinematicCameraMap[id] = cc;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_cinematiccamera in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CinematicSequences.dbc
+void DBCStoresMgr::_Load_CinematicSequences()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _cinematicSequencesMap.clear();
+    //                                                 0    1     2         3         4         5          6        7         8         9
+    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Camera_1, Camera_2, Camera_3, Camera_4, Camera_5, Camera_6, Camera_7, Camera_8 FROM dbc_cinematicsequences");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_cinematicsequences. DB table `dbc_cinematicsequences` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CinematicSequencesDBC cs;
+        cs.ID = fields[1].GetUInt32();
+
+        for (uint8 i = 0; i < 8; i++)
+            cs.Camera[i] = fields[2 + i].GetUInt32();
+
+        _cinematicSequencesMap[id] = cs;
+
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_cinematicsequences in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

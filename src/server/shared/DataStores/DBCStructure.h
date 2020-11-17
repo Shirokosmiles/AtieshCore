@@ -28,22 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct CinematicCameraEntry
-{
-    uint32 ID;                                              // 0
-    char const* Model;                                      // 1 Model filename (translate .mdx to .m2)
-    uint32 SoundID;                                         // 2 Sound ID (voiceover for cinematic)
-    DBCPosition3D Origin;                                   // 3-5 Position in map used for basis for M2 co-ordinates
-    float OriginFacing;                                     // 6 Orientation in map used for basis for M2 co-ordinates
-};
-
-struct CinematicSequencesEntry
-{
-    uint32 ID;                                              // 0
-    //uint32 SoundID;                                       // 1
-    uint32 Camera[8];                                       // 2-9 ID in CinematicCamera.dbc
-};
-
 struct CreatureDisplayInfoEntry
 {
     uint32 ID;                                              // 0

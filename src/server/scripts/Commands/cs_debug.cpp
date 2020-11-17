@@ -134,7 +134,7 @@ public:
     // cinematicId - ID from CinematicSequences.dbc
     static bool HandleDebugPlayCinematicCommand(ChatHandler* handler, uint32 cinematicId)
     {
-        CinematicSequencesEntry const* cineSeq = sCinematicSequencesStore.LookupEntry(cinematicId);
+        CinematicSequencesDBC const* cineSeq = sDBCStoresMgr->GetCinematicSequencesDBC(cinematicId);
         if (!cineSeq)
         {
             handler->PSendSysMessage(LANG_CINEMATIC_NOT_EXIST, cinematicId);

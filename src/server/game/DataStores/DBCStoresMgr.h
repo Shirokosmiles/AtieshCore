@@ -40,6 +40,8 @@ typedef std::unordered_map<uint32 /*guid*/, CharTitlesDBC> CharTitlesDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, ChatChannelsDBC> ChatChannelsDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, ChrClassesDBC> ChrClassesDBCMap;
 typedef std::unordered_map<uint32 /*guid*/, ChrRacesDBC> ChrRacesDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, CinematicCameraDBC> CinematicCameraDBCMap;
+typedef std::unordered_map<uint32 /*guid*/, CinematicSequencesDBC> CinematicSequencesDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -280,6 +282,18 @@ public:
         return nullptr;
     }
 
+    CinematicCameraDBCMap const& GetCinematicCameraDBCMap() const { return _cinematicCameraMap; }
+
+    CinematicSequencesDBC const* GetCinematicSequencesDBC(uint32 id)
+    {
+        for (CinematicSequencesDBCMap::const_iterator itr = _cinematicSequencesMap.begin(); itr != _cinematicSequencesMap.end(); ++itr)
+        {
+            if (itr->second.ID == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -299,6 +313,8 @@ protected:
     void _Load_ChatChannels();
     void _Load_ChrClasses();
     void _Load_ChrRaces();
+    void _Load_CinematicCamera();
+    void _Load_CinematicSequences();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -319,6 +335,8 @@ private:
     ChatChannelsDBCMap _chatChannelsMap;
     ChrClassesDBCMap _chrClassesMap;
     ChrRacesDBCMap _chrRacesMap;
+    CinematicCameraDBCMap _cinematicCameraMap;
+    CinematicSequencesDBCMap _cinematicSequencesMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

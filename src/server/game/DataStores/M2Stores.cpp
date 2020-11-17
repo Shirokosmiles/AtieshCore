@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Common.h"
 #include "Containers.h"
 #include "Log.h"
@@ -50,7 +50,7 @@ G3D::Vector3 TranslateLocation(G3D::Vector4 const* DBCPosition, G3D::Vector3 con
 }
 
 // Number of cameras not used. Multiple cameras never used in 3.3.5
-bool readCamera(M2Camera const* cam, uint32 buffSize, M2Header const* header, CinematicCameraEntry const* dbcentry)
+bool readCamera(M2Camera const* cam, uint32 buffSize, M2Header const* header, CinematicCameraDBC const* dbcentry)
 {
     char const* buffer = reinterpret_cast<char const*>(header);
 
@@ -58,9 +58,9 @@ bool readCamera(M2Camera const* cam, uint32 buffSize, M2Header const* header, Ci
     FlyByCameraCollection targetcam;
 
     G3D::Vector4 DBCData;
-    DBCData.x = dbcentry->Origin.X;
-    DBCData.y = dbcentry->Origin.Y;
-    DBCData.z = dbcentry->Origin.Z;
+    DBCData.x = dbcentry->OriginX;
+    DBCData.y = dbcentry->OriginY;
+    DBCData.z = dbcentry->OriginZ;
     DBCData.w = dbcentry->OriginFacing;
 
     // Read target locations, only so that we can calculate orientation
@@ -179,75 +179,80 @@ void LoadM2Cameras(std::string const& dataPath)
     TC_LOG_INFO("server.loading", ">> Loading Cinematic Camera files");
 
     uint32 oldMSTime = getMSTime();
-    for (CinematicCameraEntry const* dbcentry : sCinematicCameraStore)
+
+    CinematicCameraDBCMap const& cinemaMap = sDBCStoresMgr->GetCinematicCameraDBCMap();
+    for (CinematicCameraDBCMap::const_iterator itr = cinemaMap.begin(); itr != cinemaMap.end(); ++itr)
     {
-        std::string filenameWork = dataPath;
-        filenameWork.append(dbcentry->Model);
-
-        // Replace slashes (always to forward slash, because boost!)
-        std::replace(filenameWork.begin(), filenameWork.end(), '\\', '/');
-
-        boost::filesystem::path filename = filenameWork;
-
-        // Convert to native format
-        filename.make_preferred();
-
-        // Replace mdx to .m2
-        filename.replace_extension("m2");
-
-        std::ifstream m2file(filename.string().c_str(), std::ios::in | std::ios::binary);
-        if (!m2file.is_open())
-            continue;
-
-        // Get file size
-        m2file.seekg(0, std::ios::end);
-        std::streamoff fileSize = m2file.tellg();
-
-        // Reject if not at least the size of the header
-        if (static_cast<uint32>(fileSize) < sizeof(M2Header))
+        if (CinematicCameraDBC const* dbcentry = &itr->second)
         {
-            TC_LOG_ERROR("server.loading", "Camera file %s is damaged. File is smaller than header size", filename.string().c_str());
+            std::string filenameWork = dataPath;
+            filenameWork.append(dbcentry->Model);
+
+            // Replace slashes (always to forward slash, because boost!)
+            std::replace(filenameWork.begin(), filenameWork.end(), '\\', '/');
+
+            boost::filesystem::path filename = filenameWork;
+
+            // Convert to native format
+            filename.make_preferred();
+
+            // Replace mdx to .m2
+            filename.replace_extension("m2");
+
+            std::ifstream m2file(filename.string().c_str(), std::ios::in | std::ios::binary);
+            if (!m2file.is_open())
+                continue;
+
+            // Get file size
+            m2file.seekg(0, std::ios::end);
+            std::streamoff fileSize = m2file.tellg();
+
+            // Reject if not at least the size of the header
+            if (static_cast<uint32>(fileSize) < sizeof(M2Header))
+            {
+                TC_LOG_ERROR("server.loading", "Camera file %s is damaged. File is smaller than header size", filename.string().c_str());
+                m2file.close();
+                continue;
+            }
+
+            // Read 4 bytes (signature)
+            m2file.seekg(0, std::ios::beg);
+            char fileCheck[5];
+            m2file.read(fileCheck, 4);
+            fileCheck[4] = 0;
+
+            // Check file has correct magic (MD20)
+            if (strcmp(fileCheck, "MD20"))
+            {
+                TC_LOG_ERROR("server.loading", "Camera file %s is damaged. File identifier not found", filename.string().c_str());
+                m2file.close();
+                continue;
+            }
+
+            // Now we have a good file, read it all into a vector of char's, then close the file.
+            std::vector<char> buffer(fileSize);
+            m2file.seekg(0, std::ios::beg);
+            if (!m2file.read(buffer.data(), fileSize))
+            {
+                m2file.close();
+                continue;
+            }
             m2file.close();
-            continue;
+
+            // Read header
+            M2Header const* header = reinterpret_cast<M2Header const*>(buffer.data());
+
+            if (header->ofsCameras + sizeof(M2Camera) > static_cast<uint32>(fileSize))
+            {
+                TC_LOG_ERROR("server.loading", "Camera file %s is damaged. Camera references position beyond file end", filename.string().c_str());
+                continue;
+            }
+
+            // Get camera(s) - Main header, then dump them.
+            M2Camera const* cam = reinterpret_cast<M2Camera const*>(buffer.data() + header->ofsCameras);
+            if (!readCamera(cam, fileSize, header, dbcentry))
+                TC_LOG_ERROR("server.loading", "Camera file %s is damaged. Camera references position beyond file end", filename.string().c_str());
         }
-
-        // Read 4 bytes (signature)
-        m2file.seekg(0, std::ios::beg);
-        char fileCheck[5];
-        m2file.read(fileCheck, 4);
-        fileCheck[4] = 0;
-
-        // Check file has correct magic (MD20)
-        if (strcmp(fileCheck, "MD20"))
-        {
-            TC_LOG_ERROR("server.loading", "Camera file %s is damaged. File identifier not found", filename.string().c_str());
-            m2file.close();
-            continue;
-        }
-
-        // Now we have a good file, read it all into a vector of char's, then close the file.
-        std::vector<char> buffer(fileSize);
-        m2file.seekg(0, std::ios::beg);
-        if (!m2file.read(buffer.data(), fileSize))
-        {
-            m2file.close();
-            continue;
-        }
-        m2file.close();
-
-        // Read header
-        M2Header const* header = reinterpret_cast<M2Header const*>(buffer.data());
-
-        if (header->ofsCameras + sizeof(M2Camera) > static_cast<uint32>(fileSize))
-        {
-            TC_LOG_ERROR("server.loading", "Camera file %s is damaged. Camera references position beyond file end", filename.string().c_str());
-            continue;
-        }
-
-        // Get camera(s) - Main header, then dump them.
-        M2Camera const* cam = reinterpret_cast<M2Camera const*>(buffer.data() + header->ofsCameras);
-        if (!readCamera(cam, fileSize, header, dbcentry))
-            TC_LOG_ERROR("server.loading", "Camera file %s is damaged. Camera references position beyond file end", filename.string().c_str());
     }
 
     TC_LOG_INFO("server.loading", ">> Loaded %u cinematic waypoint sets in %u ms", (uint32)sFlyByCameraStore.size(), GetMSTimeDiffToNow(oldMSTime));

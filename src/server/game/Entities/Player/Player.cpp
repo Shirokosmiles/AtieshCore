@@ -6523,7 +6523,7 @@ void Player::SendCinematicStart(uint32 CinematicSequenceId) const
     packet.CinematicID = CinematicSequenceId;
     SendDirectMessage(packet.Write());
 
-    if (CinematicSequencesEntry const* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
+    if (CinematicSequencesDBC const* sequence = sDBCStoresMgr->GetCinematicSequencesDBC(CinematicSequenceId))
         _cinematicMgr->SetActiveCinematicCamera(sequence->Camera[0]);
 }
 
