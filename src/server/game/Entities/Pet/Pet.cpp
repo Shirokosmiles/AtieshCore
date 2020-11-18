@@ -18,6 +18,7 @@
 #include "Pet.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "Formulas.h"
 #include "Group.h"
 #include "InstanceScript.h"
@@ -911,7 +912,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 
     SetDisplayId(creature->GetDisplayId());
 
-    if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family))
+    if (CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(cinfo->family))
         SetName(cFamily->Name[sWorld->GetDefaultDbcLocale()]);
     else
         SetName(creature->GetNameForLocaleIdx(sObjectMgr->GetDBCLocaleIndex()));
@@ -924,7 +925,7 @@ bool Pet::CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner)
     if (!CreateBaseAtTamed(cinfo, owner->GetMap(), owner->GetPhaseMask()))
         return false;
 
-    if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family))
+    if (CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(cinfo->family))
         SetName(cFamily->Name[sWorld->GetDefaultDbcLocale()]);
 
     Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), owner->GetOrientation());
@@ -1262,7 +1263,7 @@ bool Pet::HaveInDiet(ItemTemplate const* item) const
     if (!cInfo)
         return false;
 
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->family);
+    CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(cInfo->family);
     if (!cFamily)
         return false;
 
@@ -1775,7 +1776,7 @@ bool Pet::resetTalents()
     if (!ci)
         return false;
     // Check pet talent type
-    CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(ci->family);
+    CreatureFamilyDBC const* pet_family = sDBCStoresMgr->GetCreatureFamilyDBCMap(ci->family);
     if (!pet_family || pet_family->PetTalentType < 0)
         return false;
 
@@ -2023,7 +2024,7 @@ void Pet::LearnPetPassives()
     if (!cInfo)
         return;
 
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->family);
+    CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(cInfo->family);
     if (!cFamily)
         return;
 
@@ -2145,7 +2146,7 @@ Player* Pet::GetOwner() const
 
 float Pet::GetNativeObjectScale() const
 {
-    CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(GetCreatureTemplate()->family);
+    CreatureFamilyDBC const* creatureFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(GetCreatureTemplate()->family);
     if (creatureFamily && creatureFamily->MinScale > 0.0f && getPetType() == HUNTER_PET)
     {
         float scale;

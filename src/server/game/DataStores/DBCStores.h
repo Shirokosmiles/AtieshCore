@@ -36,7 +36,6 @@ enum LocaleConstant : uint8;
 typedef std::list<uint32> SimpleFactionsList;
 TC_GAME_API SimpleFactionsList const* GetFactionTeamList(uint32 faction);
 
-TC_GAME_API char const* GetPetName(uint32 petfamily, uint32 dbclang);
 TC_GAME_API uint32 GetTalentSpellCost(uint32 spellId);
 TC_GAME_API TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
 
@@ -106,7 +105,7 @@ TC_GAME_API EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint
 //TC_GAME_API extern DBCStorage <CinematicSequencesEntry>      sCinematicSequencesStore;
 //TC_GAME_API extern DBCStorage <CreatureDisplayInfoEntry>     sCreatureDisplayInfoStore;
 //TC_GAME_API extern DBCStorage <CreatureDisplayInfoExtraEntry> sCreatureDisplayInfoExtraStore;
-TC_GAME_API extern DBCStorage <CreatureFamilyEntry>          sCreatureFamilyStore;
+//TC_GAME_API extern DBCStorage <CreatureFamilyEntry>          sCreatureFamilyStore;
 TC_GAME_API extern DBCStorage <CreatureModelDataEntry>       sCreatureModelDataStore;
 TC_GAME_API extern DBCStorage <CreatureSpellDataEntry>       sCreatureSpellDataStore;
 TC_GAME_API extern DBCStorage <CreatureTypeEntry>            sCreatureTypeStore;

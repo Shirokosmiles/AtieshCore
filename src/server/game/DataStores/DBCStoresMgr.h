@@ -44,6 +44,7 @@ typedef std::unordered_map<uint32 /*ID*/, CinematicCameraDBC> CinematicCameraDBC
 typedef std::unordered_map<uint32 /*ID*/, CinematicSequencesDBC> CinematicSequencesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, CreatureDisplayInfoDBC> CreatureDisplayInfoDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, CreatureDisplayInfoExtraDBC> CreatureDisplayInfoExtraDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CreatureFamilyDBC> CreatureFamilyDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -274,6 +275,25 @@ public:
         return nullptr;
     }
 
+    CreatureFamilyDBCMap const& GetCreatureFamilyDBCMap() const { return _creatureFamilyMap; }
+    CreatureFamilyDBC const* GetCreatureFamilyDBCMap(uint32 id)
+    {
+        CreatureFamilyDBCMap::const_iterator itr = _creatureFamilyMap.find(id);
+        if (itr != _creatureFamilyMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    char const* GetPetName(uint32 petfamily, uint32 dbclang)
+    {
+        if (!petfamily)
+            return nullptr;
+        CreatureFamilyDBC const* pet_family = GetCreatureFamilyDBCMap(petfamily);
+        if (!pet_family)
+            return nullptr;
+        return pet_family->Name[dbclang].c_str();
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -297,6 +317,7 @@ protected:
     void _Load_CinematicSequences();
     void _Load_CreatureDisplayInfo();
     void _Load_CreatureDisplayInfoExtra();
+    void _Load_CreatureFamily();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -321,6 +342,7 @@ private:
     CinematicSequencesDBCMap _cinematicSequencesMap;
     CreatureDisplayInfoDBCMap _creatureDisplayInfoMap;
     CreatureDisplayInfoExtraDBCMap _creatureDisplayInfoExtraMap;
+    CreatureFamilyDBCMap _creatureFamilyMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

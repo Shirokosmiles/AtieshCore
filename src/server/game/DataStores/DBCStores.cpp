@@ -18,6 +18,7 @@
 #include "DBCStores.h"
 #include "DBCFileLoader.h"
 #include "DBCfmt.h"
+#include "DBCStoresMgr.h"
 #include "Errors.h"
 #include "IteratorPair.h"
 #include "Log.h"
@@ -66,7 +67,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
 //DBCStorage <CreatureDisplayInfoEntry> sCreatureDisplayInfoStore(CreatureDisplayInfofmt);
 //DBCStorage <CreatureDisplayInfoExtraEntry> sCreatureDisplayInfoExtraStore(CreatureDisplayInfoExtrafmt);
-DBCStorage <CreatureFamilyEntry> sCreatureFamilyStore(CreatureFamilyfmt);
+//DBCStorage <CreatureFamilyEntry> sCreatureFamilyStore(CreatureFamilyfmt);
 DBCStorage <CreatureModelDataEntry> sCreatureModelDataStore(CreatureModelDatafmt);
 DBCStorage <CreatureSpellDataEntry> sCreatureSpellDataStore(CreatureSpellDatafmt);
 DBCStorage <CreatureTypeEntry> sCreatureTypeStore(CreatureTypefmt);
@@ -301,7 +302,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sCinematicSequencesStore,            "CinematicSequences.dbc");
     //LOAD_DBC(sCreatureDisplayInfoStore,           "CreatureDisplayInfo.dbc");
     //LOAD_DBC(sCreatureDisplayInfoExtraStore,      "CreatureDisplayInfoExtra.dbc");
-    LOAD_DBC(sCreatureFamilyStore,                "CreatureFamily.dbc");
+    //LOAD_DBC(sCreatureFamilyStore,                "CreatureFamily.dbc");
     LOAD_DBC(sCreatureModelDataStore,             "CreatureModelData.dbc");
     LOAD_DBC(sCreatureSpellDataStore,             "CreatureSpellData.dbc");
     LOAD_DBC(sCreatureTypeStore,                  "CreatureType.dbc");
@@ -473,17 +474,21 @@ void LoadDBCStores(const std::string& dataPath)
         SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->Spell);
         if (spellInfo && spellInfo->Attributes & SPELL_ATTR0_PASSIVE)
         {
-            for (CreatureFamilyEntry const* cFamily : sCreatureFamilyStore)
+            CreatureFamilyDBCMap const& CreatureFamilyMap = sDBCStoresMgr->GetCreatureFamilyDBCMap();
+            for (CreatureFamilyDBCMap::const_iterator itr = CreatureFamilyMap.begin(); itr != CreatureFamilyMap.end(); ++itr)
             {
-                if (skillLine->SkillLine != cFamily->SkillLine[0] && skillLine->SkillLine != cFamily->SkillLine[1])
-                    continue;
-                if (spellInfo->SpellLevel)
-                    continue;
+                if (CreatureFamilyDBC const* cFamily = &itr->second)
+                {
+                    if (skillLine->SkillLine != cFamily->SkillLine[0] && skillLine->SkillLine != cFamily->SkillLine[1])
+                        continue;
+                    if (spellInfo->SpellLevel)
+                        continue;
 
-                if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
-                    continue;
+                    if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+                        continue;
 
-                sPetFamilySpellsStore[cFamily->ID].insert(spellInfo->ID);
+                    sPetFamilySpellsStore[cFamily->ID].insert(spellInfo->ID);
+                }
             }
         }
     }
@@ -663,16 +668,6 @@ SimpleFactionsList const* GetFactionTeamList(uint32 faction)
         return &itr->second;
 
     return nullptr;
-}
-
-char const* GetPetName(uint32 petfamily, uint32 dbclang)
-{
-    if (!petfamily)
-        return nullptr;
-    CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(petfamily);
-    if (!pet_family)
-        return nullptr;
-    return pet_family->Name[dbclang];
 }
 
 TalentSpellPos const* GetTalentSpellPos(uint32 spellId)

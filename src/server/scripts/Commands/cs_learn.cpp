@@ -263,7 +263,7 @@ public:
             return false;
         }
 
-        CreatureFamilyEntry const* petFamily = sCreatureFamilyStore.LookupEntry(creatureInfo->family);
+        CreatureFamilyDBC const* petFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(creatureInfo->family);
         if (!petFamily)
         {
             handler->SendSysMessage(LANG_WRONG_PET_TYPE);

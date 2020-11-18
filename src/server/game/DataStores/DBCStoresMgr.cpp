@@ -48,6 +48,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _cinematicSequencesMap.clear();
     _creatureDisplayInfoMap.clear();
     _creatureDisplayInfoExtraMap.clear();
+    _creatureFamilyMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -75,6 +76,7 @@ void DBCStoresMgr::Initialize()
     _Load_CinematicSequences();
     _Load_CreatureDisplayInfo();
     _Load_CreatureDisplayInfoExtra();
+    _Load_CreatureFamily();
 }
 
 // load Achievement.dbc
@@ -940,4 +942,46 @@ void DBCStoresMgr::_Load_CreatureDisplayInfoExtra()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturedisplayinfoextra      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CreatureFamily.dbc
+void DBCStoresMgr::_Load_CreatureFamily()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _creatureFamilyMap.clear();
+    //                                                0       1          2            3            4            5            6            7             8               9               10              11              12              13              14              15              16              17
+    QueryResult result = WorldDatabase.Query("SELECT ID, MinScale, MinScaleLevel, MaxScale, MaxScaleLevel, SkillLine_1, SkillLine_2, PetFoodMask, PetTalentType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_creaturefamily");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturefamily. DB table `dbc_creaturefamily` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CreatureFamilyDBC cf;
+        cf.ID = id;
+        cf.MinScale      = fields[1].GetFloat();
+        cf.MinScaleLevel = fields[2].GetUInt32();
+        cf.MaxScale      = fields[3].GetFloat();
+        cf.MaxScaleLevel = fields[4].GetUInt32();
+        cf.SkillLine[0]  = fields[5].GetUInt32();
+        cf.SkillLine[1]  = fields[6].GetUInt32();
+        cf.PetFoodMask   = fields[7].GetUInt32();
+        cf.PetTalentType = fields[8].GetInt32();
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            cf.Name[i] = fields[9 + i].GetString();
+
+        _creatureFamilyMap[id] = cf;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturefamily                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

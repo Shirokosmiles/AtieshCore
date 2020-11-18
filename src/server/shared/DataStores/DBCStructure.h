@@ -28,22 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct CreatureFamilyEntry
-{
-    uint32 ID;                                              // 0
-    float MinScale;                                         // 1
-    uint32 MinScaleLevel;                                   // 2
-    float MaxScale;                                         // 3
-    uint32 MaxScaleLevel;                                   // 4
-    uint32 SkillLine[2];                                    // 5-6
-    uint32 PetFoodMask;                                     // 7
-    int32 PetTalentType;                                    // 8
-    //int32 CategoryEnumID;                                 // 9
-    char const* Name[16];                                   // 10-25
-    //uint32 Name_lang_mask;                                // 26
-    //char const* IconFile;                                 // 27
-};
-
 enum CreatureModelDataFlags
 {
     CREATURE_MODEL_DATA_FLAGS_CAN_MOUNT = 0x00000080
