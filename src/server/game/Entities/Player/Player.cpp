@@ -4734,6 +4734,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     //Characters level 20 and up suffer from ten minutes of sickness.
     int32 startLevel = sWorld->getIntConfig(CONFIG_DEATH_SICKNESS_LEVEL);
     ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(GetRace());
+    ASSERT_NOTNULL(raceEntry);
 
     if (int32(GetLevel()) >= startLevel)
     {
@@ -18225,7 +18226,7 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             }
 
             ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(GetRace());
-
+            ASSERT_NOTNULL(raceEntry);
             // negative effects should continue counting down after logout
             if (remaintime != -1 && ((!spellInfo->IsPositive() && spellInfo->Id != raceEntry->ResSicknessSpellID) || spellInfo->HasAttribute(SPELL_ATTR4_FADES_WHILE_LOGGED_OUT))) // Resurrection sickness should not fade while logged out
             {

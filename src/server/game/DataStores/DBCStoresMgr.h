@@ -22,26 +22,28 @@
 #include "DBCStoresMgrStructure.h"
 #include <unordered_map>
 
-typedef std::unordered_map<uint32 /*guid*/, AchievementDBC> AchievementDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, AchievementCriteriaDBC> AchievementCriteriaDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, AreaTableDBC> AreaTableDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, AreaGroupDBC> AreaGroupDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, AreaPOIDBC> AreaPOIDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, AreaTriggerDBC> AreaTriggerDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, AuctionHouseDBC> AuctionHouseDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, BankBagSlotPricesDBC> BankBagSlotPricesDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, BannedAddOnsDBC> BannedAddOnsDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, BarberShopStyleDBC> BarberShopStyleDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, BattlemasterListDBC> BattlemasterListDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, CharacterFacialHairStylesDBC> CharacterFacialHairStylesDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, CharSectionsDBC> CharSectionsDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, CharStartOutfitDBC> CharStartOutfitDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, CharTitlesDBC> CharTitlesDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, ChatChannelsDBC> ChatChannelsDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, ChrClassesDBC> ChrClassesDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, ChrRacesDBC> ChrRacesDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, CinematicCameraDBC> CinematicCameraDBCMap;
-typedef std::unordered_map<uint32 /*guid*/, CinematicSequencesDBC> CinematicSequencesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, AchievementDBC> AchievementDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, AchievementCriteriaDBC> AchievementCriteriaDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, AreaTableDBC> AreaTableDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, AreaGroupDBC> AreaGroupDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, AreaPOIDBC> AreaPOIDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, AreaTriggerDBC> AreaTriggerDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, AuctionHouseDBC> AuctionHouseDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, BankBagSlotPricesDBC> BankBagSlotPricesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, BannedAddOnsDBC> BannedAddOnsDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, BarberShopStyleDBC> BarberShopStyleDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, BattlemasterListDBC> BattlemasterListDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CharacterFacialHairStylesDBC> CharacterFacialHairStylesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CharSectionsDBC> CharSectionsDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CharStartOutfitDBC> CharStartOutfitDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CharTitlesDBC> CharTitlesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ChatChannelsDBC> ChatChannelsDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ChrClassesDBC> ChrClassesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ChrRacesDBC> ChrRacesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CinematicCameraDBC> CinematicCameraDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CinematicSequencesDBC> CinematicSequencesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CreatureDisplayInfoDBC> CreatureDisplayInfoDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CreatureDisplayInfoExtraDBC> CreatureDisplayInfoExtraDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -58,11 +60,9 @@ public:
     uint32 GetAchievementDBCSize() { return _achievementMap.size(); }
     AchievementDBC const* GetAchievementDBC(uint32 id) const
     {
-        for (AchievementDBCMap::const_iterator itr = _achievementMap.begin(); itr != _achievementMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        AchievementDBCMap::const_iterator itr = _achievementMap.find(id);
+        if (itr != _achievementMap.end())
+            return &itr->second;
         return nullptr;
     }
 
@@ -70,104 +70,84 @@ public:
     uint32 GetAchievementCriteriaDBCSize() { return _achievementCriteriaMap.size(); }
     AchievementCriteriaDBC const* GetAchievementCriteriaDBC(uint32 id) const
     {
-        for (AchievementCriteriaDBCMap::const_iterator itr = _achievementCriteriaMap.begin(); itr != _achievementCriteriaMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        AchievementCriteriaDBCMap::const_iterator itr = _achievementCriteriaMap.find(id);
+        if (itr != _achievementCriteriaMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     AreaTableDBCMap const& GetAreaTableDBCMap() const { return _areaTableMap; }
     AreaTableDBC const* GetAreaTableDBC(uint32 id) const
     {
-        for (AreaTableDBCMap::const_iterator itr = _areaTableMap.begin(); itr != _areaTableMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        AreaTableDBCMap::const_iterator itr = _areaTableMap.find(id);
+        if (itr != _areaTableMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     AreaGroupDBC const* GetAreaGroupDBC(uint32 id) const
     {
-        for (AreaGroupDBCMap::const_iterator itr = _areaGroupMap.begin(); itr != _areaGroupMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        AreaGroupDBCMap::const_iterator itr = _areaGroupMap.find(id);
+        if (itr != _areaGroupMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     AreaPOIDBC const* GetAreaPOIDBC(uint32 id) const
     {
-        for (AreaPOIDBCMap::const_iterator itr = _areaPOIMap.begin(); itr != _areaPOIMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        AreaPOIDBCMap::const_iterator itr = _areaPOIMap.find(id);
+        if (itr != _areaPOIMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     AreaTriggerDBC const* GetAreaTriggerDBC(uint32 id) const
     {
-        for (AreaTriggerDBCMap::const_iterator itr = _areaTriggerMap.begin(); itr != _areaTriggerMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        AreaTriggerDBCMap::const_iterator itr = _areaTriggerMap.find(id);
+        if (itr != _areaTriggerMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     AuctionHouseDBC const* GetAuctionHouseDBC(uint32 id) const
     {
-        for (AuctionHouseDBCMap::const_iterator itr = _auctionHouseMap.begin(); itr != _auctionHouseMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        AuctionHouseDBCMap::const_iterator itr = _auctionHouseMap.find(id);
+        if (itr != _auctionHouseMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     BankBagSlotPricesDBC const* GetBankBagSlotPricesDBC(uint32 id) const
     {
-        for (BankBagSlotPricesDBCMap::const_iterator itr = _bankBagSlotPricesMap.begin(); itr != _bankBagSlotPricesMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        BankBagSlotPricesDBCMap::const_iterator itr = _bankBagSlotPricesMap.find(id);
+        if (itr != _bankBagSlotPricesMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     uint32 GetBannedAddOnsSize() { return _bannedAddonsMap.size(); }
     BannedAddOnsDBC const* GetBannedAddOnsDBC(uint32 id) const
     {
-        for (BannedAddOnsDBCMap::const_iterator itr = _bannedAddonsMap.begin(); itr != _bannedAddonsMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        BannedAddOnsDBCMap::const_iterator itr = _bannedAddonsMap.find(id);
+        if (itr != _bannedAddonsMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     BarberShopStyleDBC const* GetBarberShopStyleDBC(uint32 id) const
     {
-        for (BarberShopStyleDBCMap::const_iterator itr = _barberShopStyleMap.begin(); itr != _barberShopStyleMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        BarberShopStyleDBCMap::const_iterator itr = _barberShopStyleMap.find(id);
+        if (itr != _barberShopStyleMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     BattlemasterListDBCMap const& GetBattlemasterListDBCMap() const { return _battlemasterListMap; }
     BattlemasterListDBC const* GetBattlemasterListDBC(uint32 id) const
     {
-        for (BattlemasterListDBCMap::const_iterator itr = _battlemasterListMap.begin(); itr != _battlemasterListMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        BattlemasterListDBCMap::const_iterator itr = _battlemasterListMap.find(id);
+        if (itr != _battlemasterListMap.end())
+            return &itr->second;
         return nullptr;
     }
 
@@ -200,11 +180,9 @@ public:
     CharStartOutfitDBCMap const& GetCharStartOutfitDBCMap() const { return _charStartOutfitMap; }
     CharStartOutfitDBC const* GetCharStartOutfitDBC(uint32 id)
     {
-        for (CharStartOutfitDBCMap::const_iterator itr = _charStartOutfitMap.begin(); itr != _charStartOutfitMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        CharStartOutfitDBCMap::const_iterator itr = _charStartOutfitMap.find(id);
+        if (itr != _charStartOutfitMap.end())
+            return &itr->second;
         return nullptr;
     }
 
@@ -223,62 +201,50 @@ public:
     CharTitlesDBCMap const& GetCharTitlesDBCMap() const { return _charTitlesMap; }
     CharTitlesDBC const* GetCharTitlesDBC(uint32 id)
     {
-        for (CharTitlesDBCMap::const_iterator itr = _charTitlesMap.begin(); itr != _charTitlesMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        CharTitlesDBCMap::const_iterator itr = _charTitlesMap.find(id);
+        if (itr != _charTitlesMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     ChatChannelsDBCMap const& GetChatChannelsDBCMap() const { return _chatChannelsMap; }
     ChatChannelsDBC const* GetChatChannelsDBC(uint32 id)
     {
-        for (ChatChannelsDBCMap::const_iterator itr = _chatChannelsMap.begin(); itr != _chatChannelsMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        ChatChannelsDBCMap::const_iterator itr = _chatChannelsMap.find(id);
+        if (itr != _chatChannelsMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     ChrClassesDBC const* GetChrClassesDBC(uint32 id)
     {
-        for (ChrClassesDBCMap::const_iterator itr = _chrClassesMap.begin(); itr != _chrClassesMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
+        ChrClassesDBCMap::const_iterator itr = _chrClassesMap.find(id);
+        if (itr != _chrClassesMap.end())
                 return &itr->second;
-        }
         return nullptr;
     }
 
     char const* GetChrClassName(uint8 class_, uint8 locale)
     {
-        for (ChrClassesDBCMap::const_iterator itr = _chrClassesMap.begin(); itr != _chrClassesMap.end(); ++itr)
-        {
-            if (itr->second.ID == class_)
-                return itr->second.Name[locale].c_str();
-        }
+        ChrClassesDBCMap::const_iterator itr = _chrClassesMap.find(class_);
+        if (itr != _chrClassesMap.end())
+            return itr->second.Name[locale].c_str();
         return nullptr;
     }
 
     ChrRacesDBC const* GetChrRacesDBC(uint32 id)
     {
-        for (ChrRacesDBCMap::const_iterator itr = _chrRacesMap.begin(); itr != _chrRacesMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        ChrRacesDBCMap::const_iterator itr = _chrRacesMap.find(id);
+        if (itr != _chrRacesMap.end())
+            return &itr->second;
         return nullptr;
     }
 
     char const* GetRaceName(uint8 race, uint8 locale)
     {
-        for (ChrRacesDBCMap::const_iterator itr = _chrRacesMap.begin(); itr != _chrRacesMap.end(); ++itr)
-        {
-            if (itr->second.ID == race)
-                return itr->second.Name[locale].c_str();
-        }
+        ChrRacesDBCMap::const_iterator itr = _chrRacesMap.find(race);
+        if (itr != _chrRacesMap.end())
+            return itr->second.Name[locale].c_str();
         return nullptr;
     }
 
@@ -286,11 +252,25 @@ public:
 
     CinematicSequencesDBC const* GetCinematicSequencesDBC(uint32 id)
     {
-        for (CinematicSequencesDBCMap::const_iterator itr = _cinematicSequencesMap.begin(); itr != _cinematicSequencesMap.end(); ++itr)
-        {
-            if (itr->second.ID == id)
-                return &itr->second;
-        }
+        CinematicSequencesDBCMap::const_iterator itr = _cinematicSequencesMap.find(id);
+        if (itr != _cinematicSequencesMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    CreatureDisplayInfoDBC const* GetCreatureDisplayInfoDBC(uint32 id)
+    {
+        CreatureDisplayInfoDBCMap::const_iterator itr = _creatureDisplayInfoMap.find(id);
+        if (itr != _creatureDisplayInfoMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    CreatureDisplayInfoExtraDBC const* GetCreatureDisplayInfoExtraDBC(uint32 id)
+    {
+        CreatureDisplayInfoExtraDBCMap::const_iterator itr = _creatureDisplayInfoExtraMap.find(id);
+        if (itr != _creatureDisplayInfoExtraMap.end())
+            return &itr->second;
         return nullptr;
     }
 
@@ -315,6 +295,8 @@ protected:
     void _Load_ChrRaces();
     void _Load_CinematicCamera();
     void _Load_CinematicSequences();
+    void _Load_CreatureDisplayInfo();
+    void _Load_CreatureDisplayInfoExtra();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -337,6 +319,8 @@ private:
     ChrRacesDBCMap _chrRacesMap;
     CinematicCameraDBCMap _cinematicCameraMap;
     CinematicSequencesDBCMap _cinematicSequencesMap;
+    CreatureDisplayInfoDBCMap _creatureDisplayInfoMap;
+    CreatureDisplayInfoExtraDBCMap _creatureDisplayInfoExtraMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

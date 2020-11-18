@@ -2145,7 +2145,9 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                     uint32 title_horde = it->second;
 
                     CharTitlesDBC const* atitleInfo = sDBCStoresMgr->GetCharTitlesDBC(title_alliance);
+                    ASSERT_NOTNULL(atitleInfo);
                     CharTitlesDBC const* htitleInfo = sDBCStoresMgr->GetCharTitlesDBC(title_horde);
+                    ASSERT_NOTNULL(htitleInfo);
                     // new team
                     if (newTeam == ALLIANCE)
                     {

@@ -655,14 +655,14 @@ public:
             return false;
         }
 
-        if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+        if (!displayId)
         {
             handler->PSendSysMessage(LANG_COMMAND_INVALID_PARAM, Trinity::ToString(displayId).c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+        if (!sDBCStoresMgr->GetCreatureDisplayInfoDBC(displayId))
         {
             handler->PSendSysMessage("* The specified displayId '%u' doesn't exist", displayId);
             handler->SetSentErrorMessage(true);

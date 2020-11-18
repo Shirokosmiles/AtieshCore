@@ -371,6 +371,7 @@ struct CharTitlesDBC
     uint32 MaskID;                                          // 36 used in PLAYER_CHOSEN_TITLE and 1<<index in PLAYER__FIELD_KNOWN_TITLES
 };
 
+// load ChatChannels.dbc
 struct ChatChannelsDBC
 {
     uint32 ID;                                              // 0
@@ -464,4 +465,39 @@ struct CinematicSequencesDBC
     uint32 ID;                                              // 0
     //uint32 SoundID;                                       // 1
     uint32 Camera[8];                                       // 2-9 ID in CinematicCamera.dbc
+};
+
+// load CreatureDisplayInfo.dbc
+struct CreatureDisplayInfoDBC
+{
+    uint32 ID;                                              // 0
+    uint32 ModelID;                                         // 1
+    //uint32 SoundID;                                       // 2
+    uint32 ExtendedDisplayInfoID;                           // 3
+    float CreatureModelScale;                               // 4
+    //uint32 CreatureModelAlpha;                            // 5
+    //char const* TextureVariation[3];                      // 6-8
+    //char const* PortraitTextureName;                      // 9
+    //uint32 SizeClass;                                     // 10
+    //uint32 BloodID;                                       // 11
+    //uint32 NPCSoundID;                                    // 12
+    //uint32 ParticleColorID;                               // 13
+    //uint32 CreatureGeosetData;                            // 14
+    //uint32 ObjectEffectPackageID;                         // 15
+};
+
+// load CreatureDisplayInfoExtra.dbc
+struct CreatureDisplayInfoExtraDBC
+{
+    uint32 ID;                                              // 0
+    uint32 DisplayRaceID;                                   // 1
+    uint32 DisplaySexID;                                    // 2
+    //uint32 SkinID;                                        // 3
+    //uint32 FaceID;                                        // 4
+    //uint32 HairStyleID;                                   // 5
+    //uint32 HairColorID;                                   // 6
+    //uint32 FacialHairID;                                  // 7
+    //uint32 NPCItemDisplay[11];                            // 8-18
+    //uint32 Flags;                                         // 19
+    //char const* BakeName;                                 // 20
 };

@@ -513,7 +513,7 @@ public:
             return false;
 
         uint32 mount = atoul(mount_cstr);
-        if (!sCreatureDisplayInfoStore.LookupEntry(mount))
+        if (!sDBCStoresMgr->GetCreatureDisplayInfoDBC(mount))
         {
             handler->SendSysMessage(LANG_NO_MOUNT);
             handler->SetSentErrorMessage(true);

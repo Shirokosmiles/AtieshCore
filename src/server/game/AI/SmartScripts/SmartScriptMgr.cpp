@@ -1100,7 +1100,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                         TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has ModelID set with also set CreatureId, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                         return false;
                     }
-                    else if (!sCreatureDisplayInfoStore.LookupEntry(e.action.morphOrMount.model))
+                    else if (!sDBCStoresMgr->GetCreatureDisplayInfoDBC(e.action.morphOrMount.model))
                     {
                         TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Model id %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.morphOrMount.model);
                         return false;

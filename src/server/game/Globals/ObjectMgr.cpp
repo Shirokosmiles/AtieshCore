@@ -779,7 +779,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 
         if (creatureAddon.mount)
         {
-            if (!sCreatureDisplayInfoStore.LookupEntry(creatureAddon.mount))
+            if (!sDBCStoresMgr->GetCreatureDisplayInfoDBC(creatureAddon.mount))
             {
                 TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid displayInfoId (%u) for mount defined in `creature_template_addon`", entry, creatureAddon.mount);
                 creatureAddon.mount = 0;
@@ -1017,11 +1017,11 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     }
 
     // used later for scale
-    CreatureDisplayInfoEntry const* displayScaleEntry = nullptr;
+    CreatureDisplayInfoDBC const* displayScaleEntry = nullptr;
 
     if (cInfo->Modelid1)
     {
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->Modelid1);
+        CreatureDisplayInfoDBC const* displayEntry = sDBCStoresMgr->GetCreatureDisplayInfoDBC(cInfo->Modelid1);
         if (!displayEntry)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) lists non-existing Modelid1 id (%u), this can crash the client.", cInfo->Entry, cInfo->Modelid1);
@@ -1037,7 +1037,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 
     if (cInfo->Modelid2)
     {
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->Modelid2);
+        CreatureDisplayInfoDBC const* displayEntry = sDBCStoresMgr->GetCreatureDisplayInfoDBC(cInfo->Modelid2);
         if (!displayEntry)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) lists non-existing Modelid2 id (%u), this can crash the client.", cInfo->Entry, cInfo->Modelid2);
@@ -1053,7 +1053,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 
     if (cInfo->Modelid3)
     {
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->Modelid3);
+        CreatureDisplayInfoDBC const* displayEntry = sDBCStoresMgr->GetCreatureDisplayInfoDBC(cInfo->Modelid3);
         if (!displayEntry)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) lists non-existing Modelid3 id (%u), this can crash the client.", cInfo->Entry, cInfo->Modelid3);
@@ -1069,7 +1069,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 
     if (cInfo->Modelid4)
     {
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->Modelid4);
+        CreatureDisplayInfoDBC const* displayEntry = sDBCStoresMgr->GetCreatureDisplayInfoDBC(cInfo->Modelid4);
         if (!displayEntry)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) lists non-existing Modelid4 id (%u), this can crash the client.", cInfo->Entry, cInfo->Modelid4);
@@ -1315,7 +1315,7 @@ void ObjectMgr::LoadCreatureAddons()
 
         if (creatureAddon.mount)
         {
-            if (!sCreatureDisplayInfoStore.LookupEntry(creatureAddon.mount))
+            if (!sDBCStoresMgr->GetCreatureDisplayInfoDBC(creatureAddon.mount))
             {
                 TC_LOG_ERROR("sql.sql", "Creature (GUID: %u) has invalid displayInfoId (%u) for mount defined in `creature_addon`", guid, creatureAddon.mount);
                 creatureAddon.mount = 0;
@@ -1658,7 +1658,7 @@ void ObjectMgr::LoadCreatureModelInfo()
         Field* fields = result->Fetch();
 
         uint32 modelId = fields[0].GetUInt32();
-        CreatureDisplayInfoEntry const* creatureDisplay = sCreatureDisplayInfoStore.LookupEntry(modelId);
+        CreatureDisplayInfoDBC const* creatureDisplay = sDBCStoresMgr->GetCreatureDisplayInfoDBC(modelId);
         if (!creatureDisplay)
         {
             TC_LOG_ERROR("sql.sql", "Table `creature_model_info` has model for nonexistent display id (%u).", modelId);
@@ -1681,7 +1681,7 @@ void ObjectMgr::LoadCreatureModelInfo()
             modelInfo.gender = GENDER_MALE;
         }
 
-        if (modelInfo.modelid_other_gender && !sCreatureDisplayInfoStore.LookupEntry(modelInfo.modelid_other_gender))
+        if (modelInfo.modelid_other_gender && !sDBCStoresMgr->GetCreatureDisplayInfoDBC(modelInfo.modelid_other_gender))
         {
             TC_LOG_ERROR("sql.sql", "Table `creature_model_info` has nonexistent alt.gender model (%u) for existed display id (%u).", modelInfo.modelid_other_gender, modelId);
             modelInfo.modelid_other_gender = 0;
@@ -1734,7 +1734,7 @@ void ObjectMgr::LoadPlayerTotemModels()
             continue;
         }
 
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(displayId);
+        CreatureDisplayInfoDBC const* displayEntry = sDBCStoresMgr->GetCreatureDisplayInfoDBC(displayId);
         if (!displayEntry)
         {
             TC_LOG_ERROR("sql.sql", "TotemSlot: %u defined in `player_totem_model` has non-existing model (%u), skipped.", totemSlot, displayId);

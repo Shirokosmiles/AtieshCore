@@ -46,6 +46,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _chrRacesMap.clear();
     _cinematicCameraMap.clear();
     _cinematicSequencesMap.clear();
+    _creatureDisplayInfoMap.clear();
+    _creatureDisplayInfoExtraMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -71,6 +73,8 @@ void DBCStoresMgr::Initialize()
     _Load_ChrRaces();
     _Load_CinematicCamera();
     _Load_CinematicSequences();
+    _Load_CreatureDisplayInfo();
+    _Load_CreatureDisplayInfoExtra();
 }
 
 // load Achievement.dbc
@@ -79,8 +83,8 @@ void DBCStoresMgr::_Load_Achievement()
     uint32 oldMSTime = getMSTime();
 
     _achievementMap.clear();
-    //                                                0     1     2         3           4                    5                6                7                8                9                10               11              12            13       14     15           16                17
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Faction, Instance_Id, Title_Lang_enUS, Title_Lang_koKR, Title_Lang_frFR, Title_Lang_deDE, Title_Lang_zhCN, Title_Lang_zhTW, Title_Lang_esES, Title_Lang_esMX, Title_Lang_ruRU, Category, Points, Flags, Minimum_Criteria, Shares_Criteria FROM dbc_achievement");
+    //                                                0      1         2               3           4                    5                6                7                8                9                10               11           12       13      14         15                16
+    QueryResult result = WorldDatabase.Query("SELECT ID, Faction, Instance_Id, Title_Lang_enUS, Title_Lang_koKR, Title_Lang_frFR, Title_Lang_deDE, Title_Lang_zhCN, Title_Lang_zhTW, Title_Lang_esES, Title_Lang_esMX, Title_Lang_ruRU, Category, Points, Flags, Minimum_Criteria, Shares_Criteria FROM dbc_achievement");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievements. DB table `dbc_achievement` is empty.");
@@ -94,31 +98,32 @@ void DBCStoresMgr::_Load_Achievement()
 
         uint32 id = fields[0].GetUInt32();
         AchievementDBC ach;
-        ach.ID              = fields[1].GetUInt32();
-        ach.Faction         = fields[2].GetInt32();
-        ach.InstanceID      = fields[3].GetInt32();
+        ach.ID              = id;
+        ach.Faction         = fields[1].GetInt32();
+        ach.InstanceID      = fields[2].GetInt32();
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
         {
-            const char* test = fields[4+i].GetCString();
+            const char* test = fields[3+i].GetCString();
             std::array<const char*, 16> name;
             std::memcpy(name.data(), test, 16);
 
             ach.Title[i] = name;
         }
 
-        ach.Category        = fields[13].GetUInt32();
-        ach.Points          = fields[14].GetUInt32();
-        ach.Flags           = fields[15].GetUInt32();
-        ach.MinimumCriteria = fields[16].GetUInt32();
-        ach.SharesCriteria  = fields[17].GetUInt32();
+        ach.Category        = fields[12].GetUInt32();
+        ach.Points          = fields[13].GetUInt32();
+        ach.Flags           = fields[14].GetUInt32();
+        ach.MinimumCriteria = fields[15].GetUInt32();
+        ach.SharesCriteria  = fields[16].GetUInt32();
 
         _achievementMap[id] = ach;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_achievements in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_achievements                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Achievement_Criteria.dbc
@@ -127,8 +132,8 @@ void DBCStoresMgr::_Load_AchievementCriteria()
     uint32 oldMSTime = getMSTime();
 
     _achievementCriteriaMap.clear();
-    //                                                0     1        2           3       4        5           6            7            8           9                10                      11                   12                      13                       14                   15                       16                  17                      18             19           20                21           22
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Achievement_Id, Type, Asset_Id, Quantity, Start_Event, Start_Asset, Fail_Event, Fail_Asset, Description_Lang_enUS, Description_Lang_koKR, Description_Lang_frFR, Description_Lang_deDE, Description_Lang_zhCN, Description_Lang_zhTW, Description_Lang_esES, Description_Lang_esMX, Description_Lang_ruRU, Flags, Timer_Start_Event, Timer_Asset_Id, Timer_Time FROM dbc_achievement_criteria");
+    //                                                0          1        2         3       4           5           6            7            8                9                10                      11                   12                      13                       14                   15                       16                  17                    18            19           20                21
+    QueryResult result = WorldDatabase.Query("SELECT ID, Achievement_Id, Type, Asset_Id, Quantity, Start_Event, Start_Asset, Fail_Event, Fail_Asset, Description_Lang_enUS, Description_Lang_koKR, Description_Lang_frFR, Description_Lang_deDE, Description_Lang_zhCN, Description_Lang_zhTW, Description_Lang_esES, Description_Lang_esMX, Description_Lang_ruRU, Flags, Timer_Start_Event, Timer_Asset_Id, Timer_Time FROM dbc_achievement_criteria");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievement_criteria. DB table `dbc_achievement_criteria` is empty.");
@@ -142,38 +147,39 @@ void DBCStoresMgr::_Load_AchievementCriteria()
 
         uint32 id = fields[0].GetUInt32();
         AchievementCriteriaDBC achc;
-        achc.ID                  = fields[1].GetUInt32();
-        achc.AchievementID       = fields[2].GetUInt32();
-        achc.Type                = fields[3].GetUInt32();
+        achc.ID                  = id;
+        achc.AchievementID       = fields[1].GetUInt32();
+        achc.Type                = fields[2].GetUInt32();
 
-        achc.Asset.ID            = fields[4].GetUInt32();
-        achc.Quantity            = fields[5].GetUInt32();
+        achc.Asset.ID            = fields[3].GetUInt32();
+        achc.Quantity            = fields[4].GetUInt32();
 
-        achc.AdditionalRequirements[0].Type = fields[6].GetUInt32();
-        achc.AdditionalRequirements[0].Asset = fields[7].GetUInt32();
-        achc.AdditionalRequirements[1].Type = fields[8].GetUInt32();
-        achc.AdditionalRequirements[1].Asset = fields[9].GetUInt32();
+        achc.AdditionalRequirements[0].Type = fields[5].GetUInt32();
+        achc.AdditionalRequirements[0].Asset = fields[6].GetUInt32();
+        achc.AdditionalRequirements[1].Type = fields[7].GetUInt32();
+        achc.AdditionalRequirements[1].Asset = fields[8].GetUInt32();
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
         {
-            const char* test = fields[10 + i].GetCString();
+            const char* test = fields[9 + i].GetCString();
             std::array<const char*, 16> name;
             std::memcpy(name.data(), test, 16);
 
             achc.name[i] = name;
         }
 
-        achc.Flags      = fields[19].GetUInt32();
-        achc.StartEvent = fields[20].GetUInt32();
-        achc.StartAsset = fields[21].GetUInt32();
-        achc.StartTimer = fields[22].GetUInt32();
+        achc.Flags      = fields[18].GetUInt32();
+        achc.StartEvent = fields[19].GetUInt32();
+        achc.StartAsset = fields[20].GetUInt32();
+        achc.StartTimer = fields[21].GetUInt32();
 
         _achievementCriteriaMap[id] = achc;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_achievement_criteria in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_achievement_criteria          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load AreaTable.dbc
@@ -182,8 +188,8 @@ void DBCStoresMgr::_Load_AreaTable()
     uint32 oldMSTime = getMSTime();
 
     _areaTableMap.clear();
-    //                                                0     1       2             3          4       5           6                  7                    8                   9                   10                  11                  12                  13                14                   15                16               17               18              19              20
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, ContinentID, ParentAreaID, AreaBit, Flags, ExplorationLevel, AreaName_Lang_enUS, AreaName_Lang_koKR, AreaName_Lang_frFR, AreaName_Lang_deDE, AreaName_Lang_zhCN, AreaName_Lang_zhTW, AreaName_Lang_esES, AreaName_Lang_esMX, AreaName_Lang_ruRU, FactionGroupMask, LiquidTypeID_1, LiquidTypeID_2, LiquidTypeID_3, LiquidTypeID_4 FROM dbc_areatable");
+    //                                                0       1            2           3       4           5                  6                  7                    8                   9                   10                  11                  12                  13                14                   15                16               17               18              19
+    QueryResult result = WorldDatabase.Query("SELECT ID, ContinentID, ParentAreaID, AreaBit, Flags, ExplorationLevel, AreaName_Lang_enUS, AreaName_Lang_koKR, AreaName_Lang_frFR, AreaName_Lang_deDE, AreaName_Lang_zhCN, AreaName_Lang_zhTW, AreaName_Lang_esES, AreaName_Lang_esMX, AreaName_Lang_ruRU, FactionGroupMask, LiquidTypeID_1, LiquidTypeID_2, LiquidTypeID_3, LiquidTypeID_4 FROM dbc_areatable");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areatable. DB table `dbc_areatable` is empty.");
@@ -197,28 +203,29 @@ void DBCStoresMgr::_Load_AreaTable()
 
         uint32 id = fields[0].GetUInt32();
         AreaTableDBC at;
-        at.ID               = fields[1].GetUInt32();
-        at.ContinentID      = fields[2].GetUInt32();
-        at.ParentAreaID     = fields[3].GetUInt32();
-        at.AreaBit          = fields[4].GetUInt32();
-        at.Flags            = fields[5].GetUInt32();
-        at.ExplorationLevel = fields[6].GetInt32();
+        at.ID               = id;
+        at.ContinentID      = fields[1].GetUInt32();
+        at.ParentAreaID     = fields[2].GetUInt32();
+        at.AreaBit          = fields[3].GetUInt32();
+        at.Flags            = fields[4].GetUInt32();
+        at.ExplorationLevel = fields[5].GetInt32();
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-            at.AreaName[i] = fields[7 + i].GetString();
+            at.AreaName[i] = fields[6 + i].GetString();
 
-        at.FactionGroupMask = fields[16].GetUInt32();
-        at.LiquidTypeID[0]  = fields[17].GetUInt32();
-        at.LiquidTypeID[1]  = fields[18].GetUInt32();
-        at.LiquidTypeID[2]  = fields[19].GetUInt32();
-        at.LiquidTypeID[3]  = fields[20].GetUInt32();
+        at.FactionGroupMask = fields[15].GetUInt32();
+        at.LiquidTypeID[0]  = fields[16].GetUInt32();
+        at.LiquidTypeID[1]  = fields[17].GetUInt32();
+        at.LiquidTypeID[2]  = fields[18].GetUInt32();
+        at.LiquidTypeID[3]  = fields[19].GetUInt32();
 
         _areaTableMap[id] = at;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_areatable in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_areatable                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load AreaGroup.dbc
@@ -227,8 +234,8 @@ void DBCStoresMgr::_Load_AreaGroup()
     uint32 oldMSTime = getMSTime();
 
     _areaGroupMap.clear();
-    //                                                0     1     2         3         4         5         6         7         8
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, AreaID_1, AreaID_2, AreaID_3, AreaID_4, AreaID_5, AreaID_6, NextAreaID FROM dbc_areagroup");
+    //                                                0     1         2         3         4         5         6         7
+    QueryResult result = WorldDatabase.Query("SELECT ID, AreaID_1, AreaID_2, AreaID_3, AreaID_4, AreaID_5, AreaID_6, NextAreaID FROM dbc_areagroup");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areagroup. DB table `dbc_areagroup` is empty.");
@@ -242,18 +249,19 @@ void DBCStoresMgr::_Load_AreaGroup()
 
         uint32 id = fields[0].GetUInt32();
         AreaGroupDBC ag;
-        ag.ID = fields[1].GetUInt32();
+        ag.ID = id;
 
         for (uint8 i = 0; i < MAX_GROUP_AREA_IDS; i++)
-            ag.AreaID[i] = fields[2 + i].GetUInt32();
+            ag.AreaID[i] = fields[1 + i].GetUInt32();
 
-        ag.NextAreaID = fields[8].GetUInt32();
+        ag.NextAreaID = fields[7].GetUInt32();
         _areaGroupMap[id] = ag;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_areagroup in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_areagroup                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load AreaPOI.dbc
@@ -262,8 +270,8 @@ void DBCStoresMgr::_Load_AreaPOI()
     uint32 oldMSTime = getMSTime();
 
     _areaPOIMap.clear();
-    //                                                0     1       2        3        4       5      6       7       8        9      10      11       12     13 14 15       16        17         18
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Importance, Icon_1, Icon_2, Icon_3, Icon_4, Icon_5, Icon_6, Icon_7, Icon_8, Icon_9, FactionID, X, Y, Z, ContinentID, AreaID, WorldStateID FROM dbc_areapoi");
+    //                                                0     1          2        3       4       5      6       7       8        9      10      11       12 13 14      15       16        17
+    QueryResult result = WorldDatabase.Query("SELECT ID, Importance, Icon_1, Icon_2, Icon_3, Icon_4, Icon_5, Icon_6, Icon_7, Icon_8, Icon_9, FactionID, X, Y, Z, ContinentID, AreaID, WorldStateID FROM dbc_areapoi");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areapoi. DB table `dbc_areapoi` is empty.");
@@ -277,26 +285,27 @@ void DBCStoresMgr::_Load_AreaPOI()
 
         uint32 id = fields[0].GetUInt32();
         AreaPOIDBC ap;
-        ap.ID         = fields[1].GetUInt32();
-        ap.Importance = fields[2].GetUInt32();
+        ap.ID         = id;
+        ap.Importance = fields[1].GetUInt32();
 
         for (uint8 i = 0; i < 9; i++)
-            ap.Icon[i] = fields[3 + i].GetUInt32();
+            ap.Icon[i] = fields[2 + i].GetUInt32();
 
-        ap.FactionID    = fields[12].GetUInt32();
-        ap.Pos.X        = fields[13].GetFloat();
-        ap.Pos.Y        = fields[14].GetFloat();
-        ap.Pos.Z        = fields[15].GetFloat();
-        ap.ContinentID  = fields[16].GetUInt32();
-        ap.AreaID       = fields[17].GetUInt32();
-        ap.WorldStateID = fields[18].GetUInt32();
+        ap.FactionID    = fields[11].GetUInt32();
+        ap.Pos.X        = fields[12].GetFloat();
+        ap.Pos.Y        = fields[13].GetFloat();
+        ap.Pos.Z        = fields[14].GetFloat();
+        ap.ContinentID  = fields[15].GetUInt32();
+        ap.AreaID       = fields[16].GetUInt32();
+        ap.WorldStateID = fields[17].GetUInt32();
 
         _areaPOIMap[id] = ap;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_areapoi in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_areapoi                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load AreaTrigger.dbc
@@ -305,8 +314,8 @@ void DBCStoresMgr::_Load_AreaTrigger()
     uint32 oldMSTime = getMSTime();
 
     _areaTriggerMap.clear();
-    //                                                0     1       2       3  4  5     6         7          8          9         10
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, ContinentID, X, Y, Z, Radius, Box_Length, Box_Width, Box_Height, Box_Yaw FROM dbc_areatrigger");
+    //                                                0     1         2  3  4     5        6          7          8           9
+    QueryResult result = WorldDatabase.Query("SELECT ID, ContinentID, X, Y, Z, Radius, Box_Length, Box_Width, Box_Height, Box_Yaw FROM dbc_areatrigger");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areatrigger. DB table `dbc_areatrigger` is empty.");
@@ -320,22 +329,23 @@ void DBCStoresMgr::_Load_AreaTrigger()
 
         uint32 id = fields[0].GetUInt32();
         AreaTriggerDBC at;
-        at.ID          = fields[1].GetUInt32();
-        at.ContinentID = fields[2].GetUInt32();
-        at.Pos.X       = fields[3].GetFloat();
-        at.Pos.Y       = fields[4].GetFloat();
-        at.Pos.Z       = fields[5].GetFloat();
-        at.Radius      = fields[6].GetFloat();
-        at.BoxLength   = fields[7].GetFloat();
-        at.BoxWidth    = fields[8].GetFloat();
-        at.BoxHeight   = fields[9].GetFloat();
+        at.ID          = id;
+        at.ContinentID = fields[1].GetUInt32();
+        at.Pos.X       = fields[2].GetFloat();
+        at.Pos.Y       = fields[3].GetFloat();
+        at.Pos.Z       = fields[4].GetFloat();
+        at.Radius      = fields[5].GetFloat();
+        at.BoxLength   = fields[6].GetFloat();
+        at.BoxWidth    = fields[7].GetFloat();
+        at.BoxHeight   = fields[8].GetFloat();
 
         _areaTriggerMap[id] = at;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_areatrigger in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_areatrigger                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load AuctionHouse.dbc
@@ -344,8 +354,8 @@ void DBCStoresMgr::_Load_AuctionHouse()
     uint32 oldMSTime = getMSTime();
 
     _auctionHouseMap.clear();
-    //                                                0     1       2          3               4
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, FactionID, DepositRate, ConsignmentRate FROM dbc_auctionhouse");
+    //                                                0     1             2             3
+    QueryResult result = WorldDatabase.Query("SELECT ID, FactionID, DepositRate, ConsignmentRate FROM dbc_auctionhouse");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_auctionhouse. DB table `dbc_auctionhouse` is empty.");
@@ -359,17 +369,18 @@ void DBCStoresMgr::_Load_AuctionHouse()
 
         uint32 id = fields[0].GetUInt32();
         AuctionHouseDBC ah;
-        ah.ID              = fields[1].GetUInt32();
-        ah.FactionID       = fields[2].GetUInt32();
-        ah.DepositRate     = fields[3].GetUInt32();
-        ah.ConsignmentRate = fields[4].GetUInt32();
+        ah.ID              = id;
+        ah.FactionID       = fields[1].GetUInt32();
+        ah.DepositRate     = fields[2].GetUInt32();
+        ah.ConsignmentRate = fields[3].GetUInt32();
 
         _auctionHouseMap[id] = ah;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_auctionhouse in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_auctionhouse                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load BankBagSlotPrices.dbc
@@ -378,8 +389,8 @@ void DBCStoresMgr::_Load_BankBagSlotPrices()
     uint32 oldMSTime = getMSTime();
 
     _bankBagSlotPricesMap.clear();
-    //                                                0     1    2
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Cost FROM dbc_bankbagslotprices");
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Cost FROM dbc_bankbagslotprices");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_bankbagslotprices. DB table `dbc_bankbagslotprices` is empty.");
@@ -393,15 +404,16 @@ void DBCStoresMgr::_Load_BankBagSlotPrices()
 
         uint32 id = fields[0].GetUInt32();
         BankBagSlotPricesDBC bsp;
-        bsp.ID   = fields[1].GetUInt32();
-        bsp.Cost = fields[2].GetUInt32();
+        bsp.ID   = id;
+        bsp.Cost = fields[1].GetUInt32();
 
         _bankBagSlotPricesMap[id] = bsp;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_bankbagslotprices in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_bankbagslotprices             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load BannedAddOns.dbc
@@ -410,8 +422,8 @@ void DBCStoresMgr::_Load_BannedAddOns()
     uint32 oldMSTime = getMSTime();
 
     _bannedAddonsMap.clear();
-    //                                                0     1
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID FROM dbc_bannedaddons");
+    //                                                0
+    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_bannedaddons");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_bannedaddons. DB table `dbc_bannedaddons` is empty.");
@@ -425,14 +437,15 @@ void DBCStoresMgr::_Load_BannedAddOns()
 
         uint32 id = fields[0].GetUInt32();
         BannedAddOnsDBC ba;
-        ba.ID = fields[1].GetUInt32();
+        ba.ID = id;
 
         _bannedAddonsMap[id] = ba;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_bannedaddons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_bannedaddons                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load BarberShopStyle.dbc
@@ -441,8 +454,8 @@ void DBCStoresMgr::_Load_BarberShopStyle()
     uint32 oldMSTime = getMSTime();
 
     _barberShopStyleMap.clear();
-    //                                                0     1    2    3     4    5
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Type, Race, Sex, Data FROM dbc_barbershopstyle");
+    //                                                0    1    2     3     4
+    QueryResult result = WorldDatabase.Query("SELECT ID, Type, Race, Sex, Data FROM dbc_barbershopstyle");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_barbershopstyle. DB table `dbc_barbershopstyle` is empty.");
@@ -456,18 +469,19 @@ void DBCStoresMgr::_Load_BarberShopStyle()
 
         uint32 id = fields[0].GetUInt32();
         BarberShopStyleDBC bs;
-        bs.ID   = fields[1].GetUInt32();
-        bs.Type = fields[2].GetUInt32();
-        bs.Race = fields[3].GetUInt32();
-        bs.Sex  = fields[4].GetUInt32();
-        bs.Data = fields[5].GetUInt32();
+        bs.ID   = id;
+        bs.Type = fields[1].GetUInt32();
+        bs.Race = fields[2].GetUInt32();
+        bs.Sex  = fields[3].GetUInt32();
+        bs.Data = fields[4].GetUInt32();
 
         _barberShopStyleMap[id] = bs;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_barbershopstyle in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_barbershopstyle               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load BattlemasterList.dbc
@@ -476,8 +490,8 @@ void DBCStoresMgr::_Load_BattlemasterList()
     uint32 oldMSTime = getMSTime();
 
     _battlemasterListMap.clear();
-    //                                                0     1    2          3        4        5        6        7       8       9           10              11              12              13              14              15              16              17              18              19              20              21
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, MapID_1, MapID_2, MapID_3, MapID_4, MapID_5, MapID_6, MapID_7, MapID_8, InstanceType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MaxGroupSize, HolidayWorldState FROM dbc_battlemasterlist");
+    //                                                0     1        2        3        4        5        6        7       8             9           10              11              12              13              14              15              16              17              18              19              20
+    QueryResult result = WorldDatabase.Query("SELECT ID, MapID_1, MapID_2, MapID_3, MapID_4, MapID_5, MapID_6, MapID_7, MapID_8, InstanceType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MaxGroupSize, HolidayWorldState FROM dbc_battlemasterlist");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_battlemasterlist. DB table `dbc_battlemasterlist` is empty.");
@@ -491,25 +505,26 @@ void DBCStoresMgr::_Load_BattlemasterList()
 
         uint32 id = fields[0].GetUInt32();
         BattlemasterListDBC bl;
-        bl.ID = fields[1].GetUInt32();
+        bl.ID = id;
 
         for (uint8 i = 0; i < 8; i++)
-            bl.MapID[i] = fields[2 + i].GetInt32();
+            bl.MapID[i] = fields[1 + i].GetInt32();
 
-        bl.InstanceType = fields[10].GetUInt32();
+        bl.InstanceType = fields[9].GetUInt32();
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-            bl.Name[i] = fields[11 + i].GetInt32();
+            bl.Name[i] = fields[10 + i].GetInt32();
 
-        bl.MaxGroupSize      = fields[20].GetUInt32();
-        bl.HolidayWorldState = fields[21].GetUInt32();
+        bl.MaxGroupSize      = fields[19].GetUInt32();
+        bl.HolidayWorldState = fields[20].GetUInt32();
 
         _battlemasterListMap[id] = bl;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_battlemasterlist in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_battlemasterlist              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CharacterFacialHairStyles.dbc
@@ -518,8 +533,8 @@ void DBCStoresMgr::_Load_CharacterFacialHairStyles()
     uint32 oldMSTime = getMSTime();
 
     _characterFacialHairStyleMap.clear();
-    //                                                 0    1     2      3         4
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, RaceID, SexID, VariationID FROM dbc_characterfacialhairstyles");
+    //                                                0    1       2        3
+    QueryResult result = WorldDatabase.Query("SELECT ID, RaceID, SexID, VariationID FROM dbc_characterfacialhairstyles");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_characterfacialhairstyles. DB table `dbc_characterfacialhairstyles` is empty.");
@@ -533,17 +548,18 @@ void DBCStoresMgr::_Load_CharacterFacialHairStyles()
 
         uint32 id = fields[0].GetUInt32();
         CharacterFacialHairStylesDBC cfhs;
-        cfhs.ID          = fields[1].GetUInt32();
-        cfhs.RaceID      = fields[2].GetUInt8();
-        cfhs.SexID       = fields[3].GetUInt8();
-        cfhs.VariationID = fields[4].GetUInt8();
+        cfhs.ID          = id;
+        cfhs.RaceID      = fields[1].GetUInt8();
+        cfhs.SexID       = fields[2].GetUInt8();
+        cfhs.VariationID = fields[3].GetUInt8();
 
         _characterFacialHairStyleMap[id] = cfhs;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_characterfacialhairstyles in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_characterfacialhairstyles     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CharSections.dbc
@@ -552,8 +568,8 @@ void DBCStoresMgr::_Load_CharSections()
     uint32 oldMSTime = getMSTime();
 
     _charSectionMap.clear();
-    //                                                 0    1     2      3         4         5          6              7
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, RaceID, SexID, BaseSection, Flags, VariationIndex, ColorIndex FROM dbc_charsections");
+    //                                                0    1       2         3         4         5             6
+    QueryResult result = WorldDatabase.Query("SELECT ID, RaceID, SexID, BaseSection, Flags, VariationIndex, ColorIndex FROM dbc_charsections");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_charsections. DB table `dbc_charsections` is empty.");
@@ -567,20 +583,21 @@ void DBCStoresMgr::_Load_CharSections()
 
         uint32 id = fields[0].GetUInt32();
         CharSectionsDBC cs;
-        cs.ID             = fields[1].GetUInt32();
-        cs.RaceID         = fields[2].GetUInt8();
-        cs.SexID          = fields[3].GetUInt8();
-        cs.BaseSection    = fields[4].GetUInt8();
-        cs.Flags          = fields[5].GetUInt8();
-        cs.VariationIndex = fields[6].GetUInt8();
-        cs.ColorIndex     = fields[7].GetUInt8();
+        cs.ID             = id;
+        cs.RaceID         = fields[1].GetUInt8();
+        cs.SexID          = fields[2].GetUInt8();
+        cs.BaseSection    = fields[3].GetUInt8();
+        cs.Flags          = fields[4].GetUInt8();
+        cs.VariationIndex = fields[5].GetUInt8();
+        cs.ColorIndex     = fields[6].GetUInt8();
 
         _charSectionMap[id] = cs;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_charsections in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_charsections                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CharStartOutfit.dbc
@@ -589,8 +606,8 @@ void DBCStoresMgr::_Load_CharStartOutfit()
     uint32 oldMSTime = getMSTime();
 
     _charStartOutfitMap.clear();
-    //                                                 0    1     2      3         4      5         6         7         8         9         10        11        12        13        14          15        16          17        18          19         20         21        22          23         24         25        26          27        28
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, RaceID, ClassID, SexID, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, ItemID_11, ItemID_12, ItemID_13, ItemID_14, ItemID_15, ItemID_16, ItemID_17, ItemID_18, ItemID_19, ItemID_20, ItemID_21, ItemID_22, ItemID_23, ItemID_24 FROM dbc_charstartoutfit");
+    //                                                0    1        2       3       4         5         6         7         8         9         10        11        12        13        14          15        16          17        18          19         20         21        22          23         24         25        26          27
+    QueryResult result = WorldDatabase.Query("SELECT ID, RaceID, ClassID, SexID, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, ItemID_11, ItemID_12, ItemID_13, ItemID_14, ItemID_15, ItemID_16, ItemID_17, ItemID_18, ItemID_19, ItemID_20, ItemID_21, ItemID_22, ItemID_23, ItemID_24 FROM dbc_charstartoutfit");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_charstartoutfit. DB table `dbc_charstartoutfit` is empty.");
@@ -604,20 +621,21 @@ void DBCStoresMgr::_Load_CharStartOutfit()
 
         uint32 id = fields[0].GetUInt32();
         CharStartOutfitDBC cso;
-        cso.ID      = fields[1].GetUInt32();
-        cso.RaceID  = fields[2].GetUInt8();
-        cso.ClassID = fields[3].GetUInt8();
-        cso.SexID   = fields[4].GetUInt8();
+        cso.ID      = id;
+        cso.RaceID  = fields[1].GetUInt8();
+        cso.ClassID = fields[2].GetUInt8();
+        cso.SexID   = fields[3].GetUInt8();
 
         for (uint8 i = 0; i < MAX_OUTFIT_ITEMS; i++)
-            cso.ItemID[i] = fields[5 + i].GetInt32();        
+            cso.ItemID[i] = fields[4 + i].GetInt32();        
 
         _charStartOutfitMap[id] = cso;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_charstartoutfit in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_charstartoutfit               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CharTitles.dbc
@@ -626,8 +644,8 @@ void DBCStoresMgr::_Load_CharTitles()
     uint32 oldMSTime = getMSTime();
 
     _charTitlesMap.clear();
-    //                                                 0    1       2               3               4               5               6               7               8               9               10              11              12                13                14              15              16              17                  18              19             20
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name1_Lang_enUS, Name1_Lang_koKR, Name1_Lang_frFR, Name1_Lang_deDE, Name1_Lang_zhCN, Name1_Lang_zhTW, Name1_Lang_esES, Name1_Lang_esMX, Name1_Lang_ruRU, Mask_ID FROM dbc_chartitles");
+    //                                                0        1               2               3               4               5               6               7               8               9               10              11              12                13                14              15              16              17                  18           19
+    QueryResult result = WorldDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name1_Lang_enUS, Name1_Lang_koKR, Name1_Lang_frFR, Name1_Lang_deDE, Name1_Lang_zhCN, Name1_Lang_zhTW, Name1_Lang_esES, Name1_Lang_esMX, Name1_Lang_ruRU, Mask_ID FROM dbc_chartitles");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chartitles. DB table `dbc_chartitles` is empty.");
@@ -641,22 +659,23 @@ void DBCStoresMgr::_Load_CharTitles()
 
         uint32 id = fields[0].GetUInt32();
         CharTitlesDBC ct;
-        ct.ID = fields[1].GetUInt32();
+        ct.ID = id;
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-            ct.Name[i] = fields[2 + i].GetString();
+            ct.Name[i] = fields[1 + i].GetString();
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-            ct.Name1[i] = fields[11 + i].GetString();
+            ct.Name1[i] = fields[10 + i].GetString();
 
-        ct.MaskID = fields[20].GetUInt32();
+        ct.MaskID = fields[19].GetUInt32();
 
         _charTitlesMap[id] = ct;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chartitles in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_chartitles                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ChatChannels.dbc
@@ -665,8 +684,8 @@ void DBCStoresMgr::_Load_ChatChannels()
     uint32 oldMSTime = getMSTime();
 
     _chatChannelsMap.clear();
-    //                                                 0    1    2           3               4               5               6               7               8               9               10              11
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Flags, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_chatchannels");
+    //                                                0    1             2           3               4               5               6               7               8               9               10
+    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_chatchannels");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chatchannels. DB table `dbc_chatchannels` is empty.");
@@ -680,18 +699,19 @@ void DBCStoresMgr::_Load_ChatChannels()
 
         uint32 id = fields[0].GetUInt32();
         ChatChannelsDBC cc;
-        cc.ID = fields[1].GetUInt32();
+        cc.ID = id;
         cc.Flags = fields[1].GetUInt32();
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-            cc.Name[i] = fields[3 + i].GetString();
+            cc.Name[i] = fields[2 + i].GetString();
 
         _chatChannelsMap[id] = cc;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chatchannels in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_chatchannels                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ChrClasses.dbc
@@ -700,8 +720,8 @@ void DBCStoresMgr::_Load_ChrClasses()
     uint32 oldMSTime = getMSTime();
 
     _chrClassesMap.clear();
-    //                                                 0    1       2               3               4               5               6               7               8               9               10              11              12              13                  14
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, DisplayPower, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, SpellClassSet, CinematicSequenceID, Required_Expansion  FROM dbc_chrclasses");
+    //                                                0       1              2               3               4               5               6               7               8               9               10              11              12                   13
+    QueryResult result = WorldDatabase.Query("SELECT ID, DisplayPower, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, SpellClassSet, CinematicSequenceID, Required_Expansion FROM dbc_chrclasses");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrclasses. DB table `dbc_chrclasses` is empty.");
@@ -715,22 +735,23 @@ void DBCStoresMgr::_Load_ChrClasses()
 
         uint32 id = fields[0].GetUInt32();
         ChrClassesDBC cc;
-        cc.ID           = fields[1].GetUInt32();
-        cc.DisplayPower = fields[2].GetUInt32();
+        cc.ID           = id;
+        cc.DisplayPower = fields[1].GetUInt32();
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-            cc.Name[i] = fields[3 + i].GetString();
+            cc.Name[i] = fields[2 + i].GetString();
 
-        cc.SpellClassSet       = fields[12].GetUInt32();
-        cc.CinematicSequenceID = fields[13].GetUInt32();
-        cc.RequiredExpansion   = fields[14].GetUInt32();
+        cc.SpellClassSet       = fields[11].GetUInt32();
+        cc.CinematicSequenceID = fields[12].GetUInt32();
+        cc.RequiredExpansion   = fields[13].GetUInt32();
 
         _chrClassesMap[id] = cc;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chrclasses in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_chrclasses                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ChrRaces.dbc
@@ -739,8 +760,8 @@ void DBCStoresMgr::_Load_ChrRaces()
     uint32 oldMSTime = getMSTime();
 
     _chrRacesMap.clear();
-    //                                                 0    1     2       3            4               5               6               7               8               9                 10           11              12              13              14               15              16              17               18              19              20
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Flags, FactionID, MaleDisplayId, FemaleDisplayId, BaseLanguage, CreatureType, ResSicknessSpellID, CinematicSequenceID, Alliance, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Required_Expansion FROM dbc_chrraces");
+    //                                                0    1         2          3                4               5            6               7                     8               9            10           11              12              13              14               15              16              17               18              19
+    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, FactionID, MaleDisplayId, FemaleDisplayId, BaseLanguage, CreatureType, ResSicknessSpellID, CinematicSequenceID, Alliance, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Required_Expansion FROM dbc_chrraces");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrraces. DB table `dbc_chrraces` is empty.");
@@ -754,28 +775,29 @@ void DBCStoresMgr::_Load_ChrRaces()
 
         uint32 id = fields[0].GetUInt32();
         ChrRacesDBC cr;
-        cr.ID                  = fields[1].GetUInt32();
-        cr.Flags               = fields[2].GetUInt32();
-        cr.FactionID           = fields[3].GetUInt32();
-        cr.MaleDisplayID       = fields[4].GetUInt32();
-        cr.FemaleDisplayID     = fields[5].GetUInt32();
-        cr.BaseLanguage        = fields[6].GetUInt32();
-        cr.CreatureType        = fields[7].GetUInt32();
-        cr.ResSicknessSpellID  = fields[8].GetUInt32();
-        cr.CinematicSequenceID = fields[9].GetUInt32();
-        cr.Alliance            = fields[10].GetUInt32();
+        cr.ID                  = id;
+        cr.Flags               = fields[1].GetUInt32();
+        cr.FactionID           = fields[2].GetUInt32();
+        cr.MaleDisplayID       = fields[3].GetUInt32();
+        cr.FemaleDisplayID     = fields[4].GetUInt32();
+        cr.BaseLanguage        = fields[5].GetUInt32();
+        cr.CreatureType        = fields[6].GetUInt32();
+        cr.ResSicknessSpellID  = fields[7].GetUInt32();
+        cr.CinematicSequenceID = fields[8].GetUInt32();
+        cr.Alliance            = fields[9].GetUInt32();
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-            cr.Name[i] = fields[11 + i].GetString();
+            cr.Name[i] = fields[10 + i].GetString();
 
-        cr.RequiredExpansion   = fields[20].GetUInt32();
+        cr.RequiredExpansion   = fields[19].GetUInt32();
 
         _chrRacesMap[id] = cr;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_chrraces in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_chrraces                      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CinematicCamera.dbc
@@ -784,8 +806,8 @@ void DBCStoresMgr::_Load_CinematicCamera()
     uint32 oldMSTime = getMSTime();
 
     _cinematicCameraMap.clear();
-    //                                                 0    1    2       3        4         5       6          7
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Model, SoundID, OriginX, OriginY, OriginZ, OriginFacing FROM dbc_cinematiccamera");
+    //                                               0     1       2        3        4         5       6
+    QueryResult result = WorldDatabase.Query("SELECT ID, Model, SoundID, OriginX, OriginY, OriginZ, OriginFacing FROM dbc_cinematiccamera");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_cinematiccamera. DB table `dbc_cinematiccamera` is empty.");
@@ -799,20 +821,21 @@ void DBCStoresMgr::_Load_CinematicCamera()
 
         uint32 id = fields[0].GetUInt32();
         CinematicCameraDBC cc;
-        cc.ID           = fields[1].GetUInt32();
-        cc.Model        = fields[2].GetString();
-        cc.SoundID      = fields[3].GetUInt32();
-        cc.OriginX      = fields[4].GetFloat();
-        cc.OriginY      = fields[5].GetFloat();
-        cc.OriginZ      = fields[6].GetFloat();
-        cc.OriginFacing = fields[7].GetFloat();
+        cc.ID           = id;
+        cc.Model        = fields[1].GetString();
+        cc.SoundID      = fields[2].GetUInt32();
+        cc.OriginX      = fields[3].GetFloat();
+        cc.OriginY      = fields[4].GetFloat();
+        cc.OriginZ      = fields[5].GetFloat();
+        cc.OriginFacing = fields[6].GetFloat();
 
         _cinematicCameraMap[id] = cc;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_cinematiccamera in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_cinematiccamera               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CinematicSequences.dbc
@@ -821,8 +844,8 @@ void DBCStoresMgr::_Load_CinematicSequences()
     uint32 oldMSTime = getMSTime();
 
     _cinematicSequencesMap.clear();
-    //                                                 0    1     2         3         4         5          6        7         8         9
-    QueryResult result = WorldDatabase.Query("SELECT guid, ID, Camera_1, Camera_2, Camera_3, Camera_4, Camera_5, Camera_6, Camera_7, Camera_8 FROM dbc_cinematicsequences");
+    //                                                0      1        2         3         4         5          6        7         8
+    QueryResult result = WorldDatabase.Query("SELECT ID, Camera_1, Camera_2, Camera_3, Camera_4, Camera_5, Camera_6, Camera_7, Camera_8 FROM dbc_cinematicsequences");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_cinematicsequences. DB table `dbc_cinematicsequences` is empty.");
@@ -836,15 +859,85 @@ void DBCStoresMgr::_Load_CinematicSequences()
 
         uint32 id = fields[0].GetUInt32();
         CinematicSequencesDBC cs;
-        cs.ID = fields[1].GetUInt32();
+        cs.ID = id;
 
         for (uint8 i = 0; i < 8; i++)
-            cs.Camera[i] = fields[2 + i].GetUInt32();
+            cs.Camera[i] = fields[1 + i].GetUInt32();
 
         _cinematicSequencesMap[id] = cs;
 
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u DBC_cinematicsequences in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_cinematicsequences            %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CreatureDisplayInfo.dbc
+void DBCStoresMgr::_Load_CreatureDisplayInfo()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _creatureDisplayInfoMap.clear();
+    //                                                0    1                2                     3
+    QueryResult result = WorldDatabase.Query("SELECT ID, ModelID, ExtendedDisplayInfoID, CreatureModelScale FROM dbc_creaturedisplayinfo");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturedisplayinfo. DB table `dbc_creaturedisplayinfo` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();        
+        CreatureDisplayInfoDBC cdi;
+        cdi.ID = id;
+        cdi.ModelID               = fields[1].GetUInt32();
+        cdi.ExtendedDisplayInfoID = fields[2].GetUInt32();
+        cdi.CreatureModelScale    = fields[3].GetFloat();
+
+        _creatureDisplayInfoMap[id] = cdi;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturedisplayinfo           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CreatureDisplayInfoExtra.dbc
+void DBCStoresMgr::_Load_CreatureDisplayInfoExtra()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _creatureDisplayInfoExtraMap.clear();
+    //                                                0       1              2
+    QueryResult result = WorldDatabase.Query("SELECT ID, DisplayRaceID, DisplaySexID FROM dbc_creaturedisplayinfoextra");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturedisplayinfoextra. DB table `dbc_creaturedisplayinfoextra` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CreatureDisplayInfoExtraDBC cdie;
+        cdie.ID = id;
+        cdie.DisplayRaceID = fields[1].GetUInt32();
+        cdie.DisplaySexID  = fields[2].GetUInt32();
+
+        _creatureDisplayInfoExtraMap[id] = cdie;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturedisplayinfoextra      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

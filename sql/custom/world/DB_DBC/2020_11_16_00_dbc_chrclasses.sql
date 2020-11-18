@@ -3,7 +3,6 @@
 -- ----------------------------
 DROP TABLE IF EXISTS `dbc_chrclasses`;
 CREATE TABLE `dbc_chrclasses`  (
-  `guid` int(11) NOT NULL AUTO_INCREMENT,
   `ID` int(11) NOT NULL DEFAULT 0,
   `Field01` int(11) NOT NULL DEFAULT 0,
   `DisplayPower` int(11) NOT NULL DEFAULT 0,
@@ -64,20 +63,20 @@ CREATE TABLE `dbc_chrclasses`  (
   `Flags` int(11) NOT NULL DEFAULT 0,
   `CinematicSequenceID` int(11) NOT NULL DEFAULT 0,
   `Required_Expansion` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`guid`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 11 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE = MyISAM CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of dbc_chrclasses
 -- ----------------------------
 INSERT INTO `dbc_chrclasses` VALUES
-(1, 1, 0, 1, 1, 'Warrior', '', '', 'Guerrier', 'Krieger', '', '战士', '', '', 'Guerrero', '', 'Воин', '', '', '', '', 16712191, '', '', '', 'Guerrière', 'Kriegerin', '', '', '', '', 'Guerrera', '', '', '', '', '', '', 16712172, '', '', '', 'Guerrier', 'Krieger', '', '', '', '', 'Guerrero', '', 'Воин', '', '', '', '', 16712172, 'WARRIOR', 4, 50, 0, 0),
-(2, 2, 0, 0, 1, 'Paladin', '', '', 'Paladin', 'Paladin', '', '圣骑士', '', '', 'Paladín', '', 'Паладин', '', '', '', '', 16712191, '', '', '', '', '', '', '', '', '', 'Paladín', '', '', '', '', '', '', 16712172, '', '', '', 'Paladin', 'Paladin', '', '', '', '', 'Paladín', '', 'Паладин', '', '', '', '', 16712172, 'PALADIN', 10, 58, 0, 0),
-(3, 3, 1, 0, 1, 'Hunter', '', '', 'Chasseur', 'Jäger', '', '猎人', '', '', 'Cazador', '', 'Охотник', '', '', '', '', 16712191, '', '', '', 'Chasseresse', 'Jägerin', '', '', '', '', 'Cazadora', '', 'Охотница', '', '', '', '', 16712172, '', '', '', 'Chasseur', 'Jäger', '', '', '', '', 'Cazador', '', 'Охотник', '', '', '', '', 16712172, 'HUNTER', 9, 22, 0, 0),
-(4, 4, 1, 3, 1, 'Rogue', '', '', 'Voleur', 'Schurke', '', '潜行者', '', '', 'Pícaro', '', 'Разбойник', '', '', '', '', 16712191, '', '', '', 'Voleuse', 'Schurkin', '', '', '', '', 'Pícara', '', 'Разбойница', '', '', '', '', 16712172, '', '', '', 'Voleur', 'Schurke', '', '', '', '', 'Pícaro', '', 'Разбойник', '', '', '', '', 16712172, 'ROGUE', 8, 2, 0, 0),
-(5, 5, 0, 0, 1, 'Priest', '', '', 'Prêtre', 'Priester', '', '牧师', '', '', 'Sacerdote', '', 'Жрец', '', '', '', '', 16712191, '', '', '', 'Prêtresse', 'Priesterin', '', '', '', '', 'Sacerdotisa', '', 'Жрица', '', '', '', '', 16712172, '', '', '', 'Prêtre', 'Priester', '', '', '', '', 'Sacerdote', '', 'Жрец', '', '', '', '', 16712172, 'PRIEST', 6, 2, 0, 0),
-(6, 6, 9, 6, 1, 'Death Knight', '', '', 'Chevalier de la mort', 'Todesritter', '', '死亡骑士', '', '', 'Caballero de la Muerte', '', 'Рыцарь смерти', '', '', '', '', 16712190, '', '', '', '', '', '', '', '', '', 'Caballero de la Muerte', '', '', '', '', '', '', 16712172, '', '', '', 'Chevalier de la mort', 'Todesritter', '', '', '', '', 'Caballero de la Muerte', '', 'Рыцарь смерти', '', '', '', '', 16712172, 'DEATHKNIGHT', 15, 122, 165, 2),
-(7, 7, 1, 0, 1, 'Shaman', '', '', 'Chaman', 'Schamane', '', '萨满祭司', '', '', 'Chamán', '', 'Шаман', '', '', '', '', 16712191, '', '', '', 'Chamane', 'Schamanin', '', '', '', '', 'Chamán', '', 'Шаманка', '', '', '', '', 16712172, '', '', '', 'Chaman', 'Schamane', '', '', '', '', 'Chamán', '', 'Шаман', '', '', '', '', 16712172, 'SHAMAN', 11, 26, 0, 0),
-(8, 8, 0, 0, 1, 'Mage', '', '', 'Mage', 'Magier', '', '法师', '', '', 'Mago', '', 'Маг', '', '', '', '', 16712191, '', '', '', 'Mage', 'Magierin', '', '', '', '', 'Maga', '', '', '', '', '', '', 16712172, '', '', '', 'Mage', 'Magier', '', '', '', '', 'Mago', '', 'Маг', '', '', '', '', 16712172, 'MAGE', 3, 2, 0, 0),
-(9, 9, 0, 0, 126, 'Warlock', '', '', 'Démoniste', 'Hexenmeister', '', '术士', '', '', 'Brujo', '', 'Чернокнижник', '', '', '', '', 16712191, '', '', '', 'Démoniste', 'Hexenmeisterin', '', '', '', '', 'Bruja', '', 'Чернокнижница', '', '', '', '', 16712172, '', '', '', 'Démoniste', 'Hexenmeister', '', '', '', '', 'Brujo', '', 'Чернокнижник', '', '', '', '', 16712172, 'WARLOCK', 5, 6, 0, 0),
-(10, 11, 0, 0, 1, 'Druid', '', '', 'Druide', 'Druide', '', '德鲁伊', '', '', 'Druida', '', 'Друид', '', '', '', '', 16712191, '', '', '', 'Druidesse', 'Druidin', '', '', '', '', 'Druida', '', '', '', '', '', '', 16712172, '', '', '', 'Druide', 'Druide', '', '', '', '', 'Druida', '', 'Друид', '', '', '', '', 16712172, 'DRUID', 7, 10, 0, 0);
+(1, 0, 1, 1, 'Warrior', '', '', 'Guerrier', 'Krieger', '', '战士', '', '', 'Guerrero', '', 'Воин', '', '', '', '', 16712191, '', '', '', 'Guerrière', 'Kriegerin', '', '', '', '', 'Guerrera', '', '', '', '', '', '', 16712172, '', '', '', 'Guerrier', 'Krieger', '', '', '', '', 'Guerrero', '', 'Воин', '', '', '', '', 16712172, 'WARRIOR', 4, 50, 0, 0),
+(2, 0, 0, 1, 'Paladin', '', '', 'Paladin', 'Paladin', '', '圣骑士', '', '', 'Paladín', '', 'Паладин', '', '', '', '', 16712191, '', '', '', '', '', '', '', '', '', 'Paladín', '', '', '', '', '', '', 16712172, '', '', '', 'Paladin', 'Paladin', '', '', '', '', 'Paladín', '', 'Паладин', '', '', '', '', 16712172, 'PALADIN', 10, 58, 0, 0),
+(3, 1, 0, 1, 'Hunter', '', '', 'Chasseur', 'Jäger', '', '猎人', '', '', 'Cazador', '', 'Охотник', '', '', '', '', 16712191, '', '', '', 'Chasseresse', 'Jägerin', '', '', '', '', 'Cazadora', '', 'Охотница', '', '', '', '', 16712172, '', '', '', 'Chasseur', 'Jäger', '', '', '', '', 'Cazador', '', 'Охотник', '', '', '', '', 16712172, 'HUNTER', 9, 22, 0, 0),
+(4, 1, 3, 1, 'Rogue', '', '', 'Voleur', 'Schurke', '', '潜行者', '', '', 'Pícaro', '', 'Разбойник', '', '', '', '', 16712191, '', '', '', 'Voleuse', 'Schurkin', '', '', '', '', 'Pícara', '', 'Разбойница', '', '', '', '', 16712172, '', '', '', 'Voleur', 'Schurke', '', '', '', '', 'Pícaro', '', 'Разбойник', '', '', '', '', 16712172, 'ROGUE', 8, 2, 0, 0),
+(5, 0, 0, 1, 'Priest', '', '', 'Prêtre', 'Priester', '', '牧师', '', '', 'Sacerdote', '', 'Жрец', '', '', '', '', 16712191, '', '', '', 'Prêtresse', 'Priesterin', '', '', '', '', 'Sacerdotisa', '', 'Жрица', '', '', '', '', 16712172, '', '', '', 'Prêtre', 'Priester', '', '', '', '', 'Sacerdote', '', 'Жрец', '', '', '', '', 16712172, 'PRIEST', 6, 2, 0, 0),
+(6, 9, 6, 1, 'Death Knight', '', '', 'Chevalier de la mort', 'Todesritter', '', '死亡骑士', '', '', 'Caballero de la Muerte', '', 'Рыцарь смерти', '', '', '', '', 16712190, '', '', '', '', '', '', '', '', '', 'Caballero de la Muerte', '', '', '', '', '', '', 16712172, '', '', '', 'Chevalier de la mort', 'Todesritter', '', '', '', '', 'Caballero de la Muerte', '', 'Рыцарь смерти', '', '', '', '', 16712172, 'DEATHKNIGHT', 15, 122, 165, 2),
+(7, 1, 0, 1, 'Shaman', '', '', 'Chaman', 'Schamane', '', '萨满祭司', '', '', 'Chamán', '', 'Шаман', '', '', '', '', 16712191, '', '', '', 'Chamane', 'Schamanin', '', '', '', '', 'Chamán', '', 'Шаманка', '', '', '', '', 16712172, '', '', '', 'Chaman', 'Schamane', '', '', '', '', 'Chamán', '', 'Шаман', '', '', '', '', 16712172, 'SHAMAN', 11, 26, 0, 0),
+(8, 0, 0, 1, 'Mage', '', '', 'Mage', 'Magier', '', '法师', '', '', 'Mago', '', 'Маг', '', '', '', '', 16712191, '', '', '', 'Mage', 'Magierin', '', '', '', '', 'Maga', '', '', '', '', '', '', 16712172, '', '', '', 'Mage', 'Magier', '', '', '', '', 'Mago', '', 'Маг', '', '', '', '', 16712172, 'MAGE', 3, 2, 0, 0),
+(9, 0, 0, 126, 'Warlock', '', '', 'Démoniste', 'Hexenmeister', '', '术士', '', '', 'Brujo', '', 'Чернокнижник', '', '', '', '', 16712191, '', '', '', 'Démoniste', 'Hexenmeisterin', '', '', '', '', 'Bruja', '', 'Чернокнижница', '', '', '', '', 16712172, '', '', '', 'Démoniste', 'Hexenmeister', '', '', '', '', 'Brujo', '', 'Чернокнижник', '', '', '', '', 16712172, 'WARLOCK', 5, 6, 0, 0),
+(11, 0, 0, 1, 'Druid', '', '', 'Druide', 'Druide', '', '德鲁伊', '', '', 'Druida', '', 'Друид', '', '', '', '', 16712191, '', '', '', 'Druidesse', 'Druidin', '', '', '', '', 'Druida', '', '', '', '', '', '', 16712172, '', '', '', 'Druide', 'Druide', '', '', '', '', 'Druida', '', 'Друид', '', '', '', '', 16712172, 'DRUID', 7, 10, 0, 0);
