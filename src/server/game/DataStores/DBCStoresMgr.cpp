@@ -49,6 +49,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _creatureDisplayInfoMap.clear();
     _creatureDisplayInfoExtraMap.clear();
     _creatureFamilyMap.clear();
+    _creatureModelDataMap.clear();
+    _creatureSpellDataMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -77,6 +79,8 @@ void DBCStoresMgr::Initialize()
     _Load_CreatureDisplayInfo();
     _Load_CreatureDisplayInfoExtra();
     _Load_CreatureFamily();
+    _Load_CreatureModelData();
+    _Load_CreatureSpellData();
 }
 
 // load Achievement.dbc
@@ -984,4 +988,75 @@ void DBCStoresMgr::_Load_CreatureFamily()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturefamily                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CreatureModelData.dbc
+void DBCStoresMgr::_Load_CreatureModelData()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _creatureModelDataMap.clear();
+    //                                                0     1       2           3              4              5
+    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, ModelName, ModelScale, CollisionHeight, MountHeight FROM dbc_creaturemodeldata");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturemodeldata. DB table `dbc_creaturemodeldata` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CreatureModelDataDBC cmd;
+        cmd.ID = id;
+        cmd.Flags           = fields[1].GetUInt32();
+        cmd.ModelName       = fields[2].GetString();
+        cmd.ModelScale      = fields[3].GetFloat();
+        cmd.CollisionHeight = fields[4].GetFloat();
+        cmd.MountHeight     = fields[5].GetFloat();
+
+        _creatureModelDataMap[id] = cmd;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturemodeldata             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CreatureSpellData.dbc
+void DBCStoresMgr::_Load_CreatureSpellData()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _creatureSpellDataMap.clear();
+    //                                                0     1         2         3         4
+    QueryResult result = WorldDatabase.Query("SELECT ID, Spells_1, Spells_1, Spells_1, Spells_1 FROM dbc_creaturespelldata");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturespelldata. DB table `dbc_creaturespelldata` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CreatureSpellDataDBC csd;
+        csd.ID = id;
+        for (uint8 i = 0; i < MAX_CREATURE_SPELL_DATA_SLOT; i++)
+            csd.Spells[i] = fields[1 + i].GetUInt32();
+
+        _creatureSpellDataMap[id] = csd;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturespelldata             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

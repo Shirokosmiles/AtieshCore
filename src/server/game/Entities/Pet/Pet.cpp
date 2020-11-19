@@ -912,7 +912,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 
     SetDisplayId(creature->GetDisplayId());
 
-    if (CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(cinfo->family))
+    if (CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBC(cinfo->family))
         SetName(cFamily->Name[sWorld->GetDefaultDbcLocale()]);
     else
         SetName(creature->GetNameForLocaleIdx(sObjectMgr->GetDBCLocaleIndex()));
@@ -925,7 +925,7 @@ bool Pet::CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner)
     if (!CreateBaseAtTamed(cinfo, owner->GetMap(), owner->GetPhaseMask()))
         return false;
 
-    if (CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(cinfo->family))
+    if (CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBC(cinfo->family))
         SetName(cFamily->Name[sWorld->GetDefaultDbcLocale()]);
 
     Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), owner->GetOrientation());
@@ -1263,7 +1263,7 @@ bool Pet::HaveInDiet(ItemTemplate const* item) const
     if (!cInfo)
         return false;
 
-    CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(cInfo->family);
+    CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBC(cInfo->family);
     if (!cFamily)
         return false;
 
@@ -1776,7 +1776,7 @@ bool Pet::resetTalents()
     if (!ci)
         return false;
     // Check pet talent type
-    CreatureFamilyDBC const* pet_family = sDBCStoresMgr->GetCreatureFamilyDBCMap(ci->family);
+    CreatureFamilyDBC const* pet_family = sDBCStoresMgr->GetCreatureFamilyDBC(ci->family);
     if (!pet_family || pet_family->PetTalentType < 0)
         return false;
 
@@ -2024,7 +2024,7 @@ void Pet::LearnPetPassives()
     if (!cInfo)
         return;
 
-    CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(cInfo->family);
+    CreatureFamilyDBC const* cFamily = sDBCStoresMgr->GetCreatureFamilyDBC(cInfo->family);
     if (!cFamily)
         return;
 
@@ -2146,7 +2146,7 @@ Player* Pet::GetOwner() const
 
 float Pet::GetNativeObjectScale() const
 {
-    CreatureFamilyDBC const* creatureFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(GetCreatureTemplate()->family);
+    CreatureFamilyDBC const* creatureFamily = sDBCStoresMgr->GetCreatureFamilyDBC(GetCreatureTemplate()->family);
     if (creatureFamily && creatureFamily->MinScale > 0.0f && getPetType() == HUNTER_PET)
     {
         float scale;

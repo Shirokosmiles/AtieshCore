@@ -1135,7 +1135,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     }
 
     // must exist or used hidden but used in data horse case
-    if (cInfo->family && !sDBCStoresMgr->GetCreatureFamilyDBCMap(cInfo->family) && cInfo->family != CREATURE_FAMILY_HORSE_CUSTOM)
+    if (cInfo->family && !sDBCStoresMgr->GetCreatureFamilyDBC(cInfo->family) && cInfo->family != CREATURE_FAMILY_HORSE_CUSTOM)
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid creature family (%u) in `family`.", cInfo->Entry, cInfo->family);
         const_cast<CreatureTemplate*>(cInfo)->family = CREATURE_FAMILY_NONE;
@@ -1161,7 +1161,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 
     if (cInfo->PetSpellDataId)
     {
-        CreatureSpellDataEntry const* spellDataId = sCreatureSpellDataStore.LookupEntry(cInfo->PetSpellDataId);
+        CreatureSpellDataDBC const* spellDataId = sDBCStoresMgr->GetCreatureSpellDataDBC(cInfo->PetSpellDataId);
         if (!spellDataId)
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has non-existing PetSpellDataId (%u).", cInfo->Entry, cInfo->PetSpellDataId);
     }
@@ -1690,8 +1690,8 @@ void ObjectMgr::LoadCreatureModelInfo()
         if (modelInfo.combat_reach < 0.1f)
             modelInfo.combat_reach = DEFAULT_PLAYER_COMBAT_REACH;
 
-        if (CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(creatureDisplay->ModelID))
-            modelInfo.is_trigger = strstr(modelData->ModelName, "InvisibleStalker") != nullptr;
+        if (CreatureModelDataDBC const* modelData = sDBCStoresMgr->GetCreatureModelDataDBC(creatureDisplay->ModelID))
+            modelInfo.is_trigger = strstr(modelData->ModelName.c_str(), "InvisibleStalker") != nullptr;
 
         ++count;
     }

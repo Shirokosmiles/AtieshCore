@@ -2302,7 +2302,7 @@ void SpellMgr::LoadPetDefaultSpells()
             continue;
 
         // for creature with PetSpellDataId get default pet spells from dbc
-        CreatureSpellDataEntry const* spellDataEntry = sCreatureSpellDataStore.LookupEntry(creatureTemplatePair.second.PetSpellDataId);
+        CreatureSpellDataDBC const* spellDataEntry = sDBCStoresMgr->GetCreatureSpellDataDBC(creatureTemplatePair.second.PetSpellDataId);
         if (!spellDataEntry)
             continue;
 

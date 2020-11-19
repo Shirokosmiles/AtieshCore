@@ -263,7 +263,7 @@ public:
             return false;
         }
 
-        CreatureFamilyDBC const* petFamily = sDBCStoresMgr->GetCreatureFamilyDBCMap(creatureInfo->family);
+        CreatureFamilyDBC const* petFamily = sDBCStoresMgr->GetCreatureFamilyDBC(creatureInfo->family);
         if (!petFamily)
         {
             handler->SendSysMessage(LANG_WRONG_PET_TYPE);

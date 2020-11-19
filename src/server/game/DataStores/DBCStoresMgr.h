@@ -45,6 +45,8 @@ typedef std::unordered_map<uint32 /*ID*/, CinematicSequencesDBC> CinematicSequen
 typedef std::unordered_map<uint32 /*ID*/, CreatureDisplayInfoDBC> CreatureDisplayInfoDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, CreatureDisplayInfoExtraDBC> CreatureDisplayInfoExtraDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, CreatureFamilyDBC> CreatureFamilyDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CreatureModelDataDBC> CreatureModelDataDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CreatureSpellDataDBC> CreatureSpellDataDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -276,7 +278,7 @@ public:
     }
 
     CreatureFamilyDBCMap const& GetCreatureFamilyDBCMap() const { return _creatureFamilyMap; }
-    CreatureFamilyDBC const* GetCreatureFamilyDBCMap(uint32 id)
+    CreatureFamilyDBC const* GetCreatureFamilyDBC(uint32 id)
     {
         CreatureFamilyDBCMap::const_iterator itr = _creatureFamilyMap.find(id);
         if (itr != _creatureFamilyMap.end())
@@ -288,10 +290,26 @@ public:
     {
         if (!petfamily)
             return nullptr;
-        CreatureFamilyDBC const* pet_family = GetCreatureFamilyDBCMap(petfamily);
+        CreatureFamilyDBC const* pet_family = GetCreatureFamilyDBC(petfamily);
         if (!pet_family)
             return nullptr;
         return pet_family->Name[dbclang].c_str();
+    }
+
+    CreatureModelDataDBC const* GetCreatureModelDataDBC(uint32 id)
+    {
+        CreatureModelDataDBCMap::const_iterator itr = _creatureModelDataMap.find(id);
+        if (itr != _creatureModelDataMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    CreatureSpellDataDBC const* GetCreatureSpellDataDBC(uint32 id)
+    {
+        CreatureSpellDataDBCMap::const_iterator itr = _creatureSpellDataMap.find(id);
+        if (itr != _creatureSpellDataMap.end())
+            return &itr->second;
+        return nullptr;
     }
 
 protected:
@@ -318,6 +336,8 @@ protected:
     void _Load_CreatureDisplayInfo();
     void _Load_CreatureDisplayInfoExtra();
     void _Load_CreatureFamily();
+    void _Load_CreatureModelData();
+    void _Load_CreatureSpellData();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -343,6 +363,8 @@ private:
     CreatureDisplayInfoDBCMap _creatureDisplayInfoMap;
     CreatureDisplayInfoExtraDBCMap _creatureDisplayInfoExtraMap;
     CreatureFamilyDBCMap _creatureFamilyMap;
+    CreatureModelDataDBCMap _creatureModelDataMap;
+    CreatureSpellDataDBCMap _creatureSpellDataMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

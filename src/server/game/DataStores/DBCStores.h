@@ -106,8 +106,8 @@ TC_GAME_API EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint
 //TC_GAME_API extern DBCStorage <CreatureDisplayInfoEntry>     sCreatureDisplayInfoStore;
 //TC_GAME_API extern DBCStorage <CreatureDisplayInfoExtraEntry> sCreatureDisplayInfoExtraStore;
 //TC_GAME_API extern DBCStorage <CreatureFamilyEntry>          sCreatureFamilyStore;
-TC_GAME_API extern DBCStorage <CreatureModelDataEntry>       sCreatureModelDataStore;
-TC_GAME_API extern DBCStorage <CreatureSpellDataEntry>       sCreatureSpellDataStore;
+//TC_GAME_API extern DBCStorage <CreatureModelDataEntry>       sCreatureModelDataStore;
+//TC_GAME_API extern DBCStorage <CreatureSpellDataEntry>       sCreatureSpellDataStore;
 TC_GAME_API extern DBCStorage <CreatureTypeEntry>            sCreatureTypeStore;
 TC_GAME_API extern DBCStorage <CurrencyTypesEntry>           sCurrencyTypesStore;
 TC_GAME_API extern DBCStorage <DestructibleModelDataEntry>   sDestructibleModelDataStore;

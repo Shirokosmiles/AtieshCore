@@ -25464,7 +25464,7 @@ void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRa
     if (!ci)
         return;
 
-    CreatureFamilyDBC const* pet_family = sDBCStoresMgr->GetCreatureFamilyDBCMap(ci->family);
+    CreatureFamilyDBC const* pet_family = sDBCStoresMgr->GetCreatureFamilyDBC(ci->family);
 
     if (!pet_family)
         return;
@@ -25721,7 +25721,7 @@ void Player::BuildPetTalentsInfoData(WorldPacket* data)
     if (!ci)
         return;
 
-    CreatureFamilyDBC const* pet_family = sDBCStoresMgr->GetCreatureFamilyDBCMap(ci->family);
+    CreatureFamilyDBC const* pet_family = sDBCStoresMgr->GetCreatureFamilyDBC(ci->family);
     if (!pet_family || pet_family->PetTalentType < 0)
         return;
 

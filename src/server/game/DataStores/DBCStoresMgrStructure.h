@@ -518,3 +518,47 @@ struct CreatureFamilyDBC
     //uint32 Name_lang_mask;                                // 26
     //char const* IconFile;                                 // 27
 };
+
+// load CreatureModelData.dbc
+enum CreatureModelDataFlags
+{
+    CREATURE_MODEL_DATA_FLAGS_CAN_MOUNT = 0x00000080
+};
+
+struct CreatureModelDataDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Flags;                                           // 1
+    std::string ModelName;                                  // 2
+    //uint32 SizeClass;                                     // 3
+    float ModelScale;                                       // 4 Used in calculation of unit collision data
+    //int32 BloodID;                                        // 5
+    //int32 FootprintTextureID;                             // 6
+    //uint32 FootprintTextureLength;                        // 7
+    //uint32 FootprintTextureWidth;                         // 8
+    //float FootprintParticleScale;                         // 9
+    //uint32 FoleyMaterialID;                               // 10
+    //float FootstepShakeSize;                              // 11
+    //uint32 DeathThudShakeSize;                            // 12
+    //uint32 SoundID;                                       // 13
+    //float CollisionWidth;                                 // 14
+    float CollisionHeight;                                  // 15
+    float MountHeight;                                      // 16 Used in calculation of unit collision data when mounted
+    //float GeoBoxMin[3];                                   // 17-19
+    //float GeoBoxMax[3];                                   // 20-22
+    //float WorldEffectScale;                               // 23
+    //float AttachedEffectScale;                            // 24
+    //float MissileCollisionRadius;                         // 25
+    //float MissileCollisionPush;                           // 26
+    //float MissileCollisionRaise;                          // 27
+
+    inline bool HasFlag(CreatureModelDataFlags flag) const { return (Flags & flag) != 0; }
+};
+
+// load CreatureSpellData.dbc
+struct CreatureSpellDataDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Spells[MAX_CREATURE_SPELL_DATA_SLOT];            // 1-4
+    //uint32 Availability[MAX_CREATURE_SPELL_DATA_SLOT];    // 4-7
+};
