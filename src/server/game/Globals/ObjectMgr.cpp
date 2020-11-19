@@ -1128,7 +1128,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         const_cast<CreatureTemplate*>(cInfo)->speed_run = 1.14286f;
     }
 
-    if (cInfo->type && !sCreatureTypeStore.LookupEntry(cInfo->type))
+    if (cInfo->type && !sDBCStoresMgr->GetCreatureTypeDBC(cInfo->type))
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid creature type (%u) in `type`.", cInfo->Entry, cInfo->type);
         const_cast<CreatureTemplate*>(cInfo)->type = CREATURE_TYPE_HUMANOID;
@@ -3332,7 +3332,7 @@ void ObjectMgr::LoadItemTemplates()
 
                 if (BAG_FAMILY_MASK_CURRENCY_TOKENS & mask)
                 {
-                    CurrencyTypesEntry const* ctEntry = sCurrencyTypesStore.LookupEntry(itemTemplate.ItemId);
+                    CurrencyTypesDBC const* ctEntry = sDBCStoresMgr->GetCurrencyTypesDBCByItemID(itemTemplate.ItemId);
                     if (!ctEntry)
                     {
                         TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has currency bag family bit set in BagFamily but not listed in CurrencyTypes.dbc, remove bit", entry);

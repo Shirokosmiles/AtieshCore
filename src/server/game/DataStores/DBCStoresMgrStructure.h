@@ -214,7 +214,7 @@ struct AreaGroupDBC
     uint32 NextAreaID;                                      // 7 index of next group
 };
 
-// load AreaPOI.dbc
+// load AreaPOI.dbc (NOT USED)
 struct AreaPOIDBC
 {
     uint32 ID;                                              // 0
@@ -561,4 +561,36 @@ struct CreatureSpellDataDBC
     uint32 ID;                                              // 0
     uint32 Spells[MAX_CREATURE_SPELL_DATA_SLOT];            // 1-4
     //uint32 Availability[MAX_CREATURE_SPELL_DATA_SLOT];    // 4-7
+};
+
+// load CreatureType.dbc
+enum CreatureTypeEntryFlags
+{
+    CREATURE_TYPE_ENTRY_FLAGS_IGNORED_TAB_TARGETING = 0x01 // Means do not include in tab targeting.
+};
+
+struct CreatureTypeDBC
+{
+    uint32 ID;                                              // 0
+    //char const* Name[16];                                 // 1-16
+    //uint32 Name_lang_mask;                                // 17
+    //uint32 Flags;                                         // 18
+};
+
+// load CurrencyCategory.dbc (NOT USED)
+struct CurrencyCategoryDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Flags;                                           // 1
+    std::string Name[TOTAL_LOCALES];                        // 2-17
+    //uint32 Name_lang_mask;                                // 18
+};
+
+// load CurrencyTypes.dbc
+struct CurrencyTypesDBC
+{
+    uint32 ID;                                              // 0
+    uint32 ItemID;                                          // 1
+    //uint32 CategoryID;                                    // 2
+    uint32 BitIndex;                                        // 3 bit index in PLAYER_FIELD_KNOWN_CURRENCIES (1 << (index-1))
 };

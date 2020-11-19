@@ -51,6 +51,9 @@ DBCStoresMgr::~DBCStoresMgr()
     _creatureFamilyMap.clear();
     _creatureModelDataMap.clear();
     _creatureSpellDataMap.clear();
+    _creatureTypeMap.clear();
+    _currencyCategoryMap.clear();
+    _currencyTypesMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -59,8 +62,7 @@ void DBCStoresMgr::Initialize()
     _Load_AchievementCriteria();
     _Load_AreaTable();
     _Load_AreaGroup();
-    // unused
-    //_Load_AreaPOI();
+    //_Load_AreaPOI(); // unused
     _Load_AreaTrigger();
     _Load_AuctionHouse();
     _Load_BankBagSlotPrices();
@@ -81,6 +83,9 @@ void DBCStoresMgr::Initialize()
     _Load_CreatureFamily();
     _Load_CreatureModelData();
     _Load_CreatureSpellData();
+    _Load_CreatureType();
+    //_Load_CurrencyCategory(); // unused
+    _Load_CurrencyTypes();
 }
 
 // load Achievement.dbc
@@ -270,7 +275,7 @@ void DBCStoresMgr::_Load_AreaGroup()
     TC_LOG_INFO("server.loading", ">> Loaded DBC_areagroup                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
-// load AreaPOI.dbc
+// load AreaPOI.dbc  (NOT USED)
 void DBCStoresMgr::_Load_AreaPOI()
 {
     uint32 oldMSTime = getMSTime();
@@ -1059,4 +1064,105 @@ void DBCStoresMgr::_Load_CreatureSpellData()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturespelldata             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CreatureSpellData.dbc
+void DBCStoresMgr::_Load_CreatureType()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _creatureTypeMap.clear();
+    //                                                0
+    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_creaturetype");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturetype. DB table `dbc_creaturetype` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CreatureTypeDBC ct;
+        ct.ID = id;
+
+        _creatureTypeMap[id] = ct;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturetype                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CurrencyCategory.dbc (NOT USED)
+void DBCStoresMgr::_Load_CurrencyCategory()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _currencyCategoryMap.clear();
+    //                                                0    1           2               3               4               5               6               7               8               9               10
+    QueryResult result = WorldDatabase.Query("SELECT ID, Flags,  Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_currencycategory");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_currencycategory. DB table `dbc_currencycategory` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        CurrencyCategoryDBC cc;
+        cc.ID = id;
+        cc.Flags = fields[1].GetUInt32();
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            cc.Name[i] = fields[2 + i].GetString();
+
+        _currencyCategoryMap[id] = cc;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_currencycategory              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load CurrencyTypes.dbc
+void DBCStoresMgr::_Load_CurrencyTypes()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _currencyTypesMap.clear();
+    //                                                0    1        2
+    QueryResult result = WorldDatabase.Query("SELECT ID, ItemID, BitIndex FROM dbc_currencytypes");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_currencytypes. DB table `dbc_currencytypes` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 itemID = fields[1].GetUInt32();
+        CurrencyTypesDBC ct;
+        ct.ID       = fields[0].GetUInt32();
+        ct.ItemID   = itemID;
+        ct.BitIndex = fields[2].GetUInt32();
+
+        _currencyTypesMap[itemID] = ct;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_currencytypes                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

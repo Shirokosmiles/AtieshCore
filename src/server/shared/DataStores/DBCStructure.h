@@ -28,37 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-enum CreatureTypeEntryFlags
-{
-    CREATURE_TYPE_ENTRY_FLAGS_IGNORED_TAB_TARGETING = 0x01 // Means do not include in tab targeting.
-};
-
-struct CreatureTypeEntry
-{
-    uint32 ID;                                              // 0
-    //char const* Name[16];                                 // 1-16
-    //uint32 Name_lang_mask;                                // 17
-    //uint32 Flags;                                         // 18
-};
-
-/* not used
-struct CurrencyCategoryEntry
-{
-    uint32 ID;                                              // 0
-    uint32 Flags;                                           // 1
-    char const* Name[16];                                   // 2-17
-    uint32 Name_lang_mask;                                  // 18
-};
-*/
-
-struct CurrencyTypesEntry
-{
-    //uint32 ID;                                            // 0
-    uint32 ItemID;                                          // 1
-    //uint32 CategoryID;                                    // 2
-    uint32 BitIndex;                                        // 3 bit index in PLAYER_FIELD_KNOWN_CURRENCIES (1 << (index-1))
-};
-
 struct DestructibleModelDataEntry
 {
     uint32 ID;                                              // 0

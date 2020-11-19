@@ -47,6 +47,9 @@ typedef std::unordered_map<uint32 /*ID*/, CreatureDisplayInfoExtraDBC> CreatureD
 typedef std::unordered_map<uint32 /*ID*/, CreatureFamilyDBC> CreatureFamilyDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, CreatureModelDataDBC> CreatureModelDataDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, CreatureSpellDataDBC> CreatureSpellDataDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CreatureTypeDBC> CreatureTypeDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, CurrencyCategoryDBC> CurrencyCategoryDBCMap;
+typedef std::unordered_map<uint32 /*ItemID*/, CurrencyTypesDBC> CurrencyTypesDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -181,14 +184,6 @@ public:
     }
 
     CharStartOutfitDBCMap const& GetCharStartOutfitDBCMap() const { return _charStartOutfitMap; }
-    CharStartOutfitDBC const* GetCharStartOutfitDBC(uint32 id)
-    {
-        CharStartOutfitDBCMap::const_iterator itr = _charStartOutfitMap.find(id);
-        if (itr != _charStartOutfitMap.end())
-            return &itr->second;
-        return nullptr;
-    }
-
     CharStartOutfitDBC const* GetCharStartOutfitDBCWithParam(uint8 race, uint8 classID, uint8 gender)
     {
         for (CharStartOutfitDBCMap::const_iterator itr = _charStartOutfitMap.begin(); itr != _charStartOutfitMap.end(); ++itr)
@@ -312,6 +307,30 @@ public:
         return nullptr;
     }
 
+    CreatureTypeDBC const* GetCreatureTypeDBC(uint32 id)
+    {
+        CreatureTypeDBCMap::const_iterator itr = _creatureTypeMap.find(id);
+        if (itr != _creatureTypeMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    CurrencyCategoryDBC const* GetCurrencyCategoryDBC(uint32 id)
+    {
+        CurrencyCategoryDBCMap::const_iterator itr = _currencyCategoryMap.find(id);
+        if (itr != _currencyCategoryMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    CurrencyTypesDBC const* GetCurrencyTypesDBCByItemID(uint32 ItemID)
+    {
+        CurrencyTypesDBCMap::const_iterator itr = _currencyTypesMap.find(ItemID);
+        if (itr != _currencyTypesMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -338,6 +357,9 @@ protected:
     void _Load_CreatureFamily();
     void _Load_CreatureModelData();
     void _Load_CreatureSpellData();
+    void _Load_CreatureType();
+    void _Load_CurrencyCategory();
+    void _Load_CurrencyTypes();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -365,6 +387,9 @@ private:
     CreatureFamilyDBCMap _creatureFamilyMap;
     CreatureModelDataDBCMap _creatureModelDataMap;
     CreatureSpellDataDBCMap _creatureSpellDataMap;
+    CreatureTypeDBCMap _creatureTypeMap;
+    CurrencyCategoryDBCMap _currencyCategoryMap;
+    CurrencyTypesDBCMap _currencyTypesMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

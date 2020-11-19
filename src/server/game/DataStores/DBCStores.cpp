@@ -70,8 +70,8 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <CreatureFamilyEntry> sCreatureFamilyStore(CreatureFamilyfmt);
 //DBCStorage <CreatureModelDataEntry> sCreatureModelDataStore(CreatureModelDatafmt);
 //DBCStorage <CreatureSpellDataEntry> sCreatureSpellDataStore(CreatureSpellDatafmt);
-DBCStorage <CreatureTypeEntry> sCreatureTypeStore(CreatureTypefmt);
-DBCStorage <CurrencyTypesEntry> sCurrencyTypesStore(CurrencyTypesfmt);
+//DBCStorage <CreatureTypeEntry> sCreatureTypeStore(CreatureTypefmt);
+//DBCStorage <CurrencyTypesEntry> sCurrencyTypesStore(CurrencyTypesfmt);
 
 DBCStorage <DestructibleModelDataEntry> sDestructibleModelDataStore(DestructibleModelDatafmt);
 DBCStorage <DungeonEncounterEntry> sDungeonEncounterStore(DungeonEncounterfmt);
@@ -305,8 +305,8 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sCreatureFamilyStore,                "CreatureFamily.dbc");
     //LOAD_DBC(sCreatureModelDataStore,             "CreatureModelData.dbc");
     //LOAD_DBC(sCreatureSpellDataStore,             "CreatureSpellData.dbc");
-    LOAD_DBC(sCreatureTypeStore,                  "CreatureType.dbc");
-    LOAD_DBC(sCurrencyTypesStore,                 "CurrencyTypes.dbc");
+    //LOAD_DBC(sCreatureTypeStore,                  "CreatureType.dbc");
+    //LOAD_DBC(sCurrencyTypesStore,                 "CurrencyTypes.dbc");
     LOAD_DBC(sDestructibleModelDataStore,         "DestructibleModelData.dbc");
     LOAD_DBC(sDungeonEncounterStore,              "DungeonEncounter.dbc");
     LOAD_DBC(sDurabilityCostsStore,               "DurabilityCosts.dbc");
