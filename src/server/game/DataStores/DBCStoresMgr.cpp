@@ -54,6 +54,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _creatureTypeMap.clear();
     _currencyCategoryMap.clear();
     _currencyTypesMap.clear();
+    _destructibleModelDataMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -86,6 +87,7 @@ void DBCStoresMgr::Initialize()
     _Load_CreatureType();
     //_Load_CurrencyCategory(); // unused
     _Load_CurrencyTypes();
+    _Load_DestructibleModelData();
 }
 
 // load Achievement.dbc
@@ -1165,4 +1167,40 @@ void DBCStoresMgr::_Load_CurrencyTypes()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_currencytypes                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load DestructibleModelData.dbc
+void DBCStoresMgr::_Load_DestructibleModelData()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _destructibleModelDataMap.clear();
+    //                                                0       1         2           3           4
+    QueryResult result = WorldDatabase.Query("SELECT ID, State1Wmo, State2Wmo, State3Wmo, RepairGroundFx FROM dbc_destructiblemodeldata");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_destructiblemodeldata. DB table `dbc_destructiblemodeldata` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        DestructibleModelDataDBC dmd;
+        dmd.ID = id;
+        dmd.State1Wmo      = fields[1].GetUInt32();
+        dmd.State2Wmo      = fields[2].GetUInt32();
+        dmd.State3Wmo      = fields[3].GetUInt32();
+        dmd.RepairGroundFx = fields[4].GetUInt32();
+
+        _destructibleModelDataMap[id] = dmd;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_destructiblemodeldata        %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

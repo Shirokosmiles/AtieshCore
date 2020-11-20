@@ -20,6 +20,7 @@
 #include "CellImpl.h"
 #include "CreatureAISelector.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "GameObjectAI.h"
 #include "GameObjectModel.h"
 #include "GameTime.h"
@@ -2299,7 +2300,7 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, WorldOb
             SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED);
 
             uint32 modelId = m_goInfo->displayId;
-            if (DestructibleModelDataEntry const* modelData = sDestructibleModelDataStore.LookupEntry(m_goInfo->building.destructibleData))
+            if (DestructibleModelDataDBC const* modelData = sDBCStoresMgr->GetDestructibleModelDataDBC(m_goInfo->building.destructibleData))
                 if (modelData->State1Wmo)
                     modelId = modelData->State1Wmo;
             SetDisplayId(modelId);
@@ -2328,7 +2329,7 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, WorldOb
             SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);
 
             uint32 modelId = m_goInfo->displayId;
-            if (DestructibleModelDataEntry const* modelData = sDestructibleModelDataStore.LookupEntry(m_goInfo->building.destructibleData))
+            if (DestructibleModelDataDBC const* modelData = sDBCStoresMgr->GetDestructibleModelDataDBC(m_goInfo->building.destructibleData))
                 if (modelData->State2Wmo)
                     modelId = modelData->State2Wmo;
             SetDisplayId(modelId);
@@ -2347,7 +2348,7 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, WorldOb
             RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_DESTROYED);
 
             uint32 modelId = m_goInfo->displayId;
-            if (DestructibleModelDataEntry const* modelData = sDestructibleModelDataStore.LookupEntry(m_goInfo->building.destructibleData))
+            if (DestructibleModelDataDBC const* modelData = sDBCStoresMgr->GetDestructibleModelDataDBC(m_goInfo->building.destructibleData))
                 if (modelData->State3Wmo)
                     modelId = modelData->State3Wmo;
             SetDisplayId(modelId);

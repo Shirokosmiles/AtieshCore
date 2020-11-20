@@ -50,6 +50,7 @@ typedef std::unordered_map<uint32 /*ID*/, CreatureSpellDataDBC> CreatureSpellDat
 typedef std::unordered_map<uint32 /*ID*/, CreatureTypeDBC> CreatureTypeDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, CurrencyCategoryDBC> CurrencyCategoryDBCMap;
 typedef std::unordered_map<uint32 /*ItemID*/, CurrencyTypesDBC> CurrencyTypesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, DestructibleModelDataDBC> DestructibleModelDataDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -331,6 +332,14 @@ public:
         return nullptr;
     }
 
+    DestructibleModelDataDBC const* GetDestructibleModelDataDBC(uint32 ID)
+    {
+        DestructibleModelDataDBCMap::const_iterator itr = _destructibleModelDataMap.find(ID);
+        if (itr != _destructibleModelDataMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -360,6 +369,7 @@ protected:
     void _Load_CreatureType();
     void _Load_CurrencyCategory();
     void _Load_CurrencyTypes();
+    void _Load_DestructibleModelData();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -390,6 +400,7 @@ private:
     CreatureTypeDBCMap _creatureTypeMap;
     CurrencyCategoryDBCMap _currencyCategoryMap;
     CurrencyTypesDBCMap _currencyTypesMap;
+    DestructibleModelDataDBCMap _destructibleModelDataMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()
