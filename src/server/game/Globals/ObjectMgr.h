@@ -46,7 +46,7 @@ class Vehicle;
 class Map;
 struct AccessRequirement;
 struct DeclinedName;
-struct DungeonEncounterEntry;
+struct DungeonEncounterDBC;
 struct FactionEntry;
 struct PlayerClassInfo;
 struct PlayerClassLevelInfo;
@@ -946,10 +946,10 @@ enum EncounterCreditType : uint8
 
 struct DungeonEncounter
 {
-    DungeonEncounter(DungeonEncounterEntry const* _dbcEntry, EncounterCreditType _creditType, uint32 _creditEntry, uint32 _lastEncounterDungeon)
+    DungeonEncounter(DungeonEncounterDBC const* _dbcEntry, EncounterCreditType _creditType, uint32 _creditEntry, uint32 _lastEncounterDungeon)
         : dbcEntry(_dbcEntry), creditType(_creditType), creditEntry(_creditEntry), lastEncounterDungeon(_lastEncounterDungeon) { }
 
-    DungeonEncounterEntry const* dbcEntry;
+    DungeonEncounterDBC const* dbcEntry;
     EncounterCreditType creditType;
     uint32 creditEntry;
     uint32 lastEncounterDungeon;

@@ -32,7 +32,7 @@ CREATE TABLE `dbc_auctionhouse`  (
 -- ----------------------------
 INSERT INTO `dbc_auctionhouse` VALUES
 (1, 1, 5, 5, 'Stormwind Auction House', '', '', 'Hôtel des ventes de Hurlevent', 'Auktionshaus von Sturmwind', '', '暴风城拍卖行', '', '', 'Casa de subastas: Ventormenta', '', 'Аукционный дом Штормграда', '', '', '', '', 16712190),
-(2, 3, 5, 5, 'Alliance Auction House', '', '', 'Hôtel des ventes de l\\\'Alliance', 'Auktionshaus der Allianz', '', '联盟拍卖行', '', '', 'Casa de subastas: Alianza', '', 'Аукционный дом Альянса', '', '', '', '', 16712190),
+(2, 3, 5, 5, 'Alliance Auction House', '', '', 'Hôtel des ventes de l\'Alliance', 'Auktionshaus der Allianz', '', '联盟拍卖行', '', '', 'Casa de subastas: Alianza', '', 'Аукционный дом Альянса', '', '', '', '', 16712190),
 (3, 4, 5, 5, 'Darnassus Auction House', '', '', 'Hôtel des ventes de Darnassus', 'Auktionshaus von Darnassus', '', '达纳苏斯拍卖行', '', '', 'Casa de subastas: Darnassus', '', 'Аукционный дом Дарнаса', '', '', '', '', 16712190),
 (4, 5, 5, 5, 'Undercity Auction House', '', '', 'Hôtel des ventes de Fossoyeuse', 'Auktionshaus von Unterstadt', '', '幽暗城拍卖行', '', '', 'Casa de subastas: Entrañas', '', 'Аукционный дом Подгорода', '', '', '', '', 16712190),
 (5, 6, 5, 5, 'Thunder Bluff  Auction House', '', '', 'Hôtel des ventes des Pitons du Tonnerre', 'Auktionshaus von Donnerfels', '', '雷霆崖拍卖行', '', '', 'Casa de subastas: Cima del Trueno', '', 'Аукционный дом Громового Утеса', '', '', '', '', 16712190),

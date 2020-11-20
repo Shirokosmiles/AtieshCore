@@ -28,11 +28,6 @@
 
 enum LocaleConstant : uint8;
 
- // temporary hack until includes are sorted out (don't want to pull in Windows.h)
-#ifdef GetClassName
-#undef GetClassName
-#endif
-
 typedef std::list<uint32> SimpleFactionsList;
 TC_GAME_API SimpleFactionsList const* GetFactionTeamList(uint32 faction);
 
@@ -111,7 +106,7 @@ TC_GAME_API EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint
 //TC_GAME_API extern DBCStorage <CreatureTypeEntry>            sCreatureTypeStore;
 //TC_GAME_API extern DBCStorage <CurrencyTypesEntry>           sCurrencyTypesStore;
 //TC_GAME_API extern DBCStorage <DestructibleModelDataEntry>   sDestructibleModelDataStore;
-TC_GAME_API extern DBCStorage <DungeonEncounterEntry>        sDungeonEncounterStore;
+//TC_GAME_API extern DBCStorage <DungeonEncounterEntry>        sDungeonEncounterStore;
 TC_GAME_API extern DBCStorage <DurabilityCostsEntry>         sDurabilityCostsStore;
 TC_GAME_API extern DBCStorage <DurabilityQualityEntry>       sDurabilityQualityStore;
 TC_GAME_API extern DBCStorage <EmotesEntry>                  sEmotesStore;

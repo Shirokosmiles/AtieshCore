@@ -55,6 +55,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _currencyCategoryMap.clear();
     _currencyTypesMap.clear();
     _destructibleModelDataMap.clear();
+    _dungeonEncounterMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -88,6 +89,7 @@ void DBCStoresMgr::Initialize()
     //_Load_CurrencyCategory(); // unused
     _Load_CurrencyTypes();
     _Load_DestructibleModelData();
+    _Load_DungeonEncounter();
 }
 
 // load Achievement.dbc
@@ -1202,5 +1204,42 @@ void DBCStoresMgr::_Load_DestructibleModelData()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_destructiblemodeldata        %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_destructiblemodeldata         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load DungeonEncounter.dbc
+void DBCStoresMgr::_Load_DungeonEncounter()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _dungeonEncounterMap.clear();
+    //                                                0     1       2        3          4               5               6               7               8               9               10               11               12
+    QueryResult result = WorldDatabase.Query("SELECT ID, MapID, Difficulty, Bit, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_dungeonencounter");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_dungeonencounter. DB table `dbc_dungeonencounter` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        DungeonEncounterDBC de;
+        de.ID = id;
+        de.MapID      = fields[1].GetUInt32();
+        de.Difficulty = fields[2].GetUInt32();
+        de.Bit        = fields[3].GetUInt32();
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            de.Name[i] = fields[4 + i].GetString();
+
+        _dungeonEncounterMap[id] = de;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_dungeonencounter              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

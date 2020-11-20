@@ -28,18 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct DungeonEncounterEntry
-{
-    uint32 ID;                                              // 0
-    uint32 MapID;                                           // 1
-    uint32 Difficulty;                                      // 2
-    //uint32 OrderIndex;                                    // 3
-    uint32 Bit;                                             // 4 encounter index for creating completed mask
-    char const* Name[16];                                   // 5-20
-    //uint32 Name_lang_mask;                                // 21
-    //uint32 SpellIconID;                                   // 22
-};
-
 struct DurabilityCostsEntry
 {
     uint32 ID;                                              // 0

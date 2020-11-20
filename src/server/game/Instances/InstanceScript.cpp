@@ -23,6 +23,7 @@
 #include "CreatureAIImpl.h"
 #include "DatabaseEnv.h"
 #include "DBCStructure.h"
+#include "DBCStoresMgrStructure.h"
 #include "GameObject.h"
 #include "Group.h"
 #include "LFGMgr.h"

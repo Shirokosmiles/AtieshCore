@@ -51,6 +51,7 @@ typedef std::unordered_map<uint32 /*ID*/, CreatureTypeDBC> CreatureTypeDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, CurrencyCategoryDBC> CurrencyCategoryDBCMap;
 typedef std::unordered_map<uint32 /*ItemID*/, CurrencyTypesDBC> CurrencyTypesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, DestructibleModelDataDBC> DestructibleModelDataDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, DungeonEncounterDBC> DungeonEncounterDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -340,6 +341,14 @@ public:
         return nullptr;
     }
 
+    DungeonEncounterDBC const* GetDungeonEncounterDBC(uint32 ID)
+    {
+        DungeonEncounterDBCMap::const_iterator itr = _dungeonEncounterMap.find(ID);
+        if (itr != _dungeonEncounterMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -370,6 +379,7 @@ protected:
     void _Load_CurrencyCategory();
     void _Load_CurrencyTypes();
     void _Load_DestructibleModelData();
+    void _Load_DungeonEncounter();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -401,6 +411,7 @@ private:
     CurrencyCategoryDBCMap _currencyCategoryMap;
     CurrencyTypesDBCMap _currencyTypesMap;
     DestructibleModelDataDBCMap _destructibleModelDataMap;
+    DungeonEncounterDBCMap _dungeonEncounterMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

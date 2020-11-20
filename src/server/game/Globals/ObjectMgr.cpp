@@ -6099,7 +6099,7 @@ void ObjectMgr::LoadInstanceEncounters()
     }
 
     uint32 count = 0;
-    std::map<uint32, DungeonEncounterEntry const*> dungeonLastBosses;
+    std::map<uint32, DungeonEncounterDBC const*> dungeonLastBosses;
     do
     {
         Field* fields = result->Fetch();
@@ -6107,7 +6107,7 @@ void ObjectMgr::LoadInstanceEncounters()
         uint8 creditType = fields[1].GetUInt8();
         uint32 creditEntry = fields[2].GetUInt32();
         uint32 lastEncounterDungeon = fields[3].GetUInt16();
-        DungeonEncounterEntry const* dungeonEncounter = sDungeonEncounterStore.LookupEntry(entry);
+        DungeonEncounterDBC const* dungeonEncounter = sDBCStoresMgr->GetDungeonEncounterDBC(entry);
         if (!dungeonEncounter)
         {
             TC_LOG_ERROR("sql.sql", "Table `instance_encounters` has an invalid encounter id %u, skipped!", entry);

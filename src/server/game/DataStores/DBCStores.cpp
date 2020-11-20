@@ -74,7 +74,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <CurrencyTypesEntry> sCurrencyTypesStore(CurrencyTypesfmt);
 
 //DBCStorage <DestructibleModelDataEntry> sDestructibleModelDataStore(DestructibleModelDatafmt);
-DBCStorage <DungeonEncounterEntry> sDungeonEncounterStore(DungeonEncounterfmt);
+//DBCStorage <DungeonEncounterEntry> sDungeonEncounterStore(DungeonEncounterfmt);
 DBCStorage <DurabilityQualityEntry> sDurabilityQualityStore(DurabilityQualityfmt);
 DBCStorage <DurabilityCostsEntry> sDurabilityCostsStore(DurabilityCostsfmt);
 
@@ -308,7 +308,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sCreatureTypeStore,                  "CreatureType.dbc");
     //LOAD_DBC(sCurrencyTypesStore,                 "CurrencyTypes.dbc");
     //LOAD_DBC(sDestructibleModelDataStore,         "DestructibleModelData.dbc");
-    LOAD_DBC(sDungeonEncounterStore,              "DungeonEncounter.dbc");
+    //LOAD_DBC(sDungeonEncounterStore,              "DungeonEncounter.dbc");
     LOAD_DBC(sDurabilityCostsStore,               "DurabilityCosts.dbc");
     LOAD_DBC(sDurabilityQualityStore,             "DurabilityQuality.dbc");
     LOAD_DBC(sEmotesStore,                        "Emotes.dbc");

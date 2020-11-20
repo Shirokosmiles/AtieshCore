@@ -618,3 +618,16 @@ struct DestructibleModelDataDBC
     //uint32 HealEffect;                                    // 17
     //uint32 HealEffectSpeed;                               // 18
 };
+
+// load DungeonEncounter.dbc
+struct DungeonEncounterDBC
+{
+    uint32 ID;                                              // 0
+    uint32 MapID;                                           // 1
+    uint32 Difficulty;                                      // 2
+    //uint32 OrderIndex;                                    // 3
+    uint32 Bit;                                             // 4 encounter index for creating completed mask
+    std::string Name[TOTAL_LOCALES];                        // 5-20
+    //uint32 Name_lang_mask;                                // 21
+    //uint32 SpellIconID;                                   // 22
+};
