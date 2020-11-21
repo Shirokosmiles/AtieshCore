@@ -56,6 +56,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _currencyTypesMap.clear();
     _destructibleModelDataMap.clear();
     _dungeonEncounterMap.clear();
+    _durabilityCoastsMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -90,6 +91,7 @@ void DBCStoresMgr::Initialize()
     _Load_CurrencyTypes();
     _Load_DestructibleModelData();
     _Load_DungeonEncounter();
+    _Load_DurabilityCosts();
 }
 
 // load Achievement.dbc
@@ -1242,4 +1244,41 @@ void DBCStoresMgr::_Load_DungeonEncounter()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_dungeonencounter              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load DurabilityCosts.dbc
+void DBCStoresMgr::_Load_DurabilityCosts()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _durabilityCoastsMap.clear();
+    //                                                0           1                    2                       3                    4                   5                      6                        7                   8                     9                     10                    11                        12                  13                      14                      15                  16                      17                      18                      19                     20                       21                  22                   23                   24                    25                  26                  27                  28                      29
+    QueryResult result = WorldDatabase.Query("SELECT ID, WeaponSubClassCost_1, WeaponSubClassCost_2, WeaponSubClassCost_3, WeaponSubClassCost_4, WeaponSubClassCost_5, WeaponSubClassCost_6, WeaponSubClassCost_7, WeaponSubClassCost_8, WeaponSubClassCost_9, WeaponSubClassCost_10, WeaponSubClassCost_11, WeaponSubClassCost_12, WeaponSubClassCost_13, WeaponSubClassCost_14, WeaponSubClassCost_15, WeaponSubClassCost_16, WeaponSubClassCost_17, WeaponSubClassCost_18, WeaponSubClassCost_19, WeaponSubClassCost_20, WeaponSubClassCost_21, ArmorSubClassCost_1, ArmorSubClassCost_2, ArmorSubClassCost_3, ArmorSubClassCost_4, ArmorSubClassCost_5, ArmorSubClassCost_6, ArmorSubClassCost_7, ArmorSubClassCost_8 FROM dbc_durabilitycosts");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_durabilitycosts. DB table `dbc_durabilitycosts` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        DurabilityCostsDBC dc;
+        dc.ID = id;
+        for (uint8 i = 0; i < 21; i++)
+            dc.WeaponSubClassCost[i] = fields[1 + i].GetUInt32();
+
+        for (uint8 i = 0; i < 8; i++)
+            dc.ArmorSubClassCost[i] = fields[22 + i].GetUInt32();
+
+        _durabilityCoastsMap[id] = dc;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_durabilitycosts               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

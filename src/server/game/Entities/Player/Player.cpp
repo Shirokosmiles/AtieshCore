@@ -5022,7 +5022,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
         {
             ItemTemplate const* ditemProto = item->GetTemplate();
 
-            DurabilityCostsEntry const* dcost = sDurabilityCostsStore.LookupEntry(ditemProto->ItemLevel);
+            DurabilityCostsDBC const* dcost = sDBCStoresMgr->GetDurabilityCostsDBC(ditemProto->ItemLevel);
             if (!dcost)
             {
                 TC_LOG_ERROR("entities.player.items", "Player::DurabilityRepair: Player '%s' (%s) tried to repair an item (ItemID: %u) with invalid item level %u",

@@ -631,3 +631,11 @@ struct DungeonEncounterDBC
     //uint32 Name_lang_mask;                                // 21
     //uint32 SpellIconID;                                   // 22
 };
+
+// load DurabilityCosts.dbc
+struct DurabilityCostsDBC
+{
+    uint32 ID;                                              // 0
+    uint32 WeaponSubClassCost[21];                          // 1-21
+    uint32 ArmorSubClassCost[8];                            // 22-29
+};

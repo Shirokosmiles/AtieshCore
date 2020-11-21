@@ -28,13 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct DurabilityCostsEntry
-{
-    uint32 ID;                                              // 0
-    uint32 WeaponSubClassCost[21];                          // 1-21
-    uint32 ArmorSubClassCost[8];                            // 22-29
-};
-
 struct DurabilityQualityEntry
 {
     uint32 ID;                                              // 0
