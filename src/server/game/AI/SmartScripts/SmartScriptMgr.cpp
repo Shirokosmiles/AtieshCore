@@ -627,7 +627,7 @@ bool SmartAIMgr::IsItemValid(SmartScriptHolder const& e, uint32 entry)
 
 bool SmartAIMgr::IsTextEmoteValid(SmartScriptHolder const& e, uint32 entry)
 {
-    if (!sEmotesTextStore.LookupEntry(entry))
+    if (!sDBCStoresMgr->GetEmotesTextDBC(entry))
     {
         TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Text Emote entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
         return false;

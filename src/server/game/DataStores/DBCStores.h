@@ -76,8 +76,6 @@ TC_GAME_API SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, u
 
 TC_GAME_API ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale);
 
-TC_GAME_API EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint32 race, uint32 gender);
-
 //TC_GAME_API extern DBCStorage <AchievementEntry>             sAchievementStore;
 //TC_GAME_API extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;
 //TC_GAME_API extern DBCStorage <AreaTableEntry>               sAreaTableStore;
@@ -110,8 +108,8 @@ TC_GAME_API EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint
 //TC_GAME_API extern DBCStorage <DurabilityCostsEntry>         sDurabilityCostsStore;
 //TC_GAME_API extern DBCStorage <DurabilityQualityEntry>       sDurabilityQualityStore;
 //TC_GAME_API extern DBCStorage <EmotesEntry>                  sEmotesStore;
-TC_GAME_API extern DBCStorage <EmotesTextEntry>              sEmotesTextStore;
-TC_GAME_API extern DBCStorage <EmotesTextSoundEntry>         sEmotesTextSoundStore;
+//TC_GAME_API extern DBCStorage <EmotesTextEntry>              sEmotesTextStore;
+//TC_GAME_API extern DBCStorage <EmotesTextSoundEntry>         sEmotesTextSoundStore;
 TC_GAME_API extern DBCStorage <FactionEntry>                 sFactionStore;
 TC_GAME_API extern DBCStorage <FactionTemplateEntry>         sFactionTemplateStore;
 TC_GAME_API extern DBCStorage <GameObjectArtKitEntry>        sGameObjectArtKitStore;

@@ -658,3 +658,22 @@ struct EmotesDBC
     uint32 EmoteSpecProcParam;                              // 5 unconfirmed, may be enum UnitStandStateType
     //uint32 EventSoundID;                                  // 6
 };
+
+// load EmotesText.dbc
+struct EmotesTextDBC
+{
+    uint32 ID;                                              // 0
+    //char const* Name;                                     // 1
+    uint32 EmoteID;                                         // 2
+    //uint32 EmoteText[16];                                 // 3-18
+};
+
+// load EmotesTextSound.dbc
+struct EmotesTextSoundDBC
+{
+    uint32 ID;                                              // 0
+    uint32 EmotesTextID;                                    // 1
+    uint8 RaceID;                                           // 2
+    uint8 SexID;                                            // 3 0 male / 1 female
+    uint32 SoundID;                                         // 4
+};

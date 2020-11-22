@@ -55,6 +55,8 @@ typedef std::unordered_map<uint32 /*ID*/, DungeonEncounterDBC> DungeonEncounterD
 typedef std::unordered_map<uint32 /*ID*/, DurabilityCostsDBC> DurabilityCostsDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, DurabilityQualityDBC> DurabilityQualityDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, EmotesDBC> EmotesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, EmotesTextDBC> EmotesTextDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, EmotesTextSoundDBC> EmotesTextSoundDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -376,6 +378,26 @@ public:
         return nullptr;
     }
 
+    EmotesTextDBC const* GetEmotesTextDBC(uint32 ID)
+    {
+        EmotesTextDBCMap::const_iterator itr = _emotesTextMap.find(ID);
+        if (itr != _emotesTextMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    EmotesTextSoundDBC const* GetEmotesTextSoundDBCWithParam(uint32 emote, uint8 race, uint8 gender)
+    {
+        for (EmotesTextSoundDBCMap::const_iterator itr = _emotesTextSoundMap.begin(); itr != _emotesTextSoundMap.end(); ++itr)
+        {
+            if (itr->second.EmotesTextID == emote &&
+                itr->second.RaceID == race &&
+                itr->second.SexID == gender)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -410,6 +432,8 @@ protected:
     void _Load_DurabilityCosts();
     void _Load_DurabilityQuality();
     void _Load_Emotes();
+    void _Load_EmotesText();
+    void _Load_EmotesTextSound();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -445,6 +469,8 @@ private:
     DurabilityCostsDBCMap _durabilityCoastsMap;
     DurabilityQualityDBCMap _durabilityQualityMap;
     EmotesDBCMap _emotesMap;
+    EmotesTextDBCMap _emotesTextMap;
+    EmotesTextSoundDBCMap _emotesTextSoundMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

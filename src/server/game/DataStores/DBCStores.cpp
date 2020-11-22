@@ -79,10 +79,10 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <DurabilityCostsEntry> sDurabilityCostsStore(DurabilityCostsfmt);
 
 //DBCStorage <EmotesEntry> sEmotesStore(EmotesEntryfmt);
-DBCStorage <EmotesTextEntry> sEmotesTextStore(EmotesTextEntryfmt);
-typedef std::tuple<uint32, uint32, uint32> EmotesTextSoundKey;
-static std::map<EmotesTextSoundKey, EmotesTextSoundEntry const*> sEmotesTextSoundMap;
-DBCStorage <EmotesTextSoundEntry> sEmotesTextSoundStore(EmotesTextSoundEntryfmt);
+//DBCStorage <EmotesTextEntry> sEmotesTextStore(EmotesTextEntryfmt);
+//typedef std::tuple<uint32, uint32, uint32> EmotesTextSoundKey;
+//static std::map<EmotesTextSoundKey, EmotesTextSoundEntry const*> sEmotesTextSoundMap;
+//DBCStorage <EmotesTextSoundEntry> sEmotesTextSoundStore(EmotesTextSoundEntryfmt);
 
 typedef std::map<uint32, SimpleFactionsList> FactionTeamMap;
 static FactionTeamMap sFactionTeamMap;
@@ -312,8 +312,8 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sDurabilityCostsStore,               "DurabilityCosts.dbc");
     //LOAD_DBC(sDurabilityQualityStore,             "DurabilityQuality.dbc");
     //LOAD_DBC(sEmotesStore,                        "Emotes.dbc");
-    LOAD_DBC(sEmotesTextStore,                    "EmotesText.dbc");
-    LOAD_DBC(sEmotesTextSoundStore,               "EmotesTextSound.dbc");
+    //LOAD_DBC(sEmotesTextStore,                    "EmotesText.dbc");
+    //LOAD_DBC(sEmotesTextSoundStore,               "EmotesTextSound.dbc");
     LOAD_DBC(sFactionStore,                       "Faction.dbc");
     LOAD_DBC(sFactionTemplateStore,               "FactionTemplate.dbc");
     LOAD_DBC(sGameObjectArtKitStore,              "GameObjectArtKit.dbc");
@@ -405,9 +405,6 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC_EXT(sSpellDifficultyStore, "SpellDifficulty.dbc",  "spelldifficulty_dbc",  CustomSpellDifficultyfmt, CustomSpellDifficultyIndex);
 
 #undef LOAD_DBC_EXT
-
-    for (EmotesTextSoundEntry const* entry : sEmotesTextSoundStore)
-        sEmotesTextSoundMap[EmotesTextSoundKey(entry->EmotesTextID, entry->RaceID, entry->SexID)] = entry;
 
     for (FactionEntry const* faction : sFactionStore)
     {
@@ -910,10 +907,4 @@ ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
             return CHAR_NAME_RESERVED;
 
     return CHAR_NAME_SUCCESS;
-}
-
-EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint32 race, uint32 gender)
-{
-    auto itr = sEmotesTextSoundMap.find(EmotesTextSoundKey(emote, race, gender));
-    return itr != sEmotesTextSoundMap.end() ? itr->second : nullptr;
 }

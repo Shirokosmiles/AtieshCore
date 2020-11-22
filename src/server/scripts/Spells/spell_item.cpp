@@ -3641,7 +3641,7 @@ class spell_item_toy_train_set_pulse : public SpellScript
         if (Player* target = GetHitUnit()->ToPlayer())
         {
             target->HandleEmoteCommand(EMOTE_ONESHOT_TRAIN);
-            if (EmotesTextSoundEntry const* soundEntry = FindTextSoundEmoteFor(TEXT_EMOTE_TRAIN, target->GetRace(), target->GetNativeGender()))
+            if (EmotesTextSoundDBC const* soundEntry = sDBCStoresMgr->GetEmotesTextSoundDBCWithParam(TEXT_EMOTE_TRAIN, target->GetRace(), target->GetNativeGender()))
                 target->PlayDistanceSound(soundEntry->SoundID);
         }
     }

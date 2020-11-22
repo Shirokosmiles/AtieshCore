@@ -28,23 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct EmotesTextEntry
-{
-    uint32 ID;                                              // 0
-    //char const* Name;                                     // 1
-    uint32 EmoteID;                                         // 2
-    //uint32 EmoteText[16];                                 // 3-18
-};
-
-struct EmotesTextSoundEntry
-{
-    uint32 ID;                                              // 0
-    uint32 EmotesTextID;                                    // 1
-    uint32 RaceID;                                          // 2
-    uint32 SexID;                                           // 3 0 male / 1 female
-    uint32 SoundID;                                         // 4
-};
-
 struct FactionEntry
 {
     uint32 ID;                                              // 0

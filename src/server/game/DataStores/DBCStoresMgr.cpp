@@ -59,6 +59,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _durabilityCoastsMap.clear();
     _durabilityQualityMap.clear();
     _emotesMap.clear();
+    _emotesTextMap.clear();
+    _emotesTextSoundMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -96,6 +98,8 @@ void DBCStoresMgr::Initialize()
     _Load_DurabilityCosts();
     _Load_DurabilityQuality();
     _Load_Emotes();
+    _Load_EmotesText();
+    _Load_EmotesTextSound();
 }
 
 // load Achievement.dbc
@@ -1353,4 +1357,73 @@ void DBCStoresMgr::_Load_Emotes()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_emotes                        %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load EmotesText.dbc
+void DBCStoresMgr::_Load_EmotesText()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _emotesTextMap.clear();
+    //                                                0      1
+    QueryResult result = WorldDatabase.Query("SELECT ID, EmoteID FROM dbc_emotestext");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotestext. DB table `dbc_emotestext` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        EmotesTextDBC et;
+        et.ID = id;
+        et.EmoteID = fields[1].GetUInt32();
+
+        _emotesTextMap[id] = et;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_emotestext                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load EmotesTextSound.dbc
+void DBCStoresMgr::_Load_EmotesTextSound()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _emotesTextSoundMap.clear();
+    //                                                0      1            2      3       4
+    QueryResult result = WorldDatabase.Query("SELECT ID, EmotesTextID, RaceID, SexID, SoundID FROM dbc_emotestextsound");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotestextsound. DB table `dbc_emotestextsound` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        EmotesTextSoundDBC ets;
+        ets.ID = id;
+        ets.EmotesTextID = fields[1].GetUInt32();
+        ets.RaceID       = fields[2].GetUInt8();
+        ets.SexID        = fields[3].GetUInt8();
+        ets.SoundID      = fields[4].GetUInt32();
+
+        _emotesTextSoundMap[id] = ets;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_emotestextsound               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

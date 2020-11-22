@@ -27,6 +27,7 @@
 #include "ChatPackets.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -835,7 +836,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 
     sScriptMgr->OnPlayerTextEmote(GetPlayer(), text_emote, emoteNum, guid);
 
-    EmotesTextEntry const* em = sEmotesTextStore.LookupEntry(text_emote);
+    EmotesTextDBC const* em = sDBCStoresMgr->GetEmotesTextDBC(text_emote);
     if (!em)
     {
         recvData.rfinish();
