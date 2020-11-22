@@ -57,6 +57,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _destructibleModelDataMap.clear();
     _dungeonEncounterMap.clear();
     _durabilityCoastsMap.clear();
+    _durabilityQualityMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -92,6 +93,7 @@ void DBCStoresMgr::Initialize()
     _Load_DestructibleModelData();
     _Load_DungeonEncounter();
     _Load_DurabilityCosts();
+    _Load_DurabilityQuality();
 }
 
 // load Achievement.dbc
@@ -1281,4 +1283,37 @@ void DBCStoresMgr::_Load_DurabilityCosts()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_durabilitycosts               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load DurabilityQuality.dbc
+void DBCStoresMgr::_Load_DurabilityQuality()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _durabilityQualityMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_durabilityquality");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_durabilityquality. DB table `dbc_durabilityquality` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        DurabilityQualityDBC dq;
+        dq.ID = id;
+        dq.Data = fields[1].GetFloat();
+
+        _durabilityQualityMap[id] = dq;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_durabilityquality             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

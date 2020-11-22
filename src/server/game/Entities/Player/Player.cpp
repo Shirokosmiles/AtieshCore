@@ -5031,7 +5031,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
             }
 
             uint32 dQualitymodEntryId = (ditemProto->Quality+1)*2;
-            DurabilityQualityEntry const* dQualitymodEntry = sDurabilityQualityStore.LookupEntry(dQualitymodEntryId);
+            DurabilityQualityDBC const* dQualitymodEntry = sDBCStoresMgr->GetDurabilityQualityDBC(dQualitymodEntryId);
             if (!dQualitymodEntry)
             {
                 TC_LOG_ERROR("entities.player.items", "Player::DurabilityRepair: Player '%s' (%s) tried to repair an item (ItemID: %u) with invalid QualitymodEntry %u",

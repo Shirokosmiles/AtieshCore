@@ -53,6 +53,7 @@ typedef std::unordered_map<uint32 /*ItemID*/, CurrencyTypesDBC> CurrencyTypesDBC
 typedef std::unordered_map<uint32 /*ID*/, DestructibleModelDataDBC> DestructibleModelDataDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, DungeonEncounterDBC> DungeonEncounterDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, DurabilityCostsDBC> DurabilityCostsDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, DurabilityQualityDBC> DurabilityQualityDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -358,6 +359,14 @@ public:
         return nullptr;
     }
 
+    DurabilityQualityDBC const* GetDurabilityQualityDBC(uint32 ID)
+    {
+        DurabilityQualityDBCMap::const_iterator itr = _durabilityQualityMap.find(ID);
+        if (itr != _durabilityQualityMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -390,6 +399,7 @@ protected:
     void _Load_DestructibleModelData();
     void _Load_DungeonEncounter();
     void _Load_DurabilityCosts();
+    void _Load_DurabilityQuality();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -423,6 +433,7 @@ private:
     DestructibleModelDataDBCMap _destructibleModelDataMap;
     DungeonEncounterDBCMap _dungeonEncounterMap;
     DurabilityCostsDBCMap _durabilityCoastsMap;
+    DurabilityQualityDBCMap _durabilityQualityMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

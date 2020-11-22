@@ -639,3 +639,10 @@ struct DurabilityCostsDBC
     uint32 WeaponSubClassCost[21];                          // 1-21
     uint32 ArmorSubClassCost[8];                            // 22-29
 };
+
+// load DurabilityQuality.dbc
+struct DurabilityQualityDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};

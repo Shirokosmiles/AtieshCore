@@ -28,12 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct DurabilityQualityEntry
-{
-    uint32 ID;                                              // 0
-    float Data;                                             // 1
-};
-
 struct EmotesEntry
 {
     uint32 ID;                                              // 0
