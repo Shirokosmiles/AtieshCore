@@ -18,6 +18,7 @@
 #include "QuestDef.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -124,7 +125,7 @@ void Quest::LoadQuestDetails(Field* fields)
 {
     for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
     {
-        if (!sEmotesStore.LookupEntry(fields[1+i].GetUInt16()))
+        if (!sDBCStoresMgr->GetEmotesDBC(fields[1+i].GetUInt16()))
         {
             TC_LOG_ERROR("sql.sql", "Table `quest_details` has non-existing Emote%i (%u) set for quest %u. Skipped.", 1+i, fields[1+i].GetUInt16(), fields[0].GetUInt32());
             continue;
@@ -142,10 +143,10 @@ void Quest::LoadQuestRequestItems(Field* fields)
     _emoteOnComplete = fields[1].GetUInt16();
     _emoteOnIncomplete = fields[2].GetUInt16();
 
-    if (!sEmotesStore.LookupEntry(_emoteOnComplete))
+    if (!sDBCStoresMgr->GetEmotesDBC(_emoteOnComplete))
         TC_LOG_ERROR("sql.sql", "Table `quest_request_items` has non-existing EmoteOnComplete (%u) set for quest %u.", _emoteOnComplete, fields[0].GetUInt32());
 
-    if (!sEmotesStore.LookupEntry(_emoteOnIncomplete))
+    if (!sDBCStoresMgr->GetEmotesDBC(_emoteOnIncomplete))
         TC_LOG_ERROR("sql.sql", "Table `quest_request_items` has non-existing EmoteOnIncomplete (%u) set for quest %u.", _emoteOnIncomplete, fields[0].GetUInt32());
 
     _requestItemsText = fields[3].GetString();
@@ -155,7 +156,7 @@ void Quest::LoadQuestOfferReward(Field* fields)
 {
     for (uint32 i = 0; i < QUEST_EMOTE_COUNT; ++i)
     {
-        if (!sEmotesStore.LookupEntry(fields[1 + i].GetUInt16()))
+        if (!sDBCStoresMgr->GetEmotesDBC(fields[1 + i].GetUInt16()))
         {
             TC_LOG_ERROR("sql.sql", "Table `quest_offer_reward` has non-existing Emote%i (%u) set for quest %u. Skipped.", 1 + i, fields[1 + i].GetUInt16(), fields[0].GetUInt32());
             continue;

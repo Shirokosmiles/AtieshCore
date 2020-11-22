@@ -141,7 +141,7 @@ void CreatureTextMgr::LoadCreatureTexts()
 
         if (temp.emote)
         {
-            if (!sEmotesStore.LookupEntry(temp.emote))
+            if (!sDBCStoresMgr->GetEmotesDBC(temp.emote))
             {
                 TC_LOG_ERROR("sql.sql", "CreatureTextMgr: Entry %u, Group %u in table `creature_text` has Emote %u but emote does not exist.", temp.creatureId, temp.groupId, uint32(temp.emote));
                 temp.emote = EMOTE_ONESHOT_NONE;

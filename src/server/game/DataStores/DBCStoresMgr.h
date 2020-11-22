@@ -54,6 +54,7 @@ typedef std::unordered_map<uint32 /*ID*/, DestructibleModelDataDBC> Destructible
 typedef std::unordered_map<uint32 /*ID*/, DungeonEncounterDBC> DungeonEncounterDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, DurabilityCostsDBC> DurabilityCostsDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, DurabilityQualityDBC> DurabilityQualityDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, EmotesDBC> EmotesDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -367,6 +368,14 @@ public:
         return nullptr;
     }
 
+    EmotesDBC const* GetEmotesDBC(uint32 ID)
+    {
+        EmotesDBCMap::const_iterator itr = _emotesMap.find(ID);
+        if (itr != _emotesMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -400,6 +409,7 @@ protected:
     void _Load_DungeonEncounter();
     void _Load_DurabilityCosts();
     void _Load_DurabilityQuality();
+    void _Load_Emotes();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -434,6 +444,7 @@ private:
     DungeonEncounterDBCMap _dungeonEncounterMap;
     DurabilityCostsDBCMap _durabilityCoastsMap;
     DurabilityQualityDBCMap _durabilityQualityMap;
+    EmotesDBCMap _emotesMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

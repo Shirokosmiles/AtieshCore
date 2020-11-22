@@ -28,17 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct EmotesEntry
-{
-    uint32 ID;                                              // 0
-    //char const* EmoteSlashCommand;                        // 1 internal name
-    //uint32 AnimID;                                        // 2 ref to animationData
-    uint32 EmoteFlags;                                      // 3 bitmask, may be unit_flags
-    uint32 EmoteSpecProc;                                   // 4 Can be 0, 1 or 2 (determine how emote are shown)
-    uint32 EmoteSpecProcParam;                              // 5 unconfirmed, may be enum UnitStandStateType
-    //uint32 EventSoundID;                                  // 6
-};
-
 struct EmotesTextEntry
 {
     uint32 ID;                                              // 0

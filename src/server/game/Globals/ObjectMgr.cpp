@@ -786,7 +786,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
             }
         }
 
-        if (!sEmotesStore.LookupEntry(creatureAddon.emote))
+        if (!sDBCStoresMgr->GetEmotesDBC(creatureAddon.emote))
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid emote (%u) defined in `creature_template_addon`.", entry, creatureAddon.emote);
             creatureAddon.emote = 0;
@@ -1322,7 +1322,7 @@ void ObjectMgr::LoadCreatureAddons()
             }
         }
 
-        if (!sEmotesStore.LookupEntry(creatureAddon.emote))
+        if (!sDBCStoresMgr->GetEmotesDBC(creatureAddon.emote))
         {
             TC_LOG_ERROR("sql.sql", "Creature (GUID: %u) has invalid emote (%u) defined in `creature_addon`.", guid, creatureAddon.emote);
             creatureAddon.emote = 0;
@@ -5481,7 +5481,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
 
             case SCRIPT_COMMAND_EMOTE:
             {
-                if (!sEmotesStore.LookupEntry(tmp.Emote.EmoteID))
+                if (!sDBCStoresMgr->GetEmotesDBC(tmp.Emote.EmoteID))
                 {
                     TC_LOG_ERROR("sql.sql", "Table `%s` has invalid emote id (datalong = %u) in SCRIPT_COMMAND_EMOTE for script id %u",
                         tableName.c_str(), tmp.Emote.EmoteID, tmp.id);
@@ -6421,7 +6421,7 @@ void ObjectMgr::LoadQuestGreetings()
 
         uint16 greetEmoteType       = fields[2].GetUInt16();
 
-        if (greetEmoteType > 0 && !sEmotesStore.LookupEntry(greetEmoteType))
+        if (greetEmoteType > 0 && !sDBCStoresMgr->GetEmotesDBC(greetEmoteType))
         {
             TC_LOG_DEBUG("sql.sql", "Table `quest_greeting`: entry %u has greetEmoteType = %u but emote does not exist. Set to 0.", id, greetEmoteType);
             greetEmoteType = 0;
@@ -9853,7 +9853,7 @@ void ObjectMgr::LoadBroadcastTexts()
 
         if (bct.EmoteId1)
         {
-            if (!sEmotesStore.LookupEntry(bct.EmoteId1))
+            if (!sDBCStoresMgr->GetEmotesDBC(bct.EmoteId1))
             {
                 TC_LOG_DEBUG("broadcasttext", "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId1 %u but emote does not exist.", bct.Id, bct.EmoteId1);
                 bct.EmoteId1 = 0;
@@ -9862,7 +9862,7 @@ void ObjectMgr::LoadBroadcastTexts()
 
         if (bct.EmoteId2)
         {
-            if (!sEmotesStore.LookupEntry(bct.EmoteId2))
+            if (!sDBCStoresMgr->GetEmotesDBC(bct.EmoteId2))
             {
                 TC_LOG_DEBUG("broadcasttext", "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId2 %u but emote does not exist.", bct.Id, bct.EmoteId2);
                 bct.EmoteId2 = 0;
@@ -9871,7 +9871,7 @@ void ObjectMgr::LoadBroadcastTexts()
 
         if (bct.EmoteId3)
         {
-            if (!sEmotesStore.LookupEntry(bct.EmoteId3))
+            if (!sDBCStoresMgr->GetEmotesDBC(bct.EmoteId3))
             {
                 TC_LOG_DEBUG("broadcasttext", "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId3 %u but emote does not exist.", bct.Id, bct.EmoteId3);
                 bct.EmoteId3 = 0;

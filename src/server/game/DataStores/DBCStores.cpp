@@ -78,7 +78,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <DurabilityQualityEntry> sDurabilityQualityStore(DurabilityQualityfmt);
 //DBCStorage <DurabilityCostsEntry> sDurabilityCostsStore(DurabilityCostsfmt);
 
-DBCStorage <EmotesEntry> sEmotesStore(EmotesEntryfmt);
+//DBCStorage <EmotesEntry> sEmotesStore(EmotesEntryfmt);
 DBCStorage <EmotesTextEntry> sEmotesTextStore(EmotesTextEntryfmt);
 typedef std::tuple<uint32, uint32, uint32> EmotesTextSoundKey;
 static std::map<EmotesTextSoundKey, EmotesTextSoundEntry const*> sEmotesTextSoundMap;
@@ -311,7 +311,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sDungeonEncounterStore,              "DungeonEncounter.dbc");
     //LOAD_DBC(sDurabilityCostsStore,               "DurabilityCosts.dbc");
     //LOAD_DBC(sDurabilityQualityStore,             "DurabilityQuality.dbc");
-    LOAD_DBC(sEmotesStore,                        "Emotes.dbc");
+    //LOAD_DBC(sEmotesStore,                        "Emotes.dbc");
     LOAD_DBC(sEmotesTextStore,                    "EmotesText.dbc");
     LOAD_DBC(sEmotesTextSoundStore,               "EmotesTextSound.dbc");
     LOAD_DBC(sFactionStore,                       "Faction.dbc");
