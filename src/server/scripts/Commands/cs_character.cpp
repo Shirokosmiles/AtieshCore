@@ -28,6 +28,7 @@ EndScriptData */
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -539,8 +540,8 @@ public:
         for (FactionStateList::const_iterator itr = targetFSL.begin(); itr != targetFSL.end(); ++itr)
         {
             FactionState const& faction = itr->second;
-            FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction.ID);
-            char const* factionName = factionEntry ? factionEntry->Name[loc] : "#Not found#";
+            FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(faction.ID);
+            char const* factionName = factionEntry ? factionEntry->Name[loc].c_str() : "#Not found#";
             ReputationRank rank = target->GetReputationMgr().GetRank(factionEntry);
             std::string rankName = handler->GetTrinityString(ReputationRankStrIndex[rank]);
             std::ostringstream ss;

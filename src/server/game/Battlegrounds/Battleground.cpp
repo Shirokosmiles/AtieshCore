@@ -23,6 +23,7 @@
 #include "Creature.h"
 #include "CreatureTextMgr.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "Formulas.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
@@ -661,8 +662,8 @@ void Battleground::RewardHonorToTeam(uint32 Honor, uint32 TeamID)
 
 void Battleground::RewardReputationToTeam(uint32 a_faction_id, uint32 h_faction_id, uint32 Reputation, uint32 TeamID)
 {
-    FactionEntry const* a_factionEntry = sFactionStore.LookupEntry(a_faction_id);
-    FactionEntry const* h_factionEntry = sFactionStore.LookupEntry(h_faction_id);
+    FactionDBC const* a_factionEntry = sDBCStoresMgr->GetFactionDBC(a_faction_id);
+    FactionDBC const* h_factionEntry = sDBCStoresMgr->GetFactionDBC(h_faction_id);
 
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {

@@ -25,6 +25,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -785,7 +786,7 @@ public:
             }
         }
 
-        FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
+        FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(factionId);
 
         if (!factionEntry)
         {

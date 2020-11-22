@@ -28,6 +28,7 @@
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -2616,7 +2617,7 @@ class spell_gen_oracle_wolvar_reputation : public SpellScript
         uint32 factionId = GetSpellInfo()->Effects[effIndex].CalcValue();
         int32  repChange = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
 
-        FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
+        FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(factionId);
         if (!factionEntry)
             return;
 

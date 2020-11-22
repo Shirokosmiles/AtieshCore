@@ -28,9 +28,6 @@
 
 enum LocaleConstant : uint8;
 
-typedef std::list<uint32> SimpleFactionsList;
-TC_GAME_API SimpleFactionsList const* GetFactionTeamList(uint32 faction);
-
 TC_GAME_API uint32 GetTalentSpellCost(uint32 spellId);
 TC_GAME_API TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
 
@@ -110,7 +107,7 @@ TC_GAME_API ResponseCodes ValidateName(std::wstring const& name, LocaleConstant 
 //TC_GAME_API extern DBCStorage <EmotesEntry>                  sEmotesStore;
 //TC_GAME_API extern DBCStorage <EmotesTextEntry>              sEmotesTextStore;
 //TC_GAME_API extern DBCStorage <EmotesTextSoundEntry>         sEmotesTextSoundStore;
-TC_GAME_API extern DBCStorage <FactionEntry>                 sFactionStore;
+//TC_GAME_API extern DBCStorage <FactionEntry>                 sFactionStore;
 TC_GAME_API extern DBCStorage <FactionTemplateEntry>         sFactionTemplateStore;
 TC_GAME_API extern DBCStorage <GameObjectArtKitEntry>        sGameObjectArtKitStore;
 TC_GAME_API extern DBCStorage <GameObjectDisplayInfoEntry>   sGameObjectDisplayInfoStore;

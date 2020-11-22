@@ -57,6 +57,7 @@ typedef std::unordered_map<uint32 /*ID*/, DurabilityQualityDBC> DurabilityQualit
 typedef std::unordered_map<uint32 /*ID*/, EmotesDBC> EmotesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, EmotesTextDBC> EmotesTextDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, EmotesTextSoundDBC> EmotesTextSoundDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, FactionDBC> FactionDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -398,6 +399,15 @@ public:
         return nullptr;
     }
 
+    FactionDBCMap const& GetFactionDBCMap() const { return _factionMap; }
+    FactionDBC const* GetFactionDBC(uint32 ID)
+    {
+        FactionDBCMap::const_iterator itr = _factionMap.find(ID);
+        if (itr != _factionMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -434,6 +444,7 @@ protected:
     void _Load_Emotes();
     void _Load_EmotesText();
     void _Load_EmotesTextSound();
+    void _Load_Faction();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -471,6 +482,7 @@ private:
     EmotesDBCMap _emotesMap;
     EmotesTextDBCMap _emotesTextMap;
     EmotesTextSoundDBCMap _emotesTextSoundMap;
+    FactionDBCMap _factionMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

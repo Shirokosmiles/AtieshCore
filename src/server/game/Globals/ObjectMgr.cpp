@@ -3043,7 +3043,7 @@ void ObjectMgr::LoadItemTemplates()
 
         if (itemTemplate.Flags2 & ITEM_FLAG2_FACTION_HORDE)
         {
-            if (FactionEntry const* faction = sFactionStore.LookupEntry(HORDE))
+            if (FactionDBC const* faction = sDBCStoresMgr->GetFactionDBC(HORDE))
                 if ((itemTemplate.AllowableRace & faction->ReputationRaceMask[0]) == 0)
                     TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has value (%u) in `AllowableRace` races, not compatible with ITEM_FLAG2_FACTION_HORDE (%u) in Flags field, item cannot be equipped or used by these races.",
                         entry, itemTemplate.AllowableRace, ITEM_FLAG2_FACTION_HORDE);
@@ -3054,7 +3054,7 @@ void ObjectMgr::LoadItemTemplates()
         }
         else if (itemTemplate.Flags2 & ITEM_FLAG2_FACTION_ALLIANCE)
         {
-            if (FactionEntry const* faction = sFactionStore.LookupEntry(ALLIANCE))
+            if (FactionDBC const* faction = sDBCStoresMgr->GetFactionDBC(ALLIANCE))
                 if ((itemTemplate.AllowableRace & faction->ReputationRaceMask[0]) == 0)
                     TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has value (%u) in `AllowableRace` races, not compatible with ITEM_FLAG2_FACTION_ALLIANCE (%u) in Flags field, item cannot be equipped or used by these races.",
                         entry, itemTemplate.AllowableRace, ITEM_FLAG2_FACTION_ALLIANCE);
@@ -3112,7 +3112,7 @@ void ObjectMgr::LoadItemTemplates()
 
         if (itemTemplate.RequiredReputationFaction)
         {
-            if (!sFactionStore.LookupEntry(itemTemplate.RequiredReputationFaction))
+            if (!sDBCStoresMgr->GetFactionDBC(itemTemplate.RequiredReputationFaction))
             {
                 TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has wrong (not existing) faction in RequiredReputationFaction (%u)", entry, itemTemplate.RequiredReputationFaction);
                 itemTemplate.RequiredReputationFaction = 0;
@@ -4871,28 +4871,28 @@ void ObjectMgr::LoadQuests()
         }
         // else Skill quests can have 0 skill level, this is ok
 
-        if (qinfo->_requiredFactionId2 && !sFactionStore.LookupEntry(qinfo->_requiredFactionId2))
+        if (qinfo->_requiredFactionId2 && !sDBCStoresMgr->GetFactionDBC(qinfo->_requiredFactionId2))
         {
             TC_LOG_ERROR("sql.sql", "Quest %u has `RequiredFactionId2` = %u but faction template %u does not exist, quest can't be done.",
                 qinfo->GetQuestId(), qinfo->_requiredFactionId2, qinfo->_requiredFactionId2);
             // no changes, quest can't be done for this requirement
         }
 
-        if (qinfo->_requiredFactionId1 && !sFactionStore.LookupEntry(qinfo->_requiredFactionId1))
+        if (qinfo->_requiredFactionId1 && !sDBCStoresMgr->GetFactionDBC(qinfo->_requiredFactionId1))
         {
             TC_LOG_ERROR("sql.sql", "Quest %u has `RequiredFactionId1` = %u but faction template %u does not exist, quest can't be done.",
                 qinfo->GetQuestId(), qinfo->_requiredFactionId1, qinfo->_requiredFactionId1);
             // no changes, quest can't be done for this requirement
         }
 
-        if (qinfo->_requiredMinRepFaction && !sFactionStore.LookupEntry(qinfo->_requiredMinRepFaction))
+        if (qinfo->_requiredMinRepFaction && !sDBCStoresMgr->GetFactionDBC(qinfo->_requiredMinRepFaction))
         {
             TC_LOG_ERROR("sql.sql", "Quest %u has `RequiredMinRepFaction` = %u but faction template %u does not exist, quest can't be done.",
                 qinfo->GetQuestId(), qinfo->_requiredMinRepFaction, qinfo->_requiredMinRepFaction);
             // no changes, quest can't be done for this requirement
         }
 
-        if (qinfo->_requiredMaxRepFaction && !sFactionStore.LookupEntry(qinfo->_requiredMaxRepFaction))
+        if (qinfo->_requiredMaxRepFaction && !sDBCStoresMgr->GetFactionDBC(qinfo->_requiredMaxRepFaction))
         {
             TC_LOG_ERROR("sql.sql", "Quest %u has `RequiredMaxRepFaction` = %u but faction template %u does not exist, quest can't be done.",
                 qinfo->GetQuestId(), qinfo->_requiredMaxRepFaction, qinfo->_requiredMaxRepFaction);
@@ -5140,7 +5140,7 @@ void ObjectMgr::LoadQuests()
                 {
                TC_LOG_ERROR("sql.sql", "Quest %u has RewardFactionValueId%d = %i. That is outside the range of valid values (-9 to 9).", qinfo->GetQuestId(), j+1, qinfo->RewardFactionValueId[j]);
                 }
-                if (!sFactionStore.LookupEntry(qinfo->RewardFactionId[j]))
+                if (!sDBCStoresMgr->GetFactionDBC(qinfo->RewardFactionId[j]))
                 {
                     TC_LOG_ERROR("sql.sql", "Quest %u has `RewardFactionId%d` = %u but raw faction (faction.dbc) %u does not exist, quest will not reward reputation for this faction.", qinfo->GetQuestId(), j+1, qinfo->RewardFactionId[j], qinfo->RewardFactionId[j]);
                     qinfo->RewardFactionId[j] = 0;            // quest will not reward this
@@ -7840,7 +7840,7 @@ void ObjectMgr::LoadReputationRewardRate()
         repRate.creatureRate        = fields[6].GetFloat();
         repRate.spellRate           = fields[7].GetFloat();
 
-        FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
+        FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(factionId);
         if (!factionEntry)
         {
             TC_LOG_ERROR("sql.sql", "Faction (faction.dbc) %u does not exist but is used in `reputation_reward_rate`", factionId);
@@ -7944,7 +7944,7 @@ void ObjectMgr::LoadReputationOnKill()
 
         if (repOnKill.RepFaction1)
         {
-            FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(repOnKill.RepFaction1);
+            FactionDBC const* factionEntry1 = sDBCStoresMgr->GetFactionDBC(repOnKill.RepFaction1);
             if (!factionEntry1)
             {
                 TC_LOG_ERROR("sql.sql", "Faction (faction.dbc) %u does not exist but is used in `creature_onkill_reputation`", repOnKill.RepFaction1);
@@ -7954,7 +7954,7 @@ void ObjectMgr::LoadReputationOnKill()
 
         if (repOnKill.RepFaction2)
         {
-            FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(repOnKill.RepFaction2);
+            FactionDBC const* factionEntry2 = sDBCStoresMgr->GetFactionDBC(repOnKill.RepFaction2);
             if (!factionEntry2)
             {
                 TC_LOG_ERROR("sql.sql", "Faction (faction.dbc) %u does not exist but is used in `creature_onkill_reputation`", repOnKill.RepFaction2);
@@ -8006,7 +8006,7 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
         repTemplate.faction_rate[3]     = fields[11].GetFloat();
         repTemplate.faction_rank[3]     = fields[12].GetUInt8();
 
-        FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
+        FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(factionId);
 
         if (!factionEntry)
         {
@@ -8025,7 +8025,7 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
         {
             if (repTemplate.faction[i])
             {
-                FactionEntry const* factionSpillover = sFactionStore.LookupEntry(repTemplate.faction[i]);
+                FactionDBC const* factionSpillover = sDBCStoresMgr->GetFactionDBC(repTemplate.faction[i]);
 
                 if (!factionSpillover)
                 {
@@ -8861,7 +8861,7 @@ SpellScriptsBounds ObjectMgr::GetSpellScriptsBounds(uint32 spellId)
 }
 
 // this allows calculating base reputations to offline players, just by race and class
-int32 ObjectMgr::GetBaseReputationOf(FactionEntry const* factionEntry, uint8 race, uint8 playerClass) const
+int32 ObjectMgr::GetBaseReputationOf(FactionDBC const* factionEntry, uint8 race, uint8 playerClass) const
 {
     if (!factionEntry)
         return 0;
@@ -10141,9 +10141,9 @@ void ObjectMgr::LoadFactionChangeReputations()
         uint32 alliance = fields[0].GetUInt32();
         uint32 horde = fields[1].GetUInt32();
 
-        if (!sFactionStore.LookupEntry(alliance))
+        if (!sDBCStoresMgr->GetFactionDBC(alliance))
             TC_LOG_ERROR("sql.sql", "Reputation %u (alliance_id) referenced in `player_factionchange_reputations` does not exist, pair skipped!", alliance);
-        else if (!sFactionStore.LookupEntry(horde))
+        else if (!sDBCStoresMgr->GetFactionDBC(horde))
             TC_LOG_ERROR("sql.sql", "Reputation %u (horde_id) referenced in `player_factionchange_reputations` does not exist, pair skipped!", horde);
         else
             FactionChangeReputation[alliance] = horde;

@@ -27,6 +27,7 @@ EndScriptData */
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameEventMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -316,10 +317,10 @@ public:
         uint32 count = 0;
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-        for (uint32 id = 0; id < sFactionStore.GetNumRows(); ++id)
+        FactionDBCMap const& factionMap = sDBCStoresMgr->GetFactionDBCMap();
+        for (FactionDBCMap::const_iterator itr = factionMap.begin(); itr != factionMap.end(); ++itr)
         {
-            FactionEntry const* factionEntry = sFactionStore.LookupEntry(id);
-            if (factionEntry)
+            if (FactionDBC const* factionEntry = &itr->second)
             {
                 FactionState const* factionState = target ? target->GetReputationMgr().GetState(factionEntry) : nullptr;
 
@@ -357,9 +358,9 @@ public:
                     // or              "id - [faction] [no reputation]" format
                     std::ostringstream ss;
                     if (handler->GetSession())
-                        ss << id << " - |cffffffff|Hfaction:" << id << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
+                        ss << factionEntry->ID << " - |cffffffff|Hfaction:" << factionEntry->ID << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
                     else
-                        ss << id << " - " << name << ' ' << localeNames[locale];
+                        ss << factionEntry->ID << " - " << name << ' ' << localeNames[locale];
 
                     if (factionState) // and then target != NULL also
                     {

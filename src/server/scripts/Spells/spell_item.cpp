@@ -3594,8 +3594,8 @@ class spell_item_sunwell_neck : public SpellScriptLoader
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
                 return ValidateSpellInfo({ Aldors, Scryers }) &&
-                    sFactionStore.LookupEntry(FACTION_ALDOR) &&
-                    sFactionStore.LookupEntry(FACTION_SCRYERS);
+                    sDBCStoresMgr->GetFactionDBC(FACTION_ALDOR) &&
+                    sDBCStoresMgr->GetFactionDBC(FACTION_SCRYERS);
             }
 
             bool CheckProc(ProcEventInfo& eventInfo)

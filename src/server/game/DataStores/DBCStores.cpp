@@ -84,9 +84,9 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //static std::map<EmotesTextSoundKey, EmotesTextSoundEntry const*> sEmotesTextSoundMap;
 //DBCStorage <EmotesTextSoundEntry> sEmotesTextSoundStore(EmotesTextSoundEntryfmt);
 
-typedef std::map<uint32, SimpleFactionsList> FactionTeamMap;
-static FactionTeamMap sFactionTeamMap;
-DBCStorage <FactionEntry> sFactionStore(FactionEntryfmt);
+//typedef std::map<uint32, SimpleFactionsList> FactionTeamMap;
+//static FactionTeamMap sFactionTeamMap;
+//DBCStorage <FactionEntry> sFactionStore(FactionEntryfmt);
 DBCStorage <FactionTemplateEntry> sFactionTemplateStore(FactionTemplateEntryfmt);
 
 // Used exclusively for data validation
@@ -314,7 +314,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sEmotesStore,                        "Emotes.dbc");
     //LOAD_DBC(sEmotesTextStore,                    "EmotesText.dbc");
     //LOAD_DBC(sEmotesTextSoundStore,               "EmotesTextSound.dbc");
-    LOAD_DBC(sFactionStore,                       "Faction.dbc");
+    //LOAD_DBC(sFactionStore,                       "Faction.dbc");
     LOAD_DBC(sFactionTemplateStore,               "FactionTemplate.dbc");
     LOAD_DBC(sGameObjectArtKitStore,              "GameObjectArtKit.dbc");
     LOAD_DBC(sGameObjectDisplayInfoStore,         "GameObjectDisplayInfo.dbc");
@@ -405,15 +405,6 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC_EXT(sSpellDifficultyStore, "SpellDifficulty.dbc",  "spelldifficulty_dbc",  CustomSpellDifficultyfmt, CustomSpellDifficultyIndex);
 
 #undef LOAD_DBC_EXT
-
-    for (FactionEntry const* faction : sFactionStore)
-    {
-        if (faction->ParentFactionID)
-        {
-            SimpleFactionsList& flist = sFactionTeamMap[faction->ParentFactionID];
-            flist.push_back(faction->ID);
-        }
-    }
 
     for (GameObjectDisplayInfoEntry const* info : sGameObjectDisplayInfoStore)
     {
@@ -656,15 +647,6 @@ void LoadDBCStores(const std::string& dataPath)
 
     TC_LOG_INFO("server.loading", ">> Initialized %d data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
 
-}
-
-SimpleFactionsList const* GetFactionTeamList(uint32 faction)
-{
-    FactionTeamMap::const_iterator itr = sFactionTeamMap.find(faction);
-    if (itr != sFactionTeamMap.end())
-        return &itr->second;
-
-    return nullptr;
 }
 
 TalentSpellPos const* GetTalentSpellPos(uint32 spellId)

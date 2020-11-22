@@ -28,31 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct FactionEntry
-{
-    uint32 ID;                                              // 0
-    int32 ReputationIndex;                                  // 1
-    uint32 ReputationRaceMask[4];                           // 2-5
-    uint32 ReputationClassMask[4];                          // 6-9
-    int32 ReputationBase[4];                                // 10-13
-    uint32 ReputationFlags[4];                              // 14-17
-    uint32 ParentFactionID;                                 // 18
-    float ParentFactionMod[2];                              // 19-20 [0] Faction gains incoming rep * spilloverRateIn
-                                                            //       [1] Faction outputs rep * spilloverRateOut as spillover reputation
-    uint32 ParentFactionCap[2];                             // 21-22 [0] The highest rank the faction will profit from incoming spillover
-                                                            //       [1] It does not seem to be the max standing at which a faction outputs spillover ...so no idea
-    char const* Name[16];                                   // 23-38
-    //uint32 Name_lang_mask;                                // 39
-    //char const* Description[16];                          // 40-55
-    //uint32 Description_lang_mask;                         // 56
-
-    // helpers
-    bool CanHaveReputation() const
-    {
-        return ReputationIndex >= 0;
-    }
-};
-
 #define MAX_FACTION_RELATIONS 4
 
 struct FactionTemplateEntry

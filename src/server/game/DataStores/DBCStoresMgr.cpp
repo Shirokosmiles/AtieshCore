@@ -61,6 +61,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _emotesMap.clear();
     _emotesTextMap.clear();
     _emotesTextSoundMap.clear();
+    _factionMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -100,6 +101,7 @@ void DBCStoresMgr::Initialize()
     _Load_Emotes();
     _Load_EmotesText();
     _Load_EmotesTextSound();
+    _Load_Faction();
 }
 
 // load Achievement.dbc
@@ -1426,4 +1428,56 @@ void DBCStoresMgr::_Load_EmotesTextSound()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_emotestextsound               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load Faction.dbc
+void DBCStoresMgr::_Load_Faction()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _factionMap.clear();
+    //                                                0          1                  2                    3                    4                     5                       6                       7                     8                     9                   10                  11                12               13               14                    15                16                17                18                  19                  20                  21               22                  23               24              25             26             27                28               29           30                31
+    QueryResult result = WorldDatabase.Query("SELECT ID, ReputationIndex, ReputationRaceMask_1, ReputationRaceMask_2, ReputationRaceMask_3, ReputationRaceMask_4, ReputationClassMask_1, ReputationClassMask_2, ReputationClassMask_3, ReputationClassMask_4, ReputationBase_1, ReputationBase_2, ReputationBase_3, ReputationBase_4, ReputationFlags_1, ReputationFlags_2, ReputationFlags_3, ReputationFlags_4, ParentFactionID, ParentFactionMod_1, ParentFactionMod_2, ParentFactionCap_1, ParentFactionCap_2, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_faction");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_faction. DB table `dbc_faction` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        FactionDBC f;
+        f.ID = id;
+        f.ReputationIndex = fields[1].GetInt32();
+        for (uint8 i = 0; i < 4; i++)
+            f.ReputationRaceMask[i] = fields[2 + i].GetUInt32();
+        for (uint8 i = 0; i < 4; i++)
+            f.ReputationClassMask[i] = fields[6 + i].GetUInt32();
+        for (uint8 i = 0; i < 4; i++)
+            f.ReputationBase[i] = fields[10 + i].GetInt32();
+        for (uint8 i = 0; i < 4; i++)
+            f.ReputationFlags[i] = fields[14 + i].GetUInt32();
+
+        f.ParentFactionID = fields[18].GetInt32();
+
+        for (uint8 i = 0; i < 2; i++)
+            f.ParentFactionMod[i] = fields[19 + i].GetFloat();
+
+        for (uint8 i = 0; i < 2; i++)
+            f.ParentFactionCap[i] = fields[21 + i].GetUInt32();
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            f.Name[i] = fields[23 + i].GetString();
+
+        _factionMap[id] = f;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_faction                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

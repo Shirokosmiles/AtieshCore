@@ -47,7 +47,7 @@ class Map;
 struct AccessRequirement;
 struct DeclinedName;
 struct DungeonEncounterDBC;
-struct FactionEntry;
+struct FactionDBC;
 struct PlayerClassInfo;
 struct PlayerClassLevelInfo;
 struct PlayerInfo;
@@ -1135,7 +1135,7 @@ class TC_GAME_API ObjectMgr
             return nullptr;
         }
 
-        int32 GetBaseReputationOf(FactionEntry const* factionEntry, uint8 race, uint8 playerClass) const;
+        int32 GetBaseReputationOf(FactionDBC const* factionEntry, uint8 race, uint8 playerClass) const;
 
         RepSpilloverTemplate const* GetRepSpilloverTemplate(uint32 factionId) const
         {

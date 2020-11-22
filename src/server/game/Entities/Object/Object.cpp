@@ -2703,7 +2703,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
                         return *repRank;
                     if (!selfPlayerOwner->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_IGNORE_REPUTATION))
                     {
-                        if (FactionEntry const* targetFactionEntry = sFactionStore.LookupEntry(targetFactionTemplateEntry->Faction))
+                        if (FactionDBC const* targetFactionEntry = sDBCStoresMgr->GetFactionDBC(targetFactionTemplateEntry->Faction))
                         {
                             if (targetFactionEntry->CanHaveReputation())
                             {
@@ -2748,7 +2748,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
             return *repRank;
         if (target->ToUnit() && !target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_IGNORE_REPUTATION))
         {
-            if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionTemplateEntry->Faction))
+            if (FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(factionTemplateEntry->Faction))
             {
                 if (factionEntry->CanHaveReputation())
                 {
@@ -2791,7 +2791,7 @@ bool WorldObject::IsHostileToPlayers() const
     if (!my_faction->Faction)
         return false;
 
-    FactionEntry const* raw_faction = sFactionStore.LookupEntry(my_faction->Faction);
+    FactionDBC const* raw_faction = sDBCStoresMgr->GetFactionDBC(my_faction->Faction);
     if (raw_faction && raw_faction->ReputationIndex >= 0)
         return false;
 
@@ -2804,7 +2804,7 @@ bool WorldObject::IsNeutralToAll() const
     if (!my_faction->Faction)
         return true;
 
-    FactionEntry const* raw_faction = sFactionStore.LookupEntry(my_faction->Faction);
+    FactionDBC const* raw_faction = sDBCStoresMgr->GetFactionDBC(my_faction->Faction);
     if (raw_faction && raw_faction->ReputationIndex >= 0)
         return false;
 
@@ -2959,7 +2959,7 @@ bool WorldObject::IsValidAttackTarget(WorldObject const* target, SpellInfo const
             if (FactionTemplateEntry const* factionTemplate = creature->GetFactionTemplateEntry())
             {
                 if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
-                    if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionTemplate->Faction))
+                    if (FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(factionTemplate->Faction))
                         if (FactionState const* repState = player->GetReputationMgr().GetState(factionEntry))
                             if (!(repState->Flags & FACTION_FLAG_AT_WAR))
                                 return false;

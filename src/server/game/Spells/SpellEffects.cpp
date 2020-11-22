@@ -4295,7 +4295,7 @@ void Spell::EffectReputation(SpellEffIndex effIndex)
 
     uint32 factionId = m_spellInfo->Effects[effIndex].MiscValue;
 
-    FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
+    FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(factionId);
     if (!factionEntry)
         return;
 

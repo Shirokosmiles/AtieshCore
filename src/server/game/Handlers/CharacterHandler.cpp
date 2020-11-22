@@ -922,59 +922,59 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         if (sWorld->getBoolConfig(CONFIG_START_ALL_REP))
         {
             ReputationMgr& repMgr = pCurrChar->GetReputationMgr();
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 942), 42999, false); // Cenarion Expedition
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 935), 42999, false); // The Sha'tar
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 936), 42999, false); // Shattrath City
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1011), 42999, false); // Lower City
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 970), 42999, false); // Sporeggar
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 967), 42999, false); // The Violet Eye
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 989), 42999, false); // Keepers of Time
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 932), 42999, false); // The Aldor
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 934), 42999, false); // The Scryers
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1038), 42999, false); // Ogri'la
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1077), 42999, false); // Shattered Sun Offensive
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1106), 42999, false); // Argent Crusade
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1104), 42999, false); // Frenzyheart Tribe
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1090), 42999, false); // Kirin Tor
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1098), 42999, false); // Knights of the Ebon Blade
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1156), 42999, false); // The Ashen Verdict
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1073), 42999, false); // The Kalu'ak
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1105), 42999, false); // The Oracles
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1119), 42999, false); // The Sons of Hodir
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1091), 42999, false); // The Wyrmrest Accord
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 942), 42999, false); // Cenarion Expedition
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 935), 42999, false); // The Sha'tar
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 936), 42999, false); // Shattrath City
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1011), 42999, false); // Lower City
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 970), 42999, false); // Sporeggar
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 967), 42999, false); // The Violet Eye
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 989), 42999, false); // Keepers of Time
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 932), 42999, false); // The Aldor
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 934), 42999, false); // The Scryers
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1038), 42999, false); // Ogri'la
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1077), 42999, false); // Shattered Sun Offensive
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1106), 42999, false); // Argent Crusade
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1104), 42999, false); // Frenzyheart Tribe
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1090), 42999, false); // Kirin Tor
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1098), 42999, false); // Knights of the Ebon Blade
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1156), 42999, false); // The Ashen Verdict
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1073), 42999, false); // The Kalu'ak
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1105), 42999, false); // The Oracles
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1119), 42999, false); // The Sons of Hodir
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1091), 42999, false); // The Wyrmrest Accord
 
             // Factions depending on team, like cities and some more stuff
             switch (pCurrChar->GetCFSTeam())
             {
                 case ALLIANCE:
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  72), 42999, false); // Stormwind
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  47), 42999, false); // Ironforge
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  69), 42999, false); // Darnassus
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 930), 42999, false); // Exodar
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 730), 42999, false); // Stormpike Guard
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 978), 42999, false); // Kurenai
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  54), 42999, false); // Gnomeregan Exiles
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 946), 42999, false); // Honor Hold
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1037), 42999, false); // Alliance Vanguard
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1068), 42999, false); // Explorers' League
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1126), 42999, false); // The Frostborn
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1094), 42999, false); // The Silver Covenant
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1050), 42999, false); // Valiance Expedition
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  72), 42999, false); // Stormwind
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  47), 42999, false); // Ironforge
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  69), 42999, false); // Darnassus
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 930), 42999, false); // Exodar
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 730), 42999, false); // Stormpike Guard
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 978), 42999, false); // Kurenai
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  54), 42999, false); // Gnomeregan Exiles
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 946), 42999, false); // Honor Hold
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1037), 42999, false); // Alliance Vanguard
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1068), 42999, false); // Explorers' League
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1126), 42999, false); // The Frostborn
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1094), 42999, false); // The Silver Covenant
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1050), 42999, false); // Valiance Expedition
                     break;
                 case HORDE:
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  76), 42999, false); // Orgrimmar
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  68), 42999, false); // Undercity
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  81), 42999, false); // Thunder Bluff
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 911), 42999, false); // Silvermoon City
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 729), 42999, false); // Frostwolf Clan
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 941), 42999, false); // The Mag'har
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 530), 42999, false); // Darkspear Trolls
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 947), 42999, false); // Thrallmar
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1052), 42999, false); // Horde Expedition
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1067), 42999, false); // The Hand of Vengeance
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1124), 42999, false); // The Sunreavers
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1064), 42999, false); // The Taunka
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1085), 42999, false); // Warsong Offensive
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  76), 42999, false); // Orgrimmar
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  68), 42999, false); // Undercity
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  81), 42999, false); // Thunder Bluff
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 911), 42999, false); // Silvermoon City
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 729), 42999, false); // Frostwolf Clan
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 941), 42999, false); // The Mag'har
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 530), 42999, false); // Darkspear Trolls
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 947), 42999, false); // Thrallmar
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1052), 42999, false); // Horde Expedition
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1067), 42999, false); // The Hand of Vengeance
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1124), 42999, false); // The Sunreavers
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1064), 42999, false); // The Taunka
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1085), 42999, false); // Warsong Offensive
                     break;
                 default:
                     break;
@@ -2091,13 +2091,13 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                 {
                     fields = reputationResult->Fetch();
                     int32 oldDBRep = fields[0].GetInt32();
-                    FactionEntry const* factionEntry = sFactionStore.LookupEntry(oldReputation);
+                    FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(oldReputation);
 
                     // old base reputation
                     int32 oldBaseRep = sObjectMgr->GetBaseReputationOf(factionEntry, oldRace, playerClass);
 
                     // new base reputation
-                    int32 newBaseRep = sObjectMgr->GetBaseReputationOf(sFactionStore.LookupEntry(newReputation), factionChangeInfo->Race, playerClass);
+                    int32 newBaseRep = sObjectMgr->GetBaseReputationOf(sDBCStoresMgr->GetFactionDBC(newReputation), factionChangeInfo->Race, playerClass);
 
                     // final reputation shouldnt change
                     int32 FinalRep = oldDBRep + oldBaseRep;

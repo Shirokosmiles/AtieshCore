@@ -6645,7 +6645,7 @@ void Player::SetFactionForRace(uint8 race)
 
 ReputationRank Player::GetReputationRank(uint32 faction) const
 {
-    FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction);
+    FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(faction);
     return GetReputationMgr().GetRank(factionEntry);
 }
 
@@ -6782,7 +6782,7 @@ void Player::RewardReputation(Unit* victim, float rate)
         int32 donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), Rep->RepValue1, ChampioningFaction ? ChampioningFaction : repfaction1);
         donerep1 = int32(donerep1 * rate);
 
-        FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
+        FactionDBC const* factionEntry1 = sDBCStoresMgr->GetFactionDBC(ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
         uint32 current_reputation_rank1 = GetReputationMgr().GetRank(factionEntry1);
         if (factionEntry1)
             GetReputationMgr().ModifyReputation(factionEntry1, donerep1, current_reputation_rank1 > Rep->ReputationMaxCap1);
@@ -6793,7 +6793,7 @@ void Player::RewardReputation(Unit* victim, float rate)
         int32 donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), Rep->RepValue2, ChampioningFaction ? ChampioningFaction : repfaction2);
         donerep2 = int32(donerep2 * rate);
 
-        FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : repfaction2);
+        FactionDBC const* factionEntry2 = sDBCStoresMgr->GetFactionDBC(ChampioningFaction ? ChampioningFaction : repfaction2);
         uint32 current_reputation_rank2 = GetReputationMgr().GetRank(factionEntry2);
         if (factionEntry2)
             GetReputationMgr().ModifyReputation(factionEntry2, donerep2, current_reputation_rank2 > Rep->ReputationMaxCap2);
@@ -6845,7 +6845,7 @@ void Player::RewardReputation(Quest const* quest)
         else
             rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST, GetQuestLevel(quest), rep, rewardFactionId, noQuestBonus);
 
-        if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(rewardFactionId))
+        if (FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(rewardFactionId))
             GetReputationMgr().ModifyReputation(factionEntry, rep);
     }
 }
@@ -15241,11 +15241,11 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     AdjustQuestReqItemCount(quest, questStatusData);
 
     if (quest->GetRepObjectiveFaction())
-        if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->GetRepObjectiveFaction()))
+        if (FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(quest->GetRepObjectiveFaction()))
             GetReputationMgr().SetVisible(factionEntry);
 
     if (quest->GetRepObjectiveFaction2())
-        if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->GetRepObjectiveFaction2()))
+        if (FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(quest->GetRepObjectiveFaction2()))
             GetReputationMgr().SetVisible(factionEntry);
 
     uint32 qtime = 0;
@@ -16881,7 +16881,7 @@ void Player::MoneyChanged(uint32 count)
     }
 }
 
-void Player::ReputationChanged(FactionEntry const* factionEntry)
+void Player::ReputationChanged(FactionDBC const* factionEntry)
 {
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
@@ -16909,7 +16909,7 @@ void Player::ReputationChanged(FactionEntry const* factionEntry)
     }
 }
 
-void Player::ReputationChanged2(FactionEntry const* factionEntry)
+void Player::ReputationChanged2(FactionDBC const* factionEntry)
 {
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
@@ -26334,11 +26334,11 @@ void Player::LoadActions(PreparedQueryResult result)
 
 void Player::SetReputation(uint32 factionentry, uint32 value)
 {
-    GetReputationMgr().SetReputation(sFactionStore.LookupEntry(factionentry), value);
+    GetReputationMgr().SetReputation(sDBCStoresMgr->GetFactionDBC(factionentry), value);
 }
 uint32 Player::GetReputation(uint32 factionentry) const
 {
-    return GetReputationMgr().GetReputation(sFactionStore.LookupEntry(factionentry));
+    return GetReputationMgr().GetReputation(sDBCStoresMgr->GetFactionDBC(factionentry));
 }
 
 std::string const& Player::GetGuildName() const
