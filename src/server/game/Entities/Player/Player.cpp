@@ -23539,7 +23539,7 @@ float Player::GetReputationPriceDiscount(Creature const* creature) const
     return GetReputationPriceDiscount(creature->GetFactionTemplateEntry());
 }
 
-float Player::GetReputationPriceDiscount(FactionTemplateEntry const* factionTemplate) const
+float Player::GetReputationPriceDiscount(FactionTemplateDBC const* factionTemplate) const
 {
     if (!factionTemplate || !factionTemplate->Faction)
         return 1.0f;
@@ -24557,8 +24557,8 @@ bool Player::CanUseBattlegroundObject(GameObject* gameobject) const
     // It is possible to call this method with a null pointer, only skipping faction check.
     if (gameobject)
     {
-        FactionTemplateEntry const* playerFaction = GetFactionTemplateEntry();
-        FactionTemplateEntry const* faction = sFactionTemplateStore.LookupEntry(gameobject->GetFaction());
+        FactionTemplateDBC const* playerFaction = GetFactionTemplateEntry();
+        FactionTemplateDBC const* faction = sDBCStoresMgr->GetFactionTemplateDBC(gameobject->GetFaction());
 
         if (playerFaction && faction && !playerFaction->IsFriendlyTo(*faction))
             return false;

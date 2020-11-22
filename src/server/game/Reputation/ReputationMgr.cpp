@@ -406,7 +406,7 @@ bool ReputationMgr::SetOneFactionReputation(FactionDBC const* factionEntry, int3
     return false;
 }
 
-void ReputationMgr::SetVisible(FactionTemplateEntry const*factionTemplateEntry)
+void ReputationMgr::SetVisible(FactionTemplateDBC const* factionTemplateEntry)
 {
     if (!factionTemplateEntry->Faction)
         return;

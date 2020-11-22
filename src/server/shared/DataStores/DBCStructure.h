@@ -28,57 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-#define MAX_FACTION_RELATIONS 4
-
-struct FactionTemplateEntry
-{
-    uint32 ID;                                              // 0
-    uint32 Faction;                                         // 1
-    uint32 Flags;                                           // 2
-    uint32 FactionGroup;                                    // 3
-    uint32 FriendGroup;                                     // 4
-    uint32 EnemyGroup;                                      // 5
-    uint32 Enemies[MAX_FACTION_RELATIONS];                  // 6-9
-    uint32 Friend[MAX_FACTION_RELATIONS];                   // 10-13
-
-    // helpers
-    bool IsFriendlyTo(FactionTemplateEntry const& entry) const
-    {
-        if (entry.Faction)
-        {
-            for (int i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (Enemies[i] == entry.Faction)
-                    return false;
-            for (int i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (Friend[i] == entry.Faction)
-                    return true;
-        }
-        return (FriendGroup & entry.FactionGroup) || (FactionGroup & entry.FriendGroup);
-    }
-    bool IsHostileTo(FactionTemplateEntry const& entry) const
-    {
-        if (entry.Faction)
-        {
-            for (int i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (Enemies[i] == entry.Faction)
-                    return true;
-            for (int i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (Friend[i] == entry.Faction)
-                    return false;
-        }
-        return (EnemyGroup & entry.FactionGroup) != 0;
-    }
-    bool IsHostileToPlayers() const { return (EnemyGroup & FACTION_MASK_PLAYER) !=0; }
-    bool IsNeutralToAll() const
-    {
-        for (int i = 0; i < MAX_FACTION_RELATIONS; ++i)
-            if (Enemies[i] != 0)
-                return false;
-        return EnemyGroup == 0 && FriendGroup == 0;
-    }
-    bool IsContestedGuardFaction() const { return (Flags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD) != 0; }
-};
-
 struct GameObjectArtKitEntry
 {
     uint32 ID;                                              // 0

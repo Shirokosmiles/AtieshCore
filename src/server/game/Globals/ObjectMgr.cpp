@@ -1009,7 +1009,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         }
     }
 
-    FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction);
+    FactionTemplateDBC const* factionTemplate = sDBCStoresMgr->GetFactionTemplateDBC(cInfo->faction);
     if (!factionTemplate)
     {
         TC_LOG_FATAL("sql.sql", "Creature (Entry: %u) has non-existing faction template (%u). This can lead to crashes, aborting.", cInfo->Entry, cInfo->faction);
@@ -7644,7 +7644,7 @@ void ObjectMgr::LoadGameObjectTemplateAddons()
         }
 
         // checks
-        if (gameObjectAddon.Faction && !sFactionTemplateStore.LookupEntry(gameObjectAddon.Faction))
+        if (gameObjectAddon.Faction && !sDBCStoresMgr->GetFactionTemplateDBC(gameObjectAddon.Faction))
             TC_LOG_ERROR("sql.sql", "GameObject (Entry: %u) has invalid faction (%u) defined in `gameobject_template_addon`.", entry, gameObjectAddon.Faction);
 
         if (gameObjectAddon.Maxgold > 0)
@@ -7696,7 +7696,7 @@ void ObjectMgr::LoadGameObjectOverrides()
         gameObjectOverride.Faction = fields[1].GetUInt16();
         gameObjectOverride.Flags = fields[2].GetUInt32();
 
-        if (gameObjectOverride.Faction && !sFactionTemplateStore.LookupEntry(gameObjectOverride.Faction))
+        if (gameObjectOverride.Faction && !sDBCStoresMgr->GetFactionTemplateDBC(gameObjectOverride.Faction))
             TC_LOG_ERROR("sql.sql", "GameObject (SpawnId: %u) has invalid faction (%u) defined in `gameobject_overrides`.", spawnId, gameObjectOverride.Faction);
 
         ++count;

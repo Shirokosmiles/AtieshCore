@@ -35,6 +35,7 @@ EndContentData */
 
 #include "ScriptMgr.h"
 #include "DBCStructure.h"
+#include "DBCStoresMgrStructure.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
@@ -161,7 +162,7 @@ public:
             {
                 if (!creature->IsHostileTo(player))
                 {
-                    if (FactionTemplateEntry const* pFaction = creature->GetFactionTemplateEntry())
+                    if (FactionTemplateDBC const* pFaction = creature->GetFactionTemplateEntry())
                     {
                         uint32 Spell = 0;
 

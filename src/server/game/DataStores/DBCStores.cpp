@@ -87,7 +87,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //typedef std::map<uint32, SimpleFactionsList> FactionTeamMap;
 //static FactionTeamMap sFactionTeamMap;
 //DBCStorage <FactionEntry> sFactionStore(FactionEntryfmt);
-DBCStorage <FactionTemplateEntry> sFactionTemplateStore(FactionTemplateEntryfmt);
+//DBCStorage <FactionTemplateEntry> sFactionTemplateStore(FactionTemplateEntryfmt);
 
 // Used exclusively for data validation
 DBCStorage <GameObjectArtKitEntry> sGameObjectArtKitStore(GameObjectArtKitfmt);
@@ -315,7 +315,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sEmotesTextStore,                    "EmotesText.dbc");
     //LOAD_DBC(sEmotesTextSoundStore,               "EmotesTextSound.dbc");
     //LOAD_DBC(sFactionStore,                       "Faction.dbc");
-    LOAD_DBC(sFactionTemplateStore,               "FactionTemplate.dbc");
+    //LOAD_DBC(sFactionTemplateStore,               "FactionTemplate.dbc");
     LOAD_DBC(sGameObjectArtKitStore,              "GameObjectArtKit.dbc");
     LOAD_DBC(sGameObjectDisplayInfoStore,         "GameObjectDisplayInfo.dbc");
     LOAD_DBC(sGemPropertiesStore,                 "GemProperties.dbc");

@@ -62,6 +62,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _emotesTextMap.clear();
     _emotesTextSoundMap.clear();
     _factionMap.clear();
+    _factionTemplateMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -102,6 +103,7 @@ void DBCStoresMgr::Initialize()
     _Load_EmotesText();
     _Load_EmotesTextSound();
     _Load_Faction();
+    _Load_FactionTemplate();
 }
 
 // load Achievement.dbc
@@ -1480,4 +1482,45 @@ void DBCStoresMgr::_Load_Faction()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_faction                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load FactionTemplate.dbc
+void DBCStoresMgr::_Load_FactionTemplate()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _factionTemplateMap.clear();
+    //                                                0     1       2         3             4            5          6           7         8         9          10        11        12         13
+    QueryResult result = WorldDatabase.Query("SELECT ID, Faction, Flags, FactionGroup, FriendGroup, EnemyGroup, Enemies_1, Enemies_2, Enemies_3, Enemies_4, Friend_1, Friend_2, Friend_3, Friend_4  FROM dbc_factiontemplate");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_factiontemplate. DB table `dbc_factiontemplate` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        FactionTemplateDBC ft;
+        ft.ID = id;
+        ft.Faction      = fields[1].GetUInt32();
+        ft.Flags        = fields[2].GetUInt32();
+        ft.FactionGroup = fields[3].GetUInt32();
+        ft.FriendGroup  = fields[4].GetUInt32();
+        ft.EnemyGroup   = fields[5].GetUInt32();
+        for (uint8 i = 0; i < MAX_FACTION_RELATIONS; i++)
+            ft.Enemies[i] = fields[6 + i].GetUInt32();
+        for (uint8 i = 0; i < MAX_FACTION_RELATIONS; i++)
+            ft.Friend[i] = fields[10 + i].GetUInt32();
+
+        _factionTemplateMap[id] = ft;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_factiontemplate               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

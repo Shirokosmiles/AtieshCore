@@ -27,6 +27,7 @@ EndScriptData */
 #include "CreatureAI.h"
 #include "CreatureGroups.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "FollowMovementGenerator.h"
 #include "GameTime.h"
 #include "Language.h"
@@ -360,7 +361,7 @@ public:
     //set faction of creature
     static bool HandleNpcSetFactionIdCommand(ChatHandler* handler, uint32 factionId)
     {
-        if (!sFactionTemplateStore.LookupEntry(factionId))
+        if (!sDBCStoresMgr->GetFactionTemplateDBC(factionId))
         {
             handler->PSendSysMessage(LANG_WRONG_FACTION, factionId);
             handler->SetSentErrorMessage(true);

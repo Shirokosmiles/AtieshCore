@@ -23,6 +23,7 @@
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GossipDef.h"
 #include "Item.h"
 #include "Log.h"
@@ -270,7 +271,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     }
 
     // set faction visible if needed
-    if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->GetFaction()))
+    if (FactionTemplateDBC const* factionTemplateEntry = sDBCStoresMgr->GetFactionTemplateDBC(unit->GetFaction()))
         _player->GetReputationMgr().SetVisible(factionTemplateEntry);
 
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);

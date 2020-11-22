@@ -2609,10 +2609,10 @@ void WorldObject::SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo miss
     SendMessageToSet(&data, true);
 }
 
-FactionTemplateEntry const* WorldObject::GetFactionTemplateEntry() const
+FactionTemplateDBC const* WorldObject::GetFactionTemplateEntry() const
 {
     uint32 factionId = GetFaction();
-    FactionTemplateEntry const* entry = sFactionTemplateStore.LookupEntry(factionId);
+    FactionTemplateDBC const* entry = sDBCStoresMgr->GetFactionTemplateDBC(factionId);
     if (!entry)
     {
         switch (GetTypeId())
@@ -2653,13 +2653,13 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
     // check forced reputation to support SPELL_AURA_FORCE_REACTION
     if (selfPlayerOwner)
     {
-        if (FactionTemplateEntry const* targetFactionTemplateEntry = target->GetFactionTemplateEntry())
+        if (FactionTemplateDBC const* targetFactionTemplateEntry = target->GetFactionTemplateEntry())
             if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(targetFactionTemplateEntry))
                 return *repRank;
     }
     else if (targetPlayerOwner)
     {
-        if (FactionTemplateEntry const* selfFactionTemplateEntry = GetFactionTemplateEntry())
+        if (FactionTemplateDBC const* selfFactionTemplateEntry = GetFactionTemplateEntry())
             if (ReputationRank const* repRank = targetPlayerOwner->GetReputationMgr().GetForcedRankIfAny(selfFactionTemplateEntry))
                 return *repRank;
     }
@@ -2697,7 +2697,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
 
             if (selfPlayerOwner)
             {
-                if (FactionTemplateEntry const* targetFactionTemplateEntry = targetUnit->GetFactionTemplateEntry())
+                if (FactionTemplateDBC const* targetFactionTemplateEntry = targetUnit->GetFactionTemplateEntry())
                 {
                     if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(targetFactionTemplateEntry))
                         return *repRank;
@@ -2728,13 +2728,13 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
     return WorldObject::GetFactionReactionTo(GetFactionTemplateEntry(), target);
 }
 
-/*static*/ ReputationRank WorldObject::GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target)
+/*static*/ ReputationRank WorldObject::GetFactionReactionTo(FactionTemplateDBC const* factionTemplateEntry, WorldObject const* target)
 {
     // always neutral when no template entry found
     if (!factionTemplateEntry)
         return REP_NEUTRAL;
 
-    FactionTemplateEntry const* targetFactionTemplateEntry = target->GetFactionTemplateEntry();
+    FactionTemplateDBC const* targetFactionTemplateEntry = target->GetFactionTemplateEntry();
     if (!targetFactionTemplateEntry)
         return REP_NEUTRAL;
 
@@ -2787,7 +2787,7 @@ bool WorldObject::IsFriendlyTo(WorldObject const* target) const
 
 bool WorldObject::IsHostileToPlayers() const
 {
-    FactionTemplateEntry const* my_faction = GetFactionTemplateEntry();
+    FactionTemplateDBC const* my_faction = GetFactionTemplateEntry();
     if (!my_faction->Faction)
         return false;
 
@@ -2800,7 +2800,7 @@ bool WorldObject::IsHostileToPlayers() const
 
 bool WorldObject::IsNeutralToAll() const
 {
-    FactionTemplateEntry const* my_faction = GetFactionTemplateEntry();
+    FactionTemplateDBC const* my_faction = GetFactionTemplateEntry();
     if (!my_faction->Faction)
         return true;
 
@@ -2956,7 +2956,7 @@ bool WorldObject::IsValidAttackTarget(WorldObject const* target, SpellInfo const
             if (creature->IsContestedGuard() && player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
                 return true;
 
-            if (FactionTemplateEntry const* factionTemplate = creature->GetFactionTemplateEntry())
+            if (FactionTemplateDBC const* factionTemplate = creature->GetFactionTemplateEntry())
             {
                 if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
                     if (FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(factionTemplate->Faction))

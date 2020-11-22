@@ -12305,7 +12305,7 @@ void Unit::GetPartyMembers(std::list<Unit*> &TagUnitMap)
 
 bool Unit::IsContestedGuard() const
 {
-    if (FactionTemplateEntry const* entry = GetFactionTemplateEntry())
+    if (FactionTemplateDBC const* entry = GetFactionTemplateEntry())
         return entry->IsContestedGuardFaction();
 
     return false;
@@ -13848,8 +13848,8 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 
                 if (IsControlledByPlayer() && target != this && ConfigAccessGroups && IsInRaidWith(target))
                 {
-                    FactionTemplateEntry const* ft1 = GetFactionTemplateEntry();
-                    FactionTemplateEntry const* ft2 = target->GetFactionTemplateEntry();
+                    FactionTemplateDBC const* ft1 = GetFactionTemplateEntry();
+                    FactionTemplateDBC const* ft2 = target->GetFactionTemplateEntry();
                     if (!ft1->IsFriendlyTo(*ft2))
                     {
                         if (index == UNIT_FIELD_BYTES_2)

@@ -110,7 +110,7 @@ class TC_GAME_API ReputationMgr
             return ReputationRankStrIndex[GetRank(factionEntry)];
         };
 
-        ReputationRank const* GetForcedRankIfAny(FactionTemplateEntry const* factionTemplateEntry) const
+        ReputationRank const* GetForcedRankIfAny(FactionTemplateDBC const* factionTemplateEntry) const
         {
             ForcedReactions::const_iterator forceItr = _forcedReactions.find(factionTemplateEntry->Faction);
             return forceItr != _forcedReactions.end() ? &forceItr->second : nullptr;
@@ -126,7 +126,7 @@ class TC_GAME_API ReputationMgr
             return SetReputation(factionEntry, standing, true, spillOverOnly);
         }
 
-        void SetVisible(FactionTemplateEntry const* factionTemplateEntry);
+        void SetVisible(FactionTemplateDBC const* factionTemplateEntry);
         void SetVisible(FactionDBC const* factionEntry);
         void SetAtWar(RepListID repListID, bool on);
         void SetInactive(RepListID repListID, bool on);

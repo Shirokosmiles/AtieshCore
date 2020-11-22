@@ -5382,8 +5382,8 @@ void Spell::EffectGameObjectDamage(SpellEffIndex /*effIndex*/)
     if (!gameObjTarget)
         return;
 
-    FactionTemplateEntry const* casterFaction = m_caster->GetFactionTemplateEntry();
-    FactionTemplateEntry const* targetFaction = sFactionTemplateStore.LookupEntry(gameObjTarget->GetFaction());
+    FactionTemplateDBC const* casterFaction = m_caster->GetFactionTemplateEntry();
+    FactionTemplateDBC const* targetFaction = sDBCStoresMgr->GetFactionTemplateDBC(gameObjTarget->GetFaction());
     // Do not allow to damage GO's of friendly factions (ie: Wintergrasp Walls/Ulduar Storm Beacons)
     if (!targetFaction || (casterFaction && !casterFaction->IsFriendlyTo(*targetFaction)))
         gameObjTarget->ModifyHealth(-damage, m_caster, GetSpellInfo()->Id);

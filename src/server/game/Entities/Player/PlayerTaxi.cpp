@@ -17,6 +17,7 @@
 
 #include "PlayerTaxi.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "StringConvert.h"
@@ -179,7 +180,7 @@ std::ostringstream& operator<<(std::ostringstream& ss, PlayerTaxi const& taxi)
     return ss;
 }
 
-FactionTemplateEntry const* PlayerTaxi::GetFlightMasterFactionTemplate() const
+FactionTemplateDBC const* PlayerTaxi::GetFlightMasterFactionTemplate() const
 {
-    return sFactionTemplateStore.LookupEntry(m_flightMasterFactionId);
+    return sDBCStoresMgr->GetFactionTemplateDBC(m_flightMasterFactionId);
 }

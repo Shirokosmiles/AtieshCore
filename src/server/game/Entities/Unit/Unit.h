@@ -61,7 +61,7 @@ enum InventorySlot
 };
 
 struct AbstractFollower;
-struct FactionTemplateEntry;
+struct FactionTemplateDBC;
 struct LiquidData;
 struct LiquidTypeEntry;
 struct SpellValue;

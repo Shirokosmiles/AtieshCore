@@ -64,7 +64,7 @@ AuctionHouseObject* AuctionHouseMgr::GetAuctionsMap(uint32 factionTemplateId)
         return &mNeutralAuctions;
 
     // teams have linked auction houses
-    FactionTemplateEntry const* uEntry = sFactionTemplateStore.LookupEntry(factionTemplateId);
+    FactionTemplateDBC const* uEntry = sDBCStoresMgr->GetFactionTemplateDBC(factionTemplateId);
     if (!uEntry)
         return &mNeutralAuctions;
     else if (uEntry->FactionGroup & FACTION_MASK_ALLIANCE)
@@ -558,7 +558,7 @@ AuctionHouseDBC const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTempl
         // FIXME: found way for proper auctionhouse selection by another way
         // AuctionHouse.dbc have faction field with _player_ factions associated with auction house races.
         // but no easy way convert creature faction to player race faction for specific city
-        FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(factionTemplateId);
+        FactionTemplateDBC const* u_entry = sDBCStoresMgr->GetFactionTemplateDBC(factionTemplateId);
         if (!u_entry)
             houseid = AUCTIONHOUSE_NEUTRAL; // goblin auction house
         else if (u_entry->FactionGroup & FACTION_MASK_ALLIANCE)
