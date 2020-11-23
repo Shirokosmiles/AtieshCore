@@ -61,6 +61,7 @@ typedef std::unordered_map<uint32 /*ID*/, FactionDBC> FactionDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, FactionTemplateDBC> FactionTemplateDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, GameObjectArtKitDBC> GameObjectArtKitDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, GameObjectDisplayInfoDBC> GameObjectDisplayInfoDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GemPropertiesDBC> GemPropertiesDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -435,6 +436,14 @@ public:
         return nullptr;
     }
 
+    GemPropertiesDBC const* GetGemPropertiesDBC(uint32 ID)
+    {
+        GemPropertiesDBCMap::const_iterator itr = _gemPropertiesMap.find(ID);
+        if (itr != _gemPropertiesMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -475,6 +484,7 @@ protected:
     void _Load_FactionTemplate();
     void _Load_GameObjectArtKit();
     void _Load_GameObjectDisplayInfo();
+    void _Load_GemProperties();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -516,6 +526,7 @@ private:
     FactionTemplateDBCMap _factionTemplateMap;
     GameObjectArtKitDBCMap _gameobjectArtKitMap;
     GameObjectDisplayInfoDBCMap _gameobjectDisplayInfoMap;
+    GemPropertiesDBCMap _gemPropertiesMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

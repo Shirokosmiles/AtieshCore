@@ -65,6 +65,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _factionTemplateMap.clear();
     _gameobjectArtKitMap.clear();
     _gameobjectDisplayInfoMap.clear();
+    _gemPropertiesMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -108,6 +109,7 @@ void DBCStoresMgr::Initialize()
     _Load_FactionTemplate();
     _Load_GameObjectArtKit();
     _Load_GameObjectDisplayInfo();
+    _Load_GemProperties();
 }
 
 // load Achievement.dbc
@@ -1598,4 +1600,38 @@ void DBCStoresMgr::_Load_GameObjectDisplayInfo()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_gameobjectdisplayinfo         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load GemProperties.dbc
+void DBCStoresMgr::_Load_GemProperties()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gemPropertiesMap.clear();
+    //                                                0     1          2
+    QueryResult result = WorldDatabase.Query("SELECT ID, Enchant_Id, Type FROM dbc_gemproperties");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gemproperties. DB table `dbc_gemproperties` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GemPropertiesDBC gp;
+        gp.ID = id;
+        gp.EnchantID = fields[1].GetUInt32();
+        gp.Type      = fields[2].GetUInt32();
+
+        _gemPropertiesMap[id] = gp;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gemproperties                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

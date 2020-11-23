@@ -20,6 +20,7 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Opcodes.h"
 #include "Item.h"
 #include "Log.h"
@@ -1039,9 +1040,9 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
     for (int i = 0; i < MAX_GEM_SOCKETS; ++i)
         Gems[i] = gem_guids[i] ? _player->GetItemByGuid(gem_guids[i]) : nullptr;
 
-    GemPropertiesEntry const* GemProps[MAX_GEM_SOCKETS];
+    GemPropertiesDBC const* GemProps[MAX_GEM_SOCKETS];
     for (int i = 0; i < MAX_GEM_SOCKETS; ++i)                //get geminfo from dbc storage
-        GemProps[i] = (Gems[i]) ? sGemPropertiesStore.LookupEntry(Gems[i]->GetTemplate()->GemProperties) : nullptr;
+        GemProps[i] = (Gems[i]) ? sDBCStoresMgr->GetGemPropertiesDBC(Gems[i]->GetTemplate()->GemProperties) : nullptr;
 
     // Find first prismatic socket
     int32 firstPrismatic = 0;

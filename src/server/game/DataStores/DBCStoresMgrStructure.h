@@ -774,3 +774,13 @@ struct GameObjectDisplayInfoDBC
     DBCPosition3D GeoBoxMax;                                // 15-17
     //uint32 ObjectEffectPackageID;                         // 18
 };
+
+// load GemProperties.dbc
+struct GemPropertiesDBC
+{
+    uint32 ID;                                              // 0
+    uint32 EnchantID;                                       // 1
+    //uint32 MaxCountInv;                                   // 2
+    //uint32 MaxCountItem;                                  // 3
+    uint32 Type;                                            // 4
+};

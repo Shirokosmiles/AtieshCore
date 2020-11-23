@@ -3354,7 +3354,7 @@ void ObjectMgr::LoadItemTemplates()
             }
         }
 
-        if (itemTemplate.GemProperties && !sGemPropertiesStore.LookupEntry(itemTemplate.GemProperties))
+        if (itemTemplate.GemProperties && !sDBCStoresMgr->GetGemPropertiesDBC(itemTemplate.GemProperties))
             TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has wrong GemProperties (%u)", entry, itemTemplate.GemProperties);
 
         if (itemTemplate.FoodType >= MAX_PET_DIET)

@@ -93,7 +93,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <GameObjectArtKitEntry> sGameObjectArtKitStore(GameObjectArtKitfmt);
 
 //DBCStorage <GameObjectDisplayInfoEntry> sGameObjectDisplayInfoStore(GameObjectDisplayInfofmt);
-DBCStorage <GemPropertiesEntry> sGemPropertiesStore(GemPropertiesEntryfmt);
+//DBCStorage <GemPropertiesEntry> sGemPropertiesStore(GemPropertiesEntryfmt);
 DBCStorage <GlyphPropertiesEntry> sGlyphPropertiesStore(GlyphPropertiesfmt);
 DBCStorage <GlyphSlotEntry> sGlyphSlotStore(GlyphSlotfmt);
 
@@ -318,7 +318,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sFactionTemplateStore,               "FactionTemplate.dbc");
     //LOAD_DBC(sGameObjectArtKitStore,              "GameObjectArtKit.dbc");
     //LOAD_DBC(sGameObjectDisplayInfoStore,         "GameObjectDisplayInfo.dbc");
-    LOAD_DBC(sGemPropertiesStore,                 "GemProperties.dbc");
+    //LOAD_DBC(sGemPropertiesStore,                 "GemProperties.dbc");
     LOAD_DBC(sGlyphPropertiesStore,               "GlyphProperties.dbc");
     LOAD_DBC(sGlyphSlotStore,                     "GlyphSlot.dbc");
     LOAD_DBC(sGtBarberShopCostBaseStore,          "gtBarberShopCostBase.dbc");
@@ -624,8 +624,8 @@ void LoadDBCStores(const std::string& dataPath)
 
     // Check loaded DBC files proper version
     if (/*!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a
-        !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a*/
-        !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.5a
+        !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
+        !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.5a*/
         !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a
         !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a
         !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a

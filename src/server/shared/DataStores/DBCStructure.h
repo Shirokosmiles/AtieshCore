@@ -28,15 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct GemPropertiesEntry
-{
-    uint32 ID;                                              // 0
-    uint32 EnchantID;                                       // 1
-    //uint32 MaxCountInv;                                   // 2
-    //uint32 MaxCountItem;                                  // 3
-    uint32 Type;                                            // 4
-};
-
 struct GlyphPropertiesEntry
 {
     uint32 ID;                                              // 0

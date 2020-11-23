@@ -21,6 +21,7 @@
 #include "ConditionMgr.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "ItemEnchantmentMgr.h"
 #include "Log.h"
@@ -908,7 +909,7 @@ bool Item::GemsFitSockets() const
             ItemTemplate const* gemProto = sObjectMgr->GetItemTemplate(gemid);
             if (gemProto)
             {
-                GemPropertiesEntry const* gemProperty = sGemPropertiesStore.LookupEntry(gemProto->GemProperties);
+                GemPropertiesDBC const* gemProperty = sDBCStoresMgr->GetGemPropertiesDBC(gemProto->GemProperties);
                 if (gemProperty)
                     GemColor = gemProperty->Type;
             }
