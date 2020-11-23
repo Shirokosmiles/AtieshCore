@@ -90,9 +90,9 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <FactionTemplateEntry> sFactionTemplateStore(FactionTemplateEntryfmt);
 
 // Used exclusively for data validation
-DBCStorage <GameObjectArtKitEntry> sGameObjectArtKitStore(GameObjectArtKitfmt);
+//DBCStorage <GameObjectArtKitEntry> sGameObjectArtKitStore(GameObjectArtKitfmt);
 
-DBCStorage <GameObjectDisplayInfoEntry> sGameObjectDisplayInfoStore(GameObjectDisplayInfofmt);
+//DBCStorage <GameObjectDisplayInfoEntry> sGameObjectDisplayInfoStore(GameObjectDisplayInfofmt);
 DBCStorage <GemPropertiesEntry> sGemPropertiesStore(GemPropertiesEntryfmt);
 DBCStorage <GlyphPropertiesEntry> sGlyphPropertiesStore(GlyphPropertiesfmt);
 DBCStorage <GlyphSlotEntry> sGlyphSlotStore(GlyphSlotfmt);
@@ -316,8 +316,8 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sEmotesTextSoundStore,               "EmotesTextSound.dbc");
     //LOAD_DBC(sFactionStore,                       "Faction.dbc");
     //LOAD_DBC(sFactionTemplateStore,               "FactionTemplate.dbc");
-    LOAD_DBC(sGameObjectArtKitStore,              "GameObjectArtKit.dbc");
-    LOAD_DBC(sGameObjectDisplayInfoStore,         "GameObjectDisplayInfo.dbc");
+    //LOAD_DBC(sGameObjectArtKitStore,              "GameObjectArtKit.dbc");
+    //LOAD_DBC(sGameObjectDisplayInfoStore,         "GameObjectDisplayInfo.dbc");
     LOAD_DBC(sGemPropertiesStore,                 "GemProperties.dbc");
     LOAD_DBC(sGlyphPropertiesStore,               "GlyphProperties.dbc");
     LOAD_DBC(sGlyphSlotStore,                     "GlyphSlot.dbc");
@@ -405,16 +405,6 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC_EXT(sSpellDifficultyStore, "SpellDifficulty.dbc",  "spelldifficulty_dbc",  CustomSpellDifficultyfmt, CustomSpellDifficultyIndex);
 
 #undef LOAD_DBC_EXT
-
-    for (GameObjectDisplayInfoEntry const* info : sGameObjectDisplayInfoStore)
-    {
-        if (info->GeoBoxMax.X < info->GeoBoxMin.X)
-            std::swap(*(float*)(&info->GeoBoxMax.X), *(float*)(&info->GeoBoxMin.X));
-        if (info->GeoBoxMax.Y < info->GeoBoxMin.Y)
-            std::swap(*(float*)(&info->GeoBoxMax.Y), *(float*)(&info->GeoBoxMin.Y));
-        if (info->GeoBoxMax.Z < info->GeoBoxMin.Z)
-            std::swap(*(float*)(&info->GeoBoxMax.Z), *(float*)(&info->GeoBoxMin.Z));
-    }
 
     // fill data
     for (MapDifficultyEntry const* entry : sMapDifficultyStore)

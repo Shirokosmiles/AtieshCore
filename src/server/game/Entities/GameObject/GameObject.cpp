@@ -2107,7 +2107,7 @@ void GameObject::SendCustomAnim(uint32 anim)
 
 bool GameObject::IsInRange(float x, float y, float z, float radius) const
 {
-    GameObjectDisplayInfoEntry const* info = sGameObjectDisplayInfoStore.LookupEntry(m_goInfo->displayId);
+    GameObjectDisplayInfoDBC const* info = sDBCStoresMgr->GetGameObjectDisplayInfoDBC(m_goInfo->displayId);
     if (!info)
         return IsWithinDist3d(x, y, z, radius);
 
@@ -2717,7 +2717,7 @@ bool GameObject::IsAtInteractDistance(Player const* player, SpellInfo const* spe
         if (GetGoType() == GAMEOBJECT_TYPE_SPELL_FOCUS)
             return maxRange * maxRange >= GetExactDistSq(player);
 
-        if (sGameObjectDisplayInfoStore.LookupEntry(GetGOInfo()->displayId))
+        if (sDBCStoresMgr->GetGameObjectDisplayInfoDBC(GetGOInfo()->displayId))
             return IsAtInteractDistance(*player, maxRange);
     }
 
@@ -2726,7 +2726,7 @@ bool GameObject::IsAtInteractDistance(Player const* player, SpellInfo const* spe
 
 bool GameObject::IsAtInteractDistance(Position const& pos, float radius) const
 {
-    if (GameObjectDisplayInfoEntry const* displayInfo = sGameObjectDisplayInfoStore.LookupEntry(GetGOInfo()->displayId))
+    if (GameObjectDisplayInfoDBC const* displayInfo = sDBCStoresMgr->GetGameObjectDisplayInfoDBC(GetGOInfo()->displayId))
     {
         float scale = GetObjectScale();
 

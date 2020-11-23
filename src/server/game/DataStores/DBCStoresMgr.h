@@ -59,6 +59,8 @@ typedef std::unordered_map<uint32 /*ID*/, EmotesTextDBC> EmotesTextDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, EmotesTextSoundDBC> EmotesTextSoundDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, FactionDBC> FactionDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, FactionTemplateDBC> FactionTemplateDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GameObjectArtKitDBC> GameObjectArtKitDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GameObjectDisplayInfoDBC> GameObjectDisplayInfoDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -417,6 +419,22 @@ public:
         return nullptr;
     }
 
+    GameObjectArtKitDBC const* GetGameObjectArtKitDBC(uint32 ID)
+    {
+        GameObjectArtKitDBCMap::const_iterator itr = _gameobjectArtKitMap.find(ID);
+        if (itr != _gameobjectArtKitMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GameObjectDisplayInfoDBC const* GetGameObjectDisplayInfoDBC(uint32 ID)
+    {
+        GameObjectDisplayInfoDBCMap::const_iterator itr = _gameobjectDisplayInfoMap.find(ID);
+        if (itr != _gameobjectDisplayInfoMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -455,6 +473,8 @@ protected:
     void _Load_EmotesTextSound();
     void _Load_Faction();
     void _Load_FactionTemplate();
+    void _Load_GameObjectArtKit();
+    void _Load_GameObjectDisplayInfo();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -494,6 +514,8 @@ private:
     EmotesTextSoundDBCMap _emotesTextSoundMap;
     FactionDBCMap _factionMap;
     FactionTemplateDBCMap _factionTemplateMap;
+    GameObjectArtKitDBCMap _gameobjectArtKitMap;
+    GameObjectDisplayInfoDBCMap _gameobjectDisplayInfoMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

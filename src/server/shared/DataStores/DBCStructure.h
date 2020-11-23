@@ -28,23 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct GameObjectArtKitEntry
-{
-    uint32 ID;                                              // 0
-    //char const* TextureVariation[3]                       // 1-3 m_textureVariations[3]
-    //char const* AttachModel[4]                            // 4-8 m_attachModels[4]
-};
-
-struct GameObjectDisplayInfoEntry
-{
-    uint32 ID;                                              // 0
-    char const* ModelName;                                  // 1
-    //uint32 Sound[10];                                     // 2-11
-    DBCPosition3D GeoBoxMin;                                // 12-14
-    DBCPosition3D GeoBoxMax;                                // 15-17
-    //uint32 ObjectEffectPackageID;                         // 18
-};
-
 struct GemPropertiesEntry
 {
     uint32 ID;                                              // 0

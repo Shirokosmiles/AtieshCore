@@ -63,6 +63,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _emotesTextSoundMap.clear();
     _factionMap.clear();
     _factionTemplateMap.clear();
+    _gameobjectArtKitMap.clear();
+    _gameobjectDisplayInfoMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -104,6 +106,8 @@ void DBCStoresMgr::Initialize()
     _Load_EmotesTextSound();
     _Load_Faction();
     _Load_FactionTemplate();
+    _Load_GameObjectArtKit();
+    _Load_GameObjectDisplayInfo();
 }
 
 // load Achievement.dbc
@@ -1523,4 +1527,75 @@ void DBCStoresMgr::_Load_FactionTemplate()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_factiontemplate               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load GameObjectArtKit.dbc
+void DBCStoresMgr::_Load_GameObjectArtKit()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gameobjectArtKitMap.clear();
+    //                                                0
+    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_gameobjectartkit");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gameobjectartkit. DB table `dbc_gameobjectartkit` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GameObjectArtKitDBC gak;
+        gak.ID = id;
+
+        _gameobjectArtKitMap[id] = gak;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gameobjectartkit              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load GameObjectDisplayInfo.dbc
+void DBCStoresMgr::_Load_GameObjectDisplayInfo()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gameobjectDisplayInfoMap.clear();
+    //                                                0     1           2           3           4            5          6            7
+    QueryResult result = WorldDatabase.Query("SELECT ID, ModelName, GeoBoxMinX, GeoBoxMinY, GeoBoxMinZ, GeoBoxMaxX, GeoBoxMaxY, GeoBoxMaxZ FROM dbc_gameobjectdisplayinfo");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gameobjectdisplayinfo. DB table `dbc_gameobjectdisplayinfo` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GameObjectDisplayInfoDBC gdi;
+        gdi.ID = id;
+        gdi.ModelName   = fields[1].GetString();
+        gdi.GeoBoxMin.X = fields[2].GetFloat();
+        gdi.GeoBoxMin.Y = fields[3].GetFloat();
+        gdi.GeoBoxMin.Z = fields[4].GetFloat();
+        gdi.GeoBoxMax.X = fields[5].GetFloat();
+        gdi.GeoBoxMax.Y = fields[6].GetFloat();
+        gdi.GeoBoxMax.Z = fields[7].GetFloat();
+
+        _gameobjectDisplayInfoMap[id] = gdi;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gameobjectdisplayinfo         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

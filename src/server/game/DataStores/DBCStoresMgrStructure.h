@@ -755,3 +755,22 @@ struct FactionTemplateDBC
     }
     bool IsContestedGuardFaction() const { return (Flags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD) != 0; }
 };
+
+// load GameObjectArtKit.dbc
+struct GameObjectArtKitDBC
+{
+    uint32 ID;                                              // 0
+    //char const* TextureVariation[3]                       // 1-3 m_textureVariations[3]
+    //char const* AttachModel[4]                            // 4-8 m_attachModels[4]
+};
+
+// load GameObjectDisplayInfo.dbc
+struct GameObjectDisplayInfoDBC
+{
+    uint32 ID;                                              // 0
+    std::string ModelName;                                  // 1
+    //uint32 Sound[10];                                     // 2-11
+    DBCPosition3D GeoBoxMin;                                // 12-14
+    DBCPosition3D GeoBoxMax;                                // 15-17
+    //uint32 ObjectEffectPackageID;                         // 18
+};

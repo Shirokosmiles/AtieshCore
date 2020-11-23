@@ -2432,7 +2432,7 @@ void ObjectMgr::LoadGameObjects()
             }
         }
 
-        if (gInfo->displayId && !sGameObjectDisplayInfoStore.LookupEntry(gInfo->displayId))
+        if (gInfo->displayId && !sDBCStoresMgr->GetGameObjectDisplayInfoDBC(gInfo->displayId))
         {
             TC_LOG_ERROR("sql.sql", "Gameobject (GUID: %u Entry %u GoType: %u) has an invalid displayId (%u), not loaded.", guid, entry, gInfo->type, gInfo->displayId);
             continue;
@@ -7634,7 +7634,7 @@ void ObjectMgr::LoadGameObjectTemplateAddons()
             if (!artKitID)
                 continue;
 
-            if (!sGameObjectArtKitStore.LookupEntry(artKitID))
+            if (!sDBCStoresMgr->GetGameObjectArtKitDBC(artKitID))
             {
                 TC_LOG_ERROR("sql.sql", "GameObject (Entry: %u) has invalid `artkit%d` (%d) defined, set to zero instead.", entry, i, artKitID);
                 continue;
