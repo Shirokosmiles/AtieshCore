@@ -3982,7 +3982,7 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
     // apply new one
     if (uint32 glyph = m_spellInfo->Effects[effIndex].MiscValue)
     {
-        if (GlyphPropertiesEntry const* gp = sGlyphPropertiesStore.LookupEntry(glyph))
+        if (GlyphPropertiesDBC const* gp = sDBCStoresMgr->GetGlyphPropertiesDBC(glyph))
         {
             if (GlyphSlotEntry const* gs = sGlyphSlotStore.LookupEntry(player->GetGlyphSlot(m_glyphIndex)))
             {
@@ -3996,7 +3996,7 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
             // remove old glyph
             if (uint32 oldglyph = player->GetGlyph(m_glyphIndex))
             {
-                if (GlyphPropertiesEntry const* old_gp = sGlyphPropertiesStore.LookupEntry(oldglyph))
+                if (GlyphPropertiesDBC const* old_gp = sDBCStoresMgr->GetGlyphPropertiesDBC(oldglyph))
                 {
                     player->RemoveAurasDueToSpell(old_gp->SpellID);
                     player->SetGlyph(m_glyphIndex, 0);

@@ -21,6 +21,7 @@
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "Log.h"
@@ -568,7 +569,7 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
         {
             uint32 glyph_prop_id = param1_str ? atoul(param1_str) : 0;
 
-            GlyphPropertiesEntry const* glyphPropEntry = sGlyphPropertiesStore.LookupEntry(glyph_prop_id);
+            GlyphPropertiesDBC const* glyphPropEntry = sDBCStoresMgr->GetGlyphPropertiesDBC(glyph_prop_id);
             if (!glyphPropEntry)
                 return 0;
 

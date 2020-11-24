@@ -102,7 +102,7 @@ bool Trinity::Hyperlinks::LinkTags::glyph::StoreTo(GlyphLinkData& val, std::stri
         return false;
     if (!(val.Slot = sGlyphSlotStore.LookupEntry(slot)))
         return false;
-    if (!(val.Glyph = sGlyphPropertiesStore.LookupEntry(prop)))
+    if (!(val.Glyph = sDBCStoresMgr->GetGlyphPropertiesDBC(prop)))
         return false;
     return true;
 }

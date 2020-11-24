@@ -28,14 +28,6 @@
 // Structures used to access raw DBC data require packing for portability
 #pragma pack(push, 1)
 
-struct GlyphPropertiesEntry
-{
-    uint32 ID;                                              // 0
-    uint32 SpellID;                                         // 1
-    uint32 GlyphSlotFlags;                                  // 2
-    uint32 SpellIconID;                                     // 3
-};
-
 struct GlyphSlotEntry
 {
     uint32 ID;                                              // 0

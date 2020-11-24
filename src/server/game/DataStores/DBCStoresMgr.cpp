@@ -66,6 +66,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _gameobjectArtKitMap.clear();
     _gameobjectDisplayInfoMap.clear();
     _gemPropertiesMap.clear();
+    _glyphPropertiesMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -110,6 +111,7 @@ void DBCStoresMgr::Initialize()
     _Load_GameObjectArtKit();
     _Load_GameObjectDisplayInfo();
     _Load_GemProperties();
+    _Load_GlyphProperties();
 }
 
 // load Achievement.dbc
@@ -1634,4 +1636,39 @@ void DBCStoresMgr::_Load_GemProperties()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_gemproperties                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load GlyphProperties.dbc
+void DBCStoresMgr::_Load_GlyphProperties()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _glyphPropertiesMap.clear();
+    //                                                0     1          2                3
+    QueryResult result = WorldDatabase.Query("SELECT ID, SpellID, GlyphSlotFlags, SpellIconID FROM dbc_glyphproperties");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_glyphproperties. DB table `dbc_glyphproperties` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GlyphPropertiesDBC gp;
+        gp.ID = id;
+        gp.SpellID        = fields[1].GetUInt32();
+        gp.GlyphSlotFlags = fields[2].GetUInt32();
+        gp.SpellIconID    = fields[3].GetUInt32();
+
+        _glyphPropertiesMap[id] = gp;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_glyphproperties               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

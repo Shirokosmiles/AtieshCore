@@ -784,3 +784,12 @@ struct GemPropertiesDBC
     //uint32 MaxCountItem;                                  // 3
     uint32 Type;                                            // 4
 };
+
+// load GlyphProperties.dbc
+struct GlyphPropertiesDBC
+{
+    uint32 ID;                                              // 0
+    uint32 SpellID;                                         // 1
+    uint32 GlyphSlotFlags;                                  // 2
+    uint32 SpellIconID;                                     // 3
+};

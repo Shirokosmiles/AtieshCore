@@ -18277,7 +18277,7 @@ void Player::_LoadGlyphAuras()
     {
         if (uint32 glyph = GetGlyph(i))
         {
-            if (GlyphPropertiesEntry const* gp = sGlyphPropertiesStore.LookupEntry(glyph))
+            if (GlyphPropertiesDBC const* gp = sDBCStoresMgr->GetGlyphPropertiesDBC(glyph))
             {
                 if (GlyphSlotEntry const* gs = sGlyphSlotStore.LookupEntry(GetGlyphSlot(i)))
                 {
@@ -26240,7 +26240,7 @@ void Player::ActivateSpec(uint8 spec)
     for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
         // remove secondary glyph
         if (uint32 oldglyph = m_Glyphs[m_activeSpec][slot])
-            if (GlyphPropertiesEntry const* old_gp = sGlyphPropertiesStore.LookupEntry(oldglyph))
+            if (GlyphPropertiesDBC const* old_gp = sDBCStoresMgr->GetGlyphPropertiesDBC(oldglyph))
                 RemoveAurasDueToSpell(old_gp->SpellID);
 
     SetActiveSpec(spec);
@@ -26284,7 +26284,7 @@ void Player::ActivateSpec(uint8 spec)
 
         // apply primary glyph
         if (glyph)
-            if (GlyphPropertiesEntry const* gp = sGlyphPropertiesStore.LookupEntry(glyph))
+            if (GlyphPropertiesDBC const* gp = sDBCStoresMgr->GetGlyphPropertiesDBC(glyph))
                 CastSpell(this, gp->SpellID, true);
 
         SetGlyph(slot, glyph);
