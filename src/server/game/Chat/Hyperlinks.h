@@ -28,7 +28,7 @@
 #include <utility>
 
 struct GlyphPropertiesDBC;
-struct GlyphSlotEntry;
+struct GlyphSlotDBC;
 struct ItemRandomPropertiesEntry;
 struct ItemRandomSuffixEntry;
 struct ItemTemplate;
@@ -53,7 +53,7 @@ namespace Trinity::Hyperlinks
     struct GlyphLinkData
     {
         GlyphPropertiesDBC const* Glyph;
-        GlyphSlotEntry const* Slot;
+        GlyphSlotDBC const* Slot;
     };
 
     struct ItemLinkData

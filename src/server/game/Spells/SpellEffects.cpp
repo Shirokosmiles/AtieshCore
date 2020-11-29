@@ -3984,7 +3984,7 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
     {
         if (GlyphPropertiesDBC const* gp = sDBCStoresMgr->GetGlyphPropertiesDBC(glyph))
         {
-            if (GlyphSlotEntry const* gs = sGlyphSlotStore.LookupEntry(player->GetGlyphSlot(m_glyphIndex)))
+            if (GlyphSlotDBC const* gs = sDBCStoresMgr->GetGlyphSlotDBC(player->GetGlyphSlot(m_glyphIndex)))
             {
                 if (gp->GlyphSlotFlags != gs->Type)
                 {

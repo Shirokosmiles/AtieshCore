@@ -95,7 +95,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <GameObjectDisplayInfoEntry> sGameObjectDisplayInfoStore(GameObjectDisplayInfofmt);
 //DBCStorage <GemPropertiesEntry> sGemPropertiesStore(GemPropertiesEntryfmt);
 //DBCStorage <GlyphPropertiesEntry> sGlyphPropertiesStore(GlyphPropertiesfmt);
-DBCStorage <GlyphSlotEntry> sGlyphSlotStore(GlyphSlotfmt);
+//DBCStorage <GlyphSlotEntry> sGlyphSlotStore(GlyphSlotfmt);
 
 DBCStorage <GtBarberShopCostBaseEntry>    sGtBarberShopCostBaseStore(GtBarberShopCostBasefmt);
 DBCStorage <GtCombatRatingsEntry>         sGtCombatRatingsStore(GtCombatRatingsfmt);
@@ -320,7 +320,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sGameObjectDisplayInfoStore,         "GameObjectDisplayInfo.dbc");
     //LOAD_DBC(sGemPropertiesStore,                 "GemProperties.dbc");
     //LOAD_DBC(sGlyphPropertiesStore,               "GlyphProperties.dbc");
-    LOAD_DBC(sGlyphSlotStore,                     "GlyphSlot.dbc");
+    //LOAD_DBC(sGlyphSlotStore,                     "GlyphSlot.dbc");
     LOAD_DBC(sGtBarberShopCostBaseStore,          "gtBarberShopCostBase.dbc");
     LOAD_DBC(sGtCombatRatingsStore,               "gtCombatRatings.dbc");
     LOAD_DBC(sGtChanceToMeleeCritBaseStore,       "gtChanceToMeleeCritBase.dbc");

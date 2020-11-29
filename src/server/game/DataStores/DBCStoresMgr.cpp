@@ -67,6 +67,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _gameobjectDisplayInfoMap.clear();
     _gemPropertiesMap.clear();
     _glyphPropertiesMap.clear();
+    _glyphSlotMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -112,6 +113,7 @@ void DBCStoresMgr::Initialize()
     _Load_GameObjectDisplayInfo();
     _Load_GemProperties();
     _Load_GlyphProperties();
+    _Load_GlyphSlot();
 }
 
 // load Achievement.dbc
@@ -1671,4 +1673,38 @@ void DBCStoresMgr::_Load_GlyphProperties()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_glyphproperties               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load GlyphSlot.dbc
+void DBCStoresMgr::_Load_GlyphSlot()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _glyphSlotMap.clear();
+    //                                                0     1     2
+    QueryResult result = WorldDatabase.Query("SELECT ID, Type, Tooltip FROM dbc_glyphslot");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_glyphslot. DB table `dbc_glyphslot` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GlyphSlotDBC gs;
+        gs.ID = id;
+        gs.Type    = fields[1].GetUInt32();
+        gs.Tooltip = fields[2].GetUInt32();
+
+        _glyphSlotMap[id] = gs;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_glyphslot                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

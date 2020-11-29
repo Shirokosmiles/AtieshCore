@@ -63,6 +63,7 @@ typedef std::unordered_map<uint32 /*ID*/, GameObjectArtKitDBC> GameObjectArtKitD
 typedef std::unordered_map<uint32 /*ID*/, GameObjectDisplayInfoDBC> GameObjectDisplayInfoDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, GemPropertiesDBC> GemPropertiesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, GlyphPropertiesDBC> GlyphPropertiesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GlyphSlotDBC> GlyphSlotDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -453,6 +454,15 @@ public:
         return nullptr;
     }
 
+    GlyphSlotDBCMap const& GetGlyphSlotDBCMap() const { return _glyphSlotMap; }
+    GlyphSlotDBC const* GetGlyphSlotDBC(uint32 ID)
+    {
+        GlyphSlotDBCMap::const_iterator itr = _glyphSlotMap.find(ID);
+        if (itr != _glyphSlotMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -495,6 +505,7 @@ protected:
     void _Load_GameObjectDisplayInfo();
     void _Load_GemProperties();
     void _Load_GlyphProperties();
+    void _Load_GlyphSlot();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -538,6 +549,7 @@ private:
     GameObjectDisplayInfoDBCMap _gameobjectDisplayInfoMap;
     GemPropertiesDBCMap _gemPropertiesMap;
     GlyphPropertiesDBCMap _glyphPropertiesMap;
+    GlyphSlotDBCMap _glyphSlotMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

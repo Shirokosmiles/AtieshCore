@@ -100,7 +100,7 @@ bool Trinity::Hyperlinks::LinkTags::glyph::StoreTo(GlyphLinkData& val, std::stri
     uint32 slot, prop;
     if (!(t.TryConsumeTo(slot) && t.TryConsumeTo(prop) && t.IsEmpty()))
         return false;
-    if (!(val.Slot = sGlyphSlotStore.LookupEntry(slot)))
+    if (!(val.Slot = sDBCStoresMgr->GetGlyphSlotDBC(slot)))
         return false;
     if (!(val.Glyph = sDBCStoresMgr->GetGlyphPropertiesDBC(prop)))
         return false;

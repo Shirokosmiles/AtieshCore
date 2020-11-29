@@ -793,3 +793,11 @@ struct GlyphPropertiesDBC
     uint32 GlyphSlotFlags;                                  // 2
     uint32 SpellIconID;                                     // 3
 };
+
+// load GlyphSlot.dbc
+struct GlyphSlotDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Type;                                            // 1
+    uint32 Tooltip;                                         // 2
+};

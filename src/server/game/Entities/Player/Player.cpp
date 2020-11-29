@@ -18279,7 +18279,7 @@ void Player::_LoadGlyphAuras()
         {
             if (GlyphPropertiesDBC const* gp = sDBCStoresMgr->GetGlyphPropertiesDBC(glyph))
             {
-                if (GlyphSlotEntry const* gs = sGlyphSlotStore.LookupEntry(GetGlyphSlot(i)))
+                if (GlyphSlotDBC const* gs = sDBCStoresMgr->GetGlyphSlotDBC(GetGlyphSlot(i)))
                 {
                     if (gp->GlyphSlotFlags == gs->Type)
                     {
@@ -24619,10 +24619,15 @@ uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 n
 
 void Player::InitGlyphsForLevel()
 {
-    for (uint32 i = 0; i < sGlyphSlotStore.GetNumRows(); ++i)
-        if (GlyphSlotEntry const* gs = sGlyphSlotStore.LookupEntry(i))
+    GlyphSlotDBCMap const& gslotMap = sDBCStoresMgr->GetGlyphSlotDBCMap();
+    for (GlyphSlotDBCMap::const_iterator itr = gslotMap.begin(); itr != gslotMap.end(); ++itr)
+    {
+        if (GlyphSlotDBC const* gs = &itr->second)
+        {
             if (gs->Tooltip)
                 SetGlyphSlot(gs->Tooltip - 1, gs->ID);
+        }
+    }
 
     uint8 level = GetLevel();
     uint32 value = 0;
