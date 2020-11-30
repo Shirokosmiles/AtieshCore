@@ -80,6 +80,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _gtOCTRegenMPMap.clear();
     _gtRegenHPPerSptMap.clear();
     _gtRegenMPPerSptMap.clear();
+    _holidaysMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -138,6 +139,7 @@ void DBCStoresMgr::Initialize()
     //_Load_gtOCTRegenMP(); // unused
     _Load_gtRegenHPPerSpt();
     _Load_gtRegenMPPerSpt();
+    _Load_Holidays();
 }
 
 // load Achievement.dbc
@@ -2127,4 +2129,47 @@ void DBCStoresMgr::_Load_gtRegenMPPerSpt()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_gtregenmpperspt               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load Holidays.dbc
+void DBCStoresMgr::_Load_Holidays()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _holidaysMap.clear();
+    //                                                0      1           2           3           4           5           6           7           8            9         10         11       12      13      14      15      16      17      18      19      20      21        22        23      24        25      26        27      28        29      30        31      32        33       34       35      36       37       38          39                 40             41              42                  43             44               45              46               47                 48               49            50               51   
+    QueryResult result = WorldDatabase.Query("SELECT ID, Duration_1, Duration_2, Duration_3, Duration_4, Duration_5, Duration_6, Duration_7, Duration_8, Duration_9, Duration_10, Date_1, Date_2, Date_3, Date_4, Date_5, Date_6, Date_7, Date_8, Date_9, Date_10, Date_11, Date_12, Date_13, Date_14, Date_15, Date_16, Date_17, Date_18, Date_19, Date_20, Date_21, Date_22, Date_23, Date_24, Date_25, Date_26, Region, Looping, CalendarFlags_1, CalendarFlags_2, CalendarFlags_3, CalendarFlags_4, CalendarFlags_5, CalendarFlags_6, CalendarFlags_7, CalendarFlags_8, CalendarFlags_9, CalendarFlags_10, TextureFilename, Priority, CalendarFilterType FROM dbc_holidays");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_holidays. DB table `dbc_holidays` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        HolidaysDBC h;
+        h.ID = id;
+        for (uint8 i = 0; i < MAX_HOLIDAY_DURATIONS; i++)
+            h.Duration[i] = fields[1 + i].GetUInt32();
+        for (uint8 i = 0; i < MAX_HOLIDAY_DATES; i++)
+            h.Date[i] = fields[11 + i].GetUInt32();
+        h.Region  = fields[37].GetUInt32();
+        h.Looping = fields[38].GetUInt32();
+        for (uint8 i = 0; i < MAX_HOLIDAY_FLAGS; i++)
+            h.CalendarFlags[i] = fields[39 + i].GetUInt32();
+        h.TextureFilename    = fields[49].GetString();
+        h.Priority           = fields[50].GetUInt32();
+        h.CalendarFilterType = fields[51].GetInt32();
+
+        _holidaysMap[id] = h;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_holidays                      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

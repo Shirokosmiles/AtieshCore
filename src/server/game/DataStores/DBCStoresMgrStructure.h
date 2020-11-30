@@ -890,3 +890,24 @@ struct GtRegenMPPerSptDBC
     uint32 ID;                                              // 0
     float Data;                                             // 1
 };
+
+// load Holidays.dbc
+#define MAX_HOLIDAY_DURATIONS 10
+#define MAX_HOLIDAY_DATES 26
+#define MAX_HOLIDAY_FLAGS 10
+
+struct HolidaysDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Duration[MAX_HOLIDAY_DURATIONS];                 // 1-10
+    uint32 Date[MAX_HOLIDAY_DATES];                         // 11-36 dates in unix time starting at January, 1, 2000
+    uint32 Region;                                          // 37 WoW region
+    uint32 Looping;                                         // 38
+    uint32 CalendarFlags[MAX_HOLIDAY_FLAGS];                // 39-48
+    //uint32 HolidayNameID;                                 // 49 HolidayNames.dbc
+    //uint32 HolidayDescriptionID;                          // 50 HolidayDescriptions.dbc
+    std::string TextureFilename;                            // 51
+    uint32 Priority;                                        // 52
+    int32 CalendarFilterType;                               // 53
+    //uint32 Flags;                                         // 54 0 = Darkmoon Faire, Fishing Contest and Wotlk Launch, rest is 1
+};

@@ -234,7 +234,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaDBC const* criteria)
             }
             return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY:
-            if (!sHolidaysStore.LookupEntry(holiday.id))
+            if (!sDBCStoresMgr->GetHolidaysDBC(holiday.id))
             {
                 TC_LOG_ERROR("sql.sql", "Table `achievement_criteria_data` (Entry: %u Type: %u) for data type ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY (%u) contains an unknown holiday entry in value1 (%u), ignored.",
                     criteria->ID, criteria->Type, dataType, holiday.id);

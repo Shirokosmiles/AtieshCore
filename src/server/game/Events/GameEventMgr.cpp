@@ -266,7 +266,7 @@ void GameEventMgr::LoadFromDB()
 
             if (pGameEvent.holiday_id != HOLIDAY_NONE)
             {
-                if (!sHolidaysStore.LookupEntry(pGameEvent.holiday_id))
+                if (!sDBCStoresMgr->GetHolidaysDBC(pGameEvent.holiday_id))
                 {
                     TC_LOG_ERROR("sql.sql", "`game_event`: game event id (%i) contains nonexisting holiday id %u.", event_id, pGameEvent.holiday_id);
                     pGameEvent.holiday_id = HOLIDAY_NONE;
@@ -967,7 +967,7 @@ void GameEventMgr::LoadHolidayDates()
         Field* fields = result->Fetch();
 
         uint32 holidayId = fields[0].GetUInt32();
-        HolidaysEntry* entry = const_cast<HolidaysEntry*>(sHolidaysStore.LookupEntry(holidayId));
+        HolidaysDBC* entry = const_cast<HolidaysDBC*>(sDBCStoresMgr->GetHolidaysDBC(holidayId));
         if (!entry)
         {
             TC_LOG_ERROR("sql.sql", "holiday_dates entry has invalid holiday id %u.", holidayId);
@@ -1745,7 +1745,7 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
     if (!event.holidayStage) // Ignore holiday
         return;
 
-    HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(event.holiday_id);
+    HolidaysDBC const* holiday = sDBCStoresMgr->GetHolidaysDBC(event.holiday_id);
     if (!holiday->Date[0] || !holiday->Duration[0]) // Invalid definitions
     {
         TC_LOG_ERROR("sql.sql", "Missing date or duration for holiday %u.", event.holiday_id);

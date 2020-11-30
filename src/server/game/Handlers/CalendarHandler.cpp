@@ -40,6 +40,7 @@ Copied events should probably have a new owner
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -172,7 +173,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     data << uint32(sGameEventMgr->modifiedHolidays.size());
     for (uint32 entry : sGameEventMgr->modifiedHolidays)
     {
-        HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(entry);
+        HolidaysDBC const* holiday = sDBCStoresMgr->GetHolidaysDBC(entry);
 
         data << uint32(holiday->ID);                        // m_ID
         data << uint32(holiday->Region);                    // m_region, might be looping

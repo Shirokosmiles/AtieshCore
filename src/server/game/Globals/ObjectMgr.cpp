@@ -3369,7 +3369,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.ItemLimitCategory = 0;
         }
 
-        if (itemTemplate.HolidayId && !sHolidaysStore.LookupEntry(itemTemplate.HolidayId))
+        if (itemTemplate.HolidayId && !sDBCStoresMgr->GetHolidaysDBC(itemTemplate.HolidayId))
         {
             TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has wrong HolidayId value (%u)", entry, itemTemplate.HolidayId);
             itemTemplate.HolidayId = 0;
