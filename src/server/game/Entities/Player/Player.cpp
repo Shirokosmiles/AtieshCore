@@ -5439,8 +5439,8 @@ float Player::GetMeleeCritFromAgility() const
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtChanceToMeleeCritBaseEntry const* critBase  = sGtChanceToMeleeCritBaseStore.LookupEntry(pclass-1);
-    GtChanceToMeleeCritEntry     const* critRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
+    GtChanceToMeleeCritBaseDBC const* critBase  = sDBCStoresMgr->GetGtChanceToMeleeCritBaseDBC(pclass - 1);
+    GtChanceToMeleeCritDBC const* critRatio = sDBCStoresMgr->GetGtChanceToMeleeCritDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
     if (critBase == nullptr || critRatio == nullptr)
         return 0.0f;
 
@@ -5488,7 +5488,7 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing) cons
         level = GT_MAX_LEVEL;
 
     // Dodge per agility is proportional to crit per agility, which is available from DBC files
-    GtChanceToMeleeCritEntry  const* dodgeRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
+    GtChanceToMeleeCritDBC const* dodgeRatio = sDBCStoresMgr->GetGtChanceToMeleeCritDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
     if (dodgeRatio == nullptr || pclass > MAX_CLASSES)
         return;
 
@@ -5509,8 +5509,8 @@ float Player::GetSpellCritFromIntellect() const
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtChanceToSpellCritBaseEntry const* critBase  = sGtChanceToSpellCritBaseStore.LookupEntry(pclass-1);
-    GtChanceToSpellCritEntry     const* critRatio = sGtChanceToSpellCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
+    GtChanceToSpellCritBaseDBC const* critBase = sDBCStoresMgr->GetGtChanceToSpellCritBaseDBC(pclass - 1);
+    GtChanceToSpellCritDBC const* critRatio = sDBCStoresMgr->GetGtChanceToSpellCritDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
     if (critBase == nullptr || critRatio == nullptr)
         return 0.0f;
 
@@ -5525,9 +5525,9 @@ float Player::GetRatingMultiplier(CombatRating cr) const
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtCombatRatingsEntry const* Rating = sGtCombatRatingsStore.LookupEntry(cr*GT_MAX_LEVEL+level-1);
+    GtCombatRatingsDBC const* Rating = sDBCStoresMgr->GetGtCombatRatingsDBC(cr * GT_MAX_LEVEL + level - 1);
     // gtOCTClassCombatRatingScalarStore.dbc starts with 1, CombatRating with zero, so cr+1
-    GtOCTClassCombatRatingScalarEntry const* classRating = sGtOCTClassCombatRatingScalarStore.LookupEntry((GetClass()-1)*GT_MAX_RATING+cr+1);
+    GtOCTClassCombatRatingScalarDBC const* classRating = sDBCStoresMgr->GetGtOCTClassCombatRatingScalarDBC((GetClass() - 1) * GT_MAX_RATING + cr + 1);
     if (!Rating || !classRating)
         return 1.0f;                                        // By default use minimum coefficient (not must be called)
 
@@ -5561,8 +5561,8 @@ float Player::OCTRegenHPPerSpirit() const
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtOCTRegenHPEntry     const* baseRatio = sGtOCTRegenHPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
-    GtRegenHPPerSptEntry  const* moreRatio = sGtRegenHPPerSptStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
+    GtOCTRegenHPDBC const* baseRatio = sDBCStoresMgr->GetGtOCTRegenHPDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
+    GtRegenHPPerSptDBC const* moreRatio = sDBCStoresMgr->GetGtRegenHPPerSptDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
     if (baseRatio == nullptr || moreRatio == nullptr)
         return 0.0f;
 
@@ -5585,7 +5585,7 @@ float Player::OCTRegenMPPerSpirit() const
         level = GT_MAX_LEVEL;
 
 //    GtOCTRegenMPEntry     const* baseRatio = sGtOCTRegenMPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
-    GtRegenMPPerSptEntry  const* moreRatio = sGtRegenMPPerSptStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
+    GtRegenMPPerSptDBC const* moreRatio = sDBCStoresMgr->GetGtRegenMPPerSptDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
     if (moreRatio == nullptr)
         return 0.0f;
 
@@ -24595,7 +24595,7 @@ uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 n
     if ((hairstyle == newhairstyle) && (haircolor == newhaircolor) && (facialhair == newfacialhair) && (!newSkin || (newSkin->Data == skincolor)))
         return 0;
 
-    GtBarberShopCostBaseEntry const* bsc = sGtBarberShopCostBaseStore.LookupEntry(level - 1);
+    GtBarberShopCostBaseDBC const* bsc = sDBCStoresMgr->GetGtBarberShopCostBaseDBC(level - 1);
 
     if (!bsc)                                                // shouldn't happen
         return 0xFFFFFFFF;

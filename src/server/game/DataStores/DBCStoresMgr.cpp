@@ -68,6 +68,18 @@ DBCStoresMgr::~DBCStoresMgr()
     _gemPropertiesMap.clear();
     _glyphPropertiesMap.clear();
     _glyphSlotMap.clear();
+    _gtBarberShopCostBaseMap.clear();
+    _gtCombatRatingsMap.clear();
+    _gtChanceToMeleeCritBaseMap.clear();
+    _gtChanceToMeleeCritMap.clear();
+    _gtChanceToSpellCritBaseMap.clear();
+    _gtChanceToSpellCritMap.clear();
+    _gtNPCManaCostScalerMap.clear();
+    _gtOCTClassCombatRatingScalarMap.clear();
+    _gtOCTRegenHPMap.clear();
+    _gtOCTRegenMPMap.clear();
+    _gtRegenHPPerSptMap.clear();
+    _gtRegenMPPerSptMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -114,6 +126,18 @@ void DBCStoresMgr::Initialize()
     _Load_GemProperties();
     _Load_GlyphProperties();
     _Load_GlyphSlot();
+    _Load_gtBarberShopCostBase();
+    _Load_gtCombatRatings();
+    _Load_gtChanceToMeleeCritBase();
+    _Load_gtChanceToMeleeCrit();
+    _Load_gtChanceToSpellCritBase();
+    _Load_gtChanceToSpellCrit();
+    _Load_gtNPCManaCostScaler();
+    _Load_gtOCTClassCombatRatingScalar();
+    _Load_gtOCTRegenHP();
+    //_Load_gtOCTRegenMP(); // unused
+    _Load_gtRegenHPPerSpt();
+    _Load_gtRegenMPPerSpt();
 }
 
 // load Achievement.dbc
@@ -1707,4 +1731,400 @@ void DBCStoresMgr::_Load_GlyphSlot()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_glyphslot                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtBarberShopCostBase.dbc
+void DBCStoresMgr::_Load_gtBarberShopCostBase()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtBarberShopCostBaseMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtbarbershopcostbase");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtbarbershopcostbase. DB table `dbc_gtbarbershopcostbase` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtBarberShopCostBaseDBC gtbsc;
+        gtbsc.ID = id;
+        gtbsc.Data = fields[1].GetFloat();
+
+        _gtBarberShopCostBaseMap[id] = gtbsc;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtbarbershopcostbase          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtCombatRatings.dbc
+void DBCStoresMgr::_Load_gtCombatRatings()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtCombatRatingsMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtcombatratings");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtcombatratings. DB table `dbc_gtcombatratings` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtCombatRatingsDBC gtcr;
+        gtcr.ID = id;
+        gtcr.Data = fields[1].GetFloat();
+
+        _gtCombatRatingsMap[id] = gtcr;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtcombatratings               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtChanceToMeleeCritBase.dbc
+void DBCStoresMgr::_Load_gtChanceToMeleeCritBase()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtChanceToMeleeCritBaseMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtchancetomeleecritbase");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetomeleecritbase. DB table `dbc_gtchancetomeleecritbase` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtChanceToMeleeCritBaseDBC gtcmcb;
+        gtcmcb.ID = id;
+        gtcmcb.Data = fields[1].GetFloat();
+
+        _gtChanceToMeleeCritBaseMap[id] = gtcmcb;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtchancetomeleecritbase       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtChanceToMeleeCrit.dbc
+void DBCStoresMgr::_Load_gtChanceToMeleeCrit()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtChanceToMeleeCritMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtchancetomeleecrit");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetomeleecrit. DB table `dbc_gtchancetomeleecrit` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtChanceToMeleeCritDBC gtcmc;
+        gtcmc.ID = id;
+        gtcmc.Data = fields[1].GetFloat();
+
+        _gtChanceToMeleeCritMap[id] = gtcmc;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtchancetomeleecrit           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtChanceToSpellCritBase.dbc
+void DBCStoresMgr::_Load_gtChanceToSpellCritBase()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtChanceToSpellCritBaseMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtchancetospellcritbase");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetospellcritbase. DB table `dbc_gtchancetospellcritbase` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtChanceToSpellCritBaseDBC gtcscb;
+        gtcscb.ID = id;
+        gtcscb.Data = fields[1].GetFloat();
+
+        _gtChanceToSpellCritBaseMap[id] = gtcscb;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtchancetospellcritbase       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtChanceToSpellCrit.dbc
+void DBCStoresMgr::_Load_gtChanceToSpellCrit()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtChanceToSpellCritMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtchancetospellcrit");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetospellcrit. DB table `dbc_gtchancetospellcrit` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtChanceToSpellCritDBC gtcsc;
+        gtcsc.ID = id;
+        gtcsc.Data = fields[1].GetFloat();
+
+        _gtChanceToSpellCritMap[id] = gtcsc;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtchancetospellcrit           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtNPCManaCostScaler.dbc
+void DBCStoresMgr::_Load_gtNPCManaCostScaler()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtNPCManaCostScalerMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtnpcmanacostscaler");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtnpcmanacostscaler. DB table `dbc_gtnpcmanacostscaler` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtNPCManaCostScalerDBC gtnpcMCS;
+        gtnpcMCS.ID = id;
+        gtnpcMCS.Data = fields[1].GetFloat();
+
+        _gtNPCManaCostScalerMap[id] = gtnpcMCS;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtnpcmanacostscaler           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtOCTClassCombatRatingScalar.dbc
+void DBCStoresMgr::_Load_gtOCTClassCombatRatingScalar()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtOCTClassCombatRatingScalarMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtoctclasscombatratingscalar");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctclasscombatratingscalar. DB table `dbc_gtoctclasscombatratingscalar` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtOCTClassCombatRatingScalarDBC gtOCTccrs;
+        gtOCTccrs.ID = id;
+        gtOCTccrs.Data = fields[1].GetFloat();
+
+        _gtOCTClassCombatRatingScalarMap[id] = gtOCTccrs;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtoctclasscombatratingscalar  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtOCTRegenHP.dbc
+void DBCStoresMgr::_Load_gtOCTRegenHP()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtOCTRegenHPMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtoctregenhp");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctregenhp. DB table `dbc_gtoctregenhp` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtOCTRegenHPDBC gtOCTrhp;
+        gtOCTrhp.ID = id;
+        gtOCTrhp.Data = fields[1].GetFloat();
+
+        _gtOCTRegenHPMap[id] = gtOCTrhp;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtoctregenhp                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtOCTRegenMP.dbc
+void DBCStoresMgr::_Load_gtOCTRegenMP()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtOCTRegenMPMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtoctregenmp");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctregenmp. DB table `dbc_gtoctregenmp` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtOCTRegenMPDBC gtOCTrmp;
+        gtOCTrmp.ID = id;
+        gtOCTrmp.Data = fields[1].GetFloat();
+
+        _gtOCTRegenMPMap[id] = gtOCTrmp;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtoctregenmp                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtRegenHPPerSpt.dbc
+void DBCStoresMgr::_Load_gtRegenHPPerSpt()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtRegenHPPerSptMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtregenhpperspt");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtregenhpperspt. DB table `dbc_gtregenhpperspt` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtRegenHPPerSptDBC gtrhpps;
+        gtrhpps.ID = id;
+        gtrhpps.Data = fields[1].GetFloat();
+
+        _gtRegenHPPerSptMap[id] = gtrhpps;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtregenhpperspt               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load gtRegenMPPerSpt.dbc
+void DBCStoresMgr::_Load_gtRegenMPPerSpt()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gtRegenMPPerSptMap.clear();
+    //                                                0   1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtregenmpperspt");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtregenmpperspt. DB table `dbc_gtregenmpperspt` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        GtRegenMPPerSptDBC gtrmpps;
+        gtrmpps.ID = id;
+        gtrmpps.Data = fields[1].GetFloat();
+
+        _gtRegenMPPerSptMap[id] = gtrmpps;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtregenmpperspt               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

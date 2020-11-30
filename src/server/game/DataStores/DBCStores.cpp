@@ -97,18 +97,18 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <GlyphPropertiesEntry> sGlyphPropertiesStore(GlyphPropertiesfmt);
 //DBCStorage <GlyphSlotEntry> sGlyphSlotStore(GlyphSlotfmt);
 
-DBCStorage <GtBarberShopCostBaseEntry>    sGtBarberShopCostBaseStore(GtBarberShopCostBasefmt);
-DBCStorage <GtCombatRatingsEntry>         sGtCombatRatingsStore(GtCombatRatingsfmt);
-DBCStorage <GtChanceToMeleeCritBaseEntry> sGtChanceToMeleeCritBaseStore(GtChanceToMeleeCritBasefmt);
-DBCStorage <GtChanceToMeleeCritEntry>     sGtChanceToMeleeCritStore(GtChanceToMeleeCritfmt);
-DBCStorage <GtChanceToSpellCritBaseEntry> sGtChanceToSpellCritBaseStore(GtChanceToSpellCritBasefmt);
-DBCStorage <GtChanceToSpellCritEntry>     sGtChanceToSpellCritStore(GtChanceToSpellCritfmt);
-DBCStorage <GtNPCManaCostScalerEntry>     sGtNPCManaCostScalerStore(GtNPCManaCostScalerfmt);
-DBCStorage <GtOCTClassCombatRatingScalarEntry> sGtOCTClassCombatRatingScalarStore(GtOCTClassCombatRatingScalarfmt);
-DBCStorage <GtOCTRegenHPEntry>            sGtOCTRegenHPStore(GtOCTRegenHPfmt);
+//DBCStorage <GtBarberShopCostBaseEntry>    sGtBarberShopCostBaseStore(GtBarberShopCostBasefmt);
+//DBCStorage <GtCombatRatingsEntry>         sGtCombatRatingsStore(GtCombatRatingsfmt);
+//DBCStorage <GtChanceToMeleeCritBaseEntry> sGtChanceToMeleeCritBaseStore(GtChanceToMeleeCritBasefmt);
+//DBCStorage <GtChanceToMeleeCritEntry>     sGtChanceToMeleeCritStore(GtChanceToMeleeCritfmt);
+//DBCStorage <GtChanceToSpellCritBaseEntry> sGtChanceToSpellCritBaseStore(GtChanceToSpellCritBasefmt);
+//DBCStorage <GtChanceToSpellCritEntry>     sGtChanceToSpellCritStore(GtChanceToSpellCritfmt);
+//DBCStorage <GtNPCManaCostScalerEntry>     sGtNPCManaCostScalerStore(GtNPCManaCostScalerfmt);
+//DBCStorage <GtOCTClassCombatRatingScalarEntry> sGtOCTClassCombatRatingScalarStore(GtOCTClassCombatRatingScalarfmt);
+//DBCStorage <GtOCTRegenHPEntry>            sGtOCTRegenHPStore(GtOCTRegenHPfmt);
 //DBCStorage <GtOCTRegenMPEntry>            sGtOCTRegenMPStore(GtOCTRegenMPfmt);  -- not used currently
-DBCStorage <GtRegenHPPerSptEntry>         sGtRegenHPPerSptStore(GtRegenHPPerSptfmt);
-DBCStorage <GtRegenMPPerSptEntry>         sGtRegenMPPerSptStore(GtRegenMPPerSptfmt);
+//DBCStorage <GtRegenHPPerSptEntry>         sGtRegenHPPerSptStore(GtRegenHPPerSptfmt);
+//DBCStorage <GtRegenMPPerSptEntry>         sGtRegenMPPerSptStore(GtRegenMPPerSptfmt);
 
 DBCStorage <HolidaysEntry>                sHolidaysStore(Holidaysfmt);
 
@@ -321,18 +321,18 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sGemPropertiesStore,                 "GemProperties.dbc");
     //LOAD_DBC(sGlyphPropertiesStore,               "GlyphProperties.dbc");
     //LOAD_DBC(sGlyphSlotStore,                     "GlyphSlot.dbc");
-    LOAD_DBC(sGtBarberShopCostBaseStore,          "gtBarberShopCostBase.dbc");
-    LOAD_DBC(sGtCombatRatingsStore,               "gtCombatRatings.dbc");
-    LOAD_DBC(sGtChanceToMeleeCritBaseStore,       "gtChanceToMeleeCritBase.dbc");
-    LOAD_DBC(sGtChanceToMeleeCritStore,           "gtChanceToMeleeCrit.dbc");
-    LOAD_DBC(sGtChanceToSpellCritBaseStore,       "gtChanceToSpellCritBase.dbc");
-    LOAD_DBC(sGtChanceToSpellCritStore,           "gtChanceToSpellCrit.dbc");
-    LOAD_DBC(sGtNPCManaCostScalerStore,           "gtNPCManaCostScaler.dbc");
-    LOAD_DBC(sGtOCTClassCombatRatingScalarStore,  "gtOCTClassCombatRatingScalar.dbc");
-    LOAD_DBC(sGtOCTRegenHPStore,                  "gtOCTRegenHP.dbc");
+    //LOAD_DBC(sGtBarberShopCostBaseStore,          "gtBarberShopCostBase.dbc");
+    //LOAD_DBC(sGtCombatRatingsStore,               "gtCombatRatings.dbc");
+    //LOAD_DBC(sGtChanceToMeleeCritBaseStore,       "gtChanceToMeleeCritBase.dbc");
+    //LOAD_DBC(sGtChanceToMeleeCritStore,           "gtChanceToMeleeCrit.dbc");
+    //LOAD_DBC(sGtChanceToSpellCritBaseStore,       "gtChanceToSpellCritBase.dbc");
+    //LOAD_DBC(sGtChanceToSpellCritStore,           "gtChanceToSpellCrit.dbc");
+    //LOAD_DBC(sGtNPCManaCostScalerStore,           "gtNPCManaCostScaler.dbc");
+    //LOAD_DBC(sGtOCTClassCombatRatingScalarStore,  "gtOCTClassCombatRatingScalar.dbc");
+    //LOAD_DBC(sGtOCTRegenHPStore,                  "gtOCTRegenHP.dbc");
     //LOAD_DBC(sGtOCTRegenMPStore,                  "gtOCTRegenMP.dbc");       -- not used currently
-    LOAD_DBC(sGtRegenHPPerSptStore,               "gtRegenHPPerSpt.dbc");
-    LOAD_DBC(sGtRegenMPPerSptStore,               "gtRegenMPPerSpt.dbc");
+    //LOAD_DBC(sGtRegenHPPerSptStore,               "gtRegenHPPerSpt.dbc");
+    //LOAD_DBC(sGtRegenMPPerSptStore,               "gtRegenMPPerSpt.dbc");
     LOAD_DBC(sHolidaysStore,                      "Holidays.dbc");
     LOAD_DBC(sItemStore,                          "Item.dbc");
     LOAD_DBC(sItemBagFamilyStore,                 "ItemBagFamily.dbc");

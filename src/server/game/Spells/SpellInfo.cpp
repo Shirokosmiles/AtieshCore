@@ -495,8 +495,8 @@ int32 SpellEffectInfo::CalcValue(WorldObject const* caster /*= nullptr*/, int32 
 
             if (canEffectScale)
             {
-                GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(_spellInfo->SpellLevel - 1);
-                GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(casterUnit->GetLevel() - 1);
+                GtNPCManaCostScalerDBC const* spellScaler = sDBCStoresMgr->GetGtNPCManaCostScalerDBC(_spellInfo->SpellLevel - 1);
+                GtNPCManaCostScalerDBC const* casterScaler = sDBCStoresMgr->GetGtNPCManaCostScalerDBC(casterUnit->GetLevel() - 1);
                 if (spellScaler && casterScaler)
                     value *= casterScaler->Data / spellScaler->Data;
             }
@@ -3246,8 +3246,8 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
     {
         if (HasAttribute(SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION))
         {
-            GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(SpellLevel - 1);
-            GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(unitCaster->GetLevel() - 1);
+            GtNPCManaCostScalerDBC const* spellScaler = sDBCStoresMgr->GetGtNPCManaCostScalerDBC(SpellLevel - 1);
+            GtNPCManaCostScalerDBC const* casterScaler = sDBCStoresMgr->GetGtNPCManaCostScalerDBC(unitCaster->GetLevel() - 1);
             if (spellScaler && casterScaler)
                 powerCost *= casterScaler->Data / spellScaler->Data;
         }

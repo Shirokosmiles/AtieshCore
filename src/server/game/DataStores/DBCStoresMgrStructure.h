@@ -801,3 +801,92 @@ struct GlyphSlotDBC
     uint32 Type;                                            // 1
     uint32 Tooltip;                                         // 2
 };
+
+// All Gt* DBC store data for 100 levels, some by 100 per class/race
+#define GT_MAX_LEVEL    100
+// gtOCTClassCombatRatingScalar.dbc stores data for 32 ratings, look at MAX_COMBAT_RATING for real used amount
+#define GT_MAX_RATING   32
+
+// load gtBarberShopCostBase.dbc
+struct GtBarberShopCostBaseDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtCombatRatings.dbc
+struct GtCombatRatingsDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtChanceToMeleeCritBase.dbc
+struct GtChanceToMeleeCritBaseDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtChanceToMeleeCrit.dbc
+struct GtChanceToMeleeCritDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtChanceToSpellCritBase.dbc
+struct GtChanceToSpellCritBaseDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtChanceToSpellCrit.dbc
+struct GtChanceToSpellCritDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtNPCManaCostScaler.dbc
+struct GtNPCManaCostScalerDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtOCTClassCombatRatingScalar.dbc
+struct GtOCTClassCombatRatingScalarDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtOCTRegenHP.dbc
+struct GtOCTRegenHPDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtOCTRegenMP.dbc (UNUSED)
+struct GtOCTRegenMPDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtRegenHPPerSpt.dbc
+struct GtRegenHPPerSptDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
+// load gtRegenMPPerSpt.dbc
+struct GtRegenMPPerSptDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};

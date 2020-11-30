@@ -64,6 +64,18 @@ typedef std::unordered_map<uint32 /*ID*/, GameObjectDisplayInfoDBC> GameObjectDi
 typedef std::unordered_map<uint32 /*ID*/, GemPropertiesDBC> GemPropertiesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, GlyphPropertiesDBC> GlyphPropertiesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, GlyphSlotDBC> GlyphSlotDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtBarberShopCostBaseDBC> GtBarberShopCostBaseDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtCombatRatingsDBC> GtCombatRatingsDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtChanceToMeleeCritBaseDBC> GtChanceToMeleeCritBaseDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtChanceToMeleeCritDBC> GtChanceToMeleeCritDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtChanceToSpellCritBaseDBC> GtChanceToSpellCritBaseDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtChanceToSpellCritDBC> GtChanceToSpellCritDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtNPCManaCostScalerDBC> GtNPCManaCostScalerDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtOCTClassCombatRatingScalarDBC> GtOCTClassCombatRatingScalarDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtOCTRegenHPDBC> GtOCTRegenHPDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtOCTRegenMPDBC> GtOCTRegenMPDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtRegenHPPerSptDBC> GtRegenHPPerSptDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, GtRegenMPPerSptDBC> GtRegenMPPerSptDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -463,6 +475,102 @@ public:
         return nullptr;
     }
 
+    GtBarberShopCostBaseDBC const* GetGtBarberShopCostBaseDBC(uint32 ID)
+    {
+        GtBarberShopCostBaseDBCMap::const_iterator itr = _gtBarberShopCostBaseMap.find(ID);
+        if (itr != _gtBarberShopCostBaseMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtCombatRatingsDBC const* GetGtCombatRatingsDBC(uint32 ID)
+    {
+        GtCombatRatingsDBCMap::const_iterator itr = _gtCombatRatingsMap.find(ID);
+        if (itr != _gtCombatRatingsMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtChanceToMeleeCritBaseDBC const* GetGtChanceToMeleeCritBaseDBC(uint32 ID)
+    {
+        GtChanceToMeleeCritBaseDBCMap::const_iterator itr = _gtChanceToMeleeCritBaseMap.find(ID);
+        if (itr != _gtChanceToMeleeCritBaseMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtChanceToMeleeCritDBC const* GetGtChanceToMeleeCritDBC(uint32 ID)
+    {
+        GtChanceToMeleeCritDBCMap::const_iterator itr = _gtChanceToMeleeCritMap.find(ID);
+        if (itr != _gtChanceToMeleeCritMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtChanceToSpellCritBaseDBC const* GetGtChanceToSpellCritBaseDBC(uint32 ID)
+    {
+        GtChanceToSpellCritBaseDBCMap::const_iterator itr = _gtChanceToSpellCritBaseMap.find(ID);
+        if (itr != _gtChanceToSpellCritBaseMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtChanceToSpellCritDBC const* GetGtChanceToSpellCritDBC(uint32 ID)
+    {
+        GtChanceToSpellCritDBCMap::const_iterator itr = _gtChanceToSpellCritMap.find(ID);
+        if (itr != _gtChanceToSpellCritMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtNPCManaCostScalerDBC const* GetGtNPCManaCostScalerDBC(uint32 ID)
+    {
+        GtNPCManaCostScalerDBCMap::const_iterator itr = _gtNPCManaCostScalerMap.find(ID);
+        if (itr != _gtNPCManaCostScalerMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtOCTClassCombatRatingScalarDBC const* GetGtOCTClassCombatRatingScalarDBC(uint32 ID)
+    {
+        GtOCTClassCombatRatingScalarDBCMap::const_iterator itr = _gtOCTClassCombatRatingScalarMap.find(ID);
+        if (itr != _gtOCTClassCombatRatingScalarMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtOCTRegenHPDBC const* GetGtOCTRegenHPDBC(uint32 ID)
+    {
+        GtOCTRegenHPDBCMap::const_iterator itr = _gtOCTRegenHPMap.find(ID);
+        if (itr != _gtOCTRegenHPMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtOCTRegenMPDBC const* GetGtOCTRegenMPDBC(uint32 ID)
+    {
+        GtOCTRegenMPDBCMap::const_iterator itr = _gtOCTRegenMPMap.find(ID);
+        if (itr != _gtOCTRegenMPMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtRegenHPPerSptDBC const* GetGtRegenHPPerSptDBC(uint32 ID)
+    {
+        GtRegenHPPerSptDBCMap::const_iterator itr = _gtRegenHPPerSptMap.find(ID);
+        if (itr != _gtRegenHPPerSptMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    GtRegenMPPerSptDBC const* GetGtRegenMPPerSptDBC(uint32 ID)
+    {
+        GtRegenMPPerSptDBCMap::const_iterator itr = _gtRegenMPPerSptMap.find(ID);
+        if (itr != _gtRegenMPPerSptMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -506,6 +614,18 @@ protected:
     void _Load_GemProperties();
     void _Load_GlyphProperties();
     void _Load_GlyphSlot();
+    void _Load_gtBarberShopCostBase();
+    void _Load_gtCombatRatings();
+    void _Load_gtChanceToMeleeCritBase();
+    void _Load_gtChanceToMeleeCrit();
+    void _Load_gtChanceToSpellCritBase();
+    void _Load_gtChanceToSpellCrit();
+    void _Load_gtNPCManaCostScaler();
+    void _Load_gtOCTClassCombatRatingScalar();
+    void _Load_gtOCTRegenHP();
+    void _Load_gtOCTRegenMP();
+    void _Load_gtRegenHPPerSpt();
+    void _Load_gtRegenMPPerSpt();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -550,6 +670,18 @@ private:
     GemPropertiesDBCMap _gemPropertiesMap;
     GlyphPropertiesDBCMap _glyphPropertiesMap;
     GlyphSlotDBCMap _glyphSlotMap;
+    GtBarberShopCostBaseDBCMap _gtBarberShopCostBaseMap;
+    GtCombatRatingsDBCMap _gtCombatRatingsMap;
+    GtChanceToMeleeCritBaseDBCMap _gtChanceToMeleeCritBaseMap;
+    GtChanceToMeleeCritDBCMap _gtChanceToMeleeCritMap;
+    GtChanceToSpellCritBaseDBCMap _gtChanceToSpellCritBaseMap;
+    GtChanceToSpellCritDBCMap _gtChanceToSpellCritMap;
+    GtNPCManaCostScalerDBCMap _gtNPCManaCostScalerMap;
+    GtOCTClassCombatRatingScalarDBCMap _gtOCTClassCombatRatingScalarMap;
+    GtOCTRegenHPDBCMap _gtOCTRegenHPMap;
+    GtOCTRegenMPDBCMap _gtOCTRegenMPMap;
+    GtRegenHPPerSptDBCMap _gtRegenHPPerSptMap;
+    GtRegenMPPerSptDBCMap _gtRegenMPPerSptMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()
