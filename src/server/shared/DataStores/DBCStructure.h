@@ -46,13 +46,6 @@ struct HolidayNamesEntry
 };
 */
 
-struct ItemBagFamilyEntry
-{
-    uint32 ID;                                              // 0
-    //char const* Name[16];                                 // 1-16
-    //uint32 Name_lang_mask;                                // 17
-};
-
 struct ItemDisplayInfoEntry
 {
     uint32 ID;                                              // 0

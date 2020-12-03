@@ -3322,7 +3322,7 @@ void ObjectMgr::LoadItemTemplates()
                 if ((itemTemplate.BagFamily & mask) == 0)
                     continue;
 
-                ItemBagFamilyEntry const* bf = sItemBagFamilyStore.LookupEntry(j+1);
+                ItemBagFamilyDBC const* bf = sDBCStoresMgr->GetItemBagFamilyDBC(j+1);
                 if (!bf)
                 {
                     TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has bag family bit set not listed in ItemBagFamily.dbc, remove bit", entry);

@@ -924,3 +924,11 @@ struct ItemDBC
     uint32 InventoryType;                                    // 6
     uint32 SheatheType;                                      // 7
 };
+
+// load ItemBagFamily.dbc
+struct ItemBagFamilyDBC
+{
+    uint32 ID;                                              // 0
+    //std::string Name[16];                                 // 1-16
+    //uint32 Name_lang_mask;                                // 17
+};

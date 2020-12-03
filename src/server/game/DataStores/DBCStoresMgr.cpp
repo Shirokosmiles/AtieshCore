@@ -82,6 +82,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _gtRegenMPPerSptMap.clear();
     _holidaysMap.clear();
     _itemMap.clear();
+    _itemBagFamilyMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -142,6 +143,7 @@ void DBCStoresMgr::Initialize()
     _Load_gtRegenMPPerSpt();
     _Load_Holidays();
     _Load_Item();
+    _Load_ItemBagFamily();
 }
 
 // load Achievement.dbc
@@ -2213,4 +2215,36 @@ void DBCStoresMgr::_Load_Item()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_item                          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ItemBagFamily.dbc
+void DBCStoresMgr::_Load_ItemBagFamily()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _itemBagFamilyMap.clear();
+    //                                                0
+    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_itembagfamily");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itembagfamily. DB table `dbc_itembagfamily` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ItemBagFamilyDBC ibf;
+        ibf.ID = id;
+
+        _itemBagFamilyMap[id] = ibf;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_itembagfamily                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
