@@ -112,7 +112,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
 //DBCStorage <HolidaysEntry>                sHolidaysStore(Holidaysfmt);
 
-DBCStorage <ItemEntry>                    sItemStore(Itemfmt);
+//DBCStorage <ItemEntry>                    sItemStore(Itemfmt);
 DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore(ItemBagFamilyfmt);
 //DBCStorage <ItemCondExtCostsEntry> sItemCondExtCostsStore(ItemCondExtCostsEntryfmt);
 DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt);
@@ -334,7 +334,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sGtRegenHPPerSptStore,               "gtRegenHPPerSpt.dbc");
     //LOAD_DBC(sGtRegenMPPerSptStore,               "gtRegenMPPerSpt.dbc");
     //LOAD_DBC(sHolidaysStore,                      "Holidays.dbc");
-    LOAD_DBC(sItemStore,                          "Item.dbc");
+    //LOAD_DBC(sItemStore,                          "Item.dbc");
     LOAD_DBC(sItemBagFamilyStore,                 "ItemBagFamily.dbc");
     LOAD_DBC(sItemDisplayInfoStore,               "ItemDisplayInfo.dbc");
     //LOAD_DBC(sItemCondExtCostsStore,              "ItemCondExtCosts.dbc");
@@ -625,8 +625,8 @@ void LoadDBCStores(const std::string& dataPath)
     // Check loaded DBC files proper version
     if (/*!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a
         !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
-        !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.5a*/
-        !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a
+        !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.5a
+        !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a*/
         !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a
         !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a
         !sSpellStore.LookupEntry(80864)            )        // last added spell in 3.3.5a

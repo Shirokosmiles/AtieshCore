@@ -81,6 +81,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _gtRegenHPPerSptMap.clear();
     _gtRegenMPPerSptMap.clear();
     _holidaysMap.clear();
+    _itemMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -140,6 +141,7 @@ void DBCStoresMgr::Initialize()
     _Load_gtRegenHPPerSpt();
     _Load_gtRegenMPPerSpt();
     _Load_Holidays();
+    _Load_Item();
 }
 
 // load Achievement.dbc
@@ -2172,4 +2174,43 @@ void DBCStoresMgr::_Load_Holidays()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_holidays                      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load Item.dbc
+void DBCStoresMgr::_Load_Item()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _itemMap.clear();
+    //                                                0      1          2               3                   4            5              6             7
+    QueryResult result = WorldDatabase.Query("SELECT ID, ClassID, SubclassID, Sound_Override_Subclassid, Material, DisplayInfoID, InventoryType, SheatheType FROM dbc_item");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_item. DB table `dbc_item` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ItemDBC i;
+        i.ID = id;
+        i.ClassID                 = fields[1].GetUInt32();
+        i.SubclassID              = fields[2].GetUInt32();
+        i.SoundOverrideSubclassID = fields[3].GetInt32();
+        i.Material                = fields[4].GetInt32();
+        i.DisplayInfoID           = fields[5].GetUInt32();
+        i.InventoryType           = fields[6].GetUInt32();
+        i.SheatheType             = fields[7].GetUInt32();
+
+        _itemMap[id] = i;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_item                          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

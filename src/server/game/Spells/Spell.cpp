@@ -4720,7 +4720,7 @@ void Spell::UpdateSpellCastDataAmmo(WorldPackets::Spells::SpellAmmo& ammo)
         {
             if (uint32 item_id = m_caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i))
             {
-                if (ItemEntry const* itemEntry = sItemStore.LookupEntry(item_id))
+                if (ItemDBC const* itemEntry = sDBCStoresMgr->GetItemDBC(item_id))
                 {
                     if (itemEntry->ClassID == ITEM_CLASS_WEAPON)
                     {

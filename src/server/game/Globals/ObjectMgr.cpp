@@ -1502,7 +1502,7 @@ void ObjectMgr::LoadEquipmentTemplates()
             if (!equipmentInfo.ItemEntry[i])
                 continue;
 
-            ItemEntry const* dbcItem = sItemStore.LookupEntry(equipmentInfo.ItemEntry[i]);
+            ItemDBC const* dbcItem = sDBCStoresMgr->GetItemDBC(equipmentInfo.ItemEntry[i]);
 
             if (!dbcItem)
             {
@@ -2977,7 +2977,7 @@ void ObjectMgr::LoadItemTemplates()
 
         // Checks
 
-        ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
+        ItemDBC const* dbcitem = sDBCStoresMgr->GetItemDBC(entry);
 
         if (dbcitem)
         {
@@ -10329,7 +10329,7 @@ void ObjectMgr::LoadGameObjectQuestItems()
             continue;
         };
 
-        ItemEntry const* db2Data = sItemStore.LookupEntry(item);
+        ItemDBC const* db2Data = sDBCStoresMgr->GetItemDBC(item);
         if (!db2Data)
         {
             TC_LOG_ERROR("sql.sql", "Table `gameobject_questitem` has nonexistent item (ID: %u) in gameobject (entry: %u, idx: %u), skipped", item, entry, idx);
@@ -10374,7 +10374,7 @@ void ObjectMgr::LoadCreatureQuestItems()
             continue;
         };
 
-        ItemEntry const* db2Data = sItemStore.LookupEntry(item);
+        ItemDBC const* db2Data = sDBCStoresMgr->GetItemDBC(item);
         if (!db2Data)
         {
             TC_LOG_ERROR("sql.sql", "Table `creature_questitem` has nonexistent item (ID: %u) in creature (entry: %u, idx: %u), skipped", item, entry, idx);
@@ -10412,7 +10412,7 @@ void ObjectMgr::LoadItemPresents()
         uint32 itemId = fields[1].GetUInt32();
         uint32 count = fields[2].GetUInt32();
 
-        ItemEntry const* dbcItem = sItemStore.LookupEntry(itemId);
+        ItemDBC const* dbcItem = sDBCStoresMgr->GetItemDBC(itemId);
         if (!dbcItem)
         {
             TC_LOG_ERROR("sql.sql", "Table `item_present_slot` has nonexistent item (ID: %u) in presentSlot (entry: %u), skipped", itemId, presentSlotID);

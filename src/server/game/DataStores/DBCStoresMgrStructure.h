@@ -911,3 +911,16 @@ struct HolidaysDBC
     int32 CalendarFilterType;                               // 53
     //uint32 Flags;                                         // 54 0 = Darkmoon Faire, Fishing Contest and Wotlk Launch, rest is 1
 };
+
+// load Item.dbc
+struct ItemDBC
+{
+    uint32 ID;                                               // 0
+    uint32 ClassID;                                          // 1
+    uint32 SubclassID;                                       // 2
+    int32 SoundOverrideSubclassID;                           // 3
+    int32 Material;                                          // 4
+    uint32 DisplayInfoID;                                    // 5
+    uint32 InventoryType;                                    // 6
+    uint32 SheatheType;                                      // 7
+};

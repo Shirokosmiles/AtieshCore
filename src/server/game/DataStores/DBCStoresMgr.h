@@ -78,6 +78,8 @@ typedef std::unordered_map<uint32 /*ID*/, GtRegenHPPerSptDBC> GtRegenHPPerSptDBC
 typedef std::unordered_map<uint32 /*ID*/, GtRegenMPPerSptDBC> GtRegenMPPerSptDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, HolidaysDBC> HolidaysDBCMap;
 
+typedef std::unordered_map<uint32 /*ID*/, ItemDBC> ItemDBCMap;
+
 class TC_GAME_API DBCStoresMgr
 {
 private:
@@ -580,6 +582,15 @@ public:
         return nullptr;
     }
 
+    ItemDBCMap const& GetItemDBCMap() const { return _itemMap; }
+    ItemDBC const* GetItemDBC(uint32 ID)
+    {
+        ItemDBCMap::const_iterator itr = _itemMap.find(ID);
+        if (itr != _itemMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -636,6 +647,7 @@ protected:
     void _Load_gtRegenHPPerSpt();
     void _Load_gtRegenMPPerSpt();
     void _Load_Holidays();
+    void _Load_Item();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -693,6 +705,7 @@ private:
     GtRegenHPPerSptDBCMap _gtRegenHPPerSptMap;
     GtRegenMPPerSptDBCMap _gtRegenMPPerSptMap;
     HolidaysDBCMap _holidaysMap;
+    ItemDBCMap _itemMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

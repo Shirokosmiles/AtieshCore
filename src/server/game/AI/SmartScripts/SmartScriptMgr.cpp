@@ -617,7 +617,7 @@ bool SmartAIMgr::IsSpellValid(SmartScriptHolder const& e, uint32 entry)
 
 bool SmartAIMgr::IsItemValid(SmartScriptHolder const& e, uint32 entry)
 {
-    if (!sItemStore.LookupEntry(entry))
+    if (!sDBCStoresMgr->GetItemDBC(entry))
     {
         TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Item entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
         return false;
