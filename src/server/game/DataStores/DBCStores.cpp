@@ -115,9 +115,9 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <ItemEntry>                    sItemStore(Itemfmt);
 //DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore(ItemBagFamilyfmt);
 //DBCStorage <ItemCondExtCostsEntry> sItemCondExtCostsStore(ItemCondExtCostsEntryfmt);
-DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt);
-DBCStorage <ItemExtendedCostEntry> sItemExtendedCostStore(ItemExtendedCostEntryfmt);
-DBCStorage <ItemLimitCategoryEntry> sItemLimitCategoryStore(ItemLimitCategoryEntryfmt);
+//DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt);
+//DBCStorage <ItemExtendedCostEntry> sItemExtendedCostStore(ItemExtendedCostEntryfmt);
+//DBCStorage <ItemLimitCategoryEntry> sItemLimitCategoryStore(ItemLimitCategoryEntryfmt);
 DBCStorage <ItemRandomPropertiesEntry> sItemRandomPropertiesStore(ItemRandomPropertiesfmt);
 DBCStorage <ItemRandomSuffixEntry> sItemRandomSuffixStore(ItemRandomSuffixfmt);
 DBCStorage <ItemSetEntry> sItemSetStore(ItemSetEntryfmt);
@@ -336,10 +336,10 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sHolidaysStore,                      "Holidays.dbc");
     //LOAD_DBC(sItemStore,                          "Item.dbc");
     //LOAD_DBC(sItemBagFamilyStore,                 "ItemBagFamily.dbc");
-    LOAD_DBC(sItemDisplayInfoStore,               "ItemDisplayInfo.dbc");
+    //LOAD_DBC(sItemDisplayInfoStore,               "ItemDisplayInfo.dbc");
     //LOAD_DBC(sItemCondExtCostsStore,              "ItemCondExtCosts.dbc");
-    LOAD_DBC(sItemExtendedCostStore,              "ItemExtendedCost.dbc");
-    LOAD_DBC(sItemLimitCategoryStore,             "ItemLimitCategory.dbc");
+    //LOAD_DBC(sItemExtendedCostStore,              "ItemExtendedCost.dbc");
+    //LOAD_DBC(sItemLimitCategoryStore,             "ItemLimitCategory.dbc");
     LOAD_DBC(sItemRandomPropertiesStore,          "ItemRandomProperties.dbc");
     LOAD_DBC(sItemRandomSuffixStore,              "ItemRandomSuffix.dbc");
     LOAD_DBC(sItemSetStore,                       "ItemSet.dbc");
@@ -626,8 +626,8 @@ void LoadDBCStores(const std::string& dataPath)
     if (/*!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a
         !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
         !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.5a
-        !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a*/
-        !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a
+        !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a
+        !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a*/
         !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a
         !sSpellStore.LookupEntry(80864)            )        // last added spell in 3.3.5a
     {

@@ -3363,7 +3363,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.FoodType = 0;
         }
 
-        if (itemTemplate.ItemLimitCategory && !sItemLimitCategoryStore.LookupEntry(itemTemplate.ItemLimitCategory))
+        if (itemTemplate.ItemLimitCategory && !sDBCStoresMgr->GetItemLimitCategoryDBC(itemTemplate.ItemLimitCategory))
         {
             TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has wrong LimitCategory value (%u)", entry, itemTemplate.ItemLimitCategory);
             itemTemplate.ItemLimitCategory = 0;
@@ -9672,7 +9672,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
         return false;
     }
 
-    if (ExtendedCost && !sItemExtendedCostStore.LookupEntry(ExtendedCost))
+    if (ExtendedCost && !sDBCStoresMgr->GetItemExtendedCostDBC(ExtendedCost))
     {
         if (player)
             ChatHandler(player->GetSession()).PSendSysMessage(LANG_EXTENDED_COST_NOT_EXIST, ExtendedCost);

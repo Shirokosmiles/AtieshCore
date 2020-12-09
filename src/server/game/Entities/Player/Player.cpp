@@ -10428,7 +10428,7 @@ InventoryResult Player::CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item
     // check unique-equipped limit
     if (pProto->ItemLimitCategory)
     {
-        ItemLimitCategoryEntry const* limitEntry = sItemLimitCategoryStore.LookupEntry(pProto->ItemLimitCategory);
+        ItemLimitCategoryDBC const* limitEntry = sDBCStoresMgr->GetItemLimitCategoryDBC(pProto->ItemLimitCategory);
         if (!limitEntry)
         {
             if (no_space_count)
@@ -21685,7 +21685,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
 
     if (crItem->ExtendedCost)                            // case for new honor system
     {
-        ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(crItem->ExtendedCost);
+        ItemExtendedCostDBC const* iece = sDBCStoresMgr->GetItemExtendedCostDBC(crItem->ExtendedCost);
         ASSERT(iece);
         if (iece->HonorPoints)
             ModifyHonorPoints(-int32(iece->HonorPoints * count));
@@ -21821,7 +21821,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
 
     if (crItem->ExtendedCost)
     {
-        ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(crItem->ExtendedCost);
+        ItemExtendedCostDBC const* iece = sDBCStoresMgr->GetItemExtendedCostDBC(crItem->ExtendedCost);
         if (!iece)
         {
             TC_LOG_ERROR("entities.player", "Player::BuyItemFromVendorSlot: Item %u has wrong ExtendedCost field value %u", pProto->ItemId, crItem->ExtendedCost);
@@ -25217,7 +25217,7 @@ InventoryResult Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 
     // check unique-equipped limit
     if (itemProto->ItemLimitCategory)
     {
-        ItemLimitCategoryEntry const* limitEntry = sItemLimitCategoryStore.LookupEntry(itemProto->ItemLimitCategory);
+        ItemLimitCategoryDBC const* limitEntry = sDBCStoresMgr->GetItemLimitCategoryDBC(itemProto->ItemLimitCategory);
         if (!limitEntry)
             return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
 
@@ -26388,7 +26388,7 @@ void Player::SendRefundInfo(Item* item)
         return;
     }
 
-    ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(item->GetPaidExtendedCost());
+    ItemExtendedCostDBC const* iece = sDBCStoresMgr->GetItemExtendedCostDBC(item->GetPaidExtendedCost());
     if (!iece)
     {
         TC_LOG_DEBUG("entities.player.items", "Item refund: cannot find extendedcost data.");
@@ -26466,7 +26466,7 @@ void Player::RefundItem(Item* item)
         return;
     }
 
-    ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(item->GetPaidExtendedCost());
+    ItemExtendedCostDBC const* iece = sDBCStoresMgr->GetItemExtendedCostDBC(item->GetPaidExtendedCost());
     if (!iece)
     {
         TC_LOG_DEBUG("entities.player.items", "Item refund: cannot find extendedcost data.");

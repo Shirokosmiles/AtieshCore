@@ -23,6 +23,7 @@
 #include "DatabaseEnv.h"
 #include "DBCStructure.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Define.h"
 #include "Field.h"
 #include "GameEventMgr.h"
@@ -154,10 +155,10 @@ std::string Transmogrification::GetItemIcon(uint32 entry, uint32 width, uint32 h
     std::ostringstream ss;
     ss << "|TInterface";
     const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
-    const ItemDisplayInfoEntry* dispInfo = NULL;
+    const ItemDisplayInfoDBC* dispInfo = NULL;
     if (temp)
     {
-        dispInfo = sItemDisplayInfoStore.LookupEntry(temp->DisplayInfoID);
+        dispInfo = sDBCStoresMgr->GetItemDisplayInfoDBC(temp->DisplayInfoID);
         if (dispInfo)
             ss << "/ICONS/" << dispInfo->InventoryIcon;
     }

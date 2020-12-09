@@ -46,22 +46,6 @@ struct HolidayNamesEntry
 };
 */
 
-struct ItemDisplayInfoEntry
-{
-    uint32 ID;                                              // 0
-    char const* ModelName[2];                               // 1-2
-    char const* ModelTexture[2];                            // 3-4
-    char const* InventoryIcon[2];                           // 5-6
-    uint32 GeosetGroup[3];                                  // 7-9
-    uint32 Flags;                                           // 10
-    uint32 SpellVisualID;                                   // 11
-    uint32 GroupSoundIndex;                                 // 12
-    uint32 HelmetGeosetVisID[2];                            // 13-14
-    char const* Texture[8];                                 // 15-22
-    int32 ItemVisual;                                       // 23
-    uint32 ParticleColorID;                                 // 24
-};
-
 /*
 struct ItemCondExtCostsEntry
 {
@@ -71,29 +55,6 @@ struct ItemCondExtCostsEntry
     uint32 ArenaSeason;                                     // 3 arena season number (1-4)
 };
 */
-
-#define MAX_ITEM_EXTENDED_COST_REQUIREMENTS 5
-
-struct ItemExtendedCostEntry
-{
-    uint32 ID;                                              // 0
-    uint32 HonorPoints;                                     // 1 required honor points
-    uint32 ArenaPoints;                                     // 2 required arena points
-    uint32 ArenaBracket;                                    // 3 arena slot restrictions (min slot value)
-    uint32 ItemID[MAX_ITEM_EXTENDED_COST_REQUIREMENTS];     // 4-8 required item id
-    uint32 ItemCount[MAX_ITEM_EXTENDED_COST_REQUIREMENTS];  // 9-13 required count of item
-    uint32 RequiredArenaRating;                             // 14 required personal arena rating
-    //uint32 ItemPurchaseGroup;                             // 15
-};
-
-struct ItemLimitCategoryEntry
-{
-    uint32 ID;                                              // 0
-    //char const* Name[16]                                  // 1-16
-    //uint32 Name_lang_mask;                                // 17
-    uint32 Quantity;                                        // 18 max allowed equipped as item or in gem slot
-    uint32 Flags;                                           // 19 enum ItemLimitCategoryMode
-};
 
 #define MAX_ITEM_ENCHANTMENT_EFFECTS 3
 

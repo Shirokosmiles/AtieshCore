@@ -83,6 +83,9 @@ DBCStoresMgr::~DBCStoresMgr()
     _holidaysMap.clear();
     _itemMap.clear();
     _itemBagFamilyMap.clear();
+    _itemDisplayInfoMap.clear();
+    _itemExtendedCostMap.clear();
+    _itemLimitCategoryMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -144,6 +147,9 @@ void DBCStoresMgr::Initialize()
     _Load_Holidays();
     _Load_Item();
     _Load_ItemBagFamily();
+    _Load_ItemDisplayInfo();
+    _Load_ItemExtendedCost();
+    _Load_ItemLimitCategory();
 }
 
 // load Achievement.dbc
@@ -2247,4 +2253,130 @@ void DBCStoresMgr::_Load_ItemBagFamily()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_itembagfamily                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ItemDisplayInfo.dbc
+void DBCStoresMgr::_Load_ItemDisplayInfo()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _itemDisplayInfoMap.clear();
+    //                                                0       1            2              3               4                5               6               7              8             9           10      11                  12              13                  14             15         16        17         18          19         20        21          22         23           24
+    QueryResult result = WorldDatabase.Query("SELECT ID, ModelName_1, ModelName_2, ModelTexture_1, ModelTexture_2, InventoryIcon_1, InventoryIcon_2, GeosetGroup_1, GeosetGroup_2, GeosetGroup_3, Flags, SpellVisualID, GroupSoundIndex, HelmetGeosetVis_1, HelmetGeosetVis_2, Texture_1, Texture_2, Texture_3, Texture_4, Texture_5, Texture_6, Texture_7, Texture_8, ItemVisual, ParticleColorID FROM dbc_itemdisplayinfo");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemdisplayinfo. DB table `dbc_itemdisplayinfo` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ItemDisplayInfoDBC idi;
+        idi.ID = id;
+        for (uint8 i = 0; i < 2; i++)
+            idi.ModelName[i] = fields[1 + i].GetString();
+        for (uint8 i = 0; i < 2; i++)
+            idi.ModelTexture[i] = fields[3 + i].GetString();
+        for (uint8 i = 0; i < 2; i++)
+            idi.InventoryIcon[i] = fields[5 + i].GetString();
+        for (uint8 i = 0; i < 3; i++)
+            idi.GeosetGroup[i] = fields[7 + i].GetUInt32();
+
+        idi.Flags           = fields[10].GetUInt32();
+        idi.SpellVisualID   = fields[11].GetUInt32();
+        idi.GroupSoundIndex = fields[12].GetUInt32();
+
+        for (uint8 i = 0; i < 2; i++)
+            idi.HelmetGeosetVisID[i] = fields[13+i].GetUInt32();
+        for (uint8 i = 0; i < 8; i++)
+            idi.Texture[i] = fields[15 + i].GetString();
+
+        idi.ItemVisual      = fields[23].GetInt32();
+        idi.ParticleColorID = fields[24].GetUInt32();
+
+        _itemDisplayInfoMap[id] = idi;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemdisplayinfo               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ItemExtendedCost.dbc
+void DBCStoresMgr::_Load_ItemExtendedCost()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _itemExtendedCostMap.clear();
+    //                                                0       1            2              3          4        5         6         7         8           9           10           11            12          13                14
+    QueryResult result = WorldDatabase.Query("SELECT ID, HonorPoints, ArenaPoints, ArenaBracket, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemCount_1, ItemCount_2, ItemCount_3, ItemCount_4, ItemCount_5, RequiredArenaRating FROM dbc_itemextendedcost");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemextendedcost. DB table `dbc_itemextendedcost` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ItemExtendedCostDBC iec;
+        iec.ID = id;
+        iec.HonorPoints = fields[1].GetUInt32();
+        iec.ArenaPoints = fields[2].GetUInt32();
+        iec.ArenaBracket = fields[3].GetUInt32();
+        for (uint8 i = 0; i < MAX_ITEM_EXTENDED_COST_REQUIREMENTS; i++)
+            iec.ItemID[i] = fields[4 + i].GetUInt32();
+        for (uint8 i = 0; i < MAX_ITEM_EXTENDED_COST_REQUIREMENTS; i++)
+            iec.ItemCount[i] = fields[10 + i].GetUInt32();
+        iec.RequiredArenaRating = fields[14].GetUInt32();
+
+        _itemExtendedCostMap[id] = iec;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemextendedcost              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ItemLimitCategory.dbc
+void DBCStoresMgr::_Load_ItemLimitCategory()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _itemLimitCategoryMap.clear();
+    //                                                0     1        2
+    QueryResult result = WorldDatabase.Query("SELECT ID, Quantity, Flags FROM dbc_itemlimitcategory");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemlimitcategory. DB table `dbc_itemlimitcategory` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ItemLimitCategoryDBC ilc;
+        ilc.ID = id;
+        ilc.Quantity = fields[1].GetUInt32();
+        ilc.Flags    = fields[2].GetUInt32();
+
+        _itemLimitCategoryMap[id] = ilc;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemlimitcategory             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

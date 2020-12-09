@@ -80,6 +80,9 @@ typedef std::unordered_map<uint32 /*ID*/, HolidaysDBC> HolidaysDBCMap;
 
 typedef std::unordered_map<uint32 /*ID*/, ItemDBC> ItemDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, ItemBagFamilyDBC> ItemBagFamilyDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ItemDisplayInfoDBC> ItemDisplayInfoDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ItemExtendedCostDBC> ItemExtendedCostDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ItemLimitCategoryDBC> ItemLimitCategoryDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -600,6 +603,30 @@ public:
         return nullptr;
     }
 
+    ItemDisplayInfoDBC const* GetItemDisplayInfoDBC(uint32 ID)
+    {
+        ItemDisplayInfoDBCMap::const_iterator itr = _itemDisplayInfoMap.find(ID);
+        if (itr != _itemDisplayInfoMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    ItemExtendedCostDBC const* GetItemExtendedCostDBC(uint32 ID)
+    {
+        ItemExtendedCostDBCMap::const_iterator itr = _itemExtendedCostMap.find(ID);
+        if (itr != _itemExtendedCostMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    ItemLimitCategoryDBC const* GetItemLimitCategoryDBC(uint32 ID)
+    {
+        ItemLimitCategoryDBCMap::const_iterator itr = _itemLimitCategoryMap.find(ID);
+        if (itr != _itemLimitCategoryMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -658,6 +685,9 @@ protected:
     void _Load_Holidays();
     void _Load_Item();
     void _Load_ItemBagFamily();
+    void _Load_ItemDisplayInfo();
+    void _Load_ItemExtendedCost();
+    void _Load_ItemLimitCategory();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -717,6 +747,9 @@ private:
     HolidaysDBCMap _holidaysMap;
     ItemDBCMap _itemMap;
     ItemBagFamilyDBCMap _itemBagFamilyMap;
+    ItemDisplayInfoDBCMap _itemDisplayInfoMap;
+    ItemExtendedCostDBCMap _itemExtendedCostMap;
+    ItemLimitCategoryDBCMap _itemLimitCategoryMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

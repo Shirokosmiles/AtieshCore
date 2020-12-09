@@ -1125,7 +1125,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
         int32 limit_newcount = 0;
         if (iGemProto->ItemLimitCategory)
         {
-            if (ItemLimitCategoryEntry const* limitEntry = sItemLimitCategoryStore.LookupEntry(iGemProto->ItemLimitCategory))
+            if (ItemLimitCategoryDBC const* limitEntry = sDBCStoresMgr->GetItemLimitCategoryDBC(iGemProto->ItemLimitCategory))
             {
                 // NOTE: limitEntry->Flags is not checked because if item has limit then it is applied in equip case
                 for (int j = 0; j < MAX_GEM_SOCKETS; ++j)
