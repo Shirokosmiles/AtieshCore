@@ -133,8 +133,8 @@ TC_GAME_API ResponseCodes ValidateName(std::wstring const& name, LocaleConstant 
 //TC_GAME_API extern DBCStorage <ItemDisplayInfoEntry>         sItemDisplayInfoStore;
 //TC_GAME_API extern DBCStorage <ItemExtendedCostEntry>        sItemExtendedCostStore;
 //TC_GAME_API extern DBCStorage <ItemLimitCategoryEntry>       sItemLimitCategoryStore;
-TC_GAME_API extern DBCStorage <ItemRandomPropertiesEntry>    sItemRandomPropertiesStore;
-TC_GAME_API extern DBCStorage <ItemRandomSuffixEntry>        sItemRandomSuffixStore;
+//TC_GAME_API extern DBCStorage <ItemRandomPropertiesEntry>    sItemRandomPropertiesStore;
+//TC_GAME_API extern DBCStorage <ItemRandomSuffixEntry>        sItemRandomSuffixStore;
 TC_GAME_API extern DBCStorage <ItemSetEntry>                 sItemSetStore;
 TC_GAME_API extern DBCStorage <LFGDungeonEntry>              sLFGDungeonStore;
 TC_GAME_API extern DBCStorage <LightEntry>                   sLightStore;

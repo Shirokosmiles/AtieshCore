@@ -13938,7 +13938,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             // Random Property Exist - try found basepoints for spell (basepoints depends from item suffix factor)
                             if (item->GetItemRandomPropertyId())
                             {
-                                ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(abs(item->GetItemRandomPropertyId()));
+                                ItemRandomSuffixDBC const* item_rand = sDBCStoresMgr->GetItemRandomSuffixDBC(abs(item->GetItemRandomPropertyId()));
                                 if (item_rand)
                                 {
                                     // Search enchant_amount
@@ -13968,7 +13968,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                 case ITEM_ENCHANTMENT_TYPE_RESISTANCE:
                     if (!enchant_amount)
                     {
-                        ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(abs(item->GetItemRandomPropertyId()));
+                        ItemRandomSuffixDBC const* item_rand = sDBCStoresMgr->GetItemRandomSuffixDBC(abs(item->GetItemRandomPropertyId()));
                         if (item_rand)
                         {
                             for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
@@ -13988,7 +13988,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                 {
                     if (!enchant_amount)
                     {
-                        ItemRandomSuffixEntry const* item_rand_suffix = sItemRandomSuffixStore.LookupEntry(abs(item->GetItemRandomPropertyId()));
+                        ItemRandomSuffixDBC const* item_rand_suffix = sDBCStoresMgr->GetItemRandomSuffixDBC(abs(item->GetItemRandomPropertyId()));
                         if (item_rand_suffix)
                         {
                             for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)

@@ -132,14 +132,15 @@ struct LinkValidator<LinkTags::item>
     {
         ItemLocale const* locale = sObjectMgr->GetItemLocale(data.Item->ItemId);
 
-        std::array<char const*, 16> const* randomSuffixes = nullptr;
+        /*
         if (data.RandomProperty)
-            randomSuffixes = &data.RandomProperty->Name;
+            randomSuffixes = data.RandomProperty->Name[locale];
         else if (data.RandomSuffix)
-            randomSuffixes = &data.RandomSuffix->Name;
+            randomSuffixes = data.RandomSuffix->Name[locale];
 
-        if (data.IsBuggedInspectLink) /* DBC lookup will have failed on the client, so the link should've arrived without suffix */
+        if (data.IsBuggedInspectLink) // DBC lookup will have failed on the client, so the link should've arrived without suffix 
             randomSuffixes = nullptr;
+        */
 
         for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
         {
@@ -148,9 +149,16 @@ struct LinkValidator<LinkTags::item>
             std::string_view name = (i == DEFAULT_LOCALE) ? data.Item->Name1 : ObjectMgr::GetLocaleString(locale->Name, i);
             if (name.empty())
                 continue;
-            if (randomSuffixes)
+
+            std::string randomSuffixes = nullptr;
+            if (data.RandomProperty)
+                randomSuffixes = data.RandomProperty->Name[i];
+            else if (data.RandomSuffix)
+                randomSuffixes = data.RandomSuffix->Name[i];
+
+            if (!randomSuffixes.empty())
             {
-                std::string_view randomSuffix((*randomSuffixes)[i]);
+                std::string_view randomSuffix(randomSuffixes);
                 if (
                   (!randomSuffix.empty()) &&
                   (text.length() == (name.length() + 1 + randomSuffix.length())) &&

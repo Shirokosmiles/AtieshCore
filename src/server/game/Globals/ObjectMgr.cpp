@@ -3288,14 +3288,14 @@ void ObjectMgr::LoadItemTemplates()
             if (itemTemplate.RandomProperty == -1)
                 itemTemplate.RandomProperty = 0;
 
-            else if (!sItemRandomPropertiesStore.LookupEntry(GetItemEnchantMod(itemTemplate.RandomProperty)))
+            else if (!sDBCStoresMgr->GetItemRandomPropertiesDBC(GetItemEnchantMod(itemTemplate.RandomProperty)))
             {
                 TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has unknown (wrong or not listed in `item_enchantment_template`) RandomProperty (%u)", entry, itemTemplate.RandomProperty);
                 itemTemplate.RandomProperty = 0;
             }
         }
 
-        if (itemTemplate.RandomSuffix && !sItemRandomSuffixStore.LookupEntry(GetItemEnchantMod(itemTemplate.RandomSuffix)))
+        if (itemTemplate.RandomSuffix && !sDBCStoresMgr->GetItemRandomSuffixDBC(GetItemEnchantMod(itemTemplate.RandomSuffix)))
         {
             TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has wrong RandomSuffix (%u)", entry, itemTemplate.RandomSuffix);
             itemTemplate.RandomSuffix = 0;

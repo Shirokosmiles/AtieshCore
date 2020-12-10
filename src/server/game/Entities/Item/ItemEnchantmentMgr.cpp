@@ -21,6 +21,7 @@
 #include "ObjectMgr.h"
 #include "Util.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Random.h"
 #include "Timer.h"
 
@@ -141,7 +142,7 @@ int32 GenerateItemRandomPropertyId(uint32 item_id)
     if (itemProto->RandomProperty)
     {
         uint32 randomPropId = GetItemEnchantMod(itemProto->RandomProperty);
-        ItemRandomPropertiesEntry const* random_id = sItemRandomPropertiesStore.LookupEntry(randomPropId);
+        ItemRandomPropertiesDBC const* random_id = sDBCStoresMgr->GetItemRandomPropertiesDBC(randomPropId);
         if (!random_id)
         {
             TC_LOG_ERROR("sql.sql", "Enchantment id #%u used but it doesn't have records in 'ItemRandomProperties.dbc'", randomPropId);
@@ -154,7 +155,7 @@ int32 GenerateItemRandomPropertyId(uint32 item_id)
     else
     {
         uint32 randomPropId = GetItemEnchantMod(itemProto->RandomSuffix);
-        ItemRandomSuffixEntry const* random_id = sItemRandomSuffixStore.LookupEntry(randomPropId);
+        ItemRandomSuffixDBC const* random_id = sDBCStoresMgr->GetItemRandomSuffixDBC(randomPropId);
         if (!random_id)
         {
             TC_LOG_ERROR("sql.sql", "Enchantment id #%u used but it doesn't have records in sItemRandomSuffixStore.", randomPropId);

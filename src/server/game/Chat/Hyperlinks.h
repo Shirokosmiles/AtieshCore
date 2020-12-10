@@ -29,8 +29,8 @@
 
 struct GlyphPropertiesDBC;
 struct GlyphSlotDBC;
-struct ItemRandomPropertiesEntry;
-struct ItemRandomSuffixEntry;
+struct ItemRandomPropertiesDBC;
+struct ItemRandomSuffixDBC;
 struct ItemTemplate;
 class SpellInfo;
 class Quest;
@@ -61,8 +61,8 @@ namespace Trinity::Hyperlinks
         ItemTemplate const* Item;
         uint32 EnchantId;
         std::array<uint32, 3> GemEnchantId;
-        ItemRandomPropertiesEntry const* RandomProperty;
-        ItemRandomSuffixEntry const* RandomSuffix;
+        ItemRandomPropertiesDBC const* RandomProperty;
+        ItemRandomSuffixDBC const* RandomSuffix;
         uint32 RandomSuffixBaseAmount; /* ITEM_FIELD_PROPERTY_SEED - only nonzero for RandomSuffix items, AllocationPct from DBC are multiplied with this, then floored, to get stat value */
         uint8 RenderLevel;
         bool IsBuggedInspectLink;

@@ -137,9 +137,10 @@ bool Trinity::Hyperlinks::LinkTags::item::StoreTo(ItemLinkData& val, std::string
     {
         if (!val.Item->RandomSuffix)
             return false;
-        if (randomPropertyId < -static_cast<int32>(sItemRandomSuffixStore.GetNumRows()))
+        if (randomPropertyId < -static_cast<int32>(sDBCStoresMgr->GetItemRandomSuffixMap().size()))
             return false;
-        if (ItemRandomSuffixEntry const* suffixEntry = sItemRandomSuffixStore.LookupEntry(-randomPropertyId))
+
+        if (ItemRandomSuffixDBC const* suffixEntry = sDBCStoresMgr->GetItemRandomSuffixDBC(-randomPropertyId))
         {
             val.RandomSuffix = suffixEntry;
             val.RandomProperty = nullptr;
@@ -151,7 +152,7 @@ bool Trinity::Hyperlinks::LinkTags::item::StoreTo(ItemLinkData& val, std::string
     {
         if (!val.Item->RandomProperty)
             return false;
-        if (ItemRandomPropertiesEntry const* propEntry = sItemRandomPropertiesStore.LookupEntry(randomPropertyId))
+        if (ItemRandomPropertiesDBC const* propEntry = sDBCStoresMgr->GetItemRandomPropertiesDBC(randomPropertyId))
         {
             val.RandomSuffix = nullptr;
             val.RandomProperty = propEntry;

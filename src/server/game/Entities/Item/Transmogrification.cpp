@@ -208,31 +208,39 @@ std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) c
 
     if (int32 itemRandPropId = item->GetItemRandomPropertyId())
     {
-        std::array<char const*, 16> const* suffix = nullptr;
+        std::string suffix;
         if (itemRandPropId < 0)
         {
-            ItemRandomSuffixEntry const* itemRandEntry = sItemRandomSuffixStore.LookupEntry(-item->GetItemRandomPropertyId());
+            ItemRandomSuffixDBC const* itemRandEntry = sDBCStoresMgr->GetItemRandomSuffixDBC(-item->GetItemRandomPropertyId());
             if (itemRandEntry)
-                suffix = &itemRandEntry->Name;
+                suffix = itemRandEntry->Name[loc_idx];
         }
         else
         {
-            ItemRandomPropertiesEntry const* itemRandEntry = sItemRandomPropertiesStore.LookupEntry(item->GetItemRandomPropertyId());
+            ItemRandomPropertiesDBC const* itemRandEntry = sDBCStoresMgr->GetItemRandomPropertiesDBC(item->GetItemRandomPropertyId());
             if (itemRandEntry)
-                suffix = &itemRandEntry->Name;
+                suffix = itemRandEntry->Name[loc_idx];
         }
-        if (suffix)
+
+        if (suffix.empty())
         {
-            // dbc local name
-            if (suffix)
+            // Append the suffix (ie: of the Monkey) to the name using default enUS if localization is invalid
+            if (itemRandPropId < 0)
             {
-                // Append the suffix (ie: of the Monkey) to the name using localization
-                // or default enUS if localization is invalid
-                name += ' ';
-                int locdbc_idx = session->GetSessionDbcLocale();
-                name += (*suffix)[locdbc_idx >= 0 ? locdbc_idx : LOCALE_enUS];
+                ItemRandomSuffixDBC const* itemRandEntry = sDBCStoresMgr->GetItemRandomSuffixDBC(-item->GetItemRandomPropertyId());
+                if (itemRandEntry)
+                    suffix = itemRandEntry->Name[LOCALE_enUS];
+            }
+            else
+            {
+                ItemRandomPropertiesDBC const* itemRandEntry = sDBCStoresMgr->GetItemRandomPropertiesDBC(item->GetItemRandomPropertyId());
+                if (itemRandEntry)
+                    suffix = itemRandEntry->Name[LOCALE_enUS];
             }
         }
+
+        if (!suffix.empty())
+            name += ' ' + suffix;
     }
 
     std::ostringstream oss;

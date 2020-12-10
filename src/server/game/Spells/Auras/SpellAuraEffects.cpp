@@ -435,7 +435,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 {
                     if (castItem->GetItemSuffixFactor())
                     {
-                        if (ItemRandomSuffixEntry const* item_rand_suffix = sItemRandomSuffixStore.LookupEntry(std::abs(castItem->GetItemRandomPropertyId())))
+                        if (ItemRandomSuffixDBC const* item_rand_suffix = sDBCStoresMgr->GetItemRandomSuffixDBC(std::abs(castItem->GetItemRandomPropertyId())))
                         {
                             for (uint8 k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
                             {

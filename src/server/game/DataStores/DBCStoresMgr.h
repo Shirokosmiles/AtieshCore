@@ -83,6 +83,8 @@ typedef std::unordered_map<uint32 /*ID*/, ItemBagFamilyDBC> ItemBagFamilyDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, ItemDisplayInfoDBC> ItemDisplayInfoDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, ItemExtendedCostDBC> ItemExtendedCostDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, ItemLimitCategoryDBC> ItemLimitCategoryDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ItemRandomPropertiesDBC> ItemRandomPropertiesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ItemRandomSuffixDBC> ItemRandomSuffixDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -627,6 +629,23 @@ public:
         return nullptr;
     }
 
+    ItemRandomPropertiesDBC const* GetItemRandomPropertiesDBC(uint32 ID)
+    {
+        ItemRandomPropertiesDBCMap::const_iterator itr = _itemRandomPropertiesMap.find(ID);
+        if (itr != _itemRandomPropertiesMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    ItemRandomSuffixDBCMap const& GetItemRandomSuffixMap() const { return _itemRandomSuffixMap; }
+    ItemRandomSuffixDBC const* GetItemRandomSuffixDBC(uint32 ID)
+    {
+        ItemRandomSuffixDBCMap::const_iterator itr = _itemRandomSuffixMap.find(ID);
+        if (itr != _itemRandomSuffixMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -688,6 +707,8 @@ protected:
     void _Load_ItemDisplayInfo();
     void _Load_ItemExtendedCost();
     void _Load_ItemLimitCategory();
+    void _Load_ItemRandomProperties();
+    void _Load_ItemRandomSuffix();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -750,6 +771,8 @@ private:
     ItemDisplayInfoDBCMap _itemDisplayInfoMap;
     ItemExtendedCostDBCMap _itemExtendedCostMap;
     ItemLimitCategoryDBCMap _itemLimitCategoryMap;
+    ItemRandomPropertiesDBCMap _itemRandomPropertiesMap;
+    ItemRandomSuffixDBCMap _itemRandomSuffixMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

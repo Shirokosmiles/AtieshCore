@@ -86,6 +86,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _itemDisplayInfoMap.clear();
     _itemExtendedCostMap.clear();
     _itemLimitCategoryMap.clear();
+    _itemRandomPropertiesMap.clear();
+    _itemRandomSuffixMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -150,6 +152,8 @@ void DBCStoresMgr::Initialize()
     _Load_ItemDisplayInfo();
     _Load_ItemExtendedCost();
     _Load_ItemLimitCategory();
+    _Load_ItemRandomProperties();
+    _Load_ItemRandomSuffix();
 }
 
 // load Achievement.dbc
@@ -2379,4 +2383,81 @@ void DBCStoresMgr::_Load_ItemLimitCategory()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_itemlimitcategory             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ItemRandomProperties.dbc
+void DBCStoresMgr::_Load_ItemRandomProperties()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _itemRandomPropertiesMap.clear();
+    //                                                0       1              2              3                4              5               6               7               8               9               10              11              12
+    QueryResult result = WorldDatabase.Query("SELECT ID, Enchantment_1, Enchantment_2, Enchantment_3, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_itemrandomproperties");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemrandomproperties. DB table `dbc_itemrandomproperties` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ItemRandomPropertiesDBC irp;
+        irp.ID = id;
+        for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; i++)
+            irp.Enchantment[i] = fields[1 + i].GetUInt32();
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            irp.Name[i] = fields[4 + i].GetString();
+
+        _itemRandomPropertiesMap[id] = irp;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemrandomproperties          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ItemRandomSuffix.dbc
+void DBCStoresMgr::_Load_ItemRandomSuffix()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _itemRandomSuffixMap.clear();
+    //                                                0          1              2              3                4              5               6               7               8               9                10           11             12              13              14                15
+    QueryResult result = WorldDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Enchantment_1, Enchantment_2, Enchantment_3, AllocationPct_1, AllocationPct_2, AllocationPct_3 FROM dbc_itemrandomsuffix");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemrandomsuffix. DB table `dbc_itemrandomsuffix` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ItemRandomSuffixDBC irs;
+        irs.ID = id;
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            irs.Name[i] = fields[1 + i].GetString();
+
+        for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; i++)
+            irs.Enchantment[i] = fields[10 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; i++)
+            irs.AllocationPct[i] = fields[13 + i].GetUInt32();
+
+        _itemRandomSuffixMap[id] = irs;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemrandomsuffix              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

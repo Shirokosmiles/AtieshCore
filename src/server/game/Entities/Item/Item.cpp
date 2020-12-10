@@ -596,7 +596,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
 
     if (randomPropId > 0)
     {
-        ItemRandomPropertiesEntry const* item_rand = sItemRandomPropertiesStore.LookupEntry(randomPropId);
+        ItemRandomPropertiesDBC const* item_rand = sDBCStoresMgr->GetItemRandomPropertiesDBC(randomPropId);
         if (item_rand)
         {
             if (GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) != int32(item_rand->ID))
@@ -610,7 +610,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
     }
     else
     {
-        ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(-randomPropId);
+        ItemRandomSuffixDBC const* item_rand = sDBCStoresMgr->GetItemRandomSuffixDBC(-randomPropId);
         if (item_rand)
         {
             if (GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) != -int32(item_rand->ID) ||

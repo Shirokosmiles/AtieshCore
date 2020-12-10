@@ -797,29 +797,40 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 // These are found in ItemRandomSuffix.dbc and ItemRandomProperties.dbc
                 //  even though the DBC names seem misleading
 
-                std::array<char const*, 16> const* suffix = nullptr;
+                std::string suffix;
 
                 if (propRefID < 0)
                 {
-                    ItemRandomSuffixEntry const* itemRandSuffix = sItemRandomSuffixStore.LookupEntry(-propRefID);
+                    ItemRandomSuffixDBC const* itemRandSuffix = sDBCStoresMgr->GetItemRandomSuffixDBC(-propRefID);
                     if (itemRandSuffix)
-                        suffix = &itemRandSuffix->Name;
+                        suffix = itemRandSuffix->Name[locdbc_idx];
                 }
                 else
                 {
-                    ItemRandomPropertiesEntry const* itemRandProp = sItemRandomPropertiesStore.LookupEntry(propRefID);
+                    ItemRandomPropertiesDBC const* itemRandProp = sDBCStoresMgr->GetItemRandomPropertiesDBC(propRefID);
                     if (itemRandProp)
-                        suffix = &itemRandProp->Name;
+                        suffix = itemRandProp->Name[locdbc_idx];
                 }
 
-                // dbc local name
-                if (suffix)
+                if (suffix.empty())
                 {
-                    // Append the suffix (ie: of the Monkey) to the name using localization
-                    // or default enUS if localization is invalid
-                    name += ' ';
-                    name += (*suffix)[locdbc_idx >= 0 ? locdbc_idx : LOCALE_enUS];
+                    // Append the suffix (ie: of the Monkey) to the name using default enUS if localization is invalid
+                    if (propRefID < 0)
+                    {
+                        ItemRandomSuffixDBC const* itemRandSuffix = sDBCStoresMgr->GetItemRandomSuffixDBC(-propRefID);
+                        if (itemRandSuffix)
+                            suffix = itemRandSuffix->Name[LOCALE_enUS];
+                    }
+                    else
+                    {
+                        ItemRandomPropertiesDBC const* itemRandProp = sDBCStoresMgr->GetItemRandomPropertiesDBC(propRefID);
+                        if (itemRandProp)
+                            suffix = itemRandProp->Name[LOCALE_enUS];
+                    }
                 }
+
+                if (!suffix.empty())
+                    name += ' ' + suffix;
             }
 
             // Perform the search (with or without suffix)
