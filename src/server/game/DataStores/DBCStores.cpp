@@ -120,7 +120,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <ItemLimitCategoryEntry> sItemLimitCategoryStore(ItemLimitCategoryEntryfmt);
 //DBCStorage <ItemRandomPropertiesEntry> sItemRandomPropertiesStore(ItemRandomPropertiesfmt);
 //DBCStorage <ItemRandomSuffixEntry> sItemRandomSuffixStore(ItemRandomSuffixfmt);
-DBCStorage <ItemSetEntry> sItemSetStore(ItemSetEntryfmt);
+//DBCStorage <ItemSetEntry> sItemSetStore(ItemSetEntryfmt);
 
 DBCStorage <LFGDungeonEntry> sLFGDungeonStore(LFGDungeonEntryfmt);
 DBCStorage <LightEntry> sLightStore(LightEntryfmt);
@@ -342,7 +342,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sItemLimitCategoryStore,             "ItemLimitCategory.dbc");
     //LOAD_DBC(sItemRandomPropertiesStore,          "ItemRandomProperties.dbc");
     //LOAD_DBC(sItemRandomSuffixStore,              "ItemRandomSuffix.dbc");
-    LOAD_DBC(sItemSetStore,                       "ItemSet.dbc");
+    //LOAD_DBC(sItemSetStore,                       "ItemSet.dbc");
     LOAD_DBC(sLFGDungeonStore,                    "LFGDungeons.dbc");
     LOAD_DBC(sLightStore,                         "Light.dbc");
     LOAD_DBC(sLiquidTypeStore,                    "LiquidType.dbc");

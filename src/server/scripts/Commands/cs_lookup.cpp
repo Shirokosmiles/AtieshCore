@@ -523,10 +523,10 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in ItemSet.dbc
-        for (uint32 id = 0; id < sItemSetStore.GetNumRows(); id++)
+        ItemSetDBCMap const& itemSetMap = sDBCStoresMgr->GetItemSetMap();
+        for (ItemSetDBCMap::const_iterator itr = itemSetMap.begin(); itr != itemSetMap.end(); ++itr)
         {
-            ItemSetEntry const* set = sItemSetStore.LookupEntry(id);
-            if (set)
+            if (ItemSetDBC const* set = &itr->second)
             {
                 uint8 locale = handler->GetSessionDbcLocale();
                 std::string name = set->Name[locale];
@@ -560,15 +560,16 @@ public:
 
                     // send item set in "id - [namedlink locale]" format
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CHAT, id, id, name.c_str(), localeNames[locale]);
+                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CHAT, set->ID, set->ID, name.c_str(), localeNames[locale]);
                     else
-                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CONSOLE, id, name.c_str(), localeNames[locale]);
+                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CONSOLE, set->ID, name.c_str(), localeNames[locale]);
 
                     if (!found)
                         found = true;
                 }
             }
         }
+
         if (!found)
             handler->SendSysMessage(LANG_COMMAND_NOITEMSETFOUND);
 

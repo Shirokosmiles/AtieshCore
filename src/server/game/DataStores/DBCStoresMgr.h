@@ -85,6 +85,7 @@ typedef std::unordered_map<uint32 /*ID*/, ItemExtendedCostDBC> ItemExtendedCostD
 typedef std::unordered_map<uint32 /*ID*/, ItemLimitCategoryDBC> ItemLimitCategoryDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, ItemRandomPropertiesDBC> ItemRandomPropertiesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, ItemRandomSuffixDBC> ItemRandomSuffixDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ItemSetDBC> ItemSetDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -646,6 +647,15 @@ public:
         return nullptr;
     }
 
+    ItemSetDBCMap const& GetItemSetMap() const { return _itemSetMap; }
+    ItemSetDBC const* GetItemSetDBC(uint32 ID)
+    {
+        ItemSetDBCMap::const_iterator itr = _itemSetMap.find(ID);
+        if (itr != _itemSetMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -709,6 +719,7 @@ protected:
     void _Load_ItemLimitCategory();
     void _Load_ItemRandomProperties();
     void _Load_ItemRandomSuffix();
+    void _Load_ItemSet();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -773,6 +784,7 @@ private:
     ItemLimitCategoryDBCMap _itemLimitCategoryMap;
     ItemRandomPropertiesDBCMap _itemRandomPropertiesMap;
     ItemRandomSuffixDBCMap _itemRandomSuffixMap;
+    ItemSetDBCMap _itemSetMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

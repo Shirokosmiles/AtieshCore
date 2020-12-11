@@ -88,6 +88,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _itemLimitCategoryMap.clear();
     _itemRandomPropertiesMap.clear();
     _itemRandomSuffixMap.clear();
+    _itemSetMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -154,6 +155,7 @@ void DBCStoresMgr::Initialize()
     _Load_ItemLimitCategory();
     _Load_ItemRandomProperties();
     _Load_ItemRandomSuffix();
+    _Load_ItemSet();
 }
 
 // load Achievement.dbc
@@ -2460,4 +2462,50 @@ void DBCStoresMgr::_Load_ItemRandomSuffix()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_itemrandomsuffix              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ItemSet.dbc
+void DBCStoresMgr::_Load_ItemSet()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _itemSetMap.clear();
+    //                                                0          1              2              3                4              5               6               7               8               9            10        11        12        13        14        15        16        17        18        19           20             21             22             23          24            25           26            27             28             29             30                31              32              33              34              35              36              37
+    QueryResult result = WorldDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, SetSpellID_1, SetSpellID_2, SetSpellID_3, SetSpellID_4, SetSpellID_5, SetSpellID_6, SetSpellID_7, SetSpellID_8, SetThreshold_1, SetThreshold_2, SetThreshold_3, SetThreshold_4, SetThreshold_5, SetThreshold_6, SetThreshold_7, SetThreshold_8, RequiredSkill, RequiredSkillRank FROM dbc_itemset");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemset. DB table `dbc_itemset` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ItemSetDBC is;
+        is.ID = id;
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            is.Name[i] = fields[1 + i].GetString();
+
+        for (uint8 i = 0; i < MAX_ITEM_SET_ITEMS; i++)
+            is.ItemID[i] = fields[10 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_ITEM_SET_SPELLS; i++)
+            is.SetSpellID[i] = fields[20 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_ITEM_SET_SPELLS; i++)
+            is.SetThreshold[i] = fields[28 + i].GetUInt32();
+
+        is.RequiredSkill     = fields[36].GetUInt32();
+        is.RequiredSkillRank = fields[37].GetUInt32();
+
+        _itemSetMap[id] = is;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemset                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

@@ -3301,7 +3301,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.RandomSuffix = 0;
         }
 
-        if (itemTemplate.ItemSet && !sItemSetStore.LookupEntry(itemTemplate.ItemSet))
+        if (itemTemplate.ItemSet && !sDBCStoresMgr->GetItemSetDBC(itemTemplate.ItemSet))
         {
             TC_LOG_ERROR("sql.sql", "Item (Entry: %u) have wrong ItemSet (%u)", entry, itemTemplate.ItemSet);
             itemTemplate.ItemSet = 0;
@@ -3454,15 +3454,15 @@ void ObjectMgr::LoadItemSetNames()
     std::set<uint32> itemSetItems;
 
     // fill item set member ids
-    for (uint32 entryId = 0; entryId < sItemSetStore.GetNumRows(); ++entryId)
+    ItemSetDBCMap const& itemSetMap = sDBCStoresMgr->GetItemSetMap();
+    for (ItemSetDBCMap::const_iterator itr = itemSetMap.begin(); itr != itemSetMap.end(); ++itr)
     {
-        ItemSetEntry const* setEntry = sItemSetStore.LookupEntry(entryId);
-        if (!setEntry)
-            continue;
-
-        for (uint32 i = 0; i < MAX_ITEM_SET_ITEMS; ++i)
-            if (setEntry->ItemID[i])
-                itemSetItems.insert(setEntry->ItemID[i]);
+        if (ItemSetDBC const* setEntry = &itr->second)
+        {
+            for (uint32 i = 0; i < MAX_ITEM_SET_ITEMS; ++i)
+                if (setEntry->ItemID[i])
+                    itemSetItems.insert(setEntry->ItemID[i]);
+        }
     }
 
     //                                                  0        1            2

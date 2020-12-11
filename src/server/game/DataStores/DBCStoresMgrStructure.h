@@ -1000,3 +1000,20 @@ struct ItemRandomSuffixDBC
     std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> AllocationPct;     // 24-26
     //std::array<uint32, 2> UnusedAllocationPct;                        // 27-28
 };
+
+// load ItemSet.dbc
+#define MAX_ITEM_SET_ITEMS 10
+#define MAX_ITEM_SET_SPELLS 8
+
+struct ItemSetDBC
+{
+    uint32 ID;                                              // 0
+    std::string Name[TOTAL_LOCALES];                        // 1-16
+    //uint32 Name_lang_mask;                                // 17
+    uint32 ItemID[MAX_ITEM_SET_ITEMS];                      // 18-27
+    //uint32 UnusedItemID[7];                               // 28-34
+    uint32 SetSpellID[MAX_ITEM_SET_SPELLS];                 // 35-42
+    uint32 SetThreshold[MAX_ITEM_SET_SPELLS];               // 43-50
+    uint32 RequiredSkill;                                   // 51
+    uint32 RequiredSkillRank;                               // 52
+};

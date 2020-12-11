@@ -44,7 +44,7 @@ void AddItemsSetItem(Player* player, Item* item)
     ItemTemplate const* proto = item->GetTemplate();
     uint32 setid = proto->ItemSet;
 
-    ItemSetEntry const* set = sItemSetStore.LookupEntry(setid);
+    ItemSetDBC const* set = sDBCStoresMgr->GetItemSetDBC(setid);
 
     if (!set)
     {
@@ -125,7 +125,7 @@ void RemoveItemsSetItem(Player*player, ItemTemplate const* proto)
 {
     uint32 setid = proto->ItemSet;
 
-    ItemSetEntry const* set = sItemSetStore.LookupEntry(setid);
+    ItemSetDBC const* set = sDBCStoresMgr->GetItemSetDBC(setid);
 
     if (!set)
     {
