@@ -86,6 +86,9 @@ typedef std::unordered_map<uint32 /*ID*/, ItemLimitCategoryDBC> ItemLimitCategor
 typedef std::unordered_map<uint32 /*ID*/, ItemRandomPropertiesDBC> ItemRandomPropertiesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, ItemRandomSuffixDBC> ItemRandomSuffixDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, ItemSetDBC> ItemSetDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, LFGDungeonDBC> LFGDungeonDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, LightDBC> LightDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, LiquidTypeDBC> LiquidTypeDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -656,6 +659,56 @@ public:
         return nullptr;
     }
 
+    LFGDungeonDBCMap const& GetLFGDungeonDBCMap() const { return _lfgDungeonMap; }
+    LFGDungeonDBC const* GetLFGDungeonDBC(uint32 ID)
+    {
+        LFGDungeonDBCMap::const_iterator itr = _lfgDungeonMap.find(ID);
+        if (itr != _lfgDungeonMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    LightDBC const* GetLightDBC(uint32 ID)
+    {
+        LightDBCMap::const_iterator itr = _lightMap.find(ID);
+        if (itr != _lightMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    uint32 GetDefaultMapLight(uint32 mapId) // UNUSED
+    {
+        for (LightDBCMap::const_iterator itr = _lightMap.begin(); itr != _lightMap.end(); ++itr)
+        {
+            if (itr->second.ContinentID == mapId &&
+                itr->second.GameCoords.X == 0.0f &&
+                itr->second.GameCoords.Y == 0.0f &&
+                itr->second.GameCoords.Z == 0.0f)
+                return itr->second.ID;
+        }
+        return 0;
+    }
+
+    LFGDungeonDBC const* GetLFGDungeon(uint32 mapId, Difficulty difficulty)
+    {
+        for (LFGDungeonDBCMap::const_iterator itr = _lfgDungeonMap.begin(); itr != _lfgDungeonMap.end(); ++itr)
+        {
+            if (itr->second.MapID == int32(mapId) &&
+                Difficulty(itr->second.Difficulty) == difficulty)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
+    LiquidTypeDBCMap const& GetLiquidTypeDBCMap() const { return _liquidTypeMap; }
+    LiquidTypeDBC const* GetLiquidTypeDBC(uint32 ID)
+    {
+        LiquidTypeDBCMap::const_iterator itr = _liquidTypeMap.find(ID);
+        if (itr != _liquidTypeMap.end())
+            return &itr->second;
+        return nullptr;
+    }    
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -720,6 +773,9 @@ protected:
     void _Load_ItemRandomProperties();
     void _Load_ItemRandomSuffix();
     void _Load_ItemSet();
+    void _Load_LFGDungeons();
+    void _Load_Light();
+    void _Load_LiquidType();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -785,6 +841,9 @@ private:
     ItemRandomPropertiesDBCMap _itemRandomPropertiesMap;
     ItemRandomSuffixDBCMap _itemRandomSuffixMap;
     ItemSetDBCMap _itemSetMap;
+    LFGDungeonDBCMap _lfgDungeonMap;
+    LightDBCMap _lightMap;
+    LiquidTypeDBCMap _liquidTypeMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

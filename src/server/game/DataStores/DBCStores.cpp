@@ -122,9 +122,9 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <ItemRandomSuffixEntry> sItemRandomSuffixStore(ItemRandomSuffixfmt);
 //DBCStorage <ItemSetEntry> sItemSetStore(ItemSetEntryfmt);
 
-DBCStorage <LFGDungeonEntry> sLFGDungeonStore(LFGDungeonEntryfmt);
-DBCStorage <LightEntry> sLightStore(LightEntryfmt);
-DBCStorage <LiquidTypeEntry> sLiquidTypeStore(LiquidTypefmt);
+//DBCStorage <LFGDungeonEntry> sLFGDungeonStore(LFGDungeonEntryfmt);
+//DBCStorage <LightEntry> sLightStore(LightEntryfmt);
+//DBCStorage <LiquidTypeEntry> sLiquidTypeStore(LiquidTypefmt);
 DBCStorage <LockEntry> sLockStore(LockEntryfmt);
 
 DBCStorage <MailTemplateEntry> sMailTemplateStore(MailTemplateEntryfmt);
@@ -343,9 +343,9 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sItemRandomPropertiesStore,          "ItemRandomProperties.dbc");
     //LOAD_DBC(sItemRandomSuffixStore,              "ItemRandomSuffix.dbc");
     //LOAD_DBC(sItemSetStore,                       "ItemSet.dbc");
-    LOAD_DBC(sLFGDungeonStore,                    "LFGDungeons.dbc");
-    LOAD_DBC(sLightStore,                         "Light.dbc");
-    LOAD_DBC(sLiquidTypeStore,                    "LiquidType.dbc");
+    //LOAD_DBC(sLFGDungeonStore,                    "LFGDungeons.dbc");
+    //LOAD_DBC(sLightStore,                         "Light.dbc");
+    //LOAD_DBC(sLiquidTypeStore,                    "LiquidType.dbc");
     LOAD_DBC(sLockStore,                          "Lock.dbc");
     LOAD_DBC(sMailTemplateStore,                  "MailTemplate.dbc");
     LOAD_DBC(sMapStore,                           "Map.dbc");
@@ -809,16 +809,10 @@ uint32 const* GetTalentTabPages(uint8 cls)
     return sTalentTabPages[cls];
 }
 
-uint32 GetLiquidFlags(uint32 liquidType)
-{
-    if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(liquidType))
-        return 1 << liq->SoundBank;
 
-    return 0;
-}
 
 /// Returns LFGDungeonEntry for a specific map and difficulty. Will return first found entry if multiple dungeons use the same map (such as Scarlet Monastery)
-LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty)
+/*LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty)
 {
     for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
     {
@@ -831,22 +825,7 @@ LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty)
     }
 
     return nullptr;
-}
-
-uint32 GetDefaultMapLight(uint32 mapId)
-{
-    for (int32 i = sLightStore.GetNumRows(); i >= 0; --i)
-    {
-        LightEntry const* light = sLightStore.LookupEntry(uint32(i));
-        if (!light)
-            continue;
-
-        if (light->ContinentID == mapId && light->GameCoords.X == 0.0f && light->GameCoords.Y == 0.0f && light->GameCoords.Z == 0.0f)
-            return light->ID;
-    }
-
-    return 0;
-}
+}*/
 
 SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_)
 {

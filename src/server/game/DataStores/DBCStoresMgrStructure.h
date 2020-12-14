@@ -1017,3 +1017,65 @@ struct ItemSetDBC
     uint32 RequiredSkill;                                   // 51
     uint32 RequiredSkillRank;                               // 52
 };
+
+// load LFGDungeons.dbc
+struct LFGDungeonDBC
+{
+    uint32 ID;                                              // 0
+    std::string Name[TOTAL_LOCALES];                        // 1-16
+    //uint32 Name_lang_mask;                                // 17
+    uint32 MinLevel;                                        // 18
+    uint32 MaxLevel;                                        // 19
+    uint32 TargetLevel;                                     // 20
+    uint32 TargetLevelMin;                                  // 21
+    uint32 TargetLevelMax;                                  // 22
+    int32 MapID;                                            // 23
+    uint32 Difficulty;                                      // 24
+    uint32 Flags;                                           // 25
+    uint32 TypeID;                                          // 26
+    //int32 Faction;                                        // 27
+    //char const* TextureFilename;                          // 28
+    uint32 ExpansionLevel;                                  // 29
+    //uint32 OrderIndex;                                    // 30
+    uint32 GroupID;                                         // 31
+    //char const* Description[16];                          // 32-47
+    //uint32 Description_lang_mask;                         // 48
+
+    // Helpers
+    uint32 Entry() const { return ID + (TypeID << 24); }
+};
+
+// load Light.dbc
+struct LightDBC
+{
+    uint32 ID;                                              // 0
+    uint32 ContinentID;                                     // 1
+    DBCPosition3D GameCoords;                               // 2-4
+    //float GameFalloffStart;                               // 5
+    //float GameFalloffEnd;                                 // 6
+    //uint32 LightParamsID[8];                              // 7-14
+};
+
+// load LiquidType.dbc
+struct LiquidTypeDBC
+{
+    uint32 ID;                                              // 0
+    //char const* Name;                                     // 1
+    //uint32 Flags;                                         // 2
+    uint32 SoundBank;                                       // 3
+    //uint32 SoundID;                                       // 4
+    uint32 SpellID;                                         // 5
+    //float MaxDarkenDepth;                                 // 6
+    //float FogDarkenIntensity;                             // 7
+    //float AmbDarkenIntensity;                             // 8
+    //float DirDarkenIntensity;                             // 9
+    //uint32 LightID;                                       // 10
+    //float ParticleScale;                                  // 11
+    //uint32 ParticleMovement;                              // 12
+    //uint32 ParticleTexSlots;                              // 13
+    //uint32 MaterialID;                                    // 14
+    //char const* Texture[6];                               // 15-20
+    //uint32 Color[2];                                      // 21-22
+    //float Unk1[18];                                       // 23-40
+    //uint32 Unk2[4];                                       // 41-44
+};

@@ -114,6 +114,14 @@ TC_GAME_API int32 World::m_visibility_notify_periodOnContinents = DEFAULT_VISIBI
 TC_GAME_API int32 World::m_visibility_notify_periodInInstances  = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 TC_GAME_API int32 World::m_visibility_notify_periodInBGArenas   = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 
+TC_GAME_API uint32 GetLiquidFlags(uint32 liquidType)
+{
+    if (LiquidTypeDBC const* liq = sDBCStoresMgr->GetLiquidTypeDBC(liquidType))
+        return 1 << liq->SoundBank;
+
+    return 0;
+}
+
 /// World constructor
 World::World()
 {

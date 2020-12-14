@@ -16,6 +16,7 @@
  */
 
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "LFGMgr.h"
 #include "LFGPackets.h"
 #include "Log.h"
@@ -65,7 +66,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
     for (uint32 slot : packet.Slots)
     {
         uint32 dungeon = slot & 0x00FFFFFF;                             // remove the type from the dungeon entry
-        if (sLFGDungeonStore.LookupEntry(dungeon))
+        if (sDBCStoresMgr->GetLFGDungeonDBC(dungeon))
             newDungeons.insert(dungeon);
     }
 

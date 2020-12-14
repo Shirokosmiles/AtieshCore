@@ -2945,11 +2945,15 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
     }
 
     // add custom attribute to liquid auras
-    for (LiquidTypeEntry const* liquid : sLiquidTypeStore)
+    LiquidTypeDBCMap const& liqMap = sDBCStoresMgr->GetLiquidTypeDBCMap();
+    for (LiquidTypeDBCMap::const_iterator itr = liqMap.begin(); itr != liqMap.end(); ++itr)
     {
-        if (uint32 spellId = liquid->SpellID)
-            if (SpellInfo* spellInfo = _GetSpellInfo(spellId))
-                spellInfo->AttributesCu |= SPELL_ATTR0_CU_LIQUID_AURA;
+        if (LiquidTypeDBC const* liquid = &itr->second)
+        {
+            if (liquid->SpellID)
+                if (SpellInfo* spellInfo = _GetSpellInfo(liquid->SpellID))
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_LIQUID_AURA;
+        }
     }
 
     TC_LOG_INFO("server.loading", ">> Loaded SpellInfo custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));

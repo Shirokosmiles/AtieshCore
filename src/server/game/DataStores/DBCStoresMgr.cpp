@@ -89,6 +89,9 @@ DBCStoresMgr::~DBCStoresMgr()
     _itemRandomPropertiesMap.clear();
     _itemRandomSuffixMap.clear();
     _itemSetMap.clear();
+    _lfgDungeonMap.clear();
+    _lightMap.clear();
+    _liquidTypeMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -156,6 +159,9 @@ void DBCStoresMgr::Initialize()
     _Load_ItemRandomProperties();
     _Load_ItemRandomSuffix();
     _Load_ItemSet();
+    _Load_LFGDungeons();
+    _Load_Light();
+    _Load_LiquidType();
 }
 
 // load Achievement.dbc
@@ -2508,4 +2514,120 @@ void DBCStoresMgr::_Load_ItemSet()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_itemset                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load LFGDungeons.dbc
+void DBCStoresMgr::_Load_LFGDungeons()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _lfgDungeonMap.clear();
+    //                                                0          1              2              3                4              5               6               7               8               9            10        11          12             13                 14          15        16        17     18        19           20
+    QueryResult result = WorldDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MinLevel, MaxLevel, Target_Level, Target_Level_Min, Target_Level_Max, MapID, Difficulty, Flags, TypeID, ExpansionLevel, Group_Id FROM dbc_lfgdungeons");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_lfgdungeons. DB table `dbc_lfgdungeons` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        LFGDungeonDBC ld;
+        ld.ID = id;
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            ld.Name[i] = fields[1 + i].GetString();
+
+        ld.MinLevel       = fields[10].GetUInt32();
+        ld.MaxLevel       = fields[11].GetUInt32();
+        ld.TargetLevel    = fields[12].GetUInt32();
+        ld.TargetLevelMin = fields[13].GetUInt32();
+        ld.TargetLevelMax = fields[14].GetUInt32();
+        ld.MapID          = fields[15].GetInt32();
+        ld.Difficulty     = fields[16].GetUInt32();
+        ld.Flags          = fields[17].GetUInt32();
+        ld.TypeID         = fields[18].GetUInt32();
+        ld.ExpansionLevel = fields[19].GetUInt32();
+        ld.GroupID        = fields[20].GetUInt32();
+
+        _lfgDungeonMap[id] = ld;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_lfgdungeons                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load Light.dbc
+void DBCStoresMgr::_Load_Light()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _lightMap.clear();
+    //                                                0        1      2  3  4
+    QueryResult result = WorldDatabase.Query("SELECT ID, ContinentID, X, Y, Z FROM dbc_light");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_light. DB table `dbc_light` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        LightDBC l;
+        l.ID = id;
+        l.ContinentID  = fields[1].GetUInt32();
+        l.GameCoords.X = fields[2].GetFloat();
+        l.GameCoords.Y = fields[3].GetFloat();
+        l.GameCoords.Z = fields[4].GetFloat();
+
+        _lightMap[id] = l;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_light                         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load LiquidType.dbc
+void DBCStoresMgr::_Load_LiquidType()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _liquidTypeMap.clear();
+    //                                                0    1      2
+    QueryResult result = WorldDatabase.Query("SELECT ID, Type, SpellID FROM dbc_liquidtype");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_liquidtype. DB table `dbc_liquidtype` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        LiquidTypeDBC lt;
+        lt.ID = id;
+        lt.SoundBank = fields[1].GetUInt32();
+        lt.SpellID   = fields[2].GetUInt32();
+
+        _liquidTypeMap[id] = lt;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_liquidtype                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

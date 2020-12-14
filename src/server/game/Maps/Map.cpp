@@ -2369,7 +2369,7 @@ inline ZLiquidStatus GridMap::GetLiquidStatus(float x, float y, float z, uint8 R
     int idx=(x_int>>3)*16 + (y_int>>3);
     uint8 type = _liquidFlags ? _liquidFlags[idx] : _liquidGlobalFlags;
     uint32 entry = _liquidEntry ? _liquidEntry[idx] : _liquidGlobalEntry;
-    if (LiquidTypeEntry const* liquidEntry = sLiquidTypeStore.LookupEntry(entry))
+    if (LiquidTypeDBC const* liquidEntry = sDBCStoresMgr->GetLiquidTypeDBC(entry))
     {
         type &= MAP_LIQUID_TYPE_DARK_WATER;
         uint32 liqTypeIdx = liquidEntry->SoundBank;
@@ -2385,7 +2385,7 @@ inline ZLiquidStatus GridMap::GetLiquidStatus(float x, float y, float z, uint8 R
                         overrideLiquid = area->LiquidTypeID[liquidEntry->SoundBank];
                 }
 
-                if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(overrideLiquid))
+                if (LiquidTypeDBC const* liq = sDBCStoresMgr->GetLiquidTypeDBC(overrideLiquid))
                 {
                     entry = overrideLiquid;
                     liqTypeIdx = liq->SoundBank;
@@ -2665,7 +2665,7 @@ ZLiquidStatus Map::GetLiquidStatus(uint32 phaseMask, float x, float y, float z, 
                     liquid_type = 15;
 
                 uint32 liquidFlagType = 0;
-                if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(liquid_type))
+                if (LiquidTypeDBC const* liq = sDBCStoresMgr->GetLiquidTypeDBC(liquid_type))
                     liquidFlagType = liq->SoundBank;
 
                 if (liquid_type && liquid_type < 21)
@@ -2680,7 +2680,7 @@ ZLiquidStatus Map::GetLiquidStatus(uint32 phaseMask, float x, float y, float z, 
                                 overrideLiquid = area->LiquidTypeID[liquidFlagType];
                         }
 
-                        if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(overrideLiquid))
+                        if (LiquidTypeDBC const* liq = sDBCStoresMgr->GetLiquidTypeDBC(overrideLiquid))
                         {
                             liquid_type = overrideLiquid;
                             liquidFlagType = liq->SoundBank;
@@ -2820,7 +2820,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, fl
             liquidType = 15;
 
         uint32 liquidFlagType = 0;
-        if (LiquidTypeEntry const* liquidData = sLiquidTypeStore.LookupEntry(liquidType))
+        if (LiquidTypeDBC const* liquidData = sDBCStoresMgr->GetLiquidTypeDBC(liquidType))
             liquidFlagType = liquidData->SoundBank;
 
         if (liquidType && liquidType < 21 && areaEntry)
@@ -2833,7 +2833,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, fl
                     overrideLiquid = zoneEntry->LiquidTypeID[liquidFlagType];
             }
 
-            if (LiquidTypeEntry const* overrideData = sLiquidTypeStore.LookupEntry(overrideLiquid))
+            if (LiquidTypeDBC const* overrideData = sDBCStoresMgr->GetLiquidTypeDBC(overrideLiquid))
             {
                 liquidType = overrideLiquid;
                 liquidFlagType = overrideData->SoundBank;
