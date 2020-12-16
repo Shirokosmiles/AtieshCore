@@ -1035,10 +1035,15 @@ void LoadLootTemplates_Mail()
     uint32 count = LootTemplates_Mail.LoadAndCollectLootIds(lootIdSet);
 
     // remove real entries and check existence loot
-    for (uint32 i = 1; i < sMailTemplateStore.GetNumRows(); ++i)
-        if (sMailTemplateStore.LookupEntry(i))
-            if (lootIdSet.find(i) != lootIdSet.end())
-                lootIdSet.erase(i);
+    MailTemplateDBCMap const& mailTmpl = sDBCStoresMgr->GetMailTemplateDBCMap();
+    for (MailTemplateDBCMap::const_iterator itr = mailTmpl.begin(); itr != mailTmpl.end(); ++itr)
+    {
+        if (MailTemplateDBC const* mt = &itr->second)
+        {
+            if (lootIdSet.find(mt->ID) != lootIdSet.end())
+                lootIdSet.erase(mt->ID);
+        }
+    }
 
     // output error for any still listed (not referenced from appropriate table) ids
     LootTemplates_Mail.ReportUnusedIds(lootIdSet);

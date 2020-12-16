@@ -2762,7 +2762,7 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
     if (!lockId)
         return nullptr;
 
-    LockEntry const* lock = sLockStore.LookupEntry(lockId);
+    LockDBC const* lock = sDBCStoresMgr->GetLockDBC(lockId);
     if (!lock)
         return nullptr;
 

@@ -8134,7 +8134,7 @@ SpellCastResult Spell::CanOpenLock(uint32 effIndex, uint32 lockId, SkillType& sk
         return SPELL_CAST_OK;
 
     // Get LockInfo
-    LockEntry const* lockInfo = sLockStore.LookupEntry(lockId);
+    LockDBC const* lockInfo = sDBCStoresMgr->GetLockDBC(lockId);
 
     if (!lockInfo)
         return SPELL_FAILED_BAD_TARGETS;

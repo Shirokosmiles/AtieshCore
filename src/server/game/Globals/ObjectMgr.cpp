@@ -3273,7 +3273,7 @@ void ObjectMgr::LoadItemTemplates()
         if (itemTemplate.PageText && !GetPageText(itemTemplate.PageText))
             TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has non existing first page (Id:%u)", entry, itemTemplate.PageText);
 
-        if (itemTemplate.LockID && !sLockStore.LookupEntry(itemTemplate.LockID))
+        if (itemTemplate.LockID && !sDBCStoresMgr->GetLockDBC(itemTemplate.LockID))
             TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has wrong LockID (%u)", entry, itemTemplate.LockID);
 
         if (itemTemplate.Sheath >= MAX_SHEATHETYPE)
@@ -5207,7 +5207,7 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->_rewardMailTemplateId)
         {
-            if (!sMailTemplateStore.LookupEntry(qinfo->_rewardMailTemplateId))
+            if (!sDBCStoresMgr->GetMailTemplateDBC(qinfo->_rewardMailTemplateId))
             {
                 TC_LOG_ERROR("sql.sql", "Quest %u has `RewardMailTemplateId` = %u but mail template  %u does not exist, quest will not have a mail reward.",
                     qinfo->GetQuestId(), qinfo->_rewardMailTemplateId, qinfo->_rewardMailTemplateId);
@@ -7355,7 +7355,7 @@ void ObjectMgr::LoadGameObjectLocales()
 
 inline void CheckGOLockId(GameObjectTemplate const* goInfo, uint32 dataN, uint32 N)
 {
-    if (sLockStore.LookupEntry(dataN))
+    if (sDBCStoresMgr->GetLockDBC(dataN))
         return;
 
     TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) have data%d=%u but lock (Id: %u) not found.",
@@ -9183,7 +9183,7 @@ void ObjectMgr::LoadMailLevelRewards()
             continue;
         }
 
-        if (!sMailTemplateStore.LookupEntry(mailTemplateId))
+        if (!sDBCStoresMgr->GetMailTemplateDBC(mailTemplateId))
         {
             TC_LOG_ERROR("sql.sql", "Table `mail_level_reward` has invalid mailTemplateId (%u) for level %u that invalid not include any player races, ignoring.", mailTemplateId, level);
             continue;

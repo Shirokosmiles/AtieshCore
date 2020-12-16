@@ -89,6 +89,8 @@ typedef std::unordered_map<uint32 /*ID*/, ItemSetDBC> ItemSetDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, LFGDungeonDBC> LFGDungeonDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, LightDBC> LightDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, LiquidTypeDBC> LiquidTypeDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, LockDBC> LockDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, MailTemplateDBC> MailTemplateDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -707,7 +709,24 @@ public:
         if (itr != _liquidTypeMap.end())
             return &itr->second;
         return nullptr;
-    }    
+    }
+
+    LockDBC const* GetLockDBC(uint32 ID)
+    {
+        LockDBCMap::const_iterator itr = _lockMap.find(ID);
+        if (itr != _lockMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    MailTemplateDBCMap const& GetMailTemplateDBCMap() const { return _mailTemplateMap; }
+    MailTemplateDBC const* GetMailTemplateDBC(uint32 ID)
+    {
+        MailTemplateDBCMap::const_iterator itr = _mailTemplateMap.find(ID);
+        if (itr != _mailTemplateMap.end())
+            return &itr->second;
+        return nullptr;
+    }
 
 protected:
     void _Load_Achievement();
@@ -776,6 +795,8 @@ protected:
     void _Load_LFGDungeons();
     void _Load_Light();
     void _Load_LiquidType();
+    void _Load_Lock();
+    void _Load_MailTemplate();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -844,6 +865,8 @@ private:
     LFGDungeonDBCMap _lfgDungeonMap;
     LightDBCMap _lightMap;
     LiquidTypeDBCMap _liquidTypeMap;
+    LockDBCMap _lockMap;
+    MailTemplateDBCMap _mailTemplateMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

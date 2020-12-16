@@ -21,6 +21,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "Item.h"
@@ -221,7 +222,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     uint32 lockId = proto->LockID;
     if (lockId)
     {
-        LockEntry const* lockInfo = sLockStore.LookupEntry(lockId);
+        LockDBC const* lockInfo = sDBCStoresMgr->GetLockDBC(lockId);
 
         if (!lockInfo)
         {

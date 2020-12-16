@@ -125,9 +125,9 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <LFGDungeonEntry> sLFGDungeonStore(LFGDungeonEntryfmt);
 //DBCStorage <LightEntry> sLightStore(LightEntryfmt);
 //DBCStorage <LiquidTypeEntry> sLiquidTypeStore(LiquidTypefmt);
-DBCStorage <LockEntry> sLockStore(LockEntryfmt);
+//DBCStorage <LockEntry> sLockStore(LockEntryfmt);
 
-DBCStorage <MailTemplateEntry> sMailTemplateStore(MailTemplateEntryfmt);
+//DBCStorage <MailTemplateEntry> sMailTemplateStore(MailTemplateEntryfmt);
 DBCStorage <MapEntry> sMapStore(MapEntryfmt);
 
 // DBC used only for initialization sMapDifficultyMap at startup.
@@ -346,8 +346,8 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sLFGDungeonStore,                    "LFGDungeons.dbc");
     //LOAD_DBC(sLightStore,                         "Light.dbc");
     //LOAD_DBC(sLiquidTypeStore,                    "LiquidType.dbc");
-    LOAD_DBC(sLockStore,                          "Lock.dbc");
-    LOAD_DBC(sMailTemplateStore,                  "MailTemplate.dbc");
+    //LOAD_DBC(sLockStore,                          "Lock.dbc");
+    //LOAD_DBC(sMailTemplateStore,                  "MailTemplate.dbc");
     LOAD_DBC(sMapStore,                           "Map.dbc");
     LOAD_DBC(sMapDifficultyStore,                 "MapDifficulty.dbc");
     LOAD_DBC(sMovieStore,                         "Movie.dbc");

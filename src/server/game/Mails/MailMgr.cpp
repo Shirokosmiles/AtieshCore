@@ -23,6 +23,7 @@
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "Guild.h"
 #include "ObjectAccessor.h"
@@ -1308,7 +1309,7 @@ void MailMgr::HandleMailCreateTextItem(Player* player, uint32 mailID)
             // in mail template case we need create new item text
             if (itr->second.mailTemplateId)
             {
-                MailTemplateEntry const* mailTemplateEntry = sMailTemplateStore.LookupEntry(itr->second.mailTemplateId);
+                MailTemplateDBC const* mailTemplateEntry = sDBCStoresMgr->GetMailTemplateDBC(itr->second.mailTemplateId);
                 ASSERT(mailTemplateEntry);
                 bodyItem->SetText(mailTemplateEntry->Body[player->GetSession()->GetSessionDbcLocale()]);
             }

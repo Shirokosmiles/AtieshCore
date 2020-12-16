@@ -2690,7 +2690,7 @@ void AchievementGlobalMgr::LoadRewards()
 
         if (reward.MailTemplateId)
         {
-            if (!sMailTemplateStore.LookupEntry(reward.MailTemplateId))
+            if (!sDBCStoresMgr->GetMailTemplateDBC(reward.MailTemplateId))
             {
                 TC_LOG_ERROR("sql.sql", "Table `achievement_reward` (ID: %u) is using an invalid MailTemplate (%u).", id, reward.MailTemplateId);
                 reward.MailTemplateId = 0;

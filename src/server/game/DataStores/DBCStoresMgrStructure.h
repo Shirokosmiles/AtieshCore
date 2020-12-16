@@ -1079,3 +1079,24 @@ struct LiquidTypeDBC
     //float Unk1[18];                                       // 23-40
     //uint32 Unk2[4];                                       // 41-44
 };
+
+// load Lock.dbc
+#define MAX_LOCK_CASE 8
+struct LockDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Type[MAX_LOCK_CASE];                             // 1-8
+    uint32 Index[MAX_LOCK_CASE];                            // 9-16
+    uint32 Skill[MAX_LOCK_CASE];                            // 17-24
+    //uint32 Action[MAX_LOCK_CASE];                         // 25-32
+};
+
+// load MailTemplate.dbc
+struct MailTemplateDBC
+{
+    uint32 ID;                                              // 0
+    //char const* Subject[16];                              // 1-16
+    //uint32 Subject_lang_mask;                             // 17
+    std::string Body[16];                                   // 18-33
+    //uint32 Body_lang_mask;                                // 34
+};

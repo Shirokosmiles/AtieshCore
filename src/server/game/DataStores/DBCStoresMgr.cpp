@@ -92,6 +92,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _lfgDungeonMap.clear();
     _lightMap.clear();
     _liquidTypeMap.clear();
+    _lockMap.clear();
+    _mailTemplateMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -162,6 +164,8 @@ void DBCStoresMgr::Initialize()
     _Load_LFGDungeons();
     _Load_Light();
     _Load_LiquidType();
+    _Load_Lock();
+    _Load_MailTemplate();
 }
 
 // load Achievement.dbc
@@ -2630,4 +2634,78 @@ void DBCStoresMgr::_Load_LiquidType()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_liquidtype                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load Lock.dbc
+void DBCStoresMgr::_Load_Lock()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _lockMap.clear();
+    //                                                0    1      2         3        4      5       6       7       8       9       10       11         12      13      14        15        16      17      18       19       20        21      22       23       24
+    QueryResult result = WorldDatabase.Query("SELECT ID, Type_1, Type_2, Type_3, Type_4, Type_5, Type_6, Type_7, Type_8, Index_1, Index_2, Index_3, Index_4, Index_5, Index_6, Index_7, Index_8, Skill_1, Skill_2, Skill_3, Skill_4, Skill_5, Skill_6, Skill_7, Skill_8 FROM dbc_lock");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_lock. DB table `dbc_lock` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        LockDBC l;
+        l.ID = id;
+        for (uint8 i = 0; i < MAX_LOCK_CASE; i++)
+            l.Type[i] = fields[1 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_LOCK_CASE; i++)
+            l.Index[i] = fields[9 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_LOCK_CASE; i++)
+            l.Skill[i] = fields[17 + i].GetUInt32();
+
+        _lockMap[id] = l;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_lock                          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load MailTemplate.dbc
+void DBCStoresMgr::_Load_MailTemplate()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _mailTemplateMap.clear();
+    //                                                0         1               2               3               4               5               6               7               8               9
+    QueryResult result = WorldDatabase.Query("SELECT ID, Body_Lang_enUS, Body_Lang_koKR, Body_Lang_frFR, Body_Lang_deDE, Body_Lang_zhCN, Body_Lang_zhTW, Body_Lang_esES, Body_Lang_esMX, Body_Lang_ruRU FROM dbc_mailtemplate");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_mailtemplate. DB table `dbc_mailtemplate` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        MailTemplateDBC mt;
+        mt.ID = id;
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            mt.Body[i] = fields[1 + i].GetString();
+
+        _mailTemplateMap[id] = mt;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_mailtemplate                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
