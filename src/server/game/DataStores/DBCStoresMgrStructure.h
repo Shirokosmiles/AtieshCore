@@ -1097,6 +1097,60 @@ struct MailTemplateDBC
     uint32 ID;                                              // 0
     //char const* Subject[16];                              // 1-16
     //uint32 Subject_lang_mask;                             // 17
-    std::string Body[16];                                   // 18-33
+    std::string Body[TOTAL_LOCALES];                        // 18-33
     //uint32 Body_lang_mask;                                // 34
+};
+
+// load Map.dbc
+struct MapDBC
+{
+    uint32 ID;                                              // 0
+    //char const* Directory;                                // 1
+    uint32 InstanceType;                                    // 2
+    uint32 Flags;                                           // 3
+    //uint32 MapType;                                       // 4 0 or 1 for battlegrounds (not arenas)
+    std::string MapName[TOTAL_LOCALES];                     // 5-20
+    //uint32 MapName_lang_mask;                             // 21
+    uint32 AreaTableID;                                     // 22 common zone for instance and continent map
+    //char const* MapDescription0[16];                      // 23-38 text for PvP Zones (Horde)
+    //uint32 MapDescription0_lang_mask;                     // 39
+    //char const* MapDescription1[16];                      // 40-55 text for PvP Zones (Alliance)
+    //uint32 MapDescription1_lang_mask;                     // 56
+    uint32 LoadingScreenID;                                 // 57
+    //float MinimapIconScale;                               // 58
+    int32 CorpseMapID;                                      // 59 MapID of entrance map
+    DBCPosition2D Corpse;                                   // 60-61 entrance coordinate (if exist single entry)
+    //uint32 TimeOfDayOverride;                             // 62 -1, 0 and 720
+    uint32 ExpansionID;                                     // 63
+    uint32 RaidOffset;                                      // 64
+    uint32 MaxPlayers;                                      // 65 max players, fallback if not present in MapDifficulty.dbc
+
+    // Helpers
+    uint32 Expansion() const { return ExpansionID; }
+
+    bool IsDungeon() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID; }
+    bool IsNonRaidDungeon() const { return InstanceType == MAP_INSTANCE; }
+    bool Instanceable() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA; }
+    bool IsRaid() const { return InstanceType == MAP_RAID; }
+    bool IsBattleground() const { return InstanceType == MAP_BATTLEGROUND; }
+    bool IsBattleArena() const { return InstanceType == MAP_ARENA; }
+    bool IsBattlegroundOrArena() const { return InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA; }
+    bool IsWorldMap() const { return InstanceType == MAP_COMMON; }
+
+    bool GetEntrancePos(int32& mapid, float& x, float& y) const
+    {
+        if (CorpseMapID < 0)
+            return false;
+        mapid = CorpseMapID;
+        x = Corpse.X;
+        y = Corpse.Y;
+        return true;
+    }
+
+    bool IsContinent() const
+    {
+        return ID == 0 || ID == 1 || ID == 530 || ID == 571;
+    }
+
+    bool IsDynamicDifficultyMap() const { return (Flags & MAP_FLAG_DYNAMIC_DIFFICULTY) != 0; }
 };

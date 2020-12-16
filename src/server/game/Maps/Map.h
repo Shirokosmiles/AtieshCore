@@ -56,7 +56,7 @@ class Weather;
 class WorldObject;
 class WorldPacket;
 struct MapDifficulty;
-struct MapEntry;
+struct MapDBC;
 struct Position;
 struct ScriptAction;
 struct ScriptInfo;
@@ -324,7 +324,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
         virtual ~Map();
 
-        MapEntry const* GetEntry() const { return i_mapEntry; }
+        MapDBC const* GetEntry() const { return i_mapEntry; }
 
         // currently unused for normal maps
         bool CanUnload(uint32 diff)
@@ -706,7 +706,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         std::mutex _mapLock;
         std::mutex _gridLock;
 
-        MapEntry const* i_mapEntry;
+        MapDBC const* i_mapEntry;
         uint8 i_spawnMode;
         uint32 i_InstanceId;
         uint32 m_unloadTimer;

@@ -1332,9 +1332,10 @@ public:
         uint8 locale = handler->GetSession() ? handler->GetSession()->GetSessionDbcLocale() : sWorld->GetDefaultDbcLocale();
 
         // search in Map.dbc
-        for (uint32 id = 0; id < sMapStore.GetNumRows(); id++)
+        MapDBCMap const& mapMap = sDBCStoresMgr->GetMapDBCMap();
+        for (MapDBCMap::const_iterator itr = mapMap.begin(); itr != mapMap.end(); ++itr)
         {
-            if (MapEntry const* mapInfo = sMapStore.LookupEntry(id))
+            if (MapDBC const* mapInfo = &itr->second)
             {
                 std::string name = mapInfo->MapName[locale];
                 if (name.empty())
@@ -1349,25 +1350,25 @@ public:
                     }
 
                     std::ostringstream ss;
-                    ss << id << " - [" << name << ']';
+                    ss << mapInfo->ID << " - [" << name << ']';
 
                     if (mapInfo->IsContinent())
                         ss << handler->GetTrinityString(LANG_CONTINENT);
 
                     switch (mapInfo->InstanceType)
                     {
-                        case MAP_INSTANCE:
-                            ss << handler->GetTrinityString(LANG_INSTANCE);
-                            break;
-                        case MAP_RAID:
-                            ss << handler->GetTrinityString(LANG_RAID);
-                            break;
-                        case MAP_BATTLEGROUND:
-                            ss << handler->GetTrinityString(LANG_BATTLEGROUND);
-                            break;
-                        case MAP_ARENA:
-                            ss << handler->GetTrinityString(LANG_ARENA);
-                            break;
+                    case MAP_INSTANCE:
+                        ss << handler->GetTrinityString(LANG_INSTANCE);
+                        break;
+                    case MAP_RAID:
+                        ss << handler->GetTrinityString(LANG_RAID);
+                        break;
+                    case MAP_BATTLEGROUND:
+                        ss << handler->GetTrinityString(LANG_BATTLEGROUND);
+                        break;
+                    case MAP_ARENA:
+                        ss << handler->GetTrinityString(LANG_ARENA);
+                        break;
                     }
 
                     handler->SendSysMessage(ss.str().c_str());
@@ -1390,7 +1391,7 @@ public:
 
         uint32 id = atoi((char*)args);
 
-        if (MapEntry const* mapInfo = sMapStore.LookupEntry(id))
+        if (MapDBC const* mapInfo = sDBCStoresMgr->GetMapDBC(id))
         {
             uint8 locale = handler->GetSession() ? handler->GetSession()->GetSessionDbcLocale() : sWorld->GetDefaultDbcLocale();
             std::string name = mapInfo->MapName[locale];

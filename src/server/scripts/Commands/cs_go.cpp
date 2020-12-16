@@ -374,7 +374,7 @@ public:
         {
             uint32 count = 0;
             std::string const& scriptName = sObjectMgr->GetScriptName(pair.second.ScriptId);
-            char const* mapName = ASSERT_NOTNULL(sMapStore.LookupEntry(pair.first))->MapName[handler->GetSessionDbcLocale()];
+            char const* mapName = ASSERT_NOTNULL(sDBCStoresMgr->GetMapDBC(pair.first))->MapName[handler->GetSessionDbcLocale()].c_str();
             for (std::string_view label : labels)
                 if (StringContainsStringI(scriptName, label))
                     ++count;
@@ -423,7 +423,7 @@ public:
             else
             {
                 uint32 const parentMapId = exit->target_mapId;
-                char const* const parentMapName = ASSERT_NOTNULL(sMapStore.LookupEntry(parentMapId))->MapName[handler->GetSessionDbcLocale()];
+                char const* const parentMapName = ASSERT_NOTNULL(sDBCStoresMgr->GetMapDBC(parentMapId))->MapName[handler->GetSessionDbcLocale()].c_str();
                 handler->PSendSysMessage(LANG_COMMAND_GO_INSTANCE_GATE_FAILED, mapName, mapId, parentMapName, parentMapId);
             }
         }
@@ -523,7 +523,7 @@ public:
             for (CreatureData const* spawn : spawns)
             {
                 uint32 const mapId = spawn->mapId;
-                MapEntry const* const map = ASSERT_NOTNULL(sMapStore.LookupEntry(mapId));
+                MapDBC const* const map = ASSERT_NOTNULL(sDBCStoresMgr->GetMapDBC(mapId));
                 handler->PSendSysMessage(LANG_COMMAND_BOSS_MULTIPLE_SPAWN_ETY, spawn->spawnId, mapId, map->MapName[handler->GetSessionDbcLocale()], spawn->spawnPoint.ToString().c_str());
             }
             handler->SetSentErrorMessage(true);
@@ -540,7 +540,7 @@ public:
         uint32 const mapId = spawn->mapId;
         if (!player->TeleportTo({ mapId, spawn->spawnPoint }))
         {
-            char const* const mapName = ASSERT_NOTNULL(sMapStore.LookupEntry(mapId))->MapName[handler->GetSessionDbcLocale()];
+            char const* const mapName = ASSERT_NOTNULL(sDBCStoresMgr->GetMapDBC(mapId))->MapName[handler->GetSessionDbcLocale()].c_str();
             handler->PSendSysMessage(LANG_COMMAND_GO_BOSS_FAILED, spawn->spawnId, boss->Name.c_str(), boss->Entry, mapName);
             handler->SetSentErrorMessage(true);
             return false;

@@ -253,7 +253,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaDBC const* criteria)
             }
             return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID:
-            if (!sMapStore.LookupEntry(map_id.mapId))
+            if (!sDBCStoresMgr->GetMapDBC(map_id.mapId))
             {
                 TC_LOG_ERROR("sql.sql", "Table `achievement_criteria_data` (Entry: %u Type: %u) for data type ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID (%u) contains an unknown map id in value1 (%u), ignored.",
                     criteria->ID, criteria->Type, dataType, map_id.mapId);

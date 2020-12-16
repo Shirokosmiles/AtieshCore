@@ -19,6 +19,7 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "InstanceSaveMgr.h"
 #include "Log.h"
 #include "World.h"
@@ -229,7 +230,7 @@ void GroupMgr::LoadGroups()
             Group* group = GetGroupByDbStoreId(fields[0].GetUInt32());
             // group will never be NULL (we have run consistency sql's before loading)
 
-            MapEntry const* mapEntry = sMapStore.LookupEntry(fields[1].GetUInt16());
+            MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(fields[1].GetUInt16());
             if (!mapEntry || !mapEntry->IsDungeon())
             {
                 TC_LOG_ERROR("sql.sql", "Incorrect entry in group_instance table : no dungeon map %d", fields[1].GetUInt16());

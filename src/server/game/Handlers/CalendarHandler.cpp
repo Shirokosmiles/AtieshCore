@@ -155,7 +155,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
         if (sentMaps.find(mapId) != sentMaps.end())
             continue;
 
-        MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
+        MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(mapId);
         if (!mapEntry || !mapEntry->IsRaid())
             continue;
 

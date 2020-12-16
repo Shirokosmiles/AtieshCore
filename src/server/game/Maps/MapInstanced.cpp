@@ -18,6 +18,7 @@
 #include "MapInstanced.h"
 #include "Battleground.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
 #include "Log.h"
@@ -207,7 +208,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
     std::lock_guard<std::mutex> lock(_mapLock);
 
     // make sure we have a valid map id
-    MapEntry const* entry = sMapStore.LookupEntry(GetId());
+    MapDBC const* entry = sDBCStoresMgr->GetMapDBC(GetId());
     if (!entry)
     {
         TC_LOG_ERROR("maps", "CreateInstance: no entry for map %d", GetId());

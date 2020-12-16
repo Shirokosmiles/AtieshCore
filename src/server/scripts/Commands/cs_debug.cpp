@@ -1405,7 +1405,7 @@ public:
 
     static bool HandleDebugRaidResetCommand(ChatHandler* handler, uint32 mapId, Optional<uint8> difficulty)
     {
-        MapEntry const* mEntry = sMapStore.LookupEntry(mapId);
+        MapDBC const* mEntry = sDBCStoresMgr->GetMapDBC(mapId);
         if (!mEntry)
         {
             handler->PSendSysMessage("Invalid map specified.");

@@ -71,7 +71,7 @@ struct Condition;
 struct CreatureTemplate;
 struct CreatureData;
 struct ItemTemplate;
-struct MapEntry;
+struct MapDBC;
 struct Position;
 
 namespace Trinity::ChatCommands { struct ChatCommandBuilder; }
@@ -311,16 +311,16 @@ class TC_GAME_API FormulaScript : public ScriptObject
 
 template<class TMap> class MapScript : public UpdatableScript<TMap>
 {
-    MapEntry const* _mapEntry;
+    MapDBC const* _mapEntry;
 
     protected:
 
-        MapScript(MapEntry const* mapEntry) : _mapEntry(mapEntry) { }
+        MapScript(MapDBC const* mapEntry) : _mapEntry(mapEntry) { }
 
     public:
 
-        // Gets the MapEntry structure associated with this script. Can return NULL.
-        MapEntry const* GetEntry() { return _mapEntry; }
+        // Gets the MapDBC structure associated with this script. Can return NULL.
+        MapDBC const* GetEntry() { return _mapEntry; }
 
         // Called when the map is created.
         virtual void OnCreate(TMap* /*map*/) { }

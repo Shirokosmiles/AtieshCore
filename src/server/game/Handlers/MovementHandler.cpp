@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "Corpse.h"
 #include "Creature.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "InstanceSaveMgr.h"
 #include "Language.h"
@@ -74,7 +75,7 @@ void WorldSession::HandleMoveWorldportAck()
     }
 
     // get the destination map entry, not the current one, this will fix homebind and reset greeting
-    MapEntry const* mEntry = sMapStore.LookupEntry(loc.GetMapId());
+    MapDBC const* mEntry = sDBCStoresMgr->GetMapDBC(loc.GetMapId());
     InstanceTemplate const* mInstance = sObjectMgr->GetInstanceTemplate(loc.GetMapId());
 
     // reset instance validity, except if going to an instance inside an instance

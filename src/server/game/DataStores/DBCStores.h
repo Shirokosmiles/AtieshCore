@@ -139,7 +139,7 @@ TC_GAME_API ResponseCodes ValidateName(std::wstring const& name, LocaleConstant 
 //TC_GAME_API extern DBCStorage <LiquidTypeEntry>              sLiquidTypeStore;
 //TC_GAME_API extern DBCStorage <LockEntry>                    sLockStore;
 //TC_GAME_API extern DBCStorage <MailTemplateEntry>            sMailTemplateStore;
-TC_GAME_API extern DBCStorage <MapEntry>                     sMapStore;
+//TC_GAME_API extern DBCStorage <MapEntry>                     sMapStore;
 //TC_GAME_API extern DBCStorage <MapDifficultyEntry>           sMapDifficultyStore; -- use GetMapDifficultyData insteed
 TC_GAME_API extern MapDifficultyMap                          sMapDifficultyMap;
 TC_GAME_API extern DBCStorage <MovieEntry>                   sMovieStore;

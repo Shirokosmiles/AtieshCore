@@ -20,6 +20,7 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridStates.h"
@@ -78,7 +79,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     if (InstanceSave* old_save = GetInstanceSave(instanceId))
         return old_save;
 
-    MapEntry const* entry = sMapStore.LookupEntry(mapId);
+    MapDBC const* entry = sDBCStoresMgr->GetMapDBC(mapId);
     if (!entry)
     {
         TC_LOG_ERROR("misc", "InstanceSaveManager::AddInstanceSave: wrong mapid = %d, instanceid = %d!", mapId, instanceId);
@@ -224,7 +225,7 @@ void InstanceSave::SaveToDB()
 time_t InstanceSave::GetResetTimeForDB()
 {
     // only save the reset time for normal instances
-    MapEntry const* entry = sMapStore.LookupEntry(GetMapId());
+    MapDBC const* entry = sDBCStoresMgr->GetMapDBC(GetMapId());
     if (!entry || entry->InstanceType == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
         return 0;
     else
@@ -237,9 +238,9 @@ InstanceTemplate const* InstanceSave::GetTemplate()
     return sObjectMgr->GetInstanceTemplate(m_mapid);
 }
 
-MapEntry const* InstanceSave::GetMapEntry()
+MapDBC const* InstanceSave::GetMapEntry()
 {
-    return sMapStore.LookupEntry(m_mapid);
+    return sDBCStoresMgr->GetMapDBC(m_mapid);
 }
 
 void InstanceSave::DeleteFromDB()
@@ -630,7 +631,7 @@ void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
 void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool warn, time_t resetTime)
 {
     // global reset for all instances of the given map
-    MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
+    MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(mapid);
     if (!mapEntry->Instanceable())
         return;
     TC_LOG_DEBUG("misc", "InstanceSaveManager::ResetOrWarnAll: Processing map %s (%u) on difficulty %u (warn? %u)", mapEntry->MapName[0], mapid, uint8(difficulty), warn);

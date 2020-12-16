@@ -685,9 +685,12 @@ void World::SetInitialWorldSettings()
     sIPLocation->Load();
 
     std::vector<uint32> mapIds;
-    for (uint32 mapId = 0; mapId < sMapStore.GetNumRows(); mapId++)
-        if (sMapStore.LookupEntry(mapId))
-            mapIds.push_back(mapId);
+    MapDBCMap const& mapMap = sDBCStoresMgr->GetMapDBCMap();
+    for (MapDBCMap::const_iterator itr = mapMap.begin(); itr != mapMap.end(); ++itr)
+    {
+        if (MapDBC const* mapInfo = &itr->second)
+            mapIds.push_back(mapInfo->ID);
+    }
 
     vmmgr2->InitializeThreadUnsafe(mapIds);
 

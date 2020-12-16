@@ -94,6 +94,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _liquidTypeMap.clear();
     _lockMap.clear();
     _mailTemplateMap.clear();
+    _mapMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -166,6 +167,7 @@ void DBCStoresMgr::Initialize()
     _Load_LiquidType();
     _Load_Lock();
     _Load_MailTemplate();
+    _Load_Map();
 }
 
 // load Achievement.dbc
@@ -2708,4 +2710,49 @@ void DBCStoresMgr::_Load_MailTemplate()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_mailtemplate                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load Map.dbc
+void DBCStoresMgr::_Load_Map()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _mapMap.clear();
+    //                                                0         1         2            3                  4               5                   6                   7                  8                  9                10                    11             12           13              14          15       16         17          18           19
+    QueryResult result = WorldDatabase.Query("SELECT ID, InstanceType, Flags, MapName_Lang_enUS, MapName_Lang_koKR, MapName_Lang_frFR, MapName_Lang_deDE, MapName_Lang_zhCN, MapName_Lang_zhTW, MapName_Lang_esES, MapName_Lang_esMX, MapName_Lang_ruRU, AreaTableID, LoadingScreenID, CorpseMapID, CorpseX, CorpseY, ExpansionID, RaidOffset, MaxPlayers FROM dbc_map");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_map. DB table `dbc_map` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        MapDBC m;
+        m.ID = id;
+        m.InstanceType = fields[1].GetUInt32();
+        m.Flags        = fields[2].GetUInt32();
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            m.MapName[i] = fields[3 + i].GetString();
+
+        m.AreaTableID     = fields[12].GetUInt32();
+        m.LoadingScreenID = fields[13].GetUInt32();
+        m.CorpseMapID     = fields[14].GetInt32();
+        m.Corpse.X        = fields[15].GetFloat();
+        m.Corpse.Y        = fields[16].GetFloat();
+        m.ExpansionID     = fields[17].GetUInt32();
+        m.RaidOffset      = fields[18].GetUInt32();
+        m.MaxPlayers      = fields[19].GetUInt32();
+
+        _mapMap[id] = m;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_map                           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

@@ -125,7 +125,7 @@ public:
             }
             case DISABLE_TYPE_MAP:
             {
-                if (!sMapStore.LookupEntry(entry))
+                if (!sDBCStoresMgr->GetMapDBC(entry))
                 {
                     handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
                     handler->SetSentErrorMessage(true);
@@ -169,7 +169,7 @@ public:
             }
             case DISABLE_TYPE_VMAP:
             {
-                if (!sMapStore.LookupEntry(entry))
+                if (!sDBCStoresMgr->GetMapDBC(entry))
                 {
                     handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
                     handler->SetSentErrorMessage(true);
@@ -180,7 +180,7 @@ public:
             }
             case DISABLE_TYPE_MMAP:
             {
-                if (!sMapStore.LookupEntry(entry))
+                if (!sDBCStoresMgr->GetMapDBC(entry))
                 {
                     handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
                     handler->SetSentErrorMessage(true);

@@ -1421,7 +1421,7 @@ void ScriptMgr::OnGroupRateCalculation(float& rate, uint32 count, bool isRaid)
     { \
         FOR_SCRIPTS(M, I, E) \
         { \
-            MapEntry const* C = I->second->GetEntry(); \
+            MapDBC const* C = I->second->GetEntry(); \
             if (!C) \
                 continue; \
             if (C->ID == V->GetId()) \
@@ -2311,7 +2311,7 @@ UnitScript::UnitScript(char const* name)
 }
 
 WorldMapScript::WorldMapScript(char const* name, uint32 mapId)
-    : ScriptObject(name), MapScript<Map>(sMapStore.LookupEntry(mapId))
+    : ScriptObject(name), MapScript<Map>(sDBCStoresMgr->GetMapDBC(mapId))
 {
     if (!GetEntry())
         TC_LOG_ERROR("scripts", "Invalid WorldMapScript for %u; no such map ID.", mapId);
@@ -2323,7 +2323,7 @@ WorldMapScript::WorldMapScript(char const* name, uint32 mapId)
 }
 
 InstanceMapScript::InstanceMapScript(char const* name, uint32 mapId)
-    : ScriptObject(name), MapScript<InstanceMap>(sMapStore.LookupEntry(mapId))
+    : ScriptObject(name), MapScript<InstanceMap>(sDBCStoresMgr->GetMapDBC(mapId))
 {
     if (!GetEntry())
         TC_LOG_ERROR("scripts", "Invalid InstanceMapScript for %u; no such map ID.", mapId);
@@ -2335,7 +2335,7 @@ InstanceMapScript::InstanceMapScript(char const* name, uint32 mapId)
 }
 
 BattlegroundMapScript::BattlegroundMapScript(char const* name, uint32 mapId)
-    : ScriptObject(name), MapScript<BattlegroundMap>(sMapStore.LookupEntry(mapId))
+    : ScriptObject(name), MapScript<BattlegroundMap>(sDBCStoresMgr->GetMapDBC(mapId))
 {
     if (!GetEntry())
         TC_LOG_ERROR("scripts", "Invalid BattlegroundMapScript for %u; no such map ID.", mapId);

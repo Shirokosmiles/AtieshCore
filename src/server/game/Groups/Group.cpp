@@ -2123,7 +2123,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
     for (BoundInstancesMap::iterator itr = m_boundInstances[diff].begin(); itr != m_boundInstances[diff].end();)
     {
         InstanceSave* instanceSave = itr->second.save;
-        MapEntry const* entry = sMapStore.LookupEntry(itr->first);
+        MapDBC const* entry = sDBCStoresMgr->GetMapDBC(itr->first);
         if (!entry || entry->IsRaid() != isRaid || (!instanceSave->CanReset() && method != INSTANCE_RESET_GROUP_DISBAND))
         {
             ++itr;
@@ -2235,7 +2235,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
 InstanceGroupBind* Group::GetBoundInstance(Player* player)
 {
     uint32 mapid = player->GetMapId();
-    MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
+    MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(mapid);
     return GetBoundInstance(mapEntry);
 }
 
@@ -2246,7 +2246,7 @@ InstanceGroupBind* Group::GetBoundInstance(Map* aMap)
     return GetBoundInstance(difficulty, aMap->GetId());
 }
 
-InstanceGroupBind* Group::GetBoundInstance(MapEntry const* mapEntry)
+InstanceGroupBind* Group::GetBoundInstance(MapDBC const* mapEntry)
 {
     if (!mapEntry || !mapEntry->IsDungeon())
         return nullptr;
@@ -2322,7 +2322,7 @@ void Group::UnbindInstance(uint32 mapid, uint8 difficulty, bool unload)
 
 void Group::_homebindIfInstance(Player* player)
 {
-    if (player && !player->IsGameMaster() && sMapStore.LookupEntry(player->GetMapId())->IsDungeon())
+    if (player && !player->IsGameMaster() && sDBCStoresMgr->GetMapDBC(player->GetMapId())->IsDungeon())
         player->m_InstanceValid = false;
 }
 

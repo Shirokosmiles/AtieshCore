@@ -242,7 +242,7 @@ public:
         object->GetZoneAndAreaId(zoneId, areaId);
         uint32 mapId = object->GetMapId();
 
-        MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
+        MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(mapId);
         AreaTableDBC const* zoneEntry = sDBCStoresMgr->GetAreaTableDBC(zoneId);
         AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(areaId);
 
@@ -1769,7 +1769,7 @@ public:
         handler->PSendSysMessage(LANG_PINFO_CHR_MONEY, gold, silv, copp);
 
         // Position data
-        MapEntry const* map = sMapStore.LookupEntry(mapId);
+        MapDBC const* map = sDBCStoresMgr->GetMapDBC(mapId);
         AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(areaId);
         if (area)
         {

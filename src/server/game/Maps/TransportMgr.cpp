@@ -17,6 +17,7 @@
 
 #include "TransportMgr.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "InstanceScript.h"
 #include "Log.h"
 #include "MapManager.h"
@@ -185,12 +186,12 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
     if (transport->mapsUsed.size() > 1)
     {
         for (std::set<uint32>::const_iterator itr = transport->mapsUsed.begin(); itr != transport->mapsUsed.end(); ++itr)
-            ASSERT(!sMapStore.LookupEntry(*itr)->Instanceable());
+            ASSERT(!sDBCStoresMgr->GetMapDBC(*itr)->Instanceable());
 
         transport->inInstance = false;
     }
     else
-        transport->inInstance = sMapStore.LookupEntry(*transport->mapsUsed.begin())->Instanceable();
+        transport->inInstance = sDBCStoresMgr->GetMapDBC(*transport->mapsUsed.begin())->Instanceable();
 
     // last to first is always "teleport", even for closed paths
     keyFrames.back().Teleport = true;
@@ -404,7 +405,7 @@ Transport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType guid 
         return nullptr;
     }
 
-    if (MapEntry const* mapEntry = sMapStore.LookupEntry(mapId))
+    if (MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(mapId))
     {
         if (mapEntry->Instanceable() != tInfo->inInstance)
         {

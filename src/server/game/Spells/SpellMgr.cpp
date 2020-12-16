@@ -1215,7 +1215,7 @@ void SpellMgr::LoadSpellTargetPositions()
         st.target_Z           = fields[5].GetFloat();
         st.target_Orientation = fields[6].GetFloat();
 
-        MapEntry const* mapEntry = sMapStore.LookupEntry(st.target_mapId);
+        MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(st.target_mapId);
         if (!mapEntry)
         {
             TC_LOG_ERROR("sql.sql", "Spell (Id: %u, effIndex: %u) target map (ID: %u) does not exist in `Map.dbc`.", Spell_ID, effIndex, st.target_mapId);

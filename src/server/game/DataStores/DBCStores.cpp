@@ -128,7 +128,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <LockEntry> sLockStore(LockEntryfmt);
 
 //DBCStorage <MailTemplateEntry> sMailTemplateStore(MailTemplateEntryfmt);
-DBCStorage <MapEntry> sMapStore(MapEntryfmt);
+//DBCStorage <MapEntry> sMapStore(MapEntryfmt);
 
 // DBC used only for initialization sMapDifficultyMap at startup.
 DBCStorage <MapDifficultyEntry> sMapDifficultyStore(MapDifficultyEntryfmt); // only for loading
@@ -348,7 +348,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sLiquidTypeStore,                    "LiquidType.dbc");
     //LOAD_DBC(sLockStore,                          "Lock.dbc");
     //LOAD_DBC(sMailTemplateStore,                  "MailTemplate.dbc");
-    LOAD_DBC(sMapStore,                           "Map.dbc");
+    //LOAD_DBC(sMapStore,                           "Map.dbc");
     LOAD_DBC(sMapDifficultyStore,                 "MapDifficulty.dbc");
     LOAD_DBC(sMovieStore,                         "Movie.dbc");
     LOAD_DBC(sNamesProfanityStore,                "NamesProfanity.dbc");
@@ -627,8 +627,8 @@ void LoadDBCStores(const std::string& dataPath)
         !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
         !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.5a
         !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a
-        !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a*/
-        !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a
+        !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a
+        !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a*/
         !sSpellStore.LookupEntry(80864)            )        // last added spell in 3.3.5a
     {
         TC_LOG_ERROR("misc", "You have _outdated_ DBC files. Please extract correct versions from current using client.");
@@ -682,7 +682,7 @@ ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId)
     if (mapid < 2)
         return CONTENT_1_60;
 
-    MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
+    MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(mapid);
     if (!mapEntry)
         return CONTENT_1_60;
 

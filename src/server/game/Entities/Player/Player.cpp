@@ -1869,7 +1869,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     // preparing unsummon pet if lost (we must get pet before teleportation or will not find it later)
     Pet* pet = GetPet();
 
-    MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
+    MapDBC const* mEntry = sDBCStoresMgr->GetMapDBC(mapid);
 
     // don't let enter battlegrounds without assigned battleground id (for example through areatrigger)...
     // don't let gm level > 1 either
@@ -4772,7 +4772,7 @@ void Player::KillPlayer()
     //SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_IN_PVP);
 
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
-    ApplyModFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStore.LookupEntry(GetMapId())->Instanceable() && !HasAuraType(SPELL_AURA_PREVENT_RESURRECTION));
+    ApplyModFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sDBCStoresMgr->GetMapDBC(GetMapId())->Instanceable() && !HasAuraType(SPELL_AURA_PREVENT_RESURRECTION));
 
     // 6 minutes until repop at graveyard
     m_deathTimer = 6 * MINUTE * IN_MILLISECONDS;
@@ -7130,7 +7130,7 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
         float posy = fields[2].GetFloat();
         float posz = fields[3].GetFloat();
 
-        if (!sMapStore.LookupEntry(map))
+        if (!sDBCStoresMgr->GetMapDBC(map))
             return 0;
 
         zone = sMapMgr->GetZoneId(PHASEMASK_NORMAL, map, posx, posy, posz);
@@ -17577,7 +17577,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     _LoadBGData(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_BG_DATA));
 
     GetSession()->SetPlayer(this);
-    MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
+    MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(mapId);
     Map* map = nullptr;
     bool player_at_bg = false;
     if (!mapEntry || !IsPositionValid())
@@ -17731,7 +17731,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     }
 
     // Map could be changed before
-    mapEntry = sMapStore.LookupEntry(mapId);
+    mapEntry = sDBCStoresMgr->GetMapDBC(mapId);
     // client without expansion support
     if (mapEntry)
     {
@@ -18314,7 +18314,7 @@ void Player::LoadCorpse(PreparedQueryResult result)
         {
             Field* fields = result->Fetch();
             _corpseLocation.WorldRelocate(fields[0].GetUInt16(), fields[1].GetFloat(), fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetFloat());
-            ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStore.LookupEntry(_corpseLocation.GetMapId())->Instanceable());
+            ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sDBCStoresMgr->GetMapDBC(_corpseLocation.GetMapId())->Instanceable());
         }
     }
 
@@ -18910,7 +18910,7 @@ void Player::_LoadBoundInstances(PreparedQueryResult result)
 
             bool deleteInstance = false;
 
-            MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
+            MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(mapId);
             std::string mapname = mapEntry ? mapEntry->MapName[sWorld->GetDefaultDbcLocale()] : "Unknown";
 
             if (!mapEntry || !mapEntry->IsDungeon())
@@ -19189,7 +19189,7 @@ bool Player::Satisfy(AccessRequirement const* ar, uint32 target_map, bool report
         uint8 LevelMin = 0;
         uint8 LevelMax = 0;
 
-        MapEntry const* mapEntry = sMapStore.LookupEntry(target_map);
+        MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(target_map);
         if (!mapEntry)
             return false;
 
@@ -19358,7 +19358,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         m_homebindY = fields[3].GetFloat();
         m_homebindZ = fields[4].GetFloat();
 
-        MapEntry const* bindMapEntry = sMapStore.LookupEntry(m_homebindMapId);
+        MapDBC const* bindMapEntry = sDBCStoresMgr->GetMapDBC(m_homebindMapId);
 
         // accept saved data only for valid position (and non instanceable), and accessable
         if (MapManager::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ) &&
@@ -20494,7 +20494,7 @@ void Player::ResetInstances(uint8 method, bool isRaid)
     for (BoundInstancesMap::iterator itr = m_boundInstances[diff].begin(); itr != m_boundInstances[diff].end();)
     {
         InstanceSave* p = itr->second.save;
-        MapEntry const* entry = sMapStore.LookupEntry(itr->first);
+        MapDBC const* entry = sDBCStoresMgr->GetMapDBC(itr->first);
         if (!entry || entry->IsRaid() != isRaid || !p->CanReset())
         {
             ++itr;
