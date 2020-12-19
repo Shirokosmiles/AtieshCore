@@ -92,6 +92,7 @@ typedef std::unordered_map<uint32 /*ID*/, LiquidTypeDBC> LiquidTypeDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, LockDBC> LockDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, MailTemplateDBC> MailTemplateDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, MapDBC> MapDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, MapDifficultyDBC> MapDifficultyDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -738,6 +739,42 @@ public:
         return nullptr;
     }
 
+    MapDifficultyDBCMap const& GetMapDifficultyDBCMap() const { return _mapDifficultyMap; }
+    MapDifficultyDBC const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty)
+    {
+        for (MapDifficultyDBCMap::const_iterator itr = _mapDifficultyMap.begin(); itr != _mapDifficultyMap.end(); ++itr)
+        {
+            if (itr->second.MapID == mapId &&
+                Difficulty(itr->second.Difficulty) == difficulty)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
+    MapDifficultyDBC const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty& difficulty)
+    {
+        uint32 tmpDiff = difficulty;
+        MapDifficultyDBC const* mapDiff = GetMapDifficultyData(mapId, Difficulty(tmpDiff));
+        if (!mapDiff)
+        {
+            if (tmpDiff > RAID_DIFFICULTY_25MAN_NORMAL) // heroic, downscale to normal
+                tmpDiff -= 2;
+            else
+                tmpDiff -= 1;   // any non-normal mode for raids like tbc (only one mode)
+
+            // pull new data
+            mapDiff = GetMapDifficultyData(mapId, Difficulty(tmpDiff)); // we are 10 normal or 25 normal
+            if (!mapDiff)
+            {
+                tmpDiff -= 1;
+                mapDiff = GetMapDifficultyData(mapId, Difficulty(tmpDiff)); // 10 normal
+            }
+        }
+
+        difficulty = Difficulty(tmpDiff);
+        return mapDiff;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -808,6 +845,7 @@ protected:
     void _Load_Lock();
     void _Load_MailTemplate();
     void _Load_Map();
+    void _Load_MapDifficulty();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -879,6 +917,7 @@ private:
     LockDBCMap _lockMap;
     MailTemplateDBCMap _mailTemplateMap;
     MapDBCMap _mapMap;
+    MapDifficultyDBCMap _mapDifficultyMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

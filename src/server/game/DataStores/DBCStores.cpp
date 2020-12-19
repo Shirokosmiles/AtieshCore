@@ -131,8 +131,8 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <MapEntry> sMapStore(MapEntryfmt);
 
 // DBC used only for initialization sMapDifficultyMap at startup.
-DBCStorage <MapDifficultyEntry> sMapDifficultyStore(MapDifficultyEntryfmt); // only for loading
-MapDifficultyMap sMapDifficultyMap;
+//DBCStorage <MapDifficultyEntry> sMapDifficultyStore(MapDifficultyEntryfmt); // only for loading
+//MapDifficultyMap sMapDifficultyMap;
 
 DBCStorage <MovieEntry> sMovieStore(MovieEntryfmt);
 
@@ -349,7 +349,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sLockStore,                          "Lock.dbc");
     //LOAD_DBC(sMailTemplateStore,                  "MailTemplate.dbc");
     //LOAD_DBC(sMapStore,                           "Map.dbc");
-    LOAD_DBC(sMapDifficultyStore,                 "MapDifficulty.dbc");
+    //LOAD_DBC(sMapDifficultyStore,                 "MapDifficulty.dbc");
     LOAD_DBC(sMovieStore,                         "Movie.dbc");
     LOAD_DBC(sNamesProfanityStore,                "NamesProfanity.dbc");
     LOAD_DBC(sNamesReservedStore,                 "NamesReserved.dbc");
@@ -407,8 +407,8 @@ void LoadDBCStores(const std::string& dataPath)
 #undef LOAD_DBC_EXT
 
     // fill data
-    for (MapDifficultyEntry const* entry : sMapDifficultyStore)
-        sMapDifficultyMap[MAKE_PAIR32(entry->MapID, entry->Difficulty)] = MapDifficulty(entry->RaidDuration, entry->MaxPlayers, entry->Message[0] != '\0');
+    //for (MapDifficultyEntry const* entry : sMapDifficultyStore)
+    //    sMapDifficultyMap[MAKE_PAIR32(entry->MapID, entry->Difficulty)] = MapDifficulty(entry->RaidDuration, entry->MaxPlayers, entry->Message[0] != '\0');
 
     for (NamesProfanityEntry const* namesProfanity : sNamesProfanityStore)
     {
@@ -740,7 +740,7 @@ void Map2ZoneCoordinates(float& x, float& y, uint32 zone)
     std::swap(x, y);                                         // client have map coords swapped
 }
 
-MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty)
+/*MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty)
 {
     MapDifficultyMap::const_iterator itr = sMapDifficultyMap.find(MAKE_PAIR32(mapId, difficulty));
     return itr != sMapDifficultyMap.end() ? &itr->second : nullptr;
@@ -768,7 +768,7 @@ MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty &di
 
     difficulty = Difficulty(tmpDiff);
     return mapDiff;
-}
+}*/
 
 PvPDifficultyEntry const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 level)
 {

@@ -95,6 +95,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _lockMap.clear();
     _mailTemplateMap.clear();
     _mapMap.clear();
+    _mapDifficultyMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -168,6 +169,7 @@ void DBCStoresMgr::Initialize()
     _Load_Lock();
     _Load_MailTemplate();
     _Load_Map();
+    _Load_MapDifficulty();
 }
 
 // load Achievement.dbc
@@ -2755,4 +2757,43 @@ void DBCStoresMgr::_Load_Map()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_map                           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load MapDifficulty.dbc
+void DBCStoresMgr::_Load_MapDifficulty()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _mapDifficultyMap.clear();
+    //                                                0    1        2                3                  4                  5                   6                   7                 8                  9                  10               11              12          13
+    QueryResult result = WorldDatabase.Query("SELECT ID, MapID, Difficulty,  Message_Lang_enUS, Message_Lang_koKR, Message_Lang_frFR, Message_Lang_deDE, Message_Lang_zhCN, Message_Lang_zhTW, Message_Lang_esES, Message_Lang_esMX, Message_Lang_ruRU, RaidDuration, MaxPlayers FROM dbc_mapdifficulty");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_mapdifficulty. DB table `dbc_mapdifficulty` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        MapDifficultyDBC md;
+        md.ID = id;
+        md.MapID      = fields[1].GetUInt32();
+        md.Difficulty = fields[2].GetUInt32();
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            md.Message[i] = fields[3 + i].GetString();
+
+        md.RaidDuration = fields[12].GetUInt32();
+        md.MaxPlayers   = fields[13].GetUInt32();
+
+        _mapDifficultyMap[id] = md;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_mapdifficulty                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

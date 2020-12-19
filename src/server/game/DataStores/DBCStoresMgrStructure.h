@@ -1154,3 +1154,16 @@ struct MapDBC
 
     bool IsDynamicDifficultyMap() const { return (Flags & MAP_FLAG_DYNAMIC_DIFFICULTY) != 0; }
 };
+
+// load MapDifficulty.dbc
+struct MapDifficultyDBC
+{
+    uint32 ID;                                              // 0
+    uint32 MapID;                                           // 1
+    uint32 Difficulty;                                      // 2 (for arenas: arena slot)
+    std::string Message[TOTAL_LOCALES];                     // 3-18 text showed when transfer to map failed (missing requirements)
+    //uint32 Message_lang_mask;                             // 19
+    uint32 RaidDuration;                                    // 20
+    uint32 MaxPlayers;                                      // 21
+    //char const* Difficultystring;                         // 22
+};

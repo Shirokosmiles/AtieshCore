@@ -59,19 +59,6 @@ struct ItemCondExtCostsEntry
 #define MAX_ITEM_ENCHANTMENT_EFFECTS 3
 
 
-
-struct MapDifficultyEntry
-{
-    //uint32 ID;                                            // 0
-    uint32 MapID;                                           // 1
-    uint32 Difficulty;                                      // 2 (for arenas: arena slot)
-    char const* Message;                                    // 3-18 text showed when transfer to map failed (missing requirements)
-    //uint32 Message_lang_mask;                             // 19
-    uint32 RaidDuration;                                    // 20
-    uint32 MaxPlayers;                                      // 21
-    //char const* Difficultystring;                         // 22
-};
-
 struct MovieEntry
 {
     uint32 ID;                                              // 0
@@ -898,7 +885,7 @@ struct WorldStateZoneSounds
 #pragma pack(pop)
 
 // Structures not used for casting to loaded DBC data and not required then packing
-struct MapDifficulty
+/*struct MapDifficulty
 {
     MapDifficulty() : resetTime(0), maxPlayers(0), hasErrorMessage(false) { }
     MapDifficulty(uint32 _resetTime, uint32 _maxPlayers, bool _hasErrorMessage) : resetTime(_resetTime), maxPlayers(_maxPlayers), hasErrorMessage(_hasErrorMessage) { }
@@ -906,7 +893,7 @@ struct MapDifficulty
     uint32 resetTime;
     uint32 maxPlayers;
     bool hasErrorMessage;
-};
+};*/
 
 struct TalentSpellPos
 {

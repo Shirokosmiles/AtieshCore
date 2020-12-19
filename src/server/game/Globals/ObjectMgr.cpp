@@ -2107,7 +2107,7 @@ void ObjectMgr::LoadCreatures()
         if (MapDBC const* mapInfo = &itr->second)
         {
             for (uint8 k = 0; k < MAX_DIFFICULTY; ++k)
-                if (GetMapDifficultyData(mapInfo->ID, Difficulty(k)))
+                if (sDBCStoresMgr->GetMapDifficultyData(mapInfo->ID, Difficulty(k)))
                     spawnMasks[mapInfo->ID] |= (1 << k);
         }
     }
@@ -2408,7 +2408,7 @@ void ObjectMgr::LoadGameObjects()
         if (MapDBC const* mapInfo = &itr->second)
         {
             for (uint8 k = 0; k < MAX_DIFFICULTY; ++k)
-                if (GetMapDifficultyData(mapInfo->ID, Difficulty(k)))
+                if (sDBCStoresMgr->GetMapDifficultyData(mapInfo->ID, Difficulty(k)))
                     spawnMasks[mapInfo->ID] |= (1 << k);
         }
     }
