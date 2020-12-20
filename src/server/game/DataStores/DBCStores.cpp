@@ -142,7 +142,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //NameValidationRegexContainer NamesProfaneValidators;
 //NameValidationRegexContainer NamesReservedValidators;
 
-DBCStorage <OverrideSpellDataEntry> sOverrideSpellDataStore(OverrideSpellDatafmt);
+//DBCStorage <OverrideSpellDataEntry> sOverrideSpellDataStore(OverrideSpellDatafmt);
 
 DBCStorage <PowerDisplayEntry> sPowerDisplayStore(PowerDisplayfmt);
 DBCStorage <PvPDifficultyEntry> sPvPDifficultyStore(PvPDifficultyfmt);
@@ -353,7 +353,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sMovieStore,                         "Movie.dbc");
     //LOAD_DBC(sNamesProfanityStore,                "NamesProfanity.dbc");
     //LOAD_DBC(sNamesReservedStore,                 "NamesReserved.dbc");
-    LOAD_DBC(sOverrideSpellDataStore,             "OverrideSpellData.dbc");
+    //LOAD_DBC(sOverrideSpellDataStore,             "OverrideSpellData.dbc");
     LOAD_DBC(sPowerDisplayStore,                  "PowerDisplay.dbc");
     LOAD_DBC(sPvPDifficultyStore,                 "PvpDifficulty.dbc");
     LOAD_DBC(sQuestXPStore,                       "QuestXP.dbc");

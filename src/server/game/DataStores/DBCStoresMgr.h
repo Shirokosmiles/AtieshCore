@@ -100,14 +100,13 @@ typedef std::unordered_map<uint32 /*ID*/, NamesProfanityDBC> NamesProfanityDBCMa
 typedef std::unordered_map<uint32 /*ID*/, NamesReservedDBC> NamesReservedDBCMap;
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 
+typedef std::unordered_map<uint32 /*ID*/, OverrideSpellDataDBC> OverrideSpellDataDBCMap;
+
 class TC_GAME_API DBCStoresMgr
 {
 private:
     DBCStoresMgr() {}
     ~DBCStoresMgr();
-
-    NameValidationRegexContainer NamesProfaneValidators;
-    NameValidationRegexContainer NamesReservedValidators;
 
 public:
     static DBCStoresMgr* instance();
@@ -792,6 +791,15 @@ public:
         return nullptr;
     }
 
+    OverrideSpellDataDBC const* GetOverrideSpellDataDBC(uint32 ID)
+    {
+        OverrideSpellDataDBCMap::const_iterator itr = _overrideSpellDataMap.find(ID);
+        if (itr != _overrideSpellDataMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
         if (locale >= TOTAL_LOCALES)
@@ -883,6 +891,7 @@ protected:
     void _Load_Movie();
     void _Load_NamesProfanity();
     void _Load_NamesReserved();
+    void _Load_OverrideSpellData();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -958,6 +967,11 @@ private:
     MovieDBCMap _movieMap;
     NamesProfanityDBCMap _namesProfanityMap;
     NamesReservedDBCMap _namesReservedMap;
+    OverrideSpellDataDBCMap _overrideSpellDataMap;
+
+    // handler containers
+    NameValidationRegexContainer NamesProfaneValidators;
+    NameValidationRegexContainer NamesReservedValidators;    
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

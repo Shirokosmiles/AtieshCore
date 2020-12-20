@@ -103,6 +103,7 @@ DBCStoresMgr::~DBCStoresMgr()
         NamesProfaneValidators[i].clear();
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
         NamesReservedValidators[i].clear();
+    _overrideSpellDataMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -180,6 +181,7 @@ void DBCStoresMgr::Initialize()
     _Load_Movie();
     _Load_NamesProfanity();
     _Load_NamesReserved();
+    _Load_OverrideSpellData();
 }
 
 // load Achievement.dbc
@@ -2942,4 +2944,38 @@ void DBCStoresMgr::_Load_NamesReserved()
 
     // clear this datamap (UNUSED)
     _namesReservedMap.clear();
+}
+
+// load OverrideSpellData.dbc
+void DBCStoresMgr::_Load_OverrideSpellData()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _overrideSpellDataMap.clear();
+    //                                                0     1          2        3         4         5         6         7           8       9         10
+    QueryResult result = WorldDatabase.Query("SELECT ID, Spells_1, Spells_2, Spells_3, Spells_4, Spells_5, Spells_6, Spells_7, Spells_8, Spells_9, Spells_10 FROM dbc_overridespelldata");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_overridespelldata. DB table `dbc_overridespelldata` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        OverrideSpellDataDBC osd;
+        osd.ID = id;
+        for (uint8 i = 0; i < MAX_OVERRIDE_SPELL; i++)
+            osd.Spells[i] = fields[1 + i].GetUInt32();
+
+        _overrideSpellDataMap[id] = osd;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_overridespelldata             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

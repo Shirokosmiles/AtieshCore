@@ -1191,3 +1191,13 @@ struct NamesReservedDBC
     std::string Name;                                       // 1
     int32 Language;                                         // 2
 };
+
+// load OverrideSpellData.dbc
+#define MAX_OVERRIDE_SPELL 10
+
+struct OverrideSpellDataDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Spells[MAX_OVERRIDE_SPELL];                      // 1-10
+    //uint32 Flags;                                         // 11
+};
