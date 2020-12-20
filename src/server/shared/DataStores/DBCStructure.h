@@ -63,25 +63,9 @@ struct ItemCondExtCostsEntry
 
 
 
-struct PvPDifficultyEntry
-{
-    //uint32 ID;                                            // 0
-    uint32 MapID;                                           // 1
-    uint32 RangeIndex;                                      // 2
-    uint32 MinLevel;                                        // 3
-    uint32 MaxLevel;                                        // 4
-    uint32 Difficulty;                                      // 5
 
-    // helpers
-    BattlegroundBracketId GetBracketId() const { return BattlegroundBracketId(RangeIndex); }
-};
 
-struct QuestSortEntry
-{
-    uint32 ID;                                              // 0
-    //char const* SortName[16];                             // 1-16
-    //uint32 SortName_lang;                                 // 17
-};
+
 
 struct QuestXPEntry
 {

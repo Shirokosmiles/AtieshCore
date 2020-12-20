@@ -4821,7 +4821,7 @@ void ObjectMgr::LoadQuests()
         // client quest log visual (sort case)
         if (qinfo->_zoneOrSort < 0)
         {
-            QuestSortEntry const* qSort = sQuestSortStore.LookupEntry(-int32(qinfo->_zoneOrSort));
+            QuestSortDBC const* qSort = sDBCStoresMgr->GetQuestSortDBC(-int32(qinfo->_zoneOrSort));
             if (!qSort)
             {
                 TC_LOG_ERROR("sql.sql", "Quest %u has `ZoneOrSort` = %i (sort case) but quest sort with this id does not exist.",

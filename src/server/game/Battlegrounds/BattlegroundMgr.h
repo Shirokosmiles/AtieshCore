@@ -84,7 +84,7 @@ class TC_GAME_API BattlegroundMgr
         Battleground* GetBattlegroundThroughClientInstance(uint32 instanceId, BattlegroundTypeId bgTypeId);
         Battleground* GetBattleground(uint32 InstanceID, BattlegroundTypeId bgTypeId);
         Battleground* GetBattlegroundTemplate(BattlegroundTypeId bgTypeId);
-        Battleground* CreateNewBattleground(BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated);
+        Battleground* CreateNewBattleground(BattlegroundTypeId bgTypeId, PvPDifficultyDBC const* bracketEntry, uint8 arenaType, bool isRated);
 
         // ArenaSpectator
         BattlegroundContainer* GetBattlegroundsByType(BattlegroundTypeId bgTypeId)

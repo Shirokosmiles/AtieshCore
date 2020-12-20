@@ -56,8 +56,8 @@ TC_GAME_API uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
 
 //TC_GAME_API uint32 GetLiquidFlags(uint32 liquidType);
 
-TC_GAME_API PvPDifficultyEntry const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 level);
-TC_GAME_API PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundBracketId id);
+//TC_GAME_API PvPDifficultyEntry const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 level);
+//TC_GAME_API PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundBracketId id);
 
 //TC_GAME_API CharacterFacialHairStylesEntry const* GetCharFacialHairEntry(uint8 race, uint8 gender, uint8 facialHairID);
 //TC_GAME_API CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color);
@@ -145,7 +145,7 @@ TC_GAME_API SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, u
 //TC_GAME_API extern DBCStorage <MovieEntry>                   sMovieStore;
 //TC_GAME_API extern DBCStorage <OverrideSpellDataEntry>       sOverrideSpellDataStore;
 //TC_GAME_API extern DBCStorage <PowerDisplayEntry>            sPowerDisplayStore;
-TC_GAME_API extern DBCStorage <QuestSortEntry>               sQuestSortStore;
+//TC_GAME_API extern DBCStorage <QuestSortEntry>               sQuestSortStore;
 TC_GAME_API extern DBCStorage <QuestXPEntry>                 sQuestXPStore;
 TC_GAME_API extern DBCStorage <QuestFactionRewEntry>         sQuestFactionRewardStore;
 TC_GAME_API extern DBCStorage <RandPropPointsEntry>          sRandPropPointsStore;

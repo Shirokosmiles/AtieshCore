@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DBCEnums.h"
+
  // load Achievement.dbc
 struct AchievementDBC
 {
@@ -1211,4 +1213,26 @@ struct PowerDisplayDBC
     //uint8 Red;                                            // 3
     //uint8 Green;                                          // 4
     //uint8 Blue;                                           // 5
+};
+
+// load PvpDifficulty.dbc
+struct PvPDifficultyDBC
+{
+    uint32 ID;                                              // 0
+    uint32 MapID;                                           // 1
+    uint32 RangeIndex;                                      // 2
+    uint32 MinLevel;                                        // 3
+    uint32 MaxLevel;                                        // 4
+    uint32 Difficulty;                                      // 5
+
+    // helpers
+    BattlegroundBracketId GetBracketId() const { return BattlegroundBracketId(RangeIndex); }
+};
+
+// load QuestSort.dbc
+struct QuestSortDBC
+{
+    uint32 ID;                                              // 0
+    //char const* SortName[16];                             // 1-16
+    //uint32 SortName_lang;                                 // 17
 };

@@ -102,6 +102,8 @@ typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRe
 
 typedef std::unordered_map<uint32 /*ID*/, OverrideSpellDataDBC> OverrideSpellDataDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, PowerDisplayDBC> PowerDisplayDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, PvPDifficultyDBC> PvPDifficultyDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, QuestSortDBC> QuestSortDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -808,6 +810,44 @@ public:
         return nullptr;
     }
 
+    PvPDifficultyDBC const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 level)
+    {
+        PvPDifficultyDBC const* maxEntry = nullptr;              // used for level > max listed level case
+        for (PvPDifficultyDBCMap::const_iterator itr = _pvpDifficultyMap.begin(); itr != _pvpDifficultyMap.end(); ++itr)
+        {
+            // skip unrelated and too-high brackets
+            if (itr->second.MapID != mapid || itr->second.MinLevel > level)
+                continue;
+
+            // exactly fit
+            if (itr->second.MaxLevel >= level)
+                return &itr->second;
+
+            // remember for possible out-of-range case (search higher from existed)
+            if (!maxEntry || maxEntry->MaxLevel < itr->second.MaxLevel)
+                maxEntry = &itr->second;
+        }
+        return maxEntry;
+    }
+
+    PvPDifficultyDBC const* GetBattlegroundBracketById(uint32 mapid, BattlegroundBracketId id)
+    {
+        for (PvPDifficultyDBCMap::const_iterator itr = _pvpDifficultyMap.begin(); itr != _pvpDifficultyMap.end(); ++itr)
+        {
+            if (itr->second.MapID == mapid && itr->second.GetBracketId() == id)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
+    QuestSortDBC const* GetQuestSortDBC(uint32 ID)
+    {
+        QuestSortDBCMap::const_iterator itr = _questSortMap.find(ID);
+        if (itr != _questSortMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -902,6 +942,8 @@ protected:
     void _Load_NamesReserved();
     void _Load_OverrideSpellData();
     void _Load_PowerDisplay();
+    void _Load_PvpDifficulty();
+    void _Load_QuestSort();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -979,6 +1021,8 @@ private:
     NamesReservedDBCMap _namesReservedMap;
     OverrideSpellDataDBCMap _overrideSpellDataMap;
     PowerDisplayDBCMap _powerDisplayMap;
+    PvPDifficultyDBCMap _pvpDifficultyMap;
+    QuestSortDBCMap _questSortMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

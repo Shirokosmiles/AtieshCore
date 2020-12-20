@@ -105,6 +105,8 @@ DBCStoresMgr::~DBCStoresMgr()
         NamesReservedValidators[i].clear();
     _overrideSpellDataMap.clear();
     _powerDisplayMap.clear();
+    _pvpDifficultyMap.clear();
+    _questSortMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -184,6 +186,8 @@ void DBCStoresMgr::Initialize()
     _Load_NamesReserved();
     _Load_OverrideSpellData();
     _Load_PowerDisplay();
+    _Load_PvpDifficulty();
+    _Load_QuestSort();
 }
 
 // load Achievement.dbc
@@ -3013,4 +3017,75 @@ void DBCStoresMgr::_Load_PowerDisplay()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_powerdisplay                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load PvpDifficulty.dbc
+void DBCStoresMgr::_Load_PvpDifficulty()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _pvpDifficultyMap.clear();
+    //                                                0     1       2           3         4         5
+    QueryResult result = WorldDatabase.Query("SELECT ID, MapID, RangeIndex, MinLevel, MaxLevel, Difficulty FROM dbc_pvpdifficulty");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_pvpdifficulty. DB table `dbc_pvpdifficulty` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        PvPDifficultyDBC pd;
+        pd.ID = id;
+        pd.MapID      = fields[1].GetUInt32();
+        pd.RangeIndex = fields[2].GetUInt32();
+        pd.MinLevel   = fields[3].GetUInt32();
+        pd.MaxLevel   = fields[4].GetUInt32();
+        pd.Difficulty = fields[5].GetUInt32();
+
+        ASSERT(pd.RangeIndex < MAX_BATTLEGROUND_BRACKETS, "PvpDifficulty bracket (%d) exceeded max allowed value (%d)", pd.RangeIndex, MAX_BATTLEGROUND_BRACKETS);
+
+        _pvpDifficultyMap[id] = pd;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_pvpdifficulty                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load QuestSort.dbc
+void DBCStoresMgr::_Load_QuestSort()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _questSortMap.clear();
+    //                                                0
+    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_questsort");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_questsort. DB table `dbc_questsort` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        QuestSortDBC qs;
+        qs.ID = id;
+
+        _questSortMap[id] = qs;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_questsort                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

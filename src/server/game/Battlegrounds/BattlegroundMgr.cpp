@@ -349,7 +349,7 @@ uint32 BattlegroundMgr::CreateClientVisibleInstanceId(BattlegroundTypeId bgTypeI
 }
 
 // create a new battleground that will really be used to play
-Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId originalBgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated)
+Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId originalBgTypeId, PvPDifficultyDBC const* bracketEntry, uint8 arenaType, bool isRated)
 {
     BattlegroundTypeId bgTypeId = GetRandomBG(originalBgTypeId);
 
@@ -682,7 +682,7 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, ObjectGuid 
         if (it != bgDataStore.end())
         {
             // expected bracket entry
-            if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(it->second.m_Battlegrounds.begin()->second->GetMapId(), player->GetLevel()))
+            if (PvPDifficultyDBC const* bracketEntry = sDBCStoresMgr->GetBattlegroundBracketByLevel(it->second.m_Battlegrounds.begin()->second->GetMapId(), player->GetLevel()))
             {
                 uint32 count = 0;
                 BattlegroundBracketId bracketId = bracketEntry->GetBracketId();

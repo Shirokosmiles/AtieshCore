@@ -48,7 +48,7 @@ class WorldPacket;
 
 struct QuaternionData;
 struct BattlegroundScore;
-struct PvPDifficultyEntry;
+struct PvPDifficultyDBC;
 struct WorldSafeLocsEntry;
 
 enum BattlegroundDesertionType
@@ -333,7 +333,7 @@ class TC_GAME_API Battleground
         void SetTypeID(BattlegroundTypeId TypeID) { m_TypeID = TypeID; }
         void SetRandomTypeID(BattlegroundTypeId TypeID) { m_RandomTypeID = TypeID; }
         //here we can count minlevel and maxlevel for players
-        void SetBracket(PvPDifficultyEntry const* bracketEntry);
+        void SetBracket(PvPDifficultyDBC const* bracketEntry);
         void SetInstanceID(uint32 InstanceID) { m_InstanceID = InstanceID; }
         void SetStatus(BattlegroundStatus Status) { m_Status = Status; }
         void SetClientInstanceID(uint32 InstanceID) { m_ClientInstanceID = InstanceID; }

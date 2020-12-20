@@ -145,9 +145,9 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <OverrideSpellDataEntry> sOverrideSpellDataStore(OverrideSpellDatafmt);
 
 //DBCStorage <PowerDisplayEntry> sPowerDisplayStore(PowerDisplayfmt);
-DBCStorage <PvPDifficultyEntry> sPvPDifficultyStore(PvPDifficultyfmt);
+//DBCStorage <PvPDifficultyEntry> sPvPDifficultyStore(PvPDifficultyfmt);
 
-DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
+//DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
 DBCStorage <QuestXPEntry>   sQuestXPStore(QuestXPfmt);
 DBCStorage <QuestFactionRewEntry>  sQuestFactionRewardStore(QuestFactionRewardfmt);
 DBCStorage <RandPropPointsEntry> sRandPropPointsStore(RandPropPointsfmt);
@@ -355,10 +355,10 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sNamesReservedStore,                 "NamesReserved.dbc");
     //LOAD_DBC(sOverrideSpellDataStore,             "OverrideSpellData.dbc");
     //LOAD_DBC(sPowerDisplayStore,                  "PowerDisplay.dbc");
-    LOAD_DBC(sPvPDifficultyStore,                 "PvpDifficulty.dbc");
+    //LOAD_DBC(sPvPDifficultyStore,                 "PvpDifficulty.dbc");
     LOAD_DBC(sQuestXPStore,                       "QuestXP.dbc");
     LOAD_DBC(sQuestFactionRewardStore,            "QuestFactionReward.dbc");
-    LOAD_DBC(sQuestSortStore,                     "QuestSort.dbc");
+    //LOAD_DBC(sQuestSortStore,                     "QuestSort.dbc");
     LOAD_DBC(sRandPropPointsStore,                "RandPropPoints.dbc");
     LOAD_DBC(sScalingStatDistributionStore,       "ScalingStatDistribution.dbc");
     LOAD_DBC(sScalingStatValuesStore,             "ScalingStatValues.dbc");
@@ -409,11 +409,6 @@ void LoadDBCStores(const std::string& dataPath)
     // fill data
     //for (MapDifficultyEntry const* entry : sMapDifficultyStore)
     //    sMapDifficultyMap[MAKE_PAIR32(entry->MapID, entry->Difficulty)] = MapDifficulty(entry->RaidDuration, entry->MaxPlayers, entry->Message[0] != '\0');
-
-    for (PvPDifficultyEntry const* entry : sPvPDifficultyStore)
-    {
-        ASSERT(entry->RangeIndex < MAX_BATTLEGROUND_BRACKETS, "PvpDifficulty bracket (%d) exceeded max allowed value (%d)", entry->RangeIndex, MAX_BATTLEGROUND_BRACKETS);
-    }
 
     for (SkillRaceClassInfoEntry const* entry : sSkillRaceClassInfoStore)
         if (sSkillLineStore.LookupEntry(entry->SkillID))
@@ -712,92 +707,10 @@ void Map2ZoneCoordinates(float& x, float& y, uint32 zone)
     std::swap(x, y);                                         // client have map coords swapped
 }
 
-/*MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty)
-{
-    MapDifficultyMap::const_iterator itr = sMapDifficultyMap.find(MAKE_PAIR32(mapId, difficulty));
-    return itr != sMapDifficultyMap.end() ? &itr->second : nullptr;
-}
-
-MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty &difficulty)
-{
-    uint32 tmpDiff = difficulty;
-    MapDifficulty const* mapDiff = GetMapDifficultyData(mapId, Difficulty(tmpDiff));
-    if (!mapDiff)
-    {
-        if (tmpDiff > RAID_DIFFICULTY_25MAN_NORMAL) // heroic, downscale to normal
-            tmpDiff -= 2;
-        else
-            tmpDiff -= 1;   // any non-normal mode for raids like tbc (only one mode)
-
-        // pull new data
-        mapDiff = GetMapDifficultyData(mapId, Difficulty(tmpDiff)); // we are 10 normal or 25 normal
-        if (!mapDiff)
-        {
-            tmpDiff -= 1;
-            mapDiff = GetMapDifficultyData(mapId, Difficulty(tmpDiff)); // 10 normal
-        }
-    }
-
-    difficulty = Difficulty(tmpDiff);
-    return mapDiff;
-}*/
-
-PvPDifficultyEntry const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 level)
-{
-    PvPDifficultyEntry const* maxEntry = nullptr;              // used for level > max listed level case
-    for (uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
-    {
-        if (PvPDifficultyEntry const* entry = sPvPDifficultyStore.LookupEntry(i))
-        {
-            // skip unrelated and too-high brackets
-            if (entry->MapID != mapid || entry->MinLevel > level)
-                continue;
-
-            // exactly fit
-            if (entry->MaxLevel >= level)
-                return entry;
-
-            // remember for possible out-of-range case (search higher from existed)
-            if (!maxEntry || maxEntry->MaxLevel < entry->MaxLevel)
-                maxEntry = entry;
-        }
-    }
-
-    return maxEntry;
-}
-
-PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundBracketId id)
-{
-    for (uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
-        if (PvPDifficultyEntry const* entry = sPvPDifficultyStore.LookupEntry(i))
-            if (entry->MapID == mapid && entry->GetBracketId() == id)
-                return entry;
-
-    return nullptr;
-}
-
 uint32 const* GetTalentTabPages(uint8 cls)
 {
     return sTalentTabPages[cls];
 }
-
-
-
-/// Returns LFGDungeonEntry for a specific map and difficulty. Will return first found entry if multiple dungeons use the same map (such as Scarlet Monastery)
-/*LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty)
-{
-    for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
-    {
-        LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(i);
-        if (!dungeon)
-            continue;
-
-        if (dungeon->MapID == int32(mapId) && Difficulty(dungeon->Difficulty) == difficulty)
-            return dungeon;
-    }
-
-    return nullptr;
-}*/
 
 SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_)
 {

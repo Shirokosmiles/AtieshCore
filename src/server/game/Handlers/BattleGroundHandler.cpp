@@ -121,7 +121,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         return;
 
     // expected bracket entry
-    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), _player->GetLevel());
+    PvPDifficultyDBC const* bracketEntry = sDBCStoresMgr->GetBattlegroundBracketByLevel(bg->GetMapId(), _player->GetLevel());
     if (!bracketEntry)
         return;
 
@@ -422,7 +422,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
         GetPlayerInfo().c_str(), type, unk2, bgTypeId_, action);
 
     // expected bracket entry
-    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), _player->GetLevel());
+    PvPDifficultyDBC const* bracketEntry = sDBCStoresMgr->GetBattlegroundBracketByLevel(bg->GetMapId(), _player->GetLevel());
     if (!bracketEntry)
         return;
 
@@ -604,7 +604,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket & /*recvData*/)
                 continue;
 
             // expected bracket entry
-            PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), _player->GetLevel());
+            PvPDifficultyDBC const* bracketEntry = sDBCStoresMgr->GetBattlegroundBracketByLevel(bg->GetMapId(), _player->GetLevel());
             if (!bracketEntry)
                 continue;
 
@@ -673,7 +673,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
 
     BattlegroundTypeId bgTypeId = bg->GetTypeID();
     BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, arenatype);
-    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), _player->GetLevel());
+    PvPDifficultyDBC const* bracketEntry = sDBCStoresMgr->GetBattlegroundBracketByLevel(bg->GetMapId(), _player->GetLevel());
     if (!bracketEntry)
         return;
 
