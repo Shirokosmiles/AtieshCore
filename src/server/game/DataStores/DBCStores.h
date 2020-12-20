@@ -69,7 +69,7 @@ typedef std::unordered_multimap<uint32, SkillRaceClassInfoEntry const*> SkillRac
 typedef std::pair<SkillRaceClassInfoMap::iterator, SkillRaceClassInfoMap::iterator> SkillRaceClassInfoBounds;
 TC_GAME_API SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_);
 
-TC_GAME_API ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale);
+//TC_GAME_API ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale);
 
 //TC_GAME_API extern DBCStorage <AchievementEntry>             sAchievementStore;
 //TC_GAME_API extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;
@@ -142,7 +142,7 @@ TC_GAME_API ResponseCodes ValidateName(std::wstring const& name, LocaleConstant 
 //TC_GAME_API extern DBCStorage <MapEntry>                     sMapStore;
 //TC_GAME_API extern DBCStorage <MapDifficultyEntry>           sMapDifficultyStore; -- use GetMapDifficultyData insteed
 //TC_GAME_API extern MapDifficultyMap                          sMapDifficultyMap;
-TC_GAME_API extern DBCStorage <MovieEntry>                   sMovieStore;
+//TC_GAME_API extern DBCStorage <MovieEntry>                   sMovieStore;
 TC_GAME_API extern DBCStorage <OverrideSpellDataEntry>       sOverrideSpellDataStore;
 TC_GAME_API extern DBCStorage <PowerDisplayEntry>            sPowerDisplayStore;
 TC_GAME_API extern DBCStorage <QuestSortEntry>               sQuestSortStore;

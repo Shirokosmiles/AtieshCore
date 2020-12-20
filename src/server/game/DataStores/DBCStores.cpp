@@ -134,13 +134,13 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <MapDifficultyEntry> sMapDifficultyStore(MapDifficultyEntryfmt); // only for loading
 //MapDifficultyMap sMapDifficultyMap;
 
-DBCStorage <MovieEntry> sMovieStore(MovieEntryfmt);
+//DBCStorage <MovieEntry> sMovieStore(MovieEntryfmt);
 
-DBCStorage<NamesProfanityEntry> sNamesProfanityStore(NamesProfanityEntryfmt);
-DBCStorage<NamesReservedEntry> sNamesReservedStore(NamesReservedEntryfmt);
-typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
-NameValidationRegexContainer NamesProfaneValidators;
-NameValidationRegexContainer NamesReservedValidators;
+//DBCStorage<NamesProfanityEntry> sNamesProfanityStore(NamesProfanityEntryfmt);
+//DBCStorage<NamesReservedEntry> sNamesReservedStore(NamesReservedEntryfmt);
+//typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
+//NameValidationRegexContainer NamesProfaneValidators;
+//NameValidationRegexContainer NamesReservedValidators;
 
 DBCStorage <OverrideSpellDataEntry> sOverrideSpellDataStore(OverrideSpellDatafmt);
 
@@ -350,9 +350,9 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sMailTemplateStore,                  "MailTemplate.dbc");
     //LOAD_DBC(sMapStore,                           "Map.dbc");
     //LOAD_DBC(sMapDifficultyStore,                 "MapDifficulty.dbc");
-    LOAD_DBC(sMovieStore,                         "Movie.dbc");
-    LOAD_DBC(sNamesProfanityStore,                "NamesProfanity.dbc");
-    LOAD_DBC(sNamesReservedStore,                 "NamesReserved.dbc");
+    //LOAD_DBC(sMovieStore,                         "Movie.dbc");
+    //LOAD_DBC(sNamesProfanityStore,                "NamesProfanity.dbc");
+    //LOAD_DBC(sNamesReservedStore,                 "NamesReserved.dbc");
     LOAD_DBC(sOverrideSpellDataStore,             "OverrideSpellData.dbc");
     LOAD_DBC(sPowerDisplayStore,                  "PowerDisplay.dbc");
     LOAD_DBC(sPvPDifficultyStore,                 "PvpDifficulty.dbc");
@@ -409,34 +409,6 @@ void LoadDBCStores(const std::string& dataPath)
     // fill data
     //for (MapDifficultyEntry const* entry : sMapDifficultyStore)
     //    sMapDifficultyMap[MAKE_PAIR32(entry->MapID, entry->Difficulty)] = MapDifficulty(entry->RaidDuration, entry->MaxPlayers, entry->Message[0] != '\0');
-
-    for (NamesProfanityEntry const* namesProfanity : sNamesProfanityStore)
-    {
-        ASSERT(namesProfanity->Language < TOTAL_LOCALES || namesProfanity->Language == -1);
-        std::wstring wname;
-        bool conversionResult = Utf8toWStr(namesProfanity->Name, wname);
-        ASSERT(conversionResult);
-
-        if (namesProfanity->Language != -1)
-            NamesProfaneValidators[namesProfanity->Language].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
-        else
-            for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
-                NamesProfaneValidators[i].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
-    }
-
-    for (NamesReservedEntry const* namesReserved : sNamesReservedStore)
-    {
-        ASSERT(namesReserved->Language < TOTAL_LOCALES || namesReserved->Language == -1);
-        std::wstring wname;
-        bool conversionResult = Utf8toWStr(namesReserved->Name, wname);
-        ASSERT(conversionResult);
-
-        if (namesReserved->Language != -1)
-            NamesReservedValidators[namesReserved->Language].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
-        else
-            for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
-                NamesReservedValidators[i].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
-    }
 
     for (PvPDifficultyEntry const* entry : sPvPDifficultyStore)
     {
@@ -843,19 +815,4 @@ SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, u
     return nullptr;
 }
 
-ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
-{
-    if (locale >= TOTAL_LOCALES)
-        return RESPONSE_FAILURE;
 
-    for (Trinity::wregex const& regex : NamesProfaneValidators[locale])
-        if (Trinity::regex_search(name, regex))
-            return CHAR_NAME_PROFANE;
-
-    // regexes at TOTAL_LOCALES are loaded from NamesReserved which is not locale specific
-    for (Trinity::wregex const& regex : NamesReservedValidators[locale])
-        if (Trinity::regex_search(name, regex))
-            return CHAR_NAME_RESERVED;
-
-    return CHAR_NAME_SUCCESS;
-}

@@ -21,6 +21,7 @@
 #include "Common.h"
 #include "DBCStoresMgrStructure.h"
 #include <unordered_map>
+#include "Regex.h"
 
 typedef std::unordered_map<uint32 /*ID*/, AchievementDBC> AchievementDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, AchievementCriteriaDBC> AchievementCriteriaDBCMap;
@@ -93,12 +94,20 @@ typedef std::unordered_map<uint32 /*ID*/, LockDBC> LockDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, MailTemplateDBC> MailTemplateDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, MapDBC> MapDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, MapDifficultyDBC> MapDifficultyDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, MovieDBC> MovieDBCMap;
+
+typedef std::unordered_map<uint32 /*ID*/, NamesProfanityDBC> NamesProfanityDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, NamesReservedDBC> NamesReservedDBCMap;
+typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 
 class TC_GAME_API DBCStoresMgr
 {
 private:
     DBCStoresMgr() {}
     ~DBCStoresMgr();
+
+    NameValidationRegexContainer NamesProfaneValidators;
+    NameValidationRegexContainer NamesReservedValidators;
 
 public:
     static DBCStoresMgr* instance();
@@ -775,6 +784,31 @@ public:
         return mapDiff;
     }
 
+    MovieDBC const* GetMovieDBC(uint32 ID)
+    {
+        MovieDBCMap::const_iterator itr = _movieMap.find(ID);
+        if (itr != _movieMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
+    {
+        if (locale >= TOTAL_LOCALES)
+            return RESPONSE_FAILURE;
+
+        for (Trinity::wregex const& regex : NamesProfaneValidators[locale])
+            if (Trinity::regex_search(name, regex))
+                return CHAR_NAME_PROFANE;
+
+        // regexes at TOTAL_LOCALES are loaded from NamesReserved which is not locale specific
+        for (Trinity::wregex const& regex : NamesReservedValidators[locale])
+            if (Trinity::regex_search(name, regex))
+                return CHAR_NAME_RESERVED;
+
+        return CHAR_NAME_SUCCESS;
+    }
+
 protected:
     void _Load_Achievement();
     void _Load_AchievementCriteria();
@@ -846,6 +880,9 @@ protected:
     void _Load_MailTemplate();
     void _Load_Map();
     void _Load_MapDifficulty();
+    void _Load_Movie();
+    void _Load_NamesProfanity();
+    void _Load_NamesReserved();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -918,6 +955,9 @@ private:
     MailTemplateDBCMap _mailTemplateMap;
     MapDBCMap _mapMap;
     MapDifficultyDBCMap _mapDifficultyMap;
+    MovieDBCMap _movieMap;
+    NamesProfanityDBCMap _namesProfanityMap;
+    NamesReservedDBCMap _namesReservedMap;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

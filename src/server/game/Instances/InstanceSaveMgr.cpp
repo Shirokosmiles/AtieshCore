@@ -438,7 +438,7 @@ void InstanceSaveManager::LoadResetTimes()
 
             ScheduleReset(true, t - ResetTimeDelay[type - 1], InstResetEvent(type, mapDiff->MapID, Difficulty(mapDiff->Difficulty), 0));
 
-            ResetTimeMapDiffInstancesBounds range = mapDiffResetInstances.equal_range(mapDiff->ID);
+            ResetTimeMapDiffInstancesBounds range = mapDiffResetInstances.equal_range(mapDiff->MapID);
             for (; range.first != range.second; ++range.first)
                 ScheduleReset(true, t - ResetTimeDelay[type - 1], InstResetEvent(type, mapDiff->MapID, Difficulty(mapDiff->Difficulty), range.first->second));
         }

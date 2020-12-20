@@ -59,27 +59,6 @@ struct ItemCondExtCostsEntry
 #define MAX_ITEM_ENCHANTMENT_EFFECTS 3
 
 
-struct MovieEntry
-{
-    uint32 ID;                                              // 0
-    //char const* Filename;                                 // 1
-    //uint32 Volume;                                        // 2 always 100
-};
-
-struct NamesProfanityEntry
-{
-    //uint32 ID;                                            // 0
-    char const* Name;                                       // 1
-    int32 Language;                                         // 2
-};
-
-struct NamesReservedEntry
-{
-    //uint32 ID;                                            // 0
-    char const* Name;                                       // 1
-    int32 Language;                                         // 2
-};
-
 #define MAX_OVERRIDE_SPELL 10
 
 struct OverrideSpellDataEntry

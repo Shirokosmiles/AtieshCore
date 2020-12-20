@@ -8556,7 +8556,7 @@ ResponseCodes ObjectMgr::CheckPlayerName(std::string_view name, LocaleConstant l
         if (wname[i] == wname[i-1] && wname[i] == wname[i-2])
             return CHAR_NAME_THREE_CONSECUTIVE;
 
-    return ValidateName(wname, locale);
+    return sDBCStoresMgr->ValidateName(wname, locale);
 }
 
 bool ObjectMgr::IsValidCharterName(std::string_view name)
@@ -8684,7 +8684,7 @@ PetNameInvalidReason ObjectMgr::CheckPetName(std::string_view name, LocaleConsta
     if (!isValidString(wname, strictMask, false))
         return PET_NAME_MIXED_LANGUAGES;
 
-    switch (ValidateName(wname, locale))
+    switch (sDBCStoresMgr->ValidateName(wname, locale))
     {
         case CHAR_NAME_PROFANE:
             return PET_NAME_PROFANE;

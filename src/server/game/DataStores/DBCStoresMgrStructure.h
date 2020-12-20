@@ -1167,3 +1167,27 @@ struct MapDifficultyDBC
     uint32 MaxPlayers;                                      // 21
     //char const* Difficultystring;                         // 22
 };
+
+// load Movie.dbc
+struct MovieDBC
+{
+    uint32 ID;                                              // 0
+    //char const* Filename;                                 // 1
+    //uint32 Volume;                                        // 2 always 100
+};
+
+// load NamesProfanity.dbc
+struct NamesProfanityDBC
+{
+    uint32 ID;                                              // 0
+    std::string Name;                                       // 1
+    int32 Language;                                         // 2
+};
+
+// load NamesReserved.dbc
+struct NamesReservedDBC
+{
+    uint32 ID;                                              // 0
+    std::string Name;                                       // 1
+    int32 Language;                                         // 2
+};

@@ -162,7 +162,7 @@ public:
     // movieId - ID from Movie.dbc
     static bool HandleDebugPlayMovieCommand(ChatHandler* handler, uint32 movieId)
     {
-        if (!sMovieStore.LookupEntry(movieId))
+        if (!sDBCStoresMgr->GetMovieDBC(movieId))
         {
             handler->PSendSysMessage(LANG_MOVIE_NOT_EXIST, movieId);
             handler->SetSentErrorMessage(true);

@@ -96,6 +96,13 @@ DBCStoresMgr::~DBCStoresMgr()
     _mailTemplateMap.clear();
     _mapMap.clear();
     _mapDifficultyMap.clear();
+    _movieMap.clear();
+    _namesProfanityMap.clear();
+    _namesReservedMap.clear();
+    for (uint32 i = 0; i < TOTAL_LOCALES; i++)
+        NamesProfaneValidators[i].clear();
+    for (uint32 i = 0; i < TOTAL_LOCALES; i++)
+        NamesReservedValidators[i].clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -170,6 +177,9 @@ void DBCStoresMgr::Initialize()
     _Load_MailTemplate();
     _Load_Map();
     _Load_MapDifficulty();
+    _Load_Movie();
+    _Load_NamesProfanity();
+    _Load_NamesReserved();
 }
 
 // load Achievement.dbc
@@ -2796,4 +2806,140 @@ void DBCStoresMgr::_Load_MapDifficulty()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_mapdifficulty                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load Movie.dbc
+void DBCStoresMgr::_Load_Movie()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _movieMap.clear();
+    //                                                0
+    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_movie");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_movie. DB table `dbc_movie` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        MovieDBC m;
+        m.ID = id;
+
+        _movieMap[id] = m;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_movie                         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load NamesProfanity.dbc
+void DBCStoresMgr::_Load_NamesProfanity()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _namesProfanityMap.clear();
+    //                                                0    1       2
+    QueryResult result = WorldDatabase.Query("SELECT ID, Name, Language FROM dbc_namesprofanity");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_namesprofanity. DB table `dbc_namesprofanity` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        NamesProfanityDBC np;
+        np.ID = id;
+        np.Name     = fields[1].GetString();
+        np.Language = fields[2].GetInt32();
+
+        _namesProfanityMap[id] = np;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_namesprofanity                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+
+    // Separate namesprofanity for languages
+    for (NamesProfanityDBCMap::const_iterator itr = _namesProfanityMap.begin(); itr != _namesProfanityMap.end(); ++itr)
+    {
+        ASSERT(itr->second.Language < TOTAL_LOCALES || itr->second.Language == -1);
+        std::wstring wname;
+        bool conversionResult = Utf8toWStr(itr->second.Name, wname);
+        ASSERT(conversionResult);
+
+        if (itr->second.Language != -1)
+            NamesProfaneValidators[itr->second.Language].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
+        else
+            for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
+                NamesProfaneValidators[i].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
+    }
+
+    // clear this datamap (UNUSED)
+    _namesProfanityMap.clear();
+}
+
+// load NamesReserved.dbc
+void DBCStoresMgr::_Load_NamesReserved()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _namesReservedMap.clear();
+    //                                                0    1       2
+    QueryResult result = WorldDatabase.Query("SELECT ID, Name, Language FROM dbc_namesreserved");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_namesreserved. DB table `dbc_namesreserved` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        NamesReservedDBC nr;
+        nr.ID = id;
+        nr.Name = fields[1].GetString();
+        nr.Language = fields[2].GetInt32();
+
+        _namesReservedMap[id] = nr;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_namesreserved                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+
+    // Separate namesreserved for languages
+    for (NamesReservedDBCMap::const_iterator itr = _namesReservedMap.begin(); itr != _namesReservedMap.end(); ++itr)
+    {
+        ASSERT(itr->second.Language < TOTAL_LOCALES || itr->second.Language == -1);
+        std::wstring wname;
+        bool conversionResult = Utf8toWStr(itr->second.Name, wname);
+        ASSERT(conversionResult);
+
+        if (itr->second.Language != -1)
+            NamesReservedValidators[itr->second.Language].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
+        else
+            for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
+                NamesReservedValidators[i].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
+    }
+
+    // clear this datamap (UNUSED)
+    _namesReservedMap.clear();
 }
