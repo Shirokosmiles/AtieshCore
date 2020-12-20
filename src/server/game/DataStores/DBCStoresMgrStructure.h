@@ -1236,3 +1236,10 @@ struct QuestSortDBC
     //char const* SortName[16];                             // 1-16
     //uint32 SortName_lang;                                 // 17
 };
+
+// load QuestXP.dbc
+struct QuestXPDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Difficulty[10];                                  // 1-10
+};

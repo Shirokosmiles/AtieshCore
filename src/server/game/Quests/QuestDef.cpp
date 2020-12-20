@@ -205,7 +205,7 @@ uint32 Quest::GetXPReward(Player const* player) const
     if (player)
     {
         int32 quest_level = (_level == -1 ? player->GetLevel() : _level);
-        QuestXPEntry const* xpentry = sQuestXPStore.LookupEntry(quest_level);
+        QuestXPDBC const* xpentry = sDBCStoresMgr->GetQuestXPDBC(quest_level);
         if (!xpentry)
             return 0;
 

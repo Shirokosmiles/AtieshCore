@@ -107,6 +107,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _powerDisplayMap.clear();
     _pvpDifficultyMap.clear();
     _questSortMap.clear();
+    _questXPMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -188,6 +189,7 @@ void DBCStoresMgr::Initialize()
     _Load_PowerDisplay();
     _Load_PvpDifficulty();
     _Load_QuestSort();
+    _Load_QuestXP();
 }
 
 // load Achievement.dbc
@@ -3088,4 +3090,38 @@ void DBCStoresMgr::_Load_QuestSort()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_questsort                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load QuestXP.dbc
+void DBCStoresMgr::_Load_QuestXP()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _questXPMap.clear();
+    //                                                0         1           2              3            4               5           6               7           8              9            10
+    QueryResult result = WorldDatabase.Query("SELECT ID, Difficulty_1, Difficulty_2, Difficulty_3, Difficulty_4, Difficulty_5, Difficulty_6, Difficulty_7, Difficulty_8, Difficulty_9, Difficulty_10 FROM dbc_questxp");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_questxp. DB table `dbc_questxp` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        QuestXPDBC qxp;
+        qxp.ID = id;
+        for (uint8 i = 0; i < 10; i++)
+            qxp.Difficulty[i] = fields[1 + i].GetUInt32();
+
+        _questXPMap[id] = qxp;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_questxp                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

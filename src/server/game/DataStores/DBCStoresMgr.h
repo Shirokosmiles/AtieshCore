@@ -104,6 +104,7 @@ typedef std::unordered_map<uint32 /*ID*/, OverrideSpellDataDBC> OverrideSpellDat
 typedef std::unordered_map<uint32 /*ID*/, PowerDisplayDBC> PowerDisplayDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, PvPDifficultyDBC> PvPDifficultyDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, QuestSortDBC> QuestSortDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, QuestXPDBC> QuestXPDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -848,6 +849,14 @@ public:
         return nullptr;
     }
 
+    QuestXPDBC const* GetQuestXPDBC(uint32 ID)
+    {
+        QuestXPDBCMap::const_iterator itr = _questXPMap.find(ID);
+        if (itr != _questXPMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -944,6 +953,7 @@ protected:
     void _Load_PowerDisplay();
     void _Load_PvpDifficulty();
     void _Load_QuestSort();
+    void _Load_QuestXP();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -1023,6 +1033,7 @@ private:
     PowerDisplayDBCMap _powerDisplayMap;
     PvPDifficultyDBCMap _pvpDifficultyMap;
     QuestSortDBCMap _questSortMap;
+    QuestXPDBCMap _questXPMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
