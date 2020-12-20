@@ -5561,7 +5561,7 @@ void Unit::UpdateDisplayPower()
             {
                 if (Vehicle* vehicle = GetVehicleKit())
                 {
-                    if (PowerDisplayEntry const* powerDisplay = sPowerDisplayStore.LookupEntry(vehicle->GetVehicleInfo()->PowerDisplayID))
+                    if (PowerDisplayDBC const* powerDisplay = sDBCStoresMgr->GetPowerDisplayDBC(vehicle->GetVehicleInfo()->PowerDisplayID))
                         displayPower = Powers(powerDisplay->ActualType);
                     else if (GetClass() == CLASS_ROGUE)
                         displayPower = POWER_ENERGY;

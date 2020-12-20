@@ -104,6 +104,7 @@ DBCStoresMgr::~DBCStoresMgr()
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
         NamesReservedValidators[i].clear();
     _overrideSpellDataMap.clear();
+    _powerDisplayMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -182,6 +183,7 @@ void DBCStoresMgr::Initialize()
     _Load_NamesProfanity();
     _Load_NamesReserved();
     _Load_OverrideSpellData();
+    _Load_PowerDisplay();
 }
 
 // load Achievement.dbc
@@ -2978,4 +2980,37 @@ void DBCStoresMgr::_Load_OverrideSpellData()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_overridespelldata             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load PowerDisplay.dbc
+void DBCStoresMgr::_Load_PowerDisplay()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _powerDisplayMap.clear();
+    //                                                0     1
+    QueryResult result = WorldDatabase.Query("SELECT ID, ActualType FROM dbc_powerdisplay");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_powerdisplay. DB table `dbc_powerdisplay` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        PowerDisplayDBC pd;
+        pd.ID = id;
+        pd.ActualType = fields[1].GetUInt32();
+
+        _powerDisplayMap[id] = pd;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_powerdisplay                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

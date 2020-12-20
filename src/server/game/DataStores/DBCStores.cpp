@@ -144,7 +144,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
 //DBCStorage <OverrideSpellDataEntry> sOverrideSpellDataStore(OverrideSpellDatafmt);
 
-DBCStorage <PowerDisplayEntry> sPowerDisplayStore(PowerDisplayfmt);
+//DBCStorage <PowerDisplayEntry> sPowerDisplayStore(PowerDisplayfmt);
 DBCStorage <PvPDifficultyEntry> sPvPDifficultyStore(PvPDifficultyfmt);
 
 DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
@@ -354,7 +354,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sNamesProfanityStore,                "NamesProfanity.dbc");
     //LOAD_DBC(sNamesReservedStore,                 "NamesReserved.dbc");
     //LOAD_DBC(sOverrideSpellDataStore,             "OverrideSpellData.dbc");
-    LOAD_DBC(sPowerDisplayStore,                  "PowerDisplay.dbc");
+    //LOAD_DBC(sPowerDisplayStore,                  "PowerDisplay.dbc");
     LOAD_DBC(sPvPDifficultyStore,                 "PvpDifficulty.dbc");
     LOAD_DBC(sQuestXPStore,                       "QuestXP.dbc");
     LOAD_DBC(sQuestFactionRewardStore,            "QuestFactionReward.dbc");

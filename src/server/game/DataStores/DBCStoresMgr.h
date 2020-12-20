@@ -101,6 +101,7 @@ typedef std::unordered_map<uint32 /*ID*/, NamesReservedDBC> NamesReservedDBCMap;
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 
 typedef std::unordered_map<uint32 /*ID*/, OverrideSpellDataDBC> OverrideSpellDataDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, PowerDisplayDBC> PowerDisplayDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -799,6 +800,14 @@ public:
         return nullptr;
     }
 
+    PowerDisplayDBC const* GetPowerDisplayDBC(uint32 ID)
+    {
+        PowerDisplayDBCMap::const_iterator itr = _powerDisplayMap.find(ID);
+        if (itr != _powerDisplayMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -892,6 +901,7 @@ protected:
     void _Load_NamesProfanity();
     void _Load_NamesReserved();
     void _Load_OverrideSpellData();
+    void _Load_PowerDisplay();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -968,6 +978,7 @@ private:
     NamesProfanityDBCMap _namesProfanityMap;
     NamesReservedDBCMap _namesReservedMap;
     OverrideSpellDataDBCMap _overrideSpellDataMap;
+    PowerDisplayDBCMap _powerDisplayMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

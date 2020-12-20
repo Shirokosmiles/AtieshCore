@@ -1201,3 +1201,14 @@ struct OverrideSpellDataDBC
     uint32 Spells[MAX_OVERRIDE_SPELL];                      // 1-10
     //uint32 Flags;                                         // 11
 };
+
+// load PowerDisplay.dbc
+struct PowerDisplayDBC
+{
+    uint32 ID;                                              // 0
+    uint32 ActualType;                                      // 1
+    //char const* GlobalStringBaseTag;                      // 2
+    //uint8 Red;                                            // 3
+    //uint8 Green;                                          // 4
+    //uint8 Blue;                                           // 5
+};
