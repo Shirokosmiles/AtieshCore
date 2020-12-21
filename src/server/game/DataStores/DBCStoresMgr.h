@@ -107,6 +107,7 @@ typedef std::unordered_map<uint32 /*ID*/, QuestSortDBC> QuestSortDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, QuestXPDBC> QuestXPDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, QuestFactionRewardDBC> QuestFactionRewardDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, RandPropPointsDBC> RandPropPointsDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ScalingStatDistributionDBC> ScalingStatDistributionDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -875,6 +876,14 @@ public:
         return nullptr;
     }
 
+    ScalingStatDistributionDBC const* GetScalingStatDistributionDBC(uint32 ID)
+    {
+        ScalingStatDistributionDBCMap::const_iterator itr = _scalingStatDistributionMap.find(ID);
+        if (itr != _scalingStatDistributionMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -974,6 +983,7 @@ protected:
     void _Load_QuestXP();
     void _Load_QuestFactionReward();
     void _Load_RandPropPoints();
+    void _Load_ScalingStatDistribution();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -1056,6 +1066,7 @@ private:
     QuestXPDBCMap _questXPMap;
     QuestFactionRewardDBCMap _questFactionRewardMap;
     RandPropPointsDBCMap _randPropPointsMap;
+    ScalingStatDistributionDBCMap _scalingStatDistributionMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

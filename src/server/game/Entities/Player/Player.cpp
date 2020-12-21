@@ -7482,12 +7482,12 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply, bool updateItemA
     TC_LOG_DEBUG("entities.player.items", "Player::_ApplyItemMods: completed");
 }
 
-ScalingStatDistributionEntry const* Player::GetScalingStatDistributionFor(ItemTemplate const& itemTemplate) const
+ScalingStatDistributionDBC const* Player::GetScalingStatDistributionFor(ItemTemplate const& itemTemplate) const
 {
     if (!itemTemplate.ScalingStatDistribution)
         return nullptr;
 
-    return sScalingStatDistributionStore.LookupEntry(itemTemplate.ScalingStatDistribution);
+    return sDBCStoresMgr->GetScalingStatDistributionDBC(itemTemplate.ScalingStatDistribution);
 }
 
 ScalingStatValuesEntry const* Player::GetScalingStatValuesFor(ItemTemplate const& itemTemplate) const
@@ -7495,7 +7495,7 @@ ScalingStatValuesEntry const* Player::GetScalingStatValuesFor(ItemTemplate const
     if (!itemTemplate.ScalingStatValue)
         return nullptr;
 
-    ScalingStatDistributionEntry const* ssd = GetScalingStatDistributionFor(itemTemplate);
+    ScalingStatDistributionDBC const* ssd = GetScalingStatDistributionFor(itemTemplate);
     if (!ssd)
         return nullptr;
 
@@ -7509,7 +7509,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     if (slot >= INVENTORY_SLOT_BAG_END || !proto)
         return;
 
-    ScalingStatDistributionEntry const* ssd = GetScalingStatDistributionFor(*proto);
+    ScalingStatDistributionDBC const* ssd = GetScalingStatDistributionFor(*proto);
     ScalingStatValuesEntry const* ssv = GetScalingStatValuesFor(*proto);
     if (only_level_scale && (!ssd || !ssv))
         return;
@@ -11505,7 +11505,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
                     return EQUIP_ERR_CANT_DO_RIGHT_NOW;
             }
 
-            ScalingStatDistributionEntry const* ssd = pProto->ScalingStatDistribution ? sScalingStatDistributionStore.LookupEntry(pProto->ScalingStatDistribution) : 0;
+            ScalingStatDistributionDBC const* ssd = pProto->ScalingStatDistribution ? sDBCStoresMgr->GetScalingStatDistributionDBC(pProto->ScalingStatDistribution) : 0;
             // check allowed level (extend range to upper values if MaxLevel more or equal max player level, this let GM set high level with 1...max range items)
             if (ssd && ssd->Maxlevel < DEFAULT_MAX_LEVEL && ssd->Maxlevel < GetLevel())
                 return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;

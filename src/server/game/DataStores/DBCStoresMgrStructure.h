@@ -1259,3 +1259,12 @@ struct RandPropPointsDBC
     uint32 Superior[5];                                     // 6-10
     uint32 Good[5];                                         // 11-15
 };
+
+// load ScalingStatDistribution.dbc
+struct ScalingStatDistributionDBC
+{
+    uint32 ID;                                              // 0
+    int32 StatID[10];                                       // 1-10
+    uint32 Bonus[10];                                       // 11-20
+    uint32 Maxlevel;                                        // 21
+};

@@ -110,6 +110,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _questXPMap.clear();
     _questFactionRewardMap.clear();
     _randPropPointsMap.clear();
+    _scalingStatDistributionMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -194,6 +195,7 @@ void DBCStoresMgr::Initialize()
     _Load_QuestXP();
     _Load_QuestFactionReward();
     _Load_RandPropPoints();
+    _Load_ScalingStatDistribution();
 }
 
 // load Achievement.dbc
@@ -3187,13 +3189,13 @@ void DBCStoresMgr::_Load_RandPropPoints()
         RandPropPointsDBC rpp;
         rpp.ID = id;
         for (uint8 i = 0; i < 5; i++)
-            rpp.Epic[i] = fields[1 + i].GetInt32();
+            rpp.Epic[i] = fields[1 + i].GetUInt32();
 
         for (uint8 i = 0; i < 5; i++)
-            rpp.Superior[i] = fields[6 + i].GetInt32();
+            rpp.Superior[i] = fields[6 + i].GetUInt32();
 
         for (uint8 i = 0; i < 5; i++)
-            rpp.Good[i] = fields[11 + i].GetInt32();
+            rpp.Good[i] = fields[11 + i].GetUInt32();
 
         _randPropPointsMap[id] = rpp;
 
@@ -3202,4 +3204,43 @@ void DBCStoresMgr::_Load_RandPropPoints()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_randproppoints                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ScalingStatDistribution.dbc
+void DBCStoresMgr::_Load_ScalingStatDistribution()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _scalingStatDistributionMap.clear();
+    //                                                0     1          2        3          4         5          6       7         8          9         10       11      12         13       14      15      16        17       18       19        20        21
+    QueryResult result = WorldDatabase.Query("SELECT ID, StatID_1, StatID_2, StatID_3, StatID_4, StatID_5, StatID_6, StatID_7, StatID_8, StatID_9, StatID_10, Bonus_1, Bonus_2, Bonus_3, Bonus_4, Bonus_5, Bonus_6, Bonus_7, Bonus_8, Bonus_9, Bonus_10, Maxlevel FROM dbc_scalingstatdistribution");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_scalingstatdistribution. DB table `dbc_scalingstatdistribution` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ScalingStatDistributionDBC ssd;
+        ssd.ID = id;
+        for (uint8 i = 0; i < 10; i++)
+            ssd.StatID[i] = fields[1 + i].GetInt32();
+
+        for (uint8 i = 0; i < 10; i++)
+            ssd.Bonus[i] = fields[11 + i].GetUInt32();
+
+        ssd.Maxlevel = fields[21].GetUInt32();
+
+        _scalingStatDistributionMap[id] = ssd;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_scalingstatdistribution       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

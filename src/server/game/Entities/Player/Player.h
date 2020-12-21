@@ -48,7 +48,7 @@ struct ItemSetEffect;
 struct ItemTemplate;
 struct Loot;
 struct Mail;
-struct ScalingStatDistributionEntry;
+struct ScalingStatDistributionDBC;
 struct ScalingStatValuesEntry;
 struct TrainerSpell;
 struct VendorItem;
@@ -1985,7 +1985,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void _RemoveAllItemMods();
         void _ApplyAllItemMods();
         void _ApplyAllLevelScaleItemMods(bool apply);
-        ScalingStatDistributionEntry const* GetScalingStatDistributionFor(ItemTemplate const& itemTemplate) const;
+        ScalingStatDistributionDBC const* GetScalingStatDistributionFor(ItemTemplate const& itemTemplate) const;
         ScalingStatValuesEntry const* GetScalingStatValuesFor(ItemTemplate const& itemTemplate) const;
         void _ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply, bool only_level_scale = false);
         void _ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, bool apply);
