@@ -6824,7 +6824,7 @@ void Player::RewardReputation(Quest const* quest)
         else
         {
             uint32 row = ((quest->RewardFactionValueId[i] < 0) ? 1 : 0) + 1;
-            if (QuestFactionRewEntry const* questFactionRewEntry = sQuestFactionRewardStore.LookupEntry(row))
+            if (QuestFactionRewardDBC const* questFactionRewEntry = sDBCStoresMgr->GetQuestFactionRewardDBC(row))
             {
                 uint32 field = abs(quest->RewardFactionValueId[i]);
                 rep = questFactionRewEntry->Difficulty[field];

@@ -105,6 +105,8 @@ typedef std::unordered_map<uint32 /*ID*/, PowerDisplayDBC> PowerDisplayDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, PvPDifficultyDBC> PvPDifficultyDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, QuestSortDBC> QuestSortDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, QuestXPDBC> QuestXPDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, QuestFactionRewardDBC> QuestFactionRewardDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, RandPropPointsDBC> RandPropPointsDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -857,6 +859,22 @@ public:
         return nullptr;
     }
 
+    QuestFactionRewardDBC const* GetQuestFactionRewardDBC(uint32 ID)
+    {
+        QuestFactionRewardDBCMap::const_iterator itr = _questFactionRewardMap.find(ID);
+        if (itr != _questFactionRewardMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    RandPropPointsDBC const* GetRandPropPointsDBC(uint32 ID)
+    {
+        RandPropPointsDBCMap::const_iterator itr = _randPropPointsMap.find(ID);
+        if (itr != _randPropPointsMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -954,6 +972,8 @@ protected:
     void _Load_PvpDifficulty();
     void _Load_QuestSort();
     void _Load_QuestXP();
+    void _Load_QuestFactionReward();
+    void _Load_RandPropPoints();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -1034,6 +1054,8 @@ private:
     PvPDifficultyDBCMap _pvpDifficultyMap;
     QuestSortDBCMap _questSortMap;
     QuestXPDBCMap _questXPMap;
+    QuestFactionRewardDBCMap _questFactionRewardMap;
+    RandPropPointsDBCMap _randPropPointsMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

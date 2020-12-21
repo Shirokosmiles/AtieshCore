@@ -1243,3 +1243,19 @@ struct QuestXPDBC
     uint32 ID;                                              // 0
     uint32 Difficulty[10];                                  // 1-10
 };
+
+// load QuestFactionReward.dbc
+struct QuestFactionRewardDBC
+{
+    uint32 ID;                                              // 0
+    int32 Difficulty[10];                                   // 1
+};
+
+// load RandPropPoints.dbc
+struct RandPropPointsDBC
+{
+    uint32 ID;                                              // 0 item level
+    uint32 Epic[5];                                         // 1-5
+    uint32 Superior[5];                                     // 6-10
+    uint32 Good[5];                                         // 11-15
+};

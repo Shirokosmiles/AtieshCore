@@ -59,19 +59,8 @@ struct ItemCondExtCostsEntry
 #define MAX_ITEM_ENCHANTMENT_EFFECTS 3
 
 
-struct QuestFactionRewEntry
-{
-    uint32 ID;                                              // 0
-    int32 Difficulty[10];                                   // 1
-};
 
-struct RandPropPointsEntry
-{
-    uint32 ID;                                              // 0 item level
-    uint32 Epic[5];                                         // 1-5
-    uint32 Superior[5];                                     // 6-10
-    uint32 Good[5];                                         // 11-15
-};
+
 
 struct ScalingStatDistributionEntry
 {

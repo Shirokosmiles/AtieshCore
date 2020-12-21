@@ -108,6 +108,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _pvpDifficultyMap.clear();
     _questSortMap.clear();
     _questXPMap.clear();
+    _questFactionRewardMap.clear();
+    _randPropPointsMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -190,6 +192,8 @@ void DBCStoresMgr::Initialize()
     _Load_PvpDifficulty();
     _Load_QuestSort();
     _Load_QuestXP();
+    _Load_QuestFactionReward();
+    _Load_RandPropPoints();
 }
 
 // load Achievement.dbc
@@ -3124,4 +3128,78 @@ void DBCStoresMgr::_Load_QuestXP()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_questxp                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load QuestFactionReward.dbc
+void DBCStoresMgr::_Load_QuestFactionReward()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _questFactionRewardMap.clear();
+    //                                                0         1           2              3            4               5           6               7           8              9            10
+    QueryResult result = WorldDatabase.Query("SELECT ID, Difficulty_1, Difficulty_2, Difficulty_3, Difficulty_4, Difficulty_5, Difficulty_6, Difficulty_7, Difficulty_8, Difficulty_9, Difficulty_10 FROM dbc_questfactionreward");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_questfactionreward. DB table `dbc_questfactionreward` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        QuestFactionRewardDBC qfr;
+        qfr.ID = id;
+        for (uint8 i = 0; i < 10; i++)
+            qfr.Difficulty[i] = fields[1 + i].GetInt32();
+
+        _questFactionRewardMap[id] = qfr;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_questfactionreward            %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load RandPropPoints.dbc
+void DBCStoresMgr::_Load_RandPropPoints()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _randPropPointsMap.clear();
+    //                                                0     1       2       3       4      5          6          7           8           9          10        11      12      13      14      15
+    QueryResult result = WorldDatabase.Query("SELECT ID, Epic_1, Epic_2, Epic_3, Epic_4, Epic_5, Superior_1, Superior_2, Superior_3, Superior_4, Superior_5, Good_1, Good_2, Good_3, Good_4, Good_5 FROM dbc_randproppoints");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_randproppoints. DB table `dbc_randproppoints` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        RandPropPointsDBC rpp;
+        rpp.ID = id;
+        for (uint8 i = 0; i < 5; i++)
+            rpp.Epic[i] = fields[1 + i].GetInt32();
+
+        for (uint8 i = 0; i < 5; i++)
+            rpp.Superior[i] = fields[6 + i].GetInt32();
+
+        for (uint8 i = 0; i < 5; i++)
+            rpp.Good[i] = fields[11 + i].GetInt32();
+
+        _randPropPointsMap[id] = rpp;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_randproppoints                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

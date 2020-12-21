@@ -175,7 +175,7 @@ uint32 GenerateEnchSuffixFactor(uint32 item_id)
     if (!itemProto->RandomSuffix)
         return 0;
 
-    RandPropPointsEntry const* randomProperty = sRandPropPointsStore.LookupEntry(itemProto->ItemLevel);
+    RandPropPointsDBC const* randomProperty = sDBCStoresMgr->GetRandPropPointsDBC(itemProto->ItemLevel);
     if (!randomProperty)
         return 0;
 

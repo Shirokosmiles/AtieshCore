@@ -149,8 +149,8 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
 //DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
 //DBCStorage <QuestXPEntry>   sQuestXPStore(QuestXPfmt);
-DBCStorage <QuestFactionRewEntry>  sQuestFactionRewardStore(QuestFactionRewardfmt);
-DBCStorage <RandPropPointsEntry> sRandPropPointsStore(RandPropPointsfmt);
+//DBCStorage <QuestFactionRewEntry>  sQuestFactionRewardStore(QuestFactionRewardfmt);
+//DBCStorage <RandPropPointsEntry> sRandPropPointsStore(RandPropPointsfmt);
 DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore(ScalingStatDistributionfmt);
 DBCStorage <ScalingStatValuesEntry> sScalingStatValuesStore(ScalingStatValuesfmt);
 
@@ -357,9 +357,9 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sPowerDisplayStore,                  "PowerDisplay.dbc");
     //LOAD_DBC(sPvPDifficultyStore,                 "PvpDifficulty.dbc");
     //LOAD_DBC(sQuestXPStore,                       "QuestXP.dbc");
-    LOAD_DBC(sQuestFactionRewardStore,            "QuestFactionReward.dbc");
+    //LOAD_DBC(sQuestFactionRewardStore,            "QuestFactionReward.dbc");
     //LOAD_DBC(sQuestSortStore,                     "QuestSort.dbc");
-    LOAD_DBC(sRandPropPointsStore,                "RandPropPoints.dbc");
+    //LOAD_DBC(sRandPropPointsStore,                "RandPropPoints.dbc");
     LOAD_DBC(sScalingStatDistributionStore,       "ScalingStatDistribution.dbc");
     LOAD_DBC(sScalingStatValuesStore,             "ScalingStatValues.dbc");
     LOAD_DBC(sSkillLineStore,                     "SkillLine.dbc");
