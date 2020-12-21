@@ -2028,8 +2028,9 @@ void Pet::LearnPetPassives()
     if (!cFamily)
         return;
 
-    PetFamilySpellsStore::const_iterator petStore = sPetFamilySpellsStore.find(cFamily->ID);
-    if (petStore != sPetFamilySpellsStore.end())
+    PetFamilySpellsStore const& PetSpellStore = sDBCStoresMgr->GetPetFamilySpellsStore();
+    PetFamilySpellsStore::const_iterator petStore = PetSpellStore.find(cFamily->ID);
+    if (petStore != PetSpellStore.end())
     {
         // For general hunter pets skill 270
         // Passive 01~10, Passive 00 (20782, not used), Ferocious Inspiration (34457)

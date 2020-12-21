@@ -110,6 +110,10 @@ typedef std::unordered_map<uint32 /*ID*/, RandPropPointsDBC> RandPropPointsDBCMa
 typedef std::unordered_map<uint32 /*ID*/, ScalingStatDistributionDBC> ScalingStatDistributionDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, ScalingStatValuesDBC> ScalingStatValuesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SkillLineDBC> SkillLineDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, SkillLineAbilityDBC> SkillLineAbilityDBCMap;
+
+typedef std::set<uint32> PetFamilySpellsSet;
+typedef std::map<uint32, PetFamilySpellsSet> PetFamilySpellsStore;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -903,6 +907,15 @@ public:
         return nullptr;
     }
 
+    SkillLineAbilityDBCMap const& GetSkillLineAbilityDBCMap() const { return _skillLineAbilityMap; }
+    SkillLineAbilityDBC const* GetSkillLineAbilityDBC(uint32 ID)
+    {
+        SkillLineAbilityDBCMap::const_iterator itr = _skillLineAbilityMap.find(ID);
+        if (itr != _skillLineAbilityMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -920,6 +933,8 @@ public:
 
         return CHAR_NAME_SUCCESS;
     }
+
+    PetFamilySpellsStore const& GetPetFamilySpellsStore() { return _petFamilySpellsStore; }
 
 protected:
     void _Load_Achievement();
@@ -1005,6 +1020,12 @@ protected:
     void _Load_ScalingStatDistribution();
     void _Load_ScalingStatValues();
     void _Load_SkillLine();
+    void _Load_SkillLineAbility();
+
+    // Handle others containers
+    void _Handle_NamesProfanityRegex();
+    void _Handle_NamesReservedRegex();
+    void _Handle_PetFamilySpellsStore();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -1090,10 +1111,13 @@ private:
     ScalingStatDistributionDBCMap _scalingStatDistributionMap;
     ScalingStatValuesDBCMap _scalingStatValuesMap;
     SkillLineDBCMap _skillLineMap;
+    SkillLineAbilityDBCMap _skillLineAbilityMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
-    NameValidationRegexContainer NamesReservedValidators;    
+    NameValidationRegexContainer NamesReservedValidators;
+
+    PetFamilySpellsStore _petFamilySpellsStore;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

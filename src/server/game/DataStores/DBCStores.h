@@ -152,7 +152,7 @@ TC_GAME_API SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, u
 //TC_GAME_API extern DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore;
 //TC_GAME_API extern DBCStorage <ScalingStatValuesEntry>       sScalingStatValuesStore;
 //TC_GAME_API extern DBCStorage <SkillLineEntry>               sSkillLineStore;
-TC_GAME_API extern DBCStorage <SkillLineAbilityEntry>        sSkillLineAbilityStore;
+//TC_GAME_API extern DBCStorage <SkillLineAbilityEntry>        sSkillLineAbilityStore;
 TC_GAME_API extern DBCStorage <SkillTiersEntry>              sSkillTiersStore;
 TC_GAME_API extern DBCStorage <SoundEntriesEntry>            sSoundEntriesStore;
 TC_GAME_API extern DBCStorage <SpellCastTimesEntry>          sSpellCastTimesStore;
@@ -162,7 +162,7 @@ TC_GAME_API extern DBCStorage <SpellDurationEntry>           sSpellDurationStore
 TC_GAME_API extern DBCStorage <SpellFocusObjectEntry>        sSpellFocusObjectStore;
 TC_GAME_API extern DBCStorage <SpellItemEnchantmentEntry>    sSpellItemEnchantmentStore;
 TC_GAME_API extern DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore;
-TC_GAME_API extern PetFamilySpellsStore                      sPetFamilySpellsStore;
+//TC_GAME_API extern PetFamilySpellsStore                      sPetFamilySpellsStore;
 TC_GAME_API extern std::unordered_set<uint32>                sPetTalentSpells;
 TC_GAME_API extern DBCStorage <SpellRadiusEntry>             sSpellRadiusStore;
 TC_GAME_API extern DBCStorage <SpellRangeEntry>              sSpellRangeStore;

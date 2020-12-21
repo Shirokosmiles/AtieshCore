@@ -6159,10 +6159,15 @@ void Player::SetSkill(uint32 id, uint16 step, uint16 newVal, uint16 maxVal)
                 mSkillStatus.erase(itr);
 
             // remove all spells that related to this skill
-            for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
-                if (SkillLineAbilityEntry const* pAbility = sSkillLineAbilityStore.LookupEntry(j))
+            SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+            for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
+            {
+                if (SkillLineAbilityDBC const* pAbility = &itr->second)
+                {
                     if (pAbility->SkillLine == id)
                         RemoveSpell(sSpellMgr->GetFirstSpellInChain(pAbility->Spell));
+                }
+            }
         }
     }
     else if (newVal)                                        //add
@@ -23207,54 +23212,57 @@ void Player::LearnSkillRewardedSpells(uint32 skillId, uint32 skillValue)
 {
     uint32 raceMask  = getCFSRaceMask();
     uint32 classMask = GetClassMask();
-    for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+    SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+    for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
     {
-        SkillLineAbilityEntry const* ability = sSkillLineAbilityStore.LookupEntry(j);
-        if (!ability || ability->SkillLine != skillId)
-            continue;
-
-        if (!sSpellMgr->GetSpellInfo(ability->Spell))
-            continue;
-
-        if (ability->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE && ability->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
-            continue;
-
-        // Check race if set
-        if (ability->RaceMask && !(ability->RaceMask & raceMask))
-            continue;
-
-        // Check class if set
-        if (ability->ClassMask && !(ability->ClassMask & classMask))
-            continue;
-
-        // need unlearn spell
-        if (skillValue < ability->MinSkillLineRank && ability->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE)
-            RemoveSpell(ability->Spell);
-        // need learn
-        else
+        if (SkillLineAbilityDBC const* ability = &itr->second)
         {
-            // used to avoid double Seal of Righteousness on paladins, it's the only player spell which has both spell and forward spell in auto learn
-            if (ability->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && ability->SupercededBySpell)
+            if (ability->SkillLine != skillId)
+                continue;
+
+            if (!sSpellMgr->GetSpellInfo(ability->Spell))
+                continue;
+
+            if (ability->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE && ability->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+                continue;
+
+            // Check race if set
+            if (ability->RaceMask && !(ability->RaceMask & raceMask))
+                continue;
+
+            // Check class if set
+            if (ability->ClassMask && !(ability->ClassMask & classMask))
+                continue;
+
+            // need unlearn spell
+            if (skillValue < ability->MinSkillLineRank && ability->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE)
+                RemoveSpell(ability->Spell);
+            // need learn
+            else
             {
-                bool skipCurrent = false;
-                auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(ability->SupercededBySpell);
-                for (auto itr = bounds.first; itr != bounds.second; ++itr)
+                // used to avoid double Seal of Righteousness on paladins, it's the only player spell which has both spell and forward spell in auto learn
+                if (ability->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && ability->SupercededBySpell)
                 {
-                    if (itr->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && skillValue >= itr->second->MinSkillLineRank)
+                    bool skipCurrent = false;
+                    auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(ability->SupercededBySpell);
+                    for (auto itr = bounds.first; itr != bounds.second; ++itr)
                     {
-                        skipCurrent = true;
-                        break;
+                        if (itr->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && skillValue >= itr->second->MinSkillLineRank)
+                        {
+                            skipCurrent = true;
+                            break;
+                        }
                     }
+
+                    if (skipCurrent)
+                        continue;
                 }
 
-                if (skipCurrent)
-                    continue;
+                if (!IsInWorld())
+                    AddSpell(ability->Spell, true, true, true, false, false, ability->SkillLine);
+                else
+                    LearnSpell(ability->Spell, true, ability->SkillLine);
             }
-
-            if (!IsInWorld())
-                AddSpell(ability->Spell, true, true, true, false, false, ability->SkillLine);
-            else
-                LearnSpell(ability->Spell, true, ability->SkillLine);
         }
     }
 }

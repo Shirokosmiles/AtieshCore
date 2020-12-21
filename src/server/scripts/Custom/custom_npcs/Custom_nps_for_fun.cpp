@@ -2441,33 +2441,33 @@ public:
         void LearnSkillRecipesHelper(Player *player, uint32 skill_id)
         {
             uint32 classmask = player->GetClassMask();
-            for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+            SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+            for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
             {
-                SkillLineAbilityEntry const *skillLine = sSkillLineAbilityStore.LookupEntry(j);
-                if (!skillLine)
-                    continue;
+                if (SkillLineAbilityDBC const* skillLine = &itr->second)
+                {
+                    // wrong skill
+                    if (skillLine->SkillLine != skill_id)
+                        continue;
 
-                // wrong skill
-                if (skillLine->SkillLine != skill_id)
-                    continue;
+                    // not high rank
+                    if (skillLine->SupercededBySpell)
+                        continue;
 
-                // not high rank
-                if (skillLine->SupercededBySpell)
-                    continue;
+                    // skip racial skills
+                    if (skillLine->RaceMask != 0)
+                        continue;
 
-                // skip racial skills
-                if (skillLine->RaceMask != 0)
-                    continue;
+                    // skip wrong class skills
+                    if (skillLine->ClassMask && (skillLine->ClassMask & classmask) == 0)
+                        continue;
 
-                // skip wrong class skills
-                if (skillLine->ClassMask && (skillLine->ClassMask & classmask) == 0)
-                    continue;
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(skillLine->Spell);
+                    if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, player, false))
+                        continue;
 
-                SpellInfo const * spellInfo = sSpellMgr->GetSpellInfo(skillLine->Spell);
-                if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, player, false))
-                    continue;
-
-                player->LearnSpell(skillLine->Spell, false);
+                    player->LearnSpell(skillLine->Spell, false);
+                }
             }
         }
 

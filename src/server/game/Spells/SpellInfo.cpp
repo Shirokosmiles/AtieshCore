@@ -989,7 +989,7 @@ bool SpellInfo::IsAbilityLearnedWithProfession() const
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
-        SkillLineAbilityEntry const* pAbility = _spell_idx->second;
+        SkillLineAbilityDBC const* pAbility = _spell_idx->second;
         if (!pAbility || pAbility->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE)
             continue;
 

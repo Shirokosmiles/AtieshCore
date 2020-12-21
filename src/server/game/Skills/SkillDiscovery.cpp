@@ -17,6 +17,7 @@
 
 #include "SkillDiscovery.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgrStructure.h"
 #include "Log.h"
 #include "Player.h"
 #include "Random.h"

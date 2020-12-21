@@ -98,11 +98,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _mapDifficultyMap.clear();
     _movieMap.clear();
     _namesProfanityMap.clear();
-    _namesReservedMap.clear();
-    for (uint32 i = 0; i < TOTAL_LOCALES; i++)
-        NamesProfaneValidators[i].clear();
-    for (uint32 i = 0; i < TOTAL_LOCALES; i++)
-        NamesReservedValidators[i].clear();
+    _namesReservedMap.clear();    
     _overrideSpellDataMap.clear();
     _powerDisplayMap.clear();
     _pvpDifficultyMap.clear();
@@ -113,6 +109,14 @@ DBCStoresMgr::~DBCStoresMgr()
     _scalingStatDistributionMap.clear();
     _scalingStatValuesMap.clear();
     _skillLineMap.clear();
+    _skillLineAbilityMap.clear();
+
+    // handle additional containers
+    for (uint32 i = 0; i < TOTAL_LOCALES; i++)
+        NamesProfaneValidators[i].clear();
+    for (uint32 i = 0; i < TOTAL_LOCALES; i++)
+        NamesReservedValidators[i].clear();
+    _petFamilySpellsStore.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -200,6 +204,12 @@ void DBCStoresMgr::Initialize()
     _Load_ScalingStatDistribution();
     _Load_ScalingStatValues();
     _Load_SkillLine();
+    _Load_SkillLineAbility();
+
+    // Handle additional data-containers from DBC
+    _Handle_NamesProfanityRegex();
+    _Handle_NamesReservedRegex();
+    _Handle_PetFamilySpellsStore();
 }
 
 // load Achievement.dbc
@@ -2892,24 +2902,6 @@ void DBCStoresMgr::_Load_NamesProfanity()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_namesprofanity                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-
-    // Separate namesprofanity for languages
-    for (NamesProfanityDBCMap::const_iterator itr = _namesProfanityMap.begin(); itr != _namesProfanityMap.end(); ++itr)
-    {
-        ASSERT(itr->second.Language < TOTAL_LOCALES || itr->second.Language == -1);
-        std::wstring wname;
-        bool conversionResult = Utf8toWStr(itr->second.Name, wname);
-        ASSERT(conversionResult);
-
-        if (itr->second.Language != -1)
-            NamesProfaneValidators[itr->second.Language].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
-        else
-            for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
-                NamesProfaneValidators[i].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
-    }
-
-    // clear this datamap (UNUSED)
-    _namesProfanityMap.clear();
 }
 
 // load NamesReserved.dbc
@@ -2943,25 +2935,7 @@ void DBCStoresMgr::_Load_NamesReserved()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_namesreserved                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-
-    // Separate namesreserved for languages
-    for (NamesReservedDBCMap::const_iterator itr = _namesReservedMap.begin(); itr != _namesReservedMap.end(); ++itr)
-    {
-        ASSERT(itr->second.Language < TOTAL_LOCALES || itr->second.Language == -1);
-        std::wstring wname;
-        bool conversionResult = Utf8toWStr(itr->second.Name, wname);
-        ASSERT(conversionResult);
-
-        if (itr->second.Language != -1)
-            NamesReservedValidators[itr->second.Language].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
-        else
-            for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
-                NamesReservedValidators[i].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
-    }
-
-    // clear this datamap (UNUSED)
-    _namesReservedMap.clear();
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_namesreserved                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));    
 }
 
 // load OverrideSpellData.dbc
@@ -3339,4 +3313,118 @@ void DBCStoresMgr::_Load_SkillLine()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_skillline                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SkillLineAbility.dbc
+void DBCStoresMgr::_Load_SkillLineAbility()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _skillLineAbilityMap.clear();
+    //                                                0       1       2       3          4             5                  6                7                   8                       9
+    QueryResult result = WorldDatabase.Query("SELECT ID, SkillLine, Spell, RaceMask, ClassMask, MinSkillLineRank, SupercededBySpell, AcquireMethod, TrivialSkillLineRankHigh, TrivialSkillLineRankLow FROM dbc_skilllineability");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skilllineability. DB table `dbc_skilllineability` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SkillLineAbilityDBC sla;
+        sla.ID = id;
+        sla.SkillLine                = fields[1].GetUInt32();
+        sla.Spell                    = fields[2].GetUInt32();
+        sla.RaceMask                 = fields[3].GetUInt32();
+        sla.ClassMask                = fields[4].GetUInt32();
+        sla.MinSkillLineRank         = fields[5].GetUInt32();
+        sla.SupercededBySpell        = fields[6].GetUInt32();
+        sla.AcquireMethod            = fields[7].GetUInt32();
+        sla.TrivialSkillLineRankHigh = fields[8].GetUInt32();
+        sla.TrivialSkillLineRankLow  = fields[9].GetUInt32();
+
+        _skillLineAbilityMap[id] = sla;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_skilllineability              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// Handle others containers
+void DBCStoresMgr::_Handle_NamesProfanityRegex()
+{
+    // Separate namesprofanity for languages
+    for (NamesProfanityDBCMap::const_iterator itr = _namesProfanityMap.begin(); itr != _namesProfanityMap.end(); ++itr)
+    {
+        ASSERT(itr->second.Language < TOTAL_LOCALES || itr->second.Language == -1);
+        std::wstring wname;
+        bool conversionResult = Utf8toWStr(itr->second.Name, wname);
+        ASSERT(conversionResult);
+
+        if (itr->second.Language != -1)
+            NamesProfaneValidators[itr->second.Language].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
+        else
+            for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
+                NamesProfaneValidators[i].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
+    }
+
+    // clear this DBC container (UNUSED in life-cycle server)
+    _namesProfanityMap.clear();
+}
+
+void DBCStoresMgr::_Handle_NamesReservedRegex()
+{
+    // Separate namesreserved for languages
+    for (NamesReservedDBCMap::const_iterator itr = _namesReservedMap.begin(); itr != _namesReservedMap.end(); ++itr)
+    {
+        ASSERT(itr->second.Language < TOTAL_LOCALES || itr->second.Language == -1);
+        std::wstring wname;
+        bool conversionResult = Utf8toWStr(itr->second.Name, wname);
+        ASSERT(conversionResult);
+
+        if (itr->second.Language != -1)
+            NamesReservedValidators[itr->second.Language].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
+        else
+            for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
+                NamesReservedValidators[i].emplace_back(wname, Trinity::regex::perl | Trinity::regex::icase | Trinity::regex::optimize);
+    }
+
+    // clear this DBC container (UNUSED in life-cycle server)
+    _namesReservedMap.clear();
+}
+
+void DBCStoresMgr::_Handle_PetFamilySpellsStore()
+{
+    for (SkillLineAbilityDBCMap::const_iterator itr = _skillLineAbilityMap.begin(); itr != _skillLineAbilityMap.end(); ++itr)
+    {
+        if (SkillLineAbilityDBC const* skillLine = &itr->second)
+        {
+            SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->Spell);
+            if (spellInfo && spellInfo->Attributes & SPELL_ATTR0_PASSIVE)
+            {
+                CreatureFamilyDBCMap const& CreatureFamilyMap = sDBCStoresMgr->GetCreatureFamilyDBCMap();
+                for (CreatureFamilyDBCMap::const_iterator itr = CreatureFamilyMap.begin(); itr != CreatureFamilyMap.end(); ++itr)
+                {
+                    if (CreatureFamilyDBC const* cFamily = &itr->second)
+                    {
+                        if (skillLine->SkillLine != cFamily->SkillLine[0] && skillLine->SkillLine != cFamily->SkillLine[1])
+                            continue;
+                        if (spellInfo->SpellLevel)
+                            continue;
+
+                        if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+                            continue;
+
+                        _petFamilySpellsStore[cFamily->ID].insert(spellInfo->ID);
+                    }
+                }
+            }
+        }
+    }
 }

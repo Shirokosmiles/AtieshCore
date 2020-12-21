@@ -1968,14 +1968,14 @@ void SpellMgr::LoadSkillLineAbilityMap()
 
     uint32 count = 0;
 
-    for (uint32 i = 0; i < sSkillLineAbilityStore.GetNumRows(); ++i)
+    SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+    for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
     {
-        SkillLineAbilityEntry const* SkillInfo = sSkillLineAbilityStore.LookupEntry(i);
-        if (!SkillInfo)
-            continue;
-
-        mSkillLineAbilityMap.insert(SkillLineAbilityMap::value_type(SkillInfo->Spell, SkillInfo));
-        ++count;
+        if (SkillLineAbilityDBC const* SkillInfo = &itr->second)
+        {
+            mSkillLineAbilityMap.insert(SkillLineAbilityMap::value_type(SkillInfo->Spell, SkillInfo));
+            ++count;
+        }
     }
 
     TC_LOG_INFO("server.loading", ">> Loaded %u SkillLineAbility MultiMap Data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -2201,35 +2201,35 @@ void SpellMgr::LoadPetLevelupSpellMap()
                 if (!creatureFamily->SkillLine[j])
                     continue;
 
-                for (uint32 k = 0; k < sSkillLineAbilityStore.GetNumRows(); ++k)
+                SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+                for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
                 {
-                    SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(k);
-                    if (!skillLine)
-                        continue;
+                    if (SkillLineAbilityDBC const* skillLine = &itr->second)
+                    {
+                        //if (skillLine->skillId != creatureFamily->SkillLine[0] &&
+                        //    (!creatureFamily->SkillLine[1] || skillLine->skillId != creatureFamily->SkillLine[1]))
+                        //    continue;
 
-                    //if (skillLine->skillId != creatureFamily->SkillLine[0] &&
-                    //    (!creatureFamily->SkillLine[1] || skillLine->skillId != creatureFamily->SkillLine[1]))
-                    //    continue;
+                        if (skillLine->SkillLine != creatureFamily->SkillLine[j])
+                            continue;
 
-                    if (skillLine->SkillLine != creatureFamily->SkillLine[j])
-                        continue;
+                        if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+                            continue;
 
-                    if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
-                        continue;
+                        SpellInfo const* spell = GetSpellInfo(skillLine->Spell);
+                        if (!spell) // not exist or triggered or talent
+                            continue;
 
-                    SpellInfo const* spell = GetSpellInfo(skillLine->Spell);
-                    if (!spell) // not exist or triggered or talent
-                        continue;
+                        if (!spell->SpellLevel)
+                            continue;
 
-                    if (!spell->SpellLevel)
-                        continue;
+                        PetLevelupSpellSet& spellSet = mPetLevelupSpellMap[creatureFamily->ID];
+                        if (spellSet.empty())
+                            ++family_count;
 
-                    PetLevelupSpellSet& spellSet = mPetLevelupSpellMap[creatureFamily->ID];
-                    if (spellSet.empty())
-                        ++family_count;
-
-                    spellSet.insert(PetLevelupSpellSet::value_type(spell->SpellLevel, spell->Id));
-                    ++count;
+                        spellSet.insert(PetLevelupSpellSet::value_type(spell->SpellLevel, spell->Id));
+                        ++count;
+                    }
                 }
             }
         }
