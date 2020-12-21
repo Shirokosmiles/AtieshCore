@@ -110,6 +110,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _scalingStatValuesMap.clear();
     _skillLineMap.clear();
     _skillLineAbilityMap.clear();
+    _skillRaceClassInfoMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -205,6 +206,7 @@ void DBCStoresMgr::Initialize()
     _Load_ScalingStatValues();
     _Load_SkillLine();
     _Load_SkillLineAbility();
+    _Load_SkillRaceClassInfo();
 
     // Handle additional data-containers from DBC
     _Handle_NamesProfanityRegex();
@@ -3354,6 +3356,43 @@ void DBCStoresMgr::_Load_SkillLineAbility()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_skilllineability              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SkillRaceClassInfo.dbc
+void DBCStoresMgr::_Load_SkillRaceClassInfo()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _skillRaceClassInfoMap.clear();
+    //                                                0     1         2          3       4          5
+    QueryResult result = WorldDatabase.Query("SELECT ID, SkillID, RaceMask, ClassMask, Flags, SkillTierID FROM dbc_skillraceclassinfo");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skillraceclassinfo. DB table `dbc_skillraceclassinfo` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SkillRaceClassInfoDBC srci;
+        srci.ID = id;
+        srci.SkillID     = fields[1].GetUInt32();
+        srci.RaceMask    = fields[2].GetUInt32();
+        srci.ClassMask   = fields[3].GetUInt32();
+        srci.Flags       = fields[4].GetUInt32();
+        srci.SkillTierID = fields[5].GetUInt32();
+
+        _skillRaceClassInfoMap[id] = srci;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_skillraceclassinfo            %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle others containers

@@ -4041,7 +4041,7 @@ void ObjectMgr::LoadPlayerInfo()
                         {
                             if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
                             {
-                                if (!GetSkillRaceClassInfo(skill.SkillId, raceIndex, classIndex))
+                                if (!sDBCStoresMgr->GetSkillRaceClassInfo(skill.SkillId, raceIndex, classIndex))
                                     continue;
 
                                 if (auto& info = _playerInfo[raceIndex][classIndex])
@@ -8891,7 +8891,7 @@ int32 ObjectMgr::GetBaseReputationOf(FactionDBC const* factionEntry, uint8 race,
     return 0;
 }
 
-SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry)
+SkillRangeType GetSkillRangeType(SkillRaceClassInfoDBC const* rcEntry)
 {
     SkillLineDBC const* skill = sDBCStoresMgr->GetSkillLineDBC(rcEntry->SkillID);
     if (!skill)

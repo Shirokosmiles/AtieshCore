@@ -156,8 +156,8 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
 //DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
 //DBCStorage <SkillLineAbilityEntry> sSkillLineAbilityStore(SkillLineAbilityfmt);
-DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
-SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
+//DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
+//SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
 DBCStorage <SkillTiersEntry> sSkillTiersStore(SkillTiersfmt);
 
 DBCStorage <SoundEntriesEntry> sSoundEntriesStore(SoundEntriesfmt);
@@ -364,7 +364,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sScalingStatValuesStore,             "ScalingStatValues.dbc");
     //LOAD_DBC(sSkillLineStore,                     "SkillLine.dbc");
     //LOAD_DBC(sSkillLineAbilityStore,              "SkillLineAbility.dbc");
-    LOAD_DBC(sSkillRaceClassInfoStore,            "SkillRaceClassInfo.dbc");
+    //LOAD_DBC(sSkillRaceClassInfoStore,            "SkillRaceClassInfo.dbc");
     LOAD_DBC(sSkillTiersStore,                    "SkillTiers.dbc");
     LOAD_DBC(sSoundEntriesStore,                  "SoundEntries.dbc");
     LOAD_DBC(sSpellCastTimesStore,                "SpellCastTimes.dbc");
@@ -410,9 +410,9 @@ void LoadDBCStores(const std::string& dataPath)
     //for (MapDifficultyEntry const* entry : sMapDifficultyStore)
     //    sMapDifficultyMap[MAKE_PAIR32(entry->MapID, entry->Difficulty)] = MapDifficulty(entry->RaidDuration, entry->MaxPlayers, entry->Message[0] != '\0');
 
-    for (SkillRaceClassInfoEntry const* entry : sSkillRaceClassInfoStore)
-        if (sDBCStoresMgr->GetSkillLineDBC(entry->SkillID))
-            SkillRaceClassInfoBySkill.emplace(entry->SkillID, entry);
+    //for (SkillRaceClassInfoEntry const* entry : sSkillRaceClassInfoStore)
+    //    if (sDBCStoresMgr->GetSkillLineDBC(entry->SkillID))
+    //        SkillRaceClassInfoBySkill.emplace(entry->SkillID, entry);
 
     // Create Spelldifficulty searcher
     for (SpellDifficultyEntry const* spellDiff : sSpellDifficultyStore)
@@ -687,21 +687,3 @@ uint32 const* GetTalentTabPages(uint8 cls)
 {
     return sTalentTabPages[cls];
 }
-
-SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_)
-{
-    SkillRaceClassInfoBounds bounds = SkillRaceClassInfoBySkill.equal_range(skill);
-    for (SkillRaceClassInfoMap::iterator itr = bounds.first; itr != bounds.second; ++itr)
-    {
-        if (itr->second->RaceMask && !(itr->second->RaceMask & (1 << (race - 1))))
-            continue;
-        if (itr->second->ClassMask && !(itr->second->ClassMask & (1 << (class_ - 1))))
-            continue;
-
-        return itr->second;
-    }
-
-    return nullptr;
-}
-
-

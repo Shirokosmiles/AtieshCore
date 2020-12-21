@@ -52,7 +52,7 @@ struct PlayerClassInfo;
 struct PlayerClassLevelInfo;
 struct PlayerInfo;
 struct PlayerLevelInfo;
-struct SkillRaceClassInfoEntry;
+struct SkillRaceClassInfoDBC;
 struct WorldSafeLocsEntry;
 
 struct PageText
@@ -917,7 +917,7 @@ enum SkillRangeType
     SKILL_RANGE_NONE                                        // 0..0 always
 };
 
-SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
+SkillRangeType GetSkillRangeType(SkillRaceClassInfoDBC const* rcEntry);
 
 #define MAX_PLAYER_NAME          12                         // max allowed by client name length
 #define MAX_INTERNAL_PLAYER_NAME 15                         // max server internal player name length (> MAX_PLAYER_NAME for support declined names)

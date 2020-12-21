@@ -95,11 +95,8 @@ typedef std::unordered_map<uint32 /*ID*/, MailTemplateDBC> MailTemplateDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, MapDBC> MapDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, MapDifficultyDBC> MapDifficultyDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, MovieDBC> MovieDBCMap;
-
 typedef std::unordered_map<uint32 /*ID*/, NamesProfanityDBC> NamesProfanityDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, NamesReservedDBC> NamesReservedDBCMap;
-typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
-
 typedef std::unordered_map<uint32 /*ID*/, OverrideSpellDataDBC> OverrideSpellDataDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, PowerDisplayDBC> PowerDisplayDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, PvPDifficultyDBC> PvPDifficultyDBCMap;
@@ -111,6 +108,9 @@ typedef std::unordered_map<uint32 /*ID*/, ScalingStatDistributionDBC> ScalingSta
 typedef std::unordered_map<uint32 /*ID*/, ScalingStatValuesDBC> ScalingStatValuesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SkillLineDBC> SkillLineDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SkillLineAbilityDBC> SkillLineAbilityDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, SkillRaceClassInfoDBC> SkillRaceClassInfoDBCMap;
+
+typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 
 typedef std::set<uint32> PetFamilySpellsSet;
 typedef std::map<uint32, PetFamilySpellsSet> PetFamilySpellsStore;
@@ -916,6 +916,22 @@ public:
         return nullptr;
     }
 
+    SkillRaceClassInfoDBC const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_)
+    {
+        for (SkillRaceClassInfoDBCMap::const_iterator itr = _skillRaceClassInfoMap.begin(); itr != _skillRaceClassInfoMap.end(); ++itr)
+        {
+            if (itr->second.SkillID != skill)
+                continue;
+            if (itr->second.RaceMask && !(itr->second.RaceMask & (1 << (race - 1))))
+                continue;
+            if (itr->second.ClassMask && !(itr->second.ClassMask & (1 << (class_ - 1))))
+                continue;
+
+            return &itr->second;
+        }
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1021,6 +1037,7 @@ protected:
     void _Load_ScalingStatValues();
     void _Load_SkillLine();
     void _Load_SkillLineAbility();
+    void _Load_SkillRaceClassInfo();
 
     // Handle others containers
     void _Handle_NamesProfanityRegex();
@@ -1112,6 +1129,7 @@ private:
     ScalingStatValuesDBCMap _scalingStatValuesMap;
     SkillLineDBCMap _skillLineMap;
     SkillLineAbilityDBCMap _skillLineAbilityMap;
+    SkillRaceClassInfoDBCMap _skillRaceClassInfoMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

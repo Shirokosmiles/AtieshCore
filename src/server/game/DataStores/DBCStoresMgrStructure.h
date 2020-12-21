@@ -1389,3 +1389,16 @@ struct SkillLineAbilityDBC
     uint32 TrivialSkillLineRankLow;                         // 11
     //uint32 CharacterPoints[2];                            // 12-13
 };
+
+// load SkillRaceClassInfo.dbc
+struct SkillRaceClassInfoDBC
+{
+    uint32 ID;                                              // 0
+    uint32 SkillID;                                         // 1
+    uint32 RaceMask;                                        // 2
+    uint32 ClassMask;                                       // 3
+    uint32 Flags;                                           // 4
+    //uint32 MinLevel;                                      // 5
+    uint32 SkillTierID;                                     // 6
+    //uint32 SkillCostIndex;                                // 7
+};

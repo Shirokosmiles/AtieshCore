@@ -6054,7 +6054,7 @@ void Player::UpdateSkillsForLevel()
             continue;
 
         uint32 pskill = itr->first;
-        SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(pskill, getCFSRace(), GetClass());
+        SkillRaceClassInfoDBC const* rcEntry = sDBCStoresMgr->GetSkillRaceClassInfo(pskill, getCFSRace(), GetClass());
         if (!rcEntry)
             continue;
 
@@ -23093,7 +23093,7 @@ void Player::LearnDefaultSkills()
 
 void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
 {
-    SkillRaceClassInfoEntry const* rcInfo = GetSkillRaceClassInfo(skillId, getCFSRace(), GetClass());
+    SkillRaceClassInfoDBC const* rcInfo = sDBCStoresMgr->GetSkillRaceClassInfo(skillId, getCFSRace(), GetClass());
     if (!rcInfo)
         return;
 
@@ -23585,7 +23585,7 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
             continue;
 
         // skip wrong class and race skill saved in SkillRaceClassInfo.dbc
-        if (!GetSkillRaceClassInfo(_spell_idx->second->SkillLine, GetRace(), GetClass()))
+        if (!sDBCStoresMgr->GetSkillRaceClassInfo(_spell_idx->second->SkillLine, GetRace(), GetClass()))
             continue;
 
         return true;
@@ -25072,7 +25072,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
             uint16 value    = fields[1].GetUInt16();
             uint16 max      = fields[2].GetUInt16();
 
-            SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(skill, getCFSRace(), GetClass());
+            SkillRaceClassInfoDBC const* rcEntry = sDBCStoresMgr->GetSkillRaceClassInfo(skill, getCFSRace(), GetClass());
             if (!rcEntry)
             {
                 TC_LOG_ERROR("entities.player", "Player::_LoadSkills: Player '%s' (%s, Race: %u, Class: %u) has forbidden skill %u for his race/class combination",
