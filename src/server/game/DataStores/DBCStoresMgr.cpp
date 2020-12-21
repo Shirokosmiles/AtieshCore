@@ -111,6 +111,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _questFactionRewardMap.clear();
     _randPropPointsMap.clear();
     _scalingStatDistributionMap.clear();
+    _scalingStatValuesMap.clear();
+    _skillLineMap.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -196,6 +198,8 @@ void DBCStoresMgr::Initialize()
     _Load_QuestFactionReward();
     _Load_RandPropPoints();
     _Load_ScalingStatDistribution();
+    _Load_ScalingStatValues();
+    _Load_SkillLine();
 }
 
 // load Achievement.dbc
@@ -3243,4 +3247,96 @@ void DBCStoresMgr::_Load_ScalingStatDistribution()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_scalingstatdistribution       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load ScalingStatValues.dbc
+void DBCStoresMgr::_Load_ScalingStatValues()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _scalingStatValuesMap.clear();
+    //                                                0      1             2                3           4               5               6                   7                       8                       9           10          11              12                13            14        15        16          17              18              19                 20               21                  22          23
+    QueryResult result = WorldDatabase.Query("SELECT ID, Charlevel, ShoulderBudget, TrinketBudget, WeaponBudget1H, RangedBudget, ClothShoulderArmor, LeatherShoulderArmor, MailShoulderArmor, PlateShoulderArmor, WeaponDPS1H, WeaponDPS2H, SpellcasterDPS1H, SpellcasterDPS2H, RangedDPS, WandDPS, SpellPower, PrimaryBudget, TertiaryBudget, ClothCloakArmor, ClothChestArmor, LeatherChestArmor, MailChestArmor, PlateChestArmor FROM dbc_scalingstatvalues");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_scalingstatvalues. DB table `dbc_scalingstatvalues` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        ScalingStatValuesDBC ssv;
+        ssv.ID = id;
+        ssv.Charlevel            = fields[1].GetUInt32();
+        ssv.ShoulderBudget       = fields[2].GetUInt32();
+        ssv.TrinketBudget        = fields[3].GetUInt32();
+        ssv.WeaponBudget1H       = fields[4].GetUInt32();
+        ssv.RangedBudget         = fields[5].GetUInt32();
+        ssv.ClothShoulderArmor   = fields[6].GetUInt32();
+        ssv.LeatherShoulderArmor = fields[7].GetUInt32();
+        ssv.MailShoulderArmor    = fields[8].GetUInt32();
+        ssv.PlateShoulderArmor   = fields[9].GetUInt32();
+        ssv.WeaponDPS1H          = fields[10].GetUInt32();
+        ssv.WeaponDPS2H          = fields[11].GetUInt32();
+        ssv.SpellcasterDPS1H     = fields[12].GetUInt32();
+        ssv.SpellcasterDPS2H     = fields[13].GetUInt32();
+        ssv.RangedDPS            = fields[14].GetUInt32();
+        ssv.WandDPS              = fields[15].GetUInt32();
+        ssv.SpellPower           = fields[16].GetUInt32();
+        ssv.PrimaryBudget        = fields[17].GetUInt32();
+        ssv.TertiaryBudget       = fields[18].GetUInt32();
+        ssv.ClothCloakArmor      = fields[19].GetUInt32();
+        ssv.ClothChestArmor      = fields[20].GetUInt32();
+        ssv.LeatherChestArmor    = fields[21].GetUInt32();
+        ssv.MailChestArmor       = fields[22].GetUInt32();
+        ssv.PlateChestArmor      = fields[23].GetUInt32();
+
+        _scalingStatValuesMap[id] = ssv;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_scalingstatvalues             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SkillLine.dbc
+void DBCStoresMgr::_Load_SkillLine()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _skillLineMap.clear();
+    //                                                0       1                    2                    3                       4                     5                     6                       7                   8                       9                         10            11          12
+    QueryResult result = WorldDatabase.Query("SELECT ID, CategoryID, DisplayName_Lang_enUS, DisplayName_Lang_koKR, DisplayName_Lang_frFR, DisplayName_Lang_deDE, DisplayName_Lang_zhCN, DisplayName_Lang_zhTW, DisplayName_Lang_esES, DisplayName_Lang_esMX, DisplayName_Lang_ruRU, SpellIconID, CanLink FROM dbc_skillline");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skillline. DB table `dbc_skillline` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SkillLineDBC sl;
+        sl.ID = id;
+        sl.CategoryID = fields[1].GetInt32();
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            sl.DisplayName[i] = fields[2 + i].GetString();
+        sl.SpellIconID = fields[11].GetUInt32();
+        sl.CanLink     = fields[12].GetUInt32();        
+
+        _skillLineMap[id] = sl;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_skillline                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

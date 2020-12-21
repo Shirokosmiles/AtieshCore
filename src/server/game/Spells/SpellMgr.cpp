@@ -36,7 +36,7 @@
 
 bool IsPrimaryProfessionSkill(uint32 skill)
 {
-    SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(skill);
+    SkillLineDBC const* pSkill = sDBCStoresMgr->GetSkillLineDBC(skill);
     if (!pSkill)
         return false;
 

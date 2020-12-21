@@ -3647,7 +3647,7 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
         // not ranked skills
         for (SkillLineAbilityMap::const_iterator _spell_idx = skill_bounds.first; _spell_idx != skill_bounds.second; ++_spell_idx)
         {
-            SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(_spell_idx->second->SkillLine);
+            SkillLineDBC const* pSkill = sDBCStoresMgr->GetSkillLineDBC(_spell_idx->second->SkillLine);
             if (!pSkill)
                 continue;
 
@@ -3903,7 +3903,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
         {
             for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
             {
-                SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(_spell_idx->second->SkillLine);
+                SkillLineDBC const* pSkill = sDBCStoresMgr->GetSkillLineDBC(_spell_idx->second->SkillLine);
                 if (!pSkill)
                     continue;
 
@@ -6172,7 +6172,7 @@ void Player::SetSkill(uint32 id, uint16 step, uint16 newVal, uint16 maxVal)
         {
             if (!GetUInt32Value(PLAYER_SKILL_INDEX(i)))
             {
-                SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(id);
+                SkillLineDBC const* pSkill = sDBCStoresMgr->GetSkillLineDBC(id);
                 if (!pSkill)
                 {
                     TC_LOG_ERROR("misc", "Player::SetSkill: Skill (SkillID: %u) not found in SkillLineStore for player '%s' (%s)",
@@ -7490,7 +7490,7 @@ ScalingStatDistributionDBC const* Player::GetScalingStatDistributionFor(ItemTemp
     return sDBCStoresMgr->GetScalingStatDistributionDBC(itemTemplate.ScalingStatDistribution);
 }
 
-ScalingStatValuesEntry const* Player::GetScalingStatValuesFor(ItemTemplate const& itemTemplate) const
+ScalingStatValuesDBC const* Player::GetScalingStatValuesFor(ItemTemplate const& itemTemplate) const
 {
     if (!itemTemplate.ScalingStatValue)
         return nullptr;
@@ -7501,7 +7501,7 @@ ScalingStatValuesEntry const* Player::GetScalingStatValuesFor(ItemTemplate const
 
     // req. check at equip, but allow use for extended range if range limit max level, set proper level
     uint32 const ssd_level = std::min(uint32(GetLevel()), ssd->Maxlevel);
-    return sScalingStatValuesStore.LookupEntry(ssd_level);
+    return sDBCStoresMgr->GetScalingStatValuesDBC(ssd_level);
 }
 
 void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply, bool only_level_scale /*= false*/)
@@ -7510,7 +7510,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
         return;
 
     ScalingStatDistributionDBC const* ssd = GetScalingStatDistributionFor(*proto);
-    ScalingStatValuesEntry const* ssv = GetScalingStatValuesFor(*proto);
+    ScalingStatValuesDBC const* ssv = GetScalingStatValuesFor(*proto);
     if (only_level_scale && (!ssd || !ssv))
         return;
 
@@ -7776,7 +7776,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, bool appl
     if (!IsInFeralForm() && apply && !CanUseAttackType(attType))
         return;
 
-    ScalingStatValuesEntry const* ssv = GetScalingStatValuesFor(*proto);
+    ScalingStatValuesDBC const* ssv = GetScalingStatValuesFor(*proto);
     for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
     {
         float minDamage = proto->Damage[i].DamageMin;

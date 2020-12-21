@@ -152,9 +152,9 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <QuestFactionRewEntry>  sQuestFactionRewardStore(QuestFactionRewardfmt);
 //DBCStorage <RandPropPointsEntry> sRandPropPointsStore(RandPropPointsfmt);
 //DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore(ScalingStatDistributionfmt);
-DBCStorage <ScalingStatValuesEntry> sScalingStatValuesStore(ScalingStatValuesfmt);
+//DBCStorage <ScalingStatValuesEntry> sScalingStatValuesStore(ScalingStatValuesfmt);
 
-DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
+//DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
 DBCStorage <SkillLineAbilityEntry> sSkillLineAbilityStore(SkillLineAbilityfmt);
 DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
 SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
@@ -361,8 +361,8 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sQuestSortStore,                     "QuestSort.dbc");
     //LOAD_DBC(sRandPropPointsStore,                "RandPropPoints.dbc");
     //LOAD_DBC(sScalingStatDistributionStore,       "ScalingStatDistribution.dbc");
-    LOAD_DBC(sScalingStatValuesStore,             "ScalingStatValues.dbc");
-    LOAD_DBC(sSkillLineStore,                     "SkillLine.dbc");
+    //LOAD_DBC(sScalingStatValuesStore,             "ScalingStatValues.dbc");
+    //LOAD_DBC(sSkillLineStore,                     "SkillLine.dbc");
     LOAD_DBC(sSkillLineAbilityStore,              "SkillLineAbility.dbc");
     LOAD_DBC(sSkillRaceClassInfoStore,            "SkillRaceClassInfo.dbc");
     LOAD_DBC(sSkillTiersStore,                    "SkillTiers.dbc");
@@ -411,7 +411,7 @@ void LoadDBCStores(const std::string& dataPath)
     //    sMapDifficultyMap[MAKE_PAIR32(entry->MapID, entry->Difficulty)] = MapDifficulty(entry->RaidDuration, entry->MaxPlayers, entry->Message[0] != '\0');
 
     for (SkillRaceClassInfoEntry const* entry : sSkillRaceClassInfoStore)
-        if (sSkillLineStore.LookupEntry(entry->SkillID))
+        if (sDBCStoresMgr->GetSkillLineDBC(entry->SkillID))
             SkillRaceClassInfoBySkill.emplace(entry->SkillID, entry);
 
     for (SkillLineAbilityEntry const* skillLine : sSkillLineAbilityStore)

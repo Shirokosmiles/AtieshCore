@@ -4027,7 +4027,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                if (!sSkillLineStore.LookupEntry(skill.SkillId))
+                if (!sDBCStoresMgr->GetSkillLineDBC(skill.SkillId))
                 {
                     TC_LOG_ERROR("sql.sql", "Wrong skill id %u in `playercreateinfo_skills` table, ignoring.", skill.SkillId);
                     continue;
@@ -4863,7 +4863,7 @@ void ObjectMgr::LoadQuests()
         // RequiredSkillId, can be 0
         if (qinfo->_requiredSkillId)
         {
-            if (!sSkillLineStore.LookupEntry(qinfo->_requiredSkillId))
+            if (!sDBCStoresMgr->GetSkillLineDBC(qinfo->_requiredSkillId))
             {
                 TC_LOG_ERROR("sql.sql", "Quest %u has `RequiredSkillId` = %u but this skill does not exist",
                     qinfo->GetQuestId(), qinfo->_requiredSkillId);
@@ -8893,7 +8893,7 @@ int32 ObjectMgr::GetBaseReputationOf(FactionDBC const* factionEntry, uint8 race,
 
 SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry)
 {
-    SkillLineEntry const* skill = sSkillLineStore.LookupEntry(rcEntry->SkillID);
+    SkillLineDBC const* skill = sDBCStoresMgr->GetSkillLineDBC(rcEntry->SkillID);
     if (!skill)
         return SKILL_RANGE_NONE;
 
@@ -9252,7 +9252,7 @@ void ObjectMgr::LoadTrainers()
                 continue;
             }
 
-            if (spell.ReqSkillLine && !sSkillLineStore.LookupEntry(spell.ReqSkillLine))
+            if (spell.ReqSkillLine && !sDBCStoresMgr->GetSkillLineDBC(spell.ReqSkillLine))
             {
                 TC_LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing skill (ReqSkillLine: %u) for TrainerId %u and SpellId %u, ignoring",
                     spell.ReqSkillLine, trainerId, spell.SpellId);

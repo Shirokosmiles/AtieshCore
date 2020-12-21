@@ -2395,24 +2395,24 @@ public:
             if (skillCount >= 2)
                 return true;
 
-            for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
+            SkillLineDBCMap const& skilllinemap = sDBCStoresMgr->GetSkillLineDBCMap();
+            for (SkillLineDBCMap::const_iterator itr = skilllinemap.begin(); itr != skilllinemap.end(); ++itr)
             {
-                SkillLineEntry const *SkillInfo = sSkillLineStore.LookupEntry(i);
-                if (!SkillInfo)
-                    continue;
+                if (SkillLineDBC const* SkillInfo = &itr->second)
+                {
+                    if (SkillInfo->CategoryID == SKILL_CATEGORY_SECONDARY)
+                        continue;
 
-                if (SkillInfo->CategoryID == SKILL_CATEGORY_SECONDARY)
-                    continue;
+                    if ((SkillInfo->CategoryID != SKILL_CATEGORY_PROFESSION) || !SkillInfo->CanLink)
+                        continue;
 
-                if ((SkillInfo->CategoryID != SKILL_CATEGORY_PROFESSION) || !SkillInfo->CanLink)
-                    continue;
+                    const uint32 skillID = SkillInfo->ID;
+                    if (pPlayer->HasSkill(skillID))
+                        skillCount++;
 
-                const uint32 skillID = SkillInfo->ID;
-                if (pPlayer->HasSkill(skillID))
-                    skillCount++;
-
-                if (skillCount >= 4)
-                    return true;
+                    if (skillCount >= 4)
+                        return true;
+                }
             }
             return false;
         }
@@ -2422,7 +2422,7 @@ public:
             ChatHandler handler(pPlayer->GetSession());
             std::string skill_name;
 
-            SkillLineEntry const *SkillInfo = sSkillLineStore.LookupEntry(skill);
+            SkillLineDBC const *SkillInfo = sDBCStoresMgr->GetSkillLineDBC(skill);
             skill_name = SkillInfo->DisplayName[handler.GetSessionDbcLocale()];
 
             if (!SkillInfo)

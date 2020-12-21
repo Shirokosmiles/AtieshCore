@@ -150,8 +150,8 @@ TC_GAME_API SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, u
 //TC_GAME_API extern DBCStorage <QuestFactionRewEntry>         sQuestFactionRewardStore;
 //TC_GAME_API extern DBCStorage <RandPropPointsEntry>          sRandPropPointsStore;
 //TC_GAME_API extern DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore;
-TC_GAME_API extern DBCStorage <ScalingStatValuesEntry>       sScalingStatValuesStore;
-TC_GAME_API extern DBCStorage <SkillLineEntry>               sSkillLineStore;
+//TC_GAME_API extern DBCStorage <ScalingStatValuesEntry>       sScalingStatValuesStore;
+//TC_GAME_API extern DBCStorage <SkillLineEntry>               sSkillLineStore;
 TC_GAME_API extern DBCStorage <SkillLineAbilityEntry>        sSkillLineAbilityStore;
 TC_GAME_API extern DBCStorage <SkillTiersEntry>              sSkillTiersStore;
 TC_GAME_API extern DBCStorage <SoundEntriesEntry>            sSoundEntriesStore;

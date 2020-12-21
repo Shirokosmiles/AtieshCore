@@ -20,6 +20,7 @@
 #include "CharacterDatabaseCleaner.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "SpellMgr.h"
 #include "World.h"
@@ -118,7 +119,7 @@ void CharacterDatabaseCleaner::CleanCharacterAchievementProgress()
 
 bool CharacterDatabaseCleaner::SkillCheck(uint32 skill)
 {
-    return sSkillLineStore.LookupEntry(skill) != nullptr;
+    return sDBCStoresMgr->GetSkillLineDBC(skill) != nullptr;
 }
 
 void CharacterDatabaseCleaner::CleanCharacterSkills()

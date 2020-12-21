@@ -351,16 +351,16 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target))
             return false;
 
-        for (uint32 i = 0; i < sSkillLineStore.GetNumRows(); ++i)
+        SkillLineDBCMap const& skilllinemap = sDBCStoresMgr->GetSkillLineDBCMap();
+        for (SkillLineDBCMap::const_iterator itr = skilllinemap.begin(); itr != skilllinemap.end(); ++itr)
         {
-            SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);
-            if (!skillInfo)
-                continue;
-
-            if ((skillInfo->CategoryID == SKILL_CATEGORY_PROFESSION || skillInfo->CategoryID == SKILL_CATEGORY_SECONDARY) &&
-                skillInfo->CanLink)                             // only prof. with recipes have
+            if (SkillLineDBC const* skillInfo = &itr->second)
             {
-                HandleLearnSkillRecipesHelper(target, skillInfo->ID);
+                if ((skillInfo->CategoryID == SKILL_CATEGORY_PROFESSION || skillInfo->CategoryID == SKILL_CATEGORY_SECONDARY) &&
+                    skillInfo->CanLink)                             // only prof. with recipes have
+                {
+                    HandleLearnSkillRecipesHelper(target, skillInfo->ID);
+                }
             }
         }
 
@@ -393,44 +393,44 @@ public:
 
         std::string name;
 
-        SkillLineEntry const* targetSkillInfo = nullptr;
-        for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
+        SkillLineDBC const* targetSkillInfo = nullptr;
+        SkillLineDBCMap const& skilllinemap = sDBCStoresMgr->GetSkillLineDBCMap();
+        for (SkillLineDBCMap::const_iterator itr = skilllinemap.begin(); itr != skilllinemap.end(); ++itr)
         {
-            SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);
-            if (!skillInfo)
-                continue;
-
-            if ((skillInfo->CategoryID != SKILL_CATEGORY_PROFESSION &&
-                skillInfo->CategoryID != SKILL_CATEGORY_SECONDARY) ||
-                !skillInfo->CanLink)                            // only prof with recipes have set
-                continue;
-
-            int locale = handler->GetSessionDbcLocale();
-            name = skillInfo->DisplayName[locale];
-            if (name.empty())
-                continue;
-
-            if (!Utf8FitTo(name, namePart))
+            if (SkillLineDBC const* skillInfo = &itr->second)
             {
-                locale = 0;
-                for (; locale < TOTAL_LOCALES; ++locale)
+                if ((skillInfo->CategoryID != SKILL_CATEGORY_PROFESSION &&
+                    skillInfo->CategoryID != SKILL_CATEGORY_SECONDARY) ||
+                    !skillInfo->CanLink)                            // only prof with recipes have set
+                    continue;
+
+                int locale = handler->GetSessionDbcLocale();
+                name = skillInfo->DisplayName[locale];
+                if (name.empty())
+                    continue;
+
+                if (!Utf8FitTo(name, namePart))
                 {
-                    if (locale == handler->GetSessionDbcLocale())
-                        continue;
+                    locale = 0;
+                    for (; locale < TOTAL_LOCALES; ++locale)
+                    {
+                        if (locale == handler->GetSessionDbcLocale())
+                            continue;
 
-                    name = skillInfo->DisplayName[locale];
-                    if (name.empty())
-                        continue;
+                        name = skillInfo->DisplayName[locale];
+                        if (name.empty())
+                            continue;
 
-                    if (Utf8FitTo(name, namePart))
-                        break;
+                        if (Utf8FitTo(name, namePart))
+                            break;
+                    }
                 }
-            }
 
-            if (locale < TOTAL_LOCALES)
-            {
-                targetSkillInfo = skillInfo;
-                break;
+                if (locale < TOTAL_LOCALES)
+                {
+                    targetSkillInfo = skillInfo;
+                    break;
+                }
             }
         }
 

@@ -1411,7 +1411,7 @@ public:
             return false;
         }
 
-        SkillLineEntry const* skillLine = sSkillLineStore.LookupEntry(skillId);
+        SkillLineDBC const* skillLine = sDBCStoresMgr->GetSkillLineDBC(skillId);
         if (!skillLine)
         {
             handler->PSendSysMessage(LANG_INVALID_SKILL_ID, skillId);

@@ -108,6 +108,8 @@ typedef std::unordered_map<uint32 /*ID*/, QuestXPDBC> QuestXPDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, QuestFactionRewardDBC> QuestFactionRewardDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, RandPropPointsDBC> RandPropPointsDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, ScalingStatDistributionDBC> ScalingStatDistributionDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, ScalingStatValuesDBC> ScalingStatValuesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, SkillLineDBC> SkillLineDBCMap;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -884,6 +886,23 @@ public:
         return nullptr;
     }
 
+    ScalingStatValuesDBC const* GetScalingStatValuesDBC(uint32 ID)
+    {
+        ScalingStatValuesDBCMap::const_iterator itr = _scalingStatValuesMap.find(ID);
+        if (itr != _scalingStatValuesMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    SkillLineDBCMap const& GetSkillLineDBCMap() const { return _skillLineMap; }
+    SkillLineDBC const* GetSkillLineDBC(uint32 ID)
+    {
+        SkillLineDBCMap::const_iterator itr = _skillLineMap.find(ID);
+        if (itr != _skillLineMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -984,6 +1003,8 @@ protected:
     void _Load_QuestFactionReward();
     void _Load_RandPropPoints();
     void _Load_ScalingStatDistribution();
+    void _Load_ScalingStatValues();
+    void _Load_SkillLine();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -1067,6 +1088,8 @@ private:
     QuestFactionRewardDBCMap _questFactionRewardMap;
     RandPropPointsDBCMap _randPropPointsMap;
     ScalingStatDistributionDBCMap _scalingStatDistributionMap;
+    ScalingStatValuesDBCMap _scalingStatValuesMap;
+    SkillLineDBCMap _skillLineMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

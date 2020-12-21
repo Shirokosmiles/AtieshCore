@@ -844,10 +844,10 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in SkillLine.dbc
-        for (uint32 id = 0; id < sSkillLineStore.GetNumRows(); id++)
+        SkillLineDBCMap const& skilllinemap = sDBCStoresMgr->GetSkillLineDBCMap();
+        for (SkillLineDBCMap::const_iterator itr = skilllinemap.begin(); itr != skilllinemap.end(); ++itr)
         {
-            SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(id);
-            if (skillInfo)
+            if (SkillLineDBC const* skillInfo = &itr->second)
             {
                 uint8 locale = handler->GetSessionDbcLocale();
                 std::string name = skillInfo->DisplayName[locale];
@@ -881,13 +881,13 @@ public:
 
                     char valStr[50] = "";
                     char const* knownStr = "";
-                    if (target && target->HasSkill(id))
+                    if (target && target->HasSkill(skillInfo->ID))
                     {
                         knownStr = handler->GetTrinityString(LANG_KNOWN);
-                        uint32 curValue = target->GetPureSkillValue(id);
-                        uint32 maxValue  = target->GetPureMaxSkillValue(id);
-                        uint32 permValue = target->GetSkillPermBonusValue(id);
-                        uint32 tempValue = target->GetSkillTempBonusValue(id);
+                        uint32 curValue = target->GetPureSkillValue(skillInfo->ID);
+                        uint32 maxValue = target->GetPureMaxSkillValue(skillInfo->ID);
+                        uint32 permValue = target->GetSkillPermBonusValue(skillInfo->ID);
+                        uint32 tempValue = target->GetSkillTempBonusValue(skillInfo->ID);
 
                         char const* valFormat = handler->GetTrinityString(LANG_SKILL_VALUES);
                         snprintf(valStr, 50, valFormat, curValue, maxValue, permValue, tempValue);
@@ -895,15 +895,16 @@ public:
 
                     // send skill in "id - [namedlink locale]" format
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_SKILL_LIST_CHAT, id, id, name.c_str(), localeNames[locale], knownStr, valStr);
+                        handler->PSendSysMessage(LANG_SKILL_LIST_CHAT, skillInfo->ID, skillInfo->ID, name.c_str(), localeNames[locale], knownStr, valStr);
                     else
-                        handler->PSendSysMessage(LANG_SKILL_LIST_CONSOLE, id, name.c_str(), localeNames[locale], knownStr, valStr);
+                        handler->PSendSysMessage(LANG_SKILL_LIST_CONSOLE, skillInfo->ID, name.c_str(), localeNames[locale], knownStr, valStr);
 
                     if (!found)
                         found = true;
                 }
             }
         }
+
         if (!found)
             handler->SendSysMessage(LANG_COMMAND_NOSKILLFOUND);
 
