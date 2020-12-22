@@ -254,10 +254,10 @@ public:
         char const* knownStr = handler->GetTrinityString(LANG_KNOWN);
 
         // Search in CharTitles.dbc
-        CharTitlesDBCMap const& CharTitlesMap = sDBCStoresMgr->GetCharTitlesDBCMap();
-        for (CharTitlesDBCMap::const_iterator itr = CharTitlesMap.begin(); itr != CharTitlesMap.end(); ++itr)
+        CharTitlesDBCMap const& entryMap = sDBCStoresMgr->GetCharTitlesDBCMap();
+        for (const auto& skaID : entryMap)
         {
-            if (CharTitlesDBC const* titleInfo = &itr->second)
+            if (CharTitlesDBC const* titleInfo = &skaID.second)
             {
                 if (target->HasTitle(titleInfo))
                 {

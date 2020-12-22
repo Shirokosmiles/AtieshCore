@@ -388,10 +388,10 @@ void InstanceSaveManager::LoadResetTimes()
 
     // calculate new global reset times for expired instances and those that have never been reset yet
     // add the global reset times to the priority queue
-    MapDifficultyDBCMap const& mapDiffMap = sDBCStoresMgr->GetMapDifficultyDBCMap();
-    for (MapDifficultyDBCMap::const_iterator itr = mapDiffMap.begin(); itr != mapDiffMap.end(); ++itr)
+    MapDifficultyDBCMap const& entryMap = sDBCStoresMgr->GetMapDifficultyDBCMap();
+    for (const auto& indexID : entryMap)
     {
-        if (MapDifficultyDBC const* mapDiff = &itr->second)
+        if (MapDifficultyDBC const* mapDiff = &indexID.second)
         {
             if (!mapDiff->RaidDuration)
                 continue;

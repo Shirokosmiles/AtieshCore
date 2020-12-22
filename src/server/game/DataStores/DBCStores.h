@@ -152,7 +152,7 @@ TC_GAME_API uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
 //TC_GAME_API extern DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore;
 //TC_GAME_API extern DBCStorage <ScalingStatValuesEntry>       sScalingStatValuesStore;
 //TC_GAME_API extern DBCStorage <SkillLineEntry>               sSkillLineStore;
-//TC_GAME_API extern DBCStorage <SkillLineAbilityEntry>        sSkillLineAbilityStore;
+//TC_GAME_API extern DBCStorage <SkillLineAbilityDBC>        sSkillLineAbilityStore;
 TC_GAME_API extern DBCStorage <SkillTiersEntry>              sSkillTiersStore;
 TC_GAME_API extern DBCStorage <SoundEntriesEntry>            sSoundEntriesStore;
 TC_GAME_API extern DBCStorage <SpellCastTimesEntry>          sSpellCastTimesStore;

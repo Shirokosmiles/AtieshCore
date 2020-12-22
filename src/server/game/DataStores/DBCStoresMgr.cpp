@@ -88,6 +88,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _itemLimitCategoryMap.clear();
     _itemRandomPropertiesMap.clear();
     _itemRandomSuffixMap.clear();
+    _itemRandomSuffixTheLastIndex = 0;
     _itemSetMap.clear();
     _lfgDungeonMap.clear();
     _lightMap.clear();
@@ -122,6 +123,8 @@ DBCStoresMgr::~DBCStoresMgr()
 
 void DBCStoresMgr::Initialize()
 {
+    _itemRandomSuffixTheLastIndex = 0;
+
     _Load_Achievement();
     _Load_AchievementCriteria();
     _Load_AreaTable();
@@ -2513,8 +2516,14 @@ void DBCStoresMgr::_Load_ItemRandomSuffix()
 
         _itemRandomSuffixMap[id] = irs;
 
+        if (_itemRandomSuffixTheLastIndex)
+            if (_itemRandomSuffixTheLastIndex > id)
+                _itemRandomSuffixTheLastIndex = id;
+
         ++count;
     } while (result->NextRow());
+
+    _itemRandomSuffixTheLastIndex++; // this _itemRandomSuffixTheLastIndex should be more then the last by 1 point
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_itemrandomsuffix              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -2937,7 +2946,7 @@ void DBCStoresMgr::_Load_NamesReserved()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_namesreserved                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));    
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_namesreserved                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load OverrideSpellData.dbc
@@ -3440,20 +3449,23 @@ void DBCStoresMgr::_Handle_NamesReservedRegex()
 
 void DBCStoresMgr::_Handle_PetFamilySpellsStore()
 {
-    for (SkillLineAbilityDBCMap::const_iterator itr = _skillLineAbilityMap.begin(); itr != _skillLineAbilityMap.end(); ++itr)
+    SkillLineAbilityDBCMap const& skilllineMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+    CreatureFamilyDBCMap const& cFamilyMap = sDBCStoresMgr->GetCreatureFamilyDBCMap();
+
+    for (const auto& skaID : skilllineMap)
     {
-        if (SkillLineAbilityDBC const* skillLine = &itr->second)
+        if (SkillLineAbilityDBC const* skillLine = &skaID.second)
         {
             SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->Spell);
             if (spellInfo && spellInfo->Attributes & SPELL_ATTR0_PASSIVE)
             {
-                CreatureFamilyDBCMap const& CreatureFamilyMap = sDBCStoresMgr->GetCreatureFamilyDBCMap();
-                for (CreatureFamilyDBCMap::const_iterator itr = CreatureFamilyMap.begin(); itr != CreatureFamilyMap.end(); ++itr)
+                for (const auto& indexID : cFamilyMap)
                 {
-                    if (CreatureFamilyDBC const* cFamily = &itr->second)
+                    if (CreatureFamilyDBC const* cFamily = &indexID.second)
                     {
                         if (skillLine->SkillLine != cFamily->SkillLine[0] && skillLine->SkillLine != cFamily->SkillLine[1])
                             continue;
+
                         if (spellInfo->SpellLevel)
                             continue;
 

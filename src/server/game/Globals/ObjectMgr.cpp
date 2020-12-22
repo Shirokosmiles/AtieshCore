@@ -2101,10 +2101,10 @@ void ObjectMgr::LoadCreatures()
 
     // Build single time for check spawnmask
     std::map<uint32, uint32> spawnMasks;
-    MapDBCMap const& mapMap = sDBCStoresMgr->GetMapDBCMap();
-    for (MapDBCMap::const_iterator itr = mapMap.begin(); itr != mapMap.end(); ++itr)
+    MapDBCMap const& entryMap = sDBCStoresMgr->GetMapDBCMap();
+    for (const auto& indexID : entryMap)
     {
-        if (MapDBC const* mapInfo = &itr->second)
+        if (MapDBC const* mapInfo = &indexID.second)
         {
             for (uint8 k = 0; k < MAX_DIFFICULTY; ++k)
                 if (sDBCStoresMgr->GetMapDifficultyData(mapInfo->ID, Difficulty(k)))
@@ -2402,10 +2402,10 @@ void ObjectMgr::LoadGameObjects()
 
     // build single time for check spawnmask
     std::map<uint32, uint32> spawnMasks;
-    MapDBCMap const& mapMap = sDBCStoresMgr->GetMapDBCMap();
-    for (MapDBCMap::const_iterator itr = mapMap.begin(); itr != mapMap.end(); ++itr)
+    MapDBCMap const& entryMap = sDBCStoresMgr->GetMapDBCMap();
+    for (const auto& indexID : entryMap)
     {
-        if (MapDBC const* mapInfo = &itr->second)
+        if (MapDBC const* mapInfo = &indexID.second)
         {
             for (uint8 k = 0; k < MAX_DIFFICULTY; ++k)
                 if (sDBCStoresMgr->GetMapDifficultyData(mapInfo->ID, Difficulty(k)))
@@ -3397,10 +3397,11 @@ void ObjectMgr::LoadItemTemplates()
 
     // Check if item templates for DBC referenced character start outfit are present
     std::set<uint32> notFoundOutfit;
+
     CharStartOutfitDBCMap const& entryMap = sDBCStoresMgr->GetCharStartOutfitDBCMap();
-    for (CharStartOutfitDBCMap::const_iterator itr = entryMap.begin(); itr != entryMap.end(); ++itr)
+    for (const auto& skaID : entryMap)
     {
-        if (CharStartOutfitDBC const* entry = &itr->second)
+        if (CharStartOutfitDBC const* entry = &skaID.second)
         {
             for (uint8 j = 0; j < MAX_OUTFIT_ITEMS; ++j)
             {
@@ -3417,7 +3418,7 @@ void ObjectMgr::LoadItemTemplates()
 
     for (std::set<uint32>::const_iterator itr = notFoundOutfit.begin(); itr != notFoundOutfit.end(); ++itr)
         TC_LOG_ERROR("sql.sql", "Item (Entry: %u) does not exist in `item_template` but is referenced in `CharStartOutfit.dbc`", *itr);
-
+    notFoundOutfit.clear();
     TC_LOG_INFO("server.loading", ">> Loaded " SZFMTD " item templates in %u ms", _itemTemplateStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
@@ -3464,10 +3465,10 @@ void ObjectMgr::LoadItemSetNames()
     std::set<uint32> itemSetItems;
 
     // fill item set member ids
-    ItemSetDBCMap const& itemSetMap = sDBCStoresMgr->GetItemSetMap();
-    for (ItemSetDBCMap::const_iterator itr = itemSetMap.begin(); itr != itemSetMap.end(); ++itr)
+    ItemSetDBCMap const& entryMap = sDBCStoresMgr->GetItemSetMap();
+    for (const auto& indexID : entryMap)
     {
-        if (ItemSetDBC const* setEntry = &itr->second)
+        if (ItemSetDBC const* setEntry = &indexID.second)
         {
             for (uint32 i = 0; i < MAX_ITEM_SET_ITEMS; ++i)
                 if (setEntry->ItemID[i])

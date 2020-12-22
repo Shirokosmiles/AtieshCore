@@ -107,10 +107,10 @@ bool AuctionBotSeller::Initialize()
 
     uint32 itemsAdded = 0;
 
-    ItemDBCMap const& ItemMap = sDBCStoresMgr->GetItemDBCMap();
-    for (ItemDBCMap::const_iterator itr = ItemMap.begin(); itr != ItemMap.end(); ++itr)
+    ItemDBCMap const& entryMap = sDBCStoresMgr->GetItemDBCMap();
+    for (const auto& indexID : entryMap)
     {
-        if (ItemDBC const* itemdbc = &itr->second)
+        if (ItemDBC const* itemdbc = &indexID.second)
         {
             uint32 itemId = itemdbc->ID;
             ItemTemplate const* prototype = sObjectMgr->GetItemTemplate(itemId);

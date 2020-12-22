@@ -155,7 +155,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <ScalingStatValuesEntry> sScalingStatValuesStore(ScalingStatValuesfmt);
 
 //DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
-//DBCStorage <SkillLineAbilityEntry> sSkillLineAbilityStore(SkillLineAbilityfmt);
+//DBCStorage <SkillLineAbilityDBC> sSkillLineAbilityStore(SkillLineAbilityfmt);
 //DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
 //SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
 DBCStorage <SkillTiersEntry> sSkillTiersStore(SkillTiersfmt);

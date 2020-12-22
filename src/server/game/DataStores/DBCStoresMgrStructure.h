@@ -1373,7 +1373,7 @@ struct SkillLineDBC
 };
 
 // load SkillLineAbility.dbc
-struct SkillLineAbilityDBC
+/*struct SkillLineAbilityDBC
 {
     uint32 ID;                                              // 0
     uint32 SkillLine;                                       // 1
@@ -1388,7 +1388,7 @@ struct SkillLineAbilityDBC
     uint32 TrivialSkillLineRankHigh;                        // 10
     uint32 TrivialSkillLineRankLow;                         // 11
     //uint32 CharacterPoints[2];                            // 12-13
-};
+};*/
 
 // load SkillRaceClassInfo.dbc
 struct SkillRaceClassInfoDBC

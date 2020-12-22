@@ -159,10 +159,10 @@ public:
             return true;
         uint32 family = classEntry->SpellClassSet;
 
-        SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
-        for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
+        SkillLineAbilityDBCMap const& entryMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+        for (const auto& indexID : entryMap)
         {
-            if (SkillLineAbilityDBC const* entry = &itr->second)
+            if (SkillLineAbilityDBC const* entry = &indexID.second)
             {
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(entry->Spell);
                 if (!spellInfo)
@@ -351,10 +351,10 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target))
             return false;
 
-        SkillLineDBCMap const& skilllinemap = sDBCStoresMgr->GetSkillLineDBCMap();
-        for (SkillLineDBCMap::const_iterator itr = skilllinemap.begin(); itr != skilllinemap.end(); ++itr)
+        SkillLineDBCMap const& entryMap = sDBCStoresMgr->GetSkillLineDBCMap();
+        for (const auto& indexID : entryMap)
         {
-            if (SkillLineDBC const* skillInfo = &itr->second)
+            if (SkillLineDBC const* skillInfo = &indexID.second)
             {
                 if ((skillInfo->CategoryID == SKILL_CATEGORY_PROFESSION || skillInfo->CategoryID == SKILL_CATEGORY_SECONDARY) &&
                     skillInfo->CanLink)                             // only prof. with recipes have
@@ -394,10 +394,10 @@ public:
         std::string name;
 
         SkillLineDBC const* targetSkillInfo = nullptr;
-        SkillLineDBCMap const& skilllinemap = sDBCStoresMgr->GetSkillLineDBCMap();
-        for (SkillLineDBCMap::const_iterator itr = skilllinemap.begin(); itr != skilllinemap.end(); ++itr)
+        SkillLineDBCMap const& entryMap = sDBCStoresMgr->GetSkillLineDBCMap();
+        for (const auto& indexID : entryMap)
         {
-            if (SkillLineDBC const* skillInfo = &itr->second)
+            if (SkillLineDBC const* skillInfo = &indexID.second)
             {
                 if ((skillInfo->CategoryID != SKILL_CATEGORY_PROFESSION &&
                     skillInfo->CategoryID != SKILL_CATEGORY_SECONDARY) ||
@@ -449,10 +449,10 @@ public:
     {
         uint32 classmask = player->GetClassMask();
 
-        SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
-        for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
+        SkillLineAbilityDBCMap const& entryMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+        for (const auto& indexID : entryMap)
         {
-            if (SkillLineAbilityDBC const* skillLine = &itr->second)
+            if (SkillLineAbilityDBC const* skillLine = &indexID.second)
             {
                 // wrong skill
                 if (skillLine->SkillLine != skillId)

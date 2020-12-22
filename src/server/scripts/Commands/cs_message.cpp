@@ -64,10 +64,10 @@ public:
     {
         uint32 channelId = 0;
 
-        ChatChannelsDBCMap const& chnlMap = sDBCStoresMgr->GetChatChannelsDBCMap();
-        for (ChatChannelsDBCMap::const_iterator itr = chnlMap.begin(); itr != chnlMap.end(); ++itr)
+        ChatChannelsDBCMap const& entryMap = sDBCStoresMgr->GetChatChannelsDBCMap();
+        for (const auto& skaID : entryMap)
         {
-            if (ChatChannelsDBC const* entry = &itr->second)
+            if (ChatChannelsDBC const* entry = &skaID.second)
             {
                 if (StringContainsStringI(entry->Name[handler->GetSessionDbcLocale()], channelName))
                 {
@@ -79,9 +79,9 @@ public:
 
         AreaTableDBC const* zoneEntry = nullptr;
         AreaTableDBCMap const& areaMap = sDBCStoresMgr->GetAreaTableDBCMap();
-        for (AreaTableDBCMap::const_iterator itr = areaMap.begin(); itr != areaMap.end(); ++itr)
+        for (const auto& atID : areaMap)
         {
-            if (AreaTableDBC const* entry = &itr->second)
+            if (AreaTableDBC const* entry = &atID.second)
             {
                 if (StringContainsStringI(entry->AreaName[handler->GetSessionDbcLocale()], channelName))
                 {

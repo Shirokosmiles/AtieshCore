@@ -274,10 +274,10 @@ void ReputationMgr::Initialize()
     _exaltedFactionCount = 0;
     _sendFactionIncreased = false;
 
-    FactionDBCMap const& factionMap = sDBCStoresMgr->GetFactionDBCMap();
-    for (FactionDBCMap::const_iterator itr = factionMap.begin(); itr != factionMap.end(); ++itr)
+    FactionDBCMap const& entryMap = sDBCStoresMgr->GetFactionDBCMap();
+    for (const auto& indexID : entryMap)
     {
-        if (FactionDBC const* factionEntry = &itr->second)
+        if (FactionDBC const* factionEntry = &indexID.second)
         {
             if (factionEntry->ReputationIndex >= 0)
             {
@@ -326,10 +326,10 @@ bool ReputationMgr::SetReputation(FactionDBC const* factionEntry, int32 standing
     {
         float spillOverRepOut = float(standing);
         // check for sub-factions that receive spillover
-        FactionDBCMap const& factionMap = sDBCStoresMgr->GetFactionDBCMap();
-        for (FactionDBCMap::const_iterator itr = factionMap.begin(); itr != factionMap.end(); ++itr)
+        FactionDBCMap const& entryMap = sDBCStoresMgr->GetFactionDBCMap();
+        for (const auto& indexID : entryMap)
         {
-            if (FactionDBC const* factionEntryCalc = &itr->second)
+            if (FactionDBC const* factionEntryCalc = &indexID.second)
             {
                 if (factionEntryCalc->ParentFactionID == factionEntry->ID)
                 {

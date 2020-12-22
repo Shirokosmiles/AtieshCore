@@ -111,7 +111,6 @@ typedef std::unordered_map<uint32 /*ID*/, SkillLineAbilityDBC> SkillLineAbilityD
 typedef std::unordered_map<uint32 /*ID*/, SkillRaceClassInfoDBC> SkillRaceClassInfoDBCMap;
 
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
-
 typedef std::set<uint32> PetFamilySpellsSet;
 typedef std::map<uint32, PetFamilySpellsSet> PetFamilySpellsStore;
 
@@ -666,7 +665,7 @@ public:
         return nullptr;
     }
 
-    ItemRandomSuffixDBCMap const& GetItemRandomSuffixMap() const { return _itemRandomSuffixMap; }
+    uint32 GetNumRowItemRandomSuffixMap() const { return _itemRandomSuffixTheLastIndex; }
     ItemRandomSuffixDBC const* GetItemRandomSuffixDBC(uint32 ID)
     {
         ItemRandomSuffixDBCMap::const_iterator itr = _itemRandomSuffixMap.find(ID);
@@ -1107,6 +1106,7 @@ private:
     ItemLimitCategoryDBCMap _itemLimitCategoryMap;
     ItemRandomPropertiesDBCMap _itemRandomPropertiesMap;
     ItemRandomSuffixDBCMap _itemRandomSuffixMap;
+    uint32 _itemRandomSuffixTheLastIndex;
     ItemSetDBCMap _itemSetMap;
     LFGDungeonDBCMap _lfgDungeonMap;
     LightDBCMap _lightMap;

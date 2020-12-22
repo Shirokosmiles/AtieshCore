@@ -5206,10 +5206,10 @@ void Player::UpdateLocalChannels(uint32 newZone)
     if (!cMgr)
         return;
 
-    ChatChannelsDBCMap const& charChannelMap = sDBCStoresMgr->GetChatChannelsDBCMap();
-    for (ChatChannelsDBCMap::const_iterator itr = charChannelMap.begin(); itr != charChannelMap.end(); ++itr)
+    ChatChannelsDBCMap const& entryMap = sDBCStoresMgr->GetChatChannelsDBCMap();
+    for (const auto& skaID : entryMap)
     {
-        if (ChatChannelsDBC const* channelEntry = &itr->second)
+        if (ChatChannelsDBC const* channelEntry = &skaID.second)
         {
             Channel* usedChannel = nullptr;
             for (Channel* channel : m_channels)
@@ -6159,14 +6159,12 @@ void Player::SetSkill(uint32 id, uint16 step, uint16 newVal, uint16 maxVal)
                 mSkillStatus.erase(itr);
 
             // remove all spells that related to this skill
-            SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
-            for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
+            SkillLineAbilityDBCMap const& skilllineMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+            for (const auto& skaID : skilllineMap)
             {
-                if (SkillLineAbilityDBC const* pAbility = &itr->second)
-                {
+                if (SkillLineAbilityDBC const* pAbility = &skaID.second)
                     if (pAbility->SkillLine == id)
                         RemoveSpell(sSpellMgr->GetFirstSpellInChain(pAbility->Spell));
-                }
             }
         }
     }
@@ -9556,11 +9554,11 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
 void Player::SendBGWeekendWorldStates() const
 {
     BattlemasterListDBCMap const& blMap = sDBCStoresMgr->GetBattlemasterListDBCMap();
-    for (BattlemasterListDBCMap::const_iterator itr = blMap.begin(); itr != blMap.end(); ++itr)
+    for (const auto& blID : blMap)
     {
-        if (BattlemasterListDBC const* bl = &itr->second)
+        if (BattlemasterListDBC const* bl = &blID.second)
         {
-            if (bl && bl->HolidayWorldState)
+            if (bl->HolidayWorldState)
             {
                 if (BattlegroundMgr::IsBGWeekend((BattlegroundTypeId)bl->ID))
                     SendUpdateWorldState(bl->HolidayWorldState, 1);
@@ -23212,57 +23210,55 @@ void Player::LearnSkillRewardedSpells(uint32 skillId, uint32 skillValue)
 {
     uint32 raceMask  = getCFSRaceMask();
     uint32 classMask = GetClassMask();
-    SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
-    for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
+    SkillLineAbilityDBCMap const& skilllineMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+    for (const auto& skaID : skilllineMap)
     {
-        if (SkillLineAbilityDBC const* ability = &itr->second)
+        SkillLineAbilityDBC const* ability = &skaID.second;
+        if (!ability || ability->SkillLine != skillId)
+            continue;
+
+        if (!sSpellMgr->GetSpellInfo(ability->Spell))
+            continue;
+
+        if (ability->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE && ability->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+            continue;
+
+        // Check race if set
+        if (ability->RaceMask && !(ability->RaceMask & raceMask))
+            continue;
+
+        // Check class if set
+        if (ability->ClassMask && !(ability->ClassMask & classMask))
+            continue;
+
+        // need unlearn spell
+        if (skillValue < ability->MinSkillLineRank && ability->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE)
+            RemoveSpell(ability->Spell);
+        // need learn
+        else
         {
-            if (ability->SkillLine != skillId)
-                continue;
-
-            if (!sSpellMgr->GetSpellInfo(ability->Spell))
-                continue;
-
-            if (ability->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE && ability->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
-                continue;
-
-            // Check race if set
-            if (ability->RaceMask && !(ability->RaceMask & raceMask))
-                continue;
-
-            // Check class if set
-            if (ability->ClassMask && !(ability->ClassMask & classMask))
-                continue;
-
-            // need unlearn spell
-            if (skillValue < ability->MinSkillLineRank && ability->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE)
-                RemoveSpell(ability->Spell);
-            // need learn
-            else
+            // used to avoid double Seal of Righteousness on paladins, it's the only player spell which has both spell and forward spell in auto learn
+            if (ability->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && ability->SupercededBySpell)
             {
-                // used to avoid double Seal of Righteousness on paladins, it's the only player spell which has both spell and forward spell in auto learn
-                if (ability->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && ability->SupercededBySpell)
+                bool skipCurrent = false;
+                auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(ability->SupercededBySpell);
+                for (auto itr = bounds.first; itr != bounds.second; ++itr)
                 {
-                    bool skipCurrent = false;
-                    auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(ability->SupercededBySpell);
-                    for (auto itr = bounds.first; itr != bounds.second; ++itr)
+                    if (itr->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && skillValue >= itr->second->MinSkillLineRank)
                     {
-                        if (itr->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && skillValue >= itr->second->MinSkillLineRank)
-                        {
-                            skipCurrent = true;
-                            break;
-                        }
+                        skipCurrent = true;
+                        break;
                     }
-
-                    if (skipCurrent)
-                        continue;
                 }
 
-                if (!IsInWorld())
-                    AddSpell(ability->Spell, true, true, true, false, false, ability->SkillLine);
-                else
-                    LearnSpell(ability->Spell, true, ability->SkillLine);
+                if (skipCurrent)
+                    continue;
             }
+
+            if (!IsInWorld())
+                AddSpell(ability->Spell, true, true, true, false, false, ability->SkillLine);
+            else
+                LearnSpell(ability->Spell, true, ability->SkillLine);
         }
     }
 }
@@ -24628,10 +24624,10 @@ uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 n
 
 void Player::InitGlyphsForLevel()
 {
-    GlyphSlotDBCMap const& gslotMap = sDBCStoresMgr->GetGlyphSlotDBCMap();
-    for (GlyphSlotDBCMap::const_iterator itr = gslotMap.begin(); itr != gslotMap.end(); ++itr)
+    GlyphSlotDBCMap const& entryMap = sDBCStoresMgr->GetGlyphSlotDBCMap();
+    for (const auto& indexID : entryMap)
     {
-        if (GlyphSlotDBC const* gs = &itr->second)
+        if (GlyphSlotDBC const* gs = &indexID.second)
         {
             if (gs->Tooltip)
                 SetGlyphSlot(gs->Tooltip - 1, gs->ID);

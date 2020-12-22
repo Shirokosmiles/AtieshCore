@@ -107,10 +107,10 @@ public:
         wstrToLower(wNamePart);
 
         // Search in AreaTable.dbc
-        AreaTableDBCMap const& areatableMap = sDBCStoresMgr->GetAreaTableDBCMap();
-        for (AreaTableDBCMap::const_iterator itr = areatableMap.begin(); itr != areatableMap.end(); ++itr)
+        AreaTableDBCMap const& areaMap = sDBCStoresMgr->GetAreaTableDBCMap();
+        for (const auto& atID : areaMap)
         {
-            if (AreaTableDBC const* areaEntry = &itr->second)
+            if (AreaTableDBC const* areaEntry = &atID.second)
             {
                 uint8 locale = handler->GetSessionDbcLocale();
                 std::string name = areaEntry->AreaName[locale];
@@ -523,10 +523,10 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in ItemSet.dbc
-        ItemSetDBCMap const& itemSetMap = sDBCStoresMgr->GetItemSetMap();
-        for (ItemSetDBCMap::const_iterator itr = itemSetMap.begin(); itr != itemSetMap.end(); ++itr)
+        ItemSetDBCMap const& entryMap = sDBCStoresMgr->GetItemSetMap();
+        for (const auto& indexID : entryMap)
         {
-            if (ItemSetDBC const* set = &itr->second)
+            if (ItemSetDBC const* set = &indexID.second)
             {
                 uint8 locale = handler->GetSessionDbcLocale();
                 std::string name = set->Name[locale];
@@ -1249,10 +1249,10 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in CharTitles.dbc
-        CharTitlesDBCMap const& CharTitlesMap = sDBCStoresMgr->GetCharTitlesDBCMap();
-        for (CharTitlesDBCMap::const_iterator itr = CharTitlesMap.begin(); itr != CharTitlesMap.end(); ++itr)
+        CharTitlesDBCMap const& entryMap = sDBCStoresMgr->GetCharTitlesDBCMap();
+        for (const auto& skaID : entryMap)
         {
-            if (CharTitlesDBC const* titleInfo = &itr->second)
+            if (CharTitlesDBC const* titleInfo = &skaID.second)
             {
                 uint8 locale = handler->GetSessionDbcLocale();
                 std::string name = "";

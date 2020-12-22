@@ -2320,10 +2320,10 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
 
     uint32 loaded = 0;
 
-    AchievementCriteriaDBCMap const& AchievementCriteria = sDBCStoresMgr->GetAchievementCriteriaDBCMap();
-    for (AchievementCriteriaDBCMap::const_iterator itr = AchievementCriteria.begin(); itr != AchievementCriteria.end(); ++itr)
+    AchievementCriteriaDBCMap const& achmap = sDBCStoresMgr->GetAchievementCriteriaDBCMap();
+    for (const auto& achcID : achmap)
     {
-        if (AchievementCriteriaDBC const* criteria = &itr->second)
+        if (AchievementCriteriaDBC const* criteria = &achcID.second)
         {
             ASSERT(criteria->Type < ACHIEVEMENT_CRITERIA_TYPE_TOTAL, "ACHIEVEMENT_CRITERIA_TYPE_TOTAL must be greater than or equal to %u but is currently equal to %u",
                 criteria->Type + 1, ACHIEVEMENT_CRITERIA_TYPE_TOTAL);
@@ -2397,9 +2397,9 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
     uint32 count = 0;
 
     AchievementDBCMap const& AchievementMap = sDBCStoresMgr->GetAchievementDBCMap();
-    for (AchievementDBCMap::const_iterator itr = AchievementMap.begin(); itr != AchievementMap.end(); ++itr)
+    for (const auto& achID : AchievementMap)
     {
-        if (AchievementDBC const* achievement = &itr->second)
+        if (AchievementDBC const* achievement = &achID.second)
         {
             if (!achievement->SharesCriteria)
                 continue;
@@ -2475,10 +2475,10 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
     while (result->NextRow());
 
     // post loading checks
-    AchievementCriteriaDBCMap const& AchievementCriteria = sDBCStoresMgr->GetAchievementCriteriaDBCMap();
-    for (AchievementCriteriaDBCMap::const_iterator itr = AchievementCriteria.begin(); itr != AchievementCriteria.end(); ++itr)
+    AchievementCriteriaDBCMap const& achmap = sDBCStoresMgr->GetAchievementCriteriaDBCMap();
+    for (const auto& achcID : achmap)
     {
-        if (AchievementCriteriaDBC const* criteria = &itr->second)
+        if (AchievementCriteriaDBC const* criteria = &achcID.second)
         {
             switch (criteria->Type)
             {
@@ -2558,9 +2558,9 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     // while it will not prevent races, it will prevent crashes that happen because std::unordered_map key was added
     // instead the only potential race will happen on value associated with the key
     AchievementDBCMap const& AchievementMap = sDBCStoresMgr->GetAchievementDBCMap();
-    for (AchievementDBCMap::const_iterator itr = AchievementMap.begin(); itr != AchievementMap.end(); ++itr)
+    for (const auto& achID : AchievementMap)
     {
-        if (AchievementDBC const* achievement = &itr->second)
+        if (AchievementDBC const* achievement = &achID.second)
         {
             if (achievement->Flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
                 _allCompletedAchievements[achievement->ID] = SystemTimePoint::min();

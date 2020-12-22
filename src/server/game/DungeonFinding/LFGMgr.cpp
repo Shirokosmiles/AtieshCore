@@ -193,10 +193,10 @@ void LFGMgr::LoadLFGDungeons(bool reload /* = false */)
     LfgDungeonStore.clear();
 
     // Initialize Dungeon map with data from dbcs
-    LFGDungeonDBCMap const& lfgmap = sDBCStoresMgr->GetLFGDungeonDBCMap();
-    for (LFGDungeonDBCMap::const_iterator itr = lfgmap.begin(); itr != lfgmap.end(); ++itr)
+    LFGDungeonDBCMap const& entryMap = sDBCStoresMgr->GetLFGDungeonDBCMap();
+    for (const auto& indexID : entryMap)
     {
-        if (LFGDungeonDBC const* dungeon = &itr->second)
+        if (LFGDungeonDBC const* dungeon = &indexID.second)
         {
             switch (dungeon->TypeID)
             {

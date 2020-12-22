@@ -2441,10 +2441,10 @@ public:
         void LearnSkillRecipesHelper(Player *player, uint32 skill_id)
         {
             uint32 classmask = player->GetClassMask();
-            SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
-            for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
+            SkillLineAbilityDBCMap const& entryMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+            for (const auto& indexID : entryMap)
             {
-                if (SkillLineAbilityDBC const* skillLine = &itr->second)
+                if (SkillLineAbilityDBC const* skillLine = &indexID.second)
                 {
                     // wrong skill
                     if (skillLine->SkillLine != skill_id)

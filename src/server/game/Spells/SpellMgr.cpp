@@ -1968,14 +1968,15 @@ void SpellMgr::LoadSkillLineAbilityMap()
 
     uint32 count = 0;
 
-    SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
-    for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
+    SkillLineAbilityDBCMap const& skilllineMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+    for (const auto& skaID : skilllineMap)
     {
-        if (SkillLineAbilityDBC const* SkillInfo = &itr->second)
-        {
-            mSkillLineAbilityMap.insert(SkillLineAbilityMap::value_type(SkillInfo->Spell, SkillInfo));
-            ++count;
-        }
+        SkillLineAbilityDBC const* SkillInfo = &skaID.second;
+        if (!SkillInfo)
+            continue;
+
+        mSkillLineAbilityMap.insert(SkillLineAbilityMap::value_type(SkillInfo->Spell, SkillInfo));
+        ++count;
     }
 
     TC_LOG_INFO("server.loading", ">> Loaded %u SkillLineAbility MultiMap Data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -2191,45 +2192,46 @@ void SpellMgr::LoadPetLevelupSpellMap()
     uint32 count = 0;
     uint32 family_count = 0;
 
-    CreatureFamilyDBCMap const& CreatureFamilyMap = sDBCStoresMgr->GetCreatureFamilyDBCMap();
-    for (CreatureFamilyDBCMap::const_iterator itr = CreatureFamilyMap.begin(); itr != CreatureFamilyMap.end(); ++itr)
+    CreatureFamilyDBCMap const& entryMap = sDBCStoresMgr->GetCreatureFamilyDBCMap();
+    for (const auto& indexID : entryMap)
     {
-        if (CreatureFamilyDBC const* creatureFamily = &itr->second)
+        if (CreatureFamilyDBC const* creatureFamily = &indexID.second)
         {
             for (uint8 j = 0; j < 2; ++j)
             {
                 if (!creatureFamily->SkillLine[j])
                     continue;
 
-                SkillLineAbilityDBCMap const& skillAbMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
-                for (SkillLineAbilityDBCMap::const_iterator itr = skillAbMap.begin(); itr != skillAbMap.end(); ++itr)
+                SkillLineAbilityDBCMap const& skilllineMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
+                for (const auto& skaID : skilllineMap)
                 {
-                    if (SkillLineAbilityDBC const* skillLine = &itr->second)
-                    {
-                        //if (skillLine->skillId != creatureFamily->SkillLine[0] &&
-                        //    (!creatureFamily->SkillLine[1] || skillLine->skillId != creatureFamily->SkillLine[1]))
-                        //    continue;
+                    SkillLineAbilityDBC const* skillLine = &skaID.second;
+                    if (!skillLine)
+                        continue;
 
-                        if (skillLine->SkillLine != creatureFamily->SkillLine[j])
-                            continue;
+                    //if (skillLine->skillId != creatureFamily->SkillLine[0] &&
+                    //    (!creatureFamily->SkillLine[1] || skillLine->skillId != creatureFamily->SkillLine[1]))
+                    //    continue;
 
-                        if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
-                            continue;
+                    if (skillLine->SkillLine != creatureFamily->SkillLine[j])
+                        continue;
 
-                        SpellInfo const* spell = GetSpellInfo(skillLine->Spell);
-                        if (!spell) // not exist or triggered or talent
-                            continue;
+                    if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+                        continue;
 
-                        if (!spell->SpellLevel)
-                            continue;
+                    SpellInfo const* spell = GetSpellInfo(skillLine->Spell);
+                    if (!spell) // not exist or triggered or talent
+                        continue;
 
-                        PetLevelupSpellSet& spellSet = mPetLevelupSpellMap[creatureFamily->ID];
-                        if (spellSet.empty())
-                            ++family_count;
+                    if (!spell->SpellLevel)
+                        continue;
 
-                        spellSet.insert(PetLevelupSpellSet::value_type(spell->SpellLevel, spell->Id));
-                        ++count;
-                    }
+                    PetLevelupSpellSet& spellSet = mPetLevelupSpellMap[creatureFamily->ID];
+                    if (spellSet.empty())
+                        ++family_count;
+
+                    spellSet.insert(PetLevelupSpellSet::value_type(spell->SpellLevel, spell->Id));
+                    ++count;
                 }
             }
         }
@@ -2945,10 +2947,10 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
     }
 
     // add custom attribute to liquid auras
-    LiquidTypeDBCMap const& liqMap = sDBCStoresMgr->GetLiquidTypeDBCMap();
-    for (LiquidTypeDBCMap::const_iterator itr = liqMap.begin(); itr != liqMap.end(); ++itr)
+    LiquidTypeDBCMap const& entryMap = sDBCStoresMgr->GetLiquidTypeDBCMap();
+    for (const auto& indexID : entryMap)
     {
-        if (LiquidTypeDBC const* liquid = &itr->second)
+        if (LiquidTypeDBC const* liquid = &indexID.second)
         {
             if (liquid->SpellID)
                 if (SpellInfo* spellInfo = _GetSpellInfo(liquid->SpellID))

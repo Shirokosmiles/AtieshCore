@@ -226,10 +226,10 @@ public:
 
         uint64 titles2 = titles;
 
-        CharTitlesDBCMap const& CharTitlesMap = sDBCStoresMgr->GetCharTitlesDBCMap();
-        for (CharTitlesDBCMap::const_iterator itr = CharTitlesMap.begin(); itr != CharTitlesMap.end(); ++itr)
+        CharTitlesDBCMap const& entryMap = sDBCStoresMgr->GetCharTitlesDBCMap();
+        for (const auto& skaID : entryMap)
         {
-            if (CharTitlesDBC const* tEntry = &itr->second)
+            if (CharTitlesDBC const* tEntry = &skaID.second)
                 titles2 &= ~(uint64(1) << tEntry->MaskID);
         }              
 

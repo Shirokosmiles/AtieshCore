@@ -180,10 +180,10 @@ void LoadM2Cameras(std::string const& dataPath)
 
     uint32 oldMSTime = getMSTime();
 
-    CinematicCameraDBCMap const& cinemaMap = sDBCStoresMgr->GetCinematicCameraDBCMap();
-    for (CinematicCameraDBCMap::const_iterator itr = cinemaMap.begin(); itr != cinemaMap.end(); ++itr)
+    CinematicCameraDBCMap const& entryMap = sDBCStoresMgr->GetCinematicCameraDBCMap();
+    for (const auto& skaID : entryMap)
     {
-        if (CinematicCameraDBC const* dbcentry = &itr->second)
+        if (CinematicCameraDBC const* dbcentry = &skaID.second)
         {
             std::string filenameWork = dataPath;
             filenameWork.append(dbcentry->Model);

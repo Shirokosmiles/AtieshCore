@@ -137,7 +137,7 @@ bool Trinity::Hyperlinks::LinkTags::item::StoreTo(ItemLinkData& val, std::string
     {
         if (!val.Item->RandomSuffix)
             return false;
-        if (randomPropertyId < -static_cast<int32>(sDBCStoresMgr->GetItemRandomSuffixMap().size()))
+        if (randomPropertyId < -static_cast<int32>(sDBCStoresMgr->GetNumRowItemRandomSuffixMap()))
             return false;
 
         if (ItemRandomSuffixDBC const* suffixEntry = sDBCStoresMgr->GetItemRandomSuffixDBC(-randomPropertyId))

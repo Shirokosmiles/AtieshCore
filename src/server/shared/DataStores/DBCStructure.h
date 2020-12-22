@@ -60,7 +60,22 @@ struct ItemCondExtCostsEntry
 
 
 
-
+struct SkillLineAbilityDBC
+{
+    uint32 ID;                                              // 0
+    uint32 SkillLine;                                       // 1
+    uint32 Spell;                                           // 2
+    uint32 RaceMask;                                        // 3
+    uint32 ClassMask;                                       // 4
+    //uint32 ExcludeRace;                                   // 5
+    //uint32 ExcludeClass;                                  // 6
+    uint32 MinSkillLineRank;                                // 7
+    uint32 SupercededBySpell;                               // 8
+    uint32 AcquireMethod;                                   // 9
+    uint32 TrivialSkillLineRankHigh;                        // 10
+    uint32 TrivialSkillLineRankLow;                         // 11
+    //uint32 CharacterPoints[2];                            // 12-13
+};
 
 /*
 struct SkillLineCategoryEntry
@@ -71,8 +86,6 @@ struct SkillLineCategoryEntry
     uint32 SortIndex;                                       // 19
 };
 */
-
-
 
 #define MAX_SKILL_STEP 16
 
