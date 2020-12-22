@@ -657,7 +657,7 @@ bool SmartAIMgr::IsAreaTriggerValid(SmartScriptHolder const& e, uint32 entry)
 
 bool SmartAIMgr::IsSoundValid(SmartScriptHolder const& e, uint32 entry)
 {
-    if (!sSoundEntriesStore.LookupEntry(entry))
+    if (!sDBCStoresMgr->GetSoundEntriesDBC(entry))
     {
         TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Sound entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
         return false;

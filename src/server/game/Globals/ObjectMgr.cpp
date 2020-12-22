@@ -9849,7 +9849,7 @@ void ObjectMgr::LoadBroadcastTexts()
 
         if (bct.SoundEntriesID)
         {
-            if (!sSoundEntriesStore.LookupEntry(bct.SoundEntriesID))
+            if (!sDBCStoresMgr->GetSoundEntriesDBC(bct.SoundEntriesID))
             {
                 TC_LOG_DEBUG("broadcasttext", "BroadcastText (Id: %u) in table `broadcast_text` has SoundEntriesID %u but sound does not exist.", bct.Id, bct.SoundEntriesID);
                 bct.SoundEntriesID = 0;

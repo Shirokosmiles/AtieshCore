@@ -2568,7 +2568,7 @@ public:
 
     static bool HandlePlayAllCommand(ChatHandler* handler, uint32 soundId)
     {
-        if (!sSoundEntriesStore.LookupEntry(soundId))
+        if (!sDBCStoresMgr->GetSoundEntriesDBC(soundId))
         {
             handler->PSendSysMessage(LANG_SOUND_NOT_EXIST, soundId);
             handler->SetSentErrorMessage(true);

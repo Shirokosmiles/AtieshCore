@@ -24,6 +24,11 @@ DBCStoresMgr* DBCStoresMgr::instance()
     return &instance;
 }
 
+DBCStoresMgr::DBCStoresMgr()
+{
+    _itemRandomSuffixNumRow = 0;
+}
+
 DBCStoresMgr::~DBCStoresMgr()
 {
     _achievementMap.clear();
@@ -88,7 +93,6 @@ DBCStoresMgr::~DBCStoresMgr()
     _itemLimitCategoryMap.clear();
     _itemRandomPropertiesMap.clear();
     _itemRandomSuffixMap.clear();
-    _itemRandomSuffixTheLastIndex = 0;
     _itemSetMap.clear();
     _lfgDungeonMap.clear();
     _lightMap.clear();
@@ -113,6 +117,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _skillLineAbilityMap.clear();
     _skillRaceClassInfoMap.clear();
     _skillTiersMap.clear();
+    _soundEntriesMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -120,12 +125,11 @@ DBCStoresMgr::~DBCStoresMgr()
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
         NamesReservedValidators[i].clear();
     _petFamilySpellsStore.clear();
+    _itemRandomSuffixNumRow = 0;
 }
 
 void DBCStoresMgr::Initialize()
 {
-    _itemRandomSuffixTheLastIndex = 0;
-
     _Load_Achievement();
     _Load_AchievementCriteria();
     _Load_AreaTable();
@@ -212,6 +216,7 @@ void DBCStoresMgr::Initialize()
     _Load_SkillLineAbility();
     _Load_SkillRaceClassInfo();
     _Load_SkillTiers();
+    _Load_SoundEntries();
 
     // Handle additional data-containers from DBC
     _Handle_NamesProfanityRegex();
@@ -2518,14 +2523,14 @@ void DBCStoresMgr::_Load_ItemRandomSuffix()
 
         _itemRandomSuffixMap[id] = irs;
 
-        if (_itemRandomSuffixTheLastIndex)
-            if (_itemRandomSuffixTheLastIndex > id)
-                _itemRandomSuffixTheLastIndex = id;
+        if (_itemRandomSuffixNumRow)
+            if (_itemRandomSuffixNumRow > id)
+                _itemRandomSuffixNumRow = id;
 
         ++count;
     } while (result->NextRow());
 
-    _itemRandomSuffixTheLastIndex++; // this _itemRandomSuffixTheLastIndex should be more then the last by 1 point
+    _itemRandomSuffixNumRow++; // this _itemRandomSuffixTheLastIndex should be more then the last by 1 point
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded dbc_itemrandomsuffix              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -3438,6 +3443,38 @@ void DBCStoresMgr::_Load_SkillTiers()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_skilltiers                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SkillTiers.dbc
+void DBCStoresMgr::_Load_SoundEntries()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _soundEntriesMap.clear();
+    //                                                0
+    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_soundentries");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_soundentries. DB table `dbc_soundentries` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SoundEntriesDBC se;
+        se.ID = id;
+
+        _soundEntriesMap[id] = se;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_soundentries                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle others containers

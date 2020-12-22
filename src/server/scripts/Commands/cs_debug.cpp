@@ -176,7 +176,7 @@ public:
     // soundId - ID from SoundEntries.dbc
     static bool HandleDebugPlaySoundCommand(ChatHandler* handler, uint32 soundId)
     {
-        if (!sSoundEntriesStore.LookupEntry(soundId))
+        if (!sDBCStoresMgr->GetSoundEntriesDBC(soundId))
         {
             handler->PSendSysMessage(LANG_SOUND_NOT_EXIST, soundId);
             handler->SetSentErrorMessage(true);
@@ -205,7 +205,7 @@ public:
     // musicId - ID from SoundEntries.dbc
     static bool HandleDebugPlayMusicCommand(ChatHandler* handler, uint32 musicId)
     {
-        if (!sSoundEntriesStore.LookupEntry(musicId))
+        if (!sDBCStoresMgr->GetSoundEntriesDBC(musicId))
         {
             handler->PSendSysMessage(LANG_SOUND_NOT_EXIST, musicId);
             handler->SetSentErrorMessage(true);

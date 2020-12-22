@@ -110,6 +110,7 @@ typedef std::unordered_map<uint32 /*ID*/, SkillLineDBC> SkillLineDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SkillLineAbilityDBC> SkillLineAbilityDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SkillRaceClassInfoDBC> SkillRaceClassInfoDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SkillTiersDBC> SkillTiersDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, SoundEntriesDBC> SoundEntriesDBCMap;
 
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 typedef std::set<uint32> PetFamilySpellsSet;
@@ -118,7 +119,7 @@ typedef std::map<uint32, PetFamilySpellsSet> PetFamilySpellsStore;
 class TC_GAME_API DBCStoresMgr
 {
 private:
-    DBCStoresMgr() {}
+    DBCStoresMgr();
     ~DBCStoresMgr();
 
 public:
@@ -666,7 +667,7 @@ public:
         return nullptr;
     }
 
-    uint32 GetNumRowItemRandomSuffixMap() const { return _itemRandomSuffixTheLastIndex; }
+    uint32 GetNumRowItemRandomSuffixMap() const { return _itemRandomSuffixNumRow; }
     ItemRandomSuffixDBC const* GetItemRandomSuffixDBC(uint32 ID)
     {
         ItemRandomSuffixDBCMap::const_iterator itr = _itemRandomSuffixMap.find(ID);
@@ -940,6 +941,14 @@ public:
         return nullptr;
     }
 
+    SoundEntriesDBC const* GetSoundEntriesDBC(uint32 ID)
+    {
+        SoundEntriesDBCMap::const_iterator itr = _soundEntriesMap.find(ID);
+        if (itr != _soundEntriesMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1047,6 +1056,7 @@ protected:
     void _Load_SkillLineAbility();
     void _Load_SkillRaceClassInfo();
     void _Load_SkillTiers();
+    void _Load_SoundEntries();
 
     // Handle others containers
     void _Handle_NamesProfanityRegex();
@@ -1140,12 +1150,13 @@ private:
     SkillLineAbilityDBCMap _skillLineAbilityMap;
     SkillRaceClassInfoDBCMap _skillRaceClassInfoMap;
     SkillTiersDBCMap _skillTiersMap;
+    SoundEntriesDBCMap _soundEntriesMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
     NameValidationRegexContainer NamesReservedValidators;
     PetFamilySpellsStore _petFamilySpellsStore;
-    uint32 _itemRandomSuffixTheLastIndex;
+    uint32 _itemRandomSuffixNumRow;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

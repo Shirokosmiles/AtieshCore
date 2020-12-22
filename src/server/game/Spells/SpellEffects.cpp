@@ -5504,7 +5504,7 @@ void Spell::EffectPlayMusic(SpellEffIndex effIndex)
 
     uint32 soundid = m_spellInfo->Effects[effIndex].MiscValue;
 
-    if (!sSoundEntriesStore.LookupEntry(soundid))
+    if (!sDBCStoresMgr->GetSoundEntriesDBC(soundid))
     {
         TC_LOG_ERROR("spells", "EffectPlayMusic: Sound (Id: %u) does not exist in spell %u.", soundid, m_spellInfo->Id);
         return;
@@ -5559,7 +5559,7 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
 
     uint32 soundId = m_spellInfo->Effects[effIndex].MiscValue;
 
-    if (!sSoundEntriesStore.LookupEntry(soundId))
+    if (!sDBCStoresMgr->GetSoundEntriesDBC(soundId))
     {
         TC_LOG_ERROR("spells", "EffectPlaySound: Sound (Id: %u) does not exist in spell %u.", soundId, m_spellInfo->Id);
         return;

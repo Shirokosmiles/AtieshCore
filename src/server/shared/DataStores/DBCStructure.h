@@ -70,21 +70,7 @@ struct SkillLineCategoryEntry
 
 
 
-struct SoundEntriesEntry
-{
-    uint32 ID;                                              // 0
-    //uint32 SoundType;                                     // 1
-    //char const* Name;                                     // 2
-    //char const* File[10];                                 // 3-12
-    //uint32 Freq[10];                                      // 13-22
-    //char const* DirectoryBase;                            // 23
-    //float VolumeFloat;                                    // 24
-    //uint32 Flags;                                         // 25
-    //float MinDistance;                                    // 26
-    //float DistanceCutoff;                                 // 27
-    //uint32 EAXDef;                                        // 28
-    //uint32 SoundEntriesAdvancedID;                        // 29
-};
+
 
 struct SpellEntry
 {
