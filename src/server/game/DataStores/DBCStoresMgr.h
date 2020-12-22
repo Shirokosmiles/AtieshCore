@@ -109,6 +109,7 @@ typedef std::unordered_map<uint32 /*ID*/, ScalingStatValuesDBC> ScalingStatValue
 typedef std::unordered_map<uint32 /*ID*/, SkillLineDBC> SkillLineDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SkillLineAbilityDBC> SkillLineAbilityDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SkillRaceClassInfoDBC> SkillRaceClassInfoDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, SkillTiersDBC> SkillTiersDBCMap;
 
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 typedef std::set<uint32> PetFamilySpellsSet;
@@ -931,6 +932,14 @@ public:
         return nullptr;
     }
 
+    SkillTiersDBC const* GetSkillTiersDBC(uint32 ID)
+    {
+        SkillTiersDBCMap::const_iterator itr = _skillTiersMap.find(ID);
+        if (itr != _skillTiersMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1037,6 +1046,7 @@ protected:
     void _Load_SkillLine();
     void _Load_SkillLineAbility();
     void _Load_SkillRaceClassInfo();
+    void _Load_SkillTiers();
 
     // Handle others containers
     void _Handle_NamesProfanityRegex();
@@ -1105,8 +1115,7 @@ private:
     ItemExtendedCostDBCMap _itemExtendedCostMap;
     ItemLimitCategoryDBCMap _itemLimitCategoryMap;
     ItemRandomPropertiesDBCMap _itemRandomPropertiesMap;
-    ItemRandomSuffixDBCMap _itemRandomSuffixMap;
-    uint32 _itemRandomSuffixTheLastIndex;
+    ItemRandomSuffixDBCMap _itemRandomSuffixMap;    
     ItemSetDBCMap _itemSetMap;
     LFGDungeonDBCMap _lfgDungeonMap;
     LightDBCMap _lightMap;
@@ -1130,12 +1139,13 @@ private:
     SkillLineDBCMap _skillLineMap;
     SkillLineAbilityDBCMap _skillLineAbilityMap;
     SkillRaceClassInfoDBCMap _skillRaceClassInfoMap;
+    SkillTiersDBCMap _skillTiersMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
     NameValidationRegexContainer NamesReservedValidators;
-
     PetFamilySpellsStore _petFamilySpellsStore;
+    uint32 _itemRandomSuffixTheLastIndex;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

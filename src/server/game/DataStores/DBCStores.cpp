@@ -158,7 +158,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <SkillLineAbilityDBC> sSkillLineAbilityStore(SkillLineAbilityfmt);
 //DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
 //SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
-DBCStorage <SkillTiersEntry> sSkillTiersStore(SkillTiersfmt);
+//DBCStorage <SkillTiersEntry> sSkillTiersStore(SkillTiersfmt);
 
 DBCStorage <SoundEntriesEntry> sSoundEntriesStore(SoundEntriesfmt);
 
@@ -365,7 +365,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sSkillLineStore,                     "SkillLine.dbc");
     //LOAD_DBC(sSkillLineAbilityStore,              "SkillLineAbility.dbc");
     //LOAD_DBC(sSkillRaceClassInfoStore,            "SkillRaceClassInfo.dbc");
-    LOAD_DBC(sSkillTiersStore,                    "SkillTiers.dbc");
+    //LOAD_DBC(sSkillTiersStore,                    "SkillTiers.dbc");
     LOAD_DBC(sSoundEntriesStore,                  "SoundEntries.dbc");
     LOAD_DBC(sSpellCastTimesStore,                "SpellCastTimes.dbc");
     LOAD_DBC(sSpellCategoryStore,                 "SpellCategory.dbc");

@@ -112,6 +112,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _skillLineMap.clear();
     _skillLineAbilityMap.clear();
     _skillRaceClassInfoMap.clear();
+    _skillTiersMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -210,6 +211,7 @@ void DBCStoresMgr::Initialize()
     _Load_SkillLine();
     _Load_SkillLineAbility();
     _Load_SkillRaceClassInfo();
+    _Load_SkillTiers();
 
     // Handle additional data-containers from DBC
     _Handle_NamesProfanityRegex();
@@ -3402,6 +3404,40 @@ void DBCStoresMgr::_Load_SkillRaceClassInfo()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_skillraceclassinfo            %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SkillTiers.dbc
+void DBCStoresMgr::_Load_SkillTiers()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _skillTiersMap.clear();
+    //                                                0     1        2        3        4        5        6        7        8        9       10         11       12         13       14          15       16
+    QueryResult result = WorldDatabase.Query("SELECT ID, Value_1, Value_2, Value_3, Value_4, Value_5, Value_6, Value_7, Value_8, Value_9, Value_10, Value_11, Value_12, Value_13, Value_14, Value_15, Value_16 FROM dbc_skilltiers");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skilltiers. DB table `dbc_skilltiers` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SkillTiersDBC st;
+        st.ID = id;
+        for (uint8 i = 0; i < MAX_SKILL_STEP; i++)
+            st.Value[i] = fields[1 + i].GetUInt32();        
+
+        _skillTiersMap[id] = st;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_skilltiers                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle others containers

@@ -68,14 +68,7 @@ struct SkillLineCategoryEntry
 };
 */
 
-#define MAX_SKILL_STEP 16
 
-struct SkillTiersEntry
-{
-    uint32 ID;                                              // 0
-    //uint32 Cost[MAX_SKILL_STEP];                          // 1-16
-    uint32 Value[MAX_SKILL_STEP];                           // 17-32
-};
 
 struct SoundEntriesEntry
 {

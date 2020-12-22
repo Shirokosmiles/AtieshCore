@@ -8898,7 +8898,7 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoDBC const* rcEntry)
     if (!skill)
         return SKILL_RANGE_NONE;
 
-    if (sSkillTiersStore.LookupEntry(rcEntry->SkillTierID))
+    if (sDBCStoresMgr->GetSkillTiersDBC(rcEntry->SkillTierID))
         return SKILL_RANGE_RANK;
 
     if (rcEntry->SkillID == SKILL_RUNEFORGING)
