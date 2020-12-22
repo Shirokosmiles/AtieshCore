@@ -1,4 +1,3 @@
-
 -- ----------------------------
 -- Table structure for dbc_skilllineability
 -- ----------------------------
@@ -9,13 +8,13 @@ CREATE TABLE `dbc_skilllineability`  (
   `Spell` int(11) NOT NULL DEFAULT 0,
   `RaceMask` int(11) NOT NULL DEFAULT 0,
   `ClassMask` int(11) NOT NULL DEFAULT 0,
+  `ExcludeRace` int(11) NOT NULL DEFAULT 0,
+  `ExcludeClass` int(11) NOT NULL DEFAULT 0,
   `MinSkillLineRank` int(11) NOT NULL DEFAULT 0,
   `SupercededBySpell` int(11) NOT NULL DEFAULT 0,
   `AcquireMethod` int(11) NOT NULL DEFAULT 0,
   `TrivialSkillLineRankHigh` int(11) NOT NULL DEFAULT 0,
   `TrivialSkillLineRankLow` int(11) NOT NULL DEFAULT 0,
-  `CharacterPoints_1` int(11) NOT NULL DEFAULT 0,
-  `CharacterPoints_2` int(11) NOT NULL DEFAULT 0,
   `TradeSkillCategoryID` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE = MyISAM CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Fixed;
@@ -23,7 +22,7 @@ CREATE TABLE `dbc_skilllineability`  (
 -- ----------------------------
 -- Records of dbc_skilllineability
 -- ----------------------------
-INSERT INTO `dbc_skilllineability` VALUES 
+INSERT INTO `dbc_skilllineability` VALUES
 (69, 6, 116, 0, 128, 0, 0, 1, 0, 0, 0, 0, 0),
 (472, 6, 205, 0, 128, 0, 0, 1, 0, 0, 0, 0, 0),
 (474, 6, 122, 0, 128, 0, 0, 1, 0, 0, 0, 0, 0),
