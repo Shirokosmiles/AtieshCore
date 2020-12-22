@@ -27,6 +27,7 @@ DBCStoresMgr* DBCStoresMgr::instance()
 DBCStoresMgr::DBCStoresMgr()
 {
     _itemRandomSuffixNumRow = 0;
+    _spellNumRow = 0;
 }
 
 DBCStoresMgr::~DBCStoresMgr()
@@ -118,6 +119,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _skillRaceClassInfoMap.clear();
     _skillTiersMap.clear();
     _soundEntriesMap.clear();
+    _spellMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -126,6 +128,7 @@ DBCStoresMgr::~DBCStoresMgr()
         NamesReservedValidators[i].clear();
     _petFamilySpellsStore.clear();
     _itemRandomSuffixNumRow = 0;
+    _spellNumRow = 0;
 }
 
 void DBCStoresMgr::Initialize()
@@ -217,6 +220,7 @@ void DBCStoresMgr::Initialize()
     _Load_SkillRaceClassInfo();
     _Load_SkillTiers();
     _Load_SoundEntries();
+    _Load_Spell();
 
     // Handle additional data-containers from DBC
     _Handle_NamesProfanityRegex();
@@ -2524,8 +2528,12 @@ void DBCStoresMgr::_Load_ItemRandomSuffix()
         _itemRandomSuffixMap[id] = irs;
 
         if (_itemRandomSuffixNumRow)
-            if (_itemRandomSuffixNumRow > id)
+        {
+            if (_itemRandomSuffixNumRow < id)
                 _itemRandomSuffixNumRow = id;
+        }
+        else
+            _itemRandomSuffixNumRow = id;
 
         ++count;
     } while (result->NextRow());
@@ -3477,6 +3485,452 @@ void DBCStoresMgr::_Load_SoundEntries()
     TC_LOG_INFO("server.loading", ">> Loaded DBC_soundentries                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+// load Spell.dbc
+void DBCStoresMgr::_Load_Spell()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellMap.clear();
+    //                                                0
+    QueryResult result = WorldDatabase.Query("SELECT ID, "
+        "Category, "    // 1
+        "DispelType, "  // 2
+        "Mechanic, "    // 3
+        "Attributes, "  // 4
+        "AttributesEx, "// 5
+        "AttributesExB, "// 6
+        "AttributesExC, "// 7
+        "AttributesExD, "// 8
+        "AttributesExE, "// 9
+        "AttributesExF, "// 10
+        "AttributesExG, "// 11
+        "ShapeshiftMask_1, "// 12
+        "ShapeshiftMask_2, "// 13
+        "ShapeshiftExclude_1, "// 14
+        "ShapeshiftExclude_2, "// 15
+        "Targets, "// 16
+        "TargetCreatureType, "// 17
+        "RequiresSpellFocus, "// 18
+        "FacingCasterFlags, "// 19
+        "CasterAuraState, "// 20
+        "TargetAuraState, "// 21
+        "ExcludeCasterAuraState, "// 22
+        "ExcludeTargetAuraState, "// 23
+        "CasterAuraSpell, "// 24
+        "TargetAuraSpell, "// 25
+        "ExcludeCasterAuraSpell, "// 26
+        "ExcludeTargetAuraSpell, "// 27
+        "CastingTimeIndex, "// 28
+        "RecoveryTime, "// 29
+        "CategoryRecoveryTime, "// 30
+        "InterruptFlags, "// 31
+        "AuraInterruptFlags, "// 32
+        "ChannelInterruptFlags, "// 33
+        "ProcTypeMask, "// 34
+        "ProcChance, "// 35
+        "ProcCharges, "// 36
+        "MaxLevel, "// 37
+        "BaseLevel, "// 38
+        "SpellLevel, "// 39
+        "DurationIndex, "// 40
+        "PowerType, "// 41
+        "ManaCost, "// 42
+        "ManaCostPerLevel, "// 43
+        "ManaPerSecond, "// 44
+        "ManaPerSecondPerLevel, "// 45
+        "RangeIndex, "// 46
+        "Speed, "// 47
+        //"ModalNextSpell, "// 48
+        "CumulativeAura, "// 49                   48
+        "Totem_1, "// 50                   49
+        "Totem_2, "// 51                   50
+        "Reagent_1, "// 52                   51
+        "Reagent_2, "// 53                   52
+        "Reagent_3, "// 54                   53
+        "Reagent_4, "// 55                   54
+        "Reagent_5, "// 56                   55
+        "Reagent_6, "// 57                   56
+        "Reagent_7, "// 58                   57
+        "Reagent_8, "// 59                   58
+        "ReagentCount_1, "// 60                   59
+        "ReagentCount_2, "// 61                   60
+        "ReagentCount_3, "// 62                   61
+        "ReagentCount_4, "// 63                   62
+        "ReagentCount_5, "// 64                   63
+        "ReagentCount_6, "// 65                   64
+        "ReagentCount_7, "// 66                   65
+        "ReagentCount_8, "// 67                   66
+        "EquippedItemClass, "// 68                   67
+        "EquippedItemSubclass, "// 69                   68
+        "EquippedItemInvTypes, "// 70                   69
+        "Effect_1, "// 71                   70
+        "Effect_2, "// 72                   71
+        "Effect_3, "// 73                   72
+        "EffectDieSides_1, "// 74                   73
+        "EffectDieSides_2, "// 75                   74
+        "EffectDieSides_3, "// 76                   75
+        "EffectRealPointsPerLevel_1, "// 77                   76
+        "EffectRealPointsPerLevel_2, "// 78                   77
+        "EffectRealPointsPerLevel_3, "// 79                   78
+        "EffectBasePoints_1, "// 80                   79
+        "EffectBasePoints_2, "// 81                   80
+        "EffectBasePoints_3, "// 82                   81
+        "EffectMechanic_1, "// 83                   82
+        "EffectMechanic_2, "// 84                   83
+        "EffectMechanic_3, "// 85                   84
+        "ImplicitTargetA_1, "// 86                   85
+        "ImplicitTargetA_2, "// 87                   86
+        "ImplicitTargetA_3, "// 88                   87
+        "ImplicitTargetB_1, "// 89                   88
+        "ImplicitTargetB_2, "// 90                   89
+        "ImplicitTargetB_3, "// 91                   90
+        "EffectRadiusIndex_1, "// 92                   91
+        "EffectRadiusIndex_2, "// 93                   92
+        "EffectRadiusIndex_3, "// 94                   93
+        "EffectAura_1, "// 95                   94
+        "EffectAura_2, "// 96                   95
+        "EffectAura_3, "// 97                   96
+        "EffectAuraPeriod_1, "// 98                   97
+        "EffectAuraPeriod_2, "// 99                   98
+        "EffectAuraPeriod_3, "// 100                   99
+        "EffectAmplitude_1, "// 101                   100
+        "EffectAmplitude_2, "// 102                   101
+        "EffectAmplitude_3, "// 103                   102
+        "EffectChainTargets_1, "// 104                   103
+        "EffectChainTargets_2, "// 105                   104
+        "EffectChainTargets_3, "// 106                   105
+        "EffectItemType_1, "// 107                   106
+        "EffectItemType_2, "// 108                   107
+        "EffectItemType_3, "// 109                   108
+        "EffectMiscValue_1, "// 110                   109
+        "EffectMiscValue_2, "// 111                   110
+        "EffectMiscValue_3, "// 112                   111
+        "EffectMiscValueB_1, "// 113                   112
+        "EffectMiscValueB_2, "// 114                   113
+        "EffectMiscValueB_3, "// 115                   114
+        "EffectTriggerSpell_1, "// 116                   115
+        "EffectTriggerSpell_2, "// 117                   116
+        "EffectTriggerSpell_3, "// 118                   117
+        "EffectPointsPerCombo_1, "// 119                   118
+        "EffectPointsPerCombo_2, "// 120                   119
+        "EffectPointsPerCombo_3, "// 121                   120
+        "EffectSpellClassMaskA_1, "// 122                   121
+        "EffectSpellClassMaskA_2, "// 123                   122
+        "EffectSpellClassMaskA_3, "// 124                   123
+        "EffectSpellClassMaskB_1, "// 125                   124
+        "EffectSpellClassMaskB_2, "// 126                   125
+        "EffectSpellClassMaskB_3, "// 127                   126
+        "EffectSpellClassMaskC_1, "// 128                   127
+        "EffectSpellClassMaskC_2, "// 129                   128
+        "EffectSpellClassMaskC_3, "// 130                   129
+        "SpellVisualID_1, "// 131                   130
+        "SpellVisualID_2, "// 132                   131
+        "SpellIconID, "// 133                   132
+        "ActiveIconID, "// 134                   133
+        "SpellPriority, "// 135                   134
+        "Name_Lang_enUS, "// 136                   135
+        //"Name_Lang_enGB, "// 137
+        "Name_Lang_koKR, "// 138                   136
+        "Name_Lang_frFR, "// 139                   137
+        "Name_Lang_deDE, "// 140                   138
+        //"Name_Lang_enCN, "// 141
+        "Name_Lang_zhCN, "// 142                   139
+        //"Name_Lang_enTW, "// 143
+        "Name_Lang_zhTW, "// 144                   140
+        "Name_Lang_esES, "// 145                   141
+        "Name_Lang_esMX, "// 146                   142
+        "Name_Lang_ruRU, "// 147                   143
+        //"Name_Lang_ptPT, "// 148
+        //"Name_Lang_ptBR, "// 149
+        //"Name_Lang_itIT, "// 150
+        //"Name_Lang_Unk, "// 151
+        //"Name_Lang_Mask, "// 152
+        "NameSubtext_Lang_enUS, "// 153                   144
+        //"NameSubtext_Lang_enGB, "// 154
+        "NameSubtext_Lang_koKR, "// 155                   145
+        "NameSubtext_Lang_frFR, "// 156                   146
+        "NameSubtext_Lang_deDE, "// 157                   147
+        //"NameSubtext_Lang_enCN, "// 158
+        "NameSubtext_Lang_zhCN, "// 159                   148
+        //"NameSubtext_Lang_enTW, "// 160
+        "NameSubtext_Lang_zhTW, "// 161                   149
+        "NameSubtext_Lang_esES, "// 162                   150
+        "NameSubtext_Lang_esMX, "// 163                   151
+        "NameSubtext_Lang_ruRU, "// 164                   152
+        //"NameSubtext_Lang_ptPT, "// 165
+        //"NameSubtext_Lang_ptBR, "// 166
+        //"NameSubtext_Lang_itIT, "// 167
+        //"NameSubtext_Lang_Unk, "// 168
+        /*"NameSubtext_Lang_Mask, "// 169
+        "Description_Lang_enUS, "// 170
+        //"Description_Lang_enGB, "// 171
+        "Description_Lang_koKR, "// 172
+        "Description_Lang_frFR, "// 173
+        "Description_Lang_deDE, "// 174
+        //"Description_Lang_enCN, "// 175
+        "Description_Lang_zhCN, "// 176
+        //"Description_Lang_enTW, "// 177
+        "Description_Lang_zhTW, "// 178
+        "Description_Lang_esES, "// 179
+        "Description_Lang_esMX, "// 180
+        "Description_Lang_ruRU, "// 181
+        //"Description_Lang_ptPT, "// 182
+        //"Description_Lang_ptBR, "// 183
+        //"Description_Lang_itIT, "// 184
+        //"Description_Lang_Unk, "// 185
+        "Description_Lang_Mask, "// 186
+        "AuraDescription_Lang_enUS, "// 187
+        //"AuraDescription_Lang_enGB, "// 188
+        "AuraDescription_Lang_koKR, "// 189
+        "AuraDescription_Lang_frFR, "// 190
+        "AuraDescription_Lang_deDE, "// 191
+        //"AuraDescription_Lang_enCN, "// 192
+        "AuraDescription_Lang_zhCN, "// 193
+        //"AuraDescription_Lang_enTW, "// 194
+        "AuraDescription_Lang_zhTW, "// 195
+        "AuraDescription_Lang_esES, "// 196
+        "AuraDescription_Lang_esMX, "// 197
+        "AuraDescription_Lang_ruRU, "// 198
+        //"AuraDescription_Lang_ptPT, "// 199
+        //"AuraDescription_Lang_ptBR, "// 200
+        //"AuraDescription_Lang_itIT, "// 201
+        //"AuraDescription_Lang_Unk, "// 202
+        "AuraDescription_Lang_Mask, "// 203*/
+        "ManaCostPct, "// 204                   153
+        "StartRecoveryCategory, "// 205                   154
+        "StartRecoveryTime, "// 206                   155
+        "MaxTargetLevel, "// 207                   156
+        "SpellClassSet, "// 208                   157
+        "SpellClassMask_1, "// 209                   158
+        "SpellClassMask_2, "// 210                   159
+        "SpellClassMask_3, "// 211                   160
+        "MaxTargets, "// 212                   161
+        "DefenseType, "// 213                   162
+        "PreventionType, "// 214                   163
+        //"StanceBarOrder, "// 215
+        "EffectChainAmplitude_1, "// 216                   164
+        "EffectChainAmplitude_2, "// 217                   165
+        "EffectChainAmplitude_3, "// 218                   166
+        //"MinFactionID, "// 219
+        //"MinReputation, "// 220
+        //"RequiredAuraVision, "// 221
+        "RequiredTotemCategoryID_1, "// 222                   167
+        "RequiredTotemCategoryID_2, "// 223                   168
+        "RequiredAreasID, "// 224                   169
+        "SchoolMask, "// 225                   170
+        "RuneCostID, "// 226                   171
+        //"SpellMissileID, "// 227
+        //"PowerDisplayID, "// 228
+        "EffectBonusCoefficient_1, "// 229                   172
+        "EffectBonusCoefficient_2, "// 230                   173
+        "EffectBonusCoefficient_3 "// 231                   174
+        //"SpellDescriptionVariableID, "// 232
+        //"SpellDifficultyID "// 233
+        "FROM dbc_spell");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_soundentries. DB table `dbc_soundentries` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellDBC s;
+        s.ID = id;
+        s.Category      = fields[1].GetUInt32();
+        s.DispelType    = fields[2].GetUInt32();
+        s.Mechanic      = fields[3].GetUInt32();
+        s.Attributes    = fields[4].GetUInt32();
+        s.AttributesEx  = fields[5].GetUInt32();
+        s.AttributesExB = fields[6].GetUInt32();
+        s.AttributesExC = fields[7].GetUInt32();
+        s.AttributesExD = fields[8].GetUInt32();
+        s.AttributesExE = fields[9].GetUInt32();
+        s.AttributesExF = fields[10].GetUInt32();
+        s.AttributesExG = fields[11].GetUInt32();
+        for (uint8 i = 0; i < 2; i++)
+            s.ShapeshiftMask[i] = fields[12 + i].GetUInt32();
+        for (uint8 i = 0; i < 2; i++)
+            s.ShapeshiftExclude[i] = fields[14 + i].GetUInt32();
+        s.Targets = fields[16].GetUInt32();
+        s.TargetCreatureType        = fields[17].GetUInt32();
+        s.RequiresSpellFocus        = fields[18].GetUInt32();
+        s.FacingCasterFlags         = fields[19].GetUInt32();
+        s.CasterAuraState           = fields[20].GetUInt32();
+        s.TargetAuraState           = fields[21].GetUInt32();
+        s.ExcludeCasterAuraState    = fields[22].GetUInt32();
+        s.ExcludeTargetAuraState    = fields[23].GetUInt32();
+        s.CasterAuraSpell           = fields[24].GetUInt32();
+        s.TargetAuraSpell           = fields[25].GetUInt32();
+        s.ExcludeCasterAuraSpell    = fields[26].GetUInt32();
+        s.ExcludeTargetAuraSpell    = fields[27].GetUInt32();
+        s.CastingTimeIndex          = fields[28].GetUInt32();
+        s.RecoveryTime              = fields[29].GetUInt32();
+        s.CategoryRecoveryTime      = fields[30].GetUInt32();
+        s.InterruptFlags            = fields[31].GetUInt32();
+        s.AuraInterruptFlags        = fields[32].GetUInt32();
+        s.ChannelInterruptFlags     = fields[33].GetUInt32();
+        s.ProcTypeMask              = fields[34].GetUInt32();
+        s.ProcChance                = fields[35].GetUInt32();
+        s.ProcCharges               = fields[36].GetUInt32();
+        s.MaxLevel                  = fields[37].GetUInt32();
+        s.BaseLevel                 = fields[38].GetUInt32();
+        s.SpellLevel                = fields[39].GetUInt32();
+        s.DurationIndex             = fields[40].GetUInt32();
+        s.PowerType                 = fields[41].GetUInt32();
+        s.ManaCost                  = fields[42].GetUInt32();
+        s.ManaCostPerLevel          = fields[43].GetUInt32();
+        s.ManaPerSecond             = fields[44].GetUInt32();
+        s.ManaPerSecondPerLevel     = fields[45].GetUInt32();
+        s.RangeIndex                = fields[46].GetUInt32();
+        s.Speed                     = fields[47].GetFloat();
+        //uint32 ModalNextSpell; (UNUSED)
+        s.CumulativeAura            = fields[48].GetUInt32();
+        for (uint8 i = 0; i < 2; i++)
+            s.Totem[i] = fields[49 + i].GetUInt32();
+        for (uint8 i = 0; i < MAX_SPELL_REAGENTS; i++)
+            s.Reagent[i] = fields[51 + i].GetInt32();
+        for (uint8 i = 0; i < MAX_SPELL_REAGENTS; i++)
+            s.ReagentCount[i] = fields[59 + i].GetInt32();
+
+        s.EquippedItemClass    = fields[67].GetInt32();
+        s.EquippedItemSubclass = fields[68].GetInt32();
+        s.EquippedItemInvTypes = fields[69].GetInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.Effect[i] = fields[70 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectDieSides[i] = fields[73 + i].GetInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectRealPointsPerLevel[i] = fields[76 + i].GetFloat();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectBasePoints[i] = fields[79 + i].GetInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectMechanic[i] = fields[82 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectImplicitTargetA[i] = fields[85 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectImplicitTargetB[i] = fields[88 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectRadiusIndex[i] = fields[91 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectAura[i] = fields[94 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectAuraPeriod[i] = fields[97 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectAmplitude[i] = fields[100 + i].GetFloat();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectChainTargets[i] = fields[103 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectItemType[i] = fields[106 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectMiscValue[i] = fields[109 + i].GetInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectMiscValueB[i] = fields[112 + i].GetInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectTriggerSpell[i] = fields[115 + i].GetUInt32();
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectPointsPerCombo[i] = fields[118 + i].GetFloat();
+
+        // TODO: check this
+        // variant 1 : flag = [A1, B1, C1], [A2,B2,C2]...
+        // variant 2 : flag = [A1, A2, A3], [B1,B2,B3]...
+        // var1:
+        //for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+        //    s.EffectSpellClassMask[i].Set(fields[121 + i].GetUInt32(), fields[124 + i].GetUInt32(), fields[127 + i].GetUInt32());
+        // var2:
+        s.EffectSpellClassMask[0].Set(fields[121].GetUInt32(), fields[122].GetUInt32(), fields[123].GetUInt32());
+        s.EffectSpellClassMask[1].Set(fields[124].GetUInt32(), fields[125].GetUInt32(), fields[126].GetUInt32());
+        s.EffectSpellClassMask[2].Set(fields[127].GetUInt32(), fields[128].GetUInt32(), fields[129].GetUInt32());
+
+        for (uint8 i = 0; i < 2; i++)
+            s.SpellVisualID[i] = fields[130 + i].GetUInt32();
+
+        s.SpellIconID   = fields[132].GetUInt32();
+        s.ActiveIconID  = fields[133].GetUInt32();
+        s.SpellPriority = fields[134].GetUInt32();
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            s.Name[i] = fields[135 + i].GetString();
+
+        //uint32 Name_lang_mask; (UNUSED)
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            s.NameSubtext[i] = fields[144 + i].GetString();
+
+        //uint32 NameSubtext_lang_mask; (UNUSED)
+        //std::array<char const*, 16> Description; (UNUSED)
+        //uint32 Description_lang_mask; (UNUSED)
+        //std::array<char const*, 16> AuraDescription; (UNUSED)
+        //uint32 AuraDescription_lang_mask; (UNUSED)
+        s.ManaCostPct           = fields[153].GetUInt32();
+        s.StartRecoveryCategory = fields[154].GetUInt32();
+        s.StartRecoveryTime     = fields[155].GetUInt32();
+        s.MaxTargetLevel        = fields[156].GetUInt32();
+        s.SpellClassSet         = fields[157].GetUInt32();
+        s.SpellClassMask.Set(fields[158].GetUInt32(), fields[159].GetUInt32(), fields[160].GetUInt32());
+        s.MaxTargets            = fields[161].GetUInt32();
+        s.DefenseType           = fields[162].GetUInt32();
+        s.PreventionType        = fields[163].GetUInt32();
+        //uint32 StanceBarOrder; (UNUSED)
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectChainAmplitude[i] = fields[164 + i].GetFloat();
+
+        //uint32 MinFactionID; (UNUSED)
+        //uint32 MinReputation; (UNUSED)
+        //uint32 RequiredAuraVision; (UNUSED)
+        for (uint8 i = 0; i < 2; i++)
+            s.RequiredTotemCategoryID[i] = fields[167].GetUInt32();
+
+        s.RequiredAreasID = fields[169].GetUInt32();
+        s.SchoolMask      = fields[170].GetUInt32();
+        s.RuneCostID      = fields[171].GetUInt32();
+        //uint32 SpellMissileID; (UNUSED)
+        //uint32 PowerDisplayID; (UNUSED)
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            s.EffectBonusCoefficient[i] = fields[172 + i].GetFloat();
+
+        //uint32 DescriptionVariablesID; (UNUSED)
+        //uint32 Difficulty; (UNUSED)
+
+        _spellMap[id] = s;
+
+        if (_spellNumRow)
+        {
+            if (_spellNumRow < id)
+                _spellNumRow = id;
+        }
+        else
+            _spellNumRow = id;
+
+        ++count;
+    } while (result->NextRow());
+
+    _spellNumRow++; // this _spellNumRow should be more then the last by 1 point
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spell                         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 // Handle others containers
 void DBCStoresMgr::_Handle_NamesProfanityRegex()
 {
@@ -3529,7 +3983,7 @@ void DBCStoresMgr::_Handle_PetFamilySpellsStore()
     {
         if (SkillLineAbilityDBC const* skillLine = &skaID.second)
         {
-            SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->Spell);
+            SpellDBC const* spellInfo = sDBCStoresMgr->GetSpellDBC(skillLine->Spell);
             if (spellInfo && spellInfo->Attributes & SPELL_ATTR0_PASSIVE)
             {
                 for (const auto& indexID : cFamilyMap)

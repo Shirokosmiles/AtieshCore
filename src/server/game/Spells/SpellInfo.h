@@ -38,7 +38,7 @@ struct SpellDurationEntry;
 struct SpellModifier;
 struct SpellRangeEntry;
 struct SpellRadiusEntry;
-struct SpellEntry;
+struct SpellDBC;
 struct SpellCastTimesEntry;
 struct Condition;
 
@@ -267,7 +267,7 @@ public:
                         RealPointsPerLevel(0), BasePoints(0), PointsPerComboPoint(0), ValueMultiplier(0), DamageMultiplier(0),
                         BonusMultiplier(0), MiscValue(0), MiscValueB(0), Mechanic(MECHANIC_NONE), RadiusEntry(nullptr), ChainTarget(0),
                         ItemType(0), TriggerSpell(0), ImplicitTargetConditions(nullptr) {}
-    SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex);
+    SpellEffectInfo(SpellDBC const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex);
 
     bool IsEffect() const;
     bool IsEffect(SpellEffects effectName) const;
@@ -388,8 +388,8 @@ class TC_GAME_API SpellInfo
         uint32 SpellIconID;
         uint32 ActiveIconID;
         uint32 Priority;
-        std::array<char const*, 16> SpellName;
-        std::array<char const*, 16> Rank;
+        std::string SpellName[TOTAL_LOCALES];
+        std::string Rank[TOTAL_LOCALES];
         uint32 MaxTargetLevel;
         uint32 MaxAffectedTargets;
         uint32 SpellFamilyName;
@@ -402,7 +402,7 @@ class TC_GAME_API SpellInfo
         uint32 ExplicitTargetMask;
         SpellChainNode const* ChainEntry;
 
-        SpellInfo(SpellEntry const* spellEntry);
+        SpellInfo(SpellDBC const* spellEntry);
         ~SpellInfo();
 
         uint32 GetCategory() const;

@@ -2569,10 +2569,14 @@ void SpellMgr::LoadSpellInfoStore()
     uint32 oldMSTime = getMSTime();
 
     UnloadSpellInfoStore();
-    mSpellInfoMap.resize(sSpellStore.GetNumRows(), nullptr);
+    mSpellInfoMap.resize(sDBCStoresMgr->GetNumRowSpellDBCMap(), nullptr);
 
-    for (SpellEntry const* spellEntry : sSpellStore)
-        mSpellInfoMap[spellEntry->ID] = new SpellInfo(spellEntry);
+    SpellDBCMap const& spellMap = sDBCStoresMgr->GetSpellDBCMap();
+    for (const auto& sID : spellMap)
+    {
+        if (SpellDBC const* spellEntry = &sID.second)
+            mSpellInfoMap[spellEntry->ID] = new SpellInfo(spellEntry);
+    }
 
     for (uint32 spellIndex = 0; spellIndex < GetSpellInfoStoreSize(); ++spellIndex)
     {

@@ -327,7 +327,7 @@ std::array<SpellImplicitTargetInfo::StaticData, TOTAL_SPELL_TARGETS> SpellImplic
     {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_ENTRY,    TARGET_DIR_NONE},        // 110 TARGET_UNIT_CONE_ENTRY_110
 } };
 
-SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
+SpellEffectInfo::SpellEffectInfo(SpellDBC const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
 {
     _spellInfo = spellInfo;
     _effIndex = effIndex;
@@ -766,7 +766,7 @@ std::array<SpellEffectInfo::StaticData, TOTAL_SPELL_EFFECTS> SpellEffectInfo::_d
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 164 SPELL_EFFECT_REMOVE_AURA
 } };
 
-SpellInfo::SpellInfo(SpellEntry const* spellEntry)
+SpellInfo::SpellInfo(SpellDBC const* spellEntry)
 {
     Id = spellEntry->ID;
     CategoryEntry = spellEntry->Category ? sSpellCategoryStore.LookupEntry(spellEntry->Category) : nullptr;
@@ -831,8 +831,11 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     SpellIconID = spellEntry->SpellIconID;
     ActiveIconID = spellEntry->ActiveIconID;
     Priority = spellEntry->SpellPriority;
-    SpellName = spellEntry->Name;
-    Rank = spellEntry->NameSubtext;
+    for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+    {
+        SpellName[i] = spellEntry->Name[i];
+        Rank[i] = spellEntry->NameSubtext[i];
+    }
     MaxTargetLevel = spellEntry->MaxTargetLevel;
     MaxAffectedTargets = spellEntry->MaxTargets;
     SpellFamilyName = spellEntry->SpellClassSet;

@@ -450,7 +450,7 @@ public:
             bool talent = GetTalentSpellCost(aurApp->GetBase()->GetId()) > 0;
 
             Aura const* aura = aurApp->GetBase();
-            char const* name = aura->GetSpellInfo()->SpellName[handler->GetSessionDbcLocale()];
+            char const* name = aura->GetSpellInfo()->SpellName[handler->GetSessionDbcLocale()].c_str();
 
             std::ostringstream ss_name;
             ss_name << "|cffffffff|Hspell:" << aura->GetId() << "|h[" << name << "]|h|r";

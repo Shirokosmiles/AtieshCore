@@ -164,7 +164,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
 DBCStorage <SpellItemEnchantmentEntry> sSpellItemEnchantmentStore(SpellItemEnchantmentfmt);
 DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore(SpellItemEnchantmentConditionfmt);
-DBCStorage <SpellEntry> sSpellStore(SpellEntryfmt);
+//DBCStorage <SpellEntry> sSpellStore(SpellEntryfmt);
 PetFamilySpellsStore sPetFamilySpellsStore;
 
 DBCStorage <SpellCastTimesEntry> sSpellCastTimesStore(SpellCastTimefmt);
@@ -401,10 +401,23 @@ void LoadDBCStores(const std::string& dataPath)
 #define LOAD_DBC_EXT(store, file, dbtable, dbformat, dbpk) LoadDBC(availableDbcLocales, bad_dbc_files, store, dbcPath, file, dbtable, dbformat, dbpk)
 
     //LOAD_DBC_EXT(sAchievementStore,     "Achievement.dbc",      "achievement_dbc",      CustomAchievementfmt,     CustomAchievementIndex);
-    LOAD_DBC_EXT(sSpellStore,           "Spell.dbc",            "spell_dbc",            CustomSpellEntryfmt,      CustomSpellEntryIndex);
+    //LOAD_DBC_EXT(sSpellStore,           "Spell.dbc",            "spell_dbc",            CustomSpellEntryfmt,      CustomSpellEntryIndex);
     LOAD_DBC_EXT(sSpellDifficultyStore, "SpellDifficulty.dbc",  "spelldifficulty_dbc",  CustomSpellDifficultyfmt, CustomSpellDifficultyIndex);
 
 #undef LOAD_DBC_EXT
+
+    /*for (SpellEntry const* spellEntry : sSpellStore)
+    {
+        if (SpellDBC const* spellDBC = sDBCStoresMgr->GetSpellDBC(spellEntry->ID))
+        {
+            if (spellEntry->EffectSpellClassMask[0].operator!=(spellDBC->EffectSpellClassMask[0]))
+                TC_LOG_ERROR("server", "SpellDBC : (ID : %u) has EffectSpellClassMask 0 = %u", spellEntry->ID, spellEntry->EffectSpellClassMask[0]);
+            if (spellEntry->EffectSpellClassMask[1].operator!=(spellDBC->EffectSpellClassMask[1]))
+                TC_LOG_ERROR("server", "SpellDBC : (ID : %u) has EffectSpellClassMask 1 = %u", spellEntry->ID, spellEntry->EffectSpellClassMask[1]);
+            if (spellEntry->EffectSpellClassMask[2].operator!=(spellDBC->EffectSpellClassMask[2]))
+                TC_LOG_ERROR("server", "SpellDBC : (ID : %u) has EffectSpellClassMask 2 = %u", spellEntry->ID, spellEntry->EffectSpellClassMask[2]);
+        }
+    }*/
 
     // fill data
     //for (MapDifficultyEntry const* entry : sMapDifficultyStore)
@@ -421,7 +434,7 @@ void LoadDBCStores(const std::string& dataPath)
         memset(newEntry.DifficultySpellID, 0, 4*sizeof(uint32));
         for (uint8 x = 0; x < MAX_DIFFICULTY; ++x)
         {
-            if (spellDiff->DifficultySpellID[x] <= 0 || !sSpellStore.LookupEntry(spellDiff->DifficultySpellID[x]))
+            if (spellDiff->DifficultySpellID[x] <= 0 || !sDBCStoresMgr->GetSpellDBC(spellDiff->DifficultySpellID[x]))
             {
                 if (spellDiff->DifficultySpellID[x] > 0)//don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
                     TC_LOG_ERROR("sql.sql", "spelldifficulty_dbc: spell %i at field id:%u at spellid%i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->DifficultySpellID[x], spellDiff->ID, x);
@@ -494,10 +507,12 @@ void LoadDBCStores(const std::string& dataPath)
     // include existed nodes that have at least single not spell base (scripted) path
     {
         std::set<uint32> spellPaths;
-        for (SpellEntry const* sInfo : sSpellStore)
-            for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
-                if (sInfo->Effect[j] == SPELL_EFFECT_SEND_TAXI)
-                    spellPaths.insert(sInfo->EffectMiscValue[j]);
+        SpellDBCMap const& spellMap = sDBCStoresMgr->GetSpellDBCMap();
+        for (const auto& sID : spellMap)
+            if (SpellDBC const* sInfo = &sID.second)
+                for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+                    if (sInfo->Effect[j] == SPELL_EFFECT_SEND_TAXI)
+                        spellPaths.insert(sInfo->EffectMiscValue[j]);
 
         sTaxiNodesMask.fill(0);
         sOldContinentsNodesMask.fill(0);
@@ -566,17 +581,17 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     // Check loaded DBC files proper version
-    if (/*!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a
+    /*if (!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a
         !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
         !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.5a
         !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a
         !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a
-        !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a*/
+        !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a
         !sSpellStore.LookupEntry(80864)            )        // last added spell in 3.3.5a
     {
         TC_LOG_ERROR("misc", "You have _outdated_ DBC files. Please extract correct versions from current using client.");
         exit(1);
-    }
+    }*/
 
     TC_LOG_INFO("server.loading", ">> Initialized %d data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
 
