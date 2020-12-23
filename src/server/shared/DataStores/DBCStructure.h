@@ -68,19 +68,6 @@ struct SkillLineCategoryEntry
 };
 */
 
-
-
-
-
-
-struct SpellRadiusEntry
-{
-    uint32 ID;                                              // 0
-    float Radius;                                           // 1
-    float RadiusPerLevel;                                   // 2
-    float RadiusMax;                                        // 3
-};
-
 struct SpellRangeEntry
 {
     uint32 ID;                                              // 0

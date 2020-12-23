@@ -346,7 +346,7 @@ SpellEffectInfo::SpellEffectInfo(SpellDBC const* spellEntry, SpellInfo const* sp
     Mechanic = Mechanics(spellEntry->EffectMechanic[effIndex]);
     TargetA = SpellImplicitTargetInfo(spellEntry->EffectImplicitTargetA[effIndex]);
     TargetB = SpellImplicitTargetInfo(spellEntry->EffectImplicitTargetB[effIndex]);
-    RadiusEntry = spellEntry->EffectRadiusIndex[effIndex] ? sSpellRadiusStore.LookupEntry(spellEntry->EffectRadiusIndex[effIndex]) : nullptr;
+    RadiusEntry = spellEntry->EffectRadiusIndex[effIndex] ? sDBCStoresMgr->GetSpellRadiusDBC(spellEntry->EffectRadiusIndex[effIndex]) : nullptr;
     ChainTarget = spellEntry->EffectChainTargets[effIndex];
     ItemType = spellEntry->EffectItemType[effIndex];
     TriggerSpell = spellEntry->EffectTriggerSpell[effIndex];

@@ -37,7 +37,7 @@ struct SpellTargetPosition;
 struct SpellDurationDBC;
 struct SpellModifier;
 struct SpellRangeEntry;
-struct SpellRadiusEntry;
+struct SpellRadiusDBC;
 struct SpellDBC;
 struct SpellCastTimesDBC;
 struct SpellCategoryDBC;
@@ -257,7 +257,7 @@ public:
     Mechanics Mechanic;
     SpellImplicitTargetInfo TargetA;
     SpellImplicitTargetInfo TargetB;
-    SpellRadiusEntry const* RadiusEntry;
+    SpellRadiusDBC const* RadiusEntry;
     uint32    ChainTarget;
     uint32    ItemType;
     uint32    TriggerSpell;

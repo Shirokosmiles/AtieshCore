@@ -3202,7 +3202,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Howl of Azgalor
     ApplySpellFix({ 31344 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_100_YARDS); // 100yards instead of 50000?!
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_100_YARDS); // 100yards instead of 50000?!
     });
 
     ApplySpellFix({
@@ -3320,7 +3320,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         // Target entry seems to be wrong for this spell :/
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER_AREA_PARTY);
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_20_YARDS);
     });
 
     ApplySpellFix({
@@ -3541,7 +3541,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Desecration Arm - 36 instead of 37 - typo? :/
     ApplySpellFix({ 29809 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_7_YARDS);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_7_YARDS);
     });
 
     // Master Shapeshifter: missing stance data for forms other than bear - bear version has correct data
@@ -3933,7 +3933,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
         // in 3.3.5 there is only one radius in dbc which is 0 yards in this case
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_7_YARDS); // use max radius from 4.3.4
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_7_YARDS); // use max radius from 4.3.4
     });
     // END OF TRIAL OF THE CHAMPION SPELLS
 
@@ -4037,7 +4037,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Summon Corpse Scarabs
     ApplySpellFix({ 28864, 29105 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_10_YARDS);
     });
 
     ApplySpellFix({
@@ -4114,7 +4114,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         // in 3.3.5 there is only one radius in dbc which is 0 yards in this
         // use max radius from 4.3.4
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_25_YARDS);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_25_YARDS);
     });
     // ENDOF VIOLET HOLD
 
@@ -4124,7 +4124,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Pursued (Flame Leviathan)
     ApplySpellFix({ 62374 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS);   // 50000yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_50000_YARDS);   // 50000yd
     });
 
     // Focused Eyebeam Summon Trigger (Kologarn)
@@ -4271,19 +4271,19 @@ void SpellMgr::LoadSpellInfoCorrections()
         72452  // Defiling Horror
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_60_YARDS); // 60yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_60_YARDS); // 60yd
     });
 
     // Achievement Check
     ApplySpellFix({ 72830 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_50000_YARDS); // 50000yd
     });
 
     // Start Halls of Reflection Quest AE
     ApplySpellFix({ 72900 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS); // 200yd
     });
     // ENDOF HALLS OF REFLECTION SPELLS
 
@@ -4309,7 +4309,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Bone Slice (Lord Marrowgar)
     ApplySpellFix({ 69055, 70814 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS); // 5yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_5_YARDS); // 5yd
     });
 
     ApplySpellFix({
@@ -4322,7 +4322,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         71123  // Decimate (Stinky & Precious)
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_100_YARDS); // 100yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_100_YARDS); // 100yd
     });
 
     // Coldflame (Lord Marrowgar)
@@ -4346,7 +4346,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Award Reputation - Boss Kill
     ApplySpellFix({ 73843, 73844, 73845, 73846 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_50000_YARDS); // 50000yd
     });
 
     ApplySpellFix({
@@ -4355,13 +4355,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         72769  // Scent of Blood (Deathbringer Saurfang)
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS);
     });
 
     // Scent of Blood (Deathbringer Saurfang)
     ApplySpellFix({ 72771 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS);
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS);
     });
 
     // Resistant Skin (Deathbringer Saurfang adds)
@@ -4380,7 +4380,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Putrice-pre event leap spell
     ApplySpellFix({ 70485 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_10_YARDS);
     });
 
     ApplySpellFix({
@@ -4420,7 +4420,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Mutated Plague (Professor Putricide)
     ApplySpellFix({ 72454, 72464, 72506, 72507 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_50000_YARDS); // 50000yd
     });
 
     // Unbound Plague (Professor Putricide) (needs target selection script)
@@ -4435,7 +4435,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         72289  // Frost Infusion Quest Credit (Sindragosa)
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // another missing radius
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS); // another missing radius
     });
 
     // Empowered Flare (Blood Prince Council)
@@ -4471,7 +4471,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Frostbolt Volley (only heroic)
     ApplySpellFix({ 72015, 72016 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_2].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_40_YARDS);
+        spellInfo->Effects[EFFECT_2].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_40_YARDS);
     });
 
     // Summon Suppressor (needs target selection script)
@@ -4487,7 +4487,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         71357  // Order Whelp
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS);   // 200yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS);   // 200yd
     });
 
     // Sindragosa's Fury
@@ -4530,13 +4530,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Defile
     ApplySpellFix({ 72754, 73708, 73709, 73710 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS); // 200yd
     });
 
     // Val'kyr Target Search
     ApplySpellFix({ 69030 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS); // 200yd
         spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
     });
 
@@ -4549,9 +4549,9 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Harvest Souls
     ApplySpellFix({ 73654, 74295, 74296, 74297 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
-        spellInfo->Effects[EFFECT_2].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_50000_YARDS); // 50000yd
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_50000_YARDS); // 50000yd
+        spellInfo->Effects[EFFECT_2].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_50000_YARDS); // 50000yd
     });
 
     // Harvest Soul
@@ -4575,51 +4575,51 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Shadow Trap
     ApplySpellFix({ 73529 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS); // 10yd
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_10_YARDS); // 10yd
     });
 
     // Shadow Trap (searcher)
     ApplySpellFix({ 74282 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS); // 5yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_5_YARDS); // 5yd
     });
 
     // Restore Soul
     ApplySpellFix({ 72595, 73650 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS); // 200yd
     });
 
     // Destroy Soul
     ApplySpellFix({ 74086 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS); // 200yd
     });
 
     // Summon Spirit Bomb
     ApplySpellFix({ 74302, 74342 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS); // 200yd
         spellInfo->MaxAffectedTargets = 1;
     });
 
     // Summon Spirit Bomb
     ApplySpellFix({ 74341, 74343 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_200_YARDS); // 200yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_200_YARDS); // 200yd
         spellInfo->MaxAffectedTargets = 3;
     });
 
     // Summon Spirit Bomb
     ApplySpellFix({ 73579 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_25_YARDS); // 25yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_25_YARDS); // 25yd
     });
 
     // Fury of Frostmourne
     ApplySpellFix({ 72350 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_50000_YARDS); // 50000yd
     });
 
     ApplySpellFix(
@@ -4632,14 +4632,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         73582  // Trigger Vile Spirit (Inside, Heroic)
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_50000_YARDS); // 50000yd
     });
 
     // Raise Dead
     ApplySpellFix({ 72376 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 3;
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_50000_YARDS); // 50000yd
     });
 
     ApplySpellFix({ 62124 }, [](SpellInfo* spellInfo)
@@ -4662,14 +4662,14 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 71809 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(5); // 40yd
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS); // 10yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_10_YARDS); // 10yd
         spellInfo->Effects[EFFECT_0].MiscValue = 190;
     });
 
     // Broken Frostmourne
     ApplySpellFix({ 72405 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_20_YARDS); // 20yd
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
     });
     // ENDOF ICECROWN CITADEL SPELLS
@@ -4680,13 +4680,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Soul Consumption
     ApplySpellFix({ 74799 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_12_YARDS);
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_12_YARDS);
     });
 
     // Twilight Cutter
     ApplySpellFix({ 74769, 77844, 77845, 77846 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_100_YARDS); // 100yd
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_100_YARDS); // 100yd
     });
 
     // Twilight Mending
@@ -4701,18 +4701,18 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].Mechanic = MECHANIC_NONE;
         spellInfo->Effects[EFFECT_1].Mechanic = MECHANIC_SNARE;
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_6_YARDS);
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_6_YARDS);
     });
 
     ApplySpellFix({ 75884 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_6_YARDS);
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_6_YARDS);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_6_YARDS);
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_6_YARDS);
     });
 
     ApplySpellFix({ 75883, 75876 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_6_YARDS);
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_6_YARDS);
     });
     // ENDOF RUBY SANCTUM SPELLS
 
@@ -4978,7 +4978,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Feral Charge - Cat
     ApplySpellFix({ 49376 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_3_YARDS); // 3yd
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_3_YARDS); // 3yd
     });
 
     // Baron Rivendare (Stratholme) - Unholy Aura

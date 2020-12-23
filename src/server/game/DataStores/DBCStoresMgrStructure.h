@@ -1613,3 +1613,12 @@ struct SpellItemEnchantmentConditionDBC
     uint32 RtOperand[5];                                    // 21-25
     //uint8 Logic[5];                                       // 25-30
 };
+
+// load SpellRadius.dbc
+struct SpellRadiusDBC
+{
+    uint32 ID;                                              // 0
+    float Radius;                                           // 1
+    float RadiusPerLevel;                                   // 2
+    float RadiusMax;                                        // 3
+};
