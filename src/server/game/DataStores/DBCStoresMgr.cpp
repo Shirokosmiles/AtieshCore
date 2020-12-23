@@ -17,6 +17,7 @@
 
 #include "DBCStoresMgr.h"
 #include "DatabaseEnv.h"
+#include "SpellMgr.h"
 
 DBCStoresMgr* DBCStoresMgr::instance()
 {
@@ -124,6 +125,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _spellCastTimesMap.clear();
     _spellCategoryMap.clear();
     _spellItemEnchantmentMap.clear();
+    _spellDiffucultyMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -229,8 +231,9 @@ void DBCStoresMgr::Initialize()
     _Load_SpellCastTimes();
     _Load_SpellCategory();
     _Load_SpellItemEnchantment();
+    _Load_SpellDifficulty();
 
-    // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc
+    // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
 
     // Handle additional data-containers from DBC
@@ -247,6 +250,8 @@ void DBCStoresMgr::Initialize_WorldDBC_Corrections()
     _Handle_World_Achievement();
     // spell_dbc
     _Handle_World_Spell();
+    // spelldifficulty_dbc
+    _Handle_World_SpellDifficulty();
 }
 
 // load Achievement.dbc
@@ -4075,6 +4080,40 @@ void DBCStoresMgr::_Load_SpellItemEnchantment()
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spellitemenchantment          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+// load SpellDifficulty.dbc
+void DBCStoresMgr::_Load_SpellDifficulty()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellDiffucultyMap.clear();
+    //                                                0           1                     2                   3                   4
+    QueryResult result = WorldDatabase.Query("SELECT ID, DifficultySpellID_1, DifficultySpellID_2, DifficultySpellID_3, DifficultySpellID_4 FROM dbc_spelldifficulty");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spelldifficulty. DB table `dbc_spelldifficulty` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellDifficultyDBC sd;
+        sd.ID = id;
+        for (uint8 i = 0; i < MAX_DIFFICULTY; i++)
+            sd.DifficultySpellID[i] = fields[1].GetInt32();
+
+        _spellDiffucultyMap[id] = sd;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spelldifficulty               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 // Handle Additional dbc from World db
 void DBCStoresMgr::_Handle_World_Achievement()
 {
@@ -4434,6 +4473,43 @@ void DBCStoresMgr::_Handle_World_Spell()
     } while (result->NextRow());    
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded WorldDB::spell_dbc                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void DBCStoresMgr::_Handle_World_SpellDifficulty()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                                0      1        2         3          4
+    QueryResult result = WorldDatabase.Query("SELECT ID, spellid0, spellid1, spellid2, spellid3 FROM spelldifficulty_dbc");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 WorldDB::spelldifficulty_dbc. DB table `spelldifficulty_dbc` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        if (!GetSpellDifficultyDBC(id))
+        {
+            SpellDifficultyDBC sd;
+            sd.ID = id;
+            for (uint8 i = 0; i < MAX_DIFFICULTY; i++)
+                sd.DifficultySpellID[i] = fields[1].GetInt32();
+
+            _spellDiffucultyMap[id] = sd;
+
+            ++count;
+        }
+        else
+            TC_LOG_INFO("server.loading", ">> WorldDB::spelldifficulty_dbc          %u already exist, need to override?", id);
+
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded WorldDB::spelldifficulty_dbc      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle others containers

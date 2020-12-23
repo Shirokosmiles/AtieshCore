@@ -169,7 +169,7 @@ PetFamilySpellsStore sPetFamilySpellsStore;
 
 //DBCStorage <SpellCastTimesEntry> sSpellCastTimesStore(SpellCastTimefmt);
 //DBCStorage <SpellCategoryEntry> sSpellCategoryStore(SpellCategoryfmt);
-DBCStorage <SpellDifficultyEntry> sSpellDifficultyStore(SpellDifficultyfmt);
+//DBCStorage <SpellDifficultyEntry> sSpellDifficultyStore(SpellDifficultyfmt);
 DBCStorage <SpellDurationEntry> sSpellDurationStore(SpellDurationfmt);
 DBCStorage <SpellFocusObjectEntry> sSpellFocusObjectStore(SpellFocusObjectfmt);
 DBCStorage <SpellRadiusEntry> sSpellRadiusStore(SpellRadiusfmt);
@@ -402,7 +402,7 @@ void LoadDBCStores(const std::string& dataPath)
 
     //LOAD_DBC_EXT(sAchievementStore,     "Achievement.dbc",      "achievement_dbc",      CustomAchievementfmt,     CustomAchievementIndex);
     //LOAD_DBC_EXT(sSpellStore,           "Spell.dbc",            "spell_dbc",            CustomSpellEntryfmt,      CustomSpellEntryIndex);
-    LOAD_DBC_EXT(sSpellDifficultyStore, "SpellDifficulty.dbc",  "spelldifficulty_dbc",  CustomSpellDifficultyfmt, CustomSpellDifficultyIndex);
+    //LOAD_DBC_EXT(sSpellDifficultyStore, "SpellDifficulty.dbc",  "spelldifficulty_dbc",  CustomSpellDifficultyfmt, CustomSpellDifficultyIndex);
 
 #undef LOAD_DBC_EXT
 
@@ -427,29 +427,7 @@ void LoadDBCStores(const std::string& dataPath)
     //    if (sDBCStoresMgr->GetSkillLineDBC(entry->SkillID))
     //        SkillRaceClassInfoBySkill.emplace(entry->SkillID, entry);
 
-    // Create Spelldifficulty searcher
-    for (SpellDifficultyEntry const* spellDiff : sSpellDifficultyStore)
-    {
-        SpellDifficultyEntry newEntry;
-        memset(newEntry.DifficultySpellID, 0, 4*sizeof(uint32));
-        for (uint8 x = 0; x < MAX_DIFFICULTY; ++x)
-        {
-            if (spellDiff->DifficultySpellID[x] <= 0 || !sDBCStoresMgr->GetSpellDBC(spellDiff->DifficultySpellID[x]))
-            {
-                if (spellDiff->DifficultySpellID[x] > 0)//don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
-                    TC_LOG_ERROR("sql.sql", "spelldifficulty_dbc: spell %i at field id:%u at spellid%i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->DifficultySpellID[x], spellDiff->ID, x);
-                newEntry.DifficultySpellID[x] = 0;//spell was <= 0 or invalid, set to 0
-            }
-            else
-                newEntry.DifficultySpellID[x] = spellDiff->DifficultySpellID[x];
-        }
-        if (newEntry.DifficultySpellID[0] <= 0 || newEntry.DifficultySpellID[1] <= 0)//id0-1 must be always set!
-            continue;
-
-        for (uint8 x = 0; x < MAX_DIFFICULTY; ++x)
-            if (newEntry.DifficultySpellID[x])
-                sSpellMgr->SetSpellDifficultyId(uint32(newEntry.DifficultySpellID[x]), spellDiff->ID);
-    }
+    
 
     // create talent spells set
     for (TalentEntry const* talentInfo : sTalentStore)

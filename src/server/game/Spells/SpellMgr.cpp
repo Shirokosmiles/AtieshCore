@@ -162,19 +162,6 @@ bool SpellMgr::IsSpellValid(SpellInfo const* spellInfo, Player* player, bool msg
     return true;
 }
 
-uint32 SpellMgr::GetSpellDifficultyId(uint32 spellId) const
-{
-    SpellDifficultySearcherMap::const_iterator i = mSpellDifficultySearcherMap.find(spellId);
-    return i == mSpellDifficultySearcherMap.end() ? 0 : i->second;
-}
-
-void SpellMgr::SetSpellDifficultyId(uint32 spellId, uint32 id)
-{
-    if (uint32 i = GetSpellDifficultyId(spellId))
-        TC_LOG_ERROR("spells", "SpellMgr::SetSpellDifficultyId: The spell %u already has spellDifficultyId %u. Will override with spellDifficultyId %u.", spellId, i, id);
-    mSpellDifficultySearcherMap[spellId] = id;
-}
-
 uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, WorldObject const* caster) const
 {
     if (!GetSpellInfo(spellId))
@@ -190,11 +177,7 @@ uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, WorldObject const* cast
         return spellId; //return source spell
     }
 
-    uint32 difficultyId = GetSpellDifficultyId(spellId);
-    if (!difficultyId)
-        return spellId; //return source spell, it has only REGULAR_DIFFICULTY
-
-    SpellDifficultyEntry const* difficultyEntry = sSpellDifficultyStore.LookupEntry(difficultyId);
+    SpellDifficultyDBC const* difficultyEntry = sDBCStoresMgr->GetSpellDifficultyDBC(spellId);
     if (!difficultyEntry)
     {
         TC_LOG_ERROR("spells", "SpellMgr::GetSpellIdForDifficulty: SpellDifficultyEntry was not found for spell %u. This should never happen.", spellId);

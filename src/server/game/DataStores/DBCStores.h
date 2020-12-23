@@ -157,7 +157,7 @@ TC_GAME_API uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
 //TC_GAME_API extern DBCStorage <SoundEntriesEntry>            sSoundEntriesStore;
 //TC_GAME_API extern DBCStorage <SpellCastTimesEntry>          sSpellCastTimesStore;
 //TC_GAME_API extern DBCStorage <SpellCategoryEntry>           sSpellCategoryStore;
-TC_GAME_API extern DBCStorage <SpellDifficultyEntry>         sSpellDifficultyStore;
+//TC_GAME_API extern DBCStorage <SpellDifficultyEntry>         sSpellDifficultyStore;
 TC_GAME_API extern DBCStorage <SpellDurationEntry>           sSpellDurationStore;
 TC_GAME_API extern DBCStorage <SpellFocusObjectEntry>        sSpellFocusObjectStore;
 //TC_GAME_API extern DBCStorage <SpellItemEnchantmentEntry>    sSpellItemEnchantmentStore;
