@@ -36,7 +36,7 @@ struct SpellChainNode;
 struct SpellTargetPosition;
 struct SpellDurationDBC;
 struct SpellModifier;
-struct SpellRangeEntry;
+struct SpellRangeDBC;
 struct SpellRadiusDBC;
 struct SpellDBC;
 struct SpellCastTimesDBC;
@@ -375,7 +375,7 @@ class TC_GAME_API SpellInfo
         uint32 ManaPerSecondPerLevel;
         uint32 ManaCostPercentage;
         uint32 RuneCostID;
-        SpellRangeEntry const* RangeEntry;
+        SpellRangeDBC const* RangeEntry;
         float  Speed;
         uint32 StackAmount;
         std::array<uint32, 2> Totem;

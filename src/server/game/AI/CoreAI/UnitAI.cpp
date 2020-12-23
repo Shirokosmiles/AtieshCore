@@ -18,6 +18,7 @@
 #include "UnitAI.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
+#include "DBCStoresMgrStructure.h"
 #include "MotionMaster.h"
 #include "Player.h"
 #include "Spell.h"

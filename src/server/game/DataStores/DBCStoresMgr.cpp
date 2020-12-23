@@ -130,6 +130,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _spellFocusObjectMap.clear();
     _spellItemEnchantmentConditionMap.clear();
     _spellRadiusMap.clear();
+    _spellRangeMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -240,6 +241,7 @@ void DBCStoresMgr::Initialize()
     _Load_SpellFocusObject();
     _Load_SpellItemEnchantmentCondition();
     _Load_SpellRadius();
+    _Load_SpellRange();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4269,6 +4271,43 @@ void DBCStoresMgr::_Load_SpellRadius()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spellradius                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SpellRange.dbc
+void DBCStoresMgr::_Load_SpellRange()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellRangeMap.clear();
+    //                                                0     1           2            3          4          5
+    QueryResult result = WorldDatabase.Query("SELECT ID, RangeMin_1, RangeMin_2, RangeMax_1, RangeMax_2, Flags FROM dbc_spellrange");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellrange. DB table `dbc_spellrange` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellRangeDBC sr;
+        sr.ID = id;
+        for (uint8 i = 0; i < 2; i++)
+            sr.RangeMin[i] = fields[1 + i].GetFloat();
+        for (uint8 i = 0; i < 2; i++)
+            sr.RangeMax[i] = fields[3 + i].GetFloat();
+        sr.Flags = fields[5].GetUInt32();
+
+        _spellRangeMap[id] = sr;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellrange                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db

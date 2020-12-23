@@ -817,7 +817,7 @@ SpellInfo::SpellInfo(SpellDBC const* spellEntry)
     ManaPerSecondPerLevel = spellEntry->ManaPerSecondPerLevel;
     ManaCostPercentage = spellEntry->ManaCostPct;
     RuneCostID = spellEntry->RuneCostID;
-    RangeEntry = spellEntry->RangeIndex ? sSpellRangeStore.LookupEntry(spellEntry->RangeIndex) : nullptr;
+    RangeEntry = spellEntry->RangeIndex ? sDBCStoresMgr->GetSpellRangeDBC(spellEntry->RangeIndex) : nullptr;
     Speed = spellEntry->Speed;
     StackAmount = spellEntry->CumulativeAura;
     Totem = spellEntry->Totem;

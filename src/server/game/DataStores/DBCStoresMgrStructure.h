@@ -1622,3 +1622,16 @@ struct SpellRadiusDBC
     float RadiusPerLevel;                                   // 2
     float RadiusMax;                                        // 3
 };
+
+// load SpellRange.dbc
+struct SpellRangeDBC
+{
+    uint32 ID;                                              // 0
+    float RangeMin[2];                                      // 1-2 [0] Hostile [1] Friendly
+    float RangeMax[2];                                      // 3-4 [0] Hostile [1] Friendly
+    uint32 Flags;                                           // 5
+    //char const* DisplayName[16];                          // 6-21
+    //uint32 DisplayName_lang_mask;                         // 22
+    //char const* DisplayNameShort[16];                     // 23-38
+    //uint32 DisplayNameShort_lang_mask;                    // 39
+};

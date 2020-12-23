@@ -3210,7 +3210,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         42821  // Headless Horseman - Wisp Flight Missile
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100 yards
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(6); // 100 yards
     });
 
     // They Must Burn Bomb Aura (self)
@@ -3650,7 +3650,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         7853   // The Art of Being a Water Terror: Force Cast on Player
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(13);
     });
 
     // Wrath of the Plaguebringer
@@ -3989,13 +3989,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Polymorph (Six Demon Bag)
     ApplySpellFix({ 14621 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(4); // Medium Range
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(4); // Medium Range
     });
 
     // Concussive Barrage
     ApplySpellFix({ 35101 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(155); // Hunter Range (Long)
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(155); // Hunter Range (Long)
     });
 
     ApplySpellFix({
@@ -4013,7 +4013,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         51677   // Rogue - Unfair Advantage (Rank 2)
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(2); // 5 yards
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(2); // 5 yards
     });
 
     ApplySpellFix({
@@ -4022,7 +4022,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         57842  // Killing Spree (Off hand damage)
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(2); // Melee Range
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(2); // Melee Range
     });
 
     // Safeguard
@@ -4031,7 +4031,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         46947  // (Rank 2)
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(34); // Twenty-Five yards
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(34); // Twenty-Five yards
     });
 
     // Summon Corpse Scarabs
@@ -4103,7 +4103,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Dark Conclave Ritualist Channel
     ApplySpellFix({ 38469 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6);  // 100yd
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(6);  // 100yd
     });
 
     //
@@ -4166,7 +4166,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         64397, // Summon Swarming Guardian (Auriaya)
         }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(137); // 8y, Based in BFA effect radius
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(137); // 8y, Based in BFA effect radius
     });
 
     // Potent Pheromones (Freya)
@@ -4232,7 +4232,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Cosmic Smash (Algalon the Observer)
     ApplySpellFix({ 62311, 64596 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6);  // 100yd
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(6);  // 100yd
     });
 
     ApplySpellFix({
@@ -4479,7 +4479,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(157); // 90yd
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(157); // 90yd
     });
 
     ApplySpellFix({
@@ -4543,7 +4543,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Raging Spirit Visual
     ApplySpellFix({ 69198 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(13); // 50000yd
     });
 
     // Harvest Souls
@@ -4661,7 +4661,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Jump
     ApplySpellFix({ 71809 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(5); // 40yd
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(5); // 40yd
         spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_10_YARDS); // 10yd
         spellInfo->Effects[EFFECT_0].MiscValue = 190;
     });
@@ -4789,7 +4789,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Teleport
     ApplySpellFix({ 66551 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(13); // 50000yd
     });
 
     ApplySpellFix({ 52610 }, [](SpellInfo* spellInfo) // Savage Roar
@@ -4814,7 +4814,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Survey Sinkholes
     ApplySpellFix({ 45853 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(5); // 40 yards
+        spellInfo->RangeEntry = sDBCStoresMgr->GetSpellRangeDBC(5); // 40 yards
     });
 
     ApplySpellFix({

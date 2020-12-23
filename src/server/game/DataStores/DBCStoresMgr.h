@@ -120,6 +120,7 @@ typedef std::unordered_map<uint32 /*ID*/, SpellDurationDBC> SpellDurationDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SpellFocusObjectDBC> SpellFocusObjectDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SpellItemEnchantmentConditionDBC> SpellItemEnchantmentConditionDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SpellRadiusDBC> SpellRadiusDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, SpellRangeDBC> SpellRangeDBCMap;
 
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 typedef std::set<uint32> PetFamilySpellsSet;
@@ -1034,6 +1035,14 @@ public:
         return nullptr;
     }
 
+    SpellRangeDBC const* GetSpellRangeDBC(uint32 ID)
+    {
+        SpellRangeDBCMap::const_iterator itr = _spellRangeMap.find(ID);
+        if (itr != _spellRangeMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1151,6 +1160,7 @@ protected:
     void _Load_SpellFocusObject();
     void _Load_SpellItemEnchantmentCondition();
     void _Load_SpellRadius();
+    void _Load_SpellRange();
 
     // Handle Additional dbc from world db
     void Initialize_WorldDBC_Corrections();
@@ -1260,6 +1270,7 @@ private:
     SpellFocusObjectDBCMap _spellFocusObjectMap;
     SpellItemEnchantmentConditionDBCMap _spellItemEnchantmentConditionMap;
     SpellRadiusDBCMap _spellRadiusMap;
+    SpellRangeDBCMap _spellRangeMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
