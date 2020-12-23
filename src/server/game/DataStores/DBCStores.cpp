@@ -167,7 +167,7 @@ DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionSt
 //DBCStorage <SpellEntry> sSpellStore(SpellEntryfmt);
 PetFamilySpellsStore sPetFamilySpellsStore;
 
-DBCStorage <SpellCastTimesEntry> sSpellCastTimesStore(SpellCastTimefmt);
+//DBCStorage <SpellCastTimesEntry> sSpellCastTimesStore(SpellCastTimefmt);
 DBCStorage <SpellCategoryEntry> sSpellCategoryStore(SpellCategoryfmt);
 DBCStorage <SpellDifficultyEntry> sSpellDifficultyStore(SpellDifficultyfmt);
 DBCStorage <SpellDurationEntry> sSpellDurationStore(SpellDurationfmt);
@@ -367,7 +367,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sSkillRaceClassInfoStore,            "SkillRaceClassInfo.dbc");
     //LOAD_DBC(sSkillTiersStore,                    "SkillTiers.dbc");
     //LOAD_DBC(sSoundEntriesStore,                  "SoundEntries.dbc");
-    LOAD_DBC(sSpellCastTimesStore,                "SpellCastTimes.dbc");
+    //LOAD_DBC(sSpellCastTimesStore,                "SpellCastTimes.dbc");
     LOAD_DBC(sSpellCategoryStore,                 "SpellCategory.dbc");
     LOAD_DBC(sSpellDurationStore,                 "SpellDuration.dbc");
     LOAD_DBC(sSpellFocusObjectStore,              "SpellFocusObject.dbc");

@@ -795,7 +795,7 @@ SpellInfo::SpellInfo(SpellDBC const* spellEntry)
     TargetAuraSpell = spellEntry->TargetAuraSpell;
     ExcludeCasterAuraSpell = spellEntry->ExcludeCasterAuraSpell;
     ExcludeTargetAuraSpell = spellEntry->ExcludeTargetAuraSpell;
-    CastTimeEntry = spellEntry->CastingTimeIndex ? sSpellCastTimesStore.LookupEntry(spellEntry->CastingTimeIndex) : nullptr;
+    CastTimeEntry = spellEntry->CastingTimeIndex ? sDBCStoresMgr->GetSpellCastTimesDBC(spellEntry->CastingTimeIndex) : nullptr;
     RecoveryTime = spellEntry->RecoveryTime;
     CategoryRecoveryTime = spellEntry->CategoryRecoveryTime;
     StartRecoveryCategory = spellEntry->StartRecoveryCategory;

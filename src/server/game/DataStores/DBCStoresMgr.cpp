@@ -120,6 +120,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _skillTiersMap.clear();
     _soundEntriesMap.clear();
     _spellMap.clear();
+    _spellCastTimesMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -221,6 +222,7 @@ void DBCStoresMgr::Initialize()
     _Load_SkillTiers();
     _Load_SoundEntries();
     _Load_Spell();
+    _Load_SpellCastTimes();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc
     Initialize_WorldDBC_Corrections();
@@ -4303,6 +4305,39 @@ void DBCStoresMgr::_Handle_World_Spell()
     } while (result->NextRow());    
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded WorldDB::spell_dbc                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load Movie.dbc
+void DBCStoresMgr::_Load_SpellCastTimes()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellCastTimesMap.clear();
+    //                                                0    1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Base FROM dbc_spellcasttimes");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellcasttimes. DB table `dbc_spellcasttimes` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellCastTimesDBC sct;
+        sct.ID = id;
+        sct.Base = fields[1].GetInt32();
+
+        _spellCastTimesMap[id] = sct;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellcasttimes                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle others containers

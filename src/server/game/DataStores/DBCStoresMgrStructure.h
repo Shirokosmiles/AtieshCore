@@ -1541,3 +1541,12 @@ struct SpellDBC
     //uint32 DescriptionVariablesID;                                    // 232
     //uint32 Difficulty;                                                // 233
 };
+
+// load SpellCastTimes.dbc
+struct SpellCastTimesDBC
+{
+    uint32 ID;                                              // 0
+    int32 Base;                                             // 1
+    //int32 PerLevel;                                       // 2
+    //int32 Minimum;                                        // 3
+};

@@ -112,6 +112,7 @@ typedef std::unordered_map<uint32 /*ID*/, SkillRaceClassInfoDBC> SkillRaceClassI
 typedef std::unordered_map<uint32 /*ID*/, SkillTiersDBC> SkillTiersDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SoundEntriesDBC> SoundEntriesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SpellDBC> SpellDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, SpellCastTimesDBC> SpellCastTimesDBCMap;
 
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 typedef std::set<uint32> PetFamilySpellsSet;
@@ -960,6 +961,14 @@ public:
         return nullptr;
     }
 
+    SpellCastTimesDBC const* GetSpellCastTimesDBC(uint32 ID)
+    {
+        SpellCastTimesDBCMap::const_iterator itr = _spellCastTimesMap.find(ID);
+        if (itr != _spellCastTimesMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1069,6 +1078,7 @@ protected:
     void _Load_SkillTiers();
     void _Load_SoundEntries();
     void _Load_Spell();
+    void _Load_SpellCastTimes();
 
     // Handle Additional dbc from world db
     void Initialize_WorldDBC_Corrections();
@@ -1169,6 +1179,7 @@ private:
     SkillTiersDBCMap _skillTiersMap;
     SoundEntriesDBCMap _soundEntriesMap;
     SpellDBCMap _spellMap;
+    SpellCastTimesDBCMap _spellCastTimesMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

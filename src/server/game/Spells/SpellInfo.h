@@ -39,7 +39,7 @@ struct SpellModifier;
 struct SpellRangeEntry;
 struct SpellRadiusEntry;
 struct SpellDBC;
-struct SpellCastTimesEntry;
+struct SpellCastTimesDBC;
 struct Condition;
 
 enum SpellCastTargetFlags : uint32
@@ -352,7 +352,7 @@ class TC_GAME_API SpellInfo
         uint32 TargetAuraSpell;
         uint32 ExcludeCasterAuraSpell;
         uint32 ExcludeTargetAuraSpell;
-        SpellCastTimesEntry const* CastTimeEntry;
+        SpellCastTimesDBC const* CastTimeEntry;
         uint32 RecoveryTime;
         uint32 CategoryRecoveryTime;
         uint32 StartRecoveryCategory;
