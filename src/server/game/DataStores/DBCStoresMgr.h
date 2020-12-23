@@ -1070,6 +1070,11 @@ protected:
     void _Load_SoundEntries();
     void _Load_Spell();
 
+    // Handle Additional dbc from world db
+    void Initialize_WorldDBC_Corrections();
+    void _Handle_World_Achievement();
+    void _Handle_World_Spell();
+
     // Handle others containers
     void _Handle_NamesProfanityRegex();
     void _Handle_NamesReservedRegex();

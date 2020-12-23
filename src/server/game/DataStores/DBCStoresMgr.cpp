@@ -222,10 +222,23 @@ void DBCStoresMgr::Initialize()
     _Load_SoundEntries();
     _Load_Spell();
 
+    // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc
+    Initialize_WorldDBC_Corrections();
+
     // Handle additional data-containers from DBC
     _Handle_NamesProfanityRegex();
     _Handle_NamesReservedRegex();
     _Handle_PetFamilySpellsStore();
+}
+
+void DBCStoresMgr::Initialize_WorldDBC_Corrections()
+{
+    TC_LOG_INFO("server.loading", "Initialize DBC corrections (server-side data stores)");
+    // here we adding data in exist DBC containers from world tables:
+    // achievement_dbc
+    _Handle_World_Achievement();
+    // spell_dbc
+    _Handle_World_Spell();
 }
 
 // load Achievement.dbc
@@ -3929,6 +3942,367 @@ void DBCStoresMgr::_Load_Spell()
     _spellNumRow++; // this _spellNumRow should be more then the last by 1 point
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spell                         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// Handle Additional dbc from World db
+void DBCStoresMgr::_Handle_World_Achievement()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                                0         1           2       3       4     5         6
+    QueryResult result = WorldDatabase.Query("SELECT ID, requiredFaction, mapID, points, flags, count, refAchievement FROM achievement_dbc");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 WorldDB::achievement_dbc. DB table `achievement_dbc` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        if (!GetAchievementDBC(id))
+        {
+            AchievementDBC ach;
+            ach.ID = id;
+            ach.Faction = fields[1].GetInt32();
+            ach.InstanceID = fields[2].GetInt32();
+
+            /*for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            {
+                const char* test = fields[3 + i].GetCString();
+                std::array<const char*, 16> name;
+                std::memcpy(name.data(), test, 16);
+
+                ach.Title[i] = name;
+            }*/
+
+            //ach.Category = fields[12].GetUInt32();
+            ach.Points = fields[3].GetUInt32();
+            ach.Flags = fields[4].GetUInt32();
+            ach.MinimumCriteria = fields[5].GetUInt32();
+            ach.SharesCriteria = fields[6].GetUInt32();
+
+            _achievementMap[id] = ach;
+
+            ++count;
+        }
+        else
+            TC_LOG_INFO("server.loading", ">> WorldDB::achievement_dbc          %u already exist, need to override?", id);
+
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded WorldDB::achievement_dbc          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void DBCStoresMgr::_Handle_World_Spell()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                                0
+    QueryResult result = WorldDatabase.Query("SELECT ID, "
+        "Dispel, "// 1
+        "Mechanic, "// 2
+        "Attributes, "// 3
+        "AttributesEx, "// 4
+        "AttributesEx2, "// 5
+        "AttributesEx3, "// 6
+        "AttributesEx4, "// 7
+        "AttributesEx5, "// 8
+        "AttributesEx6, "// 9
+        "AttributesEx7, "// 10
+        "Stances, "// 11
+        "StancesNot, "// 12
+        "Targets, "// 13
+        "CastingTimeIndex, "// 14
+        "AuraInterruptFlags, "// 15
+        "ProcFlags, "// 16
+        "ProcChance, "// 17
+        "ProcCharges, "// 18
+        "MaxLevel, "// 19
+        "BaseLevel, "// 20
+        "SpellLevel, "// 21
+        "DurationIndex, "// 22
+        "RangeIndex, "// 23
+        "StackAmount, "// 24
+        "EquippedItemClass, "// 25
+        "EquippedItemSubClassMask, "// 26
+        "EquippedItemInventoryTypeMask, "// 27
+        "Effect1, "// 28
+        "Effect2, "// 29
+        "Effect3, "// 30
+        "EffectDieSides1, "// 31
+        "EffectDieSides2, "// 32
+        "EffectDieSides3, "// 33
+        "EffectRealPointsPerLevel1, "// 34
+        "EffectRealPointsPerLevel2, "// 35
+        "EffectRealPointsPerLevel3, "// 36
+        "EffectBasePoints1, "// 37
+        "EffectBasePoints2, "// 38
+        "EffectBasePoints3, "// 39
+        "EffectMechanic1, "// 40
+        "EffectMechanic2, "// 41
+        "EffectMechanic3, "// 42
+        "EffectImplicitTargetA1, "// 43
+        "EffectImplicitTargetA2, "// 44
+        "EffectImplicitTargetA3, "// 45
+        "EffectImplicitTargetB1, "// 46
+        "EffectImplicitTargetB2, "// 47
+        "EffectImplicitTargetB3, "// 48
+        "EffectRadiusIndex1, "// 49
+        "EffectRadiusIndex2, "// 50
+        "EffectRadiusIndex3, "// 51
+        "EffectApplyAuraName1, "// 52
+        "EffectApplyAuraName2, "// 53
+        "EffectApplyAuraName3, "// 54
+        "EffectAmplitude1, "// 55
+        "EffectAmplitude2, "// 56
+        "EffectAmplitude3, "// 57
+        "EffectMultipleValue1, "// 58
+        "EffectMultipleValue2, "// 59
+        "EffectMultipleValue3, "// 60
+        "EffectItemType1, "// 61
+        "EffectItemType2, "// 62
+        "EffectItemType3, "// 63
+        "EffectMiscValue1, "// 64
+        "EffectMiscValue2, "// 65
+        "EffectMiscValue3, "// 66
+        "EffectMiscValueB1, "// 67
+        "EffectMiscValueB2, "// 68
+        "EffectMiscValueB3, "// 69
+        "EffectTriggerSpell1, "// 70
+        "EffectTriggerSpell2, "// 71
+        "EffectTriggerSpell3, "// 72
+        "EffectSpellClassMaskA1, "// 73
+        "EffectSpellClassMaskA2, "// 74
+        "EffectSpellClassMaskA3, "// 75
+        "EffectSpellClassMaskB1, "// 76
+        "EffectSpellClassMaskB2, "// 77
+        "EffectSpellClassMaskB3, "// 78
+        "EffectSpellClassMaskC1, "// 79
+        "EffectSpellClassMaskC2, "// 80
+        "EffectSpellClassMaskC3, "// 81
+        "SpellName, "// 82
+        "MaxTargetLevel, "// 83
+        "SpellFamilyName, "// 84
+        "SpellFamilyFlags1, "// 85
+        "SpellFamilyFlags2, "// 86
+        "SpellFamilyFlags3, "// 87
+        "MaxAffectedTargets, "// 88
+        "DmgClass, "// 89
+        "PreventionType, "// 90
+        "DmgMultiplier1, "// 91
+        "DmgMultiplier2, "// 92
+        "DmgMultiplier3, "// 93
+        "AreaGroupId, "// 94
+        "SchoolMask "// 95
+        "FROM spell_dbc");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 WorldDB::spell_dbc. DB table `spell_dbc` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        if (!GetSpellDBC(id))
+        {
+            SpellDBC s;
+            s.ID = id;
+            //s.Category = fields[1].GetUInt32();
+            s.DispelType = fields[1].GetUInt32();
+            s.Mechanic = fields[2].GetUInt32();
+            s.Attributes = fields[3].GetUInt32();
+            s.AttributesEx = fields[4].GetUInt32();
+            s.AttributesExB = fields[5].GetUInt32();
+            s.AttributesExC = fields[6].GetUInt32();
+            s.AttributesExD = fields[7].GetUInt32();
+            s.AttributesExE = fields[8].GetUInt32();
+            s.AttributesExF = fields[9].GetUInt32();
+            s.AttributesExG = fields[10].GetUInt32();
+
+            s.ShapeshiftMask[0] = fields[11].GetUInt32();
+            s.ShapeshiftExclude[0] = fields[12].GetUInt32();
+
+            s.Targets = fields[13].GetUInt32();
+            /*s.TargetCreatureType = fields[17].GetUInt32();
+            s.RequiresSpellFocus = fields[18].GetUInt32();
+            s.FacingCasterFlags = fields[19].GetUInt32();
+            s.CasterAuraState = fields[20].GetUInt32();
+            s.TargetAuraState = fields[21].GetUInt32();
+            s.ExcludeCasterAuraState = fields[22].GetUInt32();
+            s.ExcludeTargetAuraState = fields[23].GetUInt32();
+            s.CasterAuraSpell = fields[24].GetUInt32();
+            s.TargetAuraSpell = fields[25].GetUInt32();
+            s.ExcludeCasterAuraSpell = fields[26].GetUInt32();
+            s.ExcludeTargetAuraSpell = fields[27].GetUInt32();*/
+            s.CastingTimeIndex = fields[14].GetUInt32();
+            //s.RecoveryTime = fields[29].GetUInt32();
+            //s.CategoryRecoveryTime = fields[30].GetUInt32();
+            //s.InterruptFlags = fields[31].GetUInt32();
+            s.AuraInterruptFlags = fields[15].GetUInt32();
+            //s.ChannelInterruptFlags = fields[33].GetUInt32();
+            s.ProcTypeMask = fields[16].GetUInt32();
+            s.ProcChance = fields[17].GetUInt32();
+            s.ProcCharges = fields[18].GetUInt32();
+            s.MaxLevel = fields[19].GetUInt32();
+            s.BaseLevel = fields[20].GetUInt32();
+            s.SpellLevel = fields[21].GetUInt32();
+            s.DurationIndex = fields[22].GetUInt32();
+            /*s.PowerType = fields[41].GetUInt32();
+            s.ManaCost = fields[42].GetUInt32();
+            s.ManaCostPerLevel = fields[43].GetUInt32();
+            s.ManaPerSecond = fields[44].GetUInt32();
+            s.ManaPerSecondPerLevel = fields[45].GetUInt32();*/
+            s.RangeIndex = fields[23].GetUInt32();
+            //s.Speed = fields[47].GetFloat();
+            //uint32 ModalNextSpell; (UNUSED)
+            s.CumulativeAura = fields[24].GetUInt32();
+            /*for (uint8 i = 0; i < 2; i++)
+                s.Totem[i] = fields[49 + i].GetUInt32();
+            for (uint8 i = 0; i < MAX_SPELL_REAGENTS; i++)
+                s.Reagent[i] = fields[51 + i].GetInt32();
+            for (uint8 i = 0; i < MAX_SPELL_REAGENTS; i++)
+                s.ReagentCount[i] = fields[59 + i].GetInt32();*/
+
+            s.EquippedItemClass = fields[25].GetInt32();
+            s.EquippedItemSubclass = fields[26].GetInt32();
+            s.EquippedItemInvTypes = fields[27].GetInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.Effect[i] = fields[28 + i].GetUInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectDieSides[i] = fields[31 + i].GetInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectRealPointsPerLevel[i] = fields[34 + i].GetFloat();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectBasePoints[i] = fields[37 + i].GetInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectMechanic[i] = fields[40 + i].GetUInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectImplicitTargetA[i] = fields[43 + i].GetUInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectImplicitTargetB[i] = fields[46 + i].GetUInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectRadiusIndex[i] = fields[48 + i].GetUInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectAura[i] = fields[52 + i].GetUInt32();
+
+            /*for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectAuraPeriod[i] = fields[97 + i].GetUInt32();*/
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectAmplitude[i] = fields[55 + i].GetFloat();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectChainTargets[i] = fields[58 + i].GetUInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectItemType[i] = fields[61 + i].GetUInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectMiscValue[i] = fields[64 + i].GetInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectMiscValueB[i] = fields[67 + i].GetInt32();
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectTriggerSpell[i] = fields[70 + i].GetUInt32();
+
+            /*for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectPointsPerCombo[i] = fields[118 + i].GetFloat();*/
+
+            // TODO: check this
+            // variant 1 : flag = [A1, B1, C1], [A2,B2,C2]...
+            // variant 2 : flag = [A1, A2, A3], [B1,B2,B3]...
+            // var1:
+            //for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            //    s.EffectSpellClassMask[i].Set(fields[121 + i].GetUInt32(), fields[124 + i].GetUInt32(), fields[127 + i].GetUInt32());
+            // var2:
+            s.EffectSpellClassMask[0].Set(fields[73].GetUInt32(), fields[74].GetUInt32(), fields[75].GetUInt32());
+            s.EffectSpellClassMask[1].Set(fields[76].GetUInt32(), fields[77].GetUInt32(), fields[78].GetUInt32());
+            s.EffectSpellClassMask[2].Set(fields[79].GetUInt32(), fields[80].GetUInt32(), fields[81].GetUInt32());
+
+            /*for (uint8 i = 0; i < 2; i++)
+                s.SpellVisualID[i] = fields[130 + i].GetUInt32();*/
+
+            //s.SpellIconID = fields[132].GetUInt32();
+            //s.ActiveIconID = fields[133].GetUInt32();
+            //s.SpellPriority = fields[134].GetUInt32();
+
+            for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+                s.Name[i] = fields[82].GetString();
+
+            //uint32 Name_lang_mask; (UNUSED)
+            /*for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+                s.NameSubtext[i] = fields[144 + i].GetString();*/
+
+            //uint32 NameSubtext_lang_mask; (UNUSED)
+            //std::array<char const*, 16> Description; (UNUSED)
+            //uint32 Description_lang_mask; (UNUSED)
+            //std::array<char const*, 16> AuraDescription; (UNUSED)
+            //uint32 AuraDescription_lang_mask; (UNUSED)
+            /*s.ManaCostPct = fields[153].GetUInt32();
+            s.StartRecoveryCategory = fields[154].GetUInt32();
+            s.StartRecoveryTime = fields[155].GetUInt32();*/
+            s.MaxTargetLevel = fields[83].GetUInt32();
+            s.SpellClassSet = fields[84].GetUInt32();
+            s.SpellClassMask.Set(fields[85].GetUInt32(), fields[86].GetUInt32(), fields[87].GetUInt32());
+            s.MaxTargets = fields[88].GetUInt32();
+            s.DefenseType = fields[89].GetUInt32();
+            s.PreventionType = fields[90].GetUInt32();
+            //uint32 StanceBarOrder; (UNUSED)
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectChainAmplitude[i] = fields[91 + i].GetFloat();
+
+            //uint32 MinFactionID; (UNUSED)
+            //uint32 MinReputation; (UNUSED)
+            //uint32 RequiredAuraVision; (UNUSED)
+            /*for (uint8 i = 0; i < 2; i++)
+                s.RequiredTotemCategoryID[i] = fields[167].GetUInt32();*/
+
+            s.RequiredAreasID = fields[94].GetUInt32();
+            s.SchoolMask = fields[95].GetUInt32();
+            //s.RuneCostID = fields[171].GetUInt32();
+            //uint32 SpellMissileID; (UNUSED)
+            //uint32 PowerDisplayID; (UNUSED)
+            /*for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectBonusCoefficient[i] = fields[172 + i].GetFloat();*/
+
+            //uint32 DescriptionVariablesID; (UNUSED)
+            //uint32 Difficulty; (UNUSED)
+
+            _spellMap[id] = s;
+
+            if (_spellNumRow)
+            {
+                if (_spellNumRow < id)
+                    _spellNumRow = id + 1; // this _spellNumRow should be more then the last by 1 point    
+            }
+
+            ++count;
+        }
+        else
+            TC_LOG_INFO("server.loading", ">> WorldDB::spell_dbc          %u already exist, need to override?", id);
+
+    } while (result->NextRow());    
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded WorldDB::spell_dbc                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle others containers
