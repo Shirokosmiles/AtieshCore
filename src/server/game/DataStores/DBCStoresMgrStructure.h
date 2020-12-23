@@ -1584,3 +1584,12 @@ struct SpellDifficultyDBC
     uint32 ID;                                              // 0
     int32 DifficultySpellID[MAX_DIFFICULTY];                // 1-4 instance modes: 10N, 25N, 10H, 25H or Normal/Heroic if only 1-2 is set, if 3-4 is 0 then Mode-2
 };
+
+// load SpellDuration.dbc
+struct SpellDurationDBC
+{
+    uint32 ID;                                              // 0
+    int32 Duration;                                         // 1
+    int32 DurationPerLevel;                                 // 2
+    int32 MaxDuration;                                      // 3
+};

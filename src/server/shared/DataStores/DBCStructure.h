@@ -68,13 +68,7 @@ struct SkillLineCategoryEntry
 };
 */
 
-struct SpellDurationEntry
-{
-    uint32 ID;                                              // 0
-    int32 Duration;                                         // 1
-    int32 DurationPerLevel;                                 // 2
-    int32 MaxDuration;                                      // 3
-};
+
 
 struct SpellFocusObjectEntry
 {

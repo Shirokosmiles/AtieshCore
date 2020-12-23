@@ -126,6 +126,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _spellCategoryMap.clear();
     _spellItemEnchantmentMap.clear();
     _spellDiffucultyMap.clear();
+    _spellDurationMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -232,6 +233,7 @@ void DBCStoresMgr::Initialize()
     _Load_SpellCategory();
     _Load_SpellItemEnchantment();
     _Load_SpellDifficulty();
+    _Load_SpellDuration();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4112,6 +4114,41 @@ void DBCStoresMgr::_Load_SpellDifficulty()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spelldifficulty               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SpellDuration.dbc
+void DBCStoresMgr::_Load_SpellDuration()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellDurationMap.clear();
+    //                                                0      1           2                3
+    QueryResult result = WorldDatabase.Query("SELECT ID, Duration, DurationPerLevel, MaxDuration FROM dbc_spellduration");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellduration. DB table `dbc_spellduration` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellDurationDBC sd;
+        sd.ID = id;
+        sd.Duration         = fields[1].GetInt32();
+        sd.DurationPerLevel = fields[2].GetInt32();
+        sd.MaxDuration      = fields[3].GetInt32();
+
+        _spellDurationMap[id] = sd;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellduration                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db

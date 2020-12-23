@@ -3601,7 +3601,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Natural shapeshifter
     ApplySpellFix({ 16834, 16835 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(21);
     });
 
     // Ebon Plague
@@ -3915,7 +3915,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         // this happens because blizzard has 100-200ms delay before applying an aura
         // so in retail announcer makes it on the ground before dying
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(39); // 2 seconds instead of 1.7 seconds
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(39); // 2 seconds instead of 1.7 seconds
     });
 
     ApplySpellFix({
@@ -3925,7 +3925,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         // There is an invisible stalker triggering every 2 seconds a desecration debuff so setting 10 second duration is correct
         // besides the visual desecration on the ground disappears in 10 seconds of cast
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(1); // 10 seconds instead of 15 seconds
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(1); // 10 seconds instead of 15 seconds
     });
 
     ApplySpellFix({
@@ -4097,7 +4097,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Summon Frigid Bones
     ApplySpellFix({ 53525 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(4); // 2 minutes
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(4); // 2 minutes
     });
 
     // Dark Conclave Ritualist Channel
@@ -4158,7 +4158,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         64678  // Sentinel Blast (Auriaya)
     }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(28); // 5 seconds, wrong DBC data?
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(28); // 5 seconds, wrong DBC data?
     });
 
     ApplySpellFix({
@@ -4259,7 +4259,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         // increase duration from 15 to 18 seconds because caster is already
         // unsummoned when spell missile hits the ground so nothing happen in result
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(85);
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(85);
     });
     // ENDOF TRIAL OF THE CRUSADER SPELLS
 
@@ -4374,7 +4374,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Coldflame Jets (Traps after Saurfang)
     ApplySpellFix({ 70460 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(1); // 10 seconds
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(1); // 10 seconds
     });
 
     // Putrice-pre event leap spell
@@ -4401,7 +4401,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Awaken Plagued Zombies
     ApplySpellFix({ 71159 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(21);
     });
 
     // Volatile Ooze Beam Protection (Professor Putricide)
@@ -4459,13 +4459,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Column of Frost (visual marker)
     ApplySpellFix({ 70715 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(32); // 6 seconds (missing)
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(32); // 6 seconds (missing)
     });
 
     // Mana Void (periodic aura)
     ApplySpellFix({ 71085 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(9); // 30 seconds (missing)
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(9); // 30 seconds (missing)
     });
 
     // Frostbolt Volley (only heroic)
@@ -4518,13 +4518,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Defile
     ApplySpellFix({ 72762 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(559); // 53 seconds
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(559); // 53 seconds
     });
 
     // Defile
     ApplySpellFix({ 72743 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(22); // 45 seconds
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(22); // 45 seconds
     });
 
     // Defile
@@ -4563,13 +4563,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Summon Shadow Trap
     ApplySpellFix({ 73540 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(3); // 60 seconds
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(3); // 60 seconds
     });
 
     // Shadow Trap (visual)
     ApplySpellFix({ 73530 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(27); // 3 seconds
+        spellInfo->DurationEntry = sDBCStoresMgr->GetSpellDurationDBC(27); // 3 seconds
     });
 
     // Shadow Trap

@@ -809,7 +809,7 @@ SpellInfo::SpellInfo(SpellDBC const* spellEntry)
     MaxLevel = spellEntry->MaxLevel;
     BaseLevel = spellEntry->BaseLevel;
     SpellLevel = spellEntry->SpellLevel;
-    DurationEntry = spellEntry->DurationIndex ? sSpellDurationStore.LookupEntry(spellEntry->DurationIndex) : nullptr;
+    DurationEntry = spellEntry->DurationIndex ? sDBCStoresMgr->GetSpellDurationDBC(spellEntry->DurationIndex) : nullptr;
     PowerType = static_cast<Powers>(spellEntry->PowerType);
     ManaCost = spellEntry->ManaCost;
     ManaCostPerlevel = spellEntry->ManaCostPerLevel;

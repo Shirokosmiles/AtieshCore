@@ -34,7 +34,7 @@ class SpellMgr;
 class SpellInfo;
 struct SpellChainNode;
 struct SpellTargetPosition;
-struct SpellDurationEntry;
+struct SpellDurationDBC;
 struct SpellModifier;
 struct SpellRangeEntry;
 struct SpellRadiusEntry;
@@ -367,7 +367,7 @@ class TC_GAME_API SpellInfo
         uint32 MaxLevel;
         uint32 BaseLevel;
         uint32 SpellLevel;
-        SpellDurationEntry const* DurationEntry;
+        SpellDurationDBC const* DurationEntry;
         Powers PowerType;
         uint32 ManaCost;
         uint32 ManaCostPerlevel;
