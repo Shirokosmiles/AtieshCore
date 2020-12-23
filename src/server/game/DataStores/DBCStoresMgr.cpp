@@ -127,6 +127,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _spellItemEnchantmentMap.clear();
     _spellDiffucultyMap.clear();
     _spellDurationMap.clear();
+    _spellFocusObjectMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -234,6 +235,7 @@ void DBCStoresMgr::Initialize()
     _Load_SpellItemEnchantment();
     _Load_SpellDifficulty();
     _Load_SpellDuration();
+    _Load_SpellFocusObject();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4149,6 +4151,38 @@ void DBCStoresMgr::_Load_SpellDuration()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spellduration                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SpellFocusObject.dbc
+void DBCStoresMgr::_Load_SpellFocusObject()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellFocusObjectMap.clear();
+    //                                                0
+    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_spellfocusobject");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellfocusobject. DB table `dbc_spellfocusobject` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellFocusObjectDBC sfo;
+        sfo.ID = id;
+
+        _spellFocusObjectMap[id] = sfo;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellfocusobject              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db

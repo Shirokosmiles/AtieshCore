@@ -7518,7 +7518,7 @@ void ObjectMgr::LoadGameObjectTemplate()
             {
                 if (got.spellFocus.focusId)
                 {
-                    if (!sSpellFocusObjectStore.LookupEntry(got.spellFocus.focusId))
+                    if (!sDBCStoresMgr->GetSpellFocusObjectDBC(got.spellFocus.focusId))
                         TC_LOG_ERROR("sql.sql", "GameObject (Entry: %u GoType: %u) have data0=%u but SpellFocus (Id: %u) not exist.",
                         entry, got.type, got.spellFocus.focusId, got.spellFocus.focusId);
                 }

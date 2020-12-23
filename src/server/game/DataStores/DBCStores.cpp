@@ -171,7 +171,7 @@ PetFamilySpellsStore sPetFamilySpellsStore;
 //DBCStorage <SpellCategoryEntry> sSpellCategoryStore(SpellCategoryfmt);
 //DBCStorage <SpellDifficultyEntry> sSpellDifficultyStore(SpellDifficultyfmt);
 //DBCStorage <SpellDurationEntry> sSpellDurationStore(SpellDurationfmt);
-DBCStorage <SpellFocusObjectEntry> sSpellFocusObjectStore(SpellFocusObjectfmt);
+//DBCStorage <SpellFocusObjectEntry> sSpellFocusObjectStore(SpellFocusObjectfmt);
 DBCStorage <SpellRadiusEntry> sSpellRadiusStore(SpellRadiusfmt);
 DBCStorage <SpellRangeEntry> sSpellRangeStore(SpellRangefmt);
 DBCStorage <SpellRuneCostEntry> sSpellRuneCostStore(SpellRuneCostfmt);
@@ -370,7 +370,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sSpellCastTimesStore,                "SpellCastTimes.dbc");
     //LOAD_DBC(sSpellCategoryStore,                 "SpellCategory.dbc");
     //LOAD_DBC(sSpellDurationStore,                 "SpellDuration.dbc");
-    LOAD_DBC(sSpellFocusObjectStore,              "SpellFocusObject.dbc");
+    //LOAD_DBC(sSpellFocusObjectStore,              "SpellFocusObject.dbc");
     //LOAD_DBC(sSpellItemEnchantmentStore,          "SpellItemEnchantment.dbc");
     LOAD_DBC(sSpellItemEnchantmentConditionStore, "SpellItemEnchantmentCondition.dbc");
     LOAD_DBC(sSpellRadiusStore,                   "SpellRadius.dbc");
