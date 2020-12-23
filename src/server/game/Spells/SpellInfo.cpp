@@ -769,7 +769,7 @@ std::array<SpellEffectInfo::StaticData, TOTAL_SPELL_EFFECTS> SpellEffectInfo::_d
 SpellInfo::SpellInfo(SpellDBC const* spellEntry)
 {
     Id = spellEntry->ID;
-    CategoryEntry = spellEntry->Category ? sSpellCategoryStore.LookupEntry(spellEntry->Category) : nullptr;
+    CategoryEntry = spellEntry->Category ? sDBCStoresMgr->GetSpellCategoryDBC(spellEntry->Category) : nullptr;
     Dispel = spellEntry->DispelType;
     Mechanic = spellEntry->Mechanic;
     Attributes = spellEntry->Attributes;

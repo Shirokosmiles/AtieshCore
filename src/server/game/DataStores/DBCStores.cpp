@@ -162,13 +162,13 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
 //DBCStorage <SoundEntriesEntry> sSoundEntriesStore(SoundEntriesfmt);
 
-DBCStorage <SpellItemEnchantmentEntry> sSpellItemEnchantmentStore(SpellItemEnchantmentfmt);
+//DBCStorage <SpellItemEnchantmentEntry> sSpellItemEnchantmentStore(SpellItemEnchantmentfmt);
 DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore(SpellItemEnchantmentConditionfmt);
 //DBCStorage <SpellEntry> sSpellStore(SpellEntryfmt);
 PetFamilySpellsStore sPetFamilySpellsStore;
 
 //DBCStorage <SpellCastTimesEntry> sSpellCastTimesStore(SpellCastTimefmt);
-DBCStorage <SpellCategoryEntry> sSpellCategoryStore(SpellCategoryfmt);
+//DBCStorage <SpellCategoryEntry> sSpellCategoryStore(SpellCategoryfmt);
 DBCStorage <SpellDifficultyEntry> sSpellDifficultyStore(SpellDifficultyfmt);
 DBCStorage <SpellDurationEntry> sSpellDurationStore(SpellDurationfmt);
 DBCStorage <SpellFocusObjectEntry> sSpellFocusObjectStore(SpellFocusObjectfmt);
@@ -368,10 +368,10 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sSkillTiersStore,                    "SkillTiers.dbc");
     //LOAD_DBC(sSoundEntriesStore,                  "SoundEntries.dbc");
     //LOAD_DBC(sSpellCastTimesStore,                "SpellCastTimes.dbc");
-    LOAD_DBC(sSpellCategoryStore,                 "SpellCategory.dbc");
+    //LOAD_DBC(sSpellCategoryStore,                 "SpellCategory.dbc");
     LOAD_DBC(sSpellDurationStore,                 "SpellDuration.dbc");
     LOAD_DBC(sSpellFocusObjectStore,              "SpellFocusObject.dbc");
-    LOAD_DBC(sSpellItemEnchantmentStore,          "SpellItemEnchantment.dbc");
+    //LOAD_DBC(sSpellItemEnchantmentStore,          "SpellItemEnchantment.dbc");
     LOAD_DBC(sSpellItemEnchantmentConditionStore, "SpellItemEnchantmentCondition.dbc");
     LOAD_DBC(sSpellRadiusStore,                   "SpellRadius.dbc");
     LOAD_DBC(sSpellRangeStore,                    "SpellRange.dbc");

@@ -28,6 +28,7 @@ DBCStoresMgr::DBCStoresMgr()
 {
     _itemRandomSuffixNumRow = 0;
     _spellNumRow = 0;
+    _spellItemEnchantmentNumRow = 0;
 }
 
 DBCStoresMgr::~DBCStoresMgr()
@@ -121,6 +122,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _soundEntriesMap.clear();
     _spellMap.clear();
     _spellCastTimesMap.clear();
+    _spellCategoryMap.clear();
+    _spellItemEnchantmentMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -130,6 +133,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _petFamilySpellsStore.clear();
     _itemRandomSuffixNumRow = 0;
     _spellNumRow = 0;
+    _spellItemEnchantmentNumRow = 0;
 }
 
 void DBCStoresMgr::Initialize()
@@ -223,6 +227,8 @@ void DBCStoresMgr::Initialize()
     _Load_SoundEntries();
     _Load_Spell();
     _Load_SpellCastTimes();
+    _Load_SpellCategory();
+    _Load_SpellItemEnchantment();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc
     Initialize_WorldDBC_Corrections();
@@ -3946,6 +3952,129 @@ void DBCStoresMgr::_Load_Spell()
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spell                         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+// load SpellCastTimes.dbc
+void DBCStoresMgr::_Load_SpellCastTimes()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellCastTimesMap.clear();
+    //                                                0    1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Base FROM dbc_spellcasttimes");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellcasttimes. DB table `dbc_spellcasttimes` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellCastTimesDBC sct;
+        sct.ID = id;
+        sct.Base = fields[1].GetInt32();
+
+        _spellCastTimesMap[id] = sct;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellcasttimes                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SpellCategory.dbc
+void DBCStoresMgr::_Load_SpellCategory()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellCategoryMap.clear();
+    //                                                0    1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Flags FROM dbc_spellcategory");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellcategory. DB table `dbc_spellcategory` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellCategoryDBC sc;
+        sc.ID = id;
+        sc.Flags = fields[1].GetUInt32();
+
+        _spellCategoryMap[id] = sc;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellcategory                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SpellItemEnchantment.dbc
+void DBCStoresMgr::_Load_SpellItemEnchantment()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellItemEnchantmentMap.clear();
+    //                                                0    1           2        3           4                   5                   6               7           8              9            10              11              12              13              14              15              16              17              18             19       20        21            22          23                  24            25
+    QueryResult result = WorldDatabase.Query("SELECT ID, Effect_1, Effect_2, Effect_3, EffectPointsMin_1, EffectPointsMin_2, EffectPointsMin_3, EffectArg_1, EffectArg_2, EffectArg_3, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, ItemVisual, Flags, Src_ItemID, Condition_Id, RequiredSkillID, RequiredSkillRank, MinLevel FROM dbc_spellitemenchantment");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellitemenchantment. DB table `dbc_spellitemenchantment` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellItemEnchantmentDBC sie;
+        sie.ID = id;
+        for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; i++)
+            sie.Effect[i] = fields[1 + i].GetUInt32();
+        for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; i++)
+            sie.EffectPointsMin[i] = fields[4 + i].GetUInt32();
+        for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; i++)
+            sie.EffectArg[i] = fields[7 + i].GetUInt32();
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            sie.Name[i] = fields[10 + i].GetString();
+
+        sie.ItemVisual        = fields[19].GetUInt32();
+        sie.Flags             = fields[20].GetUInt32();
+        sie.SrcItemID         = fields[21].GetUInt32();
+        sie.ConditionID       = fields[22].GetUInt32();
+        sie.RequiredSkillID   = fields[23].GetUInt32();
+        sie.RequiredSkillRank = fields[24].GetUInt32();
+        sie.MinLevel          = fields[25].GetUInt32();
+
+        _spellItemEnchantmentMap[id] = sie;
+
+        if (_spellItemEnchantmentNumRow)
+        {
+            if (_spellItemEnchantmentNumRow < id)
+                _spellItemEnchantmentNumRow = id;
+        }
+        else
+            _spellItemEnchantmentNumRow = id;
+
+        ++count;
+    } while (result->NextRow());
+
+    _spellItemEnchantmentNumRow++; // this _spellItemEnchantmentNumRow should be more then the last by 1 point
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellitemenchantment          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 // Handle Additional dbc from World db
 void DBCStoresMgr::_Handle_World_Achievement()
 {
@@ -4305,39 +4434,6 @@ void DBCStoresMgr::_Handle_World_Spell()
     } while (result->NextRow());    
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded WorldDB::spell_dbc                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-}
-
-// load Movie.dbc
-void DBCStoresMgr::_Load_SpellCastTimes()
-{
-    uint32 oldMSTime = getMSTime();
-
-    _spellCastTimesMap.clear();
-    //                                                0    1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Base FROM dbc_spellcasttimes");
-    if (!result)
-    {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellcasttimes. DB table `dbc_spellcasttimes` is empty.");
-        return;
-    }
-
-    uint32 count = 0;
-    do
-    {
-        Field* fields = result->Fetch();
-
-        uint32 id = fields[0].GetUInt32();
-        SpellCastTimesDBC sct;
-        sct.ID = id;
-        sct.Base = fields[1].GetInt32();
-
-        _spellCastTimesMap[id] = sct;
-
-        ++count;
-    } while (result->NextRow());
-
-    //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellcasttimes                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle others containers

@@ -113,6 +113,8 @@ typedef std::unordered_map<uint32 /*ID*/, SkillTiersDBC> SkillTiersDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SoundEntriesDBC> SoundEntriesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SpellDBC> SpellDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SpellCastTimesDBC> SpellCastTimesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, SpellCategoryDBC> SpellCategoryDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, SpellItemEnchantmentDBC> SpellItemEnchantmentDBCMap;
 
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 typedef std::set<uint32> PetFamilySpellsSet;
@@ -969,6 +971,23 @@ public:
         return nullptr;
     }
 
+    SpellCategoryDBC const* GetSpellCategoryDBC(uint32 ID)
+    {
+        SpellCategoryDBCMap::const_iterator itr = _spellCategoryMap.find(ID);
+        if (itr != _spellCategoryMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    uint32 GetNumRowSpellItemEnchantmentDBCMap() const { return _spellItemEnchantmentNumRow; }
+    SpellItemEnchantmentDBC const* GetSpellItemEnchantmentDBC(uint32 ID)
+    {
+        SpellItemEnchantmentDBCMap::const_iterator itr = _spellItemEnchantmentMap.find(ID);
+        if (itr != _spellItemEnchantmentMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1079,6 +1098,8 @@ protected:
     void _Load_SoundEntries();
     void _Load_Spell();
     void _Load_SpellCastTimes();
+    void _Load_SpellCategory();
+    void _Load_SpellItemEnchantment();
 
     // Handle Additional dbc from world db
     void Initialize_WorldDBC_Corrections();
@@ -1180,6 +1201,8 @@ private:
     SoundEntriesDBCMap _soundEntriesMap;
     SpellDBCMap _spellMap;
     SpellCastTimesDBCMap _spellCastTimesMap;
+    SpellCategoryDBCMap _spellCategoryMap;
+    SpellItemEnchantmentDBCMap _spellItemEnchantmentMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
@@ -1187,6 +1210,7 @@ private:
     PetFamilySpellsStore _petFamilySpellsStore;
     uint32 _itemRandomSuffixNumRow;
     uint32 _spellNumRow;
+    uint32 _spellItemEnchantmentNumRow;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

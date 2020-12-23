@@ -1109,7 +1109,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
                 }
                 else if (OldEnchants[j])
                 {
-                    if (SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(OldEnchants[j]))
+                    if (SpellItemEnchantmentDBC const* enchantEntry = sDBCStoresMgr->GetSpellItemEnchantmentDBC(OldEnchants[j]))
                     {
                         if (iGemProto->ItemId == enchantEntry->SrcItemID)
                         {
@@ -1139,7 +1139,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
                     else if (OldEnchants[j])
                     {
                         // existing gem
-                        if (SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(OldEnchants[j]))
+                        if (SpellItemEnchantmentDBC const* enchantEntry = sDBCStoresMgr->GetSpellItemEnchantmentDBC(OldEnchants[j]))
                             if (ItemTemplate const* jProto = sObjectMgr->GetItemTemplate(enchantEntry->SrcItemID))
                                 if (iGemProto->ItemLimitCategory == jProto->ItemLimitCategory)
                                     ++limit_newcount;

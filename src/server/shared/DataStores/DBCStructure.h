@@ -56,7 +56,7 @@ struct ItemCondExtCostsEntry
 };
 */
 
-#define MAX_ITEM_ENCHANTMENT_EFFECTS 3
+//#define MAX_ITEM_ENCHANTMENT_EFFECTS 3
 
 /*
 struct SkillLineCategoryEntry
@@ -67,15 +67,6 @@ struct SkillLineCategoryEntry
     uint32 SortIndex;                                       // 19
 };
 */
-
-
-
-
-struct SpellCategoryEntry
-{
-    uint32 ID;                                              // 0
-    uint32 Flags;                                           // 1
-};
 
 struct SpellDifficultyEntry
 {
@@ -96,25 +87,6 @@ struct SpellFocusObjectEntry
     uint32 ID;                                              // 0
     //char const* Name[16];                                 // 1-15
     //uint32 Name_lang_mask;                                // 16
-};
-
-struct SpellItemEnchantmentEntry
-{
-    uint32 ID;                                              // 0
-    //uint32 Charges;                                       // 1
-    uint32 Effect[MAX_ITEM_ENCHANTMENT_EFFECTS];            // 2-4
-    uint32 EffectPointsMin[MAX_ITEM_ENCHANTMENT_EFFECTS];   // 5-7
-    //uint32 EffectPointsMax[MAX_ITEM_ENCHANTMENT_EFFECTS]  // 8-10
-    uint32 EffectArg[MAX_ITEM_ENCHANTMENT_EFFECTS];         // 11-13
-    char const* Name[16];                                   // 14-29
-    //uint32 Name_lang_mask;                                // 30
-    uint32 ItemVisual;                                      // 31
-    uint32 Flags;                                           // 32
-    uint32 SrcItemID;                                       // 33
-    uint32 ConditionID;                                     // 34
-    uint32 RequiredSkillID;                                 // 35
-    uint32 RequiredSkillRank;                               // 36
-    uint32 MinLevel;                                        // 37
 };
 
 struct SpellItemEnchantmentConditionEntry

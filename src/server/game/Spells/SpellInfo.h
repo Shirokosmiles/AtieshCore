@@ -40,6 +40,7 @@ struct SpellRangeEntry;
 struct SpellRadiusEntry;
 struct SpellDBC;
 struct SpellCastTimesDBC;
+struct SpellCategoryDBC;
 struct Condition;
 
 enum SpellCastTargetFlags : uint32
@@ -326,7 +327,7 @@ class TC_GAME_API SpellInfo
 
     public:
         uint32 Id;
-        SpellCategoryEntry const* CategoryEntry;
+        SpellCategoryDBC const* CategoryEntry;
         uint32 Dispel;
         uint32 Mechanic;
         uint32 Attributes;
