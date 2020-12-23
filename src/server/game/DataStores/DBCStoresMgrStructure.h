@@ -1601,3 +1601,15 @@ struct SpellFocusObjectDBC
     //char const* Name[16];                                 // 1-15
     //uint32 Name_lang_mask;                                // 16
 };
+
+// load SpellItemEnchantmentCondition.dbc
+struct SpellItemEnchantmentConditionDBC
+{
+    uint32 ID;                                              // 0
+    uint8 LtOperandType[5];                                 // 1-5
+    //uint32 LtOperand[5];                                  // 6-10
+    uint8 Operator[5];                                      // 11-15
+    uint8 RtOperandType[5];                                 // 15-20
+    uint32 RtOperand[5];                                    // 21-25
+    //uint8 Logic[5];                                       // 25-30
+};

@@ -22080,7 +22080,7 @@ bool Player::EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot)
     if (!enchantmentcondition)
         return true;
 
-    SpellItemEnchantmentConditionEntry const* Condition = sSpellItemEnchantmentConditionStore.LookupEntry(enchantmentcondition);
+    SpellItemEnchantmentConditionDBC const* Condition = sDBCStoresMgr->GetSpellItemEnchantmentConditionDBC(enchantmentcondition);
 
     if (!Condition)
         return true;

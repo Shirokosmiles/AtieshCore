@@ -161,7 +161,7 @@ TC_GAME_API uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
 //TC_GAME_API extern DBCStorage <SpellDurationEntry>           sSpellDurationStore;
 //TC_GAME_API extern DBCStorage <SpellFocusObjectEntry>        sSpellFocusObjectStore;
 //TC_GAME_API extern DBCStorage <SpellItemEnchantmentEntry>    sSpellItemEnchantmentStore;
-TC_GAME_API extern DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore;
+//TC_GAME_API extern DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore;
 //TC_GAME_API extern PetFamilySpellsStore                      sPetFamilySpellsStore;
 TC_GAME_API extern std::unordered_set<uint32>                sPetTalentSpells;
 TC_GAME_API extern DBCStorage <SpellRadiusEntry>             sSpellRadiusStore;

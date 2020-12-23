@@ -163,7 +163,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <SoundEntriesEntry> sSoundEntriesStore(SoundEntriesfmt);
 
 //DBCStorage <SpellItemEnchantmentEntry> sSpellItemEnchantmentStore(SpellItemEnchantmentfmt);
-DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore(SpellItemEnchantmentConditionfmt);
+//DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore(SpellItemEnchantmentConditionfmt);
 //DBCStorage <SpellEntry> sSpellStore(SpellEntryfmt);
 PetFamilySpellsStore sPetFamilySpellsStore;
 
@@ -372,7 +372,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sSpellDurationStore,                 "SpellDuration.dbc");
     //LOAD_DBC(sSpellFocusObjectStore,              "SpellFocusObject.dbc");
     //LOAD_DBC(sSpellItemEnchantmentStore,          "SpellItemEnchantment.dbc");
-    LOAD_DBC(sSpellItemEnchantmentConditionStore, "SpellItemEnchantmentCondition.dbc");
+    //LOAD_DBC(sSpellItemEnchantmentConditionStore, "SpellItemEnchantmentCondition.dbc");
     LOAD_DBC(sSpellRadiusStore,                   "SpellRadius.dbc");
     LOAD_DBC(sSpellRangeStore,                    "SpellRange.dbc");
     LOAD_DBC(sSpellRuneCostStore,                 "SpellRuneCost.dbc");

@@ -128,6 +128,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _spellDiffucultyMap.clear();
     _spellDurationMap.clear();
     _spellFocusObjectMap.clear();
+    _spellItemEnchantmentConditionMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -236,6 +237,7 @@ void DBCStoresMgr::Initialize()
     _Load_SpellDifficulty();
     _Load_SpellDuration();
     _Load_SpellFocusObject();
+    _Load_SpellItemEnchantmentCondition();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4183,6 +4185,53 @@ void DBCStoresMgr::_Load_SpellFocusObject()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spellfocusobject              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SpellItemEnchantmentCondition.dbc
+void DBCStoresMgr::_Load_SpellItemEnchantmentCondition()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellItemEnchantmentConditionMap.clear();
+    //                                                0         1                   2                 3                 4               5
+    QueryResult result = WorldDatabase.Query("SELECT ID, Lt_OperandType_1, Lt_OperandType_2, Lt_OperandType_3, Lt_OperandType_4, Lt_OperandType_5, "
+    //      6           7           8           9           10
+        "Operator_1, Operator_2, Operator_3, Operator_4, Operator_5, "
+    //      11                  12                  13                  14              15
+        "Rt_OperandType_1, Rt_OperandType_2, Rt_OperandType_3, Rt_OperandType_4, Rt_OperandType_5, "
+    //          16          17            18            19          20
+        "Rt_Operand_1, Rt_Operand_2, Rt_Operand_3, Rt_Operand_4, Rt_Operand_5 "
+        "FROM dbc_spellitemenchantmentcondition");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellitemenchantmentcondition. DB table `dbc_spellitemenchantmentcondition` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellItemEnchantmentConditionDBC siec;
+        siec.ID = id;
+        for (uint8 i = 0; i < 5; i++)
+            siec.LtOperandType[i] = fields[1 + i].GetUInt8();
+        for (uint8 i = 0; i < 5; i++)
+            siec.Operator[i] = fields[5 + i].GetUInt8();
+        for (uint8 i = 0; i < 5; i++)
+            siec.RtOperandType[i] = fields[11 + i].GetUInt8();
+        for (uint8 i = 0; i < 5; i++)
+            siec.RtOperand[i] = fields[16 + i].GetUInt32();
+
+        _spellItemEnchantmentConditionMap[id] = siec;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellitemenchantmentcondition %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db
