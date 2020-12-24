@@ -133,6 +133,8 @@ DBCStoresMgr::~DBCStoresMgr()
     _spellRangeMap.clear();
     _spellRuneCostMap.clear();
     _spellShapeShiftFormMap.clear();
+    _spellVisualMap.clear();
+    _stableSlotPricesMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -246,6 +248,8 @@ void DBCStoresMgr::Initialize()
     _Load_SpellRange();
     _Load_SpellRuneCost();
     _Load_SpellShapeshiftForm();
+    _Load_SpellVisual();
+    _Load_StableSlotPrices();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4391,6 +4395,73 @@ void DBCStoresMgr::_Load_SpellShapeshiftForm()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spellshapeshiftform           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SpellVisual.dbc
+void DBCStoresMgr::_Load_SpellVisual()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellVisualMap.clear();
+    //                                                0       1           2
+    QueryResult result = WorldDatabase.Query("SELECT ID, HasMissile, MissileModel FROM dbc_spellvisual");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellvisual. DB table `dbc_spellvisual` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellVisualDBC sv;
+        sv.ID = id;
+        sv.HasMissile   = fields[1].GetUInt32();
+        sv.MissileModel = fields[2].GetInt32();
+
+        _spellVisualMap[id] = sv;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellvisual                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load StableSlotPrices.dbc
+void DBCStoresMgr::_Load_StableSlotPrices()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _stableSlotPricesMap.clear();
+    //                                                0    1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Cost FROM dbc_stableslotprices");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_stableslotprices. DB table `dbc_stableslotprices` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        StableSlotPricesDBC ssp;
+        ssp.ID = id;
+        ssp.Cost = fields[1].GetUInt32();
+
+        _stableSlotPricesMap[id] = ssp;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_stableslotprices              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db
