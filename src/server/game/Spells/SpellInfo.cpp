@@ -1480,10 +1480,10 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         return SPELL_CAST_OK;
 
     bool actAsShifted = false;
-    SpellShapeshiftFormEntry const* shapeInfo = nullptr;
+    SpellShapeshiftFormDBC const* shapeInfo = nullptr;
     if (form > 0)
     {
-        shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
+        shapeInfo = sDBCStoresMgr->GetSpellShapeshiftFormDBC(form);
         if (!shapeInfo)
         {
             TC_LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
@@ -1845,7 +1845,7 @@ SpellCastResult SpellInfo::CheckVehicle(Unit const* caster) const
         {
             if (Effects[effIndex].ApplyAuraName == SPELL_AURA_MOD_SHAPESHIFT)
             {
-                SpellShapeshiftFormEntry const* shapeShiftEntry = sSpellShapeshiftFormStore.LookupEntry(Effects[effIndex].MiscValue);
+                SpellShapeshiftFormDBC const* shapeShiftEntry = sDBCStoresMgr->GetSpellShapeshiftFormDBC(Effects[effIndex].MiscValue);
                 if (shapeShiftEntry && (shapeShiftEntry->Flags & 1) == 0)  // unk flag
                     checkMask |= VEHICLE_SEAT_FLAG_UNCONTROLLED;
                 break;
@@ -3233,7 +3233,7 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
     if (HasAttribute(SPELL_ATTR4_SPELL_VS_EXTEND_COST))
     {
         uint32 speed = 0;
-        if (SpellShapeshiftFormEntry const* ss = sSpellShapeshiftFormStore.LookupEntry(unitCaster->GetShapeshiftForm()))
+        if (SpellShapeshiftFormDBC const* ss = sDBCStoresMgr->GetSpellShapeshiftFormDBC(unitCaster->GetShapeshiftForm()))
             speed = ss->CombatRoundTime;
         else
             speed = unitCaster->GetAttackTime(GetAttackType());

@@ -9100,7 +9100,7 @@ uint32 Unit::GetCreatureType() const
     if (GetTypeId() == TYPEID_PLAYER)
     {
         ShapeshiftForm form = GetShapeshiftForm();
-        SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form);
+        SpellShapeshiftFormDBC const* ssEntry = sDBCStoresMgr->GetSpellShapeshiftFormDBC(form);
         if (ssEntry && ssEntry->CreatureType > 0)
             return ssEntry->CreatureType;
         else
@@ -9139,7 +9139,7 @@ bool Unit::IsInDisallowedMountForm() const
 
     if (ShapeshiftForm form = GetShapeshiftForm())
     {
-        SpellShapeshiftFormEntry const* shapeshift = sSpellShapeshiftFormStore.LookupEntry(form);
+        SpellShapeshiftFormDBC const* shapeshift = sDBCStoresMgr->GetSpellShapeshiftFormDBC(form);
         if (!shapeshift)
             return true;
 
@@ -12795,7 +12795,7 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
     }
 
     uint32 modelid = 0;
-    SpellShapeshiftFormEntry const* formEntry = sSpellShapeshiftFormStore.LookupEntry(form);
+    SpellShapeshiftFormDBC const* formEntry = sDBCStoresMgr->GetSpellShapeshiftFormDBC(form);
     if (formEntry && formEntry->CreatureDisplayID[0])
     {
         // Take the alliance modelid as default

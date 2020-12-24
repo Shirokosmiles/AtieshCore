@@ -21623,7 +21623,7 @@ void Player::InitDataForForm(bool reapplyMods)
 {
     ShapeshiftForm form = GetShapeshiftForm();
 
-    SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form);
+    SpellShapeshiftFormDBC const* ssEntry = sDBCStoresMgr->GetSpellShapeshiftFormDBC(form);
     if (ssEntry && ssEntry->CombatRoundTime)
     {
         SetAttackTime(BASE_ATTACK, ssEntry->CombatRoundTime);

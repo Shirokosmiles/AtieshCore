@@ -132,6 +132,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _spellRadiusMap.clear();
     _spellRangeMap.clear();
     _spellRuneCostMap.clear();
+    _spellShapeShiftFormMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -244,6 +245,7 @@ void DBCStoresMgr::Initialize()
     _Load_SpellRadius();
     _Load_SpellRange();
     _Load_SpellRuneCost();
+    _Load_SpellShapeshiftForm();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4345,6 +4347,50 @@ void DBCStoresMgr::_Load_SpellRuneCost()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spellrunecost                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SpellShapeshiftForm.dbc
+void DBCStoresMgr::_Load_SpellShapeshiftForm()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellShapeShiftFormMap.clear();
+    //                                                0    1         2             3
+    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, CreatureType, CombatRoundTime, "
+    //          4                   5                       6                   7
+        "CreatureDisplayID_1, CreatureDisplayID_2, CreatureDisplayID_3, CreatureDisplayID_4, "
+    //          8               9              10                  11              12              13              14              15
+        "PresetSpellID_1, PresetSpellID_2, PresetSpellID_3, PresetSpellID_4, PresetSpellID_5, PresetSpellID_6, PresetSpellID_7, PresetSpellID_8 "
+        "FROM dbc_spellshapeshiftform");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellshapeshiftform. DB table `dbc_spellshapeshiftform` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellShapeshiftFormDBC ssf;
+        ssf.ID = id;
+        ssf.Flags = fields[1].GetUInt32();
+        ssf.CreatureType = fields[2].GetInt32();
+        ssf.CombatRoundTime = fields[3].GetUInt32();
+        for (uint8 i = 0; i < 4; i++)
+            ssf.CreatureDisplayID[i] = fields[4 + i].GetUInt32();
+        for (uint8 i = 0; i < MAX_SHAPESHIFT_SPELLS; i++)
+            ssf.PresetSpellID[i] = fields[8 + i].GetUInt32();
+
+        _spellShapeShiftFormMap[id] = ssf;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellshapeshiftform           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db
