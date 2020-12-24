@@ -178,7 +178,7 @@ PetFamilySpellsStore sPetFamilySpellsStore;
 //DBCStorage <SpellShapeshiftFormEntry> sSpellShapeshiftFormStore(SpellShapeshiftFormfmt);
 //DBCStorage <SpellVisualEntry> sSpellVisualStore(SpellVisualfmt);
 //DBCStorage <StableSlotPricesEntry> sStableSlotPricesStore(StableSlotPricesfmt);
-DBCStorage <SummonPropertiesEntry> sSummonPropertiesStore(SummonPropertiesfmt);
+//DBCStorage <SummonPropertiesEntry> sSummonPropertiesStore(SummonPropertiesfmt);
 DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
 TalentSpellPosMap sTalentSpellPosMap;
 std::unordered_set<uint32> sPetTalentSpells;
@@ -379,7 +379,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sSpellShapeshiftFormStore,           "SpellShapeshiftForm.dbc");
     //LOAD_DBC(sSpellVisualStore,                   "SpellVisual.dbc");
     //LOAD_DBC(sStableSlotPricesStore,              "StableSlotPrices.dbc");
-    LOAD_DBC(sSummonPropertiesStore,              "SummonProperties.dbc");
+    //LOAD_DBC(sSummonPropertiesStore,              "SummonProperties.dbc");
     LOAD_DBC(sTalentStore,                        "Talent.dbc");
     LOAD_DBC(sTalentTabStore,                     "TalentTab.dbc");
     LOAD_DBC(sTaxiNodesStore,                     "TaxiNodes.dbc");

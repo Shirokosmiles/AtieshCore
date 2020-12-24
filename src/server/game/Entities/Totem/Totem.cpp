@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DBCStoresMgrStructure.h"
 #include "Totem.h"
 #include "Group.h"
 #include "Log.h"
@@ -25,7 +26,7 @@
 #include "SpellInfo.h"
 #include "TotemPackets.h"
 
-Totem::Totem(SummonPropertiesEntry const* properties, Unit* owner) : Minion(properties, owner, false)
+Totem::Totem(SummonPropertiesDBC const* properties, Unit* owner) : Minion(properties, owner, false)
 {
     m_unitTypeMask |= UNIT_MASK_TOTEM;
     m_duration = 0;

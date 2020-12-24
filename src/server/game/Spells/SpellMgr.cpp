@@ -5106,11 +5106,11 @@ void SpellMgr::LoadSpellInfoCorrections()
             spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
     }
 
-    if (SummonPropertiesEntry* properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(121)))
+    if (SummonPropertiesDBC* properties = const_cast<SummonPropertiesDBC*>(sDBCStoresMgr->GetSummonPropertiesDBC(121)))
         properties->Title = SUMMON_TYPE_TOTEM;
-    if (SummonPropertiesEntry* properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(647))) // 52893
+    if (SummonPropertiesDBC* properties = const_cast<SummonPropertiesDBC*>(sDBCStoresMgr->GetSummonPropertiesDBC(647))) // 52893
         properties->Title = SUMMON_TYPE_TOTEM;
-    if (SummonPropertiesEntry* properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(628))) // Hungry Plaguehound
+    if (SummonPropertiesDBC* properties = const_cast<SummonPropertiesDBC*>(sDBCStoresMgr->GetSummonPropertiesDBC(628))) // Hungry Plaguehound
         properties->Control = SUMMON_CATEGORY_PET;
 
     if (LockDBC* entry = const_cast<LockDBC*>(sDBCStoresMgr->GetLockDBC(36))) // 3366 Opening, allows to open without proper key

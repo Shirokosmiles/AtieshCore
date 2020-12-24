@@ -171,7 +171,7 @@ TC_GAME_API extern std::unordered_set<uint32>                sPetTalentSpells;
 //TC_GAME_API extern DBCStorage <SpellEntry>                   sSpellStore;
 //TC_GAME_API extern DBCStorage <SpellVisualEntry>             sSpellVisualStore;
 //TC_GAME_API extern DBCStorage <StableSlotPricesEntry>        sStableSlotPricesStore;
-TC_GAME_API extern DBCStorage <SummonPropertiesEntry>        sSummonPropertiesStore;
+//TC_GAME_API extern DBCStorage <SummonPropertiesEntry>        sSummonPropertiesStore;
 TC_GAME_API extern DBCStorage <TalentEntry>                  sTalentStore;
 TC_GAME_API extern DBCStorage <TalentTabEntry>               sTalentTabStore;
 TC_GAME_API extern DBCStorage <TaxiNodesEntry>               sTaxiNodesStore;

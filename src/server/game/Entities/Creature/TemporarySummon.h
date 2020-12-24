@@ -31,12 +31,12 @@ enum PetEntry : uint32
     PET_SPIRIT_WOLF     = 29264
 };
 
-struct SummonPropertiesEntry;
+struct SummonPropertiesDBC;
 
 class TC_GAME_API TempSummon : public Creature
 {
     public:
-        explicit TempSummon(SummonPropertiesEntry const* properties, WorldObject* owner, bool isWorldObject);
+        explicit TempSummon(SummonPropertiesDBC const* properties, WorldObject* owner, bool isWorldObject);
         virtual ~TempSummon() { }
         void Update(uint32 time) override;
         virtual void InitStats(uint32 lifetime);
@@ -59,7 +59,7 @@ class TC_GAME_API TempSummon : public Creature
         bool CanFollowOwner() const { return m_canFollowOwner; }
         void SetCanFollowOwner(bool can) { m_canFollowOwner = can; }
 
-        SummonPropertiesEntry const* const m_Properties;
+        SummonPropertiesDBC const* m_Properties;
 
         std::string GetDebugInfo() const override;
     private:
@@ -75,7 +75,7 @@ class TC_GAME_API TempSummon : public Creature
 class TC_GAME_API Minion : public TempSummon
 {
     public:
-        Minion(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject);
+        Minion(SummonPropertiesDBC const* properties, Unit* owner, bool isWorldObject);
         void InitStats(uint32 duration) override;
         void RemoveFromWorld() override;
         void setDeathState(DeathState s) override;
@@ -101,7 +101,7 @@ class TC_GAME_API Minion : public TempSummon
 class TC_GAME_API Guardian : public Minion
 {
     public:
-        Guardian(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject);
+        Guardian(SummonPropertiesDBC const* properties, Unit* owner, bool isWorldObject);
         void InitStats(uint32 duration) override;
         bool InitStatsForLevel(uint8 level);
         void InitSummon() override;
@@ -127,7 +127,7 @@ class TC_GAME_API Guardian : public Minion
 class TC_GAME_API Puppet : public Minion
 {
     public:
-        Puppet(SummonPropertiesEntry const* properties, Unit* owner);
+        Puppet(SummonPropertiesDBC const* properties, Unit* owner);
         void InitStats(uint32 duration) override;
         void InitSummon() override;
         void Update(uint32 time) override;

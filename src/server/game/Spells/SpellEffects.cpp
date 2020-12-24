@@ -2042,7 +2042,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
     if (!entry)
         return;
 
-    SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(m_spellInfo->Effects[effIndex].MiscValueB);
+    SummonPropertiesDBC const* properties = sDBCStoresMgr->GetSummonPropertiesDBC(m_spellInfo->Effects[effIndex].MiscValueB);
     if (!properties)
     {
         TC_LOG_ERROR("spells", "EffectSummonType: Unhandled summon type %u.", m_spellInfo->Effects[effIndex].MiscValueB);
@@ -2890,7 +2890,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
 
     if (!owner)
     {
-        SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(67);
+        SummonPropertiesDBC const* properties = sDBCStoresMgr->GetSummonPropertiesDBC(67);
         if (properties)
             SummonGuardian(effIndex, petentry, properties, 1);
         return;
@@ -5411,7 +5411,7 @@ void Spell::EffectGameObjectSetDestructionState(SpellEffIndex effIndex)
     gameObjTarget->SetDestructibleState(GameObjectDestructibleState(m_spellInfo->Effects[effIndex].MiscValue), m_caster, true);
 }
 
-void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* properties, uint32 numGuardians)
+void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesDBC const* properties, uint32 numGuardians)
 {
     Unit* unitCaster = GetUnitCasterForEffectHandlers();
     if (!unitCaster)

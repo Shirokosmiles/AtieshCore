@@ -18,6 +18,7 @@
 #include "TemporarySummon.h"
 #include "CreatureAI.h"
 #include "DBCStructure.h"
+#include "DBCStoresMgrStructure.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "Log.h"
@@ -26,7 +27,7 @@
 #include "Pet.h"
 #include "Player.h"
 
-TempSummon::TempSummon(SummonPropertiesEntry const* properties, WorldObject* owner, bool isWorldObject) :
+TempSummon::TempSummon(SummonPropertiesDBC const* properties, WorldObject* owner, bool isWorldObject) :
 Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
 m_timer(0), m_lifetime(0), m_canFollowOwner(true)
 {
@@ -337,7 +338,7 @@ std::string TempSummon::GetDebugInfo() const
     return sstr.str();
 }
 
-Minion::Minion(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject)
+Minion::Minion(SummonPropertiesDBC const* properties, Unit* owner, bool isWorldObject)
     : TempSummon(properties, owner, isWorldObject), m_owner(owner)
 {
     ASSERT(m_owner);
@@ -402,7 +403,7 @@ std::string Minion::GetDebugInfo() const
     return sstr.str();
 }
 
-Guardian::Guardian(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject) : Minion(properties, owner, isWorldObject)
+Guardian::Guardian(SummonPropertiesDBC const* properties, Unit* owner, bool isWorldObject) : Minion(properties, owner, isWorldObject)
 , m_bonusSpellDamage(0)
 {
     memset(m_statFromOwner, 0, sizeof(float)*MAX_STATS);
@@ -445,7 +446,7 @@ std::string Guardian::GetDebugInfo() const
     return sstr.str();
 }
 
-Puppet::Puppet(SummonPropertiesEntry const* properties, Unit* owner)
+Puppet::Puppet(SummonPropertiesDBC const* properties, Unit* owner)
     : Minion(properties, owner, false) //maybe true?
 {
     ASSERT(m_owner->GetTypeId() == TYPEID_PLAYER);

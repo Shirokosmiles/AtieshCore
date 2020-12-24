@@ -25,6 +25,7 @@
 #include "ScriptMgr.h"
 #include "Containers.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Map.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -2862,7 +2863,7 @@ public:
 
             //! HACK - StatSystem needs further develop to enable update on Puppet stats
             // Using same summon properties as Raise Dead 46585 (Guardian) - EffectMiscValueB = 829
-            SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(829);
+            SummonPropertiesDBC const* properties = sDBCStoresMgr->GetSummonPropertiesDBC(829);
 
             uint32 duration = uint32(GetSpellInfo()->GetDuration());
 

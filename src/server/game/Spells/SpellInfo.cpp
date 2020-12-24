@@ -1871,7 +1871,7 @@ SpellCastResult SpellInfo::CheckVehicle(Unit const* caster) const
                 if (Effects[i].Effect != SPELL_EFFECT_SUMMON)
                     continue;
 
-                SummonPropertiesEntry const* props = sSummonPropertiesStore.LookupEntry(Effects[i].MiscValueB);
+                SummonPropertiesDBC const* props = sDBCStoresMgr->GetSummonPropertiesDBC(Effects[i].MiscValueB);
                 if (props && props->Control != SUMMON_CATEGORY_WILD)
                     return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
             }

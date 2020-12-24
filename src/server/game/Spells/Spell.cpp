@@ -6097,7 +6097,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                 if (!unitCaster)
                     break;
 
-                SummonPropertiesEntry const* SummonProperties = sSummonPropertiesStore.LookupEntry(m_spellInfo->Effects[i].MiscValueB);
+                SummonPropertiesDBC const* SummonProperties = sDBCStoresMgr->GetSummonPropertiesDBC(m_spellInfo->Effects[i].MiscValueB);
                 if (!SummonProperties)
                     break;
 

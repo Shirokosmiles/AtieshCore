@@ -135,6 +135,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _spellShapeShiftFormMap.clear();
     _spellVisualMap.clear();
     _stableSlotPricesMap.clear();
+    _summonPropertiesMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -250,6 +251,7 @@ void DBCStoresMgr::Initialize()
     _Load_SpellShapeshiftForm();
     _Load_SpellVisual();
     _Load_StableSlotPrices();
+    _Load_SummonProperties();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4463,6 +4465,44 @@ void DBCStoresMgr::_Load_StableSlotPrices()
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_stableslotprices              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
+
+// load SummonProperties.dbc
+void DBCStoresMgr::_Load_SummonProperties()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _summonPropertiesMap.clear();
+    //                                                0    1        2        3      4     5
+    QueryResult result = WorldDatabase.Query("SELECT ID, Control, Faction, Title, Slot, Flags FROM dbc_summonproperties");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_summonproperties. DB table `dbc_summonproperties` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SummonPropertiesDBC sp;
+        sp.ID = id;
+        sp.Control = fields[1].GetUInt32();
+        sp.Faction = fields[2].GetUInt32();
+        sp.Title   = fields[3].GetUInt32();
+        sp.Slot    = fields[4].GetUInt32();
+        sp.Flags   = fields[5].GetUInt32();
+
+        _summonPropertiesMap[id] = sp;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_summonproperties              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 
 // Handle Additional dbc from World db
 void DBCStoresMgr::_Handle_World_Achievement()

@@ -70,23 +70,6 @@ struct SkillLineCategoryEntry
 
 
 
-
-
-
-
-
-
-
-struct SummonPropertiesEntry
-{
-    uint32 ID;                                              // 0
-    uint32 Control;                                         // 1
-    uint32 Faction;                                         // 2
-    uint32 Title;                                           // 3
-    uint32 Slot;                                            // 4
-    uint32 Flags;                                           // 5
-};
-
 struct TalentEntry
 {
     uint32 ID;                                              // 0

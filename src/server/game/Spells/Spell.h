@@ -54,7 +54,7 @@ class Unit;
 class UnitAura;
 class WorldObject;
 class WorldPacket;
-struct SummonPropertiesEntry;
+struct SummonPropertiesDBC;
 enum AuraType : uint32;
 enum CurrentSpellTypes : uint8;
 enum LootType : uint8;
@@ -789,7 +789,7 @@ class TC_GAME_API Spell
         HitTriggerSpellList m_hitTriggerSpells;
 
         // effect helpers
-        void SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* properties, uint32 numSummons);
+        void SummonGuardian(uint32 i, uint32 entry, SummonPropertiesDBC const* properties, uint32 numSummons);
         void CalculateJumpSpeeds(SpellInfo const* spellInfo, uint8 i, float dist, float& speedXY, float& speedZ);
 
         SpellCastResult CanOpenLock(uint32 effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);

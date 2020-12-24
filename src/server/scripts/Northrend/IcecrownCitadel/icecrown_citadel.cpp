@@ -20,7 +20,7 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "DBCStores.h"
-#include "DBCStoresMgrStructure.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "GridNotifiersImpl.h"
@@ -1784,7 +1784,7 @@ public:
                 return;
 
             uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
-            SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
+            SummonPropertiesDBC const* properties = sDBCStoresMgr->GetSummonPropertiesDBC(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
 
             Position pos = caster->GetPosition();
             if (caster->GetOrientation() < 1.8f)

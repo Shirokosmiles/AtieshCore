@@ -125,6 +125,7 @@ typedef std::unordered_map<uint32 /*ID*/, SpellRuneCostDBC> SpellRuneCostDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SpellShapeshiftFormDBC> SpellShapeshiftFormDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SpellVisualDBC> SpellVisualDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, StableSlotPricesDBC> StableSlotPricesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, SummonPropertiesDBC> SummonPropertiesDBCMap;
 
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 typedef std::set<uint32> PetFamilySpellsSet;
@@ -1079,6 +1080,14 @@ public:
         return nullptr;
     }
 
+    SummonPropertiesDBC const* GetSummonPropertiesDBC(uint32 ID)
+    {
+        SummonPropertiesDBCMap::const_iterator itr = _summonPropertiesMap.find(ID);
+        if (itr != _summonPropertiesMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1201,6 +1210,7 @@ protected:
     void _Load_SpellShapeshiftForm();
     void _Load_SpellVisual();
     void _Load_StableSlotPrices();
+    void _Load_SummonProperties();
 
     // Handle Additional dbc from world db
     void Initialize_WorldDBC_Corrections();
@@ -1315,6 +1325,7 @@ private:
     SpellShapeshiftFormDBCMap _spellShapeShiftFormMap;
     SpellVisualDBCMap _spellVisualMap;
     StableSlotPricesDBCMap _stableSlotPricesMap;
+    SummonPropertiesDBCMap _summonPropertiesMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
