@@ -136,13 +136,20 @@ DBCStoresMgr::~DBCStoresMgr()
     _spellVisualMap.clear();
     _stableSlotPricesMap.clear();
     _summonPropertiesMap.clear();
+    _talentMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
         NamesProfaneValidators[i].clear();
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
         NamesReservedValidators[i].clear();
+
+    for (auto& achID : _petFamilySpellsStore)
+        achID.second.clear();
     _petFamilySpellsStore.clear();
+
+    _TalentSpellPos.clear();
+    _PetTalentSpells.clear();
     _itemRandomSuffixNumRow = 0;
     _spellNumRow = 0;
     _spellItemEnchantmentNumRow = 0;
@@ -252,6 +259,7 @@ void DBCStoresMgr::Initialize()
     _Load_SpellVisual();
     _Load_StableSlotPrices();
     _Load_SummonProperties();
+    _Load_Talent();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -260,6 +268,7 @@ void DBCStoresMgr::Initialize()
     _Handle_NamesProfanityRegex();
     _Handle_NamesReservedRegex();
     _Handle_PetFamilySpellsStore();
+    _Handle_TalentSpellPosStore();
 }
 
 void DBCStoresMgr::Initialize_WorldDBC_Corrections()
@@ -4503,6 +4512,46 @@ void DBCStoresMgr::_Load_SummonProperties()
     TC_LOG_INFO("server.loading", ">> Loaded DBC_summonproperties              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+// load Talent.dbc
+void DBCStoresMgr::_Load_Talent()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _talentMap.clear();
+    //                                                0    1        2        3             4           5            6           7           8
+    QueryResult result = WorldDatabase.Query("SELECT ID, TabID, TierID, ColumnIndex, SpellRank_1, SpellRank_2, SpellRank_3, SpellRank_4, SpellRank_5, "
+    //          9              10
+        "PrereqTalent_1, PrereqRank_1 FROM dbc_talent");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_talent. DB table `dbc_talent` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        TalentDBC t;
+        t.ID = id;
+        t.TabID       = fields[1].GetUInt32();
+        t.TierID      = fields[2].GetUInt32();
+        t.ColumnIndex = fields[3].GetUInt32();
+        for (uint8 i = 0; i < MAX_TALENT_RANK; i++)
+            t.SpellRank[i] = fields[4 + i].GetUInt32();
+        t.PrereqTalent = fields[9].GetUInt32();
+        t.PrereqRank   = fields[10].GetUInt32();
+
+        _talentMap[id] = t;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_talent                        %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
 
 // Handle Additional dbc from World db
 void DBCStoresMgr::_Handle_World_Achievement()
@@ -4947,17 +4996,14 @@ void DBCStoresMgr::_Handle_NamesReservedRegex()
 
 void DBCStoresMgr::_Handle_PetFamilySpellsStore()
 {
-    SkillLineAbilityDBCMap const& skilllineMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
-    CreatureFamilyDBCMap const& cFamilyMap = sDBCStoresMgr->GetCreatureFamilyDBCMap();
-
-    for (const auto& skaID : skilllineMap)
+    for (const auto& skaID : _skillLineAbilityMap)
     {
         if (SkillLineAbilityDBC const* skillLine = &skaID.second)
         {
             SpellDBC const* spellInfo = sDBCStoresMgr->GetSpellDBC(skillLine->Spell);
             if (spellInfo && spellInfo->Attributes & SPELL_ATTR0_PASSIVE)
             {
-                for (const auto& indexID : cFamilyMap)
+                for (const auto& indexID : _creatureFamilyMap)
                 {
                     if (CreatureFamilyDBC const* cFamily = &indexID.second)
                     {
@@ -4972,6 +5018,27 @@ void DBCStoresMgr::_Handle_PetFamilySpellsStore()
 
                         _petFamilySpellsStore[cFamily->ID].insert(spellInfo->ID);
                     }
+                }
+            }
+        }
+    }
+}
+
+void DBCStoresMgr::_Handle_TalentSpellPosStore()
+{
+    // create talent spells set
+    for (const auto& talentID : _talentMap)
+    {
+        if (TalentDBC const* talentInfo = &talentID.second)
+        {
+            TalentTabEntry const* talentTab = sTalentTabStore.LookupEntry(talentInfo->TabID);
+            for (uint8 j = 0; j < MAX_TALENT_RANK; ++j)
+            {
+                if (talentInfo->SpellRank[j])
+                {
+                    _TalentSpellPos[talentInfo->SpellRank[j]] = TalentSpellPos(talentInfo->ID, j);
+                    if (talentTab && talentTab->PetTalentMask)
+                        _PetTalentSpells.insert(talentInfo->SpellRank[j]);
                 }
             }
         }

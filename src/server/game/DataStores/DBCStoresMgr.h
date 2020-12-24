@@ -20,8 +20,9 @@
 
 #include "Common.h"
 #include "DBCStoresMgrStructure.h"
-#include <unordered_map>
 #include "Regex.h"
+#include <set>
+#include <unordered_map>
 
 typedef std::unordered_map<uint32 /*ID*/, AchievementDBC> AchievementDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, AchievementCriteriaDBC> AchievementCriteriaDBCMap;
@@ -126,10 +127,13 @@ typedef std::unordered_map<uint32 /*ID*/, SpellShapeshiftFormDBC> SpellShapeshif
 typedef std::unordered_map<uint32 /*ID*/, SpellVisualDBC> SpellVisualDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, StableSlotPricesDBC> StableSlotPricesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SummonPropertiesDBC> SummonPropertiesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, TalentDBC> TalentDBCMap;
 
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
-typedef std::set<uint32> PetFamilySpellsSet;
-typedef std::map<uint32, PetFamilySpellsSet> PetFamilySpellsStore;
+typedef std::unordered_set<uint32> PetFamilySpellsSet;
+typedef std::unordered_map<uint32, PetFamilySpellsSet> PetFamilySpellsStore;
+typedef std::unordered_map<uint32, TalentSpellPos> TalentSpellPosMap;
+typedef std::unordered_set<uint32> PetTalentSpells;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -1088,6 +1092,15 @@ public:
         return nullptr;
     }
 
+    TalentDBCMap const& GetTalentDBCMap() const { return _talentMap; }
+    TalentDBC const* GetTalentDBC(uint32 ID)
+    {
+        TalentDBCMap::const_iterator itr = _talentMap.find(ID);
+        if (itr != _talentMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1107,6 +1120,25 @@ public:
     }
 
     PetFamilySpellsStore const& GetPetFamilySpellsStore() { return _petFamilySpellsStore; }
+
+    TalentSpellPos const* GetTalentSpellPos(uint32 spellId)
+    {
+        TalentSpellPosMap::const_iterator itr = _TalentSpellPos.find(spellId);
+        if (itr == _TalentSpellPos.end())
+            return nullptr;
+
+        return &itr->second;
+    }
+
+    uint32 GetTalentSpellCost(uint32 spellId)
+    {
+        if (TalentSpellPos const* pos = GetTalentSpellPos(spellId))
+            return pos->rank + 1;
+
+        return 0;
+    }
+
+    PetTalentSpells const& GetPetTalentSpells() { return _PetTalentSpells; }
 
 protected:
     void _Load_Achievement();
@@ -1211,6 +1243,7 @@ protected:
     void _Load_SpellVisual();
     void _Load_StableSlotPrices();
     void _Load_SummonProperties();
+    void _Load_Talent();
 
     // Handle Additional dbc from world db
     void Initialize_WorldDBC_Corrections();
@@ -1222,6 +1255,7 @@ protected:
     void _Handle_NamesProfanityRegex();
     void _Handle_NamesReservedRegex();
     void _Handle_PetFamilySpellsStore();
+    void _Handle_TalentSpellPosStore();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -1326,11 +1360,14 @@ private:
     SpellVisualDBCMap _spellVisualMap;
     StableSlotPricesDBCMap _stableSlotPricesMap;
     SummonPropertiesDBCMap _summonPropertiesMap;
+    TalentDBCMap _talentMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
     NameValidationRegexContainer NamesReservedValidators;
     PetFamilySpellsStore _petFamilySpellsStore;
+    TalentSpellPosMap _TalentSpellPos;
+    PetTalentSpells _PetTalentSpells;
     uint32 _itemRandomSuffixNumRow;
     uint32 _spellNumRow;
     uint32 _spellItemEnchantmentNumRow;

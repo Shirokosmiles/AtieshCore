@@ -28,8 +28,8 @@
 
 enum LocaleConstant : uint8;
 
-TC_GAME_API uint32 GetTalentSpellCost(uint32 spellId);
-TC_GAME_API TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
+//TC_GAME_API uint32 GetTalentSpellCost(uint32 spellId);
+//TC_GAME_API TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
 
 TC_GAME_API WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid);
 
@@ -163,7 +163,7 @@ TC_GAME_API uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
 //TC_GAME_API extern DBCStorage <SpellItemEnchantmentEntry>    sSpellItemEnchantmentStore;
 //TC_GAME_API extern DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore;
 //TC_GAME_API extern PetFamilySpellsStore                      sPetFamilySpellsStore;
-TC_GAME_API extern std::unordered_set<uint32>                sPetTalentSpells;
+//TC_GAME_API extern std::unordered_set<uint32>                sPetTalentSpells;
 //TC_GAME_API extern DBCStorage <SpellRadiusEntry>             sSpellRadiusStore;
 //TC_GAME_API extern DBCStorage <SpellRangeEntry>              sSpellRangeStore;
 //TC_GAME_API extern DBCStorage <SpellRuneCostEntry>           sSpellRuneCostStore;
@@ -172,7 +172,7 @@ TC_GAME_API extern std::unordered_set<uint32>                sPetTalentSpells;
 //TC_GAME_API extern DBCStorage <SpellVisualEntry>             sSpellVisualStore;
 //TC_GAME_API extern DBCStorage <StableSlotPricesEntry>        sStableSlotPricesStore;
 //TC_GAME_API extern DBCStorage <SummonPropertiesEntry>        sSummonPropertiesStore;
-TC_GAME_API extern DBCStorage <TalentEntry>                  sTalentStore;
+//TC_GAME_API extern DBCStorage <TalentEntry>                  sTalentStore;
 TC_GAME_API extern DBCStorage <TalentTabEntry>               sTalentTabStore;
 TC_GAME_API extern DBCStorage <TaxiNodesEntry>               sTaxiNodesStore;
 TC_GAME_API extern DBCStorage <TaxiPathEntry>                sTaxiPathStore;

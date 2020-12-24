@@ -165,7 +165,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <SpellItemEnchantmentEntry> sSpellItemEnchantmentStore(SpellItemEnchantmentfmt);
 //DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore(SpellItemEnchantmentConditionfmt);
 //DBCStorage <SpellEntry> sSpellStore(SpellEntryfmt);
-PetFamilySpellsStore sPetFamilySpellsStore;
+//PetFamilySpellsStore sPetFamilySpellsStore;
 
 //DBCStorage <SpellCastTimesEntry> sSpellCastTimesStore(SpellCastTimefmt);
 //DBCStorage <SpellCategoryEntry> sSpellCategoryStore(SpellCategoryfmt);
@@ -179,9 +179,7 @@ PetFamilySpellsStore sPetFamilySpellsStore;
 //DBCStorage <SpellVisualEntry> sSpellVisualStore(SpellVisualfmt);
 //DBCStorage <StableSlotPricesEntry> sStableSlotPricesStore(StableSlotPricesfmt);
 //DBCStorage <SummonPropertiesEntry> sSummonPropertiesStore(SummonPropertiesfmt);
-DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
-TalentSpellPosMap sTalentSpellPosMap;
-std::unordered_set<uint32> sPetTalentSpells;
+//DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
 DBCStorage <TalentTabEntry> sTalentTabStore(TalentTabEntryfmt);
 
 // store absolute bit position for first rank for talent inspect
@@ -380,7 +378,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sSpellVisualStore,                   "SpellVisual.dbc");
     //LOAD_DBC(sStableSlotPricesStore,              "StableSlotPrices.dbc");
     //LOAD_DBC(sSummonPropertiesStore,              "SummonProperties.dbc");
-    LOAD_DBC(sTalentStore,                        "Talent.dbc");
+    //LOAD_DBC(sTalentStore,                        "Talent.dbc");
     LOAD_DBC(sTalentTabStore,                     "TalentTab.dbc");
     LOAD_DBC(sTaxiNodesStore,                     "TaxiNodes.dbc");
     LOAD_DBC(sTaxiPathStore,                      "TaxiPath.dbc");
@@ -429,20 +427,6 @@ void LoadDBCStores(const std::string& dataPath)
 
     
 
-    // create talent spells set
-    for (TalentEntry const* talentInfo : sTalentStore)
-    {
-        TalentTabEntry const* talentTab = sTalentTabStore.LookupEntry(talentInfo->TabID);
-        for (uint8 j = 0; j < MAX_TALENT_RANK; ++j)
-        {
-            if (talentInfo->SpellRank[j])
-            {
-                sTalentSpellPosMap[talentInfo->SpellRank[j]] = TalentSpellPos(talentInfo->ID, j);
-                if (talentTab && talentTab->PetTalentMask)
-                    sPetTalentSpells.insert(talentInfo->SpellRank[j]);
-            }
-        }
-    }
 
     // prepare fast data access to bit pos of talent ranks for use at inspecting
     {
@@ -573,23 +557,6 @@ void LoadDBCStores(const std::string& dataPath)
 
     TC_LOG_INFO("server.loading", ">> Initialized %d data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
 
-}
-
-TalentSpellPos const* GetTalentSpellPos(uint32 spellId)
-{
-    TalentSpellPosMap::const_iterator itr = sTalentSpellPosMap.find(spellId);
-    if (itr == sTalentSpellPosMap.end())
-        return nullptr;
-
-    return &itr->second;
-}
-
-uint32 GetTalentSpellCost(uint32 spellId)
-{
-    if (TalentSpellPos const* pos = GetTalentSpellPos(spellId))
-        return pos->rank+1;
-
-    return 0;
 }
 
 WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid)

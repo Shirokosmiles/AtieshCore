@@ -5183,7 +5183,7 @@ void ObjectMgr::LoadQuests()
                 qinfo->_rewardDisplaySpell = 0;                        // no spell reward will display for this quest
             }
 
-            else if (GetTalentSpellCost(qinfo->_rewardDisplaySpell))
+            else if (sDBCStoresMgr->GetTalentSpellCost(qinfo->_rewardDisplaySpell))
             {
                 TC_LOG_ERROR("sql.sql", "Quest %u has `RewardDisplaySpell` = %u but spell %u is talent, quest will not have a spell reward.",
                     qinfo->GetQuestId(), qinfo->_rewardDisplaySpell, qinfo->_rewardDisplaySpell);
@@ -5208,7 +5208,7 @@ void ObjectMgr::LoadQuests()
                 qinfo->_rewardSpell = 0;                    // no spell will be cast on player
             }
 
-            else if (GetTalentSpellCost(qinfo->_rewardSpell))
+            else if (sDBCStoresMgr->GetTalentSpellCost(qinfo->_rewardSpell))
             {
                 TC_LOG_ERROR("sql.sql", "Quest %u has `RewardDisplaySpell` = %u but spell %u is talent, quest will not have a spell reward.",
                     qinfo->GetQuestId(), qinfo->_rewardSpell, qinfo->_rewardSpell);
@@ -9247,7 +9247,7 @@ void ObjectMgr::LoadTrainers()
                 continue;
             }
 
-            if (GetTalentSpellCost(spell.SpellId))
+            if (sDBCStoresMgr->GetTalentSpellCost(spell.SpellId))
             {
                 TC_LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (SpellId: %u) which is a talent, for TrainerId %u, ignoring", spell.SpellId, trainerId);
                 continue;

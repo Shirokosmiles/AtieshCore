@@ -226,26 +226,24 @@ uint32 Player::GetGearScore() const
 uint8 Player::GetMostPointsTalentTree() const
 {
     uint32 specPoints[3] = { 0, 0, 0 };
-    for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
+    TalentDBCMap const& talentMap = sDBCStoresMgr->GetTalentDBCMap();
+    for (const auto& tID : talentMap)
     {
-        TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
-
-        if (!talentInfo)
-            continue;
-
-        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
-
-        if (!talentTabInfo)
-            continue;
-
-        if (talentTabInfo->OrderIndex < 3)
+        if (TalentDBC const* talentInfo = &tID.second)
         {
-            for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
+            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+            if (!talentTabInfo)
+                continue;
+
+            if (talentTabInfo->OrderIndex < 3)
             {
-                PlayerTalentMap::iterator plrTalent = m_talents[m_activeSpec]->find(talentInfo->SpellRank[rank]);
-                if (plrTalent != m_talents[m_activeSpec]->end())
-                    if (plrTalent->second->state != PLAYERSPELL_REMOVED)
-                        specPoints[talentTabInfo->OrderIndex] += rank;
+                for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
+                {
+                    PlayerTalentMap::iterator plrTalent = m_talents[m_activeSpec]->find(talentInfo->SpellRank[rank]);
+                    if (plrTalent != m_talents[m_activeSpec]->end())
+                        if (plrTalent->second->state != PLAYERSPELL_REMOVED)
+                            specPoints[talentTabInfo->OrderIndex] += rank;
+                }
             }
         }
     }

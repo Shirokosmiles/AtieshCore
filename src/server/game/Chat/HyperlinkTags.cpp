@@ -199,7 +199,7 @@ bool Trinity::Hyperlinks::LinkTags::talent::StoreTo(TalentLinkData& val, std::st
         return false;
     if (rank < -1 || rank >= MAX_TALENT_RANK)
         return false;
-    val.Talent = sTalentStore.LookupEntry(talentId);
+    val.Talent = sDBCStoresMgr->GetTalentDBC(talentId);
     val.Rank = rank+1;
     if (!val.Talent)
         return false;

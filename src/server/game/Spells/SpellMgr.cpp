@@ -788,58 +788,58 @@ void SpellMgr::LoadSpellTalentRanks()
     // cleanup core data before reload - remove reference to ChainNode from SpellInfo
     UnloadSpellInfoChains();
 
-    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+    TalentDBCMap const& talentMap = sDBCStoresMgr->GetTalentDBCMap();
+    for (const auto& tID : talentMap)
     {
-        TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
-        if (!talentInfo)
-            continue;
-
-        SpellInfo const* lastSpell = nullptr;
-        for (uint8 rank = MAX_TALENT_RANK - 1; rank > 0; --rank)
+        if (TalentDBC const* talentInfo = &tID.second)
         {
-            if (talentInfo->SpellRank[rank])
+            SpellInfo const* lastSpell = nullptr;
+            for (uint8 rank = MAX_TALENT_RANK - 1; rank > 0; --rank)
             {
-                lastSpell = GetSpellInfo(talentInfo->SpellRank[rank]);
-                break;
-            }
-        }
-
-        if (!lastSpell)
-            continue;
-
-        SpellInfo const* firstSpell = GetSpellInfo(talentInfo->SpellRank[0]);
-        if (!firstSpell)
-        {
-            TC_LOG_ERROR("spells", "SpellMgr::LoadSpellTalentRanks: First Rank Spell %u for TalentEntry %u does not exist.", talentInfo->SpellRank[0], i);
-            continue;
-        }
-
-        SpellInfo const* prevSpell = nullptr;
-        for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
-        {
-            uint32 spellId = talentInfo->SpellRank[rank];
-            if (!spellId)
-                break;
-
-            SpellInfo const* currentSpell = GetSpellInfo(spellId);
-            if (!currentSpell)
-            {
-                TC_LOG_ERROR("spells", "SpellMgr::LoadSpellTalentRanks: Spell %u (Rank: %u) for TalentEntry %u does not exist.", spellId, rank + 1, i);
-                break;
+                if (talentInfo->SpellRank[rank])
+                {
+                    lastSpell = GetSpellInfo(talentInfo->SpellRank[rank]);
+                    break;
+                }
             }
 
-            SpellChainNode node;
-            node.first = firstSpell;
-            node.last  = lastSpell;
-            node.rank  = rank + 1;
+            if (!lastSpell)
+                continue;
 
-            node.prev = prevSpell;
-            node.next = node.rank < MAX_TALENT_RANK ? GetSpellInfo(talentInfo->SpellRank[node.rank]) : nullptr;
+            SpellInfo const* firstSpell = GetSpellInfo(talentInfo->SpellRank[0]);
+            if (!firstSpell)
+            {
+                TC_LOG_ERROR("spells", "SpellMgr::LoadSpellTalentRanks: First Rank Spell %u for TalentEntry %u does not exist.", talentInfo->SpellRank[0], talentInfo->ID);
+                continue;
+            }
 
-            mSpellChains[spellId] = node;
-            mSpellInfoMap[spellId]->ChainEntry = &mSpellChains[spellId];
+            SpellInfo const* prevSpell = nullptr;
+            for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
+            {
+                uint32 spellId = talentInfo->SpellRank[rank];
+                if (!spellId)
+                    break;
 
-            prevSpell = currentSpell;
+                SpellInfo const* currentSpell = GetSpellInfo(spellId);
+                if (!currentSpell)
+                {
+                    TC_LOG_ERROR("spells", "SpellMgr::LoadSpellTalentRanks: Spell %u (Rank: %u) for TalentEntry %u does not exist.", spellId, rank + 1, talentInfo->ID);
+                    break;
+                }
+
+                SpellChainNode node;
+                node.first = firstSpell;
+                node.last = lastSpell;
+                node.rank = rank + 1;
+
+                node.prev = prevSpell;
+                node.next = node.rank < MAX_TALENT_RANK ? GetSpellInfo(talentInfo->SpellRank[node.rank]) : nullptr;
+
+                mSpellChains[spellId] = node;
+                mSpellInfoMap[spellId]->ChainEntry = &mSpellChains[spellId];
+
+                prevSpell = currentSpell;
+            }
         }
     }
 }
@@ -1105,7 +1105,7 @@ void SpellMgr::LoadSpellLearnSpells()
             continue;
         }
 
-        if (GetTalentSpellCost(node.spell))
+        if (sDBCStoresMgr->GetTalentSpellCost(node.spell))
         {
             TC_LOG_ERROR("sql.sql", "The spell %u listed in `spell_learn_spell` attempts learning talent spell %u, skipped.", spell_id, node.spell);
             continue;
@@ -1140,7 +1140,7 @@ void SpellMgr::LoadSpellLearnSpells()
                 // talent or passive spells or skill-step spells auto-cast and not need dependent learning,
                 // pet teaching spells must not be dependent learning (cast)
                 // other required explicit dependent learning
-                dbc_node.autoLearned = entry->Effects[i].TargetA.GetTarget() == TARGET_UNIT_PET || GetTalentSpellCost(spell) > 0 || entry->IsPassive() || entry->HasEffect(SPELL_EFFECT_SKILL_STEP);
+                dbc_node.autoLearned = entry->Effects[i].TargetA.GetTarget() == TARGET_UNIT_PET || sDBCStoresMgr->GetTalentSpellCost(spell) > 0 || entry->IsPassive() || entry->HasEffect(SPELL_EFFECT_SKILL_STEP);
 
                 SpellLearnSpellMapBounds db_node_bounds = GetSpellLearnSpellMapBounds(spell);
 
@@ -5064,7 +5064,7 @@ void SpellMgr::LoadSpellInfoCorrections()
             }
 
             // Passive talent auras cannot target pets
-            if (spellInfo->IsPassive() && GetTalentSpellCost(i))
+            if (spellInfo->IsPassive() && sDBCStoresMgr->GetTalentSpellCost(i))
                 if (spellInfo->Effects[j].TargetA.GetTarget() == TARGET_UNIT_PET)
                     spellInfo->Effects[j].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
 

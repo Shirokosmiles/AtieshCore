@@ -129,7 +129,7 @@ void CharacterDatabaseCleaner::CleanCharacterSkills()
 
 bool CharacterDatabaseCleaner::SpellCheck(uint32 spell_id)
 {
-    return sSpellMgr->GetSpellInfo(spell_id) && !GetTalentSpellPos(spell_id);
+    return sSpellMgr->GetSpellInfo(spell_id) && !sDBCStoresMgr->GetTalentSpellPos(spell_id);
 }
 
 void CharacterDatabaseCleaner::CleanCharacterSpell()
@@ -139,7 +139,7 @@ void CharacterDatabaseCleaner::CleanCharacterSpell()
 
 bool CharacterDatabaseCleaner::TalentCheck(uint32 talent_id)
 {
-    TalentEntry const* talentInfo = sTalentStore.LookupEntry(talent_id);
+    TalentDBC const* talentInfo = sDBCStoresMgr->GetTalentDBC(talent_id);
     if (!talentInfo)
         return false;
 

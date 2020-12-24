@@ -1550,9 +1550,9 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
         newspell.active = active;
 
     // talent: unlearn all other talent ranks (high and low)
-    if (TalentSpellPos const* talentPos = GetTalentSpellPos(spellId))
+    if (TalentSpellPos const* talentPos = sDBCStoresMgr->GetTalentSpellPos(spellId))
     {
-        if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentPos->talent_id))
+        if (TalentDBC const* talentInfo = sDBCStoresMgr->GetTalentDBC(talentPos->talent_id))
         {
             for (uint32 rankSpellId : talentInfo->SpellRank)
             {
@@ -1609,7 +1609,7 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
     if (newspell.active == ACT_ENABLED)
         ToggleAutocast(spellInfo, true);
 
-    uint32 talentCost = GetTalentSpellCost(spellId);
+    uint32 talentCost = sDBCStoresMgr->GetTalentSpellCost(spellId);
     if (talentCost)
     {
         int32 free_points = GetMaxTalentPointsForLevel(GetLevel());
@@ -1707,7 +1707,7 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 
     RemoveAurasDueToSpell(spell_id);
 
-    uint32 talentCost = GetTalentSpellCost(spell_id);
+    uint32 talentCost = sDBCStoresMgr->GetTalentSpellCost(spell_id);
     if (talentCost > 0)
     {
         if (m_usedTalentCount > talentCost)
@@ -1789,43 +1789,41 @@ bool Pet::resetTalents()
         return false;
     }
 
-    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+    TalentDBCMap const& talentMap = sDBCStoresMgr->GetTalentDBCMap();
+    for (const auto& tID : talentMap)
     {
-        TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
-
-        if (!talentInfo)
-            continue;
-
-        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
-
-        if (!talentTabInfo)
-            continue;
-
-        // unlearn only talents for pets family talent type
-        if (!((1 << pet_family->PetTalentType) & talentTabInfo->PetTalentMask))
-            continue;
-
-        for (uint32 talentSpellId : talentInfo->SpellRank)
+        if (TalentDBC const* talentInfo = &tID.second)
         {
-            for (PetSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end();)
-            {
-                if (itr->second.state == PETSPELL_REMOVED)
-                {
-                    ++itr;
-                    continue;
-                }
-                // remove learned spells (all ranks)
-                uint32 itrFirstId = sSpellMgr->GetFirstSpellInChain(itr->first);
+            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+            if (!talentTabInfo)
+                continue;
 
-                // unlearn if first rank is talent or learned by talent
-                if (itrFirstId == talentSpellId || sSpellMgr->IsSpellLearnToSpell(talentSpellId, itrFirstId))
+            // unlearn only talents for pets family talent type
+            if (!((1 << pet_family->PetTalentType) & talentTabInfo->PetTalentMask))
+                continue;
+
+            for (uint32 talentSpellId : talentInfo->SpellRank)
+            {
+                for (PetSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end();)
                 {
-                    unlearnSpell(itr->first, false);
-                    itr = m_spells.begin();
-                    continue;
+                    if (itr->second.state == PETSPELL_REMOVED)
+                    {
+                        ++itr;
+                        continue;
+                    }
+                    // remove learned spells (all ranks)
+                    uint32 itrFirstId = sSpellMgr->GetFirstSpellInChain(itr->first);
+
+                    // unlearn if first rank is talent or learned by talent
+                    if (itrFirstId == talentSpellId || sSpellMgr->IsSpellLearnToSpell(talentSpellId, itrFirstId))
+                    {
+                        unlearnSpell(itr->first, false);
+                        itr = m_spells.begin();
+                        continue;
+                    }
+                    else
+                        ++itr;
                 }
-                else
-                    ++itr;
             }
         }
     }
@@ -1887,7 +1885,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
     ss << ") AND spell IN (";
 
     need_comma = false;
-    for (uint32 spell : sPetTalentSpells)
+    for (uint32 spell : sDBCStoresMgr->GetPetTalentSpells())
     {
         if (need_comma)
             ss << ',';

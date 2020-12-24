@@ -121,7 +121,7 @@ public:
         else
             targetPlayer->LearnSpell(spell, false);
 
-        if (GetTalentSpellCost(spellInfo->GetFirstRankSpell()->Id))
+        if (sDBCStoresMgr->GetTalentSpellCost(spellInfo->GetFirstRankSpell()->Id))
             targetPlayer->SendTalentsInfoData(false);
 
         return true;
@@ -181,7 +181,7 @@ public:
                     continue;
 
                 // skip spells with first rank learned as talent (and all talents then also)
-                if (GetTalentSpellCost(spellInfo->GetFirstRankSpell()->Id) > 0)
+                if (sDBCStoresMgr->GetTalentSpellCost(spellInfo->GetFirstRankSpell()->Id) > 0)
                     continue;
 
                 // skip broken spells
@@ -201,40 +201,40 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 classMask = player->GetClassMask();
 
-        for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+        TalentDBCMap const& talentMap = sDBCStoresMgr->GetTalentDBCMap();
+        for (const auto& tID : talentMap)
         {
-            TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
-            if (!talentInfo)
-                continue;
-
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
-            if (!talentTabInfo)
-                continue;
-
-            if ((classMask & talentTabInfo->ClassMask) == 0)
-                continue;
-
-            // search highest talent rank
-            uint32 spellId = 0;
-            for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
+            if (TalentDBC const* talentInfo = &tID.second)
             {
-                if (talentInfo->SpellRank[rank] != 0)
+                TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+                if (!talentTabInfo)
+                    continue;
+
+                if ((classMask & talentTabInfo->ClassMask) == 0)
+                    continue;
+
+                // search highest talent rank
+                uint32 spellId = 0;
+                for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
                 {
-                    spellId = talentInfo->SpellRank[rank];
-                    break;
+                    if (talentInfo->SpellRank[rank] != 0)
+                    {
+                        spellId = talentInfo->SpellRank[rank];
+                        break;
+                    }
                 }
+
+                if (!spellId)                                        // ??? none spells in talent
+                    continue;
+
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, handler->GetSession()->GetPlayer(), false))
+                    continue;
+
+                // learn highest rank of talent and learn all non-talent spell ranks (recursive by tree)
+                player->LearnSpellHighestRank(spellId);
+                player->AddTalent(spellId, player->GetActiveSpec(), true);
             }
-
-            if (!spellId)                                        // ??? none spells in talent
-                continue;
-
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, handler->GetSession()->GetPlayer(), false))
-                continue;
-
-            // learn highest rank of talent and learn all non-talent spell ranks (recursive by tree)
-            player->LearnSpellHighestRank(spellId);
-            player->AddTalent(spellId, player->GetActiveSpec(), true);
         }
 
         player->SetFreeTalentPoints(0);
@@ -278,41 +278,41 @@ public:
             return false;
         }
 
-        for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+        TalentDBCMap const& talentMap = sDBCStoresMgr->GetTalentDBCMap();
+        for (const auto& tID : talentMap)
         {
-            TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
-            if (!talentInfo)
-                continue;
-
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
-            if (!talentTabInfo)
-                continue;
-
-            // prevent learn talent for different family (cheating)
-            if (((1 << petFamily->PetTalentType) & talentTabInfo->PetTalentMask) == 0)
-                continue;
-
-            // search highest talent rank
-            uint32 spellId = 0;
-
-            for (int8 rank = MAX_TALENT_RANK-1; rank >= 0; --rank)
+            if (TalentDBC const* talentInfo = &tID.second)
             {
-                if (talentInfo->SpellRank[rank] != 0)
+                TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+                if (!talentTabInfo)
+                    continue;
+
+                // prevent learn talent for different family (cheating)
+                if (((1 << petFamily->PetTalentType) & talentTabInfo->PetTalentMask) == 0)
+                    continue;
+
+                // search highest talent rank
+                uint32 spellId = 0;
+
+                for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
                 {
-                    spellId = talentInfo->SpellRank[rank];
-                    break;
+                    if (talentInfo->SpellRank[rank] != 0)
+                    {
+                        spellId = talentInfo->SpellRank[rank];
+                        break;
+                    }
                 }
+
+                if (!spellId)                                        // ??? none spells in talent
+                    continue;
+
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, handler->GetSession()->GetPlayer(), false))
+                    continue;
+
+                // learn highest rank of talent and learn all non-talent spell ranks (recursive by tree)
+                pet->learnSpellHighRank(spellId);
             }
-
-            if (!spellId)                                        // ??? none spells in talent
-                continue;
-
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, handler->GetSession()->GetPlayer(), false))
-                continue;
-
-            // learn highest rank of talent and learn all non-talent spell ranks (recursive by tree)
-            pet->learnSpellHighRank(spellId);
         }
 
         pet->SetFreeTalentPoints(0);
@@ -508,7 +508,7 @@ public:
         else
             handler->SendSysMessage(LANG_FORGET_SPELL);
 
-        if (GetTalentSpellCost(spellId))
+        if (sDBCStoresMgr->GetTalentSpellCost(spellId))
             target->SendTalentsInfoData(false);
 
         return true;

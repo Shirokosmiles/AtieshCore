@@ -34,7 +34,6 @@ struct ItemRandomSuffixDBC;
 struct ItemTemplate;
 class SpellInfo;
 class Quest;
-struct TalentEntry;
 
 namespace Trinity::Hyperlinks
 {
@@ -76,7 +75,7 @@ namespace Trinity::Hyperlinks
 
     struct TalentLinkData
     {
-        TalentEntry const* Talent;
+        TalentDBC const* Talent;
         uint8 Rank;
         SpellInfo const* Spell;
     };

@@ -1714,3 +1714,31 @@ struct SummonPropertiesDBC
     uint32 Slot;                                            // 4
     uint32 Flags;                                           // 5
 };
+
+// load Talent.dbc
+struct TalentDBC
+{
+    uint32 ID;                                              // 0
+    uint32 TabID;                                           // 1 index in TalentTab.dbc (TalentTabEntry)
+    uint32 TierID;                                          // 2
+    uint32 ColumnIndex;                                     // 3
+    std::array<uint32, MAX_TALENT_RANK> SpellRank;          // 4-8
+    //std::array<uint32, 4> SpellRankUnused;                // 9-12
+    uint32 PrereqTalent;                                    // 13 index in Talent.dbc (TalentEntry)
+    //std::array<uint32, 2> PrereqTalentUnused;             // 14-15
+    uint32 PrereqRank;                                      // 16
+    //std::array<uint32, 2> PrereqRankUnused;               // 17-18
+    //uint32 Flags;                                         // 19
+    //uint32 RequiredSpellID;                               // 20 all 0
+    //std::array<uint32, 2> CategoryMask;                   // 21 its a 64 bit mask for pet 1<<CategoryEnumID in CreatureFamily.dbc
+};
+
+//     structure helper
+struct TalentSpellPos
+{
+    TalentSpellPos() : talent_id(0), rank(0) { }
+    TalentSpellPos(uint16 _talent_id, uint8 _rank) : talent_id(_talent_id), rank(_rank) { }
+
+    uint16 talent_id;
+    uint8  rank;
+};

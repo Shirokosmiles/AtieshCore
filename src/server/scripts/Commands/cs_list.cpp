@@ -28,6 +28,7 @@ EndScriptData */
 #include "Creature.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameTime.h"
 #include "Language.h"
@@ -447,7 +448,7 @@ public:
         handler->PSendSysMessage(LANG_COMMAND_TARGET_LISTAURAS, auras.size());
         for (auto const& [spellId, aurApp] : auras)
         {
-            bool talent = GetTalentSpellCost(aurApp->GetBase()->GetId()) > 0;
+            bool talent = sDBCStoresMgr->GetTalentSpellCost(aurApp->GetBase()->GetId()) > 0;
 
             Aura const* aura = aurApp->GetBase();
             char const* name = aura->GetSpellInfo()->SpellName[handler->GetSessionDbcLocale()].c_str();
