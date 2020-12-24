@@ -131,6 +131,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _spellItemEnchantmentConditionMap.clear();
     _spellRadiusMap.clear();
     _spellRangeMap.clear();
+    _spellRuneCostMap.clear();
 
     // handle additional containers
     for (uint32 i = 0; i < TOTAL_LOCALES; i++)
@@ -242,6 +243,7 @@ void DBCStoresMgr::Initialize()
     _Load_SpellItemEnchantmentCondition();
     _Load_SpellRadius();
     _Load_SpellRange();
+    _Load_SpellRuneCost();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4308,6 +4310,41 @@ void DBCStoresMgr::_Load_SpellRange()
 
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spellrange                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load SpellRuneCost.dbc
+void DBCStoresMgr::_Load_SpellRuneCost()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spellRuneCostMap.clear();
+    //                                                0     1      2      3         4
+    QueryResult result = WorldDatabase.Query("SELECT ID, Blood, Unholy, Frost, RunicPower FROM dbc_spellrunecost");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellrunecost. DB table `dbc_spellrunecost` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        SpellRuneCostDBC src;
+        src.ID = id;
+        for (uint8 i = 0; i < 3; i++)
+            src.RuneCost[i] = fields[1 + i].GetUInt32();
+        src.RunicPower = fields[4].GetUInt32();
+
+        _spellRuneCostMap[id] = src;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellrunecost                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db

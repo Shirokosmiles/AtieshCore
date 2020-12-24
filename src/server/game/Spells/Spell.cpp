@@ -5172,7 +5172,7 @@ SpellCastResult Spell::CheckRuneCost(uint32 runeCostID) const
     if (player->GetClass() != CLASS_DEATH_KNIGHT)
         return SPELL_CAST_OK;
 
-    SpellRuneCostEntry const* src = sSpellRuneCostStore.LookupEntry(runeCostID);
+    SpellRuneCostDBC const* src = sDBCStoresMgr->GetSpellRuneCostDBC(runeCostID);
     if (!src)
         return SPELL_CAST_OK;
 
@@ -5212,7 +5212,7 @@ void Spell::TakeRunePower(bool didHit)
     if (m_caster->GetTypeId() != TYPEID_PLAYER || m_caster->ToPlayer()->GetClass() != CLASS_DEATH_KNIGHT)
         return;
 
-    SpellRuneCostEntry const* runeCostData = sSpellRuneCostStore.LookupEntry(m_spellInfo->RuneCostID);
+    SpellRuneCostDBC const* runeCostData = sDBCStoresMgr->GetSpellRuneCostDBC(m_spellInfo->RuneCostID);
     if (!runeCostData || (runeCostData->NoRuneCost() && runeCostData->NoRunicPowerGain()))
         return;
 

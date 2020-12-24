@@ -166,7 +166,7 @@ TC_GAME_API uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
 TC_GAME_API extern std::unordered_set<uint32>                sPetTalentSpells;
 //TC_GAME_API extern DBCStorage <SpellRadiusEntry>             sSpellRadiusStore;
 //TC_GAME_API extern DBCStorage <SpellRangeEntry>              sSpellRangeStore;
-TC_GAME_API extern DBCStorage <SpellRuneCostEntry>           sSpellRuneCostStore;
+//TC_GAME_API extern DBCStorage <SpellRuneCostEntry>           sSpellRuneCostStore;
 TC_GAME_API extern DBCStorage <SpellShapeshiftFormEntry>     sSpellShapeshiftFormStore;
 //TC_GAME_API extern DBCStorage <SpellEntry>                   sSpellStore;
 TC_GAME_API extern DBCStorage <SpellVisualEntry>             sSpellVisualStore;
