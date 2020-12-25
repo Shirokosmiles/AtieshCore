@@ -144,6 +144,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _taxiPathNodeMap.clear();
     _teamContributionPointsMap.clear();
     _totemCategoryMap.clear();
+    _transportAnimationMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -291,6 +292,7 @@ void DBCStoresMgr::Initialize()
     _Load_TaxiPathNode();
     _Load_TeamContributionPoints();
     _Load_TotemCategory();
+    _Load_TransportAnimation();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4822,6 +4824,42 @@ void DBCStoresMgr::_Load_TotemCategory()
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_totemcategory                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load TransportAnimation.dbc
+void DBCStoresMgr::_Load_TransportAnimation()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _transportAnimationMap.clear();
+    //                                                0        1           2       3    4     5
+    QueryResult result = WorldDatabase.Query("SELECT ID, TransportID, TimeIndex, PosX, PosY, PosZ FROM dbc_transportanimation");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_transportanimation. DB table `dbc_transportanimation` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        TransportAnimationDBC ta;
+        ta.ID = id;
+        ta.TransportID = fields[1].GetUInt32();
+        ta.TimeIndex   = fields[2].GetUInt32();
+        ta.Pos.X       = fields[3].GetFloat();
+        ta.Pos.Y       = fields[4].GetFloat();
+        ta.Pos.Z       = fields[5].GetFloat();
+
+        _transportAnimationMap[id] = ta;
+
+        ++count;
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_transportanimation            %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db

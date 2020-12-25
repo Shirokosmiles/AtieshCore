@@ -1821,4 +1821,14 @@ struct TotemCategoryDBC
     uint32 TotemCategoryMask;                               // 19 (compatibility mask for same type: different for totems, compatible from high to low for rods)
 };
 
+// load TransportAnimation.dbc
+struct TransportAnimationDBC
+{
+    uint32 ID;                                              // 0
+    uint32 TransportID;                                     // 1
+    uint32 TimeIndex;                                       // 2
+    DBCPosition3D Pos;                                      // 3
+    //uint32 SequenceID;                                    // 4
+};
+
 #pragma pack(pop)

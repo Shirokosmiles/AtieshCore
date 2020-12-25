@@ -181,7 +181,7 @@ TC_GAME_API void Map2ZoneCoordinates(float &x, float &y, uint32 zone);
 //TC_GAME_API extern TaxiMask                                  sDeathKnightTaxiNodesMask;
 //TC_GAME_API extern TaxiPathSetBySource                       sTaxiPathSetBySource;
 //TC_GAME_API extern TaxiPathNodesByPath                       sTaxiPathNodesByPath;
-TC_GAME_API extern DBCStorage <TransportAnimationEntry>      sTransportAnimationStore;
+//TC_GAME_API extern DBCStorage <TransportAnimationEntry>      sTransportAnimationStore;
 TC_GAME_API extern DBCStorage <TransportRotationEntry>       sTransportRotationStore;
 //TC_GAME_API extern DBCStorage <TeamContributionPointsEntry>  sTeamContributionPointsStore;
 //TC_GAME_API extern DBCStorage <TotemCategoryEntry>           sTotemCategoryStore;

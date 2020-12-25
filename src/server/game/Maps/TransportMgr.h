@@ -84,7 +84,7 @@ struct TransportTemplate
     uint32 entry;
 };
 
-typedef std::map<uint32, TransportAnimationEntry const*> TransportPathContainer;
+typedef std::map<uint32, TransportAnimationDBC const*> TransportPathContainer;
 typedef std::map<uint32, TransportRotationEntry const*> TransportPathRotationContainer;
 
 struct TC_GAME_API TransportAnimation
@@ -95,7 +95,7 @@ struct TC_GAME_API TransportAnimation
     TransportPathRotationContainer Rotations;
     uint32 TotalTime;
 
-    TransportAnimationEntry const* GetAnimNode(uint32 time) const;
+    TransportAnimationDBC const* GetAnimNode(uint32 time) const;
     TransportRotationEntry const* GetAnimRotation(uint32 time) const;
 };
 
@@ -147,7 +147,7 @@ class TC_GAME_API TransportMgr
         // Generates and precaches a path for transport to avoid generation each time transport instance is created
         void GeneratePath(GameObjectTemplate const* goInfo, TransportTemplate* transport);
 
-        void AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg, TransportAnimationEntry const* node);
+        void AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg, TransportAnimationDBC const* node);
 
         void AddPathRotationToTransport(uint32 transportEntry, uint32 timeSeg, TransportRotationEntry const* node)
         {

@@ -94,8 +94,9 @@ void TransportMgr::LoadTransportTemplates()
 
 void TransportMgr::LoadTransportAnimationAndRotation()
 {
-    for (uint32 i = 0; i < sTransportAnimationStore.GetNumRows(); ++i)
-        if (TransportAnimationEntry const* anim = sTransportAnimationStore.LookupEntry(i))
+    TransportAnimationDBCMap const& taMap = sDBCStoresMgr->GetTransportAnimationDBCMap();
+    for (const auto& taID : taMap)
+        if (TransportAnimationDBC const* anim = &taID.second)
             AddPathNodeToTransport(anim->TransportID, anim->TimeIndex, anim);
 
     for (uint32 i = 0; i < sTransportRotationStore.GetNumRows(); ++i)
@@ -356,7 +357,7 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
     transport->pathTime = keyFrames.back().DepartureTime;
 }
 
-void TransportMgr::AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg, TransportAnimationEntry const* node)
+void TransportMgr::AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg, TransportAnimationDBC const* node)
 {
     TransportAnimation& animNode = _transportAnimations[transportEntry];
     if (animNode.TotalTime < timeSeg)
@@ -469,7 +470,7 @@ void TransportMgr::CreateInstanceTransports(Map* map)
         CreateTransport(*itr, 0, map);
 }
 
-TransportAnimationEntry const* TransportAnimation::GetAnimNode(uint32 time) const
+TransportAnimationDBC const* TransportAnimation::GetAnimNode(uint32 time) const
 {
     auto itr = Path.lower_bound(time);
     if (itr != Path.end())

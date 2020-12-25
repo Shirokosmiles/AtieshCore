@@ -74,14 +74,7 @@ struct SkillLineCategoryEntry
 
 
 
-struct TransportAnimationEntry
-{
-    //uint32 ID;                                            // 0
-    uint32 TransportID;                                     // 1
-    uint32 TimeIndex;                                       // 2
-    DBCPosition3D Pos;                                      // 3
-    //uint32 SequenceID;                                    // 4
-};
+
 
 struct TransportRotationEntry
 {
