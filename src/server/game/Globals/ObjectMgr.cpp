@@ -1151,7 +1151,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 
     if (cInfo->VehicleId)
     {
-        VehicleEntry const* vehId = sVehicleStore.LookupEntry(cInfo->VehicleId);
+        VehicleDBC const* vehId = sDBCStoresMgr->GetVehicleDBC(cInfo->VehicleId);
         if (!vehId)
         {
              TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has a non-existing VehicleId (%u). This *WILL* cause the client to freeze!", cInfo->Entry, cInfo->VehicleId);

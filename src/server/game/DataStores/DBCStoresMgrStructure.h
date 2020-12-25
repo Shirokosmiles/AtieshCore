@@ -1843,4 +1843,41 @@ struct TransportRotationDBC
     float W;                                                // 6
 };
 
+// load Vehicle.dbc
+#define MAX_VEHICLE_SEATS 8
+
+struct VehicleDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Flags;                                           // 1
+    float TurnSpeed;                                        // 2
+    float PitchSpeed;                                       // 3
+    float PitchMin;                                         // 4
+    float PitchMax;                                         // 5
+    uint32 SeatID[MAX_VEHICLE_SEATS];                       // 6-13
+    float MouseLookOffsetPitch;                             // 14
+    float CameraFadeDistScalarMin;                          // 15
+    float CameraFadeDistScalarMax;                          // 16
+    float CameraPitchOffset;                                // 17
+    float FacingLimitRight;                                 // 18
+    float FacingLimitLeft;                                  // 19
+    float MsslTrgtTurnLingering;                            // 20
+    float MsslTrgtPitchLingering;                           // 21
+    float MsslTrgtMouseLingering;                           // 22
+    float MsslTrgtEndOpacity;                               // 23
+    float MsslTrgtArcSpeed;                                 // 24
+    float MsslTrgtArcRepeat;                                // 25
+    float MsslTrgtArcWidth;                                 // 26
+    float MsslTrgtImpactRadius[2];                          // 27-28
+    char const* MsslTrgtArcTexture;                         // 29
+    char const* MsslTrgtImpactTexture;                      // 30
+    char const* MsslTrgtImpactModel[2];                     // 31-32
+    float CameraYawOffset;                                  // 33
+    uint32 UiLocomotionType;                                // 34
+    float MsslTrgtImpactTexRadius;                          // 35
+    uint32 VehicleUIIndicatorID;                            // 36
+    uint32 PowerDisplayID;                                  // 37
+    //uint32 PowerDisplayIDUnused[2];                       // 38-39
+};
+
 #pragma pack(pop)

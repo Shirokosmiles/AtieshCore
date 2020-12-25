@@ -20,6 +20,7 @@
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "EventProcessor.h"
 #include "Log.h"
 #include "MotionMaster.h"
@@ -33,7 +34,7 @@
 #include "Unit.h"
 #include "Util.h"
 
-Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
+Vehicle::Vehicle(Unit* unit, VehicleDBC const* vehInfo, uint32 creatureEntry) :
 UsableSeatNum(0), _me(unit), _vehicleInfo(vehInfo), _creatureEntry(creatureEntry), _status(STATUS_NONE), _lastShootPos()
 {
     for (uint32 i = 0; i < MAX_VEHICLE_SEATS; ++i)

@@ -185,7 +185,7 @@ TC_GAME_API void Map2ZoneCoordinates(float &x, float &y, uint32 zone);
 //TC_GAME_API extern DBCStorage <TransportRotationEntry>       sTransportRotationStore;
 //TC_GAME_API extern DBCStorage <TeamContributionPointsEntry>  sTeamContributionPointsStore;
 //TC_GAME_API extern DBCStorage <TotemCategoryEntry>           sTotemCategoryStore;
-TC_GAME_API extern DBCStorage <VehicleEntry>                 sVehicleStore;
+//TC_GAME_API extern DBCStorage <VehicleEntry>                 sVehicleStore;
 TC_GAME_API extern DBCStorage <VehicleSeatEntry>             sVehicleSeatStore;
 TC_GAME_API extern DBCStorage <WMOAreaTableEntry>            sWMOAreaTableStore;
 //TC_GAME_API extern DBCStorage <WorldMapAreaEntry>           sWorldMapAreaStore; -- use Zone2MapCoordinates and Map2ZoneCoordinates

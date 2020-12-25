@@ -12117,7 +12117,7 @@ void Unit::RestoreFaction()
 
 bool Unit::CreateVehicleKit(uint32 id, uint32 creatureEntry)
 {
-    VehicleEntry const* vehInfo = sVehicleStore.LookupEntry(id);
+    VehicleDBC const* vehInfo = sDBCStoresMgr->GetVehicleDBC(id);
     if (!vehInfo)
         return false;
 

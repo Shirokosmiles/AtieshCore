@@ -986,7 +986,7 @@ public:
         if (!ci)
             return false;
 
-        VehicleEntry const* ve = sVehicleStore.LookupEntry(*id);
+        VehicleDBC const* ve = sDBCStoresMgr->GetVehicleDBC(*id);
 
         if (!ve)
             return false;

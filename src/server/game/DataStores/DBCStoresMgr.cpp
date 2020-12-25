@@ -146,6 +146,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _totemCategoryMap.clear();
     _transportAnimationMap.clear();
     _transportRotationMap.clear();
+    _vehicleMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -295,6 +296,7 @@ void DBCStoresMgr::Initialize()
     _Load_TotemCategory();
     _Load_TransportAnimation();
     _Load_TransportRotation();
+    _Load_Vehicle();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4899,6 +4901,77 @@ void DBCStoresMgr::_Load_TransportRotation()
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_transportrotation             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load Vehicle.dbc
+void DBCStoresMgr::_Load_Vehicle()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _vehicleMap.clear();
+    //                                                0     1       2           3          4        5          6        7         8         9        10        11        12         13
+    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, TurnSpeed, PitchSpeed, PitchMin, PitchMax, SeatID_1, SeatID_2, SeatID_3, SeatID_4, SeatID_5, SeatID_6, SeatID_7, SeatID_8, "
+    //           14                     15                      16                      17              18                  19
+        "MouseLookOffsetPitch, CameraFadeDistScalarMin, CameraFadeDistScalarMax, CameraPitchOffset, FacingLimitRight, FacingLimitLeft, "
+    //           20                        21                       22                  23              24                  25                  26                  27                      28
+        "MsslTrgtTurnLingering, MsslTrgtPitchLingering, MsslTrgtMouseLingering, MsslTrgtEndOpacity, MsslTrgtArcSpeed, MsslTrgtArcRepeat, MsslTrgtArcWidth, MsslTrgtImpactRadius_1, MsslTrgtImpactRadius_2, "
+    //           29                     30                    31                    32                  33                34                    35                      36                 37
+        "MsslTrgtArcTexture, MsslTrgtImpactTexture, MsslTrgtImpactModel_1, MsslTrgtImpactModel_2, CameraYawOffset, UilocomotionType, MsslTrgtImpactTexRadius, VehicleUIIndicatorID, PowerDisplayID_1 FROM dbc_vehicle");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_vehicle. DB table `dbc_vehicle` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        VehicleDBC v;
+        v.ID = id;
+        v.Flags      = fields[1].GetUInt32();
+        v.TurnSpeed  = fields[2].GetFloat();
+        v.PitchSpeed = fields[3].GetFloat();
+        v.PitchMin   = fields[4].GetFloat();
+        v.PitchMax   = fields[5].GetFloat();
+        for (uint8 i = 0; i < MAX_VEHICLE_SEATS; i++)
+            v.SeatID[i] = fields[6 + i].GetUInt32();
+
+        v.MouseLookOffsetPitch    = fields[14].GetFloat();
+        v.CameraFadeDistScalarMin = fields[15].GetFloat();
+        v.CameraFadeDistScalarMax = fields[16].GetFloat();
+        v.CameraPitchOffset       = fields[17].GetFloat();
+        v.FacingLimitRight        = fields[18].GetFloat();
+        v.FacingLimitLeft         = fields[19].GetFloat();
+        v.MsslTrgtTurnLingering   = fields[20].GetFloat();
+        v.MsslTrgtPitchLingering  = fields[21].GetFloat();
+        v.MsslTrgtMouseLingering  = fields[22].GetFloat();
+        v.MsslTrgtEndOpacity      = fields[23].GetFloat();
+        v.MsslTrgtArcSpeed        = fields[24].GetFloat();
+        v.MsslTrgtArcRepeat       = fields[25].GetFloat();
+        v.MsslTrgtArcWidth        = fields[26].GetFloat();
+        for (uint8 i = 0; i < 2; i++)
+            v.MsslTrgtImpactRadius[i] = fields[27 + i].GetFloat();
+
+        v.MsslTrgtArcTexture    = fields[29].GetCString();
+        v.MsslTrgtImpactTexture = fields[30].GetCString();
+        for (uint8 i = 0; i < 2; i++)
+            v.MsslTrgtImpactModel[i] = fields[31 + i].GetCString();
+
+        v.CameraYawOffset         = fields[33].GetFloat();
+        v.UiLocomotionType        = fields[34].GetUInt32();
+        v.MsslTrgtImpactTexRadius = fields[35].GetFloat();
+        v.VehicleUIIndicatorID    = fields[36].GetUInt32();
+        v.PowerDisplayID          = fields[37].GetUInt32();
+
+        _vehicleMap[id] = v;
+
+        ++count;
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_vehicle                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db

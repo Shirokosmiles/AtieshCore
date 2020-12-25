@@ -20,6 +20,7 @@
 #include "BattlefieldMgr.h"
 #include "Battlefield/BattlefieldWG.h"
 #include "DBCStores.h"
+#include "DBCStoresMgrStructure.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
