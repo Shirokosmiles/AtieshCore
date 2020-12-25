@@ -40,7 +40,7 @@ UsableSeatNum(0), _me(unit), _vehicleInfo(vehInfo), _creatureEntry(creatureEntry
     for (uint32 i = 0; i < MAX_VEHICLE_SEATS; ++i)
     {
         if (uint32 seatId = _vehicleInfo->SeatID[i])
-            if (VehicleSeatEntry const* veSeat = sVehicleSeatStore.LookupEntry(seatId))
+            if (VehicleSeatDBC const* veSeat = sDBCStoresMgr->GetVehicleSeatDBC(seatId))
             {
                 VehicleSeatAddon const* addon = sObjectMgr->GetVehicleSeatAddon(seatId);
                 Seats.insert(std::make_pair(i, VehicleSeat(veSeat, addon)));
@@ -632,7 +632,7 @@ void Vehicle::InitMovementInfoForBase()
 }
 
 /**
- * @fn VehicleSeatEntry const* Vehicle::GetSeatForPassenger(Unit* passenger)
+ * @fn VehicleSeatDBC const* Vehicle::GetSeatForPassenger(Unit* passenger)
  *
  * @brief Returns information on the seat of specified passenger, represented by the format in VehicleSeat.dbc
  *
@@ -644,7 +644,7 @@ void Vehicle::InitMovementInfoForBase()
  * @return null if passenger not found on vehicle, else the DBC record for the seat.
  */
 
-VehicleSeatEntry const* Vehicle::GetSeatForPassenger(Unit const* passenger) const
+VehicleSeatDBC const* Vehicle::GetSeatForPassenger(Unit const* passenger) const
 {
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
         if (itr->second.Passenger.Guid == passenger->GetGUID())
@@ -837,7 +837,7 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
     Passenger->InterruptNonMeleeSpells(false);
     Passenger->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
-    VehicleSeatEntry const* veSeat = Seat->second.SeatInfo;
+    VehicleSeatDBC const* veSeat = Seat->second.SeatInfo;
     VehicleSeatAddon const* veSeatAddon = Seat->second.SeatAddon;
 
     Player* player = Passenger->ToPlayer();

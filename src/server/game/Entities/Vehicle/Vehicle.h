@@ -68,13 +68,13 @@ class TC_GAME_API Vehicle : public TransportBase
 
         SeatMap Seats;                                      ///< The collection of all seats on the vehicle. Including vacant ones.
 
-        VehicleSeatEntry const* GetSeatForPassenger(Unit const* passenger) const;
+        VehicleSeatDBC const* GetSeatForPassenger(Unit const* passenger) const;
 
         void RemovePendingEventsForPassenger(Unit* passenger);
 
     protected:
         friend class VehicleJoinEvent;
-        uint32 UsableSeatNum;                               ///< Number of seats that match VehicleSeatEntry::UsableByPlayer, used for proper display flags
+        uint32 UsableSeatNum;                               ///< Number of seats that match VehicleSeatDBC::UsableByPlayer, used for proper display flags
 
     private:
         enum Status

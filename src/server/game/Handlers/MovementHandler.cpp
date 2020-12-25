@@ -596,7 +596,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     // Some vehicles allow the passenger to turn by himself
     if (Vehicle* vehicle = mover->GetVehicle())
     {
-        if (VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(mover))
+        if (VehicleSeatDBC const* seat = vehicle->GetSeatForPassenger(mover))
         {
             if (seat->Flags & VEHICLE_SEAT_FLAG_ALLOW_TURNING)
             {

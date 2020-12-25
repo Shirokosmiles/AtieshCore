@@ -3665,7 +3665,7 @@ void ObjectMgr::LoadVehicleSeatAddon()
         float exitO = fields[5].GetFloat();
         uint8 exitParam = fields[6].GetUInt8();
 
-        if (!sVehicleSeatStore.LookupEntry(seatID))
+        if (!sDBCStoresMgr->GetVehicleSeatDBC(seatID))
         {
             TC_LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: %u does not exist in VehicleSeat.dbc. Skipping entry.", seatID);
             continue;

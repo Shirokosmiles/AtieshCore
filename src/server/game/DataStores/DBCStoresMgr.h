@@ -138,6 +138,7 @@ typedef std::unordered_map<uint32 /*ID*/, TotemCategoryDBC> TotemCategoryDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TransportAnimationDBC> TransportAnimationDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TransportRotationDBC> TransportRotationDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, VehicleDBC> VehicleDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, VehicleSeatDBC> VehicleSeatDBCMap;
 
 // HELPERS
 // regex
@@ -1221,6 +1222,14 @@ public:
         return nullptr;
     }
 
+    VehicleSeatDBC const* GetVehicleSeatDBC(uint32 ID)
+    {
+        VehicleSeatDBCMap::const_iterator itr = _vehicleSeatMap.find(ID);
+        if (itr != _vehicleSeatMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1385,6 +1394,7 @@ protected:
     void _Load_TransportAnimation();
     void _Load_TransportRotation();
     void _Load_Vehicle();
+    void _Load_VehicleSeat();
     
     void Initialize_WorldDBC_Corrections();
     void Initialize_Additional_Data();
@@ -1517,6 +1527,7 @@ private:
     TransportAnimationDBCMap _transportAnimationMap;
     TransportRotationDBCMap _transportRotationMap;
     VehicleDBCMap _vehicleMap;
+    VehicleSeatDBCMap _vehicleSeatMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

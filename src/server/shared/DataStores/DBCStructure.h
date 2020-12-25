@@ -69,73 +69,7 @@ struct SkillLineCategoryEntry
 */
 
 
-struct VehicleSeatEntry
-{
-    uint32 ID;                                              // 0
-    uint32 Flags;                                           // 1
-    int32 AttachmentID;                                     // 2
-    DBCPosition3D AttachmentOffset;                         // 3-5
-    float EnterPreDelay;                                    // 6
-    float EnterSpeed;                                       // 7
-    float EnterGravity;                                     // 8
-    float EnterMinDuration;                                 // 9
-    float EnterMaxDuration;                                 // 10
-    float EnterMinArcHeight;                                // 11
-    float EnterMaxArcHeight;                                // 12
-    int32 EnterAnimStart;                                   // 13
-    int32 EnterAnimLoop;                                    // 14
-    int32 RideAnimStart;                                    // 15
-    int32 RideAnimLoop;                                     // 16
-    int32 RideUpperAnimStart;                               // 17
-    int32 RideUpperAnimLoop;                                // 18
-    float ExitPreDelay;                                     // 19
-    float ExitSpeed;                                        // 20
-    float ExitGravity;                                      // 21
-    float ExitMinDuration;                                  // 22
-    float ExitMaxDuration;                                  // 23
-    float ExitMinArcHeight;                                 // 24
-    float ExitMaxArcHeight;                                 // 25
-    int32 ExitAnimStart;                                    // 26
-    int32 ExitAnimLoop;                                     // 27
-    int32 ExitAnimEnd;                                      // 28
-    float PassengerYaw;                                     // 29
-    float PassengerPitch;                                   // 30
-    float PassengerRoll;                                    // 31
-    int32 PassengerAttachmentID;                            // 32
-    int32 VehicleEnterAnim;                                 // 33
-    int32 VehicleExitAnim;                                  // 34
-    int32 VehicleRideAnimLoop;                              // 35
-    int32 VehicleEnterAnimBone;                             // 36
-    int32 VehicleExitAnimBone;                              // 37
-    int32 VehicleRideAnimLoopBone;                          // 38
-    float VehicleEnterAnimDelay;                            // 39
-    float VehicleExitAnimDelay;                             // 40
-    uint32 VehicleAbilityDisplay;                           // 41
-    uint32 EnterUISoundID;                                  // 42
-    uint32 ExitUISoundID;                                   // 43
-    int32 UiSkin;                                           // 44
-    uint32 FlagsB;                                          // 45
-    //float CameraEnteringDelay;                            // 46
-    //float CameraEnteringDuration;                         // 47
-    //float CameraExitingDelay;                             // 48
-    //float CameraExitingDuration;                          // 49
-    //DBCPosition3D CameraOffset;                           // 50-52
-    //float CameraPosChaseRate;                             // 53
-    //float CameraFacingChaseRate;                          // 54
-    //float CameraEnteringZoom;                             // 55
-    //float CameraSeatZoomMin;                              // 56
-    //float CameraSeatZoomMax;                              // 57
 
-    inline bool HasFlag(VehicleSeatFlags flag) const { return (Flags & flag) != 0; }
-    inline bool HasFlag(VehicleSeatFlagsB flag) const { return (FlagsB & flag) != 0; }
-
-    inline bool CanEnterOrExit() const { return HasFlag(VehicleSeatFlags(VEHICLE_SEAT_FLAG_CAN_ENTER_OR_EXIT | VEHICLE_SEAT_FLAG_CAN_CONTROL | VEHICLE_SEAT_FLAG_SHOULD_USE_VEH_SEAT_EXIT_ANIM_ON_VOLUNTARY_EXIT)); }
-    inline bool CanSwitchFromSeat() const { return HasFlag(VEHICLE_SEAT_FLAG_CAN_SWITCH); }
-    inline bool IsUsableByOverride() const { return HasFlag(VehicleSeatFlags(VEHICLE_SEAT_FLAG_UNCONTROLLED | VEHICLE_SEAT_FLAG_UNK18))
-                                    || HasFlag(VehicleSeatFlagsB(VEHICLE_SEAT_FLAG_B_USABLE_FORCED | VEHICLE_SEAT_FLAG_B_USABLE_FORCED_2 |
-                                        VEHICLE_SEAT_FLAG_B_USABLE_FORCED_3 | VEHICLE_SEAT_FLAG_B_USABLE_FORCED_4)); }
-    inline bool IsEjectable() const { return HasFlag(VEHICLE_SEAT_FLAG_B_EJECTABLE); }
-};
 
 struct WMOAreaTableEntry
 {

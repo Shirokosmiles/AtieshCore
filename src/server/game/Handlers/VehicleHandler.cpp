@@ -17,6 +17,7 @@
 
 #include "WorldSession.h"
 #include "DBCStructure.h"
+#include "DBCStoresMgrStructure.h"
 #include "Log.h"
 #include "Map.h"
 #include "ObjectAccessor.h"
@@ -60,7 +61,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recvData)
         return;
     }
 
-    VehicleSeatEntry const* seat = GetPlayer()->GetVehicle()->GetSeatForPassenger(GetPlayer());
+    VehicleSeatDBC const* seat = GetPlayer()->GetVehicle()->GetSeatForPassenger(GetPlayer());
     if (!seat->CanSwitchFromSeat())
     {
         recvData.rfinish();                                // prevent warnings spam
@@ -176,7 +177,7 @@ void WorldSession::HandleEjectPassenger(WorldPacket &data)
             return;
         }
 
-        VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(unit);
+        VehicleSeatDBC const* seat = vehicle->GetSeatForPassenger(unit);
         ASSERT(seat);
         if (seat->IsEjectable())
             unit->ExitVehicle();
@@ -193,7 +194,7 @@ void WorldSession::HandleRequestVehicleExit(WorldPacket& /*recvData*/)
 
     if (Vehicle* vehicle = GetPlayer()->GetVehicle())
     {
-        if (VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(GetPlayer()))
+        if (VehicleSeatDBC const* seat = vehicle->GetSeatForPassenger(GetPlayer()))
         {
             if (seat->CanEnterOrExit())
                 GetPlayer()->ExitVehicle();

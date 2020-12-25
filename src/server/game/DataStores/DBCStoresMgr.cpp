@@ -147,6 +147,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _transportAnimationMap.clear();
     _transportRotationMap.clear();
     _vehicleMap.clear();
+    _vehicleSeatMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -297,6 +298,7 @@ void DBCStoresMgr::Initialize()
     _Load_TransportAnimation();
     _Load_TransportRotation();
     _Load_Vehicle();
+    _Load_VehicleSeat();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4972,6 +4974,90 @@ void DBCStoresMgr::_Load_Vehicle()
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_vehicle                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load VehicleSeat.dbc
+void DBCStoresMgr::_Load_VehicleSeat()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _vehicleSeatMap.clear();
+    //                                                0    1        2                   3               4                   5
+    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, AttachmentID, AttachmentOffsetX, AttachmentOffsetY, AttachmentOffsetZ, "
+    //          6           7              8              9                 10              11                  12                 13           14
+        "EnterPreDelay, EnterSpeed, EnterGravity, EnterMinDuration, EnterMaxDuration, EnterMinArcHeight, EnterMaxArcHeight, EnterAnimStart, EnterAnimLoop, "
+    //          15            16               17                   18           19            20           21          22                 23               24               25                26           27          28
+        "RideAnimStart, RideAnimLoop, RideUpperAnimStart, RideUpperAnimLoop, ExitPreDelay, ExitSpeed, ExitGravity, ExitMinDuration, ExitMaxDuration, ExitMinArcHeight, ExitMaxArcHeight, ExitAnimStart, ExitAnimLoop, ExitAnimEnd, "
+    //          29          30              31                  32                  33              34                  35                  36                      37                      38                      39                  40                  41
+        "PassengerYaw, PassengerPitch, PassengerRoll, PassengerAttachmentID, VehicleEnterAnim, VehicleExitAnim, VehicleRideAnimLoop, VehicleEnterAnimBone, VehicleExitAnimBone, VehicleRideAnimLoopBone, VehicleEnterAnimDelay, VehicleExitAnimDelay, VehicleAbilityDisplay, "
+    //          42             43         44      45
+        "EnterUISoundID, ExitUISoundID, UiSkin, FlagsB FROM dbc_vehicleseat");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_vehicleseat. DB table `dbc_vehicleseat` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        VehicleSeatDBC vs;
+        vs.ID = id;
+        vs.Flags                   = fields[1].GetUInt32();
+        vs.AttachmentID            = fields[2].GetInt32();
+        vs.AttachmentOffset.X      = fields[3].GetFloat();
+        vs.AttachmentOffset.Y      = fields[4].GetFloat();
+        vs.AttachmentOffset.Z      = fields[5].GetFloat();
+        vs.EnterPreDelay           = fields[6].GetFloat();
+        vs.EnterSpeed              = fields[7].GetFloat();
+        vs.EnterGravity            = fields[8].GetFloat();
+        vs.EnterMinDuration        = fields[9].GetFloat();
+        vs.EnterMaxDuration        = fields[10].GetFloat();
+        vs.EnterMinArcHeight       = fields[11].GetFloat();
+        vs.EnterMaxArcHeight       = fields[12].GetFloat();
+        vs.EnterAnimStart          = fields[13].GetInt32();
+        vs.EnterAnimLoop           = fields[14].GetInt32();
+        vs.RideAnimStart           = fields[15].GetInt32();
+        vs.RideAnimLoop            = fields[16].GetInt32();
+        vs.RideUpperAnimStart      = fields[17].GetInt32();
+        vs.RideUpperAnimLoop       = fields[18].GetInt32();
+        vs.ExitPreDelay            = fields[19].GetFloat();
+        vs.ExitSpeed               = fields[20].GetFloat();
+        vs.ExitGravity             = fields[21].GetFloat();
+        vs.ExitMinDuration         = fields[22].GetFloat();
+        vs.ExitMaxDuration         = fields[23].GetFloat();
+        vs.ExitMinArcHeight        = fields[24].GetFloat();
+        vs.ExitMaxArcHeight        = fields[25].GetFloat();
+        vs.ExitAnimStart           = fields[26].GetInt32();
+        vs.ExitAnimLoop            = fields[27].GetInt32();
+        vs.ExitAnimEnd             = fields[28].GetInt32();
+        vs.PassengerYaw            = fields[29].GetFloat();
+        vs.PassengerPitch          = fields[30].GetFloat();
+        vs.PassengerRoll           = fields[31].GetFloat();
+        vs.PassengerAttachmentID   = fields[32].GetInt32();
+        vs.VehicleEnterAnim        = fields[33].GetInt32();
+        vs.VehicleExitAnim         = fields[34].GetInt32();
+        vs.VehicleRideAnimLoop     = fields[35].GetInt32();
+        vs.VehicleEnterAnimBone    = fields[36].GetInt32();
+        vs.VehicleExitAnimBone     = fields[37].GetInt32();
+        vs.VehicleRideAnimLoopBone = fields[38].GetInt32();
+        vs.VehicleEnterAnimDelay   = fields[39].GetFloat();
+        vs.VehicleExitAnimDelay    = fields[40].GetFloat();
+        vs.VehicleAbilityDisplay   = fields[41].GetUInt32();
+        vs.EnterUISoundID          = fields[42].GetUInt32();
+        vs.ExitUISoundID           = fields[43].GetUInt32();
+        vs.UiSkin                  = fields[44].GetInt32();
+        vs.FlagsB                  = fields[45].GetUInt32();
+
+        _vehicleSeatMap[id] = vs;
+
+        ++count;
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_vehicleseat                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db
