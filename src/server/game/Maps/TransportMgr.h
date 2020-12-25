@@ -85,7 +85,7 @@ struct TransportTemplate
 };
 
 typedef std::map<uint32, TransportAnimationDBC const*> TransportPathContainer;
-typedef std::map<uint32, TransportRotationEntry const*> TransportPathRotationContainer;
+typedef std::map<uint32, TransportRotationDBC const*> TransportPathRotationContainer;
 
 struct TC_GAME_API TransportAnimation
 {
@@ -96,7 +96,7 @@ struct TC_GAME_API TransportAnimation
     uint32 TotalTime;
 
     TransportAnimationDBC const* GetAnimNode(uint32 time) const;
-    TransportRotationEntry const* GetAnimRotation(uint32 time) const;
+    TransportRotationDBC const* GetAnimRotation(uint32 time) const;
 };
 
 typedef std::map<uint32, TransportAnimation> TransportAnimationContainer;
@@ -149,7 +149,7 @@ class TC_GAME_API TransportMgr
 
         void AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg, TransportAnimationDBC const* node);
 
-        void AddPathRotationToTransport(uint32 transportEntry, uint32 timeSeg, TransportRotationEntry const* node)
+        void AddPathRotationToTransport(uint32 transportEntry, uint32 timeSeg, TransportRotationDBC const* node)
         {
             _transportAnimations[transportEntry].Rotations[timeSeg] = node;
         }

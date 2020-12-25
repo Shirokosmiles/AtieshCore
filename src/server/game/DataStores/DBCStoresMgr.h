@@ -136,6 +136,7 @@ typedef std::unordered_map<uint32 /*ID*/, TaxiPathNodeDBC> TaxiPathNodeDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TeamContributionPointsDBC> TeamContributionPointsDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TotemCategoryDBC> TotemCategoryDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TransportAnimationDBC> TransportAnimationDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, TransportRotationDBC> TransportRotationDBCMap;
 
 // HELPERS
 // regex
@@ -1202,6 +1203,15 @@ public:
         return nullptr;
     }
 
+    TransportRotationDBCMap const& GetTransportRotationDBCMap() const { return _transportRotationMap; }
+    TransportRotationDBC const* GetTransportRotationDBC(uint32 ID)
+    {
+        TransportRotationDBCMap::const_iterator itr = _transportRotationMap.find(ID);
+        if (itr != _transportRotationMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1364,6 +1374,7 @@ protected:
     void _Load_TeamContributionPoints();
     void _Load_TotemCategory();
     void _Load_TransportAnimation();
+    void _Load_TransportRotation();
     
     void Initialize_WorldDBC_Corrections();
     void Initialize_Additional_Data();
@@ -1494,6 +1505,7 @@ private:
     TeamContributionPointsDBCMap _teamContributionPointsMap;
     TotemCategoryDBCMap _totemCategoryMap;
     TransportAnimationDBCMap _transportAnimationMap;
+    TransportRotationDBCMap _transportRotationMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

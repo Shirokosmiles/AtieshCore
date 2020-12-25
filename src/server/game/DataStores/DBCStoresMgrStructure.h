@@ -1831,4 +1831,16 @@ struct TransportAnimationDBC
     //uint32 SequenceID;                                    // 4
 };
 
+// load TransportRotation.dbc
+struct TransportRotationDBC
+{
+    uint32 ID;                                              // 0
+    uint32 GameObjectsID;                                   // 1
+    uint32 TimeIndex;                                       // 2
+    float X;                                                // 3
+    float Y;                                                // 4
+    float Z;                                                // 5
+    float W;                                                // 6
+};
+
 #pragma pack(pop)

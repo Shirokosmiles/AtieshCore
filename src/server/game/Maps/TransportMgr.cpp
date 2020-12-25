@@ -99,8 +99,9 @@ void TransportMgr::LoadTransportAnimationAndRotation()
         if (TransportAnimationDBC const* anim = &taID.second)
             AddPathNodeToTransport(anim->TransportID, anim->TimeIndex, anim);
 
-    for (uint32 i = 0; i < sTransportRotationStore.GetNumRows(); ++i)
-        if (TransportRotationEntry const* rot = sTransportRotationStore.LookupEntry(i))
+    TransportRotationDBCMap const& trMap = sDBCStoresMgr->GetTransportRotationDBCMap();
+    for (const auto& trID : trMap)
+        if (TransportRotationDBC const* rot = &trID.second)
             AddPathRotationToTransport(rot->GameObjectsID, rot->TimeIndex, rot);
 }
 
@@ -479,7 +480,7 @@ TransportAnimationDBC const* TransportAnimation::GetAnimNode(uint32 time) const
     return nullptr;
 }
 
-TransportRotationEntry const* TransportAnimation::GetAnimRotation(uint32 time) const
+TransportRotationDBC const* TransportAnimation::GetAnimRotation(uint32 time) const
 {
     auto itr = Rotations.lower_bound(time);
     if (itr != Rotations.end())
