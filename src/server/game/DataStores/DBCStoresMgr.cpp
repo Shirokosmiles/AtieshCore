@@ -27,10 +27,11 @@ DBCStoresMgr* DBCStoresMgr::instance()
 
 DBCStoresMgr::DBCStoresMgr()
 {
-    _itemRandomSuffixNumRow = 0;
-    _spellNumRow = 0;
+    _bannedAddonsNumRow         = 0;
+    _itemRandomSuffixNumRow     = 0;
+    _spellNumRow                = 0;
     _spellItemEnchantmentNumRow = 0;
-    _taxiPathNumRow = 0;
+    _taxiPathNumRow             = 0;
 }
 
 DBCStoresMgr::~DBCStoresMgr()
@@ -161,10 +162,11 @@ DBCStoresMgr::~DBCStoresMgr()
     _petTalentSpells.clear();
     _talentSpellPos.clear();
 
-    _itemRandomSuffixNumRow = 0;
-    _spellNumRow = 0;
+    _bannedAddonsNumRow         = 0;
+    _itemRandomSuffixNumRow     = 0;
+    _spellNumRow                = 0;
     _spellItemEnchantmentNumRow = 0;
-    _taxiPathNumRow = 0;
+    _taxiPathNumRow             = 0;
 
     for (uint8 i = 0; i < MAX_CLASSES; i++)
         for (uint8 j = 0; j < 3; j++)
@@ -697,9 +699,18 @@ void DBCStoresMgr::_Load_BannedAddOns()
 
         _bannedAddonsMap[id] = ba;
 
+        if (_bannedAddonsNumRow)
+        {
+            if (_bannedAddonsNumRow < id)
+                _bannedAddonsNumRow = id;
+        }
+        else
+            _bannedAddonsNumRow = id;
+
         ++count;
     } while (result->NextRow());
 
+    _bannedAddonsNumRow++; // this _bannedAddonsNumRow should be more then the last by 1 point
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_bannedaddons                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

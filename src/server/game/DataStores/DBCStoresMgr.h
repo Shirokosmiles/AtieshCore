@@ -240,7 +240,7 @@ public:
         return nullptr;
     }
 
-    uint32 GetBannedAddOnsSize() { return _bannedAddonsMap.size(); }
+    uint32 GetBannedAddOnsNumRow() { return _bannedAddonsNumRow; }
     BannedAddOnsDBC const* GetBannedAddOnsDBC(uint32 id) const
     {
         BannedAddOnsDBCMap::const_iterator itr = _bannedAddonsMap.find(id);
@@ -1536,6 +1536,7 @@ private:
     PetTalentSpells _petTalentSpells;
     TalentSpellPosMap _talentSpellPos;
 
+    uint32 _bannedAddonsNumRow;
     uint32 _itemRandomSuffixNumRow;
     uint32 _spellNumRow;
     uint32 _spellItemEnchantmentNumRow;

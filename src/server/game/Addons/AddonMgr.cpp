@@ -69,7 +69,7 @@ void LoadFromDB()
     if (result)
     {
         uint32 count = 0;
-        uint32 dbcMaxBannedAddon = sDBCStoresMgr->GetBannedAddOnsSize();
+        uint32 dbcMaxBannedAddon = sDBCStoresMgr->GetBannedAddOnsNumRow();
 
         do
         {
