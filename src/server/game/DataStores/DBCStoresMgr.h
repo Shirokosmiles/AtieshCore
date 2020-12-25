@@ -139,6 +139,7 @@ typedef std::unordered_map<uint32 /*ID*/, TransportAnimationDBC> TransportAnimat
 typedef std::unordered_map<uint32 /*ID*/, TransportRotationDBC> TransportRotationDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, VehicleDBC> VehicleDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, VehicleSeatDBC> VehicleSeatDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, WMOAreaTableDBC> WMOAreaTableDBCMap;
 
 // HELPERS
 // regex
@@ -1230,6 +1231,26 @@ public:
         return nullptr;
     }
 
+    WMOAreaTableDBC const* GetWMOAreaTableDBC(uint32 ID)
+    {
+        WMOAreaTableDBCMap::const_iterator itr = _wmoAreaTableMap.find(ID);
+        if (itr != _wmoAreaTableMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    WMOAreaTableDBC const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid)
+    {
+        for (WMOAreaTableDBCMap::const_iterator itr = _wmoAreaTableMap.begin(); itr != _wmoAreaTableMap.end(); ++itr)
+        {
+            if (itr->second.WMOID == rootid &&
+                itr->second.NameSetID == adtid &&
+                itr->second.WMOGroupID == groupid)
+                return &itr->second;
+        }
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1395,6 +1416,7 @@ protected:
     void _Load_TransportRotation();
     void _Load_Vehicle();
     void _Load_VehicleSeat();
+    void _Load_WMOAreaTable();
     
     void Initialize_WorldDBC_Corrections();
     void Initialize_Additional_Data();
@@ -1528,6 +1550,7 @@ private:
     TransportRotationDBCMap _transportRotationMap;
     VehicleDBCMap _vehicleMap;
     VehicleSeatDBCMap _vehicleSeatMap;
+    WMOAreaTableDBCMap _wmoAreaTableMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

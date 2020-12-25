@@ -36,14 +36,14 @@
 typedef std::map<uint16, uint32> AreaFlagByAreaID;
 typedef std::map<uint32, uint32> AreaFlagByMapID;
 
-typedef std::tuple<int16, int8, int32> WMOAreaTableKey;
-typedef std::map<WMOAreaTableKey, WMOAreaTableEntry const*> WMOAreaInfoByTripple;
+//typedef std::tuple<int16, int8, int32> WMOAreaTableKey;
+//typedef std::map<WMOAreaTableKey, WMOAreaTableEntry const*> WMOAreaInfoByTripple;
 
 //DBCStorage <AreaTableEntry> sAreaTableStore(AreaTableEntryfmt);
 //DBCStorage <AreaGroupEntry> sAreaGroupStore(AreaGroupEntryfmt);
 //DBCStorage <AreaPOIEntry> sAreaPOIStore(AreaPOIEntryfmt);
 
-static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
+//static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
 //DBCStorage <AchievementEntry> sAchievementStore(Achievementfmt);
 //DBCStorage <AchievementCriteriaEntry> sAchievementCriteriaStore(AchievementCriteriafmt);
@@ -206,7 +206,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <TransportRotationEntry> sTransportRotationStore(TransportRotationfmt);
 //DBCStorage <VehicleEntry> sVehicleStore(VehicleEntryfmt);
 //DBCStorage <VehicleSeatEntry> sVehicleSeatStore(VehicleSeatEntryfmt);
-DBCStorage <WMOAreaTableEntry> sWMOAreaTableStore(WMOAreaTableEntryfmt);
+//DBCStorage <WMOAreaTableEntry> sWMOAreaTableStore(WMOAreaTableEntryfmt);
 DBCStorage <WorldMapAreaEntry> sWorldMapAreaStore(WorldMapAreaEntryfmt);
 DBCStorage <WorldMapOverlayEntry> sWorldMapOverlayStore(WorldMapOverlayEntryfmt);
 DBCStorage <WorldSafeLocsEntry> sWorldSafeLocsStore(WorldSafeLocsEntryfmt);
@@ -389,7 +389,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sTransportRotationStore,             "TransportRotation.dbc");
     //LOAD_DBC(sVehicleStore,                       "Vehicle.dbc");
     //LOAD_DBC(sVehicleSeatStore,                   "VehicleSeat.dbc");
-    LOAD_DBC(sWMOAreaTableStore,                  "WMOAreaTable.dbc");
+    //LOAD_DBC(sWMOAreaTableStore,                  "WMOAreaTable.dbc");
     LOAD_DBC(sWorldMapAreaStore,                  "WorldMapArea.dbc");
     LOAD_DBC(sWorldMapOverlayStore,               "WorldMapOverlay.dbc");
     LOAD_DBC(sWorldSafeLocsStore,                 "WorldSafeLocs.dbc");
@@ -523,8 +523,8 @@ void LoadDBCStores(const std::string& dataPath)
         }
     }*/
 
-    for (WMOAreaTableEntry const* entry : sWMOAreaTableStore)
-        sWMOAreaInfoByTripple[WMOAreaTableKey(entry->WMOID, entry->NameSetID, entry->WMOGroupID)] = entry;
+    //for (WMOAreaTableEntry const* entry : sWMOAreaTableStore)
+    //    sWMOAreaInfoByTripple[WMOAreaTableKey(entry->WMOID, entry->NameSetID, entry->WMOGroupID)] = entry;
 
     // error checks
     if (bad_dbc_files.size() >= DBCFileCount)
@@ -559,14 +559,14 @@ void LoadDBCStores(const std::string& dataPath)
 
 }
 
-WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid)
+/*WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid)
 {
     auto i = sWMOAreaInfoByTripple.find(WMOAreaTableKey(int16(rootid), int8(adtid), groupid));
     if (i != sWMOAreaInfoByTripple.end())
         return i->second;
 
     return nullptr;
-}
+}*/
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)
 {

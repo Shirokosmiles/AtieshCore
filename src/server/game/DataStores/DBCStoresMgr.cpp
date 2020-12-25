@@ -149,6 +149,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _transportRotationMap.clear();
     _vehicleMap.clear();
     _vehicleSeatMap.clear();
+    _wmoAreaTableMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -301,6 +302,7 @@ void DBCStoresMgr::Initialize()
     _Load_TransportRotation();
     _Load_Vehicle();
     _Load_VehicleSeat();
+    _Load_WMOAreaTable();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -5069,6 +5071,42 @@ void DBCStoresMgr::_Load_VehicleSeat()
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_vehicleseat                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load WMOAreaTable.dbc
+void DBCStoresMgr::_Load_WMOAreaTable()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _wmoAreaTableMap.clear();
+    //                                                0    1        2           3        4         5
+    QueryResult result = WorldDatabase.Query("SELECT ID, WMOID, NameSetID, WMOGroupID, Flags, AreaTableID FROM dbc_wmoareatable");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_wmoareatable. DB table `dbc_wmoareatable` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        WMOAreaTableDBC wat;
+        wat.ID = id;
+        wat.WMOID       = fields[1].GetInt32();
+        wat.NameSetID   = fields[2].GetInt32();
+        wat.WMOGroupID  = fields[3].GetInt32();
+        wat.Flags       = fields[4].GetUInt32();
+        wat.AreaTableID = fields[5].GetUInt32();
+
+        _wmoAreaTableMap[id] = wat;
+
+        ++count;
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_wmoareatable                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db

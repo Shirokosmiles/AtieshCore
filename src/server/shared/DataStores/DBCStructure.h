@@ -71,22 +71,7 @@ struct SkillLineCategoryEntry
 
 
 
-struct WMOAreaTableEntry
-{
-    uint32 ID;                                              // 0 index
-    int32 WMOID;                                            // 1 used in root WMO
-    int32 NameSetID;                                        // 2 used in adt file
-    int32 WMOGroupID;                                       // 3 used in group WMO
-    //uint32 SoundProviderPref;                             // 4
-    //uint32 SoundProviderPrefUnderwater;                   // 5
-    //uint32 AmbienceID;                                    // 6
-    //uint32 ZoneMusic;                                     // 7
-    //uint32 IntroSound;                                    // 8
-    uint32 Flags;                                           // 9 used for indoor/outdoor determination
-    uint32 AreaTableID;                                     // 10 link to AreaTableEntry.ID
-    //char const* AreaName[16];                             // 11
-    //uint32 AreaName_lang_mask;                            // 12
-};
+
 
 struct WorldMapAreaEntry
 {

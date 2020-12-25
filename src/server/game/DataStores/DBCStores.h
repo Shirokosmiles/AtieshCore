@@ -31,7 +31,7 @@ enum LocaleConstant : uint8;
 //TC_GAME_API uint32 GetTalentSpellCost(uint32 spellId);
 //TC_GAME_API TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
 
-TC_GAME_API WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid);
+//TC_GAME_API WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid);
 
 TC_GAME_API uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId);
 
@@ -187,7 +187,7 @@ TC_GAME_API void Map2ZoneCoordinates(float &x, float &y, uint32 zone);
 //TC_GAME_API extern DBCStorage <TotemCategoryEntry>           sTotemCategoryStore;
 //TC_GAME_API extern DBCStorage <VehicleEntry>                 sVehicleStore;
 //TC_GAME_API extern DBCStorage <VehicleSeatEntry>             sVehicleSeatStore;
-TC_GAME_API extern DBCStorage <WMOAreaTableEntry>            sWMOAreaTableStore;
+//TC_GAME_API extern DBCStorage <WMOAreaTableEntry>            sWMOAreaTableStore;
 //TC_GAME_API extern DBCStorage <WorldMapAreaEntry>           sWorldMapAreaStore; -- use Zone2MapCoordinates and Map2ZoneCoordinates
 TC_GAME_API extern DBCStorage <WorldMapOverlayEntry>         sWorldMapOverlayStore;
 TC_GAME_API extern DBCStorage <WorldSafeLocsEntry>           sWorldSafeLocsStore;
