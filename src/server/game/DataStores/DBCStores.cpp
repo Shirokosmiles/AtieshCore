@@ -200,7 +200,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //TaxiPathNodesByPath sTaxiPathNodesByPath;
 //static DBCStorage <TaxiPathNodeEntry> sTaxiPathNodeStore(TaxiPathNodeEntryfmt);
 
-DBCStorage <TeamContributionPointsEntry> sTeamContributionPointsStore(TeamContributionPointsfmt);
+//DBCStorage <TeamContributionPointsEntry> sTeamContributionPointsStore(TeamContributionPointsfmt);
 DBCStorage <TotemCategoryEntry> sTotemCategoryStore(TotemCategoryEntryfmt);
 DBCStorage <TransportAnimationEntry> sTransportAnimationStore(TransportAnimationfmt);
 DBCStorage <TransportRotationEntry> sTransportRotationStore(TransportRotationfmt);
@@ -383,7 +383,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sTaxiNodesStore,                     "TaxiNodes.dbc");
     //LOAD_DBC(sTaxiPathStore,                      "TaxiPath.dbc");
     //LOAD_DBC(sTaxiPathNodeStore,                  "TaxiPathNode.dbc");
-    LOAD_DBC(sTeamContributionPointsStore,        "TeamContributionPoints.dbc");
+    //LOAD_DBC(sTeamContributionPointsStore,        "TeamContributionPoints.dbc");
     LOAD_DBC(sTotemCategoryStore,                 "TotemCategory.dbc");
     LOAD_DBC(sTransportAnimationStore,            "TransportAnimation.dbc");
     LOAD_DBC(sTransportRotationStore,             "TransportRotation.dbc");

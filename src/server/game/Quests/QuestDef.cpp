@@ -356,7 +356,7 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
     if (GetRewHonorAddition() > 0 || GetRewHonorMultiplier() > 0.0f)
     {
         // values stored from 0.. for 1...
-        TeamContributionPointsEntry const* tc = sTeamContributionPointsStore.LookupEntry(level);
+        TeamContributionPointsDBC const* tc = sDBCStoresMgr->GetTeamContributionPointsDBC(level);
         if (!tc)
             return 0;
 

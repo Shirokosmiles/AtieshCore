@@ -133,6 +133,7 @@ typedef std::unordered_map<uint32 /*ID*/, TalentTabDBC> TalentTabDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TaxiNodesDBC> TaxiNodesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TaxiPathDBC> TaxiPathDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TaxiPathNodeDBC> TaxiPathNodeDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, TeamContributionPointsDBC> TeamContributionPointsDBCMap;
 
 // HELPERS
 // regex
@@ -1146,10 +1147,18 @@ public:
         return nullptr;
     }
 
-    TaxiPathNodeDBC const* GeTaxiPathNodeDBC(uint32 ID)
+    TaxiPathNodeDBC const* GetTaxiPathNodeDBC(uint32 ID)
     {
         TaxiPathNodeDBCMap::const_iterator itr = _taxiPathNodeMap.find(ID);
         if (itr != _taxiPathNodeMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    TeamContributionPointsDBC const* GetTeamContributionPointsDBC(uint32 ID)
+    {
+        TeamContributionPointsDBCMap::const_iterator itr = _teamContributionPointsMap.find(ID);
+        if (itr != _teamContributionPointsMap.end())
             return &itr->second;
         return nullptr;
     }
@@ -1176,10 +1185,9 @@ public:
 
     TalentSpellPos const* GetTalentSpellPos(uint32 spellId)
     {
-        TalentSpellPosMap::const_iterator itr = _TalentSpellPos.find(spellId);
-        if (itr == _TalentSpellPos.end())
+        TalentSpellPosMap::const_iterator itr = _talentSpellPos.find(spellId);
+        if (itr == _talentSpellPos.end())
             return nullptr;
-
         return &itr->second;
     }
 
@@ -1187,11 +1195,10 @@ public:
     {
         if (TalentSpellPos const* pos = GetTalentSpellPos(spellId))
             return pos->rank + 1;
-
         return 0;
     }
 
-    PetTalentSpells const& GetPetTalentSpells() { return _PetTalentSpells; }
+    PetTalentSpells const& GetPetTalentSpells() { return _petTalentSpells; }
 
     uint32 const* GetTalentTabPages(uint8 cls)
     {
@@ -1205,7 +1212,6 @@ public:
     TaxiMask const GetDeathKnightTaxiNodesMask() { return _DeathKnightTaxiNodesMask; }
 
     TaxiPathSetBySource const& GetTaxiPathSetBySource() { return _taxiPathSetBySource; }
-
     TaxiPathNodesByPath const& GetTaxiPathNodesByPath() { return _taxiPathNodesByPath; }
 
 protected:
@@ -1316,6 +1322,7 @@ protected:
     void _Load_TaxiNodes();
     void _Load_TaxiPath();
     void _Load_TaxiPathNode();
+    void _Load_TeamContributionPoints();
 
     // Handle Additional dbc from world db
     void Initialize_WorldDBC_Corrections();
@@ -1441,13 +1448,15 @@ private:
     TaxiNodesDBCMap _taxiNodesMap;
     TaxiPathDBCMap _taxiPathMap;
     TaxiPathNodeDBCMap _taxiPathNodeMap;
+    TeamContributionPointsDBCMap _teamContributionPointsMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
     NameValidationRegexContainer NamesReservedValidators;
     PetFamilySpellsStore _petFamilySpellsStore;
-    TalentSpellPosMap _TalentSpellPos;
-    PetTalentSpells _PetTalentSpells;
+    PetTalentSpells _petTalentSpells;
+    TalentSpellPosMap _talentSpellPos;
+
     uint32 _itemRandomSuffixNumRow;
     uint32 _spellNumRow;
     uint32 _spellItemEnchantmentNumRow;

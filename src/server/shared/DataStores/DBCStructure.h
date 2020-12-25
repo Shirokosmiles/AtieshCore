@@ -70,11 +70,7 @@ struct SkillLineCategoryEntry
 
 
 
-struct TeamContributionPointsEntry
-{
-    //uint32 ID;                                            // 0
-    float Data;                                             // 1
-};
+
 
 struct TotemCategoryEntry
 {

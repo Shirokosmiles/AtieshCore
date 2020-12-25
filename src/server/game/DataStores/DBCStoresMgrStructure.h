@@ -1804,4 +1804,11 @@ struct TaxiPathNodeDBC
     uint32 DepartureEventID;                                // 10
 };
 
+// load TeamContributionPoints.dbc
+struct TeamContributionPointsDBC
+{
+    uint32 ID;                                              // 0
+    float Data;                                             // 1
+};
+
 #pragma pack(pop)

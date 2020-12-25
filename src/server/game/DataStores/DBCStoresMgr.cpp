@@ -142,6 +142,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _taxiNodesMap.clear();
     _taxiPathMap.clear();
     _taxiPathNodeMap.clear();
+    _teamContributionPointsMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -152,9 +153,9 @@ DBCStoresMgr::~DBCStoresMgr()
     for (auto& pfsID : _petFamilySpellsStore)
         pfsID.second.clear();
     _petFamilySpellsStore.clear();
+    _petTalentSpells.clear();
+    _talentSpellPos.clear();
 
-    _TalentSpellPos.clear();
-    _PetTalentSpells.clear();
     _itemRandomSuffixNumRow = 0;
     _spellNumRow = 0;
     _spellItemEnchantmentNumRow = 0;
@@ -287,6 +288,7 @@ void DBCStoresMgr::Initialize()
     _Load_TaxiNodes();
     _Load_TaxiPath();
     _Load_TaxiPathNode();
+    _Load_TeamContributionPoints();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -4748,6 +4750,38 @@ void DBCStoresMgr::_Load_TaxiPathNode()
     TC_LOG_INFO("server.loading", ">> Loaded DBC_taxipathnode                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+// load TeamContributionPoints.dbc
+void DBCStoresMgr::_Load_TeamContributionPoints()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _teamContributionPointsMap.clear();
+    //                                                0     1
+    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_teamcontributionpoints");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_teamcontributionpoints. DB table `dbc_teamcontributionpoints` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        TeamContributionPointsDBC tcp;
+        tcp.ID = id;
+        tcp.Data = fields[1].GetFloat();
+
+        _teamContributionPointsMap[id] = tcp;
+
+        ++count;
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_teamcontributionpoints        %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 // Handle Additional dbc from World db
 void DBCStoresMgr::_Handle_World_Achievement()
 {
@@ -5231,9 +5265,9 @@ void DBCStoresMgr::_Handle_TalentSpellPosStore()
             {
                 if (talentInfo->SpellRank[j])
                 {
-                    _TalentSpellPos[talentInfo->SpellRank[j]] = TalentSpellPos(talentInfo->ID, j);
+                    _talentSpellPos[talentInfo->SpellRank[j]] = TalentSpellPos(talentInfo->ID, j);
                     if (talentTab && talentTab->PetTalentMask)
-                        _PetTalentSpells.insert(talentInfo->SpellRank[j]);
+                        _petTalentSpells.insert(talentInfo->SpellRank[j]);
                 }
             }
         }
