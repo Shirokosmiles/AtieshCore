@@ -52,7 +52,7 @@ TC_GAME_API void Map2ZoneCoordinates(float &x, float &y, uint32 zone);
 //TC_GAME_API MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty);
 //TC_GAME_API MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty &difficulty);
 
-TC_GAME_API uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
+//TC_GAME_API uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
 
 //TC_GAME_API uint32 GetLiquidFlags(uint32 liquidType);
 
@@ -173,7 +173,7 @@ TC_GAME_API uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
 //TC_GAME_API extern DBCStorage <StableSlotPricesEntry>        sStableSlotPricesStore;
 //TC_GAME_API extern DBCStorage <SummonPropertiesEntry>        sSummonPropertiesStore;
 //TC_GAME_API extern DBCStorage <TalentEntry>                  sTalentStore;
-TC_GAME_API extern DBCStorage <TalentTabEntry>               sTalentTabStore;
+//TC_GAME_API extern DBCStorage <TalentTabEntry>               sTalentTabStore;
 TC_GAME_API extern DBCStorage <TaxiNodesEntry>               sTaxiNodesStore;
 TC_GAME_API extern DBCStorage <TaxiPathEntry>                sTaxiPathStore;
 TC_GAME_API extern TaxiMask                                  sTaxiNodesMask;

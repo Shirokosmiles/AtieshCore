@@ -4118,7 +4118,7 @@ bool Player::ResetTalents(bool no_cost)
     {
         if (TalentDBC const* talentInfo = &tID.second)
         {
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+            TalentTabDBC const* talentTabInfo = sDBCStoresMgr->GetTalentTabDBC(talentInfo->TabID);
             if (!talentTabInfo)
                 continue;
 
@@ -25355,7 +25355,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     if (!talentInfo)
         return;
 
-    TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+    TalentTabDBC const* talentTabInfo = sDBCStoresMgr->GetTalentTabDBC(talentInfo->TabID);
 
     if (!talentTabInfo)
         return;
@@ -25469,7 +25469,7 @@ void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRa
     if (!talentInfo)
         return;
 
-    TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+    TalentTabDBC const* talentTabInfo = sDBCStoresMgr->GetTalentTabDBC(talentInfo->TabID);
 
     if (!talentTabInfo)
         return;
@@ -25664,7 +25664,7 @@ void Player::BuildPlayerTalentsInfoData(WorldPacket* data)
             *data << uint8(talentIdCount);                  // [PH], talentIdCount
 
             // find class talent tabs (all players have 3 talent tabs)
-            uint32 const* talentTabIds = GetTalentTabPages(GetClass());
+            uint32 const* talentTabIds = sDBCStoresMgr->GetTalentTabPages(GetClass());
 
             for (uint8 i = 0; i < MAX_TALENT_TABS; ++i)
             {
@@ -25738,49 +25738,49 @@ void Player::BuildPetTalentsInfoData(WorldPacket* data)
     if (!pet_family || pet_family->PetTalentType < 0)
         return;
 
-    for (uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
+    TalentTabDBCMap const& ttMap = sDBCStoresMgr->GetTalentTabDBCMap();
+    for (const auto& ttID : ttMap)
     {
-        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentTabId);
-        if (!talentTabInfo)
-            continue;
-
-        if (!((1 << pet_family->PetTalentType) & talentTabInfo->PetTalentMask))
-            continue;
-
-        TalentDBCMap const& talentMap = sDBCStoresMgr->GetTalentDBCMap();
-        for (const auto& tID : talentMap)
+        if (TalentTabDBC const* talentTabInfo = &ttID.second)
         {
-            if (TalentDBC const* talentInfo = &tID.second)
+            if (!((1 << pet_family->PetTalentType) & talentTabInfo->PetTalentMask))
+                continue;
+
+            TalentDBCMap const& talentMap = sDBCStoresMgr->GetTalentDBCMap();
+            for (const auto& tID : talentMap)
             {
-                // skip another tab talents
-                if (talentInfo->TabID != talentTabId)
-                    continue;
-
-                // find max talent rank (0~4)
-                int8 curtalent_maxrank = -1;
-                for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
+                if (TalentDBC const* talentInfo = &tID.second)
                 {
-                    if (talentInfo->SpellRank[rank] && pet->HasSpell(talentInfo->SpellRank[rank]))
+                    // skip another tab talents
+                    if (talentInfo->TabID != talentTabInfo->ID)
+                        continue;
+
+                    // find max talent rank (0~4)
+                    int8 curtalent_maxrank = -1;
+                    for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
                     {
-                        curtalent_maxrank = rank;
-                        break;
+                        if (talentInfo->SpellRank[rank] && pet->HasSpell(talentInfo->SpellRank[rank]))
+                        {
+                            curtalent_maxrank = rank;
+                            break;
+                        }
                     }
+
+                    // not learned talent
+                    if (curtalent_maxrank < 0)
+                        continue;
+
+                    *data << uint32(talentInfo->ID);          // Talent.dbc
+                    *data << uint8(curtalent_maxrank);              // talentMaxRank (0-4)
+
+                    ++talentIdCount;
                 }
-
-                // not learned talent
-                if (curtalent_maxrank < 0)
-                    continue;
-
-                *data << uint32(talentInfo->ID);          // Talent.dbc
-                *data << uint8(curtalent_maxrank);              // talentMaxRank (0-4)
-
-                ++talentIdCount;
             }
+
+            data->put<uint8>(countPos, talentIdCount);          // put real count
+
+            break;
         }
-
-        data->put<uint8>(countPos, talentIdCount);          // put real count
-
-        break;
     }
 }
 
@@ -26219,7 +26219,7 @@ void Player::ActivateSpec(uint8 spec)
     {
         if (TalentDBC const* talentInfo = &tID.second)
         {
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+            TalentTabDBC const* talentTabInfo = sDBCStoresMgr->GetTalentTabDBC(talentInfo->TabID);
             if (!talentTabInfo)
                 continue;
 
@@ -26261,7 +26261,7 @@ void Player::ActivateSpec(uint8 spec)
     {
         if (TalentDBC const* talentInfo = &tID.second)
         {
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+            TalentTabDBC const* talentTabInfo = sDBCStoresMgr->GetTalentTabDBC(talentInfo->TabID);
             if (!talentTabInfo)
                 continue;
 

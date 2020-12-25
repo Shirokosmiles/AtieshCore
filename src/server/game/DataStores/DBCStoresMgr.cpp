@@ -137,11 +137,12 @@ DBCStoresMgr::~DBCStoresMgr()
     _stableSlotPricesMap.clear();
     _summonPropertiesMap.clear();
     _talentMap.clear();
+    _talentTabMap.clear();
 
     // handle additional containers
-    for (uint32 i = 0; i < TOTAL_LOCALES; i++)
+    for (uint8 i = 0; i < TOTAL_LOCALES; i++)
         NamesProfaneValidators[i].clear();
-    for (uint32 i = 0; i < TOTAL_LOCALES; i++)
+    for (uint8 i = 0; i < TOTAL_LOCALES; i++)
         NamesReservedValidators[i].clear();
 
     for (auto& achID : _petFamilySpellsStore)
@@ -153,6 +154,10 @@ DBCStoresMgr::~DBCStoresMgr()
     _itemRandomSuffixNumRow = 0;
     _spellNumRow = 0;
     _spellItemEnchantmentNumRow = 0;
+
+    for (uint8 i = 0; i < MAX_CLASSES; i++)
+        for (uint8 j = 0; j < 3; j++)
+            _TalentTabPages[i][j] = 0;
 }
 
 void DBCStoresMgr::Initialize()
@@ -260,6 +265,7 @@ void DBCStoresMgr::Initialize()
     _Load_StableSlotPrices();
     _Load_SummonProperties();
     _Load_Talent();
+    _Load_TalentTab();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -269,6 +275,7 @@ void DBCStoresMgr::Initialize()
     _Handle_NamesReservedRegex();
     _Handle_PetFamilySpellsStore();
     _Handle_TalentSpellPosStore();
+    _Handle_TalentTabPages();
 }
 
 void DBCStoresMgr::Initialize_WorldDBC_Corrections()
@@ -4553,6 +4560,41 @@ void DBCStoresMgr::_Load_Talent()
     TC_LOG_INFO("server.loading", ">> Loaded DBC_talent                        %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+// load Talent.dbc
+void DBCStoresMgr::_Load_TalentTab()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _talentTabMap.clear();
+    //                                                0    1               2           3
+    QueryResult result = WorldDatabase.Query("SELECT ID, ClassMask, PetTalentMask, OrderIndex FROM dbc_talenttab");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_talenttab. DB table `dbc_talenttab` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        TalentTabDBC tt;
+        tt.ID = id;
+        tt.ClassMask     = fields[1].GetUInt32();
+        tt.PetTalentMask = fields[2].GetUInt32();
+        tt.OrderIndex    = fields[3].GetUInt32();
+
+        _talentTabMap[id] = tt;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_talenttab                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 // Handle Additional dbc from World db
 void DBCStoresMgr::_Handle_World_Achievement()
 {
@@ -5031,7 +5073,7 @@ void DBCStoresMgr::_Handle_TalentSpellPosStore()
     {
         if (TalentDBC const* talentInfo = &talentID.second)
         {
-            TalentTabEntry const* talentTab = sTalentTabStore.LookupEntry(talentInfo->TabID);
+            TalentTabDBC const* talentTab = GetTalentTabDBC(talentInfo->TabID);
             for (uint8 j = 0; j < MAX_TALENT_RANK; ++j)
             {
                 if (talentInfo->SpellRank[j])
@@ -5041,6 +5083,26 @@ void DBCStoresMgr::_Handle_TalentSpellPosStore()
                         _PetTalentSpells.insert(talentInfo->SpellRank[j]);
                 }
             }
+        }
+    }
+}
+
+void DBCStoresMgr::_Handle_TalentTabPages()
+{
+    // prepare fast data access to bit pos of talent ranks for use at inspecting
+    // now have all max ranks (and then bit amount used for store talent ranks in inspect)
+    for (const auto& ttabID : _talentTabMap)
+    {
+        if (TalentTabDBC const* talentTabInfo = &ttabID.second)
+        {
+            // prevent memory corruption; otherwise cls will become 12 below
+            if ((talentTabInfo->ClassMask & CLASSMASK_ALL_PLAYABLE) == 0)
+                continue;
+
+            // store class talent tab pages
+            for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
+                if (talentTabInfo->ClassMask & (1 << (cls - 1)))
+                    _TalentTabPages[cls][talentTabInfo->OrderIndex] = talentTabInfo->ID;
         }
     }
 }

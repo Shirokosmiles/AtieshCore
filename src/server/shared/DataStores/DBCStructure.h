@@ -72,18 +72,7 @@ struct SkillLineCategoryEntry
 
 
 
-struct TalentTabEntry
-{
-    uint32 ID;                                              // 0
-    //char const* Name[16];                                 // 1-16
-    //uint32 Name_lang_mask;                                // 17
-    //unit32 SpellIconID;                                   // 18
-    //uint32 RaceMask;                                      // 19
-    uint32 ClassMask;                                       // 20
-    uint32 PetTalentMask;                                   // 21
-    uint32 OrderIndex;                                      // 22
-    //char const* BackgroundFile;                           // 23
-};
+
 
 struct TaxiNodesEntry
 {

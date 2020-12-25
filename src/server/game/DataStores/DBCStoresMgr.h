@@ -21,6 +21,7 @@
 #include "Common.h"
 #include "DBCStoresMgrStructure.h"
 #include "Regex.h"
+#include "SharedDefines.h"
 #include <set>
 #include <unordered_map>
 
@@ -128,6 +129,7 @@ typedef std::unordered_map<uint32 /*ID*/, SpellVisualDBC> SpellVisualDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, StableSlotPricesDBC> StableSlotPricesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, SummonPropertiesDBC> SummonPropertiesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TalentDBC> TalentDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, TalentTabDBC> TalentTabDBCMap;
 
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 typedef std::unordered_set<uint32> PetFamilySpellsSet;
@@ -1101,6 +1103,15 @@ public:
         return nullptr;
     }
 
+    TalentTabDBCMap const& GetTalentTabDBCMap() const { return _talentTabMap; }
+    TalentTabDBC const* GetTalentTabDBC(uint32 ID)
+    {
+        TalentTabDBCMap::const_iterator itr = _talentTabMap.find(ID);
+        if (itr != _talentTabMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1139,6 +1150,11 @@ public:
     }
 
     PetTalentSpells const& GetPetTalentSpells() { return _PetTalentSpells; }
+
+    uint32 const* GetTalentTabPages(uint8 cls)
+    {
+        return _TalentTabPages[cls];
+    }
 
 protected:
     void _Load_Achievement();
@@ -1244,6 +1260,7 @@ protected:
     void _Load_StableSlotPrices();
     void _Load_SummonProperties();
     void _Load_Talent();
+    void _Load_TalentTab();
 
     // Handle Additional dbc from world db
     void Initialize_WorldDBC_Corrections();
@@ -1256,6 +1273,7 @@ protected:
     void _Handle_NamesReservedRegex();
     void _Handle_PetFamilySpellsStore();
     void _Handle_TalentSpellPosStore();
+    void _Handle_TalentTabPages();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -1361,6 +1379,7 @@ private:
     StableSlotPricesDBCMap _stableSlotPricesMap;
     SummonPropertiesDBCMap _summonPropertiesMap;
     TalentDBCMap _talentMap;
+    TalentTabDBCMap _talentTabMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
@@ -1371,6 +1390,8 @@ private:
     uint32 _itemRandomSuffixNumRow;
     uint32 _spellNumRow;
     uint32 _spellItemEnchantmentNumRow;
+    // store absolute bit position for first rank for talent inspect
+    uint32 _TalentTabPages[MAX_CLASSES][3];
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

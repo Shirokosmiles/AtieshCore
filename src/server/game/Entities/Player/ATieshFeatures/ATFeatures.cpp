@@ -231,7 +231,7 @@ uint8 Player::GetMostPointsTalentTree() const
     {
         if (TalentDBC const* talentInfo = &tID.second)
         {
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+            TalentTabDBC const* talentTabInfo = sDBCStoresMgr->GetTalentTabDBC(talentInfo->TabID);
             if (!talentTabInfo)
                 continue;
 

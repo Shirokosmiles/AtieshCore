@@ -180,10 +180,10 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <StableSlotPricesEntry> sStableSlotPricesStore(StableSlotPricesfmt);
 //DBCStorage <SummonPropertiesEntry> sSummonPropertiesStore(SummonPropertiesfmt);
 //DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
-DBCStorage <TalentTabEntry> sTalentTabStore(TalentTabEntryfmt);
+//DBCStorage <TalentTabEntry> sTalentTabStore(TalentTabEntryfmt);
 
 // store absolute bit position for first rank for talent inspect
-static uint32 sTalentTabPages[MAX_CLASSES][3];
+//static uint32 sTalentTabPages[MAX_CLASSES][3];
 
 DBCStorage <TaxiNodesEntry> sTaxiNodesStore(TaxiNodesEntryfmt);
 TaxiMask sTaxiNodesMask;
@@ -379,7 +379,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sStableSlotPricesStore,              "StableSlotPrices.dbc");
     //LOAD_DBC(sSummonPropertiesStore,              "SummonProperties.dbc");
     //LOAD_DBC(sTalentStore,                        "Talent.dbc");
-    LOAD_DBC(sTalentTabStore,                     "TalentTab.dbc");
+    //LOAD_DBC(sTalentTabStore,                     "TalentTab.dbc");
     LOAD_DBC(sTaxiNodesStore,                     "TaxiNodes.dbc");
     LOAD_DBC(sTaxiPathStore,                      "TaxiPath.dbc");
     LOAD_DBC(sTaxiPathNodeStore,                  "TaxiPathNode.dbc");
@@ -429,9 +429,9 @@ void LoadDBCStores(const std::string& dataPath)
 
 
     // prepare fast data access to bit pos of talent ranks for use at inspecting
-    {
+    /*{
         // now have all max ranks (and then bit amount used for store talent ranks in inspect)
-        for (TalentTabEntry const* talentTabInfo : sTalentTabStore)
+        for (TalentTabDBC const* talentTabInfo : sTalentTabStore)
         {
             // prevent memory corruption; otherwise cls will become 12 below
             if ((talentTabInfo->ClassMask & CLASSMASK_ALL_PLAYABLE) == 0)
@@ -442,7 +442,7 @@ void LoadDBCStores(const std::string& dataPath)
                 if (talentTabInfo->ClassMask & (1 << (cls - 1)))
                     sTalentTabPages[cls][talentTabInfo->OrderIndex] = talentTabInfo->ID;
         }
-    }
+    }*/
 
     for (TaxiPathEntry const* entry : sTaxiPathStore)
         sTaxiPathSetBySource[entry->FromTaxiNode][entry->ToTaxiNode] = TaxiPathBySourceAndDestination(entry->ID, entry->Cost);
@@ -641,9 +641,4 @@ void Map2ZoneCoordinates(float& x, float& y, uint32 zone)
     x = (x-maEntry->LocTop)/((maEntry->LocBottom-maEntry->LocTop)/100);
     y = (y-maEntry->LocLeft)/((maEntry->LocRight-maEntry->LocLeft)/100);    // client y coord from top to down
     std::swap(x, y);                                         // client have map coords swapped
-}
-
-uint32 const* GetTalentTabPages(uint8 cls)
-{
-    return sTalentTabPages[cls];
 }
