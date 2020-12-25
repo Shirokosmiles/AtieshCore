@@ -131,12 +131,16 @@ typedef std::unordered_map<uint32 /*ID*/, SummonPropertiesDBC> SummonPropertiesD
 typedef std::unordered_map<uint32 /*ID*/, TalentDBC> TalentDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TalentTabDBC> TalentTabDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TaxiNodesDBC> TaxiNodesDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, TaxiPathDBC> TaxiPathDBCMap;
 
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
 typedef std::unordered_set<uint32> PetFamilySpellsSet;
 typedef std::unordered_map<uint32, PetFamilySpellsSet> PetFamilySpellsStore;
 typedef std::unordered_map<uint32, TalentSpellPos> TalentSpellPosMap;
 typedef std::unordered_set<uint32> PetTalentSpells;
+
+typedef std::unordered_map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
+typedef std::unordered_map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -1122,6 +1126,15 @@ public:
         return nullptr;
     }
 
+    uint32 GetNumRowTaxiPathMap() const { return _taxiPathNumRow; }
+    TaxiPathDBC const* GetTaxiPathDBC(uint32 ID)
+    {
+        TaxiPathDBCMap::const_iterator itr = _taxiPathMap.find(ID);
+        if (itr != _taxiPathMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1166,11 +1179,13 @@ public:
         return _TalentTabPages[cls];
     }
 
-    TaxiMask GetTaxiNodesMask() { return _TaxiNodesMask; }
-    TaxiMask GetOldContinentsNodesMask() { return _OldContinentsNodesMask; }
-    TaxiMask GetHordeTaxiNodesMask() { return _HordeTaxiNodesMask; }
-    TaxiMask GetAllianceTaxiNodesMask() { return _AllianceTaxiNodesMask; }
-    TaxiMask GetDeathKnightTaxiNodesMask() { return _DeathKnightTaxiNodesMask; }
+    TaxiMask const GetTaxiNodesMask() { return _TaxiNodesMask; }
+    TaxiMask const GetOldContinentsNodesMask() { return _OldContinentsNodesMask; }
+    TaxiMask const GetHordeTaxiNodesMask() { return _HordeTaxiNodesMask; }
+    TaxiMask const GetAllianceTaxiNodesMask() { return _AllianceTaxiNodesMask; }
+    TaxiMask const GetDeathKnightTaxiNodesMask() { return _DeathKnightTaxiNodesMask; }
+
+    TaxiPathSetBySource const& GetTaxiPathSetBySource() { return _taxiPathSetBySource; }
 
 protected:
     void _Load_Achievement();
@@ -1278,6 +1293,7 @@ protected:
     void _Load_Talent();
     void _Load_TalentTab();
     void _Load_TaxiNodes();
+    void _Load_TaxiPath();
 
     // Handle Additional dbc from world db
     void Initialize_WorldDBC_Corrections();
@@ -1292,6 +1308,7 @@ protected:
     void _Handle_TalentSpellPosStore();
     void _Handle_TalentTabPages();
     void _Handle_TaxiNodesMask();
+    void _Handle_TaxiPathSetBySource();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -1399,6 +1416,7 @@ private:
     TalentDBCMap _talentMap;
     TalentTabDBCMap _talentTabMap;
     TaxiNodesDBCMap _taxiNodesMap;
+    TaxiPathDBCMap _taxiPathMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
@@ -1409,6 +1427,7 @@ private:
     uint32 _itemRandomSuffixNumRow;
     uint32 _spellNumRow;
     uint32 _spellItemEnchantmentNumRow;
+    uint32 _taxiPathNumRow;
     // store absolute bit position for first rank for talent inspect
     uint32 _TalentTabPages[MAX_CLASSES][3];
 
@@ -1417,6 +1436,7 @@ private:
     TaxiMask _HordeTaxiNodesMask;
     TaxiMask _AllianceTaxiNodesMask;
     TaxiMask _DeathKnightTaxiNodesMask;
+    TaxiPathSetBySource _taxiPathSetBySource;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

@@ -1124,7 +1124,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             break;
         case SMART_ACTION_ACTIVATE_TAXI:
             {
-                if (!sTaxiPathStore.LookupEntry(e.action.taxi.id))
+                if (!sDBCStoresMgr->GetTaxiPathDBC(e.action.taxi.id))
                 {
                     TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses invalid Taxi path ID %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.taxi.id);
                     return false;

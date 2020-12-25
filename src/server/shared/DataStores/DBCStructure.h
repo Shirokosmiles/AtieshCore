@@ -68,22 +68,6 @@ struct SkillLineCategoryEntry
 };
 */
 
-
-
-
-
-
-
-
-
-struct TaxiPathEntry
-{
-    uint32 ID;                                              // 0
-    uint32 FromTaxiNode;                                    // 1
-    uint32 ToTaxiNode;                                      // 2
-    uint32 Cost;                                            // 3
-};
-
 struct TaxiPathNodeEntry
 {
     //uint32 ID;                                            // 0
@@ -346,16 +330,7 @@ struct WorldStateZoneSounds
     bool hasErrorMessage;
 };*/
 
-struct TaxiPathBySourceAndDestination
-{
-    TaxiPathBySourceAndDestination() : ID(0), price(0) { }
-    TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) { }
 
-    uint32    ID;
-    uint32    price;
-};
-typedef std::map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
-typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 
 typedef std::vector<TaxiPathNodeEntry const*> TaxiPathNodeList;
 typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;

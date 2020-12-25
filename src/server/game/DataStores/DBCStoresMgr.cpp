@@ -30,6 +30,7 @@ DBCStoresMgr::DBCStoresMgr()
     _itemRandomSuffixNumRow = 0;
     _spellNumRow = 0;
     _spellItemEnchantmentNumRow = 0;
+    _taxiPathNumRow = 0;
 }
 
 DBCStoresMgr::~DBCStoresMgr()
@@ -139,6 +140,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _talentMap.clear();
     _talentTabMap.clear();
     _taxiNodesMap.clear();
+    _taxiPathMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -146,8 +148,8 @@ DBCStoresMgr::~DBCStoresMgr()
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
         NamesReservedValidators[i].clear();
 
-    for (auto& achID : _petFamilySpellsStore)
-        achID.second.clear();
+    for (auto& pfsID : _petFamilySpellsStore)
+        pfsID.second.clear();
     _petFamilySpellsStore.clear();
 
     _TalentSpellPos.clear();
@@ -155,6 +157,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _itemRandomSuffixNumRow = 0;
     _spellNumRow = 0;
     _spellItemEnchantmentNumRow = 0;
+    _taxiPathNumRow = 0;
 
     for (uint8 i = 0; i < MAX_CLASSES; i++)
         for (uint8 j = 0; j < 3; j++)
@@ -165,6 +168,10 @@ DBCStoresMgr::~DBCStoresMgr()
     _HordeTaxiNodesMask.fill(0);
     _AllianceTaxiNodesMask.fill(0);
     _DeathKnightTaxiNodesMask.fill(0);
+
+    for (auto& tpsID : _taxiPathSetBySource)
+        tpsID.second.clear();
+    _taxiPathSetBySource.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -274,6 +281,7 @@ void DBCStoresMgr::Initialize()
     _Load_Talent();
     _Load_TalentTab();
     _Load_TaxiNodes();
+    _Load_TaxiPath();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -285,6 +293,7 @@ void DBCStoresMgr::Initialize()
     _Handle_TalentSpellPosStore();
     _Handle_TalentTabPages();
     _Handle_TaxiNodesMask();
+    _Handle_TaxiPathSetBySource();
 }
 
 void DBCStoresMgr::Initialize_WorldDBC_Corrections()
@@ -4648,6 +4657,50 @@ void DBCStoresMgr::_Load_TaxiNodes()
     TC_LOG_INFO("server.loading", ">> Loaded DBC_taxinodes                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+// load TaxiNodes.dbc
+void DBCStoresMgr::_Load_TaxiPath()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _taxiPathMap.clear();
+    //                                                0         1          2         3
+    QueryResult result = WorldDatabase.Query("SELECT ID, FromTaxiNode, ToTaxiNode, Cost FROM dbc_taxipath");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxipath. DB table `dbc_taxipath` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        TaxiPathDBC tp;
+        tp.ID = id;
+        tp.FromTaxiNode = fields[1].GetUInt32();
+        tp.ToTaxiNode   = fields[2].GetUInt32();
+        tp.Cost         = fields[3].GetUInt32();
+
+        _taxiPathMap[id] = tp;
+
+        if (_taxiPathNumRow)
+        {
+            if (_taxiPathNumRow < id)
+                _taxiPathNumRow = id;
+        }
+        else
+            _taxiPathNumRow = id;
+
+        ++count;
+    } while (result->NextRow());
+
+    _taxiPathNumRow++; // this _taxiPathNumRow should be more then the last by 1 point
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_taxipath                      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 // Handle Additional dbc from World db
 void DBCStoresMgr::_Handle_World_Achievement()
 {
@@ -5182,8 +5235,8 @@ void DBCStoresMgr::_Handle_TaxiNodesMask()
     {
         if (TaxiNodesDBC const* node = &tnID.second)
         {
-            TaxiPathSetBySource::const_iterator src_i = sTaxiPathSetBySource.find(node->ID);
-            if (src_i != sTaxiPathSetBySource.end() && !src_i->second.empty())
+            TaxiPathSetBySource::const_iterator src_i = _taxiPathSetBySource.find(node->ID);
+            if (src_i != _taxiPathSetBySource.end() && !src_i->second.empty())
             {
                 bool ok = false;
                 for (TaxiPathSetForSource::const_iterator dest_i = src_i->second.begin(); dest_i != src_i->second.end(); ++dest_i)
@@ -5222,4 +5275,13 @@ void DBCStoresMgr::_Handle_TaxiNodesMask()
         }
     }
     spellPaths.clear();
+}
+
+void DBCStoresMgr::_Handle_TaxiPathSetBySource()
+{
+    for (const auto& tpID : _taxiPathMap)
+    {
+        if (TaxiPathDBC const* entry = &tpID.second)
+            _taxiPathSetBySource[entry->FromTaxiNode][entry->ToTaxiNode] = TaxiPathBySourceAndDestination(entry->ID, entry->Cost);
+    }
 }

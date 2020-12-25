@@ -6666,17 +6666,18 @@ uint32 ObjectMgr::GetNearestTaxiNode(float x, float y, float z, uint32 mapid, ui
 
 void ObjectMgr::GetTaxiPath(uint32 source, uint32 destination, uint32 &path, uint32 &cost)
 {
-    TaxiPathSetBySource::iterator src_i = sTaxiPathSetBySource.find(source);
-    if (src_i == sTaxiPathSetBySource.end())
+    TaxiPathSetBySource const& tpsbsMap = sDBCStoresMgr->GetTaxiPathSetBySource();
+    TaxiPathSetBySource::const_iterator src_i = tpsbsMap.find(source);
+    if (src_i == tpsbsMap.end())
     {
         path = 0;
         cost = 0;
         return;
     }
 
-    TaxiPathSetForSource& pathSet = src_i->second;
+    TaxiPathSetForSource const& pathSet = src_i->second;
 
-    TaxiPathSetForSource::iterator dest_i = pathSet.find(destination);
+    TaxiPathSetForSource::const_iterator dest_i = pathSet.find(destination);
     if (dest_i == pathSet.end())
     {
         path = 0;

@@ -1767,3 +1767,22 @@ struct TaxiNodesDBC
     //uint32 Name_lang_mask;                                // 22
     uint32 MountCreatureID[2];                              // 23-24
 };
+
+// load TaxiPath.dbc
+struct TaxiPathDBC
+{
+    uint32 ID;                                              // 0
+    uint32 FromTaxiNode;                                    // 1
+    uint32 ToTaxiNode;                                      // 2
+    uint32 Cost;                                            // 3
+};
+
+//     structure helper
+struct TaxiPathBySourceAndDestination
+{
+    TaxiPathBySourceAndDestination() : ID(0), price(0) { }
+    TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) { }
+
+    uint32 ID;
+    uint32 price;
+};
