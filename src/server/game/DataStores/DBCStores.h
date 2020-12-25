@@ -43,8 +43,6 @@ enum ContentLevels : uint8
 };
 TC_GAME_API ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId);
 
-TC_GAME_API bool IsTotemCategoryCompatiableWith(uint32 itemTotemCategoryId, uint32 requiredTotemCategoryId);
-
 TC_GAME_API void Zone2MapCoordinates(float &x, float &y, uint32 zone);
 TC_GAME_API void Map2ZoneCoordinates(float &x, float &y, uint32 zone);
 
@@ -186,7 +184,7 @@ TC_GAME_API void Map2ZoneCoordinates(float &x, float &y, uint32 zone);
 TC_GAME_API extern DBCStorage <TransportAnimationEntry>      sTransportAnimationStore;
 TC_GAME_API extern DBCStorage <TransportRotationEntry>       sTransportRotationStore;
 //TC_GAME_API extern DBCStorage <TeamContributionPointsEntry>  sTeamContributionPointsStore;
-TC_GAME_API extern DBCStorage <TotemCategoryEntry>           sTotemCategoryStore;
+//TC_GAME_API extern DBCStorage <TotemCategoryEntry>           sTotemCategoryStore;
 TC_GAME_API extern DBCStorage <VehicleEntry>                 sVehicleStore;
 TC_GAME_API extern DBCStorage <VehicleSeatEntry>             sVehicleSeatStore;
 TC_GAME_API extern DBCStorage <WMOAreaTableEntry>            sWMOAreaTableStore;

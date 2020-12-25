@@ -1811,4 +1811,14 @@ struct TeamContributionPointsDBC
     float Data;                                             // 1
 };
 
+// load TotemCategory.dbc
+struct TotemCategoryDBC
+{
+    uint32 ID;                                              // 0
+    //char const* Name[16];                                 // 1-16
+    //uint32 Name_lang_mask;                                // 17
+    uint32 TotemCategoryType;                               // 18 (one for specialization)
+    uint32 TotemCategoryMask;                               // 19 (compatibility mask for same type: different for totems, compatible from high to low for rods)
+};
+
 #pragma pack(pop)

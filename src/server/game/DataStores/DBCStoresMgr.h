@@ -134,6 +134,7 @@ typedef std::unordered_map<uint32 /*ID*/, TaxiNodesDBC> TaxiNodesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TaxiPathDBC> TaxiPathDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TaxiPathNodeDBC> TaxiPathNodeDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TeamContributionPointsDBC> TeamContributionPointsDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, TotemCategoryDBC> TotemCategoryDBCMap;
 
 // HELPERS
 // regex
@@ -1163,6 +1164,34 @@ public:
         return nullptr;
     }
 
+    TotemCategoryDBC const* GetTotemCategoryDBC(uint32 ID)
+    {
+        TotemCategoryDBCMap::const_iterator itr = _totemCategoryMap.find(ID);
+        if (itr != _totemCategoryMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    bool IsTotemCategoryCompatiableWith(uint32 itemTotemCategoryId, uint32 requiredTotemCategoryId)
+    {
+        if (requiredTotemCategoryId == 0)
+            return true;
+        if (itemTotemCategoryId == 0)
+            return false;
+
+        TotemCategoryDBC const* itemEntry = GetTotemCategoryDBC(itemTotemCategoryId);
+        if (!itemEntry)
+            return false;
+        TotemCategoryDBC const* reqEntry = GetTotemCategoryDBC(requiredTotemCategoryId);
+        if (!reqEntry)
+            return false;
+
+        if (itemEntry->TotemCategoryType != reqEntry->TotemCategoryType)
+            return false;
+
+        return (itemEntry->TotemCategoryMask & reqEntry->TotemCategoryMask) == reqEntry->TotemCategoryMask;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1212,7 +1241,7 @@ public:
     TaxiMask const GetDeathKnightTaxiNodesMask() { return _DeathKnightTaxiNodesMask; }
 
     TaxiPathSetBySource const& GetTaxiPathSetBySource() { return _taxiPathSetBySource; }
-    TaxiPathNodesByPath const& GetTaxiPathNodesByPath() { return _taxiPathNodesByPath; }
+    TaxiPathNodesByPath const& GetTaxiPathNodesByPath() { return _taxiPathNodesByPath; }    
 
 protected:
     void _Load_Achievement();
@@ -1323,9 +1352,12 @@ protected:
     void _Load_TaxiPath();
     void _Load_TaxiPathNode();
     void _Load_TeamContributionPoints();
+    void _Load_TotemCategory();
+    
+    void Initialize_WorldDBC_Corrections();
+    void Initialize_Additional_Data();
 
     // Handle Additional dbc from world db
-    void Initialize_WorldDBC_Corrections();
     void _Handle_World_Achievement();
     void _Handle_World_Spell();
     void _Handle_World_SpellDifficulty();
@@ -1449,6 +1481,7 @@ private:
     TaxiPathDBCMap _taxiPathMap;
     TaxiPathNodeDBCMap _taxiPathNodeMap;
     TeamContributionPointsDBCMap _teamContributionPointsMap;
+    TotemCategoryDBCMap _totemCategoryMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

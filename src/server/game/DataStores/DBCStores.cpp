@@ -201,7 +201,7 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //static DBCStorage <TaxiPathNodeEntry> sTaxiPathNodeStore(TaxiPathNodeEntryfmt);
 
 //DBCStorage <TeamContributionPointsEntry> sTeamContributionPointsStore(TeamContributionPointsfmt);
-DBCStorage <TotemCategoryEntry> sTotemCategoryStore(TotemCategoryEntryfmt);
+//DBCStorage <TotemCategoryEntry> sTotemCategoryStore(TotemCategoryEntryfmt);
 DBCStorage <TransportAnimationEntry> sTransportAnimationStore(TransportAnimationfmt);
 DBCStorage <TransportRotationEntry> sTransportRotationStore(TransportRotationfmt);
 DBCStorage <VehicleEntry> sVehicleStore(VehicleEntryfmt);
@@ -384,7 +384,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sTaxiPathStore,                      "TaxiPath.dbc");
     //LOAD_DBC(sTaxiPathNodeStore,                  "TaxiPathNode.dbc");
     //LOAD_DBC(sTeamContributionPointsStore,        "TeamContributionPoints.dbc");
-    LOAD_DBC(sTotemCategoryStore,                 "TotemCategory.dbc");
+    //LOAD_DBC(sTotemCategoryStore,                 "TotemCategory.dbc");
     LOAD_DBC(sTransportAnimationStore,            "TransportAnimation.dbc");
     LOAD_DBC(sTransportRotationStore,             "TransportRotation.dbc");
     LOAD_DBC(sVehicleStore,                       "Vehicle.dbc");
@@ -595,26 +595,6 @@ ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId)
         case 1:  return CONTENT_61_70;
         case 2:  return CONTENT_71_80;
     }
-}
-
-bool IsTotemCategoryCompatiableWith(uint32 itemTotemCategoryId, uint32 requiredTotemCategoryId)
-{
-    if (requiredTotemCategoryId == 0)
-        return true;
-    if (itemTotemCategoryId == 0)
-        return false;
-
-    TotemCategoryEntry const* itemEntry = sTotemCategoryStore.LookupEntry(itemTotemCategoryId);
-    if (!itemEntry)
-        return false;
-    TotemCategoryEntry const* reqEntry = sTotemCategoryStore.LookupEntry(requiredTotemCategoryId);
-    if (!reqEntry)
-        return false;
-
-    if (itemEntry->TotemCategoryType != reqEntry->TotemCategoryType)
-        return false;
-
-    return (itemEntry->TotemCategoryMask & reqEntry->TotemCategoryMask) == reqEntry->TotemCategoryMask;
 }
 
 void Zone2MapCoordinates(float& x, float& y, uint32 zone)

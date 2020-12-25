@@ -143,6 +143,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _taxiPathMap.clear();
     _taxiPathNodeMap.clear();
     _teamContributionPointsMap.clear();
+    _totemCategoryMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -289,19 +290,13 @@ void DBCStoresMgr::Initialize()
     _Load_TaxiPath();
     _Load_TaxiPathNode();
     _Load_TeamContributionPoints();
+    _Load_TotemCategory();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
 
-    // Handle additional data-containers from DBC
-    _Handle_NamesProfanityRegex();
-    _Handle_NamesReservedRegex();
-    _Handle_PetFamilySpellsStore();
-    _Handle_TalentSpellPosStore();
-    _Handle_TalentTabPages();
-    _Handle_TaxiNodesMask();
-    _Handle_TaxiPathSetBySource();
-    _Handle_TaxiPathNodesByPath();
+    // Handle additional data from DBC
+    Initialize_Additional_Data();
 }
 
 void DBCStoresMgr::Initialize_WorldDBC_Corrections()
@@ -314,6 +309,20 @@ void DBCStoresMgr::Initialize_WorldDBC_Corrections()
     _Handle_World_Spell();
     // spelldifficulty_dbc
     _Handle_World_SpellDifficulty();
+}
+
+void DBCStoresMgr::Initialize_Additional_Data()
+{
+    TC_LOG_INFO("server.loading", "Initialize Additional Data from DBC");
+    // Handle additional data-containers from DBC
+    _Handle_NamesProfanityRegex();
+    _Handle_NamesReservedRegex();
+    _Handle_PetFamilySpellsStore();
+    _Handle_TalentSpellPosStore();
+    _Handle_TalentTabPages();
+    _Handle_TaxiNodesMask();
+    _Handle_TaxiPathSetBySource();
+    _Handle_TaxiPathNodesByPath();
 }
 
 // load Achievement.dbc
@@ -4780,6 +4789,39 @@ void DBCStoresMgr::_Load_TeamContributionPoints()
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_teamcontributionpoints        %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load TotemCategory.dbc
+void DBCStoresMgr::_Load_TotemCategory()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _totemCategoryMap.clear();
+    //                                                0          1                  2
+    QueryResult result = WorldDatabase.Query("SELECT ID, TotemCategoryType, TotemCategoryMask FROM dbc_totemcategory");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_totemcategory. DB table `dbc_totemcategory` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        TotemCategoryDBC tc;
+        tc.ID = id;
+        tc.TotemCategoryType = fields[1].GetUInt32();
+        tc.TotemCategoryMask = fields[2].GetUInt32();
+
+        _totemCategoryMap[id] = tc;
+
+        ++count;
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_totemcategory                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db
