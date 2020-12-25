@@ -1912,10 +1912,10 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                 if (numFullTaximasks > 11)
                     numFullTaximasks = 11;
 
-                TaxiMask const& factionMask = newTeam == HORDE ? sHordeTaxiNodesMask : sAllianceTaxiNodesMask;
+                TaxiMask const& factionMask = newTeam == HORDE ? sDBCStoresMgr->GetHordeTaxiNodesMask() : sDBCStoresMgr->GetAllianceTaxiNodesMask();
                 for (uint8 i = 0; i < numFullTaximasks; ++i)
                 {
-                    uint8 deathKnightExtraNode = (playerClass == CLASS_DEATH_KNIGHT) ? sDeathKnightTaxiNodesMask[i] : 0;
+                    uint8 deathKnightExtraNode = (playerClass == CLASS_DEATH_KNIGHT) ? sDBCStoresMgr->GetDeathKnightTaxiNodesMask()[i] : 0;
                     taximaskstream << uint32(factionMask[i] | deathKnightExtraNode) << ' ';
                 }
 

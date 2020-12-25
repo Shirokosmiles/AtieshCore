@@ -31,7 +31,7 @@ void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level
         case CLASS_DEATH_KNIGHT:
         {
             for (uint8 i = 0; i < TaxiMaskSize; ++i)
-                m_taximask[i] |= sOldContinentsNodesMask[i];
+                m_taximask[i] |= sDBCStoresMgr->GetOldContinentsNodesMask()[i];
             break;
         }
     }
@@ -72,7 +72,7 @@ bool PlayerTaxi::LoadTaxiMask(std::string const& data)
         if (Optional<uint32> mask = Trinity::StringTo<uint32>(tokens[index]))
         {
             // load and set bits only for existing taxi nodes
-            m_taximask[index] = sTaxiNodesMask[index] & *mask;
+            m_taximask[index] = sDBCStoresMgr->GetTaxiNodesMask()[index] & *mask;
             if (m_taximask[index] != *mask)
                 warn = true;
         }
@@ -90,7 +90,7 @@ void PlayerTaxi::AppendTaximaskTo(ByteBuffer& data, bool all)
     if (all)
     {
         for (uint8 i = 0; i < TaxiMaskSize; ++i)
-            data << uint32(sTaxiNodesMask[i]);              // all existing nodes
+            data << uint32(sDBCStoresMgr->GetTaxiNodesMask()[i]);              // all existing nodes
     }
     else
     {

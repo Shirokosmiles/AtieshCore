@@ -185,12 +185,12 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 // store absolute bit position for first rank for talent inspect
 //static uint32 sTalentTabPages[MAX_CLASSES][3];
 
-DBCStorage <TaxiNodesEntry> sTaxiNodesStore(TaxiNodesEntryfmt);
-TaxiMask sTaxiNodesMask;
-TaxiMask sOldContinentsNodesMask;
-TaxiMask sHordeTaxiNodesMask;
-TaxiMask sAllianceTaxiNodesMask;
-TaxiMask sDeathKnightTaxiNodesMask;
+//DBCStorage <TaxiNodesEntry> sTaxiNodesStore(TaxiNodesEntryfmt);
+//TaxiMask sTaxiNodesMask;
+//TaxiMask sOldContinentsNodesMask;
+//TaxiMask sHordeTaxiNodesMask;
+//TaxiMask sAllianceTaxiNodesMask;
+//TaxiMask sDeathKnightTaxiNodesMask;
 
 // DBC used only for initialization sTaxiPathSetBySource at startup.
 TaxiPathSetBySource sTaxiPathSetBySource;
@@ -380,7 +380,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sSummonPropertiesStore,              "SummonProperties.dbc");
     //LOAD_DBC(sTalentStore,                        "Talent.dbc");
     //LOAD_DBC(sTalentTabStore,                     "TalentTab.dbc");
-    LOAD_DBC(sTaxiNodesStore,                     "TaxiNodes.dbc");
+    //LOAD_DBC(sTaxiNodesStore,                     "TaxiNodes.dbc");
     LOAD_DBC(sTaxiPathStore,                      "TaxiPath.dbc");
     LOAD_DBC(sTaxiPathNodeStore,                  "TaxiPathNode.dbc");
     LOAD_DBC(sTeamContributionPointsStore,        "TeamContributionPoints.dbc");
@@ -467,7 +467,7 @@ void LoadDBCStores(const std::string& dataPath)
 
     // Initialize global taxinodes mask
     // include existed nodes that have at least single not spell base (scripted) path
-    {
+    /*{
         std::set<uint32> spellPaths;
         SpellDBCMap const& spellMap = sDBCStoresMgr->GetSpellDBCMap();
         for (const auto& sID : spellMap)
@@ -521,7 +521,7 @@ void LoadDBCStores(const std::string& dataPath)
             if (node->ID == 315 || node->ID == 333)
                 const_cast<TaxiNodesEntry*>(node)->MountCreatureID[1] = 32981;
         }
-    }
+    }*/
 
     for (WMOAreaTableEntry const* entry : sWMOAreaTableStore)
         sWMOAreaInfoByTripple[WMOAreaTableKey(entry->WMOID, entry->NameSetID, entry->WMOGroupID)] = entry;

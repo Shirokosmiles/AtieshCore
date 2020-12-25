@@ -17698,9 +17698,9 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
         else if (!m_taxi.LoadTaxiDestinationsFromString(taxi_nodes, GetTeam()))
         {
             // problems with taxi path loading
-            TaxiNodesEntry const* nodeEntry = nullptr;
+            TaxiNodesDBC const* nodeEntry = nullptr;
             if (uint32 node_id = m_taxi.GetTaxiSource())
-                nodeEntry = sTaxiNodesStore.LookupEntry(node_id);
+                nodeEntry = sDBCStoresMgr->GetTaxiNodesDBC(node_id);
 
             if (!nodeEntry)                                      // don't know taxi start node, teleport to homebind
             {
@@ -17719,7 +17719,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
         if (uint32 node_id = m_taxi.GetTaxiSource())
         {
             // save source node as recall coord to prevent recall and fall from sky
-            TaxiNodesEntry const* nodeEntry = sTaxiNodesStore.LookupEntry(node_id);
+            TaxiNodesDBC const* nodeEntry = sDBCStoresMgr->GetTaxiNodesDBC(node_id);
             if (nodeEntry && nodeEntry->ContinentID == GetMapId())
             {
                 ASSERT(nodeEntry);                                  // checked in m_taxi.LoadTaxiDestinationsFromString
@@ -21396,7 +21396,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     uint32 sourcenode = nodes[0];
 
     // starting node too far away (cheat?)
-    TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(sourcenode);
+    TaxiNodesDBC const* node = sDBCStoresMgr->GetTaxiNodesDBC(sourcenode);
     if (!node)
     {
         GetSession()->SendActivateTaxiReply(ERR_TAXINOSUCHPATH);
@@ -21497,7 +21497,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
 
     if (sWorld->getBoolConfig(CONFIG_INSTANT_TAXI))
     {
-        TaxiNodesEntry const* lastPathNode = sTaxiNodesStore.LookupEntry(nodes[nodes.size()-1]);
+        TaxiNodesDBC const* lastPathNode = sDBCStoresMgr->GetTaxiNodesDBC(nodes[nodes.size()-1]);
         ASSERT(lastPathNode);
         m_taxi.ClearTaxiDestinations();
         ModifyMoney(-(int32)totalcost);

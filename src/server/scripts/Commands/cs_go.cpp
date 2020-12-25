@@ -26,6 +26,7 @@ EndScriptData */
 #include "Chat.h"
 #include "Containers.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "Language.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
@@ -233,7 +234,7 @@ public:
 
     static bool HandleGoTaxinodeCommand(ChatHandler* handler, Variant<Hyperlink<taxinode>, uint32> nodeId)
     {
-        TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(nodeId);
+        TaxiNodesDBC const* node = sDBCStoresMgr->GetTaxiNodesDBC(nodeId);
         if (!node)
         {
             handler->PSendSysMessage(LANG_COMMAND_GOTAXINODENOTFOUND, nodeId);

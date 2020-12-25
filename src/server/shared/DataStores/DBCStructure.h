@@ -74,15 +74,7 @@ struct SkillLineCategoryEntry
 
 
 
-struct TaxiNodesEntry
-{
-    uint32 ID;                                              // 0
-    uint32 ContinentID;                                     // 1
-    DBCPosition3D Pos;                                      // 2-4
-    char const* Name[16];                                   // 5-21
-    //uint32 Name_lang_mask;                                // 22
-    uint32 MountCreatureID[2];                              // 23-24
-};
+
 
 struct TaxiPathEntry
 {

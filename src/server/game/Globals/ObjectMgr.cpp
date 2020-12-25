@@ -6628,34 +6628,36 @@ uint32 ObjectMgr::GetNearestTaxiNode(float x, float y, float z, uint32 mapid, ui
     float dist = 10000;
     uint32 id = 0;
 
-    for (uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
+    TaxiNodesDBCMap const& tnMap = sDBCStoresMgr->GetTaxiNodesDBCMap();
+    for (const auto& tnID : tnMap)
     {
-        TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(i);
-
-        if (!node || node->ContinentID != mapid || (!node->MountCreatureID[team == ALLIANCE ? 1 : 0] && node->MountCreatureID[0] != 32981)) // dk flight
-            continue;
-
-        uint8  field   = (uint8)((i - 1) / 32);
-        uint32 submask = 1<<((i-1)%32);
-
-        // skip not taxi network nodes
-        if ((sTaxiNodesMask[field] & submask) == 0)
-            continue;
-
-        float dist2 = (node->Pos.X - x)*(node->Pos.X - x)+(node->Pos.Y - y)*(node->Pos.Y - y)+(node->Pos.Z - z)*(node->Pos.Z - z);
-        if (found)
+        if (TaxiNodesDBC const* node = &tnID.second)
         {
-            if (dist2 < dist)
+            if (node->ContinentID != mapid || (!node->MountCreatureID[team == ALLIANCE ? 1 : 0] && node->MountCreatureID[0] != 32981)) // dk flight
+                continue;
+
+            uint8  field = (uint8)((node->ID - 1) / 32);
+            uint32 submask = 1 << ((node->ID - 1) % 32);
+
+            // skip not taxi network nodes
+            if ((sDBCStoresMgr->GetTaxiNodesMask()[field] & submask) == 0)
+                continue;
+
+            float dist2 = (node->Pos.X - x) * (node->Pos.X - x) + (node->Pos.Y - y) * (node->Pos.Y - y) + (node->Pos.Z - z) * (node->Pos.Z - z);
+            if (found)
             {
-                dist = dist2;
-                id = i;
+                if (dist2 < dist)
+                {
+                    dist = dist2;
+                    id = node->ID;
+                }
             }
-        }
-        else
-        {
-            found = true;
-            dist = dist2;
-            id = i;
+            else
+            {
+                found = true;
+                dist = dist2;
+                id = node->ID;
+            }
         }
     }
 
@@ -6691,7 +6693,7 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, uint32 team, bool allowed_alt
     uint32 mount_id = 0;
 
     // select mount creature id
-    TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(id);
+    TaxiNodesDBC const* node = sDBCStoresMgr->GetTaxiNodesDBC(id);
     if (node)
     {
         uint32 mount_entry = 0;

@@ -1756,3 +1756,14 @@ struct TalentTabDBC
     uint32 OrderIndex;                                      // 22
     //char const* BackgroundFile;                           // 23
 };
+
+// load TaxiNodes.dbc
+struct TaxiNodesDBC
+{
+    uint32 ID;                                              // 0
+    uint32 ContinentID;                                     // 1
+    DBCPosition3D Pos;                                      // 2-4
+    std::string Name[TOTAL_LOCALES];                        // 5-21
+    //uint32 Name_lang_mask;                                // 22
+    uint32 MountCreatureID[2];                              // 23-24
+};

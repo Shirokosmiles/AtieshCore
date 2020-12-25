@@ -138,6 +138,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _summonPropertiesMap.clear();
     _talentMap.clear();
     _talentTabMap.clear();
+    _taxiNodesMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -158,6 +159,12 @@ DBCStoresMgr::~DBCStoresMgr()
     for (uint8 i = 0; i < MAX_CLASSES; i++)
         for (uint8 j = 0; j < 3; j++)
             _TalentTabPages[i][j] = 0;
+
+    _TaxiNodesMask.fill(0);
+    _OldContinentsNodesMask.fill(0);
+    _HordeTaxiNodesMask.fill(0);
+    _AllianceTaxiNodesMask.fill(0);
+    _DeathKnightTaxiNodesMask.fill(0);
 }
 
 void DBCStoresMgr::Initialize()
@@ -266,6 +273,7 @@ void DBCStoresMgr::Initialize()
     _Load_SummonProperties();
     _Load_Talent();
     _Load_TalentTab();
+    _Load_TaxiNodes();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -276,6 +284,7 @@ void DBCStoresMgr::Initialize()
     _Handle_PetFamilySpellsStore();
     _Handle_TalentSpellPosStore();
     _Handle_TalentTabPages();
+    _Handle_TaxiNodesMask();
 }
 
 void DBCStoresMgr::Initialize_WorldDBC_Corrections()
@@ -726,7 +735,7 @@ void DBCStoresMgr::_Load_BattlemasterList()
         bl.InstanceType = fields[9].GetUInt32();
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-            bl.Name[i] = fields[10 + i].GetInt32();
+            bl.Name[i] = fields[10 + i].GetString();
 
         bl.MaxGroupSize      = fields[19].GetUInt32();
         bl.HolidayWorldState = fields[20].GetUInt32();
@@ -4595,6 +4604,50 @@ void DBCStoresMgr::_Load_TalentTab()
     TC_LOG_INFO("server.loading", ">> Loaded DBC_talenttab                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+// load TaxiNodes.dbc
+void DBCStoresMgr::_Load_TaxiNodes()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _taxiNodesMap.clear();
+    //                                                0    1          2  3  4
+    QueryResult result = WorldDatabase.Query("SELECT ID, ContinentID, X, Y, Z, "
+    //          5               6               7               8               9               10              11              12          13
+        "Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, "
+    //          14                  15
+        "MountCreatureID_1, MountCreatureID_2 FROM dbc_taxinodes");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxinodes. DB table `dbc_taxinodes` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        TaxiNodesDBC tn;
+        tn.ID = id;
+        tn.ContinentID = fields[1].GetUInt32();
+        tn.Pos.X       = fields[2].GetFloat();
+        tn.Pos.Y       = fields[3].GetFloat();
+        tn.Pos.Z       = fields[4].GetFloat();
+        for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+            tn.Name[i] = fields[5 + i].GetString();
+        for (uint8 i = 0; i < 2; i++)
+            tn.MountCreatureID[i] = fields[14 + i].GetUInt32();
+
+        _taxiNodesMap[id] = tn;
+
+        ++count;
+    } while (result->NextRow());
+
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_taxinodes                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 // Handle Additional dbc from World db
 void DBCStoresMgr::_Handle_World_Achievement()
 {
@@ -5105,4 +5158,68 @@ void DBCStoresMgr::_Handle_TalentTabPages()
                     _TalentTabPages[cls][talentTabInfo->OrderIndex] = talentTabInfo->ID;
         }
     }
+}
+
+void DBCStoresMgr::_Handle_TaxiNodesMask()
+{
+    // Initialize global taxinodes mask
+    // include existed nodes that have at least single not spell base (scripted) path
+    std::set<uint32> spellPaths;
+    SpellDBCMap const& spellMap = sDBCStoresMgr->GetSpellDBCMap();
+    for (const auto& sID : spellMap)
+        if (SpellDBC const* sInfo = &sID.second)
+            for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+                if (sInfo->Effect[j] == SPELL_EFFECT_SEND_TAXI)
+                    spellPaths.insert(sInfo->EffectMiscValue[j]);
+
+    _TaxiNodesMask.fill(0);
+    _OldContinentsNodesMask.fill(0);
+    _HordeTaxiNodesMask.fill(0);
+    _AllianceTaxiNodesMask.fill(0);
+    _DeathKnightTaxiNodesMask.fill(0);
+
+    for (const auto& tnID : _taxiNodesMap)
+    {
+        if (TaxiNodesDBC const* node = &tnID.second)
+        {
+            TaxiPathSetBySource::const_iterator src_i = sTaxiPathSetBySource.find(node->ID);
+            if (src_i != sTaxiPathSetBySource.end() && !src_i->second.empty())
+            {
+                bool ok = false;
+                for (TaxiPathSetForSource::const_iterator dest_i = src_i->second.begin(); dest_i != src_i->second.end(); ++dest_i)
+                {
+                    // not spell path
+                    if (dest_i->second.price || spellPaths.find(dest_i->second.ID) == spellPaths.end())
+                    {
+                        ok = true;
+                        break;
+                    }
+                }
+
+                if (!ok)
+                    continue;
+            }
+
+            // valid taxi network node
+            uint8  field = (uint8)((node->ID - 1) / 32);
+            uint32 submask = 1 << ((node->ID - 1) % 32);
+            _TaxiNodesMask[field] |= submask;
+
+            if (node->MountCreatureID[0] && node->MountCreatureID[0] != 32981)
+                _HordeTaxiNodesMask[field] |= submask;
+            if (node->MountCreatureID[1] && node->MountCreatureID[1] != 32981)
+                _AllianceTaxiNodesMask[field] |= submask;
+            if (node->MountCreatureID[0] == 32981 || node->MountCreatureID[1] == 32981)
+                _DeathKnightTaxiNodesMask[field] |= submask;
+
+            // old continent node (+ nodes virtually at old continents, check explicitly to avoid loading map files for zone info)
+            if (node->ContinentID < 2 || node->ID == 82 || node->ID == 83 || node->ID == 93 || node->ID == 94)
+                _OldContinentsNodesMask[field] |= submask;
+
+            // fix DK node at Ebon Hold and Shadow Vault flight master
+            if (node->ID == 315 || node->ID == 333)
+                const_cast<TaxiNodesDBC*>(node)->MountCreatureID[1] = 32981;
+        }
+    }
+    spellPaths.clear();
 }
