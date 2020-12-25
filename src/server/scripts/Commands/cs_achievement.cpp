@@ -67,8 +67,8 @@ public:
                 return false;
         }
 
-        if (AchievementDBC const* AchievementDBC = sAchievementMgr->GetAchievement(achievementId))
-            target->CompletedAchievement(AchievementDBC);
+        if (AchievementDBC const* ach = sAchievementMgr->GetAchievement(achievementId))
+            target->CompletedAchievement(ach);
 
         return true;
     }

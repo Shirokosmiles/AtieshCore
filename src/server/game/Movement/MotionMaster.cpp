@@ -21,6 +21,7 @@
 #include "CreatureAISelector.h"
 #include "Containers.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Errors.h"
 #include "G3DPosition.hpp"
 #include "Log.h"
@@ -983,7 +984,7 @@ void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
 {
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        if (path < sTaxiPathNodesByPath.size())
+        if (path < sDBCStoresMgr->GetTaxiPathNodesByPath().size())
         {
             TC_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveTaxiFlight: '%s', taxi to path Id: %u (node %u)", _owner->GetGUID().ToString().c_str(), path, pathnode);
 

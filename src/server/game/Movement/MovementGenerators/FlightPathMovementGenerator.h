@@ -18,13 +18,12 @@
 #ifndef TRINITY_FLIGHTPATHMOVEMENTGENERATOR_H
 #define TRINITY_FLIGHTPATHMOVEMENTGENERATOR_H
 
-#include "DBCStructure.h"
+#include "DBCStoresMgr.h"
 #include "MovementGenerator.h"
 #include "PathMovementBase.h"
 #include <deque>
 
 class Player;
-
 /**
  * FlightPathMovementGenerator generates movement of the player for the paths
  * and hence generates ground and activities for the player.
@@ -51,7 +50,7 @@ class FlightPathMovementGenerator : public MovementGeneratorMedium<Player, Fligh
         void LoadPath(Player* owner); // called from MotionMaster
         void SetCurrentNodeAfterTeleport();
         void SkipCurrentNode() { ++_currentNode; }
-        void DoEventIfAny(Player* owner, TaxiPathNodeEntry const* node, bool departure);
+        void DoEventIfAny(Player* owner, TaxiPathNodeDBC const* node, bool departure);
         void InitEndGridInfo();
         void PreloadEndGrid();
 

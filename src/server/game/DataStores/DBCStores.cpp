@@ -197,8 +197,8 @@ static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 //DBCStorage <TaxiPathEntry> sTaxiPathStore(TaxiPathEntryfmt);
 
 // DBC used only for initialization sTaxiPathNodeStore at startup.
-TaxiPathNodesByPath sTaxiPathNodesByPath;
-static DBCStorage <TaxiPathNodeEntry> sTaxiPathNodeStore(TaxiPathNodeEntryfmt);
+//TaxiPathNodesByPath sTaxiPathNodesByPath;
+//static DBCStorage <TaxiPathNodeEntry> sTaxiPathNodeStore(TaxiPathNodeEntryfmt);
 
 DBCStorage <TeamContributionPointsEntry> sTeamContributionPointsStore(TeamContributionPointsfmt);
 DBCStorage <TotemCategoryEntry> sTotemCategoryStore(TotemCategoryEntryfmt);
@@ -382,7 +382,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sTalentTabStore,                     "TalentTab.dbc");
     //LOAD_DBC(sTaxiNodesStore,                     "TaxiNodes.dbc");
     //LOAD_DBC(sTaxiPathStore,                      "TaxiPath.dbc");
-    LOAD_DBC(sTaxiPathNodeStore,                  "TaxiPathNode.dbc");
+    //LOAD_DBC(sTaxiPathNodeStore,                  "TaxiPathNode.dbc");
     LOAD_DBC(sTeamContributionPointsStore,        "TeamContributionPoints.dbc");
     LOAD_DBC(sTotemCategoryStore,                 "TotemCategory.dbc");
     LOAD_DBC(sTransportAnimationStore,            "TransportAnimation.dbc");
@@ -447,7 +447,7 @@ void LoadDBCStores(const std::string& dataPath)
     //for (TaxiPathEntry const* entry : sTaxiPathStore)
     //    sTaxiPathSetBySource[entry->FromTaxiNode][entry->ToTaxiNode] = TaxiPathBySourceAndDestination(entry->ID, entry->Cost);
 
-    uint32 pathCount = sDBCStoresMgr->GetNumRowTaxiPathMap();
+    /*uint32 pathCount = sDBCStoresMgr->GetNumRowTaxiPathMap();
     // Calculate path nodes count
     std::vector<uint32> pathLength;
     pathLength.resize(pathCount);                           // 0 and some other indexes not used
@@ -463,7 +463,7 @@ void LoadDBCStores(const std::string& dataPath)
         sTaxiPathNodesByPath[i].resize(pathLength[i]);
     // fill data
     for (TaxiPathNodeEntry const* entry : sTaxiPathNodeStore)
-        sTaxiPathNodesByPath[entry->PathID][entry->NodeIndex] = entry;
+        sTaxiPathNodesByPath[entry->PathID][entry->NodeIndex] = entry;*/
 
     // Initialize global taxinodes mask
     // include existed nodes that have at least single not spell base (scripted) path

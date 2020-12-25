@@ -21563,15 +21563,15 @@ void Player::ContinueTaxiFlight() const
     // search appropriate start path node
     uint32 startNode = 0;
 
-    TaxiPathNodeList const& nodeList = sTaxiPathNodesByPath[path];
+    TaxiPathNodeList const& nodeList = sDBCStoresMgr->GetTaxiPathNodesByPath()[path];
 
     float distPrev;
     float distNext = GetExactDistSq(nodeList[0]->Loc.X, nodeList[0]->Loc.Y, nodeList[0]->Loc.Z);
 
     for (uint32 i = 1; i < nodeList.size(); ++i)
     {
-        TaxiPathNodeEntry const* node = nodeList[i];
-        TaxiPathNodeEntry const* prevNode = nodeList[i-1];
+        TaxiPathNodeDBC const* node = nodeList[i];
+        TaxiPathNodeDBC const* prevNode = nodeList[i-1];
 
         // skip nodes at another map
         if (node->ContinentID != GetMapId())

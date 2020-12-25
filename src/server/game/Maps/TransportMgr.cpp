@@ -71,7 +71,7 @@ void TransportMgr::LoadTransportTemplates()
             continue;
         }
 
-        if (goInfo->moTransport.taxiPathId >= sTaxiPathNodesByPath.size())
+        if (goInfo->moTransport.taxiPathId >= sDBCStoresMgr->GetTaxiPathNodesByPath().size())
         {
             TC_LOG_ERROR("sql.sql", "Transport %u (name: %s) has an invalid path specified in `gameobject_template`.`data0` (%u) field, skipped.", entry, goInfo->name.c_str(), goInfo->moTransport.taxiPathId);
             continue;
@@ -123,7 +123,8 @@ public:
 void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTemplate* transport)
 {
     uint32 pathId = goInfo->moTransport.taxiPathId;
-    TaxiPathNodeList const& path = sTaxiPathNodesByPath[pathId];
+    TaxiPathNodesByPath const& tpnPath = sDBCStoresMgr->GetTaxiPathNodesByPath();
+    TaxiPathNodeList const& path = tpnPath[pathId];
     std::vector<KeyFrame>& keyFrames = transport->keyFrames;
     Movement::PointsArray splinePath, allPoints;
     bool mapChange = false;
@@ -144,7 +145,7 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
     {
         if (!mapChange)
         {
-            TaxiPathNodeEntry const* node_i = path[i];
+            TaxiPathNodeDBC const* node_i = path[i];
             if (i != path.size() - 1 && (node_i->Flags & 1 || node_i->ContinentID != path[i + 1]->ContinentID))
             {
                 keyFrames.back().Teleport = true;
@@ -389,7 +390,7 @@ Transport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType guid 
     Transport* trans = new Transport();
 
     // ...at first waypoint
-    TaxiPathNodeEntry const* startNode = tInfo->keyFrames.begin()->Node;
+    TaxiPathNodeDBC const* startNode = tInfo->keyFrames.begin()->Node;
     uint32 mapId = startNode->ContinentID;
     float x = startNode->Loc.X;
     float y = startNode->Loc.Y;

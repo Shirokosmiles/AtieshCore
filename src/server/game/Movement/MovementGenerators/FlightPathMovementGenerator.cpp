@@ -52,7 +52,7 @@ MovementGeneratorType FlightPathMovementGenerator::GetMovementGeneratorType() co
 
 bool FlightPathMovementGenerator::GetResetPosition(Unit* /*owner*/, float& x, float& y, float& z)
 {
-    TaxiPathNodeEntry const* node = _path[_currentNode];
+    TaxiPathNodeDBC const* node = _path[_currentNode];
     x = node->Loc.X;
     y = node->Loc.Y;
     z = node->Loc.Z;
@@ -192,7 +192,7 @@ uint32 FlightPathMovementGenerator::GetPathAtMapEnd() const
     return _path.size();
 }
 
-bool IsNodeIncludedInShortenedPath(TaxiPathNodeEntry const* p1, TaxiPathNodeEntry const* p2)
+bool IsNodeIncludedInShortenedPath(TaxiPathNodeDBC const* p1, TaxiPathNodeDBC const* p2)
 {
     return p1->ContinentID != p2->ContinentID || std::pow(p1->Loc.X - p2->Loc.X, 2) + std::pow(p1->Loc.Y - p2->Loc.Y, 2) > SKIP_SPLINE_POINT_DISTANCE_SQ;
 }
@@ -206,14 +206,14 @@ void FlightPathMovementGenerator::LoadPath(Player* owner)
     {
         uint32 path, cost;
         sObjectMgr->GetTaxiPath(taxi[src], taxi[dst], path, cost);
-        if (path >= sTaxiPathNodesByPath.size())
+        if (path >= sDBCStoresMgr->GetTaxiPathNodesByPath().size())
             return;
 
-        TaxiPathNodeList const& nodes = sTaxiPathNodesByPath[path];
+        TaxiPathNodeList const& nodes = sDBCStoresMgr->GetTaxiPathNodesByPath()[path];
         if (!nodes.empty())
         {
-            TaxiPathNodeEntry const* start = nodes[0];
-            TaxiPathNodeEntry const* end = nodes[nodes.size() - 1];
+            TaxiPathNodeDBC const* start = nodes[0];
+            TaxiPathNodeDBC const* end = nodes[nodes.size() - 1];
             bool passedPreviousSegmentProximityCheck = false;
             for (uint32 i = 0; i < nodes.size(); ++i)
             {
@@ -254,7 +254,7 @@ void FlightPathMovementGenerator::SetCurrentNodeAfterTeleport()
     }
 }
 
-void FlightPathMovementGenerator::DoEventIfAny(Player* owner, TaxiPathNodeEntry const* node, bool departure)
+void FlightPathMovementGenerator::DoEventIfAny(Player* owner, TaxiPathNodeDBC const* node, bool departure)
 {
     ASSERT(node, "%s", owner->GetDebugInfo().c_str());
 

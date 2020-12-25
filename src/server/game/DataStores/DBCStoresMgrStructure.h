@@ -17,6 +17,9 @@
 
 #include "DBCEnums.h"
 
+ // Structures used to access raw DBC data require packing for portability
+#pragma pack(push, 1)
+
  // load Achievement.dbc
 struct AchievementDBC
 {
@@ -1786,3 +1789,19 @@ struct TaxiPathBySourceAndDestination
     uint32 ID;
     uint32 price;
 };
+
+// load TaxiPathNode.dbc
+struct TaxiPathNodeDBC
+{
+    uint32 ID;                                              // 0
+    uint32 PathID;                                          // 1
+    uint32 NodeIndex;                                       // 2
+    uint32 ContinentID;                                     // 3
+    DBCPosition3D Loc;                                      // 4-6
+    uint32 Flags;                                           // 7
+    uint32 Delay;                                           // 8
+    uint32 ArrivalEventID;                                  // 9
+    uint32 DepartureEventID;                                // 10
+};
+
+#pragma pack(pop)

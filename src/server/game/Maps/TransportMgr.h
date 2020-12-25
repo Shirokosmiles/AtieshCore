@@ -19,6 +19,7 @@
 #define TRANSPORTMGR_H
 
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "ObjectGuid.h"
 #include <memory>
 
@@ -42,14 +43,14 @@ typedef std::unordered_map<uint32, std::set<uint32> > TransportInstanceMap;
 
 struct KeyFrame
 {
-    explicit KeyFrame(TaxiPathNodeEntry const* node) : Index(0), Node(node), InitialOrientation(0.0f),
+    explicit KeyFrame(TaxiPathNodeDBC const* node) : Index(0), Node(node), InitialOrientation(0.0f),
         DistSinceStop(-1.0f), DistUntilStop(-1.0f), DistFromPrev(-1.0f), TimeFrom(0.0f), TimeTo(0.0f),
         Teleport(false), ArriveTime(0), DepartureTime(0), Spline(nullptr), NextDistFromPrev(0.0f), NextArriveTime(0)
     {
     }
 
     uint32 Index;
-    TaxiPathNodeEntry const* Node;
+    TaxiPathNodeDBC const* Node;
     float InitialOrientation;
     float DistSinceStop;
     float DistUntilStop;

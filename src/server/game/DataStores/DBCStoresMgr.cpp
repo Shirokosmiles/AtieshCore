@@ -141,6 +141,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _talentTabMap.clear();
     _taxiNodesMap.clear();
     _taxiPathMap.clear();
+    _taxiPathNodeMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -172,6 +173,9 @@ DBCStoresMgr::~DBCStoresMgr()
     for (auto& tpsID : _taxiPathSetBySource)
         tpsID.second.clear();
     _taxiPathSetBySource.clear();
+
+    for (uint32 i = 1; i < _taxiPathNodesByPath.size(); ++i)
+        _taxiPathNodesByPath[i].clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -282,6 +286,7 @@ void DBCStoresMgr::Initialize()
     _Load_TalentTab();
     _Load_TaxiNodes();
     _Load_TaxiPath();
+    _Load_TaxiPathNode();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -294,6 +299,7 @@ void DBCStoresMgr::Initialize()
     _Handle_TalentTabPages();
     _Handle_TaxiNodesMask();
     _Handle_TaxiPathSetBySource();
+    _Handle_TaxiPathNodesByPath();
 }
 
 void DBCStoresMgr::Initialize_WorldDBC_Corrections()
@@ -4701,6 +4707,47 @@ void DBCStoresMgr::_Load_TaxiPath()
     TC_LOG_INFO("server.loading", ">> Loaded DBC_taxipath                      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+// load TaxiPathNode.dbc
+void DBCStoresMgr::_Load_TaxiPathNode()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _taxiPathNodeMap.clear();
+    //                                                0     1        2           3          4   5     6      7      8           9               10
+    QueryResult result = WorldDatabase.Query("SELECT ID, PathID, NodeIndex, ContinentID, LocX, LocY, LocZ, Flags, Delay, ArrivalEventID, DepartureEventID FROM dbc_taxipathnode");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxipathnode. DB table `dbc_taxipathnode` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        TaxiPathNodeDBC tp;
+        tp.ID = id;
+        tp.PathID           = fields[1].GetUInt32();
+        tp.NodeIndex        = fields[2].GetUInt32();
+        tp.ContinentID      = fields[3].GetUInt32();
+        tp.Loc.X            = fields[4].GetFloat();
+        tp.Loc.Y            = fields[5].GetFloat();
+        tp.Loc.Z            = fields[6].GetFloat();
+        tp.Flags            = fields[7].GetUInt32();
+        tp.Delay            = fields[8].GetUInt32();
+        tp.ArrivalEventID   = fields[9].GetUInt32();
+        tp.DepartureEventID = fields[10].GetUInt32();
+
+        _taxiPathNodeMap[id] = tp;
+
+        ++count;
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_taxipathnode                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 // Handle Additional dbc from World db
 void DBCStoresMgr::_Handle_World_Achievement()
 {
@@ -5283,5 +5330,30 @@ void DBCStoresMgr::_Handle_TaxiPathSetBySource()
     {
         if (TaxiPathDBC const* entry = &tpID.second)
             _taxiPathSetBySource[entry->FromTaxiNode][entry->ToTaxiNode] = TaxiPathBySourceAndDestination(entry->ID, entry->Cost);
+    }
+}
+
+void DBCStoresMgr::_Handle_TaxiPathNodesByPath()
+{
+    uint32 pathCount = _taxiPathNumRow;
+    // Calculate path nodes count
+    std::vector<uint32> pathLength;
+    pathLength.resize(pathCount);                           // 0 and some other indexes not used
+    for (const auto& tpnID : _taxiPathNodeMap)
+    {
+        if (TaxiPathNodeDBC const* entry = &tpnID.second)
+            if (pathLength[entry->PathID] < entry->NodeIndex + 1)
+                pathLength[entry->PathID] = entry->NodeIndex + 1;
+    }
+
+    // Set path length
+    _taxiPathNodesByPath.resize(pathCount);                 // 0 and some other indexes not used
+    for (uint32 i = 1; i < _taxiPathNodesByPath.size(); ++i)
+        _taxiPathNodesByPath[i].resize(pathLength[i]);
+    // fill data
+    for (const auto& tpnID : _taxiPathNodeMap)
+    {
+        if (TaxiPathNodeDBC const* entry = &tpnID.second)
+            _taxiPathNodesByPath[entry->PathID][entry->NodeIndex] = entry;
     }
 }

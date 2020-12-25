@@ -22,8 +22,8 @@
 #include "DBCStoresMgrStructure.h"
 #include "Regex.h"
 #include "SharedDefines.h"
-#include <set>
 #include <unordered_map>
+#include <unordered_set>
 
 typedef std::unordered_map<uint32 /*ID*/, AchievementDBC> AchievementDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, AchievementCriteriaDBC> AchievementCriteriaDBCMap;
@@ -132,15 +132,27 @@ typedef std::unordered_map<uint32 /*ID*/, TalentDBC> TalentDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TalentTabDBC> TalentTabDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TaxiNodesDBC> TaxiNodesDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, TaxiPathDBC> TaxiPathDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, TaxiPathNodeDBC> TaxiPathNodeDBCMap;
 
+// HELPERS
+// regex
 typedef std::array<std::vector<Trinity::wregex>, TOTAL_LOCALES> NameValidationRegexContainer;
+
+// PetFamilySpells
 typedef std::unordered_set<uint32> PetFamilySpellsSet;
 typedef std::unordered_map<uint32, PetFamilySpellsSet> PetFamilySpellsStore;
+
+// PetTalentSpells
 typedef std::unordered_map<uint32, TalentSpellPos> TalentSpellPosMap;
 typedef std::unordered_set<uint32> PetTalentSpells;
 
+// TaxiPathSetBySource
 typedef std::unordered_map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
 typedef std::unordered_map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
+
+// TaxiPathNodesByPath
+typedef std::vector<TaxiPathNodeDBC const*> TaxiPathNodeList;
+typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -1126,11 +1138,18 @@ public:
         return nullptr;
     }
 
-    uint32 GetNumRowTaxiPathMap() const { return _taxiPathNumRow; }
     TaxiPathDBC const* GetTaxiPathDBC(uint32 ID)
     {
         TaxiPathDBCMap::const_iterator itr = _taxiPathMap.find(ID);
         if (itr != _taxiPathMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    TaxiPathNodeDBC const* GeTaxiPathNodeDBC(uint32 ID)
+    {
+        TaxiPathNodeDBCMap::const_iterator itr = _taxiPathNodeMap.find(ID);
+        if (itr != _taxiPathNodeMap.end())
             return &itr->second;
         return nullptr;
     }
@@ -1186,6 +1205,8 @@ public:
     TaxiMask const GetDeathKnightTaxiNodesMask() { return _DeathKnightTaxiNodesMask; }
 
     TaxiPathSetBySource const& GetTaxiPathSetBySource() { return _taxiPathSetBySource; }
+
+    TaxiPathNodesByPath const& GetTaxiPathNodesByPath() { return _taxiPathNodesByPath; }
 
 protected:
     void _Load_Achievement();
@@ -1294,6 +1315,7 @@ protected:
     void _Load_TalentTab();
     void _Load_TaxiNodes();
     void _Load_TaxiPath();
+    void _Load_TaxiPathNode();
 
     // Handle Additional dbc from world db
     void Initialize_WorldDBC_Corrections();
@@ -1309,6 +1331,7 @@ protected:
     void _Handle_TalentTabPages();
     void _Handle_TaxiNodesMask();
     void _Handle_TaxiPathSetBySource();
+    void _Handle_TaxiPathNodesByPath();
 
 private:
     AchievementDBCMap _achievementMap;
@@ -1417,6 +1440,7 @@ private:
     TalentTabDBCMap _talentTabMap;
     TaxiNodesDBCMap _taxiNodesMap;
     TaxiPathDBCMap _taxiPathMap;
+    TaxiPathNodeDBCMap _taxiPathNodeMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;
@@ -1437,6 +1461,7 @@ private:
     TaxiMask _AllianceTaxiNodesMask;
     TaxiMask _DeathKnightTaxiNodesMask;
     TaxiPathSetBySource _taxiPathSetBySource;
+    TaxiPathNodesByPath _taxiPathNodesByPath;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()

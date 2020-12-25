@@ -5774,11 +5774,11 @@ void ObjectMgr::LoadEventScripts()
                     if (spell->Effects[j].MiscValue)
                         evt_scripts.insert(spell->Effects[j].MiscValue);
 
-    for (size_t path_idx = 0; path_idx < sTaxiPathNodesByPath.size(); ++path_idx)
+    for (size_t path_idx = 0; path_idx < sDBCStoresMgr->GetTaxiPathNodesByPath().size(); ++path_idx)
     {
-        for (size_t node_idx = 0; node_idx < sTaxiPathNodesByPath[path_idx].size(); ++node_idx)
+        for (size_t node_idx = 0; node_idx < sDBCStoresMgr->GetTaxiPathNodesByPath()[path_idx].size(); ++node_idx)
         {
-            TaxiPathNodeEntry const* node = sTaxiPathNodesByPath[path_idx][node_idx];
+            TaxiPathNodeDBC const* node = sDBCStoresMgr->GetTaxiPathNodesByPath()[path_idx][node_idx];
 
             if (node->ArrivalEventID)
                 evt_scripts.insert(node->ArrivalEventID);
@@ -7564,7 +7564,7 @@ void ObjectMgr::LoadGameObjectTemplate()
             {
                 if (got.moTransport.taxiPathId)
                 {
-                    if (got.moTransport.taxiPathId >= sTaxiPathNodesByPath.size() || sTaxiPathNodesByPath[got.moTransport.taxiPathId].empty())
+                    if (got.moTransport.taxiPathId >= sDBCStoresMgr->GetTaxiPathNodesByPath().size() || sDBCStoresMgr->GetTaxiPathNodesByPath()[got.moTransport.taxiPathId].empty())
                         TC_LOG_ERROR("sql.sql", "GameObject (Entry: %u GoType: %u) have data0=%u but TaxiPath (Id: %u) not exist.",
                             entry, got.type, got.moTransport.taxiPathId, got.moTransport.taxiPathId);
                 }

@@ -20,7 +20,6 @@
 
 #include "DatabaseEnvFwd.h"
 #include "DBCEnums.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Duration.h"
 #include "ObjectGuid.h"
