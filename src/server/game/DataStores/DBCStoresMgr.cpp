@@ -185,6 +185,12 @@ DBCStoresMgr::~DBCStoresMgr()
 
     for (uint32 i = 1; i < _taxiPathNodesByPath.size(); ++i)
         _taxiPathNodesByPath[i].clear();
+
+    _characterFacialHairStylesByTripple.clear();
+    _charSectionsByPenta.clear();
+    _charStartOutfitByTripple.clear();
+    _emotesTextSoundByTripple.clear();
+    _wmoAreaInfoByTripple.clear();
 }
 
 void DBCStoresMgr::Initialize()
@@ -335,6 +341,13 @@ void DBCStoresMgr::Initialize_Additional_Data()
     _Handle_TaxiNodesMask();
     _Handle_TaxiPathSetBySource();
     _Handle_TaxiPathNodesByPath();
+
+    //tuple for indexes search
+    _Handle_CharacterFacialHairStylesByTripple();
+    _Handle_CharSectionsByPenta();
+    _Handle_CharStartOutfitByTripple();
+    _Handle_EmotesTextSoundByTripple();
+    _Handle_WMOAreaInfoByTripple();
 }
 
 // load Achievement.dbc
@@ -5716,5 +5729,51 @@ void DBCStoresMgr::_Handle_TaxiPathNodesByPath()
     {
         if (TaxiPathNodeDBC const* entry = &tpnID.second)
             _taxiPathNodesByPath[entry->PathID][entry->NodeIndex] = entry;
+    }
+}
+
+// map with tuple
+void DBCStoresMgr::_Handle_CharacterFacialHairStylesByTripple()
+{
+    for (const auto& cfhsID : _characterFacialHairStyleMap)
+    {
+        if (CharacterFacialHairStylesDBC const* entry = &cfhsID.second)
+            _characterFacialHairStylesByTripple[CharacterFacialHairStylesKey(entry->RaceID, entry->SexID, entry->VariationID)] = entry;
+    }
+}
+
+void DBCStoresMgr::_Handle_CharSectionsByPenta()
+{
+    for (const auto& csID : _charSectionMap)
+    {
+        if (CharSectionsDBC const* entry = &csID.second)
+            _charSectionsByPenta[CharSectionsKey(entry->RaceID, CharSectionType(entry->BaseSection), entry->SexID, entry->VariationIndex, entry->ColorIndex)] = entry;
+    }
+}
+
+void DBCStoresMgr::_Handle_CharStartOutfitByTripple()
+{
+    for (const auto& csoID : _charStartOutfitMap)
+    {
+        if (CharStartOutfitDBC const* entry = &csoID.second)
+            _charStartOutfitByTripple[CharStartOutfitKey(entry->RaceID, entry->ClassID, entry->SexID)] = entry;
+    }
+}
+
+void DBCStoresMgr::_Handle_EmotesTextSoundByTripple()
+{
+    for (const auto& etsID : _emotesTextSoundMap)
+    {
+        if (EmotesTextSoundDBC const* entry = &etsID.second)
+            _emotesTextSoundByTripple[EmotesTextSoundKey(entry->EmotesTextID, entry->RaceID, entry->SexID)] = entry;
+    }
+}
+
+void DBCStoresMgr::_Handle_WMOAreaInfoByTripple()
+{
+    for (const auto& wmoID : _wmoAreaTableMap)
+    {
+        if (WMOAreaTableDBC const* entry = &wmoID.second)
+            _wmoAreaInfoByTripple[WMOAreaTableKey(entry->WMOID, entry->NameSetID, entry->WMOGroupID)] = entry;
     }
 }

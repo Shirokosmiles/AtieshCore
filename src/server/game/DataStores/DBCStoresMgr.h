@@ -21,7 +21,10 @@
 #include "Common.h"
 #include "DBCStoresMgrStructure.h"
 #include "Regex.h"
+#include "Log.h"
 #include "SharedDefines.h"
+#include <tuple>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -161,6 +164,27 @@ typedef std::unordered_map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 typedef std::vector<TaxiPathNodeDBC const*> TaxiPathNodeList;
 typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;
 
+// tuples for the Fastest search by more indexes
+// CharacterFacialHairStylesByTripple
+typedef std::tuple<uint8, uint8, uint8> CharacterFacialHairStylesKey;
+typedef std::map<CharacterFacialHairStylesKey, CharacterFacialHairStylesDBC const*> CharacterFacialHairStylesByTripple;
+
+// CharSectionsByPenta
+typedef std::tuple<uint8, CharSectionType, uint8, uint8, uint8> CharSectionsKey;
+typedef std::map<CharSectionsKey, CharSectionsDBC const*> CharSectionsByPenta;
+
+// CharStartOutfitByTripple
+typedef std::tuple<uint8, uint8, uint8> CharStartOutfitKey;
+typedef std::map<CharStartOutfitKey, CharStartOutfitDBC const*> CharStartOutfitByTripple;
+
+// EmotesTextSoundByTripple
+typedef std::tuple<uint32, uint8, uint8> EmotesTextSoundKey;
+typedef std::map<EmotesTextSoundKey, EmotesTextSoundDBC const*> EmotesTextSoundByTripple;
+
+// WMOAreaInfoByTripple
+typedef std::tuple<int32, int32, int32> WMOAreaTableKey;
+typedef std::map<WMOAreaTableKey, WMOAreaTableDBC const*> WMOAreaInfoByTripple;
+
 class TC_GAME_API DBCStoresMgr
 {
 private:
@@ -269,40 +293,26 @@ public:
 
     CharacterFacialHairStylesDBC const* GetCharFacialHairDBC(uint8 race, uint8 gender, uint8 facialHairID)
     {
-        for (CharacterFacialHairStylesDBCMap::const_iterator itr = _characterFacialHairStyleMap.begin(); itr != _characterFacialHairStyleMap.end(); ++itr)
-        {
-            if (itr->second.RaceID == race &&
-                itr->second.SexID == gender &&
-                itr->second.VariationID == facialHairID)
-                return &itr->second;
-        }
+        auto i = _characterFacialHairStylesByTripple.find(CharacterFacialHairStylesKey(race, gender, facialHairID));
+        if (i != _characterFacialHairStylesByTripple.end())
+            return i->second;
         return nullptr;
     }
 
     CharSectionsDBC const* GetCharSectionsDBC(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color)
     {
-        for (CharSectionsDBCMap::const_iterator itr = _charSectionMap.begin(); itr != _charSectionMap.end(); ++itr)
-        {
-            if (itr->second.RaceID == race &&
-                itr->second.BaseSection == genType &&
-                itr->second.SexID == gender &&                
-                itr->second.VariationIndex == type &&
-                itr->second.ColorIndex == color)
-                return &itr->second;
-        }
+        auto i = _charSectionsByPenta.find(CharSectionsKey(race, genType, gender, type, color));
+        if (i != _charSectionsByPenta.end())
+            return i->second;
         return nullptr;
     }
 
     CharStartOutfitDBCMap const& GetCharStartOutfitDBCMap() const { return _charStartOutfitMap; }
     CharStartOutfitDBC const* GetCharStartOutfitDBCWithParam(uint8 race, uint8 classID, uint8 gender)
     {
-        for (CharStartOutfitDBCMap::const_iterator itr = _charStartOutfitMap.begin(); itr != _charStartOutfitMap.end(); ++itr)
-        {
-            if (itr->second.RaceID == race &&
-                itr->second.ClassID == classID &&
-                itr->second.SexID == gender)
-                return &itr->second;
-        }
+        auto i = _charStartOutfitByTripple.find(CharStartOutfitKey(race, classID, gender));
+        if (i != _charStartOutfitByTripple.end())
+            return i->second;
         return nullptr;
     }
 
@@ -491,13 +501,9 @@ public:
 
     EmotesTextSoundDBC const* GetEmotesTextSoundDBCWithParam(uint32 emote, uint8 race, uint8 gender)
     {
-        for (EmotesTextSoundDBCMap::const_iterator itr = _emotesTextSoundMap.begin(); itr != _emotesTextSoundMap.end(); ++itr)
-        {
-            if (itr->second.EmotesTextID == emote &&
-                itr->second.RaceID == race &&
-                itr->second.SexID == gender)
-                return &itr->second;
-        }
+        auto i = _emotesTextSoundByTripple.find(EmotesTextSoundKey(emote, race, gender));
+        if (i != _emotesTextSoundByTripple.end())
+            return i->second;
         return nullptr;
     }
 
@@ -1241,13 +1247,9 @@ public:
 
     WMOAreaTableDBC const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid)
     {
-        for (WMOAreaTableDBCMap::const_iterator itr = _wmoAreaTableMap.begin(); itr != _wmoAreaTableMap.end(); ++itr)
-        {
-            if (itr->second.WMOID == rootid &&
-                itr->second.NameSetID == adtid &&
-                itr->second.WMOGroupID == groupid)
-                return &itr->second;
-        }
+        auto i = _wmoAreaInfoByTripple.find(WMOAreaTableKey(rootid, adtid, groupid));
+        if (i != _wmoAreaInfoByTripple.end())
+            return i->second;
         return nullptr;
     }
 
@@ -1436,6 +1438,12 @@ protected:
     void _Handle_TaxiPathSetBySource();
     void _Handle_TaxiPathNodesByPath();
 
+    void _Handle_CharacterFacialHairStylesByTripple();
+    void _Handle_CharSectionsByPenta();
+    void _Handle_CharStartOutfitByTripple();
+    void _Handle_EmotesTextSoundByTripple();
+    void _Handle_WMOAreaInfoByTripple();
+
 private:
     AchievementDBCMap _achievementMap;
     AchievementCriteriaDBCMap _achievementCriteriaMap;
@@ -1574,6 +1582,12 @@ private:
     TaxiMask _DeathKnightTaxiNodesMask;
     TaxiPathSetBySource _taxiPathSetBySource;
     TaxiPathNodesByPath _taxiPathNodesByPath;
+
+    CharacterFacialHairStylesByTripple _characterFacialHairStylesByTripple;
+    CharSectionsByPenta _charSectionsByPenta;
+    CharStartOutfitByTripple _charStartOutfitByTripple;
+    EmotesTextSoundByTripple _emotesTextSoundByTripple;
+    WMOAreaInfoByTripple _wmoAreaInfoByTripple;
 };
 
 #define sDBCStoresMgr DBCStoresMgr::instance()
