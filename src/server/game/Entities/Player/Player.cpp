@@ -25034,7 +25034,7 @@ uint32 Player::CalculateTalentsPoints() const
 bool Player::CanFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const
 {
     // continent checked in SpellInfo::CheckLocation at cast and area update
-    uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
+    uint32 v_map = sDBCStoresMgr->GetVirtualMapForMapAndZone(mapid, zone);
     if (v_map == 571 && !bySpell->HasAttribute(SPELL_ATTR7_IGNORE_COLD_WEATHER_FLYING))
         if (!HasSpell(54197)) // 54197 = Cold Weather Flying
             return false;

@@ -285,7 +285,7 @@ public:
             return false;
         }
 
-        Zone2MapCoordinates(x, y, zoneEntry->ID);
+        sDBCStoresMgr->Zone2MapCoordinates(x, y, zoneEntry->ID);
 
         if (!MapManager::IsValidMapCoord(zoneEntry->ContinentID, x, y))
         {

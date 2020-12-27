@@ -73,20 +73,7 @@ struct SkillLineCategoryEntry
 
 
 
-struct WorldMapAreaEntry
-{
-    //uint32 ID;                                            // 0
-    uint32 MapID;                                           // 1
-    uint32 AreaID;                                          // 2
-    //char const* AreaName                                  // 3
-    float LocLeft;                                          // 4
-    float LocRight;                                         // 5
-    float LocTop;                                           // 6
-    float LocBottom;                                        // 7
-    int32 DisplayMapID;                                     // 8 -1 (map_id have correct map) other: virtual map where zone show (map_id - where zone in fact internally)
-    //int32 DefaultDungeonFloor;                            // 9 pointer to DungeonMap.dbc (override x1, x2, y1, y2 coordinates)
-    //uint32 ParentWorldMapID;                              // 10
-};
+
 
 #define MAX_WORLD_MAP_OVERLAY_AREA_IDX 4
 

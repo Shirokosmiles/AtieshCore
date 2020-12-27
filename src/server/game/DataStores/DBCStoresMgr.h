@@ -143,6 +143,7 @@ typedef std::unordered_map<uint32 /*ID*/, TransportRotationDBC> TransportRotatio
 typedef std::unordered_map<uint32 /*ID*/, VehicleDBC> VehicleDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, VehicleSeatDBC> VehicleSeatDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, WMOAreaTableDBC> WMOAreaTableDBCMap;
+typedef std::unordered_map<uint32 /*AreaID*/, WorldMapAreaDBC> WorldMapAreaDBCMap;
 
 // HELPERS
 // regex
@@ -196,6 +197,13 @@ typedef std::map<MapDifficultyKey, MapDifficultyDBC const*> MapDifficultyByDoubl
 // WMOAreaInfoByTripple
 typedef std::tuple<int32, int32, int32> WMOAreaTableKey;
 typedef std::map<WMOAreaTableKey, WMOAreaTableDBC const*> WMOAreaInfoByTripple;
+
+enum ContentLevels : uint8
+{
+    CONTENT_1_60 = 0,
+    CONTENT_61_70,
+    CONTENT_71_80
+};
 
 class TC_GAME_API DBCStoresMgr
 {
@@ -986,6 +994,7 @@ public:
 
             return itr->second;
         }
+        return nullptr;
     }
 
     SkillTiersDBC const* GetSkillTiersDBC(uint32 ID)
@@ -1257,6 +1266,69 @@ public:
         return nullptr;
     }
 
+    WorldMapAreaDBC const* GetWorldMapAreaDBCByAreaID(uint32 AreaID)
+    {
+        WorldMapAreaDBCMap::const_iterator itr = _worldMapAreaMap.find(AreaID);
+        if (itr != _worldMapAreaMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)
+    {
+        if (mapid != 530 && mapid != 571)                        // speed for most cases
+            return mapid;
+
+        if (WorldMapAreaDBC const* wma = GetWorldMapAreaDBCByAreaID(zoneId))
+            return wma->DisplayMapID >= 0 ? wma->DisplayMapID : wma->MapID;
+
+        return mapid;
+    }
+
+    ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId)
+    {
+        mapid = GetVirtualMapForMapAndZone(mapid, zoneId);
+        if (mapid < 2)
+            return CONTENT_1_60;
+
+        MapDBC const* mapEntry = GetMapDBC(mapid);
+        if (!mapEntry)
+            return CONTENT_1_60;
+
+        switch (mapEntry->Expansion())
+        {
+            default: return CONTENT_1_60;
+            case 1:  return CONTENT_61_70;
+            case 2:  return CONTENT_71_80;
+        }
+    }
+
+    void Zone2MapCoordinates(float& x, float& y, uint32 zone)
+    {
+        WorldMapAreaDBC const* maEntry = GetWorldMapAreaDBCByAreaID(zone);
+
+        // if not listed then map coordinates (instance)
+        if (!maEntry)
+            return;
+
+        std::swap(x, y);                                         // at client map coords swapped
+        x = x * ((maEntry->LocBottom - maEntry->LocTop) / 100) + maEntry->LocTop;
+        y = y * ((maEntry->LocRight - maEntry->LocLeft) / 100) + maEntry->LocLeft;      // client y coord from top to down
+    }
+
+    void Map2ZoneCoordinates(float& x, float& y, uint32 zone)
+    {
+        WorldMapAreaDBC const* maEntry = GetWorldMapAreaDBCByAreaID(zone);
+
+        // if not listed then map coordinates (instance)
+        if (!maEntry)
+            return;
+
+        x = (x - maEntry->LocTop) / ((maEntry->LocBottom - maEntry->LocTop) / 100);
+        y = (y - maEntry->LocLeft) / ((maEntry->LocRight - maEntry->LocLeft) / 100);    // client y coord from top to down
+        std::swap(x, y);                                         // client have map coords swapped
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1423,6 +1495,7 @@ protected:
     void _Load_Vehicle();
     void _Load_VehicleSeat();
     void _Load_WMOAreaTable();
+    void _Load_WorldMapArea();
     
     void Initialize_WorldDBC_Corrections();
     void Initialize_Additional_Data();
@@ -1566,6 +1639,7 @@ private:
     VehicleDBCMap _vehicleMap;
     VehicleSeatDBCMap _vehicleSeatMap;
     WMOAreaTableDBCMap _wmoAreaTableMap;
+    WorldMapAreaDBCMap _worldMapAreaMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

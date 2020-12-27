@@ -207,7 +207,7 @@ typedef std::map<uint32, uint32> AreaFlagByMapID;
 //DBCStorage <VehicleEntry> sVehicleStore(VehicleEntryfmt);
 //DBCStorage <VehicleSeatEntry> sVehicleSeatStore(VehicleSeatEntryfmt);
 //DBCStorage <WMOAreaTableEntry> sWMOAreaTableStore(WMOAreaTableEntryfmt);
-DBCStorage <WorldMapAreaEntry> sWorldMapAreaStore(WorldMapAreaEntryfmt);
+//DBCStorage <WorldMapAreaEntry> sWorldMapAreaStore(WorldMapAreaEntryfmt);
 DBCStorage <WorldMapOverlayEntry> sWorldMapOverlayStore(WorldMapOverlayEntryfmt);
 DBCStorage <WorldSafeLocsEntry> sWorldSafeLocsStore(WorldSafeLocsEntryfmt);
 
@@ -390,7 +390,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sVehicleStore,                       "Vehicle.dbc");
     //LOAD_DBC(sVehicleSeatStore,                   "VehicleSeat.dbc");
     //LOAD_DBC(sWMOAreaTableStore,                  "WMOAreaTable.dbc");
-    LOAD_DBC(sWorldMapAreaStore,                  "WorldMapArea.dbc");
+    //LOAD_DBC(sWorldMapAreaStore,                  "WorldMapArea.dbc");
     LOAD_DBC(sWorldMapOverlayStore,               "WorldMapOverlay.dbc");
     LOAD_DBC(sWorldSafeLocsStore,                 "WorldSafeLocs.dbc");
 
@@ -568,7 +568,7 @@ void LoadDBCStores(const std::string& dataPath)
     return nullptr;
 }*/
 
-uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)
+/*uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)
 {
     if (mapid != 530 && mapid != 571)                        // speed for most cases
         return mapid;
@@ -622,3 +622,4 @@ void Map2ZoneCoordinates(float& x, float& y, uint32 zone)
     y = (y-maEntry->LocLeft)/((maEntry->LocRight-maEntry->LocLeft)/100);    // client y coord from top to down
     std::swap(x, y);                                         // client have map coords swapped
 }
+*/

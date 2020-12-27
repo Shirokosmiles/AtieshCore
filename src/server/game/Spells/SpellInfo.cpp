@@ -1554,7 +1554,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
         }
         else
         {
-            uint32 const v_map = GetVirtualMapForMapAndZone(map_id, zone_id);
+            uint32 const v_map = sDBCStoresMgr->GetVirtualMapForMapAndZone(map_id, zone_id);
             MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(v_map);
             if (!mapEntry || mapEntry->Expansion() < 1 || !mapEntry->IsContinent())
                 return SPELL_FAILED_INCORRECT_AREA;

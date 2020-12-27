@@ -249,7 +249,7 @@ public:
         float zoneX = object->GetPositionX();
         float zoneY = object->GetPositionY();
 
-        Map2ZoneCoordinates(zoneX, zoneY, zoneId);
+        sDBCStoresMgr->Map2ZoneCoordinates(zoneX, zoneY, zoneId);
 
         Map const* map = object->GetMap();
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);

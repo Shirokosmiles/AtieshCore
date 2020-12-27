@@ -33,18 +33,13 @@ enum LocaleConstant : uint8;
 
 //TC_GAME_API WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid);
 
-TC_GAME_API uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId);
+//TC_GAME_API uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId);
 
-enum ContentLevels : uint8
-{
-    CONTENT_1_60 = 0,
-    CONTENT_61_70,
-    CONTENT_71_80
-};
-TC_GAME_API ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId);
 
-TC_GAME_API void Zone2MapCoordinates(float &x, float &y, uint32 zone);
-TC_GAME_API void Map2ZoneCoordinates(float &x, float &y, uint32 zone);
+//TC_GAME_API ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId);
+
+//TC_GAME_API void Zone2MapCoordinates(float &x, float &y, uint32 zone);
+//TC_GAME_API void Map2ZoneCoordinates(float &x, float &y, uint32 zone);
 
 //typedef std::map<uint32/*pair32(map, diff)*/, MapDifficulty> MapDifficultyMap;
 //TC_GAME_API MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty);

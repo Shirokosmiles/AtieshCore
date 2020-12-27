@@ -150,6 +150,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _vehicleMap.clear();
     _vehicleSeatMap.clear();
     _wmoAreaTableMap.clear();
+    _worldMapAreaMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -312,6 +313,7 @@ void DBCStoresMgr::Initialize()
     _Load_Vehicle();
     _Load_VehicleSeat();
     _Load_WMOAreaTable();
+    _Load_WorldMapArea();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -5126,6 +5128,45 @@ void DBCStoresMgr::_Load_WMOAreaTable()
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_wmoareatable                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load WMOAreaTable.dbc
+void DBCStoresMgr::_Load_WorldMapArea()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _worldMapAreaMap.clear();
+    //                                                0    1      2        3        4         5         6           7
+    QueryResult result = WorldDatabase.Query("SELECT ID, MapID, AreaID, LocLeft, LocRight, LocTop, LocBottom, DisplayMapID FROM dbc_worldmaparea");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldmaparea. DB table `dbc_worldmaparea` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        WorldMapAreaDBC wma;
+        wma.ID = id;
+        wma.MapID        = fields[1].GetUInt32();
+        uint32 AreaId    = fields[2].GetUInt32();
+        wma.AreaID       = AreaId;        
+        wma.LocLeft      = fields[3].GetFloat();
+        wma.LocRight     = fields[4].GetFloat();
+        wma.LocTop       = fields[5].GetFloat();
+        wma.LocBottom    = fields[6].GetFloat();
+        wma.DisplayMapID = fields[7].GetInt32();        
+
+        _worldMapAreaMap[AreaId] = wma;
+
+        ++count;
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_worldmaparea                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db
