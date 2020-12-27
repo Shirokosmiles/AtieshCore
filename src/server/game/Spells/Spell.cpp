@@ -23,7 +23,6 @@
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "DisableMgr.h"
 #include "DynamicObject.h"

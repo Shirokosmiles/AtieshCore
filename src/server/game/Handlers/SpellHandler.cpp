@@ -20,7 +20,6 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"

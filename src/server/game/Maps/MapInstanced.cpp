@@ -17,7 +17,6 @@
 
 #include "MapInstanced.h"
 #include "Battleground.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"

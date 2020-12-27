@@ -16,7 +16,7 @@
  */
 
 #include "ScriptMgr.h"
-#include "DBCStoresMgrStructure.h"
+#include "DBCStructure.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
 #include "Player.h"

@@ -20,7 +20,6 @@
 #include "Battleground.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Item.h"
 #include "GameTime.h"

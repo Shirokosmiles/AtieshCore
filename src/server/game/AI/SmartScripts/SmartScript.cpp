@@ -21,7 +21,7 @@
 #include "Creature.h"
 #include "CreatureTextMgr.h"
 #include "CreatureTextMgrImpl.h"
-#include "DBCStoresMgrStructure.h"
+#include "DBCStructure.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "GossipDef.h"

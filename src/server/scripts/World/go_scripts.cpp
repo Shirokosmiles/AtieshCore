@@ -35,7 +35,6 @@ EndContentData */
 
 #include "ScriptMgr.h"
 #include "DBCStructure.h"
-#include "DBCStoresMgrStructure.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"

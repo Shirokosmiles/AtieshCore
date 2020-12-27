@@ -20,7 +20,6 @@
 #include "AccountMgr.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Log.h"
 #include "Map.h"

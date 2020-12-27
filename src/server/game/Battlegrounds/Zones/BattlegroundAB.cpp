@@ -18,7 +18,6 @@
 #include "BattlegroundAB.h"
 #include "BattlegroundMgr.h"
 #include "Creature.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "Language.h"

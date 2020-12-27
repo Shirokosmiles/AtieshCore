@@ -19,7 +19,6 @@
 #include "Battleground.h"
 #include "Common.h"
 #include "CreatureAI.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "EventProcessor.h"
 #include "Log.h"

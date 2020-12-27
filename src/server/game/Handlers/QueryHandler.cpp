@@ -19,7 +19,6 @@
 #include "CharacterCache.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "Log.h"

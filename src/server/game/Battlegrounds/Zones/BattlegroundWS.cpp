@@ -18,7 +18,6 @@
 
 #include "BattlegroundWS.h"
 #include "BattlegroundMgr.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "Language.h"

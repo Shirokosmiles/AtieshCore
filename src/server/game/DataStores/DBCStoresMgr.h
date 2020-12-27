@@ -19,7 +19,7 @@
 #define _DBCMGR_H
 
 #include "Common.h"
-#include "DBCStoresMgrStructure.h"
+#include "DBCStructure.h"
 #include "Regex.h"
 #include "Log.h"
 #include "SharedDefines.h"

@@ -20,7 +20,6 @@
 #include "CellImpl.h"
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"

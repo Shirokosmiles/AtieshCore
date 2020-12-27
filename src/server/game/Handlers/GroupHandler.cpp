@@ -19,7 +19,7 @@
 #include "CharacterCache.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "DBCStoresMgrStructure.h"
+#include "DBCStructure.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "Log.h"

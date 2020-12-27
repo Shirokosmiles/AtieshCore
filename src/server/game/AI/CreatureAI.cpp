@@ -21,7 +21,6 @@
 #include "CreatureAIImpl.h"
 #include "CreatureTextMgr.h"
 #include "DBCStructure.h"
-#include "DBCStoresMgrStructure.h"
 #include "Language.h"
 #include "Log.h"
 #include "Map.h"

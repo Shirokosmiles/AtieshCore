@@ -19,7 +19,6 @@
 #include "Battleground.h"
 #include "Corpse.h"
 #include "Creature.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Item.h"
 #include "ItemTemplate.h"

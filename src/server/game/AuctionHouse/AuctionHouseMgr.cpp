@@ -22,7 +22,6 @@
 #include "Common.h"
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "Item.h"

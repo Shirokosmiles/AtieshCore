@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DBCStoresMgrStructure.h"
+#include "DBCStructure.h"
 #include "Totem.h"
 #include "Group.h"
 #include "Log.h"

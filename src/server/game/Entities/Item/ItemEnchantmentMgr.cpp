@@ -20,7 +20,6 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Util.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Random.h"
 #include "Timer.h"

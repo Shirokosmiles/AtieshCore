@@ -20,7 +20,6 @@
 #include "CharacterCache.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "GameTime.h"
 #include "Item.h"
 #include "Language.h"

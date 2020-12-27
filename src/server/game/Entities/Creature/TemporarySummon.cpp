@@ -18,7 +18,6 @@
 #include "TemporarySummon.h"
 #include "CreatureAI.h"
 #include "DBCStructure.h"
-#include "DBCStoresMgrStructure.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "Log.h"

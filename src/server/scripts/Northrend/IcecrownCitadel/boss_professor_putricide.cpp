@@ -16,7 +16,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GridNotifiers.h"
 #include "Group.h"

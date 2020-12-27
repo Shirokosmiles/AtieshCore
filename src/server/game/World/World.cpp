@@ -670,14 +670,12 @@ void World::SetInitialWorldSettings()
 
     LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realm.Id.Realm);      // One-time query    
 
-    TC_LOG_INFO("server.loading", "Initialize data stores...");
     ///- Load the DBC files
-    /// TC_LOG_INFO("server.loading", "Loading SpellInfo store...");
+    TC_LOG_INFO("server.loading", "Initialize DBC data stores...");
     sDBCStoresMgr->Initialize();
-
-    LoadDBCStores(m_dataPath);
     DetectDBCLang();
 
+    TC_LOG_INFO("server.loading", "Initialize data stores...");
     // Load cinematic cameras
     LoadM2Cameras(m_dataPath);
 

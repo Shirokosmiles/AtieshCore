@@ -16,7 +16,6 @@
  */
 
 #include "FlightPathMovementGenerator.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Log.h"
 #include "MapManager.h"

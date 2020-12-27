@@ -20,7 +20,6 @@
 #include "CellImpl.h"
 #include "Common.h"
 #include "Creature.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameObjectAI.h"
 #include "Log.h"

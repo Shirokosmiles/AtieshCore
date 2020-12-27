@@ -18,7 +18,6 @@
 #ifndef TRINITY_FORMULAS_H
 #define TRINITY_FORMULAS_H
 
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Creature.h"
 #include "Log.h"

@@ -21,7 +21,7 @@
 #include "BattlegroundMgr.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "Group.h"
 #include "Language.h"

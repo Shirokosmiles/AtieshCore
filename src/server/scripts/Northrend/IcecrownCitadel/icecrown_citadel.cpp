@@ -19,7 +19,6 @@
 #include "CellImpl.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"

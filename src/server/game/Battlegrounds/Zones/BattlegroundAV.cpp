@@ -16,7 +16,6 @@
  */
 
 #include "BattlegroundAV.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "Language.h"

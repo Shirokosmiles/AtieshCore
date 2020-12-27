@@ -20,7 +20,6 @@
 #include "WorldSession.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Log.h"
 #include "ObjectMgr.h"                                      // for normalizePlayerName

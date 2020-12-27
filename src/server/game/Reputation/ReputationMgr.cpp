@@ -17,7 +17,6 @@
 
 #include "ReputationMgr.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Log.h"
 #include "ObjectMgr.h"

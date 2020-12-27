@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "LFGMgr.h"
 #include "LFGPackets.h"

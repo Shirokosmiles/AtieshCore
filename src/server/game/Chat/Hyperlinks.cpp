@@ -18,7 +18,7 @@
 #include "Hyperlinks.h"
 #include "advstd.h"
 #include "Common.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Errors.h"
 #include "ObjectMgr.h"
 #include "SharedDefines.h"

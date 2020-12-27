@@ -16,7 +16,6 @@
  */
 
 #include "PlayerTaxi.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"

@@ -24,7 +24,6 @@
 #include "Common.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "DisableMgr.h"
 #include "GameTime.h"

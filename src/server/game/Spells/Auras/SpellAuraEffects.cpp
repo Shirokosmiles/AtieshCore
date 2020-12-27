@@ -21,7 +21,7 @@
 #include "BattlefieldMgr.h"
 #include "CellImpl.h"
 #include "Common.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GridNotifiersImpl.h"
 #include "Item.h"
 #include "Log.h"

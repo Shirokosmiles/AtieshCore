@@ -24,7 +24,6 @@ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "Chat.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Language.h"
 #include "ObjectMgr.h"

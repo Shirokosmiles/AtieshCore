@@ -18,7 +18,6 @@
 #include "GroupMgr.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "InstanceSaveMgr.h"
 #include "Log.h"

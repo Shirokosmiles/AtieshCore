@@ -18,7 +18,6 @@
 #include "LootMgr.h"
 #include "Containers.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Group.h"
 #include "Log.h"

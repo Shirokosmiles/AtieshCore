@@ -21,7 +21,7 @@
 #include "Chat.h"
 #include "Containers.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "Map.h"
 #include "MotionMaster.h"

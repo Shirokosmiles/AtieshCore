@@ -27,7 +27,6 @@
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"

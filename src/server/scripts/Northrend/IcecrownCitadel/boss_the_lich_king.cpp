@@ -18,7 +18,6 @@
 #include "ScriptMgr.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GridNotifiersImpl.h"
 #include "icecrown_citadel.h"

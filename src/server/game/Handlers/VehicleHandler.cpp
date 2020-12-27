@@ -17,7 +17,6 @@
 
 #include "WorldSession.h"
 #include "DBCStructure.h"
-#include "DBCStoresMgrStructure.h"
 #include "Log.h"
 #include "Map.h"
 #include "ObjectAccessor.h"

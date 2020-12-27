@@ -18,7 +18,6 @@
 #include "OutdoorPvP.h"
 #include "CellImpl.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"

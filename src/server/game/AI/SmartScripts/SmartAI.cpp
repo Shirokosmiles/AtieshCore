@@ -19,7 +19,6 @@
 #include "Creature.h"
 #include "CreatureGroups.h"
 #include "DBCStructure.h"
-#include "DBCStoresMgrStructure.h"
 #include "GameObject.h"
 #include "Group.h"
 #include "Log.h"

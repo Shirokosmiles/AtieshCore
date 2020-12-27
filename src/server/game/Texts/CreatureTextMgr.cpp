@@ -21,7 +21,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GridNotifiersImpl.h"
 #include "Log.h"
 #include "MiscPackets.h"

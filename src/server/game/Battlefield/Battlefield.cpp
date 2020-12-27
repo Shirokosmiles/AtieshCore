@@ -20,7 +20,6 @@
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"

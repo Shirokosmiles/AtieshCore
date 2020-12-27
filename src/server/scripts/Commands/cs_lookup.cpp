@@ -26,7 +26,6 @@ EndScriptData */
 #include "AccountMgr.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameEventMgr.h"
 #include "ObjectAccessor.h"

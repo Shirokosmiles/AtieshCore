@@ -5213,10 +5213,10 @@ void DBCStoresMgr::_Load_WorldSafeLocs()
 
     _worldSafeLocsMap.clear();
     //                                                0     1         2     3     4
-    QueryResult result = WorldDatabase.Query("SELECT ID, Continent, LocX, LocY, LocZ FROM dbc_worldmapoverlay");
+    QueryResult result = WorldDatabase.Query("SELECT ID, Continent, LocX, LocY, LocZ FROM dbc_worldsafelocs");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldmapoverlay. DB table `dbc_worldmapoverlay` is empty.");
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldsafelocs. DB table `dbc_worldsafelocs` is empty.");
         return;
     }
 
@@ -5238,7 +5238,7 @@ void DBCStoresMgr::_Load_WorldSafeLocs()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_worldmapoverlay               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_worldsafelocs                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db

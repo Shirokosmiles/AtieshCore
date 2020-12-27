@@ -27,7 +27,6 @@ EndScriptData */
 #include "Chat.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameTime.h"

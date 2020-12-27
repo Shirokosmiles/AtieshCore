@@ -37,7 +37,6 @@ EndContentData */
 
 #include "ScriptMgr.h"
 #include "DBCStructure.h"
-#include "DBCStoresMgrStructure.h"
 #include "GameObject.h"
 #include "GameTime.h"
 #include "MotionMaster.h"

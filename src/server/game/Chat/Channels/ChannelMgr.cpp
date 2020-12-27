@@ -18,7 +18,6 @@
 #include "ChannelMgr.h"
 #include "Channel.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Log.h"
 #include "Player.h"

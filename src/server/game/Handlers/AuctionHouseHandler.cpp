@@ -22,7 +22,6 @@
 #include "Creature.h"
 #include "DatabaseEnv.h"
 #include "DBCStructure.h"
-#include "DBCStoresMgrStructure.h"
 #include "GameTime.h"
 #include "Item.h"
 #include "Language.h"

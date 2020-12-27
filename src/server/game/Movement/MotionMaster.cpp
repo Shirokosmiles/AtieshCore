@@ -20,7 +20,6 @@
 #include "Creature.h"
 #include "CreatureAISelector.h"
 #include "Containers.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Errors.h"
 #include "G3DPosition.hpp"

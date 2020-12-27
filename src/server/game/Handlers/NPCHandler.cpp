@@ -22,7 +22,6 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GossipDef.h"
 #include "Item.h"

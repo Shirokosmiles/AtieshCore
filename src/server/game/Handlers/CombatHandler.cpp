@@ -20,7 +20,6 @@
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DBCStructure.h"
-#include "DBCStoresMgrStructure.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"

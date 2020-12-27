@@ -16,7 +16,6 @@
  */
 
 #include "AccountMgr.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "Language.h"

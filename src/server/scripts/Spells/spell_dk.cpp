@@ -24,7 +24,6 @@
 #include "CreatureAI.h"
 #include "ScriptMgr.h"
 #include "Containers.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Map.h"
 #include "ObjectAccessor.h"

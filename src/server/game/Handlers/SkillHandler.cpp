@@ -17,7 +17,6 @@
 
 #include "WorldSession.h"
 #include "Common.h"
-#include "DBCStores.h"
 #include "DBCStoresMgr.h"
 #include "Log.h"
 #include "ObjectAccessor.h"

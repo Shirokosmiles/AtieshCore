@@ -17,7 +17,6 @@
 
 #include "zulgurub.h"
 #include "DBCStructure.h"
-#include "DBCStoresMgrStructure.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
