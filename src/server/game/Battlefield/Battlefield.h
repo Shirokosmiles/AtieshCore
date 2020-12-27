@@ -83,7 +83,6 @@ typedef std::vector<BfGraveyard*> GraveyardVect;
 
 struct PlayerHolder
 {
-    ObjectGuid GUID;
     bool inZone;
     bool inQueue;
     bool inWar;
@@ -93,7 +92,7 @@ struct PlayerHolder
     TeamId team;
     time_t time;
 };
-typedef std::unordered_map<uint32, PlayerHolder> PlayerHolderContainer;
+typedef std::unordered_map<ObjectGuid::LowType, PlayerHolder> PlayerHolderContainer;
 
 class TC_GAME_API BfCapturePoint
 {
@@ -273,7 +272,7 @@ class TC_GAME_API Battlefield : public ZoneScript
          * \brief Kick player from battlefield and teleport him to kick-point location
          * \param guid : guid of player who must be kick
          */
-        void KickPlayerFromBattlefield(ObjectGuid guid);
+        void KickPlayerFromBattlefield(ObjectGuid::LowType plrid);
 
         /// Called when player (player) enter in zone
         void HandlePlayerEnterZone(Player* player, uint32 zone);

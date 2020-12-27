@@ -778,7 +778,7 @@ void BattlefieldWG::OnBattleStart()
         workshop->UpdateGraveyardAndWorkshop();
 
     for (PlayerHolderContainer::iterator itr = m_PlayerMap.begin(); itr != m_PlayerMap.end(); ++itr)
-        if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+        if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
         {
             SendInitWorldStatesTo(player);
 
@@ -867,7 +867,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
             if (itr->second.team == GetDefenderTeam())
             {
                 // section for defenders
-                if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+                if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
                 {
                     player->CastSpell(player, SPELL_ESSENCE_OF_WINTERGRASP, true);
                     player->CastSpell(player, SPELL_VICTORY_REWARD, true);
@@ -886,7 +886,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
             else
             {
                 // section for attackers
-                if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+                if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
                 {
                     player->CastSpell(player, SPELL_DEFEAT_REWARD, true);
                     RemoveAurasFromPlayer(player);
@@ -1792,7 +1792,7 @@ void BattlefieldWG::HandlePromotion(Player* playerKiller, Unit* unitKilled)
 
     for (PlayerHolderContainer::iterator itr = m_PlayerMap.begin(); itr != m_PlayerMap.end(); ++itr)
         if (itr->second.inWar && itr->second.team == teamId)
-            if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+            if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
                 if (player->GetDistance2d(unitKilled) < 40.0f)
                     PromotePlayer(player);
 }
@@ -1966,7 +1966,7 @@ void BattlefieldWG::FillInitialWorldStates(WorldPackets::WorldState::InitWorldSt
 void BattlefieldWG::SendInitWorldStatesToAll()
 {
     for (PlayerHolderContainer::const_iterator itr = m_PlayerMap.begin(); itr != m_PlayerMap.end(); ++itr)
-        if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+        if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
             SendInitWorldStatesTo(player);
 }
 
@@ -1976,7 +1976,7 @@ void BattlefieldWG::BrokenWallOrTower(TeamId team, BfWGGameObjectBuilding* build
     {
         for (PlayerHolderContainer::const_iterator itr = m_PlayerMap.begin(); itr != m_PlayerMap.end(); ++itr)
             if (itr->second.inWar && itr->second.team == GetAttackerTeam())
-                if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+                if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
                     if (player->GetDistance2d(ASSERT_NOTNULL(GetGameObject(building->GetGUID()))) < 50.0f)
                         player->KilledMonsterCredit(QUEST_CREDIT_DEFEND_SIEGE);
     }
@@ -1998,13 +1998,13 @@ void BattlefieldWG::UpdatedDestroyedTowerCount(TeamId team)
                 if (itr->second.team == GetAttackerTeam())
                 {
                     // Remove buff stack on attackers
-                    if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+                    if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
                         player->RemoveAuraFromStack(SPELL_TOWER_CONTROL);
                 }
                 else
                 {
                     // Add buff stack to defenders and give achievement/quest credit
-                    if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+                    if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
                     {
                         player->CastSpell(player, SPELL_TOWER_CONTROL, true);
                         player->KilledMonsterCredit(QUEST_CREDIT_TOWERS_DESTROYED);
@@ -2136,14 +2136,14 @@ void BattlefieldWG::UpdateTenacity()
                 // Remove old buff
                 if (m_tenacityTeam != TEAM_NEUTRAL)
                 {
-                    if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+                    if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
                         if (player->GetLevel() >= m_MinLevel)
                             player->RemoveAurasDueToSpell(SPELL_TENACITY);
 
                 }
 
                 if (itr->second.inWar)
-                    if (Player* player = ObjectAccessor::FindPlayer(itr->second.GUID))
+                    if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
                     {
                         player->SetAuraStack(SPELL_TENACITY, player, newStack);
 
