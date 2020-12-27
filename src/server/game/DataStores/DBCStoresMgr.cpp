@@ -1892,7 +1892,7 @@ void DBCStoresMgr::_Load_GemProperties()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gemproperties                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gemproperties                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load GlyphProperties.dbc
@@ -1927,7 +1927,7 @@ void DBCStoresMgr::_Load_GlyphProperties()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_glyphproperties               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_glyphproperties               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load GlyphSlot.dbc
@@ -1961,7 +1961,7 @@ void DBCStoresMgr::_Load_GlyphSlot()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_glyphslot                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_glyphslot                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtBarberShopCostBase.dbc
@@ -1994,7 +1994,7 @@ void DBCStoresMgr::_Load_gtBarberShopCostBase()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtbarbershopcostbase          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtbarbershopcostbase          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtCombatRatings.dbc
@@ -2027,7 +2027,7 @@ void DBCStoresMgr::_Load_gtCombatRatings()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtcombatratings               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtcombatratings               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtChanceToMeleeCritBase.dbc
@@ -2060,7 +2060,7 @@ void DBCStoresMgr::_Load_gtChanceToMeleeCritBase()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtchancetomeleecritbase       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetomeleecritbase       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtChanceToMeleeCrit.dbc
@@ -2093,7 +2093,7 @@ void DBCStoresMgr::_Load_gtChanceToMeleeCrit()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtchancetomeleecrit           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetomeleecrit           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtChanceToSpellCritBase.dbc
@@ -2126,7 +2126,7 @@ void DBCStoresMgr::_Load_gtChanceToSpellCritBase()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtchancetospellcritbase       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetospellcritbase       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtChanceToSpellCrit.dbc
@@ -2159,7 +2159,7 @@ void DBCStoresMgr::_Load_gtChanceToSpellCrit()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtchancetospellcrit           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetospellcrit           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtNPCManaCostScaler.dbc
@@ -2192,7 +2192,7 @@ void DBCStoresMgr::_Load_gtNPCManaCostScaler()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtnpcmanacostscaler           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtnpcmanacostscaler           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtOCTClassCombatRatingScalar.dbc
@@ -2225,7 +2225,7 @@ void DBCStoresMgr::_Load_gtOCTClassCombatRatingScalar()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtoctclasscombatratingscalar  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtoctclasscombatratingscalar  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtOCTRegenHP.dbc
@@ -2258,7 +2258,7 @@ void DBCStoresMgr::_Load_gtOCTRegenHP()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtoctregenhp                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtoctregenhp                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtOCTRegenMP.dbc
@@ -2291,7 +2291,7 @@ void DBCStoresMgr::_Load_gtOCTRegenMP()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtoctregenmp                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtoctregenmp                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtRegenHPPerSpt.dbc
@@ -2324,7 +2324,7 @@ void DBCStoresMgr::_Load_gtRegenHPPerSpt()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtregenhpperspt               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtregenhpperspt               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtRegenMPPerSpt.dbc
@@ -2357,7 +2357,7 @@ void DBCStoresMgr::_Load_gtRegenMPPerSpt()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_gtregenmpperspt               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtregenmpperspt               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Holidays.dbc
@@ -2400,7 +2400,7 @@ void DBCStoresMgr::_Load_Holidays()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_holidays                      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_holidays                      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Item.dbc
@@ -2439,7 +2439,7 @@ void DBCStoresMgr::_Load_Item()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_item                          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_item                          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemBagFamily.dbc
@@ -2471,7 +2471,7 @@ void DBCStoresMgr::_Load_ItemBagFamily()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_itembagfamily                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_itembagfamily                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemDisplayInfo.dbc
@@ -2523,7 +2523,7 @@ void DBCStoresMgr::_Load_ItemDisplayInfo()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemdisplayinfo               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemdisplayinfo               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemExtendedCost.dbc
@@ -2563,7 +2563,7 @@ void DBCStoresMgr::_Load_ItemExtendedCost()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemextendedcost              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemextendedcost              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemLimitCategory.dbc
@@ -2597,7 +2597,7 @@ void DBCStoresMgr::_Load_ItemLimitCategory()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemlimitcategory             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemlimitcategory             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemRandomProperties.dbc
@@ -2634,7 +2634,7 @@ void DBCStoresMgr::_Load_ItemRandomProperties()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemrandomproperties          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemrandomproperties          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemRandomSuffix.dbc
@@ -2684,7 +2684,7 @@ void DBCStoresMgr::_Load_ItemRandomSuffix()
     _itemRandomSuffixNumRow++; // this _itemRandomSuffixTheLastIndex should be more then the last by 1 point
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemrandomsuffix              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemrandomsuffix              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemSet.dbc
@@ -2730,7 +2730,7 @@ void DBCStoresMgr::_Load_ItemSet()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded dbc_itemset                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemset                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load LFGDungeons.dbc

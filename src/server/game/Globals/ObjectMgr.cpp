@@ -3821,7 +3821,6 @@ void ObjectMgr::PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint3
                     if (entry->ItemID[x] > 0 && uint32(entry->ItemID[x]) == itemId)
                     {
                         found = true;
-                        TC_LOG_ERROR("sql.sql", "Item %u has founded in dbc, but const_cast!", itemId);
                         const_cast<CharStartOutfitDBC*>(entry)->ItemID[x] = 0;
                         break;
                     }
