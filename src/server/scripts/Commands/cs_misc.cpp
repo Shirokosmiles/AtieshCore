@@ -991,7 +991,7 @@ public:
         else
             return false;
 
-        WorldSafeLocsEntry const* graveyard = sWorldSafeLocsStore.LookupEntry(graveyardId);
+        WorldSafeLocsDBC const* graveyard = sDBCStoresMgr->GetWorldSafeLocsDBC(graveyardId);
 
         if (!graveyard)
         {
@@ -1036,7 +1036,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 zone_id = player->GetZoneId();
 
-        WorldSafeLocsEntry const* graveyard = sObjectMgr->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), team);
+        WorldSafeLocsDBC const* graveyard = sObjectMgr->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), team);
         if (graveyard)
         {
             uint32 graveyardId = graveyard->ID;

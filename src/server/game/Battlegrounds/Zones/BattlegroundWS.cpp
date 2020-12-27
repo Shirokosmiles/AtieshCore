@@ -19,6 +19,7 @@
 #include "BattlegroundWS.h"
 #include "BattlegroundMgr.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "Log.h"
@@ -726,14 +727,14 @@ bool BattlegroundWS::SetupBattleground()
         }
     }
 
-    WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(WS_GRAVEYARD_MAIN_ALLIANCE);
+    WorldSafeLocsDBC const* sg = sDBCStoresMgr->GetWorldSafeLocsDBC(WS_GRAVEYARD_MAIN_ALLIANCE);
     if (!sg || !AddSpiritGuide(WS_SPIRIT_MAIN_ALLIANCE, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, 3.124139f), TEAM_ALLIANCE))
     {
         TC_LOG_ERROR("bg.battleground", "BattlegroundWS: Failed to spawn Alliance spirit guide! Battleground not created!");
         return false;
     }
 
-    sg = sWorldSafeLocsStore.LookupEntry(WS_GRAVEYARD_MAIN_HORDE);
+    sg = sDBCStoresMgr->GetWorldSafeLocsDBC(WS_GRAVEYARD_MAIN_HORDE);
     if (!sg || !AddSpiritGuide(WS_SPIRIT_MAIN_HORDE, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, 3.193953f), TEAM_HORDE))
     {
         TC_LOG_ERROR("bg.battleground", "BattlegroundWS: Failed to spawn Horde spirit guide! Battleground not created!");
@@ -824,7 +825,7 @@ bool BattlegroundWS::UpdatePlayerScore(Player* player, uint32 type, uint32 value
     return true;
 }
 
-WorldSafeLocsEntry const* BattlegroundWS::GetClosestGraveyard(Player* player)
+WorldSafeLocsDBC const* BattlegroundWS::GetClosestGraveyard(Player* player)
 {
     //if status in progress, it returns main graveyards with spiritguides
     //else it will return the graveyard in the flagroom - this is especially good
@@ -834,16 +835,16 @@ WorldSafeLocsEntry const* BattlegroundWS::GetClosestGraveyard(Player* player)
     if (player->GetTeam() == ALLIANCE)
     {
         if (GetStatus() == STATUS_IN_PROGRESS)
-            return sWorldSafeLocsStore.LookupEntry(WS_GRAVEYARD_MAIN_ALLIANCE);
+            return sDBCStoresMgr->GetWorldSafeLocsDBC(WS_GRAVEYARD_MAIN_ALLIANCE);
         else
-            return sWorldSafeLocsStore.LookupEntry(WS_GRAVEYARD_FLAGROOM_ALLIANCE);
+            return sDBCStoresMgr->GetWorldSafeLocsDBC(WS_GRAVEYARD_FLAGROOM_ALLIANCE);
     }
     else
     {
         if (GetStatus() == STATUS_IN_PROGRESS)
-            return sWorldSafeLocsStore.LookupEntry(WS_GRAVEYARD_MAIN_HORDE);
+            return sDBCStoresMgr->GetWorldSafeLocsDBC(WS_GRAVEYARD_MAIN_HORDE);
         else
-            return sWorldSafeLocsStore.LookupEntry(WS_GRAVEYARD_FLAGROOM_HORDE);
+            return sDBCStoresMgr->GetWorldSafeLocsDBC(WS_GRAVEYARD_FLAGROOM_HORDE);
     }
 }
 

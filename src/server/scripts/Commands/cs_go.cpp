@@ -176,7 +176,7 @@ public:
 
     static bool HandleGoGraveyardCommand(ChatHandler* handler, uint32 gyId)
     {
-        WorldSafeLocsEntry const* gy = sWorldSafeLocsStore.LookupEntry(gyId);
+        WorldSafeLocsDBC const* gy = sDBCStoresMgr->GetWorldSafeLocsDBC(gyId);
         if (!gy)
         {
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDNOEXIST, gyId);

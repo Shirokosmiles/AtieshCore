@@ -2005,4 +2005,15 @@ struct WorldMapOverlayDBC
     //uint32 HitRectBottom;                                 // 15
     //uint32 HitRectRight;                                  // 16
 };
+
+// load WorldSafeLocs.dbc
+struct WorldSafeLocsDBC
+{
+    uint32 ID;                                              // 0
+    uint32 Continent;                                       // 1
+    DBCPosition3D Loc;                                      // 2-4
+    //char const* AreaName[16]                              // 5-20
+    //uint32 AreaName_lang_mask;                            // 21
+};
+
 #pragma pack(pop)

@@ -49,7 +49,7 @@ class WorldPacket;
 struct QuaternionData;
 struct BattlegroundScore;
 struct PvPDifficultyDBC;
-struct WorldSafeLocsEntry;
+struct WorldSafeLocsDBC;
 
 enum BattlegroundDesertionType
 {
@@ -485,7 +485,7 @@ class TC_GAME_API Battleground
         virtual void HandlePlayerResurrect(Player* /*player*/) { }
 
         // Death related
-        virtual WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        virtual WorldSafeLocsDBC const* GetClosestGraveyard(Player* player);
 
         virtual void AddPlayer(Player* player);                // must be implemented in BG subclass
 

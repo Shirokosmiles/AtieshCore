@@ -118,7 +118,7 @@ class TC_GAME_API SpecialEvent : public ZoneScript
         virtual void SendGlobalWorldStates(Player const* /*player*/) const { }
 
         // Closest available graveyard WorldSafeLocsEntry for Player's TeamId
-        virtual WorldSafeLocsEntry const* GetClosestGraveyardLocation(Player* who)
+        virtual WorldSafeLocsDBC const* GetClosestGraveyardLocation(Player* who)
         {
             return sObjectMgr->GetClosestGraveyard(who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), who->GetMapId(), who->GetTeam());
         }

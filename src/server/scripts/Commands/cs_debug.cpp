@@ -1491,7 +1491,7 @@ public:
     static bool HandleDebugNearGraveyard(ChatHandler* handler, Optional<EXACT_SEQUENCE("linked")> linked)
     {
         Player* player = handler->GetPlayer();
-        WorldSafeLocsEntry const* nearestLoc = nullptr;
+        WorldSafeLocsDBC const* nearestLoc = nullptr;
 
         if (linked)
         {
@@ -1512,16 +1512,19 @@ public:
             float z = player->GetPositionZ();
             float distNearest = std::numeric_limits<float>::max();
 
-            for (uint32 i = 0; i < sWorldSafeLocsStore.GetNumRows(); ++i)
+            WorldSafeLocsDBCMap const& wslMap = sDBCStoresMgr->GetWorldSafeLocsDBCMap();
+            for (const auto& wslID : wslMap)
             {
-                WorldSafeLocsEntry const* loc = sWorldSafeLocsStore.LookupEntry(i);
-                if (loc && loc->Continent == player->GetMapId())
+                if (WorldSafeLocsDBC const* loc = &wslID.second)
                 {
-                    float dist = (loc->Loc.X - x) * (loc->Loc.X - x) + (loc->Loc.Y - y) * (loc->Loc.Y - y) + (loc->Loc.Z - z) * (loc->Loc.Z - z);
-                    if (dist < distNearest)
+                    if (loc->Continent == player->GetMapId())
                     {
-                        distNearest = dist;
-                        nearestLoc = loc;
+                        float dist = (loc->Loc.X - x) * (loc->Loc.X - x) + (loc->Loc.Y - y) * (loc->Loc.Y - y) + (loc->Loc.Z - z) * (loc->Loc.Z - z);
+                        if (dist < distNearest)
+                        {
+                            distNearest = dist;
+                            nearestLoc = loc;
+                        }
                     }
                 }
             }

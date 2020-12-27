@@ -53,7 +53,7 @@ struct PlayerClassLevelInfo;
 struct PlayerInfo;
 struct PlayerLevelInfo;
 struct SkillRaceClassInfoDBC;
-struct WorldSafeLocsEntry;
+struct WorldSafeLocsDBC;
 
 struct PageText
 {
@@ -1103,8 +1103,8 @@ class TC_GAME_API ObjectMgr
         GossipText const* GetGossipText(uint32 Text_ID) const;
         QuestGreeting const* GetQuestGreeting(ObjectGuid guid) const;
 
-        WorldSafeLocsEntry const* GetDefaultGraveyard(uint32 team) const;
-        WorldSafeLocsEntry const* GetClosestGraveyard(float x, float y, float z, uint32 MapId, uint32 team) const;
+        WorldSafeLocsDBC const* GetDefaultGraveyard(uint32 team) const;
+        WorldSafeLocsDBC const* GetClosestGraveyard(float x, float y, float z, uint32 MapId, uint32 team) const;
         bool AddGraveyardLink(uint32 id, uint32 zoneId, uint32 team, bool persist = true);
         void RemoveGraveyardLink(uint32 id, uint32 zoneId, uint32 team, bool persist = false);
         void LoadGraveyardZones();

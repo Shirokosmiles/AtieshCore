@@ -6761,7 +6761,7 @@ void ObjectMgr::LoadGraveyardZones()
         uint32 zoneId = fields[1].GetUInt32();
         uint32 team   = fields[2].GetUInt16();
 
-        WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(safeLocId);
+        WorldSafeLocsDBC const* entry = sDBCStoresMgr->GetWorldSafeLocsDBC(safeLocId);
         if (!entry)
         {
             TC_LOG_ERROR("sql.sql", "Table `graveyard_zone` has a record for non-existing graveyard (WorldSafeLocsID: %u), skipped.", safeLocId);
@@ -6794,7 +6794,7 @@ void ObjectMgr::LoadGraveyardZones()
     TC_LOG_INFO("server.loading", ">> Loaded %u graveyard-zone links in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
-WorldSafeLocsEntry const* ObjectMgr::GetDefaultGraveyard(uint32 team) const
+WorldSafeLocsDBC const* ObjectMgr::GetDefaultGraveyard(uint32 team) const
 {
     enum DefaultGraveyard
     {
@@ -6803,13 +6803,13 @@ WorldSafeLocsEntry const* ObjectMgr::GetDefaultGraveyard(uint32 team) const
     };
 
     if (team == HORDE)
-        return sWorldSafeLocsStore.LookupEntry(HORDE_GRAVEYARD);
+        return sDBCStoresMgr->GetWorldSafeLocsDBC(HORDE_GRAVEYARD);
     else if (team == ALLIANCE)
-        return sWorldSafeLocsStore.LookupEntry(ALLIANCE_GRAVEYARD);
+        return sDBCStoresMgr->GetWorldSafeLocsDBC(ALLIANCE_GRAVEYARD);
     else return nullptr;
 }
 
-WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveyard(float x, float y, float z, uint32 MapId, uint32 team) const
+WorldSafeLocsDBC const* ObjectMgr::GetClosestGraveyard(float x, float y, float z, uint32 MapId, uint32 team) const
 {
     // search for zone associated closest graveyard
     uint32 zoneId = sMapMgr->GetZoneId(PHASEMASK_NORMAL, MapId, x, y, z);
@@ -6844,15 +6844,15 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveyard(float x, float y, float
     // at corpse map
     bool foundNear = false;
     float distNear = 10000;
-    WorldSafeLocsEntry const* entryNear = nullptr;
+    WorldSafeLocsDBC const* entryNear = nullptr;
 
     // at entrance map for corpse map
     bool foundEntr = false;
     float distEntr = 10000;
-    WorldSafeLocsEntry const* entryEntr = nullptr;
+    WorldSafeLocsDBC const* entryEntr = nullptr;
 
     // some where other
-    WorldSafeLocsEntry const* entryFar = nullptr;
+    WorldSafeLocsDBC const* entryFar = nullptr;
 
     MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(MapId);
 
@@ -6860,7 +6860,7 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveyard(float x, float y, float
     {
         GraveyardData const& data = range.first->second;
 
-        WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(data.safeLocId);
+        WorldSafeLocsDBC const* entry = sDBCStoresMgr->GetWorldSafeLocsDBC(data.safeLocId);
         if (!entry)
         {
             TC_LOG_ERROR("sql.sql", "Table `graveyard_zone` has record for not existing graveyard (WorldSafeLocsID %u), skipped.", data.safeLocId);

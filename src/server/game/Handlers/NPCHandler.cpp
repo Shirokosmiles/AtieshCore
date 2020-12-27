@@ -331,7 +331,7 @@ void WorldSession::SendSpiritResurrect()
     _player->DurabilityLossAll(0.25f, true);
 
     // get corpse nearest graveyard
-    WorldSafeLocsEntry const* corpseGrave = nullptr;
+    WorldSafeLocsDBC const* corpseGrave = nullptr;
     WorldLocation corpseLocation = _player->GetCorpseLocation();
     if (_player->HasCorpse())
     {
@@ -345,7 +345,7 @@ void WorldSession::SendSpiritResurrect()
     // teleport to nearest from corpse graveyard, if different from nearest to player ghost
     if (corpseGrave)
     {
-        WorldSafeLocsEntry const* ghostGrave = sObjectMgr->GetClosestGraveyard(
+        WorldSafeLocsDBC const* ghostGrave = sObjectMgr->GetClosestGraveyard(
             _player->GetPositionX(), _player->GetPositionY(), _player->GetPositionZ(), _player->GetMapId(), _player->GetTeam());
 
         if (corpseGrave != ghostGrave)

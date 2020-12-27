@@ -18,6 +18,7 @@
 
 #include "BattlegroundSA.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "Log.h"
@@ -550,8 +551,8 @@ bool BattlegroundSA::ResetObjs()
     //Graveyards
     for (uint32 i = 0; i < BG_SA_MAX_GY; ++i)
     {
-        WorldSafeLocsEntry const* sg = nullptr;
-        sg = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
+        WorldSafeLocsDBC const* sg = nullptr;
+        sg = sDBCStoresMgr->GetWorldSafeLocsDBC(BG_SA_GYEntries[i]);
 
         if (!sg)
         {
@@ -1045,11 +1046,11 @@ void BattlegroundSA::DemolisherStartState(bool start)
 
 void BattlegroundSA::DestroyGate(Player* /*player*/, GameObject* /*go*/) { }
 
-WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
+WorldSafeLocsDBC const* BattlegroundSA::GetClosestGraveyard(Player* player)
 {
     uint32 safeloc = 0;
-    WorldSafeLocsEntry const* ret;
-    WorldSafeLocsEntry const* closest;
+    WorldSafeLocsDBC const* ret;
+    WorldSafeLocsDBC const* closest;
     float dist, nearest;
     float x, y, z;
 
@@ -1060,7 +1061,7 @@ WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
     else
         safeloc = BG_SA_GYEntries[BG_SA_DEFENDER_LAST_GY];
 
-    closest = sWorldSafeLocsStore.LookupEntry(safeloc);
+    closest = sDBCStoresMgr->GetWorldSafeLocsDBC(safeloc);
     ASSERT(closest);
     nearest = player->GetExactDistSq(closest->Loc.X, closest->Loc.Y, closest->Loc.Z);
 
@@ -1069,7 +1070,7 @@ WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
         if (GraveyardStatus[i] != player->GetTeamId())
             continue;
 
-        ret = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
+        ret = sDBCStoresMgr->GetWorldSafeLocsDBC(BG_SA_GYEntries[i]);
         ASSERT(ret);
         dist = player->GetExactDistSq(ret->Loc.X, ret->Loc.Y, ret->Loc.Z);
         if (dist < nearest)
@@ -1203,7 +1204,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
 
     DelCreature(BG_SA_MAXNPC + i);
     GraveyardStatus[i] = Source->GetTeamId();
-    WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
+    WorldSafeLocsDBC const* sg = sDBCStoresMgr->GetWorldSafeLocsDBC(BG_SA_GYEntries[i]);
     if (!sg)
     {
         TC_LOG_ERROR("bg.battleground", "BattlegroundSA::CaptureGraveyard: non-existant GY entry: %u", BG_SA_GYEntries[i]);

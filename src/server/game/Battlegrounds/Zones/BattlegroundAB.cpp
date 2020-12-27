@@ -19,6 +19,7 @@
 #include "BattlegroundMgr.h"
 #include "Creature.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "Log.h"
@@ -754,7 +755,7 @@ void BattlegroundAB::EndBattleground(uint32 winner)
     Battleground::EndBattleground(winner);
 }
 
-WorldSafeLocsEntry const* BattlegroundAB::GetClosestGraveyard(Player* player)
+WorldSafeLocsDBC const* BattlegroundAB::GetClosestGraveyard(Player* player)
 {
     TeamId teamIndex = player->GetTeamId();
 
@@ -766,7 +767,7 @@ WorldSafeLocsEntry const* BattlegroundAB::GetClosestGraveyard(Player* player)
         if (m_Nodes[i] == teamIndex + BG_AB_NODE_TYPE_OCCUPIED)
             nodes.push_back(i);
 
-    WorldSafeLocsEntry const* good_entry = nullptr;
+    WorldSafeLocsDBC const* good_entry = nullptr;
     // If so, select the closest node to place ghost on
     if (!nodes.empty())
     {
@@ -776,7 +777,7 @@ WorldSafeLocsEntry const* BattlegroundAB::GetClosestGraveyard(Player* player)
         float minDistSq = 999999.0f;
         for (uint8 node : nodes)
         {
-            WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(BG_AB_GraveyardIds[node]);
+            WorldSafeLocsDBC const* entry = sDBCStoresMgr->GetWorldSafeLocsDBC(BG_AB_GraveyardIds[node]);
             if (!entry)
                 continue;
 
@@ -792,7 +793,7 @@ WorldSafeLocsEntry const* BattlegroundAB::GetClosestGraveyard(Player* player)
 
     // If not, place ghost on starting location
     if (!good_entry)
-        good_entry = sWorldSafeLocsStore.LookupEntry(BG_AB_GraveyardIds[BG_AB_SPIRIT_ALIANCE + teamIndex]);
+        good_entry = sDBCStoresMgr->GetWorldSafeLocsDBC(BG_AB_GraveyardIds[BG_AB_SPIRIT_ALIANCE + teamIndex]);
 
     return good_entry;
 }

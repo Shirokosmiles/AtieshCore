@@ -579,7 +579,7 @@ void BattlegroundMgr::LoadBattlegroundTemplates()
         if (bgTemplate.Id != BATTLEGROUND_AA && bgTemplate.Id != BATTLEGROUND_RB)
         {
             uint32 startId = fields[5].GetUInt32();
-            if (WorldSafeLocsEntry const* start = sWorldSafeLocsStore.LookupEntry(startId))
+            if (WorldSafeLocsDBC const* start = sDBCStoresMgr->GetWorldSafeLocsDBC(startId))
             {
                 bgTemplate.StartLocation[TEAM_ALLIANCE].Relocate(start->Loc.X, start->Loc.Y, start->Loc.Z, fields[6].GetFloat());
             }
@@ -590,7 +590,7 @@ void BattlegroundMgr::LoadBattlegroundTemplates()
             }
 
             startId = fields[7].GetUInt32();
-            if (WorldSafeLocsEntry const* start = sWorldSafeLocsStore.LookupEntry(startId))
+            if (WorldSafeLocsDBC const* start = sDBCStoresMgr->GetWorldSafeLocsDBC(startId))
             {
                 bgTemplate.StartLocation[TEAM_HORDE].Relocate(start->Loc.X, start->Loc.Y, start->Loc.Z, fields[8].GetFloat());
             }

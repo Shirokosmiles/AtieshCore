@@ -209,7 +209,7 @@ typedef std::map<uint32, uint32> AreaFlagByMapID;
 //DBCStorage <WMOAreaTableEntry> sWMOAreaTableStore(WMOAreaTableEntryfmt);
 //DBCStorage <WorldMapAreaEntry> sWorldMapAreaStore(WorldMapAreaEntryfmt);
 //DBCStorage <WorldMapOverlayEntry> sWorldMapOverlayStore(WorldMapOverlayEntryfmt);
-DBCStorage <WorldSafeLocsEntry> sWorldSafeLocsStore(WorldSafeLocsEntryfmt);
+//DBCStorage <WorldSafeLocsEntry> sWorldSafeLocsStore(WorldSafeLocsEntryfmt);
 
 typedef std::list<std::string> StoreProblemList;
 
@@ -392,7 +392,7 @@ void LoadDBCStores(const std::string& dataPath)
     //LOAD_DBC(sWMOAreaTableStore,                  "WMOAreaTable.dbc");
     //LOAD_DBC(sWorldMapAreaStore,                  "WorldMapArea.dbc");
     //LOAD_DBC(sWorldMapOverlayStore,               "WorldMapOverlay.dbc");
-    LOAD_DBC(sWorldSafeLocsStore,                 "WorldSafeLocs.dbc");
+    //LOAD_DBC(sWorldSafeLocsStore,                 "WorldSafeLocs.dbc");
 
 #undef LOAD_DBC
 

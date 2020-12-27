@@ -21,6 +21,7 @@
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
 #include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -755,7 +756,7 @@ BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
     return nullptr;
 }
 
-WorldSafeLocsEntry const* Battlefield::GetClosestGraveyard(Player* player)
+WorldSafeLocsDBC const* Battlefield::GetClosestGraveyard(Player* player)
 {
     BfGraveyard* closestGY = nullptr;
     float maxdist = -1;
@@ -776,7 +777,7 @@ WorldSafeLocsEntry const* Battlefield::GetClosestGraveyard(Player* player)
     }
 
     if (closestGY)
-        return sWorldSafeLocsStore.LookupEntry(closestGY->GetGraveyardId());
+        return sDBCStoresMgr->GetWorldSafeLocsDBC(closestGY->GetGraveyardId());
 
     return nullptr;
 }
@@ -850,7 +851,7 @@ void BfGraveyard::SetSpirit(Creature* spirit, TeamId team)
 
 float BfGraveyard::GetDistance(Player* player)
 {
-    WorldSafeLocsEntry const* safeLoc = sWorldSafeLocsStore.LookupEntry(m_GraveyardId);
+    WorldSafeLocsDBC const* safeLoc = sDBCStoresMgr->GetWorldSafeLocsDBC(m_GraveyardId);
     return player->GetDistance2d(safeLoc->Loc.X, safeLoc->Loc.Y);
 }
 
@@ -919,7 +920,7 @@ void BfGraveyard::GiveControlTo(TeamId team)
 
 void BfGraveyard::RelocateDeadPlayers()
 {
-    WorldSafeLocsEntry const* closestGrave = nullptr;
+    WorldSafeLocsDBC const* closestGrave = nullptr;
     for (GuidSet::const_iterator itr = m_ResurrectQueue.begin(); itr != m_ResurrectQueue.end(); ++itr)
     {
         Player* player = ObjectAccessor::FindPlayer(*itr);

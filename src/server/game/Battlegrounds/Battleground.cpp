@@ -1323,7 +1323,7 @@ void Battleground::RelocateDeadPlayers(ObjectGuid guideGuid)
     GuidVector& ghostList = itr->second;
     if (!ghostList.empty())
     {
-        WorldSafeLocsEntry const* closestGrave = nullptr;
+        WorldSafeLocsDBC const* closestGrave = nullptr;
         for (GuidVector::const_iterator itr = ghostList.begin(); itr != ghostList.end(); ++itr)
         {
             Player* player = ObjectAccessor::FindPlayer(*itr);
@@ -1783,7 +1783,7 @@ void Battleground::SetBgRaid(uint32 TeamID, Group* bg_raid)
     old_raid = bg_raid;
 }
 
-WorldSafeLocsEntry const* Battleground::GetClosestGraveyard(Player* player)
+WorldSafeLocsDBC const* Battleground::GetClosestGraveyard(Player* player)
 {
     return sObjectMgr->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam());
 }
