@@ -98,11 +98,11 @@ public:
 
     bool HandleMailMarkAsRead(uint32 mailID);
     bool HandleMailDelete(uint32 mailID);
-    uint8 HandleMailReturnToSender(uint32 mailID);
-    uint8 HandleMailTakeItem(Player* player, uint32 mailID, ObjectGuid::LowType item_guid, uint32& count, uint8& msg_result);
-    void HandleMailTakeMoney(Player* player, uint32 mailID);
+    MailResponseResult HandleMailReturnToSender(uint32 mailID);
+    MailResponseResult HandleMailTakeItem(Player* player, uint32 mailID, ObjectGuid::LowType item_guid, uint32& count, uint32& msg_result);
+    MailResponseResult HandleMailTakeMoney(Player* player, uint32 mailID, uint32& msg_result);
     void HandleGetMailList(Player* player, WorldPacket& data);
-    void HandleMailCreateTextItem(Player* player, uint32 mailID);
+    MailResponseResult HandleMailCreateTextItem(Player* player, uint32 mailID, uint32& msg_result);
     bool HandleQueryNextMailTime(Player* player, WorldPacket& data);
 
     time_t GetMailMgrExpiryTimer() { return _ExpTimer.GetExpiry().count(); }

@@ -335,21 +335,8 @@ void WorldSession::HandleMailReturnToSender(WorldPackets::Mail::MailReturnToSend
 {
     if (!CanOpenMailBox(returnToSender.Mailbox))
         return;
-
-    switch (sMailMgr->HandleMailReturnToSender(returnToSender.MailID))
-    {
-        case 0:
-            _player->SendMailResult(returnToSender.MailID, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
-            break;
-        case 1:
-            _player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
-            break;
-        case 2:
-            _player->SendMailResult(returnToSender.MailID, MAIL_RETURNED_TO_SENDER, MAIL_OK);
-            break;
-        default:
-            break;
-    }
+    MailResponseResult result = sMailMgr->HandleMailReturnToSender(returnToSender.MailID);
+    _player->SendMailResult(returnToSender.MailID, MAIL_RETURNED_TO_SENDER, result);
 }
 
 //called when player takes item attached in mail
@@ -358,25 +345,10 @@ void WorldSession::HandleMailTakeItem(WorldPackets::Mail::MailTakeItem& takeItem
     if (!CanOpenMailBox(takeItem.Mailbox))
         return;
 
-    uint8 msg_result = 0;
+    uint32 msg_result = 0;
     uint32 count = 0;
-    switch (sMailMgr->HandleMailTakeItem(_player, takeItem.MailID, takeItem.AttachID, count, msg_result))
-    {
-        case 0:
-            _player->SendMailResult(takeItem.MailID, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
-            break;
-        case 1:
-            _player->SendMailResult(takeItem.MailID, MAIL_ITEM_TAKEN, MAIL_ERR_NOT_ENOUGH_MONEY);
-            break;
-        case 2:
-            _player->SendMailResult(takeItem.MailID, MAIL_ITEM_TAKEN, MAIL_OK, 0, takeItem.AttachID, count);
-            break;
-        case 3:
-            _player->SendMailResult(takeItem.MailID, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg_result);
-            break;
-        default:
-            break;
-    }
+    MailResponseResult result = sMailMgr->HandleMailTakeItem(_player, takeItem.MailID, takeItem.AttachID, count, msg_result);
+    _player->SendMailResult(takeItem.MailID, MAIL_ITEM_TAKEN, result, msg_result, takeItem.AttachID, count);
 }
 
 void WorldSession::HandleMailTakeMoney(WorldPackets::Mail::MailTakeMoney& takeMoney)
@@ -384,7 +356,9 @@ void WorldSession::HandleMailTakeMoney(WorldPackets::Mail::MailTakeMoney& takeMo
     if (!CanOpenMailBox(takeMoney.Mailbox))
         return;
 
-    sMailMgr->HandleMailTakeMoney(_player, takeMoney.MailID);
+    uint32 msg_result = 0;
+    MailResponseResult result = sMailMgr->HandleMailTakeMoney(_player, takeMoney.MailID, msg_result);
+    _player->SendMailResult(takeMoney.MailID, MAIL_MONEY_TAKEN, result, msg_result);
 }
 
 //called when player lists his received mails
@@ -407,7 +381,9 @@ void WorldSession::HandleMailCreateTextItem(WorldPackets::Mail::MailCreateTextIt
     if (!CanOpenMailBox(createTextItem.Mailbox))
         return;
 
-    sMailMgr->HandleMailCreateTextItem(_player, createTextItem.MailID);
+    uint32 msg_result = 0;
+    MailResponseResult result = sMailMgr->HandleMailCreateTextItem(_player, createTextItem.MailID, msg_result);
+    _player->SendMailResult(createTextItem.MailID, MAIL_MADE_PERMANENT, result, msg_result);
 }
 
 void WorldSession::HandleQueryNextMailTime(WorldPacket& /*recvData*/)

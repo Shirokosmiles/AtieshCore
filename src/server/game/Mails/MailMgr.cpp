@@ -852,38 +852,33 @@ uint32 MailMgr::GetMailBoxSize(ObjectGuid::LowType playerId)
 
 bool MailMgr::HandleMailMarkAsRead(uint32 mailID)
 {
-    bool result = false;
-    for (MailMap::iterator itr = m_mails.begin(); itr != m_mails.end(); ++itr)
+    MailMap::iterator itr = m_mails.find(mailID);
+    if (itr != m_mails.end())
     {
-        if (itr->first == mailID)
-        {
-            itr->second.checked = itr->second.checked | MAIL_CHECK_MASK_READ;
-            itr->second.state = MAIL_STATE_CHANGED;
-            result = true;
+        itr->second.checked = itr->second.checked | MAIL_CHECK_MASK_READ;
+        itr->second.state = MAIL_STATE_CHANGED;
 
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_MARK_AS_READ);
-            stmt->setUInt8(0, itr->second.checked);
-            stmt->setUInt8(1, itr->second.state);
-            stmt->setUInt32(2, itr->first);
-            CharacterDatabase.Execute(stmt);
-        }
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_MARK_AS_READ);
+        stmt->setUInt8(0, itr->second.checked);
+        stmt->setUInt8(1, itr->second.state);
+        stmt->setUInt32(2, itr->first);
+        CharacterDatabase.Execute(stmt);
+        return true;
     }
 
-    return result;
+    return false;
 }
 
 bool MailMgr::HandleMailDelete(uint32 mailID)
 {
     bool result = false;
-    for (MailMap::iterator itr = m_mails.begin(); itr != m_mails.end(); ++itr)
+    MailMap::const_iterator itr = m_mails.find(mailID);
+    if (itr != m_mails.end())
     {
-        if (itr->first == mailID)
-        {
-            result = true;
-            // if mail with item and COD we should reward sender (he should not lost the money)
-            if (itr->second.COD && itr->second.sender && itr->second.messageType == MAIL_NORMAL)
-                SendMailByGUID(0, itr->second.sender, MAIL_NORMAL, "Money received", "From old mail with COD", itr->second.COD, MAIL_CHECK_MASK_COD_PAYMENT);
-        }
+        result = true;
+        // if mail with item and COD we should reward sender (he should not lost the money)
+        if (itr->second.COD && itr->second.sender && itr->second.messageType == MAIL_NORMAL)
+            SendMailByGUID(0, itr->second.sender, MAIL_NORMAL, "Money received", "From old mail with COD", itr->second.COD, MAIL_CHECK_MASK_COD_PAYMENT);
     }
 
     if (result)
@@ -891,20 +886,13 @@ bool MailMgr::HandleMailDelete(uint32 mailID)
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         RemoveMail(mailID, trans);
         CharacterDatabase.CommitTransaction(trans);
-    }
+    }    
 
     return result;
 }
 
-uint8 MailMgr::HandleMailReturnToSender(uint32 mailID)
+MailResponseResult MailMgr::HandleMailReturnToSender(uint32 mailID)
 {
-    uint8 result = 0;
-
-    // 0 = MAIL_ERR_INTERNAL_ERROR
-    // 1 = MAIL_ERR_RECIPIENT_CAP_REACHED
-    // 2 = MAIL_OK
-
-    uint32 old_maild     = 0;
     uint32 new_sender    = 0;
     uint32 new_receiver  = 0;
     uint32 money         = 0;
@@ -912,262 +900,233 @@ uint8 MailMgr::HandleMailReturnToSender(uint32 mailID)
     std::string subject, body;
     bool itemsExist = false;
 
-    for (MailMap::iterator itr = m_mails.begin(); itr != m_mails.end(); ++itr)
+    // Handle old-exist mailID (check it)
+    MailMap::const_iterator itr = m_mails.find(mailID);
+    if (itr != m_mails.end())
     {
-        if (itr->first == mailID)
+        if (itr->second.deliver_time > GameTime::GetGameTime())
+            return MAIL_ERR_INTERNAL_ERROR;
+
+        ObjectGuid oldsenderGuid(HighGuid::Player, itr->second.sender);
+        ObjectGuid oldreceiverGuid(HighGuid::Player, itr->second.receiver);
+
+        uint32 sr_account = 0;
+        uint32 rc_account = 0;
+
+        sr_account = sCharacterCache->GetCharacterAccountIdByGuid(oldsenderGuid);
+        rc_account = sCharacterCache->GetCharacterAccountIdByGuid(oldreceiverGuid);
+
+        Player* oldsender = ObjectAccessor::FindConnectedPlayer(oldsenderGuid);
+
+        if (!oldsender && !sr_account) // sender (new receiver) not exist
+            return MAIL_ERR_RECIPIENT_NOT_FOUND;
+
+        if (itr->second.sender) // new receiver
         {
-            if (itr->second.deliver_time > GameTime::GetGameTime())
-                continue; // return 0
-
-            ObjectGuid oldsenderGuid(HighGuid::Player, itr->second.sender);
-            ObjectGuid oldreceiverGuid(HighGuid::Player, itr->second.receiver);
-
-            uint32 sr_account = 0;
-            uint32 rc_account = 0;
-
-            sr_account = sCharacterCache->GetCharacterAccountIdByGuid(oldsenderGuid);
-            rc_account = sCharacterCache->GetCharacterAccountIdByGuid(oldreceiverGuid);
-
-            Player* oldsender = ObjectAccessor::FindConnectedPlayer(oldsenderGuid);
-
-            if (!oldsender && !sr_account) // sender (new receiver) not exist
-                continue; // return 0
-
-            if (itr->second.sender) // new receiver
+            if (Player* receiver = ObjectAccessor::FindPlayerByLowGUID(itr->second.sender))
             {
-                if (Player* receiver = ObjectAccessor::FindPlayerByLowGUID(itr->second.sender))
-                {
-                    if (GetMailBoxSize(itr->second.sender) + receiver->GetAuctionLotsCount() > sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_COUNT_CONTROLLER))
-                    {
-                        result = 1;
-                        continue; // return 1
-                    }
-                }
+                if (GetMailBoxSize(itr->second.sender) + receiver->GetAuctionLotsCount() > sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_COUNT_CONTROLLER))
+                    return MAIL_ERR_RECIPIENT_CAP_REACHED;
             }
-
-            result = 2; // MAIL_OK, now just gather info from mail for new mail
-
-            old_maild = itr->first;
-            new_receiver = itr->second.sender;
-            new_sender = itr->second.receiver;
-            subject = itr->second.subject;
-            body = itr->second.body;
-            money = itr->second.money;
-            if (itr->second.items_exist)
-                itemsExist = true;
-
-            bool needItemDelay = sr_account != rc_account;
-            // If theres is an item, there is a one hour delivery delay.
-            deliver_delay = needItemDelay ? sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY) : 0;
         }
+
+        // MAIL_OK, now just gather info from mail for new mail
+        new_receiver = itr->second.sender;
+        new_sender = itr->second.receiver;
+        subject = itr->second.subject;
+        body = itr->second.body;
+        money = itr->second.money;
+        if (itr->second.items_exist)
+            itemsExist = true;
+
+        bool needItemDelay = sr_account != rc_account;
+        // If theres is an item, there is a one hour delivery delay.
+        deliver_delay = needItemDelay ? sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY) : 0;
     }
 
-    if (result == 2) // MAIL_OK
-    {
-        // 1 step - send new mail
-        uint32 new_mailID = SendReturnMailByGUID(old_maild, new_sender, new_receiver, subject, body, money, itemsExist, deliver_delay);
+    // 1 step - send new mail
+    uint32 new_mailID = SendReturnMailByGUID(mailID, new_sender, new_receiver, subject, body, money, itemsExist, deliver_delay);
 
-        // 2 step - update mail_items for new mailid
-        if (itemsExist)
+    // 2 step - update mail_items for new mailid
+    if (itemsExist)
+    {
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        for (MailItemMap::iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
+        {
+            if (itr->second.messageID == mailID)
+            {
+                itr->second.receiver_guid = new_receiver;
+                // update mailId in memory container (in DB it already done in SendReturnMailByGUID func)
+                itr->second.messageID = new_mailID;
+
+                // owner in data will set at mail receive and item extracting
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
+                stmt->setUInt32(0, itr->second.receiver_guid);
+                stmt->setUInt32(1, itr->second.item_guid);
+                trans->Append(stmt);
+            }
+        }
+        CharacterDatabase.CommitTransaction(trans);
+    }
+
+    // 3 step - delete old mail
+    CharacterDatabaseTransaction trans2 = CharacterDatabase.BeginTransaction();
+    RemoveMail(mailID, trans2);
+    CharacterDatabase.CommitTransaction(trans2);
+    return MAIL_OK;
+}
+
+MailResponseResult MailMgr::HandleMailTakeItem(Player* player, uint32 mailID, ObjectGuid::LowType item_guid, uint32& count, uint32& msg_result)
+{
+    if (!player || !player->GetSession())
+        return MAIL_ERR_RECIPIENT_NOT_FOUND;
+
+    MailMap::iterator itr = m_mails.find(mailID);
+    if (itr != m_mails.end())
+    {
+        if (itr->second.deliver_time > GameTime::GetGameTime())
+            return MAIL_ERR_INTERNAL_ERROR;
+
+        // check on item id
+        bool itemexist = false;
+        for (MailItemMap::iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
+        {
+            if (itr->second.messageID == mailID && itr->second.item_guid == item_guid)
+                itemexist = true;
+        }
+
+        Item* it = sMailMgr->GetMItem(item_guid);
+        if (!it || !itemexist)
+        {
+            if (!it && itemexist)
+                TC_LOG_ERROR("mailMgr", "Mail (%u) has item (GUID: %u), but doesn not exist in ItemMap of pointers", mailID, item_guid);
+            if (it && !itemexist)
+                TC_LOG_ERROR("mailMgr", "Mail (%u) has item (GUID: %u), but doesn not exist in MailItemMap", mailID, item_guid);
+            return MAIL_ERR_MAIL_ATTACHMENT_INVALID;
+        }
+
+        if (!player->HasEnoughMoney(itr->second.COD))
+            return MAIL_ERR_CANT_SEND_WRAPPED_COD;
+
+        ItemPosCountVec dest;
+        msg_result = player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, it, false);
+        if (msg_result == EQUIP_ERR_OK)
         {
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+            //if there is COD, take COD money from player and send them to sender by mail
+            if (itr->second.COD > 0)
+            {
+                ObjectGuid sender_guid(HighGuid::Player, itr->second.sender);
+                Player* receiver = ObjectAccessor::FindConnectedPlayer(sender_guid);
+
+                uint32 sender_accId = 0;
+
+                if (player->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+                {
+                    std::string sender_name;
+                    if (receiver)
+                    {
+                        sender_accId = receiver->GetSession()->GetAccountId();
+                        sender_name = receiver->GetName();
+                    }
+                    else
+                    {
+                        // can be calculated early
+                        sender_accId = sCharacterCache->GetCharacterAccountIdByGuid(sender_guid);
+
+                        if (!sCharacterCache->GetCharacterNameByGuid(sender_guid, sender_name))
+                            sender_name = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
+                    }
+                    sLog->outCommand(player->GetSession()->GetAccountId(), "GM %s (Account: %u) receiver mail item: %s (Entry: %u Count: %u) and send COD money: %u to player: %s (Account: %u)",
+                        player->GetName().c_str(), player->GetSession()->GetAccountId(), it->GetTemplate()->Name1.c_str(), it->GetEntry(), it->GetCount(), itr->second.COD, sender_name.c_str(), sender_accId);
+                }
+                else if (!receiver)
+                    sender_accId = sCharacterCache->GetCharacterAccountIdByGuid(sender_guid);
+
+                // check player existence
+                if (receiver || sender_accId)
+                    SendMailBy(player, itr->second.sender, itr->second.subject, "", itr->second.COD, MAIL_CHECK_MASK_COD_PAYMENT);
+
+                player->ModifyMoney(-int32(itr->second.COD));
+
+                itr->second.COD = 0;
+            }
+
+            //upd state
+            itr->second.state = MAIL_STATE_CHANGED;
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_STATE);
+            stmt->setUInt8(0, MAIL_STATE_CHANGED);
+            stmt->setUInt32(1, mailID);
+            trans->Append(stmt);
+
+            count = it->GetCount();                      // save counts before store and possible merge with deleting
+            it->SetState(ITEM_UNCHANGED);                       // need to set this state, otherwise item cannot be removed later, if neccessary
+            player->MoveItemToInventory(dest, it, true);
+            player->SaveInventoryAndGoldToDB(trans);
+
+            // upd owner of item
+            CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
+            stmt2->setUInt32(0, player->GetGUID().GetCounter());
+            stmt2->setUInt32(1, item_guid);
+            trans->Append(stmt2);
+
+            RemoveMailItem(item_guid, trans);
+
+            // check on others items in this mail, and set "has_items" = 0 if no
+            bool has_items = false;
             for (MailItemMap::iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
             {
                 if (itr->second.messageID == mailID)
-                {
-                    itr->second.receiver_guid = new_receiver;
-                    // update mailId in memory container (in DB it already done in SendReturnMailByGUID func)
-                    itr->second.messageID = new_mailID;
-
-                    // owner in data will set at mail receive and item extracting
-                    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
-                    stmt->setUInt32(0, itr->second.receiver_guid);
-                    stmt->setUInt32(1, itr->second.item_guid);
-                    trans->Append(stmt);
-                }
+                    has_items = true;
             }
+
+            CharacterDatabasePreparedStatement* stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_ITEM_HAS_ITEM);
+            stmt3->setUInt8(0, has_items ? 1 : 0);
+            stmt3->setUInt32(1, mailID);
+            trans->Append(stmt3);
+
             CharacterDatabase.CommitTransaction(trans);
+            return MAIL_OK;
         }
-
-        // 3 step - delete old mail
-        CharacterDatabaseTransaction trans2 = CharacterDatabase.BeginTransaction();
-        RemoveMail(old_maild, trans2);
-        CharacterDatabase.CommitTransaction(trans2);
+        else
+            return MAIL_ERR_EQUIP_ERROR;
     }
 
-    return result;
+    return MAIL_ERR_INTERNAL_ERROR;
 }
 
-uint8 MailMgr::HandleMailTakeItem(Player* player, uint32 mailID, ObjectGuid::LowType item_guid, uint32& count, uint8& msg_result)
-{
-    if (!player || !player->GetSession())
-        return 0;
-
-    uint8 result = 0;
-    // 0 = MAIL_ERR_INTERNAL_ERROR
-    // 1 = MAIL_ERR_NOT_ENOUGH_MONEY
-    // 2 = MAIL_OK
-    // 3 = MAIL_ERR_EQUIP_ERROR
-
-    for (MailMap::iterator itr = m_mails.begin(); itr != m_mails.end(); ++itr)
-    {
-        if (itr->first == mailID)
-        {
-            if (itr->second.deliver_time > GameTime::GetGameTime())
-                continue; // return 0
-
-            // check on item id
-            bool itemexist = false;
-            for (MailItemMap::iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
-            {
-                if (itr->second.messageID == mailID && itr->second.item_guid == item_guid)
-                    itemexist = true;
-            }
-
-            Item* it = sMailMgr->GetMItem(item_guid);
-            if (!it || !itemexist)
-            {
-                if (!it && itemexist)
-                    TC_LOG_ERROR("mailMgr", "Mail (%u) has item (GUID: %u), but doesn not exist in ItemMap of pointers", mailID, item_guid);
-                if (it && !itemexist)
-                    TC_LOG_ERROR("mailMgr", "Mail (%u) has item (GUID: %u), but doesn not exist in MailItemMap", mailID, item_guid);
-                continue; // return 0
-            }
-
-            if (!player->HasEnoughMoney(itr->second.COD))
-            {
-                result = 1;
-                continue; // return 1
-            }
-
-            ItemPosCountVec dest;
-            msg_result = player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, it, false);
-            if (msg_result == EQUIP_ERR_OK)
-            {
-                CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-                if (itr->second.COD > 0)                                     //if there is COD, take COD money from player and send them to sender by mail
-                {
-                    ObjectGuid sender_guid(HighGuid::Player, itr->second.sender);
-                    Player* receiver = ObjectAccessor::FindConnectedPlayer(sender_guid);
-
-                    uint32 sender_accId = 0;
-
-                    if (player->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
-                    {
-                        std::string sender_name;
-                        if (receiver)
-                        {
-                            sender_accId = receiver->GetSession()->GetAccountId();
-                            sender_name = receiver->GetName();
-                        }
-                        else
-                        {
-                            // can be calculated early
-                            sender_accId = sCharacterCache->GetCharacterAccountIdByGuid(sender_guid);
-
-                            if (!sCharacterCache->GetCharacterNameByGuid(sender_guid, sender_name))
-                                sender_name = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
-                        }
-                        sLog->outCommand(player->GetSession()->GetAccountId(), "GM %s (Account: %u) receiver mail item: %s (Entry: %u Count: %u) and send COD money: %u to player: %s (Account: %u)",
-                            player->GetName().c_str(), player->GetSession()->GetAccountId(), it->GetTemplate()->Name1.c_str(), it->GetEntry(), it->GetCount(), itr->second.COD, sender_name.c_str(), sender_accId);
-                    }
-                    else if (!receiver)
-                        sender_accId = sCharacterCache->GetCharacterAccountIdByGuid(sender_guid);
-
-                    // check player existence
-                    if (receiver || sender_accId)
-                        SendMailBy(player, itr->second.sender, itr->second.subject, "", itr->second.COD, MAIL_CHECK_MASK_COD_PAYMENT);
-
-                    player->ModifyMoney(-int32(itr->second.COD));
-
-                    itr->second.COD = 0;
-                }
-
-                itr->second.state = MAIL_STATE_CHANGED;
-                //upd state
-                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_STATE);
-                stmt->setUInt8(0, MAIL_STATE_CHANGED);
-                stmt->setUInt32(1, mailID);
-                trans->Append(stmt);
-
-                //player->m_mailsUpdated = true;
-                count = it->GetCount();                      // save counts before store and possible merge with deleting
-                it->SetState(ITEM_UNCHANGED);                       // need to set this state, otherwise item cannot be removed later, if neccessary
-                player->MoveItemToInventory(dest, it, true);
-                player->SaveInventoryAndGoldToDB(trans);
-
-                // upd owner of item
-                CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
-                stmt2->setUInt32(0, player->GetGUID().GetCounter());
-                stmt2->setUInt32(1, item_guid);
-                trans->Append(stmt2);
-
-                RemoveMailItem(item_guid, trans);
-
-                // check on others items in this mail, and set "has_items" = 0 if no
-                bool need_to_upd_has_items = true;
-                for (MailItemMap::iterator itr = m_mailitems.begin(); itr != m_mailitems.end(); ++itr)
-                {
-                    if (itr->second.messageID == mailID)
-                        itemexist = false;
-                }
-
-                if (need_to_upd_has_items)
-                {
-                    CharacterDatabasePreparedStatement* stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_ITEM_HAS_ITEM);
-                    stmt3->setUInt8(0, 0);
-                    stmt3->setUInt32(0, mailID);
-                    trans->Append(stmt3);
-                }
-
-                CharacterDatabase.CommitTransaction(trans);
-
-                //player->SendMailResult(mailID, MAIL_ITEM_TAKEN, MAIL_OK, 0, itemId, count);
-                result = 2;
-            }
-            else
-                result = 3;
-                //player->SendMailResult(mailID, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg_result);
-        }
-    }
-
-    return result;
-}
-
-void MailMgr::HandleMailTakeMoney(Player* player, uint32 mailID)
+MailResponseResult MailMgr::HandleMailTakeMoney(Player* player, uint32 mailID, uint32& msg_result)
 {
     if (!player)
-        return;
+        return MAIL_ERR_RECIPIENT_NOT_FOUND;
 
-    for (MailMap::iterator itr = m_mails.begin(); itr != m_mails.end(); ++itr)
+    MailMap::iterator itr = m_mails.find(mailID);
+    if (itr != m_mails.end())
     {
-        if (itr->first == mailID)
+        if (itr->second.deliver_time > GameTime::GetGameTime())
+            return MAIL_ERR_INTERNAL_ERROR;
+
+        if (!player->ModifyMoney(itr->second.money, false))
         {
-            if (itr->second.deliver_time > GameTime::GetGameTime())
-            {
-                player->SendMailResult(mailID, MAIL_MONEY_TAKEN, MAIL_ERR_INTERNAL_ERROR);
-                continue;
-            }
-
-            if (!player->ModifyMoney(itr->second.money, false))
-            {
-                player->SendMailResult(mailID, MAIL_MONEY_TAKEN, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_TOO_MUCH_GOLD);
-                continue;
-            }
-
-            itr->second.money = 0;
-            itr->second.state = MAIL_STATE_CHANGED;
-            //player->m_mailsUpdated = true;
-
-            player->SendMailResult(mailID, MAIL_MONEY_TAKEN, MAIL_OK);
-
-            // save money and mail to prevent cheating
-            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-            player->SaveGoldToDB(trans);
-            _RemoveMoneyFromMail(mailID, trans);
-            CharacterDatabase.CommitTransaction(trans);
+            msg_result = EQUIP_ERR_TOO_MUCH_GOLD;
+            return MAIL_ERR_EQUIP_ERROR;
         }
+
+        itr->second.money = 0;
+        itr->second.state = MAIL_STATE_CHANGED;
+
+        player->SendMailResult(mailID, MAIL_MONEY_TAKEN, MAIL_OK);
+
+        // save money and mail to prevent cheating
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        player->SaveGoldToDB(trans);
+        _RemoveMoneyFromMail(mailID, trans);
+        CharacterDatabase.CommitTransaction(trans);
+        return MAIL_OK;
     }
+
+    return MAIL_ERR_INTERNAL_ERROR;
 }
 
 void MailMgr::HandleGetMailList(Player* player, WorldPacket& data)
@@ -1283,63 +1242,58 @@ void MailMgr::HandleGetMailList(Player* player, WorldPacket& data)
     data.put<uint8>(4, mailsCount);                        // set real send mails to client
 }
 
-void MailMgr::HandleMailCreateTextItem(Player* player, uint32 mailID)
+MailResponseResult MailMgr::HandleMailCreateTextItem(Player* player, uint32 mailID, uint32& msg_result)
 {
     if (!player || !player->GetSession())
-        return;
+        return MAIL_ERR_RECIPIENT_NOT_FOUND;
 
-    for (MailMap::iterator itr = m_mails.begin(); itr != m_mails.end(); ++itr)
+    MailMap::iterator itr = m_mails.find(mailID);
+    if (itr != m_mails.end())
     {
-        if (itr->first == mailID)
+        if ((itr->second.body.empty() && !itr->second.mailTemplateId) || itr->second.deliver_time > GameTime::GetGameTime() || (itr->second.checked & MAIL_CHECK_MASK_COPIED))
+            return MAIL_ERR_INTERNAL_ERROR;
+
+        Item* bodyItem = new Item;                              // This is not bag and then can be used new Item.
+        if (!bodyItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), MAIL_BODY_ITEM_TEMPLATE, player))
         {
-            if ((itr->second.body.empty() && !itr->second.mailTemplateId) || itr->second.deliver_time > GameTime::GetGameTime() || (itr->second.checked & MAIL_CHECK_MASK_COPIED))
-            {
-                player->SendMailResult(mailID, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
-                continue;
-            }
+            delete bodyItem;
+            return MAIL_ERR_MAIL_ATTACHMENT_INVALID;
+        }
 
-            Item* bodyItem = new Item;                              // This is not bag and then can be used new Item.
-            if (!bodyItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), MAIL_BODY_ITEM_TEMPLATE, player))
-            {
-                delete bodyItem;
-                continue;
-            }
+        // in mail template case we need create new item text
+        if (itr->second.mailTemplateId)
+        {
+            MailTemplateDBC const* mailTemplateEntry = sDBCStoresMgr->GetMailTemplateDBC(itr->second.mailTemplateId);
+            ASSERT(mailTemplateEntry);
+            bodyItem->SetText(mailTemplateEntry->Body[player->GetSession()->GetSessionDbcLocale()]);
+        }
+        else
+            bodyItem->SetText(itr->second.body);
 
-            // in mail template case we need create new item text
-            if (itr->second.mailTemplateId)
-            {
-                MailTemplateDBC const* mailTemplateEntry = sDBCStoresMgr->GetMailTemplateDBC(itr->second.mailTemplateId);
-                ASSERT(mailTemplateEntry);
-                bodyItem->SetText(mailTemplateEntry->Body[player->GetSession()->GetSessionDbcLocale()]);
-            }
-            else
-                bodyItem->SetText(itr->second.body);
+        if (itr->second.messageType == MAIL_NORMAL)
+            bodyItem->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HighGuid::Player, itr->second.sender));
 
-            if (itr->second.messageType == MAIL_NORMAL)
-                bodyItem->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HighGuid::Player, itr->second.sender));
+        bodyItem->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_MAIL_TEXT_MASK);
 
-            bodyItem->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_MAIL_TEXT_MASK);
+        TC_LOG_DEBUG("network", "HandleMailCreateTextItem mailid=%u", mailID);
 
-            TC_LOG_INFO("network", "HandleMailCreateTextItem mailid=%u", mailID);
-
-            ItemPosCountVec dest;
-            uint8 msg = player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, bodyItem, false);
-            if (msg == EQUIP_ERR_OK)
-            {
-                itr->second.checked = itr->second.checked | MAIL_CHECK_MASK_COPIED;
-                itr->second.state = MAIL_STATE_CHANGED;
-                //player->m_mailsUpdated = true;
-
-                player->StoreItem(dest, bodyItem, true);
-                player->SendMailResult(mailID, MAIL_MADE_PERMANENT, MAIL_OK);
-            }
-            else
-            {
-                player->SendMailResult(mailID, MAIL_MADE_PERMANENT, MAIL_ERR_EQUIP_ERROR, msg);
-                delete bodyItem;
-            }
+        ItemPosCountVec dest;
+        msg_result = player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, bodyItem, false);
+        if (msg_result == EQUIP_ERR_OK)
+        {
+            itr->second.checked = itr->second.checked | MAIL_CHECK_MASK_COPIED;
+            itr->second.state = MAIL_STATE_CHANGED;
+            player->StoreItem(dest, bodyItem, true);
+            return MAIL_OK;
+        }
+        else
+        {
+            delete bodyItem;
+            return MAIL_ERR_EQUIP_ERROR;
         }
     }
+
+    return MAIL_ERR_INTERNAL_ERROR;
 }
 
 bool MailMgr::HandleQueryNextMailTime(Player* player, WorldPacket& data)
