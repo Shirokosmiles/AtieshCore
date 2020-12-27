@@ -58,6 +58,8 @@ class TC_GAME_API TempSummon : public Creature
         uint32 GetTimer() const { return m_timer; }
         bool CanFollowOwner() const { return m_canFollowOwner; }
         void SetCanFollowOwner(bool can) { m_canFollowOwner = can; }
+        void SetVisibleBySummonerOnly(bool visibleBySummonerOnly) { m_visibleBySummonerOnly = visibleBySummonerOnly; }
+        bool IsVisibleBySummonerOnly() const { return m_visibleBySummonerOnly; }
 
         SummonPropertiesDBC const* m_Properties;
 
@@ -70,6 +72,7 @@ class TC_GAME_API TempSummon : public Creature
         ObjectGuid m_summonerGOGUID;
 
         bool m_canFollowOwner;
+        bool m_visibleBySummonerOnly;
 };
 
 class TC_GAME_API Minion : public TempSummon

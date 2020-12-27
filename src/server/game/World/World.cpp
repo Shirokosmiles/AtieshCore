@@ -108,11 +108,13 @@ TC_GAME_API std::atomic<uint32> World::m_worldLoopCounter(0);
 
 TC_GAME_API float World::m_MaxVisibleDistanceOnContinents = DEFAULT_VISIBILITY_DISTANCE;
 TC_GAME_API float World::m_MaxVisibleDistanceInInstances  = DEFAULT_VISIBILITY_INSTANCE;
-TC_GAME_API float World::m_MaxVisibleDistanceInBGArenas   = DEFAULT_VISIBILITY_BGARENAS;
+TC_GAME_API float World::m_MaxVisibleDistanceInBG         = DEFAULT_VISIBILITY_BGARENAS;
+TC_GAME_API float World::m_MaxVisibleDistanceInArenas     = DEFAULT_VISIBILITY_BGARENAS;
 
 TC_GAME_API int32 World::m_visibility_notify_periodOnContinents = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 TC_GAME_API int32 World::m_visibility_notify_periodInInstances  = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
-TC_GAME_API int32 World::m_visibility_notify_periodInBGArenas   = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
+TC_GAME_API int32 World::m_visibility_notify_periodInBG         = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
+TC_GAME_API int32 World::m_visibility_notify_periodInArenas     = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 
 TC_GAME_API uint32 GetLiquidFlags(uint32 liquidType)
 {
@@ -542,7 +544,8 @@ void World::LoadConfigSettings(bool reload)
     ///-visibility in instances
     m_MaxVisibleDistanceInInstances = m_float_configs[CONFIG_VISIBILITY_DISTANCE_INSTANCES];
     ///-visibility in BG/Arenas
-    m_MaxVisibleDistanceInBGArenas = m_float_configs[CONFIG_VISIBILITY_DISTANCE_BGARENAS];
+    m_MaxVisibleDistanceInBG = m_float_configs[CONFIG_VISIBILITY_DISTANCE_BG];
+    m_MaxVisibleDistanceInArenas = m_float_configs[CONFIG_VISIBILITY_DISTANCE_ARENAS];
     ///- Read all rates from the config file
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
         playerBaseMoveSpeed[i] = baseMoveSpeed[i] * rate_values[RATE_MOVESPEED];
@@ -553,7 +556,8 @@ void World::LoadConfigSettings(bool reload)
     SetPlayerAmountLimit(m_int_configs[CONFIG_MAX_PLAYERS_ON_REALM]);
     m_visibility_notify_periodOnContinents = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_ONCONTINENTS];
     m_visibility_notify_periodInInstances = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_ININSTANCES];
-    m_visibility_notify_periodInBGArenas = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_INBGARENAS];
+    m_visibility_notify_periodInBG = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_INBG];
+    m_visibility_notify_periodInArenas = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_INARENAS];
     TC_LOG_INFO("server.loading", "Will clear `logs` table of entries older than %i seconds every %u minutes.", m_int_configs[CONFIG_LOGDB_CLEARTIME], m_int_configs[CONFIG_LOGDB_CLEARINTERVAL]);
     TC_LOG_INFO("server.loading", "Client cache version set to: %u", m_int_configs[CONFIG_CLIENTCACHE_VERSION]);
     //###      End
