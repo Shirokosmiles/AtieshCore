@@ -178,6 +178,17 @@ World::~World()
     while (cliCmdQueue.next(command))
         delete command;
 
+    for (uint32 i = 0; i < MAX_RATES; i++)
+        rate_values[i] = 0;
+    for (uint32 i = 0; i < INT_CONFIG_VALUE_COUNT; i++)
+        m_int_configs[i] = 0;
+    for (uint32 i = 0; i < BOOL_CONFIG_VALUE_COUNT; i++)
+        m_bool_configs[i] = 0;
+    for (uint32 i = 0; i < FLOAT_CONFIG_VALUE_COUNT; i++)
+        m_float_configs[i] = 0;
+    for (uint32 i = 0; i < STRING_CONFIG_VALUE_COUNT; i++)
+        m_string_configs[i] = nullptr;
+
     VMAP::VMapFactory::clear();
     MMAP::MMapFactory::clear();
 
