@@ -190,6 +190,9 @@ DBCStoresMgr::~DBCStoresMgr()
     _charSectionsByPenta.clear();
     _charStartOutfitByTripple.clear();
     _emotesTextSoundByTripple.clear();
+    _lfgDungeonByDouble.clear();
+    _mapDifficultyByDouble.clear();
+    _skillRaceClassInfoBySkill.clear();
     _wmoAreaInfoByTripple.clear();
 }
 
@@ -347,6 +350,9 @@ void DBCStoresMgr::Initialize_Additional_Data()
     _Handle_CharSectionsByPenta();
     _Handle_CharStartOutfitByTripple();
     _Handle_EmotesTextSoundByTripple();
+    _Handle_LFGDungeonDBCByDouble();
+    _Handle_MapDifficultyByDouble();
+    _Handle_SkillRaceClassInfo();
     _Handle_WMOAreaInfoByTripple();
 }
 
@@ -5766,6 +5772,34 @@ void DBCStoresMgr::_Handle_EmotesTextSoundByTripple()
     {
         if (EmotesTextSoundDBC const* entry = &etsID.second)
             _emotesTextSoundByTripple[EmotesTextSoundKey(entry->EmotesTextID, entry->RaceID, entry->SexID)] = entry;
+    }
+}
+
+void DBCStoresMgr::_Handle_LFGDungeonDBCByDouble()
+{
+    for (const auto& lfgdID : _lfgDungeonMap)
+    {
+        if (LFGDungeonDBC const* entry = &lfgdID.second)
+            _lfgDungeonByDouble[LFGDungeonKey(entry->MapID, Difficulty(entry->Difficulty))] = entry;
+    }
+}
+
+void DBCStoresMgr::_Handle_MapDifficultyByDouble()
+{
+    for (const auto& mpID : _mapDifficultyMap)
+    {
+        if (MapDifficultyDBC const* entry = &mpID.second)
+            _mapDifficultyByDouble[MapDifficultyKey(entry->MapID, Difficulty(entry->Difficulty))] = entry;
+    }
+}
+
+void DBCStoresMgr::_Handle_SkillRaceClassInfo()
+{
+    for (const auto& srciID : _skillRaceClassInfoMap)
+    {
+        if (SkillRaceClassInfoDBC const* entry = &srciID.second)
+            if (GetSkillLineDBC(entry->SkillID))
+                _skillRaceClassInfoBySkill.emplace(entry->SkillID, entry);
     }
 }
 

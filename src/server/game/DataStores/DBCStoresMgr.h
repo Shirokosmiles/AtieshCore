@@ -164,6 +164,10 @@ typedef std::unordered_map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 typedef std::vector<TaxiPathNodeDBC const*> TaxiPathNodeList;
 typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;
 
+// SkillRaceClassInfoBounds
+typedef std::unordered_multimap<uint32, SkillRaceClassInfoDBC const*> SkillRaceClassInfoMap;
+typedef std::pair<SkillRaceClassInfoMap::iterator, SkillRaceClassInfoMap::iterator> SkillRaceClassInfoBounds;
+
 // tuples for the Fastest search by more indexes
 // CharacterFacialHairStylesByTripple
 typedef std::tuple<uint8, uint8, uint8> CharacterFacialHairStylesKey;
@@ -180,6 +184,14 @@ typedef std::map<CharStartOutfitKey, CharStartOutfitDBC const*> CharStartOutfitB
 // EmotesTextSoundByTripple
 typedef std::tuple<uint32, uint8, uint8> EmotesTextSoundKey;
 typedef std::map<EmotesTextSoundKey, EmotesTextSoundDBC const*> EmotesTextSoundByTripple;
+
+// LFGDungeonDBCByDouble
+typedef std::tuple<int32, Difficulty> LFGDungeonKey;
+typedef std::map<LFGDungeonKey, LFGDungeonDBC const*> LFGDungeonDBCByDouble;
+
+// MapDifficultyByDouble
+typedef std::tuple<uint32, Difficulty> MapDifficultyKey;
+typedef std::map<MapDifficultyKey, MapDifficultyDBC const*> MapDifficultyByDouble;
 
 // WMOAreaInfoByTripple
 typedef std::tuple<int32, int32, int32> WMOAreaTableKey;
@@ -768,12 +780,9 @@ public:
 
     LFGDungeonDBC const* GetLFGDungeon(uint32 mapId, Difficulty difficulty)
     {
-        for (LFGDungeonDBCMap::const_iterator itr = _lfgDungeonMap.begin(); itr != _lfgDungeonMap.end(); ++itr)
-        {
-            if (itr->second.MapID == int32(mapId) &&
-                Difficulty(itr->second.Difficulty) == difficulty)
-                return &itr->second;
-        }
+        auto i = _lfgDungeonByDouble.find(LFGDungeonKey(mapId, difficulty));
+        if (i != _lfgDungeonByDouble.end())
+            return i->second;
         return nullptr;
     }
 
@@ -815,12 +824,9 @@ public:
     MapDifficultyDBCMap const& GetMapDifficultyDBCMap() const { return _mapDifficultyMap; }
     MapDifficultyDBC const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty)
     {
-        for (MapDifficultyDBCMap::const_iterator itr = _mapDifficultyMap.begin(); itr != _mapDifficultyMap.end(); ++itr)
-        {
-            if (itr->second.MapID == mapId &&
-                Difficulty(itr->second.Difficulty) == difficulty)
-                return &itr->second;
-        }
+        auto i = _mapDifficultyByDouble.find(MapDifficultyKey(mapId, difficulty));
+        if (i != _mapDifficultyByDouble.end())
+            return i->second;
         return nullptr;
     }
 
@@ -970,18 +976,16 @@ public:
 
     SkillRaceClassInfoDBC const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_)
     {
-        for (SkillRaceClassInfoDBCMap::const_iterator itr = _skillRaceClassInfoMap.begin(); itr != _skillRaceClassInfoMap.end(); ++itr)
+        SkillRaceClassInfoBounds bounds = _skillRaceClassInfoBySkill.equal_range(skill);
+        for (SkillRaceClassInfoMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
         {
-            if (itr->second.SkillID != skill)
+            if (itr->second->RaceMask && !(itr->second->RaceMask & (1 << (race - 1))))
                 continue;
-            if (itr->second.RaceMask && !(itr->second.RaceMask & (1 << (race - 1))))
-                continue;
-            if (itr->second.ClassMask && !(itr->second.ClassMask & (1 << (class_ - 1))))
+            if (itr->second->ClassMask && !(itr->second->ClassMask & (1 << (class_ - 1))))
                 continue;
 
-            return &itr->second;
+            return itr->second;
         }
-        return nullptr;
     }
 
     SkillTiersDBC const* GetSkillTiersDBC(uint32 ID)
@@ -1442,6 +1446,9 @@ protected:
     void _Handle_CharSectionsByPenta();
     void _Handle_CharStartOutfitByTripple();
     void _Handle_EmotesTextSoundByTripple();
+    void _Handle_LFGDungeonDBCByDouble();
+    void _Handle_MapDifficultyByDouble();
+    void _Handle_SkillRaceClassInfo();
     void _Handle_WMOAreaInfoByTripple();
 
 private:
@@ -1587,6 +1594,9 @@ private:
     CharSectionsByPenta _charSectionsByPenta;
     CharStartOutfitByTripple _charStartOutfitByTripple;
     EmotesTextSoundByTripple _emotesTextSoundByTripple;
+    LFGDungeonDBCByDouble _lfgDungeonByDouble;
+    MapDifficultyByDouble _mapDifficultyByDouble;
+    SkillRaceClassInfoMap _skillRaceClassInfoBySkill;
     WMOAreaInfoByTripple _wmoAreaInfoByTripple;
 };
 
