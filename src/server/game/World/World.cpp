@@ -527,7 +527,6 @@ void World::LoadConfigSettings(bool reload)
         TC_LOG_INFO("server.loading", "Using DataDir %s", m_dataPath.c_str());
     }
 
-    TC_LOG_INFO("server.loading", "WORLD: DBC     data directory is: %sdbc", m_dataPath.c_str());
     TC_LOG_INFO("server.loading", "WORLD: Cameras data directory is: %sCameras", m_dataPath.c_str());
     TC_LOG_INFO("server.loading", "WORLD: Maps    data directory is: %smaps", m_dataPath.c_str());
     TC_LOG_INFO("server.loading", "WORLD: VMap    data directory is: %svmaps", m_dataPath.c_str());

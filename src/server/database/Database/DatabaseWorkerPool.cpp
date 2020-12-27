@@ -21,6 +21,7 @@
 #include "Errors.h"
 #include "Implementation/LoginDatabase.h"
 #include "Implementation/WorldDatabase.h"
+#include "Implementation/DBCDatabase.h"
 #include "Implementation/CharacterDatabase.h"
 #include "Log.h"
 #include "MySQLPreparedStatement.h"
@@ -505,4 +506,5 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction<T>& trans, PreparedSt
 
 template class TC_DATABASE_API DatabaseWorkerPool<LoginDatabaseConnection>;
 template class TC_DATABASE_API DatabaseWorkerPool<WorldDatabaseConnection>;
+template class TC_DATABASE_API DatabaseWorkerPool<DBCDatabaseConnection>;
 template class TC_DATABASE_API DatabaseWorkerPool<CharacterDatabaseConnection>;

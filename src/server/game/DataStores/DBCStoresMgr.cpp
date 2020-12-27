@@ -369,7 +369,7 @@ void DBCStoresMgr::_Load_Achievement()
 
     _achievementMap.clear();
     //                                                0      1         2               3           4                    5                6                7                8                9                10               11           12       13      14         15                16
-    QueryResult result = WorldDatabase.Query("SELECT ID, Faction, Instance_Id, Title_Lang_enUS, Title_Lang_koKR, Title_Lang_frFR, Title_Lang_deDE, Title_Lang_zhCN, Title_Lang_zhTW, Title_Lang_esES, Title_Lang_esMX, Title_Lang_ruRU, Category, Points, Flags, Minimum_Criteria, Shares_Criteria FROM dbc_achievement");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Faction, Instance_Id, Title_Lang_enUS, Title_Lang_koKR, Title_Lang_frFR, Title_Lang_deDE, Title_Lang_zhCN, Title_Lang_zhTW, Title_Lang_esES, Title_Lang_esMX, Title_Lang_ruRU, Category, Points, Flags, Minimum_Criteria, Shares_Criteria FROM dbc_achievement");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievements. DB table `dbc_achievement` is empty.");
@@ -418,7 +418,7 @@ void DBCStoresMgr::_Load_AchievementCriteria()
 
     _achievementCriteriaMap.clear();
     //                                                0          1        2         3       4           5           6            7            8                9                10                      11                   12                      13                       14                   15                       16                  17                    18            19           20                21
-    QueryResult result = WorldDatabase.Query("SELECT ID, Achievement_Id, Type, Asset_Id, Quantity, Start_Event, Start_Asset, Fail_Event, Fail_Asset, Description_Lang_enUS, Description_Lang_koKR, Description_Lang_frFR, Description_Lang_deDE, Description_Lang_zhCN, Description_Lang_zhTW, Description_Lang_esES, Description_Lang_esMX, Description_Lang_ruRU, Flags, Timer_Start_Event, Timer_Asset_Id, Timer_Time FROM dbc_achievement_criteria");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Achievement_Id, Type, Asset_Id, Quantity, Start_Event, Start_Asset, Fail_Event, Fail_Asset, Description_Lang_enUS, Description_Lang_koKR, Description_Lang_frFR, Description_Lang_deDE, Description_Lang_zhCN, Description_Lang_zhTW, Description_Lang_esES, Description_Lang_esMX, Description_Lang_ruRU, Flags, Timer_Start_Event, Timer_Asset_Id, Timer_Time FROM dbc_achievement_criteria");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievement_criteria. DB table `dbc_achievement_criteria` is empty.");
@@ -474,7 +474,7 @@ void DBCStoresMgr::_Load_AreaTable()
 
     _areaTableMap.clear();
     //                                                0       1            2           3       4           5                  6                  7                    8                   9                   10                  11                  12                  13                14                   15                16               17               18              19
-    QueryResult result = WorldDatabase.Query("SELECT ID, ContinentID, ParentAreaID, AreaBit, Flags, ExplorationLevel, AreaName_Lang_enUS, AreaName_Lang_koKR, AreaName_Lang_frFR, AreaName_Lang_deDE, AreaName_Lang_zhCN, AreaName_Lang_zhTW, AreaName_Lang_esES, AreaName_Lang_esMX, AreaName_Lang_ruRU, FactionGroupMask, LiquidTypeID_1, LiquidTypeID_2, LiquidTypeID_3, LiquidTypeID_4 FROM dbc_areatable");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, ParentAreaID, AreaBit, Flags, ExplorationLevel, AreaName_Lang_enUS, AreaName_Lang_koKR, AreaName_Lang_frFR, AreaName_Lang_deDE, AreaName_Lang_zhCN, AreaName_Lang_zhTW, AreaName_Lang_esES, AreaName_Lang_esMX, AreaName_Lang_ruRU, FactionGroupMask, LiquidTypeID_1, LiquidTypeID_2, LiquidTypeID_3, LiquidTypeID_4 FROM dbc_areatable");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areatable. DB table `dbc_areatable` is empty.");
@@ -520,7 +520,7 @@ void DBCStoresMgr::_Load_AreaGroup()
 
     _areaGroupMap.clear();
     //                                                0     1         2         3         4         5         6         7
-    QueryResult result = WorldDatabase.Query("SELECT ID, AreaID_1, AreaID_2, AreaID_3, AreaID_4, AreaID_5, AreaID_6, NextAreaID FROM dbc_areagroup");
+    QueryResult result = DBCDatabase.Query("SELECT ID, AreaID_1, AreaID_2, AreaID_3, AreaID_4, AreaID_5, AreaID_6, NextAreaID FROM dbc_areagroup");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areagroup. DB table `dbc_areagroup` is empty.");
@@ -556,7 +556,7 @@ void DBCStoresMgr::_Load_AreaPOI()
 
     _areaPOIMap.clear();
     //                                                0     1          2        3       4       5      6       7       8        9      10      11       12 13 14      15       16        17
-    QueryResult result = WorldDatabase.Query("SELECT ID, Importance, Icon_1, Icon_2, Icon_3, Icon_4, Icon_5, Icon_6, Icon_7, Icon_8, Icon_9, FactionID, X, Y, Z, ContinentID, AreaID, WorldStateID FROM dbc_areapoi");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Importance, Icon_1, Icon_2, Icon_3, Icon_4, Icon_5, Icon_6, Icon_7, Icon_8, Icon_9, FactionID, X, Y, Z, ContinentID, AreaID, WorldStateID FROM dbc_areapoi");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areapoi. DB table `dbc_areapoi` is empty.");
@@ -600,7 +600,7 @@ void DBCStoresMgr::_Load_AreaTrigger()
 
     _areaTriggerMap.clear();
     //                                                0     1         2  3  4     5        6          7          8           9
-    QueryResult result = WorldDatabase.Query("SELECT ID, ContinentID, X, Y, Z, Radius, Box_Length, Box_Width, Box_Height, Box_Yaw FROM dbc_areatrigger");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, X, Y, Z, Radius, Box_Length, Box_Width, Box_Height, Box_Yaw FROM dbc_areatrigger");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areatrigger. DB table `dbc_areatrigger` is empty.");
@@ -640,7 +640,7 @@ void DBCStoresMgr::_Load_AuctionHouse()
 
     _auctionHouseMap.clear();
     //                                                0     1             2             3
-    QueryResult result = WorldDatabase.Query("SELECT ID, FactionID, DepositRate, ConsignmentRate FROM dbc_auctionhouse");
+    QueryResult result = DBCDatabase.Query("SELECT ID, FactionID, DepositRate, ConsignmentRate FROM dbc_auctionhouse");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_auctionhouse. DB table `dbc_auctionhouse` is empty.");
@@ -675,7 +675,7 @@ void DBCStoresMgr::_Load_BankBagSlotPrices()
 
     _bankBagSlotPricesMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Cost FROM dbc_bankbagslotprices");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Cost FROM dbc_bankbagslotprices");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_bankbagslotprices. DB table `dbc_bankbagslotprices` is empty.");
@@ -708,7 +708,7 @@ void DBCStoresMgr::_Load_BannedAddOns()
 
     _bannedAddonsMap.clear();
     //                                                0
-    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_bannedaddons");
+    QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_bannedaddons");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_bannedaddons. DB table `dbc_bannedaddons` is empty.");
@@ -749,7 +749,7 @@ void DBCStoresMgr::_Load_BarberShopStyle()
 
     _barberShopStyleMap.clear();
     //                                                0    1    2     3     4
-    QueryResult result = WorldDatabase.Query("SELECT ID, Type, Race, Sex, Data FROM dbc_barbershopstyle");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Type, Race, Sex, Data FROM dbc_barbershopstyle");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_barbershopstyle. DB table `dbc_barbershopstyle` is empty.");
@@ -785,7 +785,7 @@ void DBCStoresMgr::_Load_BattlemasterList()
 
     _battlemasterListMap.clear();
     //                                                0     1        2        3        4        5        6        7       8             9           10              11              12              13              14              15              16              17              18              19              20
-    QueryResult result = WorldDatabase.Query("SELECT ID, MapID_1, MapID_2, MapID_3, MapID_4, MapID_5, MapID_6, MapID_7, MapID_8, InstanceType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MaxGroupSize, HolidayWorldState FROM dbc_battlemasterlist");
+    QueryResult result = DBCDatabase.Query("SELECT ID, MapID_1, MapID_2, MapID_3, MapID_4, MapID_5, MapID_6, MapID_7, MapID_8, InstanceType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MaxGroupSize, HolidayWorldState FROM dbc_battlemasterlist");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_battlemasterlist. DB table `dbc_battlemasterlist` is empty.");
@@ -828,7 +828,7 @@ void DBCStoresMgr::_Load_CharacterFacialHairStyles()
 
     _characterFacialHairStyleMap.clear();
     //                                                0    1       2        3
-    QueryResult result = WorldDatabase.Query("SELECT ID, RaceID, SexID, VariationID FROM dbc_characterfacialhairstyles");
+    QueryResult result = DBCDatabase.Query("SELECT ID, RaceID, SexID, VariationID FROM dbc_characterfacialhairstyles");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_characterfacialhairstyles. DB table `dbc_characterfacialhairstyles` is empty.");
@@ -863,7 +863,7 @@ void DBCStoresMgr::_Load_CharSections()
 
     _charSectionMap.clear();
     //                                                0    1       2         3         4         5             6
-    QueryResult result = WorldDatabase.Query("SELECT ID, RaceID, SexID, BaseSection, Flags, VariationIndex, ColorIndex FROM dbc_charsections");
+    QueryResult result = DBCDatabase.Query("SELECT ID, RaceID, SexID, BaseSection, Flags, VariationIndex, ColorIndex FROM dbc_charsections");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_charsections. DB table `dbc_charsections` is empty.");
@@ -901,7 +901,7 @@ void DBCStoresMgr::_Load_CharStartOutfit()
 
     _charStartOutfitMap.clear();
     //                                                0    1        2       3       4         5         6         7         8         9         10        11        12        13        14          15        16          17        18          19         20         21        22          23         24         25        26          27
-    QueryResult result = WorldDatabase.Query("SELECT ID, RaceID, ClassID, SexID, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, ItemID_11, ItemID_12, ItemID_13, ItemID_14, ItemID_15, ItemID_16, ItemID_17, ItemID_18, ItemID_19, ItemID_20, ItemID_21, ItemID_22, ItemID_23, ItemID_24 FROM dbc_charstartoutfit");
+    QueryResult result = DBCDatabase.Query("SELECT ID, RaceID, ClassID, SexID, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, ItemID_11, ItemID_12, ItemID_13, ItemID_14, ItemID_15, ItemID_16, ItemID_17, ItemID_18, ItemID_19, ItemID_20, ItemID_21, ItemID_22, ItemID_23, ItemID_24 FROM dbc_charstartoutfit");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_charstartoutfit. DB table `dbc_charstartoutfit` is empty.");
@@ -939,7 +939,7 @@ void DBCStoresMgr::_Load_CharTitles()
 
     _charTitlesMap.clear();
     //                                                0        1               2               3               4               5               6               7               8               9               10              11              12                13                14              15              16              17                  18           19
-    QueryResult result = WorldDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name1_Lang_enUS, Name1_Lang_koKR, Name1_Lang_frFR, Name1_Lang_deDE, Name1_Lang_zhCN, Name1_Lang_zhTW, Name1_Lang_esES, Name1_Lang_esMX, Name1_Lang_ruRU, Mask_ID FROM dbc_chartitles");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name1_Lang_enUS, Name1_Lang_koKR, Name1_Lang_frFR, Name1_Lang_deDE, Name1_Lang_zhCN, Name1_Lang_zhTW, Name1_Lang_esES, Name1_Lang_esMX, Name1_Lang_ruRU, Mask_ID FROM dbc_chartitles");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chartitles. DB table `dbc_chartitles` is empty.");
@@ -979,7 +979,7 @@ void DBCStoresMgr::_Load_ChatChannels()
 
     _chatChannelsMap.clear();
     //                                                0    1             2           3               4               5               6               7               8               9               10
-    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_chatchannels");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_chatchannels");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chatchannels. DB table `dbc_chatchannels` is empty.");
@@ -1015,7 +1015,7 @@ void DBCStoresMgr::_Load_ChrClasses()
 
     _chrClassesMap.clear();
     //                                                0       1              2               3               4               5               6               7               8               9               10              11              12                   13
-    QueryResult result = WorldDatabase.Query("SELECT ID, DisplayPower, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, SpellClassSet, CinematicSequenceID, Required_Expansion FROM dbc_chrclasses");
+    QueryResult result = DBCDatabase.Query("SELECT ID, DisplayPower, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, SpellClassSet, CinematicSequenceID, Required_Expansion FROM dbc_chrclasses");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrclasses. DB table `dbc_chrclasses` is empty.");
@@ -1055,7 +1055,7 @@ void DBCStoresMgr::_Load_ChrRaces()
 
     _chrRacesMap.clear();
     //                                                0    1         2          3                4               5            6               7                     8               9            10           11              12              13              14               15              16              17               18              19
-    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, FactionID, MaleDisplayId, FemaleDisplayId, BaseLanguage, CreatureType, ResSicknessSpellID, CinematicSequenceID, Alliance, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Required_Expansion FROM dbc_chrraces");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags, FactionID, MaleDisplayId, FemaleDisplayId, BaseLanguage, CreatureType, ResSicknessSpellID, CinematicSequenceID, Alliance, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Required_Expansion FROM dbc_chrraces");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrraces. DB table `dbc_chrraces` is empty.");
@@ -1101,7 +1101,7 @@ void DBCStoresMgr::_Load_CinematicCamera()
 
     _cinematicCameraMap.clear();
     //                                               0     1       2        3        4         5       6
-    QueryResult result = WorldDatabase.Query("SELECT ID, Model, SoundID, OriginX, OriginY, OriginZ, OriginFacing FROM dbc_cinematiccamera");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Model, SoundID, OriginX, OriginY, OriginZ, OriginFacing FROM dbc_cinematiccamera");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_cinematiccamera. DB table `dbc_cinematiccamera` is empty.");
@@ -1139,7 +1139,7 @@ void DBCStoresMgr::_Load_CinematicSequences()
 
     _cinematicSequencesMap.clear();
     //                                                0      1        2         3         4         5          6        7         8
-    QueryResult result = WorldDatabase.Query("SELECT ID, Camera_1, Camera_2, Camera_3, Camera_4, Camera_5, Camera_6, Camera_7, Camera_8 FROM dbc_cinematicsequences");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Camera_1, Camera_2, Camera_3, Camera_4, Camera_5, Camera_6, Camera_7, Camera_8 FROM dbc_cinematicsequences");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_cinematicsequences. DB table `dbc_cinematicsequences` is empty.");
@@ -1174,7 +1174,7 @@ void DBCStoresMgr::_Load_CreatureDisplayInfo()
 
     _creatureDisplayInfoMap.clear();
     //                                                0    1                2                     3
-    QueryResult result = WorldDatabase.Query("SELECT ID, ModelID, ExtendedDisplayInfoID, CreatureModelScale FROM dbc_creaturedisplayinfo");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ModelID, ExtendedDisplayInfoID, CreatureModelScale FROM dbc_creaturedisplayinfo");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturedisplayinfo. DB table `dbc_creaturedisplayinfo` is empty.");
@@ -1209,7 +1209,7 @@ void DBCStoresMgr::_Load_CreatureDisplayInfoExtra()
 
     _creatureDisplayInfoExtraMap.clear();
     //                                                0       1              2
-    QueryResult result = WorldDatabase.Query("SELECT ID, DisplayRaceID, DisplaySexID FROM dbc_creaturedisplayinfoextra");
+    QueryResult result = DBCDatabase.Query("SELECT ID, DisplayRaceID, DisplaySexID FROM dbc_creaturedisplayinfoextra");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturedisplayinfoextra. DB table `dbc_creaturedisplayinfoextra` is empty.");
@@ -1243,7 +1243,7 @@ void DBCStoresMgr::_Load_CreatureFamily()
 
     _creatureFamilyMap.clear();
     //                                                0       1          2            3            4            5            6            7             8               9               10              11              12              13              14              15              16              17
-    QueryResult result = WorldDatabase.Query("SELECT ID, MinScale, MinScaleLevel, MaxScale, MaxScaleLevel, SkillLine_1, SkillLine_2, PetFoodMask, PetTalentType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_creaturefamily");
+    QueryResult result = DBCDatabase.Query("SELECT ID, MinScale, MinScaleLevel, MaxScale, MaxScaleLevel, SkillLine_1, SkillLine_2, PetFoodMask, PetTalentType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_creaturefamily");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturefamily. DB table `dbc_creaturefamily` is empty.");
@@ -1285,7 +1285,7 @@ void DBCStoresMgr::_Load_CreatureModelData()
 
     _creatureModelDataMap.clear();
     //                                                0     1       2           3              4              5
-    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, ModelName, ModelScale, CollisionHeight, MountHeight FROM dbc_creaturemodeldata");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags, ModelName, ModelScale, CollisionHeight, MountHeight FROM dbc_creaturemodeldata");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturemodeldata. DB table `dbc_creaturemodeldata` is empty.");
@@ -1322,7 +1322,7 @@ void DBCStoresMgr::_Load_CreatureSpellData()
 
     _creatureSpellDataMap.clear();
     //                                                0     1         2         3         4
-    QueryResult result = WorldDatabase.Query("SELECT ID, Spells_1, Spells_1, Spells_1, Spells_1 FROM dbc_creaturespelldata");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Spells_1, Spells_1, Spells_1, Spells_1 FROM dbc_creaturespelldata");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturespelldata. DB table `dbc_creaturespelldata` is empty.");
@@ -1356,7 +1356,7 @@ void DBCStoresMgr::_Load_CreatureType()
 
     _creatureTypeMap.clear();
     //                                                0
-    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_creaturetype");
+    QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_creaturetype");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturetype. DB table `dbc_creaturetype` is empty.");
@@ -1388,7 +1388,7 @@ void DBCStoresMgr::_Load_CurrencyCategory()
 
     _currencyCategoryMap.clear();
     //                                                0    1           2               3               4               5               6               7               8               9               10
-    QueryResult result = WorldDatabase.Query("SELECT ID, Flags,  Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_currencycategory");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags,  Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_currencycategory");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_currencycategory. DB table `dbc_currencycategory` is empty.");
@@ -1423,7 +1423,7 @@ void DBCStoresMgr::_Load_CurrencyTypes()
 
     _currencyTypesMap.clear();
     //                                                0    1        2
-    QueryResult result = WorldDatabase.Query("SELECT ID, ItemID, BitIndex FROM dbc_currencytypes");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ItemID, BitIndex FROM dbc_currencytypes");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_currencytypes. DB table `dbc_currencytypes` is empty.");
@@ -1457,7 +1457,7 @@ void DBCStoresMgr::_Load_DestructibleModelData()
 
     _destructibleModelDataMap.clear();
     //                                                0       1         2           3           4
-    QueryResult result = WorldDatabase.Query("SELECT ID, State1Wmo, State2Wmo, State3Wmo, RepairGroundFx FROM dbc_destructiblemodeldata");
+    QueryResult result = DBCDatabase.Query("SELECT ID, State1Wmo, State2Wmo, State3Wmo, RepairGroundFx FROM dbc_destructiblemodeldata");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_destructiblemodeldata. DB table `dbc_destructiblemodeldata` is empty.");
@@ -1493,7 +1493,7 @@ void DBCStoresMgr::_Load_DungeonEncounter()
 
     _dungeonEncounterMap.clear();
     //                                                0     1       2        3          4               5               6               7               8               9               10               11               12
-    QueryResult result = WorldDatabase.Query("SELECT ID, MapID, Difficulty, Bit, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_dungeonencounter");
+    QueryResult result = DBCDatabase.Query("SELECT ID, MapID, Difficulty, Bit, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_dungeonencounter");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_dungeonencounter. DB table `dbc_dungeonencounter` is empty.");
@@ -1530,7 +1530,7 @@ void DBCStoresMgr::_Load_DurabilityCosts()
 
     _durabilityCoastsMap.clear();
     //                                                0           1                    2                       3                    4                   5                      6                        7                   8                     9                     10                    11                        12                  13                      14                      15                  16                      17                      18                      19                     20                       21                  22                   23                   24                    25                  26                  27                  28                      29
-    QueryResult result = WorldDatabase.Query("SELECT ID, WeaponSubClassCost_1, WeaponSubClassCost_2, WeaponSubClassCost_3, WeaponSubClassCost_4, WeaponSubClassCost_5, WeaponSubClassCost_6, WeaponSubClassCost_7, WeaponSubClassCost_8, WeaponSubClassCost_9, WeaponSubClassCost_10, WeaponSubClassCost_11, WeaponSubClassCost_12, WeaponSubClassCost_13, WeaponSubClassCost_14, WeaponSubClassCost_15, WeaponSubClassCost_16, WeaponSubClassCost_17, WeaponSubClassCost_18, WeaponSubClassCost_19, WeaponSubClassCost_20, WeaponSubClassCost_21, ArmorSubClassCost_1, ArmorSubClassCost_2, ArmorSubClassCost_3, ArmorSubClassCost_4, ArmorSubClassCost_5, ArmorSubClassCost_6, ArmorSubClassCost_7, ArmorSubClassCost_8 FROM dbc_durabilitycosts");
+    QueryResult result = DBCDatabase.Query("SELECT ID, WeaponSubClassCost_1, WeaponSubClassCost_2, WeaponSubClassCost_3, WeaponSubClassCost_4, WeaponSubClassCost_5, WeaponSubClassCost_6, WeaponSubClassCost_7, WeaponSubClassCost_8, WeaponSubClassCost_9, WeaponSubClassCost_10, WeaponSubClassCost_11, WeaponSubClassCost_12, WeaponSubClassCost_13, WeaponSubClassCost_14, WeaponSubClassCost_15, WeaponSubClassCost_16, WeaponSubClassCost_17, WeaponSubClassCost_18, WeaponSubClassCost_19, WeaponSubClassCost_20, WeaponSubClassCost_21, ArmorSubClassCost_1, ArmorSubClassCost_2, ArmorSubClassCost_3, ArmorSubClassCost_4, ArmorSubClassCost_5, ArmorSubClassCost_6, ArmorSubClassCost_7, ArmorSubClassCost_8 FROM dbc_durabilitycosts");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_durabilitycosts. DB table `dbc_durabilitycosts` is empty.");
@@ -1567,7 +1567,7 @@ void DBCStoresMgr::_Load_DurabilityQuality()
 
     _durabilityQualityMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_durabilityquality");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_durabilityquality");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_durabilityquality. DB table `dbc_durabilityquality` is empty.");
@@ -1600,7 +1600,7 @@ void DBCStoresMgr::_Load_Emotes()
 
     _emotesMap.clear();
     //                                                0      1              2               3
-    QueryResult result = WorldDatabase.Query("SELECT ID, EmoteFlags, EmoteSpecProc, EmoteSpecProcParam FROM dbc_emotes");
+    QueryResult result = DBCDatabase.Query("SELECT ID, EmoteFlags, EmoteSpecProc, EmoteSpecProcParam FROM dbc_emotes");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotes. DB table `dbc_emotes` is empty.");
@@ -1635,7 +1635,7 @@ void DBCStoresMgr::_Load_EmotesText()
 
     _emotesTextMap.clear();
     //                                                0      1
-    QueryResult result = WorldDatabase.Query("SELECT ID, EmoteID FROM dbc_emotestext");
+    QueryResult result = DBCDatabase.Query("SELECT ID, EmoteID FROM dbc_emotestext");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotestext. DB table `dbc_emotestext` is empty.");
@@ -1668,7 +1668,7 @@ void DBCStoresMgr::_Load_EmotesTextSound()
 
     _emotesTextSoundMap.clear();
     //                                                0      1            2      3       4
-    QueryResult result = WorldDatabase.Query("SELECT ID, EmotesTextID, RaceID, SexID, SoundID FROM dbc_emotestextsound");
+    QueryResult result = DBCDatabase.Query("SELECT ID, EmotesTextID, RaceID, SexID, SoundID FROM dbc_emotestextsound");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotestextsound. DB table `dbc_emotestextsound` is empty.");
@@ -1704,7 +1704,7 @@ void DBCStoresMgr::_Load_Faction()
 
     _factionMap.clear();
     //                                                0          1                  2                    3                    4                     5                       6                       7                     8                     9                   10                  11                12               13               14                    15                16                17                18                  19                  20                  21               22                  23               24              25             26             27                28               29           30                31
-    QueryResult result = WorldDatabase.Query("SELECT ID, ReputationIndex, ReputationRaceMask_1, ReputationRaceMask_2, ReputationRaceMask_3, ReputationRaceMask_4, ReputationClassMask_1, ReputationClassMask_2, ReputationClassMask_3, ReputationClassMask_4, ReputationBase_1, ReputationBase_2, ReputationBase_3, ReputationBase_4, ReputationFlags_1, ReputationFlags_2, ReputationFlags_3, ReputationFlags_4, ParentFactionID, ParentFactionMod_1, ParentFactionMod_2, ParentFactionCap_1, ParentFactionCap_2, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_faction");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ReputationIndex, ReputationRaceMask_1, ReputationRaceMask_2, ReputationRaceMask_3, ReputationRaceMask_4, ReputationClassMask_1, ReputationClassMask_2, ReputationClassMask_3, ReputationClassMask_4, ReputationBase_1, ReputationBase_2, ReputationBase_3, ReputationBase_4, ReputationFlags_1, ReputationFlags_2, ReputationFlags_3, ReputationFlags_4, ParentFactionID, ParentFactionMod_1, ParentFactionMod_2, ParentFactionCap_1, ParentFactionCap_2, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_faction");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_faction. DB table `dbc_faction` is empty.");
@@ -1756,7 +1756,7 @@ void DBCStoresMgr::_Load_FactionTemplate()
 
     _factionTemplateMap.clear();
     //                                                0     1       2         3             4            5          6           7         8         9          10        11        12         13
-    QueryResult result = WorldDatabase.Query("SELECT ID, Faction, Flags, FactionGroup, FriendGroup, EnemyGroup, Enemies_1, Enemies_2, Enemies_3, Enemies_4, Friend_1, Friend_2, Friend_3, Friend_4  FROM dbc_factiontemplate");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Faction, Flags, FactionGroup, FriendGroup, EnemyGroup, Enemies_1, Enemies_2, Enemies_3, Enemies_4, Friend_1, Friend_2, Friend_3, Friend_4  FROM dbc_factiontemplate");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_factiontemplate. DB table `dbc_factiontemplate` is empty.");
@@ -1797,7 +1797,7 @@ void DBCStoresMgr::_Load_GameObjectArtKit()
 
     _gameobjectArtKitMap.clear();
     //                                                0
-    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_gameobjectartkit");
+    QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_gameobjectartkit");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gameobjectartkit. DB table `dbc_gameobjectartkit` is empty.");
@@ -1829,7 +1829,7 @@ void DBCStoresMgr::_Load_GameObjectDisplayInfo()
 
     _gameobjectDisplayInfoMap.clear();
     //                                                0     1           2           3           4            5          6            7
-    QueryResult result = WorldDatabase.Query("SELECT ID, ModelName, GeoBoxMinX, GeoBoxMinY, GeoBoxMinZ, GeoBoxMaxX, GeoBoxMaxY, GeoBoxMaxZ FROM dbc_gameobjectdisplayinfo");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ModelName, GeoBoxMinX, GeoBoxMinY, GeoBoxMinZ, GeoBoxMaxX, GeoBoxMaxY, GeoBoxMaxZ FROM dbc_gameobjectdisplayinfo");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gameobjectdisplayinfo. DB table `dbc_gameobjectdisplayinfo` is empty.");
@@ -1868,7 +1868,7 @@ void DBCStoresMgr::_Load_GemProperties()
 
     _gemPropertiesMap.clear();
     //                                                0     1          2
-    QueryResult result = WorldDatabase.Query("SELECT ID, Enchant_Id, Type FROM dbc_gemproperties");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Enchant_Id, Type FROM dbc_gemproperties");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gemproperties. DB table `dbc_gemproperties` is empty.");
@@ -1902,7 +1902,7 @@ void DBCStoresMgr::_Load_GlyphProperties()
 
     _glyphPropertiesMap.clear();
     //                                                0     1          2                3
-    QueryResult result = WorldDatabase.Query("SELECT ID, SpellID, GlyphSlotFlags, SpellIconID FROM dbc_glyphproperties");
+    QueryResult result = DBCDatabase.Query("SELECT ID, SpellID, GlyphSlotFlags, SpellIconID FROM dbc_glyphproperties");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_glyphproperties. DB table `dbc_glyphproperties` is empty.");
@@ -1937,7 +1937,7 @@ void DBCStoresMgr::_Load_GlyphSlot()
 
     _glyphSlotMap.clear();
     //                                                0     1     2
-    QueryResult result = WorldDatabase.Query("SELECT ID, Type, Tooltip FROM dbc_glyphslot");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Type, Tooltip FROM dbc_glyphslot");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_glyphslot. DB table `dbc_glyphslot` is empty.");
@@ -1971,7 +1971,7 @@ void DBCStoresMgr::_Load_gtBarberShopCostBase()
 
     _gtBarberShopCostBaseMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtbarbershopcostbase");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtbarbershopcostbase");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtbarbershopcostbase. DB table `dbc_gtbarbershopcostbase` is empty.");
@@ -2004,7 +2004,7 @@ void DBCStoresMgr::_Load_gtCombatRatings()
 
     _gtCombatRatingsMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtcombatratings");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtcombatratings");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtcombatratings. DB table `dbc_gtcombatratings` is empty.");
@@ -2037,7 +2037,7 @@ void DBCStoresMgr::_Load_gtChanceToMeleeCritBase()
 
     _gtChanceToMeleeCritBaseMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtchancetomeleecritbase");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtchancetomeleecritbase");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetomeleecritbase. DB table `dbc_gtchancetomeleecritbase` is empty.");
@@ -2070,7 +2070,7 @@ void DBCStoresMgr::_Load_gtChanceToMeleeCrit()
 
     _gtChanceToMeleeCritMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtchancetomeleecrit");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtchancetomeleecrit");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetomeleecrit. DB table `dbc_gtchancetomeleecrit` is empty.");
@@ -2103,7 +2103,7 @@ void DBCStoresMgr::_Load_gtChanceToSpellCritBase()
 
     _gtChanceToSpellCritBaseMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtchancetospellcritbase");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtchancetospellcritbase");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetospellcritbase. DB table `dbc_gtchancetospellcritbase` is empty.");
@@ -2136,7 +2136,7 @@ void DBCStoresMgr::_Load_gtChanceToSpellCrit()
 
     _gtChanceToSpellCritMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtchancetospellcrit");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtchancetospellcrit");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetospellcrit. DB table `dbc_gtchancetospellcrit` is empty.");
@@ -2169,7 +2169,7 @@ void DBCStoresMgr::_Load_gtNPCManaCostScaler()
 
     _gtNPCManaCostScalerMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtnpcmanacostscaler");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtnpcmanacostscaler");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtnpcmanacostscaler. DB table `dbc_gtnpcmanacostscaler` is empty.");
@@ -2202,7 +2202,7 @@ void DBCStoresMgr::_Load_gtOCTClassCombatRatingScalar()
 
     _gtOCTClassCombatRatingScalarMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtoctclasscombatratingscalar");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtoctclasscombatratingscalar");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctclasscombatratingscalar. DB table `dbc_gtoctclasscombatratingscalar` is empty.");
@@ -2235,7 +2235,7 @@ void DBCStoresMgr::_Load_gtOCTRegenHP()
 
     _gtOCTRegenHPMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtoctregenhp");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtoctregenhp");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctregenhp. DB table `dbc_gtoctregenhp` is empty.");
@@ -2268,7 +2268,7 @@ void DBCStoresMgr::_Load_gtOCTRegenMP()
 
     _gtOCTRegenMPMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtoctregenmp");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtoctregenmp");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctregenmp. DB table `dbc_gtoctregenmp` is empty.");
@@ -2301,7 +2301,7 @@ void DBCStoresMgr::_Load_gtRegenHPPerSpt()
 
     _gtRegenHPPerSptMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtregenhpperspt");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtregenhpperspt");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtregenhpperspt. DB table `dbc_gtregenhpperspt` is empty.");
@@ -2334,7 +2334,7 @@ void DBCStoresMgr::_Load_gtRegenMPPerSpt()
 
     _gtRegenMPPerSptMap.clear();
     //                                                0   1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_gtregenmpperspt");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtregenmpperspt");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtregenmpperspt. DB table `dbc_gtregenmpperspt` is empty.");
@@ -2367,7 +2367,7 @@ void DBCStoresMgr::_Load_Holidays()
 
     _holidaysMap.clear();
     //                                                0      1           2           3           4           5           6           7           8            9         10         11       12      13      14      15      16      17      18      19      20      21        22        23      24        25      26        27      28        29      30        31      32        33       34       35      36       37       38          39                 40             41              42                  43             44               45              46               47                 48               49            50               51   
-    QueryResult result = WorldDatabase.Query("SELECT ID, Duration_1, Duration_2, Duration_3, Duration_4, Duration_5, Duration_6, Duration_7, Duration_8, Duration_9, Duration_10, Date_1, Date_2, Date_3, Date_4, Date_5, Date_6, Date_7, Date_8, Date_9, Date_10, Date_11, Date_12, Date_13, Date_14, Date_15, Date_16, Date_17, Date_18, Date_19, Date_20, Date_21, Date_22, Date_23, Date_24, Date_25, Date_26, Region, Looping, CalendarFlags_1, CalendarFlags_2, CalendarFlags_3, CalendarFlags_4, CalendarFlags_5, CalendarFlags_6, CalendarFlags_7, CalendarFlags_8, CalendarFlags_9, CalendarFlags_10, TextureFilename, Priority, CalendarFilterType FROM dbc_holidays");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Duration_1, Duration_2, Duration_3, Duration_4, Duration_5, Duration_6, Duration_7, Duration_8, Duration_9, Duration_10, Date_1, Date_2, Date_3, Date_4, Date_5, Date_6, Date_7, Date_8, Date_9, Date_10, Date_11, Date_12, Date_13, Date_14, Date_15, Date_16, Date_17, Date_18, Date_19, Date_20, Date_21, Date_22, Date_23, Date_24, Date_25, Date_26, Region, Looping, CalendarFlags_1, CalendarFlags_2, CalendarFlags_3, CalendarFlags_4, CalendarFlags_5, CalendarFlags_6, CalendarFlags_7, CalendarFlags_8, CalendarFlags_9, CalendarFlags_10, TextureFilename, Priority, CalendarFilterType FROM dbc_holidays");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_holidays. DB table `dbc_holidays` is empty.");
@@ -2410,7 +2410,7 @@ void DBCStoresMgr::_Load_Item()
 
     _itemMap.clear();
     //                                                0      1          2               3                   4            5              6             7
-    QueryResult result = WorldDatabase.Query("SELECT ID, ClassID, SubclassID, Sound_Override_Subclassid, Material, DisplayInfoID, InventoryType, SheatheType FROM dbc_item");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ClassID, SubclassID, Sound_Override_Subclassid, Material, DisplayInfoID, InventoryType, SheatheType FROM dbc_item");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_item. DB table `dbc_item` is empty.");
@@ -2449,7 +2449,7 @@ void DBCStoresMgr::_Load_ItemBagFamily()
 
     _itemBagFamilyMap.clear();
     //                                                0
-    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_itembagfamily");
+    QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_itembagfamily");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itembagfamily. DB table `dbc_itembagfamily` is empty.");
@@ -2481,7 +2481,7 @@ void DBCStoresMgr::_Load_ItemDisplayInfo()
 
     _itemDisplayInfoMap.clear();
     //                                                0       1            2              3               4                5               6               7              8             9           10      11                  12              13                  14             15         16        17         18          19         20        21          22         23           24
-    QueryResult result = WorldDatabase.Query("SELECT ID, ModelName_1, ModelName_2, ModelTexture_1, ModelTexture_2, InventoryIcon_1, InventoryIcon_2, GeosetGroup_1, GeosetGroup_2, GeosetGroup_3, Flags, SpellVisualID, GroupSoundIndex, HelmetGeosetVis_1, HelmetGeosetVis_2, Texture_1, Texture_2, Texture_3, Texture_4, Texture_5, Texture_6, Texture_7, Texture_8, ItemVisual, ParticleColorID FROM dbc_itemdisplayinfo");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ModelName_1, ModelName_2, ModelTexture_1, ModelTexture_2, InventoryIcon_1, InventoryIcon_2, GeosetGroup_1, GeosetGroup_2, GeosetGroup_3, Flags, SpellVisualID, GroupSoundIndex, HelmetGeosetVis_1, HelmetGeosetVis_2, Texture_1, Texture_2, Texture_3, Texture_4, Texture_5, Texture_6, Texture_7, Texture_8, ItemVisual, ParticleColorID FROM dbc_itemdisplayinfo");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemdisplayinfo. DB table `dbc_itemdisplayinfo` is empty.");
@@ -2533,7 +2533,7 @@ void DBCStoresMgr::_Load_ItemExtendedCost()
 
     _itemExtendedCostMap.clear();
     //                                                0       1            2              3          4        5         6         7         8           9           10           11            12          13                14
-    QueryResult result = WorldDatabase.Query("SELECT ID, HonorPoints, ArenaPoints, ArenaBracket, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemCount_1, ItemCount_2, ItemCount_3, ItemCount_4, ItemCount_5, RequiredArenaRating FROM dbc_itemextendedcost");
+    QueryResult result = DBCDatabase.Query("SELECT ID, HonorPoints, ArenaPoints, ArenaBracket, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemCount_1, ItemCount_2, ItemCount_3, ItemCount_4, ItemCount_5, RequiredArenaRating FROM dbc_itemextendedcost");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemextendedcost. DB table `dbc_itemextendedcost` is empty.");
@@ -2573,7 +2573,7 @@ void DBCStoresMgr::_Load_ItemLimitCategory()
 
     _itemLimitCategoryMap.clear();
     //                                                0     1        2
-    QueryResult result = WorldDatabase.Query("SELECT ID, Quantity, Flags FROM dbc_itemlimitcategory");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Quantity, Flags FROM dbc_itemlimitcategory");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemlimitcategory. DB table `dbc_itemlimitcategory` is empty.");
@@ -2607,7 +2607,7 @@ void DBCStoresMgr::_Load_ItemRandomProperties()
 
     _itemRandomPropertiesMap.clear();
     //                                                0       1              2              3                4              5               6               7               8               9               10              11              12
-    QueryResult result = WorldDatabase.Query("SELECT ID, Enchantment_1, Enchantment_2, Enchantment_3, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_itemrandomproperties");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Enchantment_1, Enchantment_2, Enchantment_3, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_itemrandomproperties");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemrandomproperties. DB table `dbc_itemrandomproperties` is empty.");
@@ -2644,7 +2644,7 @@ void DBCStoresMgr::_Load_ItemRandomSuffix()
 
     _itemRandomSuffixMap.clear();
     //                                                0          1              2              3                4              5               6               7               8               9                10           11             12              13              14                15
-    QueryResult result = WorldDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Enchantment_1, Enchantment_2, Enchantment_3, AllocationPct_1, AllocationPct_2, AllocationPct_3 FROM dbc_itemrandomsuffix");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Enchantment_1, Enchantment_2, Enchantment_3, AllocationPct_1, AllocationPct_2, AllocationPct_3 FROM dbc_itemrandomsuffix");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemrandomsuffix. DB table `dbc_itemrandomsuffix` is empty.");
@@ -2694,7 +2694,7 @@ void DBCStoresMgr::_Load_ItemSet()
 
     _itemSetMap.clear();
     //                                                0          1              2              3                4              5               6               7               8               9            10        11        12        13        14        15        16        17        18        19           20             21             22             23          24            25           26            27             28             29             30                31              32              33              34              35              36              37
-    QueryResult result = WorldDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, SetSpellID_1, SetSpellID_2, SetSpellID_3, SetSpellID_4, SetSpellID_5, SetSpellID_6, SetSpellID_7, SetSpellID_8, SetThreshold_1, SetThreshold_2, SetThreshold_3, SetThreshold_4, SetThreshold_5, SetThreshold_6, SetThreshold_7, SetThreshold_8, RequiredSkill, RequiredSkillRank FROM dbc_itemset");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, SetSpellID_1, SetSpellID_2, SetSpellID_3, SetSpellID_4, SetSpellID_5, SetSpellID_6, SetSpellID_7, SetSpellID_8, SetThreshold_1, SetThreshold_2, SetThreshold_3, SetThreshold_4, SetThreshold_5, SetThreshold_6, SetThreshold_7, SetThreshold_8, RequiredSkill, RequiredSkillRank FROM dbc_itemset");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemset. DB table `dbc_itemset` is empty.");
@@ -2740,7 +2740,7 @@ void DBCStoresMgr::_Load_LFGDungeons()
 
     _lfgDungeonMap.clear();
     //                                                0          1              2              3                4              5               6               7               8               9            10        11          12             13                 14          15        16        17     18        19           20
-    QueryResult result = WorldDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MinLevel, MaxLevel, Target_Level, Target_Level_Min, Target_Level_Max, MapID, Difficulty, Flags, TypeID, ExpansionLevel, Group_Id FROM dbc_lfgdungeons");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MinLevel, MaxLevel, Target_Level, Target_Level_Min, Target_Level_Max, MapID, Difficulty, Flags, TypeID, ExpansionLevel, Group_Id FROM dbc_lfgdungeons");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_lfgdungeons. DB table `dbc_lfgdungeons` is empty.");
@@ -2786,7 +2786,7 @@ void DBCStoresMgr::_Load_Light()
 
     _lightMap.clear();
     //                                                0        1      2  3  4
-    QueryResult result = WorldDatabase.Query("SELECT ID, ContinentID, X, Y, Z FROM dbc_light");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, X, Y, Z FROM dbc_light");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_light. DB table `dbc_light` is empty.");
@@ -2822,7 +2822,7 @@ void DBCStoresMgr::_Load_LiquidType()
 
     _liquidTypeMap.clear();
     //                                                0    1      2
-    QueryResult result = WorldDatabase.Query("SELECT ID, Type, SpellID FROM dbc_liquidtype");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Type, SpellID FROM dbc_liquidtype");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_liquidtype. DB table `dbc_liquidtype` is empty.");
@@ -2856,7 +2856,7 @@ void DBCStoresMgr::_Load_Lock()
 
     _lockMap.clear();
     //                                                0    1      2         3        4      5       6       7       8       9       10       11         12      13      14        15        16      17      18       19       20        21      22       23       24
-    QueryResult result = WorldDatabase.Query("SELECT ID, Type_1, Type_2, Type_3, Type_4, Type_5, Type_6, Type_7, Type_8, Index_1, Index_2, Index_3, Index_4, Index_5, Index_6, Index_7, Index_8, Skill_1, Skill_2, Skill_3, Skill_4, Skill_5, Skill_6, Skill_7, Skill_8 FROM dbc_lock");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Type_1, Type_2, Type_3, Type_4, Type_5, Type_6, Type_7, Type_8, Index_1, Index_2, Index_3, Index_4, Index_5, Index_6, Index_7, Index_8, Skill_1, Skill_2, Skill_3, Skill_4, Skill_5, Skill_6, Skill_7, Skill_8 FROM dbc_lock");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_lock. DB table `dbc_lock` is empty.");
@@ -2896,7 +2896,7 @@ void DBCStoresMgr::_Load_MailTemplate()
 
     _mailTemplateMap.clear();
     //                                                0         1               2               3               4               5               6               7               8               9
-    QueryResult result = WorldDatabase.Query("SELECT ID, Body_Lang_enUS, Body_Lang_koKR, Body_Lang_frFR, Body_Lang_deDE, Body_Lang_zhCN, Body_Lang_zhTW, Body_Lang_esES, Body_Lang_esMX, Body_Lang_ruRU FROM dbc_mailtemplate");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Body_Lang_enUS, Body_Lang_koKR, Body_Lang_frFR, Body_Lang_deDE, Body_Lang_zhCN, Body_Lang_zhTW, Body_Lang_esES, Body_Lang_esMX, Body_Lang_ruRU FROM dbc_mailtemplate");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_mailtemplate. DB table `dbc_mailtemplate` is empty.");
@@ -2930,7 +2930,7 @@ void DBCStoresMgr::_Load_Map()
 
     _mapMap.clear();
     //                                                0         1         2            3                  4               5                   6                   7                  8                  9                10                    11             12           13              14          15       16         17          18           19
-    QueryResult result = WorldDatabase.Query("SELECT ID, InstanceType, Flags, MapName_Lang_enUS, MapName_Lang_koKR, MapName_Lang_frFR, MapName_Lang_deDE, MapName_Lang_zhCN, MapName_Lang_zhTW, MapName_Lang_esES, MapName_Lang_esMX, MapName_Lang_ruRU, AreaTableID, LoadingScreenID, CorpseMapID, CorpseX, CorpseY, ExpansionID, RaidOffset, MaxPlayers FROM dbc_map");
+    QueryResult result = DBCDatabase.Query("SELECT ID, InstanceType, Flags, MapName_Lang_enUS, MapName_Lang_koKR, MapName_Lang_frFR, MapName_Lang_deDE, MapName_Lang_zhCN, MapName_Lang_zhTW, MapName_Lang_esES, MapName_Lang_esMX, MapName_Lang_ruRU, AreaTableID, LoadingScreenID, CorpseMapID, CorpseX, CorpseY, ExpansionID, RaidOffset, MaxPlayers FROM dbc_map");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_map. DB table `dbc_map` is empty.");
@@ -2975,7 +2975,7 @@ void DBCStoresMgr::_Load_MapDifficulty()
 
     _mapDifficultyMap.clear();
     //                                                0    1        2                3                  4                  5                   6                   7                 8                  9                  10               11              12          13
-    QueryResult result = WorldDatabase.Query("SELECT ID, MapID, Difficulty,  Message_Lang_enUS, Message_Lang_koKR, Message_Lang_frFR, Message_Lang_deDE, Message_Lang_zhCN, Message_Lang_zhTW, Message_Lang_esES, Message_Lang_esMX, Message_Lang_ruRU, RaidDuration, MaxPlayers FROM dbc_mapdifficulty");
+    QueryResult result = DBCDatabase.Query("SELECT ID, MapID, Difficulty,  Message_Lang_enUS, Message_Lang_koKR, Message_Lang_frFR, Message_Lang_deDE, Message_Lang_zhCN, Message_Lang_zhTW, Message_Lang_esES, Message_Lang_esMX, Message_Lang_ruRU, RaidDuration, MaxPlayers FROM dbc_mapdifficulty");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_mapdifficulty. DB table `dbc_mapdifficulty` is empty.");
@@ -3014,7 +3014,7 @@ void DBCStoresMgr::_Load_Movie()
 
     _movieMap.clear();
     //                                                0
-    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_movie");
+    QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_movie");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_movie. DB table `dbc_movie` is empty.");
@@ -3046,7 +3046,7 @@ void DBCStoresMgr::_Load_NamesProfanity()
 
     _namesProfanityMap.clear();
     //                                                0    1       2
-    QueryResult result = WorldDatabase.Query("SELECT ID, Name, Language FROM dbc_namesprofanity");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Name, Language FROM dbc_namesprofanity");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_namesprofanity. DB table `dbc_namesprofanity` is empty.");
@@ -3080,7 +3080,7 @@ void DBCStoresMgr::_Load_NamesReserved()
 
     _namesReservedMap.clear();
     //                                                0    1       2
-    QueryResult result = WorldDatabase.Query("SELECT ID, Name, Language FROM dbc_namesreserved");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Name, Language FROM dbc_namesreserved");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_namesreserved. DB table `dbc_namesreserved` is empty.");
@@ -3114,7 +3114,7 @@ void DBCStoresMgr::_Load_OverrideSpellData()
 
     _overrideSpellDataMap.clear();
     //                                                0     1          2        3         4         5         6         7           8       9         10
-    QueryResult result = WorldDatabase.Query("SELECT ID, Spells_1, Spells_2, Spells_3, Spells_4, Spells_5, Spells_6, Spells_7, Spells_8, Spells_9, Spells_10 FROM dbc_overridespelldata");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Spells_1, Spells_2, Spells_3, Spells_4, Spells_5, Spells_6, Spells_7, Spells_8, Spells_9, Spells_10 FROM dbc_overridespelldata");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_overridespelldata. DB table `dbc_overridespelldata` is empty.");
@@ -3148,7 +3148,7 @@ void DBCStoresMgr::_Load_PowerDisplay()
 
     _powerDisplayMap.clear();
     //                                                0     1
-    QueryResult result = WorldDatabase.Query("SELECT ID, ActualType FROM dbc_powerdisplay");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ActualType FROM dbc_powerdisplay");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_powerdisplay. DB table `dbc_powerdisplay` is empty.");
@@ -3181,7 +3181,7 @@ void DBCStoresMgr::_Load_PvpDifficulty()
 
     _pvpDifficultyMap.clear();
     //                                                0     1       2           3         4         5
-    QueryResult result = WorldDatabase.Query("SELECT ID, MapID, RangeIndex, MinLevel, MaxLevel, Difficulty FROM dbc_pvpdifficulty");
+    QueryResult result = DBCDatabase.Query("SELECT ID, MapID, RangeIndex, MinLevel, MaxLevel, Difficulty FROM dbc_pvpdifficulty");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_pvpdifficulty. DB table `dbc_pvpdifficulty` is empty.");
@@ -3220,7 +3220,7 @@ void DBCStoresMgr::_Load_QuestSort()
 
     _questSortMap.clear();
     //                                                0
-    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_questsort");
+    QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_questsort");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_questsort. DB table `dbc_questsort` is empty.");
@@ -3252,7 +3252,7 @@ void DBCStoresMgr::_Load_QuestXP()
 
     _questXPMap.clear();
     //                                                0         1           2              3            4               5           6               7           8              9            10
-    QueryResult result = WorldDatabase.Query("SELECT ID, Difficulty_1, Difficulty_2, Difficulty_3, Difficulty_4, Difficulty_5, Difficulty_6, Difficulty_7, Difficulty_8, Difficulty_9, Difficulty_10 FROM dbc_questxp");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Difficulty_1, Difficulty_2, Difficulty_3, Difficulty_4, Difficulty_5, Difficulty_6, Difficulty_7, Difficulty_8, Difficulty_9, Difficulty_10 FROM dbc_questxp");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_questxp. DB table `dbc_questxp` is empty.");
@@ -3286,7 +3286,7 @@ void DBCStoresMgr::_Load_QuestFactionReward()
 
     _questFactionRewardMap.clear();
     //                                                0         1           2              3            4               5           6               7           8              9            10
-    QueryResult result = WorldDatabase.Query("SELECT ID, Difficulty_1, Difficulty_2, Difficulty_3, Difficulty_4, Difficulty_5, Difficulty_6, Difficulty_7, Difficulty_8, Difficulty_9, Difficulty_10 FROM dbc_questfactionreward");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Difficulty_1, Difficulty_2, Difficulty_3, Difficulty_4, Difficulty_5, Difficulty_6, Difficulty_7, Difficulty_8, Difficulty_9, Difficulty_10 FROM dbc_questfactionreward");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_questfactionreward. DB table `dbc_questfactionreward` is empty.");
@@ -3320,7 +3320,7 @@ void DBCStoresMgr::_Load_RandPropPoints()
 
     _randPropPointsMap.clear();
     //                                                0     1       2       3       4      5          6          7           8           9          10        11      12      13      14      15
-    QueryResult result = WorldDatabase.Query("SELECT ID, Epic_1, Epic_2, Epic_3, Epic_4, Epic_5, Superior_1, Superior_2, Superior_3, Superior_4, Superior_5, Good_1, Good_2, Good_3, Good_4, Good_5 FROM dbc_randproppoints");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Epic_1, Epic_2, Epic_3, Epic_4, Epic_5, Superior_1, Superior_2, Superior_3, Superior_4, Superior_5, Good_1, Good_2, Good_3, Good_4, Good_5 FROM dbc_randproppoints");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_randproppoints. DB table `dbc_randproppoints` is empty.");
@@ -3360,7 +3360,7 @@ void DBCStoresMgr::_Load_ScalingStatDistribution()
 
     _scalingStatDistributionMap.clear();
     //                                                0     1          2        3          4         5          6       7         8          9         10       11      12         13       14      15      16        17       18       19        20        21
-    QueryResult result = WorldDatabase.Query("SELECT ID, StatID_1, StatID_2, StatID_3, StatID_4, StatID_5, StatID_6, StatID_7, StatID_8, StatID_9, StatID_10, Bonus_1, Bonus_2, Bonus_3, Bonus_4, Bonus_5, Bonus_6, Bonus_7, Bonus_8, Bonus_9, Bonus_10, Maxlevel FROM dbc_scalingstatdistribution");
+    QueryResult result = DBCDatabase.Query("SELECT ID, StatID_1, StatID_2, StatID_3, StatID_4, StatID_5, StatID_6, StatID_7, StatID_8, StatID_9, StatID_10, Bonus_1, Bonus_2, Bonus_3, Bonus_4, Bonus_5, Bonus_6, Bonus_7, Bonus_8, Bonus_9, Bonus_10, Maxlevel FROM dbc_scalingstatdistribution");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_scalingstatdistribution. DB table `dbc_scalingstatdistribution` is empty.");
@@ -3399,7 +3399,7 @@ void DBCStoresMgr::_Load_ScalingStatValues()
 
     _scalingStatValuesMap.clear();
     //                                                0      1             2                3           4               5               6                   7                       8                       9           10          11              12                13            14        15        16          17              18              19                 20               21                  22          23
-    QueryResult result = WorldDatabase.Query("SELECT ID, Charlevel, ShoulderBudget, TrinketBudget, WeaponBudget1H, RangedBudget, ClothShoulderArmor, LeatherShoulderArmor, MailShoulderArmor, PlateShoulderArmor, WeaponDPS1H, WeaponDPS2H, SpellcasterDPS1H, SpellcasterDPS2H, RangedDPS, WandDPS, SpellPower, PrimaryBudget, TertiaryBudget, ClothCloakArmor, ClothChestArmor, LeatherChestArmor, MailChestArmor, PlateChestArmor FROM dbc_scalingstatvalues");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Charlevel, ShoulderBudget, TrinketBudget, WeaponBudget1H, RangedBudget, ClothShoulderArmor, LeatherShoulderArmor, MailShoulderArmor, PlateShoulderArmor, WeaponDPS1H, WeaponDPS2H, SpellcasterDPS1H, SpellcasterDPS2H, RangedDPS, WandDPS, SpellPower, PrimaryBudget, TertiaryBudget, ClothCloakArmor, ClothChestArmor, LeatherChestArmor, MailChestArmor, PlateChestArmor FROM dbc_scalingstatvalues");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_scalingstatvalues. DB table `dbc_scalingstatvalues` is empty.");
@@ -3454,7 +3454,7 @@ void DBCStoresMgr::_Load_SkillLine()
 
     _skillLineMap.clear();
     //                                                0       1                    2                    3                       4                     5                     6                       7                   8                       9                         10            11          12
-    QueryResult result = WorldDatabase.Query("SELECT ID, CategoryID, DisplayName_Lang_enUS, DisplayName_Lang_koKR, DisplayName_Lang_frFR, DisplayName_Lang_deDE, DisplayName_Lang_zhCN, DisplayName_Lang_zhTW, DisplayName_Lang_esES, DisplayName_Lang_esMX, DisplayName_Lang_ruRU, SpellIconID, CanLink FROM dbc_skillline");
+    QueryResult result = DBCDatabase.Query("SELECT ID, CategoryID, DisplayName_Lang_enUS, DisplayName_Lang_koKR, DisplayName_Lang_frFR, DisplayName_Lang_deDE, DisplayName_Lang_zhCN, DisplayName_Lang_zhTW, DisplayName_Lang_esES, DisplayName_Lang_esMX, DisplayName_Lang_ruRU, SpellIconID, CanLink FROM dbc_skillline");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skillline. DB table `dbc_skillline` is empty.");
@@ -3491,7 +3491,7 @@ void DBCStoresMgr::_Load_SkillLineAbility()
 
     _skillLineAbilityMap.clear();
     //                                                0       1       2       3          4             5                  6                7                   8                       9
-    QueryResult result = WorldDatabase.Query("SELECT ID, SkillLine, Spell, RaceMask, ClassMask, MinSkillLineRank, SupercededBySpell, AcquireMethod, TrivialSkillLineRankHigh, TrivialSkillLineRankLow FROM dbc_skilllineability");
+    QueryResult result = DBCDatabase.Query("SELECT ID, SkillLine, Spell, RaceMask, ClassMask, MinSkillLineRank, SupercededBySpell, AcquireMethod, TrivialSkillLineRankHigh, TrivialSkillLineRankLow FROM dbc_skilllineability");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skilllineability. DB table `dbc_skilllineability` is empty.");
@@ -3532,7 +3532,7 @@ void DBCStoresMgr::_Load_SkillRaceClassInfo()
 
     _skillRaceClassInfoMap.clear();
     //                                                0     1         2          3       4          5
-    QueryResult result = WorldDatabase.Query("SELECT ID, SkillID, RaceMask, ClassMask, Flags, SkillTierID FROM dbc_skillraceclassinfo");
+    QueryResult result = DBCDatabase.Query("SELECT ID, SkillID, RaceMask, ClassMask, Flags, SkillTierID FROM dbc_skillraceclassinfo");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skillraceclassinfo. DB table `dbc_skillraceclassinfo` is empty.");
@@ -3569,7 +3569,7 @@ void DBCStoresMgr::_Load_SkillTiers()
 
     _skillTiersMap.clear();
     //                                                0     1        2        3        4        5        6        7        8        9       10         11       12         13       14          15       16
-    QueryResult result = WorldDatabase.Query("SELECT ID, Value_1, Value_2, Value_3, Value_4, Value_5, Value_6, Value_7, Value_8, Value_9, Value_10, Value_11, Value_12, Value_13, Value_14, Value_15, Value_16 FROM dbc_skilltiers");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Value_1, Value_2, Value_3, Value_4, Value_5, Value_6, Value_7, Value_8, Value_9, Value_10, Value_11, Value_12, Value_13, Value_14, Value_15, Value_16 FROM dbc_skilltiers");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skilltiers. DB table `dbc_skilltiers` is empty.");
@@ -3603,7 +3603,7 @@ void DBCStoresMgr::_Load_SoundEntries()
 
     _soundEntriesMap.clear();
     //                                                0
-    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_soundentries");
+    QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_soundentries");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_soundentries. DB table `dbc_soundentries` is empty.");
@@ -3635,7 +3635,7 @@ void DBCStoresMgr::_Load_Spell()
 
     _spellMap.clear();
     //                                                0
-    QueryResult result = WorldDatabase.Query("SELECT ID, "
+    QueryResult result = DBCDatabase.Query("SELECT ID, "
         "Category, "    // 1
         "DispelType, "  // 2
         "Mechanic, "    // 3
@@ -4081,7 +4081,7 @@ void DBCStoresMgr::_Load_SpellCastTimes()
 
     _spellCastTimesMap.clear();
     //                                                0    1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Base FROM dbc_spellcasttimes");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Base FROM dbc_spellcasttimes");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellcasttimes. DB table `dbc_spellcasttimes` is empty.");
@@ -4114,7 +4114,7 @@ void DBCStoresMgr::_Load_SpellCategory()
 
     _spellCategoryMap.clear();
     //                                                0    1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Flags FROM dbc_spellcategory");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags FROM dbc_spellcategory");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellcategory. DB table `dbc_spellcategory` is empty.");
@@ -4147,7 +4147,7 @@ void DBCStoresMgr::_Load_SpellItemEnchantment()
 
     _spellItemEnchantmentMap.clear();
     //                                                0    1           2        3           4                   5                   6               7           8              9            10              11              12              13              14              15              16              17              18             19       20        21            22          23                  24            25
-    QueryResult result = WorldDatabase.Query("SELECT ID, Effect_1, Effect_2, Effect_3, EffectPointsMin_1, EffectPointsMin_2, EffectPointsMin_3, EffectArg_1, EffectArg_2, EffectArg_3, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, ItemVisual, Flags, Src_ItemID, Condition_Id, RequiredSkillID, RequiredSkillRank, MinLevel FROM dbc_spellitemenchantment");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Effect_1, Effect_2, Effect_3, EffectPointsMin_1, EffectPointsMin_2, EffectPointsMin_3, EffectArg_1, EffectArg_2, EffectArg_3, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, ItemVisual, Flags, Src_ItemID, Condition_Id, RequiredSkillID, RequiredSkillRank, MinLevel FROM dbc_spellitemenchantment");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellitemenchantment. DB table `dbc_spellitemenchantment` is empty.");
@@ -4204,7 +4204,7 @@ void DBCStoresMgr::_Load_SpellDifficulty()
 
     _spellDiffucultyMap.clear();
     //                                                0           1                     2                   3                   4
-    QueryResult result = WorldDatabase.Query("SELECT ID, DifficultySpellID_1, DifficultySpellID_2, DifficultySpellID_3, DifficultySpellID_4 FROM dbc_spelldifficulty");
+    QueryResult result = DBCDatabase.Query("SELECT ID, DifficultySpellID_1, DifficultySpellID_2, DifficultySpellID_3, DifficultySpellID_4 FROM dbc_spelldifficulty");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spelldifficulty. DB table `dbc_spelldifficulty` is empty.");
@@ -4238,7 +4238,7 @@ void DBCStoresMgr::_Load_SpellDuration()
 
     _spellDurationMap.clear();
     //                                                0      1           2                3
-    QueryResult result = WorldDatabase.Query("SELECT ID, Duration, DurationPerLevel, MaxDuration FROM dbc_spellduration");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Duration, DurationPerLevel, MaxDuration FROM dbc_spellduration");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellduration. DB table `dbc_spellduration` is empty.");
@@ -4273,7 +4273,7 @@ void DBCStoresMgr::_Load_SpellFocusObject()
 
     _spellFocusObjectMap.clear();
     //                                                0
-    QueryResult result = WorldDatabase.Query("SELECT ID FROM dbc_spellfocusobject");
+    QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_spellfocusobject");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellfocusobject. DB table `dbc_spellfocusobject` is empty.");
@@ -4305,7 +4305,7 @@ void DBCStoresMgr::_Load_SpellItemEnchantmentCondition()
 
     _spellItemEnchantmentConditionMap.clear();
     //                                                0         1                   2                 3                 4               5
-    QueryResult result = WorldDatabase.Query("SELECT ID, Lt_OperandType_1, Lt_OperandType_2, Lt_OperandType_3, Lt_OperandType_4, Lt_OperandType_5, "
+    QueryResult result = DBCDatabase.Query("SELECT ID, Lt_OperandType_1, Lt_OperandType_2, Lt_OperandType_3, Lt_OperandType_4, Lt_OperandType_5, "
     //      6           7           8           9           10
         "Operator_1, Operator_2, Operator_3, Operator_4, Operator_5, "
     //      11                  12                  13                  14              15
@@ -4352,7 +4352,7 @@ void DBCStoresMgr::_Load_SpellRadius()
 
     _spellRadiusMap.clear();
     //                                                0     1           2            3
-    QueryResult result = WorldDatabase.Query("SELECT ID, Radius, RadiusPerLevel, RadiusMax FROM dbc_spellradius");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Radius, RadiusPerLevel, RadiusMax FROM dbc_spellradius");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellradius. DB table `dbc_spellradius` is empty.");
@@ -4387,7 +4387,7 @@ void DBCStoresMgr::_Load_SpellRange()
 
     _spellRangeMap.clear();
     //                                                0     1           2            3          4          5
-    QueryResult result = WorldDatabase.Query("SELECT ID, RangeMin_1, RangeMin_2, RangeMax_1, RangeMax_2, Flags FROM dbc_spellrange");
+    QueryResult result = DBCDatabase.Query("SELECT ID, RangeMin_1, RangeMin_2, RangeMax_1, RangeMax_2, Flags FROM dbc_spellrange");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellrange. DB table `dbc_spellrange` is empty.");
@@ -4424,7 +4424,7 @@ void DBCStoresMgr::_Load_SpellRuneCost()
 
     _spellRuneCostMap.clear();
     //                                                0     1      2      3         4
-    QueryResult result = WorldDatabase.Query("SELECT ID, Blood, Unholy, Frost, RunicPower FROM dbc_spellrunecost");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Blood, Unholy, Frost, RunicPower FROM dbc_spellrunecost");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellrunecost. DB table `dbc_spellrunecost` is empty.");
@@ -4459,7 +4459,7 @@ void DBCStoresMgr::_Load_SpellShapeshiftForm()
 
     _spellShapeShiftFormMap.clear();
     //                                                0    1         2             3
-    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, CreatureType, CombatRoundTime, "
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags, CreatureType, CombatRoundTime, "
     //          4                   5                       6                   7
         "CreatureDisplayID_1, CreatureDisplayID_2, CreatureDisplayID_3, CreatureDisplayID_4, "
     //          8               9              10                  11              12              13              14              15
@@ -4503,7 +4503,7 @@ void DBCStoresMgr::_Load_SpellVisual()
 
     _spellVisualMap.clear();
     //                                                0       1           2
-    QueryResult result = WorldDatabase.Query("SELECT ID, HasMissile, MissileModel FROM dbc_spellvisual");
+    QueryResult result = DBCDatabase.Query("SELECT ID, HasMissile, MissileModel FROM dbc_spellvisual");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellvisual. DB table `dbc_spellvisual` is empty.");
@@ -4537,7 +4537,7 @@ void DBCStoresMgr::_Load_StableSlotPrices()
 
     _stableSlotPricesMap.clear();
     //                                                0    1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Cost FROM dbc_stableslotprices");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Cost FROM dbc_stableslotprices");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_stableslotprices. DB table `dbc_stableslotprices` is empty.");
@@ -4570,7 +4570,7 @@ void DBCStoresMgr::_Load_SummonProperties()
 
     _summonPropertiesMap.clear();
     //                                                0    1        2        3      4     5
-    QueryResult result = WorldDatabase.Query("SELECT ID, Control, Faction, Title, Slot, Flags FROM dbc_summonproperties");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Control, Faction, Title, Slot, Flags FROM dbc_summonproperties");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_summonproperties. DB table `dbc_summonproperties` is empty.");
@@ -4607,7 +4607,7 @@ void DBCStoresMgr::_Load_Talent()
 
     _talentMap.clear();
     //                                                0    1        2        3             4           5            6           7           8
-    QueryResult result = WorldDatabase.Query("SELECT ID, TabID, TierID, ColumnIndex, SpellRank_1, SpellRank_2, SpellRank_3, SpellRank_4, SpellRank_5, "
+    QueryResult result = DBCDatabase.Query("SELECT ID, TabID, TierID, ColumnIndex, SpellRank_1, SpellRank_2, SpellRank_3, SpellRank_4, SpellRank_5, "
     //          9              10
         "PrereqTalent_1, PrereqRank_1 FROM dbc_talent");
     if (!result)
@@ -4648,7 +4648,7 @@ void DBCStoresMgr::_Load_TalentTab()
 
     _talentTabMap.clear();
     //                                                0    1               2           3
-    QueryResult result = WorldDatabase.Query("SELECT ID, ClassMask, PetTalentMask, OrderIndex FROM dbc_talenttab");
+    QueryResult result = DBCDatabase.Query("SELECT ID, ClassMask, PetTalentMask, OrderIndex FROM dbc_talenttab");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_talenttab. DB table `dbc_talenttab` is empty.");
@@ -4683,7 +4683,7 @@ void DBCStoresMgr::_Load_TaxiNodes()
 
     _taxiNodesMap.clear();
     //                                                0    1          2  3  4
-    QueryResult result = WorldDatabase.Query("SELECT ID, ContinentID, X, Y, Z, "
+    QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, X, Y, Z, "
     //          5               6               7               8               9               10              11              12          13
         "Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, "
     //          14                  15
@@ -4727,7 +4727,7 @@ void DBCStoresMgr::_Load_TaxiPath()
 
     _taxiPathMap.clear();
     //                                                0         1          2         3
-    QueryResult result = WorldDatabase.Query("SELECT ID, FromTaxiNode, ToTaxiNode, Cost FROM dbc_taxipath");
+    QueryResult result = DBCDatabase.Query("SELECT ID, FromTaxiNode, ToTaxiNode, Cost FROM dbc_taxipath");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxipath. DB table `dbc_taxipath` is empty.");
@@ -4771,7 +4771,7 @@ void DBCStoresMgr::_Load_TaxiPathNode()
 
     _taxiPathNodeMap.clear();
     //                                                0     1        2           3          4   5     6      7      8           9               10
-    QueryResult result = WorldDatabase.Query("SELECT ID, PathID, NodeIndex, ContinentID, LocX, LocY, LocZ, Flags, Delay, ArrivalEventID, DepartureEventID FROM dbc_taxipathnode");
+    QueryResult result = DBCDatabase.Query("SELECT ID, PathID, NodeIndex, ContinentID, LocX, LocY, LocZ, Flags, Delay, ArrivalEventID, DepartureEventID FROM dbc_taxipathnode");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxipathnode. DB table `dbc_taxipathnode` is empty.");
@@ -4812,7 +4812,7 @@ void DBCStoresMgr::_Load_TeamContributionPoints()
 
     _teamContributionPointsMap.clear();
     //                                                0     1
-    QueryResult result = WorldDatabase.Query("SELECT ID, Data FROM dbc_teamcontributionpoints");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_teamcontributionpoints");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_teamcontributionpoints. DB table `dbc_teamcontributionpoints` is empty.");
@@ -4844,7 +4844,7 @@ void DBCStoresMgr::_Load_TotemCategory()
 
     _totemCategoryMap.clear();
     //                                                0          1                  2
-    QueryResult result = WorldDatabase.Query("SELECT ID, TotemCategoryType, TotemCategoryMask FROM dbc_totemcategory");
+    QueryResult result = DBCDatabase.Query("SELECT ID, TotemCategoryType, TotemCategoryMask FROM dbc_totemcategory");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_totemcategory. DB table `dbc_totemcategory` is empty.");
@@ -4877,7 +4877,7 @@ void DBCStoresMgr::_Load_TransportAnimation()
 
     _transportAnimationMap.clear();
     //                                                0        1           2       3    4     5
-    QueryResult result = WorldDatabase.Query("SELECT ID, TransportID, TimeIndex, PosX, PosY, PosZ FROM dbc_transportanimation");
+    QueryResult result = DBCDatabase.Query("SELECT ID, TransportID, TimeIndex, PosX, PosY, PosZ FROM dbc_transportanimation");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_transportanimation. DB table `dbc_transportanimation` is empty.");
@@ -4913,7 +4913,7 @@ void DBCStoresMgr::_Load_TransportRotation()
 
     _transportRotationMap.clear();
     //                                                0        1            2        3     4     5    6
-    QueryResult result = WorldDatabase.Query("SELECT ID, GameObjectsID, TimeIndex, RotX, RotY, RotZ, RotW FROM dbc_transportrotation");
+    QueryResult result = DBCDatabase.Query("SELECT ID, GameObjectsID, TimeIndex, RotX, RotY, RotZ, RotW FROM dbc_transportrotation");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_transportrotation. DB table `dbc_transportrotation` is empty.");
@@ -4950,7 +4950,7 @@ void DBCStoresMgr::_Load_Vehicle()
 
     _vehicleMap.clear();
     //                                                0     1       2           3          4        5          6        7         8         9        10        11        12         13
-    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, TurnSpeed, PitchSpeed, PitchMin, PitchMax, SeatID_1, SeatID_2, SeatID_3, SeatID_4, SeatID_5, SeatID_6, SeatID_7, SeatID_8, "
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags, TurnSpeed, PitchSpeed, PitchMin, PitchMax, SeatID_1, SeatID_2, SeatID_3, SeatID_4, SeatID_5, SeatID_6, SeatID_7, SeatID_8, "
     //           14                     15                      16                      17              18                  19
         "MouseLookOffsetPitch, CameraFadeDistScalarMin, CameraFadeDistScalarMax, CameraPitchOffset, FacingLimitRight, FacingLimitLeft, "
     //           20                        21                       22                  23              24                  25                  26                  27                      28
@@ -5021,7 +5021,7 @@ void DBCStoresMgr::_Load_VehicleSeat()
 
     _vehicleSeatMap.clear();
     //                                                0    1        2                   3               4                   5
-    QueryResult result = WorldDatabase.Query("SELECT ID, Flags, AttachmentID, AttachmentOffsetX, AttachmentOffsetY, AttachmentOffsetZ, "
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags, AttachmentID, AttachmentOffsetX, AttachmentOffsetY, AttachmentOffsetZ, "
     //          6           7              8              9                 10              11                  12                 13           14
         "EnterPreDelay, EnterSpeed, EnterGravity, EnterMinDuration, EnterMaxDuration, EnterMinArcHeight, EnterMaxArcHeight, EnterAnimStart, EnterAnimLoop, "
     //          15            16               17                   18           19            20           21          22                 23               24               25                26           27          28
@@ -5105,7 +5105,7 @@ void DBCStoresMgr::_Load_WMOAreaTable()
 
     _wmoAreaTableMap.clear();
     //                                                0    1        2           3        4         5
-    QueryResult result = WorldDatabase.Query("SELECT ID, WMOID, NameSetID, WMOGroupID, Flags, AreaTableID FROM dbc_wmoareatable");
+    QueryResult result = DBCDatabase.Query("SELECT ID, WMOID, NameSetID, WMOGroupID, Flags, AreaTableID FROM dbc_wmoareatable");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_wmoareatable. DB table `dbc_wmoareatable` is empty.");
@@ -5141,7 +5141,7 @@ void DBCStoresMgr::_Load_WorldMapArea()
 
     _worldMapAreaMap.clear();
     //                                                0    1      2        3        4         5         6           7
-    QueryResult result = WorldDatabase.Query("SELECT ID, MapID, AreaID, LocLeft, LocRight, LocTop, LocBottom, DisplayMapID FROM dbc_worldmaparea");
+    QueryResult result = DBCDatabase.Query("SELECT ID, MapID, AreaID, LocLeft, LocRight, LocTop, LocBottom, DisplayMapID FROM dbc_worldmaparea");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldmaparea. DB table `dbc_worldmaparea` is empty.");
@@ -5180,7 +5180,7 @@ void DBCStoresMgr::_Load_WorldMapOverlay()
 
     _worldMapOverlayMap.clear();
     //                                                0     1         2         3         4
-    QueryResult result = WorldDatabase.Query("SELECT ID, AreaID_1, AreaID_2, AreaID_3, AreaID_4 FROM dbc_worldmapoverlay");
+    QueryResult result = DBCDatabase.Query("SELECT ID, AreaID_1, AreaID_2, AreaID_3, AreaID_4 FROM dbc_worldmapoverlay");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldmapoverlay. DB table `dbc_worldmapoverlay` is empty.");
@@ -5213,7 +5213,7 @@ void DBCStoresMgr::_Load_WorldSafeLocs()
 
     _worldSafeLocsMap.clear();
     //                                                0     1         2     3     4
-    QueryResult result = WorldDatabase.Query("SELECT ID, Continent, LocX, LocY, LocZ FROM dbc_worldsafelocs");
+    QueryResult result = DBCDatabase.Query("SELECT ID, Continent, LocX, LocY, LocZ FROM dbc_worldsafelocs");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldsafelocs. DB table `dbc_worldsafelocs` is empty.");
