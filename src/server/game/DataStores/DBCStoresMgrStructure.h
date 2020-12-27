@@ -1985,4 +1985,24 @@ struct WorldMapAreaDBC
     //uint32 ParentWorldMapID;                              // 10
 };
 
+// load WorldMapOverlay.dbc
+#define MAX_WORLD_MAP_OVERLAY_AREA_IDX 4
+
+struct WorldMapOverlayDBC
+{
+    uint32 ID;                                              // 0
+    //uint32 MapAreaID;                                     // 1 ID in WorldMapArea.dbc
+    uint32 AreaID[MAX_WORLD_MAP_OVERLAY_AREA_IDX];          // 2-5
+    //uint32 MapPointX;                                     // 6
+    //uint32 MapPointY;                                     // 7
+    //char const* TextureName                               // 8
+    //uint32 TextureWidth;                                  // 9
+    //uint32 TextureHeight;                                 // 10
+    //uint32 OffsetX;                                       // 11
+    //uint32 OffsetY;                                       // 12
+    //uint32 HitRectTop;                                    // 13
+    //uint32 HitRectLeft;                                   // 14
+    //uint32 HitRectBottom;                                 // 15
+    //uint32 HitRectRight;                                  // 16
+};
 #pragma pack(pop)

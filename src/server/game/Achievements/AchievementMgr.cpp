@@ -1884,7 +1884,7 @@ bool AchievementMgr::RequirementsSatisfied(AchievementCriteriaDBC const* achieve
             break;
         case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
         {
-            WorldMapOverlayEntry const* worldOverlayEntry = sWorldMapOverlayStore.LookupEntry(achievementCriteria->Asset.WorldMapOverlayID);
+            WorldMapOverlayDBC const* worldOverlayEntry = sDBCStoresMgr->GetWorldMapOverlayDBC(achievementCriteria->Asset.WorldMapOverlayID);
             if (!worldOverlayEntry)
                 return false;
 
@@ -2336,7 +2336,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
                     m_AchievementCriteriasByMiscValue[criteria->Type][criteria->Asset.ID].push_back(criteria);
                 else
                 {
-                    WorldMapOverlayEntry const* worldOverlayEntry = sWorldMapOverlayStore.LookupEntry(criteria->Asset.WorldMapOverlayID);
+                    WorldMapOverlayDBC const* worldOverlayEntry = sDBCStoresMgr->GetWorldMapOverlayDBC(criteria->Asset.WorldMapOverlayID);
                     if (!worldOverlayEntry)
                         break;
 

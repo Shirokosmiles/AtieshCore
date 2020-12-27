@@ -144,6 +144,7 @@ typedef std::unordered_map<uint32 /*ID*/, VehicleDBC> VehicleDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, VehicleSeatDBC> VehicleSeatDBCMap;
 typedef std::unordered_map<uint32 /*ID*/, WMOAreaTableDBC> WMOAreaTableDBCMap;
 typedef std::unordered_map<uint32 /*AreaID*/, WorldMapAreaDBC> WorldMapAreaDBCMap;
+typedef std::unordered_map<uint32 /*ID*/, WorldMapOverlayDBC> WorldMapOverlayDBCMap;
 
 // HELPERS
 // regex
@@ -1329,6 +1330,14 @@ public:
         std::swap(x, y);                                         // client have map coords swapped
     }
 
+    WorldMapOverlayDBC const* GetWorldMapOverlayDBC(uint32 ID)
+    {
+        WorldMapOverlayDBCMap::const_iterator itr = _worldMapOverlayMap.find(ID);
+        if (itr != _worldMapOverlayMap.end())
+            return &itr->second;
+        return nullptr;
+    }
+
     // Handlers for working with DBC data
     ResponseCodes ValidateName(std::wstring const& name, LocaleConstant locale)
     {
@@ -1496,6 +1505,7 @@ protected:
     void _Load_VehicleSeat();
     void _Load_WMOAreaTable();
     void _Load_WorldMapArea();
+    void _Load_WorldMapOverlay();
     
     void Initialize_WorldDBC_Corrections();
     void Initialize_Additional_Data();
@@ -1640,6 +1650,7 @@ private:
     VehicleSeatDBCMap _vehicleSeatMap;
     WMOAreaTableDBCMap _wmoAreaTableMap;
     WorldMapAreaDBCMap _worldMapAreaMap;
+    WorldMapOverlayDBCMap _worldMapOverlayMap;
 
     // handler containers
     NameValidationRegexContainer NamesProfaneValidators;

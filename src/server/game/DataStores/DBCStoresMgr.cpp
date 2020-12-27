@@ -151,6 +151,7 @@ DBCStoresMgr::~DBCStoresMgr()
     _vehicleSeatMap.clear();
     _wmoAreaTableMap.clear();
     _worldMapAreaMap.clear();
+    _worldMapOverlayMap.clear();
 
     // handle additional containers
     for (uint8 i = 0; i < TOTAL_LOCALES; i++)
@@ -314,6 +315,7 @@ void DBCStoresMgr::Initialize()
     _Load_VehicleSeat();
     _Load_WMOAreaTable();
     _Load_WorldMapArea();
+    _Load_WorldMapOverlay();
 
     // Before we will start handle dbc-data we should to add dbc-corrections from WorldDB dbc-tables : achievement_dbc and spell_dbc and spelldifficulty_dbc
     Initialize_WorldDBC_Corrections();
@@ -5167,6 +5169,39 @@ void DBCStoresMgr::_Load_WorldMapArea()
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_worldmaparea                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+// load WorldMapOverlay.dbc
+void DBCStoresMgr::_Load_WorldMapOverlay()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _worldMapOverlayMap.clear();
+    //                                                0     1         2         3         4
+    QueryResult result = WorldDatabase.Query("SELECT ID, AreaID_1, AreaID_2, AreaID_3, AreaID_4 FROM dbc_worldmapoverlay");
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldmapoverlay. DB table `dbc_worldmapoverlay` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        WorldMapOverlayDBC wmo;
+        wmo.ID = id;
+        for (uint8 i = 0; i < MAX_WORLD_MAP_OVERLAY_AREA_IDX; i++)
+            wmo.AreaID[i] = fields[1 + i].GetUInt32();
+
+        _worldMapOverlayMap[id] = wmo;
+
+        ++count;
+    } while (result->NextRow());
+    //                                       1111111111111111111111111111111111
+    TC_LOG_INFO("server.loading", ">> Loaded DBC_worldmapoverlay               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db
