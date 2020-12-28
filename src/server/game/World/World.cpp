@@ -174,6 +174,19 @@ World::~World()
         m_sessions.erase(m_sessions.begin());
     }
 
+    m_sessions.clear();
+    m_disconnects.clear();
+    m_maxActiveSessionCount = 0;
+    m_maxQueuedSessionCount = 0;
+    m_PlayerCount = 0;
+    m_MaxPlayerCount = 0;
+
+    m_newCharString.clear();
+
+    m_ShutdownTimer = 0;
+    m_ShutdownMask = 0;
+    m_CleaningFlags = 0;
+
     CliCommandHolder* command = nullptr;
     while (cliCmdQueue.next(command))
         delete command;
@@ -187,12 +200,51 @@ World::~World()
     for (uint32 i = 0; i < FLOAT_CONFIG_VALUE_COUNT; i++)
         m_float_configs[i] = 0;
     for (uint32 i = 0; i < STRING_CONFIG_VALUE_COUNT; i++)
-        m_string_configs[i] = nullptr;
+        m_string_configs[i].clear();
 
     VMAP::VMapFactory::clear();
     MMAP::MMapFactory::clear();
 
-    /// @todo free addSessQueue
+    m_worldstates.clear();
+    m_playerLimit = 0;
+    m_availableDbcLocaleMask = 0;
+    m_dataPath.clear();
+
+    // for max speed access
+    m_MaxVisibleDistanceOnContinents = 0;
+    m_MaxVisibleDistanceInInstances = 0;
+    m_MaxVisibleDistanceInBG = 0;
+    m_MaxVisibleDistanceInArenas = 0;
+    m_visibility_notify_periodOnContinents = 0;
+    m_visibility_notify_periodInInstances = 0;
+    m_visibility_notify_periodInBG = 0;
+    m_visibility_notify_periodInArenas = 0;
+
+    // next daily quests and random bg reset time
+    m_NextDailyQuestReset = 0;
+    m_NextWeeklyQuestReset = 0;
+    m_NextMonthlyQuestReset = 0;
+    m_NextRandomBGReset = 0;
+    m_NextCalendarOldEventsDeletionTime = 0;
+    m_NextGuildReset = 0;
+
+    //Player Queue
+    for (WorldSession* n : m_QueuedPlayer) {
+        delete n;
+    }
+    m_QueuedPlayer.clear();
+
+    m_DBVersion.clear();
+    m_Autobroadcasts.clear();
+    m_AutobroadcastsWeights.clear();
+
+    _guidWarningMsg.clear();
+    _alertRestartReason.clear();
+
+    _warnDiff = 0;
+    _warnShutdownTime = 0;
+    excludeACMapsId.clear();
+    mapbankBagsId.clear();
 }
 
 World* World::instance()
