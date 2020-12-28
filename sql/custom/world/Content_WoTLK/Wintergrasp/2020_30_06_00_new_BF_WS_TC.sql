@@ -1310,3 +1310,6 @@ DELETE FROM `gameobject_addon` WHERE `guid` =75191;
 DELETE FROM `gameobject_addon` WHERE `guid` =75192;
 DELETE FROM `gameobject_addon` WHERE `guid` =75193;
 DELETE FROM `gameobject_addon` WHERE `guid` =75194;
+
+UPDATE `creature_template` SET `ScriptName`='' WHERE (`entry`='30400');
+UPDATE `creature_template` SET `ScriptName`='' WHERE (`entry`='30499');

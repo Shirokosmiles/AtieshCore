@@ -117,498 +117,6 @@ uint32 const vehiclesList[MAX_WINTERGRASP_VEHICLES] =
     NPC_WINTERGRASP_SIEGE_ENGINE_HORDE
 };
 
-class wg_se_workshop_mechanic : public CreatureScript
-{
-    public:
-        wg_se_workshop_mechanic() : CreatureScript("wg_se_workshop_mechanic") { }
-
-        struct wg_se_workshop_mechanicAI : public ScriptedAI
-        {
-            wg_se_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
-
-            bool OnGossipHello(Player* player) override
-            {
-                if (me->IsQuestGiver())
-                    player->PrepareQuestMenu(me->GetGUID());
-
-                if (CanBuild())
-                {
-                    if (player->HasAura(SPELL_CORPORAL))
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                    else if (player->HasAura(SPELL_LIEUTENANT))
-                    {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    }
-                }
-                else
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-
-                SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
-                return true;
-            }
-
-            bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
-            {
-                uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-                CloseGossipMenuFor(player);
-
-                if (CanBuild())
-                {
-                    switch (action - GOSSIP_ACTION_INFO_DEF)
-                    {
-                        case 0:
-                            DoCast(player, SPELL_BUILD_CATAPULT_FORCE, true);
-                            break;
-                        case 1:
-                            DoCast(player, SPELL_BUILD_DEMOLISHER_FORCE, true);
-                            break;
-                        case 2:
-                            DoCast(player, player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
-                            break;
-                    }
-                    if (Creature* controlArms = me->FindNearestCreature(NPC_WINTERGRASP_CONTROL_ARMS, 30.0f, true))
-                        DoCast(controlArms, SPELL_ACTIVATE_CONTROL_ARMS, true);
-                }
-                return true;
-            }
-
-        private:
-            bool CanBuild() const
-            {
-                Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-                if (!wintergrasp)
-                    return false;
-
-                switch (me->GetEntry())
-                {
-                    case NPC_GOBLIN_MECHANIC:
-                        return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
-                    case NPC_GNOMISH_ENGINEER:
-                        return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
-                    default:
-                        return false;
-                }
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const override
-        {
-            return new wg_se_workshop_mechanicAI(creature);
-        }
-};
-
-class wg_sw_workshop_mechanic : public CreatureScript
-{
-public:
-    wg_sw_workshop_mechanic() : CreatureScript("wg_sw_workshop_mechanic") { }
-
-    struct wg_sw_workshop_mechanicAI : public ScriptedAI
-    {
-        wg_sw_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
-
-        bool OnGossipHello(Player* player) override
-        {
-            if (me->IsQuestGiver())
-                player->PrepareQuestMenu(me->GetGUID());
-
-            if (CanBuild())
-            {
-                if (player->HasAura(SPELL_CORPORAL))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                else if (player->HasAura(SPELL_LIEUTENANT))
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                }
-            }
-            else
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-
-            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
-            return true;
-        }
-
-        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
-        {
-            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            CloseGossipMenuFor(player);
-
-            if (CanBuild())
-            {
-                switch (action - GOSSIP_ACTION_INFO_DEF)
-                {
-                case 0:
-                    DoCast(player, SPELL_BUILD_CATAPULT_FORCE, true);
-                    break;
-                case 1:
-                    DoCast(player, SPELL_BUILD_DEMOLISHER_FORCE, true);
-                    break;
-                case 2:
-                    DoCast(player, player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
-                    break;
-                }
-                if (Creature* controlArms = me->FindNearestCreature(NPC_WINTERGRASP_CONTROL_ARMS, 30.0f, true))
-                    DoCast(controlArms, SPELL_ACTIVATE_CONTROL_ARMS, true);
-            }
-            return true;
-        }
-
-    private:
-        bool CanBuild() const
-        {
-            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-            if (!wintergrasp)
-                return false;
-
-            switch (me->GetEntry())
-            {
-            case NPC_GOBLIN_MECHANIC:
-                return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
-            case NPC_GNOMISH_ENGINEER:
-                return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
-            default:
-                return false;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new wg_sw_workshop_mechanicAI(creature);
-    }
-};
-
-class wg_ne_workshop_mechanic : public CreatureScript
-{
-public:
-    wg_ne_workshop_mechanic() : CreatureScript("wg_ne_workshop_mechanic") { }
-
-    struct wg_ne_workshop_mechanicAI : public ScriptedAI
-    {
-        wg_ne_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
-
-        bool OnGossipHello(Player* player) override
-        {
-            if (me->IsQuestGiver())
-                player->PrepareQuestMenu(me->GetGUID());
-
-            if (CanBuild())
-            {
-                if (player->HasAura(SPELL_CORPORAL))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                else if (player->HasAura(SPELL_LIEUTENANT))
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                }
-            }
-            else
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-
-            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
-            return true;
-        }
-
-        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
-        {
-            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            CloseGossipMenuFor(player);
-
-            if (CanBuild())
-            {
-                switch (action - GOSSIP_ACTION_INFO_DEF)
-                {
-                case 0:
-                    DoCast(player, SPELL_BUILD_CATAPULT_FORCE, true);
-                    break;
-                case 1:
-                    DoCast(player, SPELL_BUILD_DEMOLISHER_FORCE, true);
-                    break;
-                case 2:
-                    DoCast(player, player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
-                    break;
-                }
-                if (Creature* controlArms = me->FindNearestCreature(NPC_WINTERGRASP_CONTROL_ARMS, 30.0f, true))
-                    DoCast(controlArms, SPELL_ACTIVATE_CONTROL_ARMS, true);
-            }
-            return true;
-        }
-
-    private:
-        bool CanBuild() const
-        {
-            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-            if (!wintergrasp)
-                return false;
-
-            switch (me->GetEntry())
-            {
-            case NPC_GOBLIN_MECHANIC:
-                return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
-            case NPC_GNOMISH_ENGINEER:
-                return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
-            default:
-                return false;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new wg_ne_workshop_mechanicAI(creature);
-    }
-};
-
-class wg_nw_workshop_mechanic : public CreatureScript
-{
-public:
-    wg_nw_workshop_mechanic() : CreatureScript("wg_nw_workshop_mechanic") { }
-
-    struct wg_nw_workshop_mechanicAI : public ScriptedAI
-    {
-        wg_nw_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
-
-        bool OnGossipHello(Player* player) override
-        {
-            if (me->IsQuestGiver())
-                player->PrepareQuestMenu(me->GetGUID());
-
-            if (CanBuild())
-            {
-                if (player->HasAura(SPELL_CORPORAL))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                else if (player->HasAura(SPELL_LIEUTENANT))
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                }
-            }
-            else
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-
-            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
-            return true;
-        }
-
-        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
-        {
-            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            CloseGossipMenuFor(player);
-
-            if (CanBuild())
-            {
-                switch (action - GOSSIP_ACTION_INFO_DEF)
-                {
-                case 0:
-                    DoCast(player, SPELL_BUILD_CATAPULT_FORCE, true);
-                    break;
-                case 1:
-                    DoCast(player, SPELL_BUILD_DEMOLISHER_FORCE, true);
-                    break;
-                case 2:
-                    DoCast(player, player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
-                    break;
-                }
-                if (Creature* controlArms = me->FindNearestCreature(NPC_WINTERGRASP_CONTROL_ARMS, 30.0f, true))
-                    DoCast(controlArms, SPELL_ACTIVATE_CONTROL_ARMS, true);
-            }
-            return true;
-        }
-
-    private:
-        bool CanBuild() const
-        {
-            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-            if (!wintergrasp)
-                return false;
-
-            switch (me->GetEntry())
-            {
-            case NPC_GOBLIN_MECHANIC:
-                return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
-            case NPC_GNOMISH_ENGINEER:
-                return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
-            default:
-                return false;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new wg_nw_workshop_mechanicAI(creature);
-    }
-};
-
-class wg_ke_workshop_mechanic : public CreatureScript
-{
-public:
-    wg_ke_workshop_mechanic() : CreatureScript("wg_ke_workshop_mechanic") { }
-
-    struct wg_ke_workshop_mechanicAI : public ScriptedAI
-    {
-        wg_ke_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
-
-        bool OnGossipHello(Player* player) override
-        {
-            if (me->IsQuestGiver())
-                player->PrepareQuestMenu(me->GetGUID());
-
-            if (CanBuild())
-            {
-                if (player->HasAura(SPELL_CORPORAL))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                else if (player->HasAura(SPELL_LIEUTENANT))
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                }
-            }
-            else
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-
-            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
-            return true;
-        }
-
-        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
-        {
-            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            CloseGossipMenuFor(player);
-
-            if (CanBuild())
-            {
-                switch (action - GOSSIP_ACTION_INFO_DEF)
-                {
-                case 0:
-                    DoCast(player, SPELL_BUILD_CATAPULT_FORCE, true);
-                    break;
-                case 1:
-                    DoCast(player, SPELL_BUILD_DEMOLISHER_FORCE, true);
-                    break;
-                case 2:
-                    DoCast(player, player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
-                    break;
-                }
-                if (Creature* controlArms = me->FindNearestCreature(NPC_WINTERGRASP_CONTROL_ARMS, 30.0f, true))
-                    DoCast(controlArms, SPELL_ACTIVATE_CONTROL_ARMS, true);
-            }
-            return true;
-        }
-
-    private:
-        bool CanBuild() const
-        {
-            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-            if (!wintergrasp)
-                return false;
-
-            switch (me->GetEntry())
-            {
-            case NPC_GOBLIN_MECHANIC:
-                return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
-            case NPC_GNOMISH_ENGINEER:
-                return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
-            default:
-                return false;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new wg_ke_workshop_mechanicAI(creature);
-    }
-};
-
-class wg_kw_workshop_mechanic : public CreatureScript
-{
-public:
-    wg_kw_workshop_mechanic() : CreatureScript("wg_kw_workshop_mechanic") { }
-
-    struct wg_kw_workshop_mechanicAI : public ScriptedAI
-    {
-        wg_kw_workshop_mechanicAI(Creature* creature) : ScriptedAI(creature) { }
-
-        bool OnGossipHello(Player* player) override
-        {
-            if (me->IsQuestGiver())
-                player->PrepareQuestMenu(me->GetGUID());
-
-            if (CanBuild())
-            {
-                if (player->HasAura(SPELL_CORPORAL))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                else if (player->HasAura(SPELL_LIEUTENANT))
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                }
-            }
-            else
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-
-            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
-            return true;
-        }
-
-        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
-        {
-            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            CloseGossipMenuFor(player);
-
-            if (CanBuild())
-            {
-                switch (action - GOSSIP_ACTION_INFO_DEF)
-                {
-                case 0:
-                    DoCast(player, SPELL_BUILD_CATAPULT_FORCE, true);
-                    break;
-                case 1:
-                    DoCast(player, SPELL_BUILD_DEMOLISHER_FORCE, true);
-                    break;
-                case 2:
-                    DoCast(player, player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
-                    break;
-                }
-                if (Creature* controlArms = me->FindNearestCreature(NPC_WINTERGRASP_CONTROL_ARMS, 30.0f, true))
-                    DoCast(controlArms, SPELL_ACTIVATE_CONTROL_ARMS, true);
-            }
-            return true;
-        }
-
-    private:
-        bool CanBuild() const
-        {
-            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-            if (!wintergrasp)
-                return false;
-
-            switch (me->GetEntry())
-            {
-            case NPC_GOBLIN_MECHANIC:
-                return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
-            case NPC_GNOMISH_ENGINEER:
-                return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
-            default:
-                return false;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new wg_kw_workshop_mechanicAI(creature);
-    }
-};
-
 class npc_wg_spirit_guide : public CreatureScript
 {
     public:
@@ -1068,16 +576,753 @@ class condition_is_wintergrasp_alliance : public ConditionScript
         }
 };
 
+enum GuardData
+{
+    EVENT_STRIKE     = 1,
+    EVENT_BLOOD_HOWL = 2,
+    EVENT_ENRAGE     = 3,
+
+    SPELL_STRIKE     = 11976,
+    SPELL_BLOOD_HOWL = 3264,
+    SPELL_ENRAGE     = 8599
+};
+
+struct wg_guardAI : public ScriptedAI
+{
+    wg_guardAI(Creature* creature) : ScriptedAI(creature)
+    {
+        _enraged = false;
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        events.ScheduleEvent(EVENT_STRIKE, 3s);
+        events.ScheduleEvent(EVENT_BLOOD_HOWL, randtime(10s, 17s));
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!me || !me->IsAlive())
+            return;
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        if (!_enraged && me->GetHealthPct() < 30)
+            events.ScheduleEvent(EVENT_ENRAGE, 0s);
+
+        events.Update(diff);
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_STRIKE:
+                {
+                    DoCastVictim(SPELL_STRIKE);
+                    events.ScheduleEvent(EVENT_STRIKE, randtime(2s, 10s));
+                    break;
+                }
+                case EVENT_BLOOD_HOWL:
+                {
+                    DoCastSelf(SPELL_BLOOD_HOWL);
+                    events.ScheduleEvent(EVENT_BLOOD_HOWL, randtime(17s, 37s));
+                    break;
+                }
+                case EVENT_ENRAGE:
+                {
+                    DoCastSelf(SPELL_ENRAGE);
+                    _enraged = true;
+                    break;
+                }
+            }
+        }
+
+        if (UpdateVictim())
+            DoMeleeAttackIfReady();
+    }
+private:
+    EventMap events;
+    bool _enraged;
+};
+
+//  bridges
+//West
+class wg_west_bridge_guard : public CreatureScript
+{
+public:
+    wg_west_bridge_guard() : CreatureScript("wg_west_bridge_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_west_roaming_bridge_guard : public CreatureScript
+{
+public:
+    wg_west_roaming_bridge_guard() : CreatureScript("wg_west_roaming_bridge_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//Middle
+class wg_middle_bridge_guard : public CreatureScript
+{
+public:
+    wg_middle_bridge_guard() : CreatureScript("wg_middle_bridge_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_middle_roaming_bridge_guard : public CreatureScript
+{
+public:
+    wg_middle_roaming_bridge_guard() : CreatureScript("wg_middle_roaming_bridge_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//East
+class wg_east_bridge_guard : public CreatureScript
+{
+public:
+    wg_east_bridge_guard() : CreatureScript("wg_east_bridge_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_east_roaming_bridge_guard : public CreatureScript
+{
+public:
+    wg_east_roaming_bridge_guard() : CreatureScript("wg_east_roaming_bridge_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//  Attack towers
+//west
+class wg_wt_standing_guard : public CreatureScript
+{
+public:
+    wg_wt_standing_guard() : CreatureScript("wg_wt_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_wt_roaming_guard : public CreatureScript
+{
+public:
+    wg_wt_roaming_guard() : CreatureScript("wg_wt_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//south
+class wg_st_standing_guard : public CreatureScript
+{
+public:
+    wg_st_standing_guard() : CreatureScript("wg_st_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_st_roaming_guard : public CreatureScript
+{
+public:
+    wg_st_roaming_guard() : CreatureScript("wg_st_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//east
+class wg_et_standing_guard : public CreatureScript
+{
+public:
+    wg_et_standing_guard() : CreatureScript("wg_et_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_et_roaming_guard : public CreatureScript
+{
+public:
+    wg_et_roaming_guard() : CreatureScript("wg_et_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//  Defend Towers
+//tower North-East
+class wg_ne_standing_guard : public CreatureScript
+{
+public:
+    wg_ne_standing_guard() : CreatureScript("wg_ne_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_ne_roaming_guard : public CreatureScript
+{
+public:
+    wg_ne_roaming_guard() : CreatureScript("wg_ne_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//tower North-West
+class wg_nw_roaming_guard : public CreatureScript
+{
+public:
+    wg_nw_roaming_guard() : CreatureScript("wg_nw_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_nw_standing_guard : public CreatureScript
+{
+public:
+    wg_nw_standing_guard() : CreatureScript("wg_nw_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//tower South-East
+class wg_se_standing_guard : public CreatureScript
+{
+public:
+    wg_se_standing_guard() : CreatureScript("wg_se_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_se_roaming_guard : public CreatureScript
+{
+public:
+    wg_se_roaming_guard() : CreatureScript("wg_se_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//tower South-West
+class wg_sw_standing_guard : public CreatureScript
+{
+public:
+    wg_sw_standing_guard() : CreatureScript("wg_sw_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_sw_roaming_guard : public CreatureScript
+{
+public:
+    wg_sw_roaming_guard() : CreatureScript("wg_sw_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//keep vault
+class wg_vault_standing_guard : public CreatureScript
+{
+public:
+    wg_vault_standing_guard() : CreatureScript("wg_vault_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_vault_roaming_guard : public CreatureScript
+{
+public:
+    wg_vault_roaming_guard() : CreatureScript("wg_vault_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+//workshops
+class wg_ne_workshop_standing_guard : public CreatureScript
+{
+public:
+    wg_ne_workshop_standing_guard() : CreatureScript("wg_ne_workshop_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_ne_workshop_roaming_guard : public CreatureScript
+{
+public:
+    wg_ne_workshop_roaming_guard() : CreatureScript("wg_ne_workshop_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_nw_workshop_standing_guard : public CreatureScript
+{
+public:
+    wg_nw_workshop_standing_guard() : CreatureScript("wg_nw_workshop_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_nw_workshop_roaming_guard : public CreatureScript
+{
+public:
+    wg_nw_workshop_roaming_guard() : CreatureScript("wg_nw_workshop_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_se_workshop_standing_guard : public CreatureScript
+{
+public:
+    wg_se_workshop_standing_guard() : CreatureScript("wg_se_workshop_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_se_workshop_roaming_guard : public CreatureScript
+{
+public:
+    wg_se_workshop_roaming_guard() : CreatureScript("wg_se_workshop_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_sw_workshop_standing_guard : public CreatureScript
+{
+public:
+    wg_sw_workshop_standing_guard() : CreatureScript("wg_sw_workshop_standing_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+class wg_sw_workshop_roaming_guard : public CreatureScript
+{
+public:
+    wg_sw_workshop_roaming_guard() : CreatureScript("wg_sw_workshop_roaming_guard") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_guardAI(creature);
+    }
+};
+
+struct wg_turretAI : public ScriptedAI
+{
+    wg_turretAI(Creature* creature) : ScriptedAI(creature) { }
+};
+
+// Turrets
+//attack turrets
+//west
+class wg_wt_assault_cannon : public CreatureScript
+{
+public:
+    wg_wt_assault_cannon() : CreatureScript("wg_wt_assault_cannon") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_turretAI(creature);
+    }
+};
+
+//south
+class wg_st_assault_cannon : public CreatureScript
+{
+public:
+    wg_st_assault_cannon() : CreatureScript("wg_st_assault_cannon") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_turretAI(creature);
+    }
+};
+
+//east
+class wg_et_assault_cannon : public CreatureScript
+{
+public:
+    wg_et_assault_cannon() : CreatureScript("wg_et_assault_cannon") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_turretAI(creature);
+    }
+};
+
+//defense turrets
+//South_west
+class npc_wg_SW_cannon : public CreatureScript
+{
+public:
+    npc_wg_SW_cannon() : CreatureScript("npc_wg_SW_cannon") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_turretAI(creature);
+    }
+};
+
+//South_east
+class npc_wg_SE_cannon : public CreatureScript
+{
+public:
+    npc_wg_SE_cannon() : CreatureScript("npc_wg_SE_cannon") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_turretAI(creature);
+    }
+};
+
+//North_west
+class npc_wg_NW_cannon : public CreatureScript
+{
+public:
+    npc_wg_NW_cannon() : CreatureScript("npc_wg_NW_cannon") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_turretAI(creature);
+    }
+};
+
+//North_east
+class npc_wg_NE_cannon : public CreatureScript
+{
+public:
+    npc_wg_NE_cannon() : CreatureScript("npc_wg_NE_cannon") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_turretAI(creature);
+    }
+};
+
+//keep gate
+class npc_wg_fortress_gate_cannon : public CreatureScript
+{
+public:
+    npc_wg_fortress_gate_cannon() : CreatureScript("npc_wg_fortress_gate_cannon") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_turretAI(creature);
+    }
+};
+
+//keep gate
+class npc_wg_fortress_cannon : public CreatureScript
+{
+public:
+    npc_wg_fortress_cannon() : CreatureScript("npc_wg_fortress_cannon") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new wg_turretAI(creature);
+    }
+};
+
+// Engineer
+struct demolisher_engineerAI : public ScriptedAI
+{
+    demolisher_engineerAI(Creature* creature) : ScriptedAI(creature) { }
+
+    bool OnGossipHello(Player* player) override
+    {
+        if (me->IsQuestGiver())
+            player->PrepareQuestMenu(me->GetGUID());
+
+        if (CanBuild())
+        {
+            if (player->HasAura(SPELL_CORPORAL))
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            else if (player->HasAura(SPELL_LIEUTENANT))
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            }
+        }
+        else
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_DEMO4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+
+        SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+    {
+        uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
+        CloseGossipMenuFor(player);
+
+        if (CanBuild())
+        {
+            switch (action - GOSSIP_ACTION_INFO_DEF)
+            {
+            case 0:
+                DoCast(player, SPELL_BUILD_CATAPULT_FORCE, true);
+                break;
+            case 1:
+                DoCast(player, SPELL_BUILD_DEMOLISHER_FORCE, true);
+                break;
+            case 2:
+                DoCast(player, player->GetTeamId() == TEAM_ALLIANCE ? SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE : SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE, true);
+                break;
+            }
+            if (Creature* controlArms = me->FindNearestCreature(NPC_WINTERGRASP_CONTROL_ARMS, 30.0f, true))
+                DoCast(controlArms, SPELL_ACTIVATE_CONTROL_ARMS, true);
+        }
+        return true;
+    }
+
+private:
+    bool CanBuild() const
+    {
+        Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+        if (!wintergrasp)
+            return false;
+
+        switch (me->GetEntry())
+        {
+        case NPC_GOBLIN_MECHANIC:
+            return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
+        case NPC_GNOMISH_ENGINEER:
+            return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
+        default:
+            return false;
+        }
+    }
+};
+
+class wg_se_workshop_mechanic : public CreatureScript
+{
+public:
+    wg_se_workshop_mechanic() : CreatureScript("wg_se_workshop_mechanic") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new demolisher_engineerAI(creature);
+    }
+};
+
+class wg_sw_workshop_mechanic : public CreatureScript
+{
+public:
+    wg_sw_workshop_mechanic() : CreatureScript("wg_sw_workshop_mechanic") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new demolisher_engineerAI(creature);
+    }
+};
+
+class wg_ne_workshop_mechanic : public CreatureScript
+{
+public:
+    wg_ne_workshop_mechanic() : CreatureScript("wg_ne_workshop_mechanic") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new demolisher_engineerAI(creature);
+    }
+};
+
+class wg_nw_workshop_mechanic : public CreatureScript
+{
+public:
+    wg_nw_workshop_mechanic() : CreatureScript("wg_nw_workshop_mechanic") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new demolisher_engineerAI(creature);
+    }
+};
+
+class wg_ke_workshop_mechanic : public CreatureScript
+{
+public:
+    wg_ke_workshop_mechanic() : CreatureScript("wg_ke_workshop_mechanic") { }    
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new demolisher_engineerAI(creature);
+    }
+};
+
+class wg_kw_workshop_mechanic : public CreatureScript
+{
+public:
+    wg_kw_workshop_mechanic() : CreatureScript("wg_kw_workshop_mechanic") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new demolisher_engineerAI(creature);
+    }
+};
+
 void AddSC_wintergrasp()
 {
-    new npc_wg_queue();
-    new npc_wg_spirit_guide();
+    /// Guards section
+    //bridges
+    //west
+    new wg_west_bridge_guard();
+    new wg_west_roaming_bridge_guard();
+    //middle
+    new wg_middle_bridge_guard();
+    new wg_middle_roaming_bridge_guard();
+    //east
+    new wg_east_bridge_guard();
+    new wg_east_roaming_bridge_guard();
+
+    //attack towers
+    //east
+    new wg_et_standing_guard();
+    new wg_et_roaming_guard();
+    //west
+    new wg_wt_standing_guard();
+    new wg_wt_roaming_guard();
+    //south
+    new wg_st_standing_guard();
+    new wg_st_roaming_guard();
+
+    //defense tower
+    //noth-east
+    new wg_ne_standing_guard();
+    new wg_ne_roaming_guard();
+    //north-west
+    new wg_nw_standing_guard();
+    new wg_nw_roaming_guard();
+    //south-east
+    new wg_se_standing_guard();
+    new wg_se_roaming_guard();
+    //south-west
+    new wg_sw_standing_guard();
+    new wg_sw_roaming_guard();
+
+    //keep
+    new wg_vault_standing_guard();
+    new wg_vault_roaming_guard();
+
+    //workshops
+    //ne
+    new wg_ne_workshop_standing_guard();
+    new wg_ne_workshop_roaming_guard();
+    //nw
+    new wg_nw_workshop_standing_guard();
+    new wg_nw_workshop_roaming_guard();
+    //se
+    new wg_se_workshop_standing_guard();
+    new wg_se_workshop_roaming_guard();
+    //sw
+    new wg_sw_workshop_standing_guard();
+    new wg_sw_workshop_roaming_guard();
+    /// End Guards section
+
+    /// Turret section
+    new wg_wt_assault_cannon();
+    new wg_st_assault_cannon();
+    new wg_et_assault_cannon();
+    new npc_wg_SW_cannon();
+    new npc_wg_SE_cannon();
+    new npc_wg_NW_cannon();
+    new npc_wg_NE_cannon();
+    new npc_wg_fortress_gate_cannon();
+    new npc_wg_fortress_cannon();
+    /// Engineer
     new wg_se_workshop_mechanic();
     new wg_sw_workshop_mechanic();
     new wg_ne_workshop_mechanic();
     new wg_nw_workshop_mechanic();
     new wg_ke_workshop_mechanic();
     new wg_kw_workshop_mechanic();
+    ///
+
+    new npc_wg_queue();
+    new npc_wg_spirit_guide();    
     new go_wg_vehicle_teleporter();
     new spell_wintergrasp_force_building();
     new spell_wintergrasp_grab_passenger();
