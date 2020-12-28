@@ -318,7 +318,7 @@ class TC_GAME_API Battlefield : public ZoneScript
         Creature* SpawnCreature(uint32 entry, Position const& pos);
         GameObject* SpawnGameObject(uint32 entry, Position const& pos, QuaternionData const& rot);
 
-        Creature* GetCreature(ObjectGuid guid);
+        Creature* GetCreature(ObjectGuid::LowType spawnid);
         GameObject* GetGameObject(ObjectGuid guid);
 
         // Script-methods

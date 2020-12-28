@@ -680,7 +680,7 @@ bool BattlefieldWG::SetupBattlefield()
     {
         if (WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i))
         {
-            if (workshop->GetId() < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+            if (workshop->GetId() < BATTLEFIELD_WG_WORKSHOP_NE)
                 workshop->InitialWorkshopAndCapturePoint(GetAttackerTeam(), workshop->GetId());
             else
                 workshop->InitialWorkshopAndCapturePoint(GetDefenderTeam(), workshop->GetId());
@@ -952,7 +952,7 @@ void BattlefieldWG::OnStartGrouping()
     SendWarning(BATTLEFIELD_WG_TEXT_START_GROUPING);
 }
 
-uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
+WGGraveyardId BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
 {
     switch (areaId)
     {
@@ -975,7 +975,7 @@ uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
             break;
     }
 
-    return 0;
+    return BATTLEFIELD_WG_GY_WORKSHOP_NE;
 }
 
 void BattlefieldWG::OnCreatureCreate(Creature* creature)
@@ -987,9 +987,35 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
         case NPC_TAUNKA_SPIRIT_GUIDE:
         {
             TeamId teamId = (creature->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE);
-            uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId());
-            if (m_GraveyardList[graveyardId])
-                m_GraveyardList[graveyardId]->SetSpirit(creature, teamId);
+            WGGraveyardId graveyardId = GetSpiritGraveyardId(creature->GetAreaId());
+            if (m_GraveyardList[uint8(graveyardId)])
+            {
+                m_GraveyardList[uint8(graveyardId)]->SetSpirit(creature, teamId);
+                switch (graveyardId)
+                {
+                    case BATTLEFIELD_WG_GY_WORKSHOP_NE:
+                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, teamId);
+                        break;
+                    case BATTLEFIELD_WG_GY_WORKSHOP_NW:
+                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, teamId);
+                        break;
+                    case BATTLEFIELD_WG_GY_WORKSHOP_SE:
+                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, teamId);
+                        break;
+                    case BATTLEFIELD_WG_GY_WORKSHOP_SW:
+                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, teamId);
+                        break;
+                    case BATTLEFIELD_WG_GY_KEEP:
+                        AddCreatureInHolderByGUID(creature, VAULT_KEEP, teamId);
+                        break;
+                    case BATTLEFIELD_WG_GY_HORDE:
+                        AddCreatureInHolderByGUID(creature, WG_HORDE_GRAVEYARD, teamId);
+                        break;
+                    case BATTLEFIELD_WG_GY_ALLIANCE:
+                        AddCreatureInHolderByGUID(creature, WG_ALLIANCE_GRAVEYARD, teamId);
+                        break;
+                }
+            }
             break;
         }
         case NPC_WORKSHOP_MECHANIC_HORDE:
@@ -1351,13 +1377,13 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
 
             if (creature->GetScriptName() == "wg_vault_standing_guard")
             {
-                if (AddCreatureInHolderByGUID(creature, VAULT_GATE_GUARD, TEAM_ALLIANCE))
+                if (AddCreatureInHolderByGUID(creature, VAULT_KEEP, TEAM_ALLIANCE))
                     registered = true;
             }
 
             if (creature->GetScriptName() == "wg_vault_roaming_guard")
             {
-                if (AddCreatureInHolderByGUID(creature, VAULT_GATE_GUARD, TEAM_ALLIANCE))
+                if (AddCreatureInHolderByGUID(creature, VAULT_KEEP, TEAM_ALLIANCE))
                     registered = true;
             }
 
@@ -1549,13 +1575,13 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
 
             if (creature->GetScriptName() == "wg_vault_standing_guard")
             {
-                if (AddCreatureInHolderByGUID(creature, VAULT_GATE_GUARD, TEAM_HORDE))
+                if (AddCreatureInHolderByGUID(creature, VAULT_KEEP, TEAM_HORDE))
                     registered = true;
             }
 
             if (creature->GetScriptName() == "wg_vault_roaming_guard")
             {
-                if (AddCreatureInHolderByGUID(creature, VAULT_GATE_GUARD, TEAM_HORDE))
+                if (AddCreatureInHolderByGUID(creature, VAULT_KEEP, TEAM_HORDE))
                     registered = true;
             }
 
@@ -1925,7 +1951,7 @@ uint32 BattlefieldWG::GetData(uint32 data) const
         case AREA_WESTPARK_WORKSHOP:
         case AREA_EASTPARK_WORKSHOP:
             // Graveyards and Workshops are controlled by the same team.
-            if (BfGraveyard const* graveyard = GetGraveyardById(GetSpiritGraveyardId(data)))
+            if (BfGraveyard const* graveyard = GetGraveyardById(uint32(GetSpiritGraveyardId(data))))
                 return graveyard->GetControlTeamId();
             break;
         default:
@@ -2176,23 +2202,21 @@ void BattlefieldWG::UpdateTenacity()
         m_tenacityTeam = TEAM_NEUTRAL;
 }
 
-bool BattlefieldWG::IsCreatureInHolder(ObjectGuid guid)
+bool BattlefieldWG::IsCreatureInHolder(ObjectGuid::LowType spawnID)
 {
-    bool result = false;
-    for (CreatureHolderContainer::const_iterator itr = m_CreatureMap.begin(); itr != m_CreatureMap.end(); ++itr)
-        if (itr->second.m_GUID == guid)
+    CreatureHolderContainer::const_iterator itr = m_CreatureMap.find(spawnID);
+    if (itr != m_CreatureMap.end())
+    {
+        if (Creature* creature = GetCreature(spawnID))
         {
-            result = true;
-            if (Creature* creature = GetCreature(itr->second.m_GUID))
-            {
-                if (itr->second.m_isActive)
-                    ShowNpc(creature, true);
-                else
-                    HideNpc(creature);
-            }
+            if (itr->second.m_isActive)
+                ShowNpc(creature, true);
+            else
+                HideNpc(creature);
+            return true;
         }
-
-    return result;
+    }
+    return false;
 }
 
 bool BattlefieldWG::AddCreatureInHolderByGUID(Creature* creature, uint8 npcType, TeamId team)
@@ -2202,21 +2226,11 @@ bool BattlefieldWG::AddCreatureInHolderByGUID(Creature* creature, uint8 npcType,
 
     UpdateStatusForCreature(creature, npcType);
 
-    // find max id
-    uint32 new_id = 0;
-    for (CreatureHolderContainer::const_iterator itr = m_CreatureMap.begin(); itr != m_CreatureMap.end(); ++itr)
-        if (itr->first > new_id)
-            new_id = itr->first;
-
-    // use next
-    ++new_id;
-
     CreatureHolder ch;
-    ch.m_GUID = creature->GetGUID();
     ch.m_npcType = npcType;
     ch.m_team = team;
     ch.m_isActive = creature->IsVisible();
-    m_CreatureMap[new_id] = ch;
+    m_CreatureMap[creature->GetGUID().GetCounter()] = ch;
     return true;
 }
 
@@ -2271,7 +2285,7 @@ void BattlefieldWG::UpdateStatusForCreature(Creature* creature, uint8 npcType)
         case NW_TOWER_GUARD:
         case SE_TOWER_GUARD:
         case SW_TOWER_GUARD:
-        case VAULT_GATE_GUARD:
+        case VAULT_KEEP:
         {
             for (BfWGGameObjectBuilding* building : BuildingsInZone)
             {
@@ -2323,9 +2337,34 @@ void BattlefieldWG::UpdateStatusForCreature(Creature* creature, uint8 npcType)
                                 HideNpc(creature);
                             break;
                         }
+                        case NPC_TAUNKA_SPIRIT_GUIDE:
+                        case NPC_DWARVEN_SPIRIT_GUIDE:
+                        {
+                            if (creature->GetFaction() == NPCGuardFaction[workshop->GetTeamControl()])
+                                ShowNpc(creature, true);
+                            else
+                                HideNpc(creature);
+                            break;
+                        }
                     }
                 }
             }
+            break;
+        }
+        case WG_ALLIANCE_GRAVEYARD:
+        {
+            if (creature->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE)
+                ShowNpc(creature, true);
+            else
+                HideNpc(creature);
+            break;
+        }
+        case WG_HORDE_GRAVEYARD:
+        {
+            if (creature->GetEntry() == NPC_TAUNKA_SPIRIT_GUIDE)
+                ShowNpc(creature, true);
+            else
+                HideNpc(creature);
             break;
         }
     }
@@ -2334,22 +2373,28 @@ void BattlefieldWG::UpdateStatusForCreature(Creature* creature, uint8 npcType)
 void BattlefieldWG::ShowCreatureByNPCType(uint8 npcType, TeamId team)
 {
     for (CreatureHolderContainer::iterator itr = m_CreatureMap.begin(); itr != m_CreatureMap.end(); ++itr)
-        if (itr->second.m_npcType == npcType && itr->second.m_team == team)
+        if (itr->second.m_npcType == npcType &&
+            itr->second.m_team == team)
         {
-            if (Creature* creature = GetCreature(itr->second.m_GUID))
+            if (Creature* creature = GetCreature(itr->first))
+            {
                 ShowNpc(creature, true);
-            itr->second.m_isActive = true;
+                itr->second.m_isActive = true;
+            }
         }
 }
 
 void BattlefieldWG::HideCreatureByNPCType(uint8 npcType, TeamId team)
 {
     for (CreatureHolderContainer::iterator itr = m_CreatureMap.begin(); itr != m_CreatureMap.end(); ++itr)
-        if (itr->second.m_npcType == npcType && itr->second.m_team == team)
+        if (itr->second.m_npcType == npcType &&
+            itr->second.m_team == team)
         {
-            if (Creature* creature = GetCreature(itr->second.m_GUID))
+            if (Creature* creature = GetCreature(itr->first))
+            {
                 HideNpc(creature);
-            itr->second.m_isActive = false;
+                itr->second.m_isActive = false;
+            }
         }
 }
 
@@ -2358,12 +2403,12 @@ void BattlefieldWG::UpdateCreatureTurretByNPCType(uint8 npcType, TeamId team)
     for (CreatureHolderContainer::iterator itr = m_CreatureMap.begin(); itr != m_CreatureMap.end(); ++itr)
         if (itr->second.m_npcType == npcType)
         {
-            if (Creature* creature = GetCreature(itr->second.m_GUID))
+            if (Creature* creature = GetCreature(itr->first))
             {
                 ShowNpc(creature, true);
                 creature->SetFaction(WintergraspFaction[team]);
-            }
-            itr->second.m_isActive = true;
+                itr->second.m_isActive = true;
+            }            
         }
 }
 
@@ -2372,11 +2417,11 @@ void BattlefieldWG::HideCreatureTurretByNPCType(uint8 npcType)
     for (CreatureHolderContainer::iterator itr = m_CreatureMap.begin(); itr != m_CreatureMap.end(); ++itr)
         if (itr->second.m_npcType == npcType)
         {
-            if (Creature* creature = GetCreature(itr->second.m_GUID))
+            if (Creature* creature = GetCreature(itr->first))
             {
                 ShowNpc(creature, true);
-            }
-            itr->second.m_isActive = false;
+                itr->second.m_isActive = false;
+            }            
         }
 }
 
@@ -2442,8 +2487,8 @@ void BattlefieldWG::UpdateAllGuardsAndTurretsBeforeBattle()
     ShowCreatureByNPCType(SW_TOWER_GUARD, GetDefenderTeam());
     HideCreatureByNPCType(SW_TOWER_GUARD, GetAttackerTeam());
 
-    ShowCreatureByNPCType(VAULT_GATE_GUARD, GetDefenderTeam());
-    HideCreatureByNPCType(VAULT_GATE_GUARD, GetAttackerTeam());
+    ShowCreatureByNPCType(VAULT_KEEP, GetDefenderTeam());
+    HideCreatureByNPCType(VAULT_KEEP, GetAttackerTeam());
     // turrets
     UpdateCreatureTurretByNPCType(FORTRESS_GATE_TURRET, GetDefenderTeam());
     UpdateCreatureTurretByNPCType(VAULT_GATE_TURRET, GetDefenderTeam());

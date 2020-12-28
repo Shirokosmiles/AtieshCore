@@ -61,9 +61,7 @@ enum NPCtype
     NW_TOWER_GUARD,
     SE_TOWER_GUARD,
     SW_TOWER_GUARD,
-    VAULT_GATE_GUARD,
-
-    VAULT_GATE_OTHER_NPC,
+    VAULT_KEEP,
 
     FORTRESS_GATE_TURRET,
     VAULT_GATE_TURRET,
@@ -78,17 +76,19 @@ enum NPCtype
     WG_WORKSHOP_NE,
     WG_WORKSHOP_NW,
     WG_WORKSHOP_KEEP_WEST,
-    WG_WORKSHOP_KEEP_EAST
+    WG_WORKSHOP_KEEP_EAST,
+
+    WG_ALLIANCE_GRAVEYARD,
+    WG_HORDE_GRAVEYARD
 };
 
 struct CreatureHolder
 {
-    ObjectGuid m_GUID;
     uint8 m_npcType;
     TeamId m_team;
     bool m_isActive;
 };
-typedef std::unordered_map<uint32, CreatureHolder> CreatureHolderContainer;
+typedef std::unordered_map<ObjectGuid::LowType, CreatureHolder> CreatureHolderContainer;
 
 enum WintergraspSpells
 {
@@ -403,11 +403,11 @@ class BattlefieldWG : public Battlefield
         bool FindAndRemoveVehicleFromList(Unit* vehicle);
 
         // returns the graveyardId in the specified area.
-        uint8 GetSpiritGraveyardId(uint32 areaId) const;
+        WGGraveyardId GetSpiritGraveyardId(uint32 areaId) const;
 
         uint32 GetData(uint32 data) const override;
 
-        bool IsCreatureInHolder(ObjectGuid guid);
+        bool IsCreatureInHolder(ObjectGuid::LowType guid);
         bool AddCreatureInHolderByGUID(Creature* creature, uint8 npcType, TeamId team = TEAM_NEUTRAL);
         void UpdateStatusForCreature(Creature* creature, uint8 npcType);
         void ShowCreatureByNPCType(uint8 npcType, TeamId team);

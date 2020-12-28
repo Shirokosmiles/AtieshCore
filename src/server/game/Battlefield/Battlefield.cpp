@@ -995,11 +995,11 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, Position const& pos, Quat
     return go;
 }
 
-Creature* Battlefield::GetCreature(ObjectGuid guid)
+Creature* Battlefield::GetCreature(ObjectGuid::LowType spawnid)
 {
     if (!m_Map)
         return nullptr;
-    return m_Map->GetCreature(guid);
+    return m_Map->GetCreatureBySpawnId(spawnid);
 }
 
 GameObject* Battlefield::GetGameObject(ObjectGuid guid)

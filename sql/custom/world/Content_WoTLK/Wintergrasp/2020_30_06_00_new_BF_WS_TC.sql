@@ -1313,3 +1313,27 @@ DELETE FROM `gameobject_addon` WHERE `guid` =75194;
 
 UPDATE `creature_template` SET `ScriptName`='' WHERE (`entry`='30400');
 UPDATE `creature_template` SET `ScriptName`='' WHERE (`entry`='30499');
+
+-- workshop NE
+-- 31842 alliance 88318
+-- 31841 horde 88312
+
+-- workshop NW
+-- alliance 88319
+-- horde 88313
+
+-- workshop SE
+-- alliance 88316
+-- horde 88310
+
+-- workshop SW
+-- alliance 88317
+-- horde 88311
+
+-- factional graveyard
+-- alliance 88321
+-- horde 88315
+
+-- keep graveyard
+-- alliance 88320
+-- horde 88314
