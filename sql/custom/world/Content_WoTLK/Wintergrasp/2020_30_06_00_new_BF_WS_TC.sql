@@ -649,9 +649,9 @@ INSERT INTO `creature`(`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `ph
 
 --  SE workshop start =============================================================================
 --  SE workshop (horde)
-(@CGUID+282, 30499, 571, 0, 0, 1, 1, 0, 1, 4357.67, 2357.99, 382.007, 1.67552, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_se_workshop_mechanic', 0),
+(@CGUID+282, 30499, 571, 0, 0, 1, 1, 0, 0, 4357.67, 2357.99, 382.007, 1.67552, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_se_workshop_mechanic', 0),
 --  SE workshop (alliance)
-(@CGUID+283, 30400, 571, 0, 0, 1, 1, 0, 1, 4357.67, 2357.99, 382.007, 1.67552, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_se_workshop_mechanic', 0),
+(@CGUID+283, 30400, 571, 0, 0, 1, 1, 0, 0, 4357.67, 2357.99, 382.007, 1.67552, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_se_workshop_mechanic', 0),
 
 --  SE workshop horde guard
 (@CGUID+284, 30739, 571, 0, 0, 1, 1, 0, 1, 4397.63, 2323.44, 376.212, 0.348455, 300, 0, 0, 11001, 0, 0, 0, 0, 0, 'wg_se_workshop_standing_guard', 0),
@@ -681,8 +681,8 @@ INSERT INTO `creature`(`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `ph
 
 --  NE workshop start =============================================================================
 --  NE workshop
-(@CGUID+304, 30499, 571, 0, 0, 1, 1, 0, 1, 4939.76, 2389.06, 326.153, 3.26377, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_ne_workshop_mechanic', 0),
-(@CGUID+305, 30400, 571, 0, 0, 1, 1, 0, 1, 4939.76, 2389.06, 326.153, 3.26377, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_ne_workshop_mechanic', 0),
+(@CGUID+304, 30499, 571, 0, 0, 1, 1, 0, 0, 4939.76, 2389.06, 326.153, 3.26377, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_ne_workshop_mechanic', 0),
+(@CGUID+305, 30400, 571, 0, 0, 1, 1, 0, 0, 4939.76, 2389.06, 326.153, 3.26377, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_ne_workshop_mechanic', 0),
 
 --  NE workshop horde guard
 (@CGUID+306, 30739, 571, 0, 0, 1, 1, 0, 1, 5016.53, 2524.13, 341.319, 1.06554, 300, 0, 0, 11001, 0, 0, 0, 0, 0, 'wg_ne_workshop_standing_guard', 0),
@@ -724,8 +724,8 @@ INSERT INTO `creature`(`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `ph
 
 --  SW workshop start =============================================================================
 --  SW workshop
-(@CGUID+338, 30499, 571, 0, 0, 1, 1, 0, 1, 4354.15, 3312.82, 378.046, 1.67552, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_sw_workshop_mechanic', 0),
-(@CGUID+339, 30400, 571, 0, 0, 1, 1, 0, 1, 4354.15, 3312.82, 378.046, 1.67552, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_sw_workshop_mechanic', 0),
+(@CGUID+338, 30499, 571, 0, 0, 1, 1, 0, 0, 4354.15, 3312.82, 378.046, 1.67552, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_sw_workshop_mechanic', 0),
+(@CGUID+339, 30400, 571, 0, 0, 1, 1, 0, 0, 4354.15, 3312.82, 378.046, 1.67552, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_sw_workshop_mechanic', 0),
 
 --  SW workshop alliance guard
 (@CGUID+340, 30740, 571, 0, 0, 1, 1, 0, 1, 4392.6, 3375.58, 364.757, 1.43785, 300, 0, 0, 11001, 0, 0, 0, 0, 0, 'wg_sw_workshop_standing_guard', 0),
@@ -763,8 +763,8 @@ INSERT INTO `creature`(`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `ph
 
 --  NW workshop start =============================================================================
 --  NW workshop
-(@CGUID+368, 30499, 571, 0, 0, 1, 1, 0, 1, 4964.89, 3383.06, 382.911, 6.12611, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_nw_workshop_mechanic', 0),
-(@CGUID+369, 30400, 571, 0, 0, 1, 1, 0, 1, 4964.89, 3383.06, 382.911, 6.12611, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_nw_workshop_mechanic', 0),
+(@CGUID+368, 30499, 571, 0, 0, 1, 1, 0, 0, 4964.89, 3383.06, 382.911, 6.12611, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_nw_workshop_mechanic', 0),
+(@CGUID+369, 30400, 571, 0, 0, 1, 1, 0, 0, 4964.89, 3383.06, 382.911, 6.12611, 180, 0, 0, 1, 0, 0, 0, 0, 0, 'wg_nw_workshop_mechanic', 0),
 
 --  NW workshop alliance guard
 (@CGUID+370, 30740, 571, 0, 0, 1, 1, 0, 1, 5019.27, 3287.78, 370.23, 5.4614, 300, 0, 0, 11001, 0, 0, 0, 0, 0, 'wg_nw_workshop_standing_guard', 0),
@@ -1149,3 +1149,164 @@ INSERT INTO `creature`(`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `ph
 UPDATE `creature` SET `ScriptName` = '' WHERE `ScriptName` = 'npc_wg_give_promotion_credit';
 UPDATE `spell_area` SET `autocast` = 0 WHERE `spell` = 56618;
 UPDATE `spell_area` SET `autocast` = 0 WHERE `spell` = 56617;
+
+DELETE FROM `gameobject_addon` WHERE `guid` =17789;
+DELETE FROM `gameobject_addon` WHERE `guid` =74739;
+DELETE FROM `gameobject_addon` WHERE `guid` =17787;
+DELETE FROM `gameobject_addon` WHERE `guid` =17786;
+DELETE FROM `gameobject_addon` WHERE `guid` =74737;
+DELETE FROM `gameobject_addon` WHERE `guid` =74735;
+DELETE FROM `gameobject_addon` WHERE `guid` =74733;
+DELETE FROM `gameobject_addon` WHERE `guid` =74731;
+DELETE FROM `gameobject_addon` WHERE `guid` =74729;
+DELETE FROM `gameobject_addon` WHERE `guid` =75982;
+DELETE FROM `gameobject_addon` WHERE `guid` =75981;
+DELETE FROM `gameobject_addon` WHERE `guid` =71414;
+DELETE FROM `gameobject_addon` WHERE `guid` =75980;
+DELETE FROM `gameobject_addon` WHERE `guid` =75979;
+DELETE FROM `gameobject_addon` WHERE `guid` =71413;
+DELETE FROM `gameobject_addon` WHERE `guid` =71412;
+DELETE FROM `gameobject_addon` WHERE `guid` =75978;
+DELETE FROM `gameobject_addon` WHERE `guid` =75977;
+DELETE FROM `gameobject_addon` WHERE `guid` =75974;
+DELETE FROM `gameobject_addon` WHERE `guid` =75973;
+DELETE FROM `gameobject_addon` WHERE `guid` =75972;
+DELETE FROM `gameobject_addon` WHERE `guid` =75971;
+DELETE FROM `gameobject_addon` WHERE `guid` =75970;
+DELETE FROM `gameobject_addon` WHERE `guid` =75969;
+DELETE FROM `gameobject_addon` WHERE `guid` =75968;
+DELETE FROM `gameobject_addon` WHERE `guid` =71411;
+DELETE FROM `gameobject_addon` WHERE `guid` =75967;
+DELETE FROM `gameobject_addon` WHERE `guid` =71410;
+DELETE FROM `gameobject_addon` WHERE `guid` =75966;
+DELETE FROM `gameobject_addon` WHERE `guid` =75965;
+DELETE FROM `gameobject_addon` WHERE `guid` =71409;
+DELETE FROM `gameobject_addon` WHERE `guid` =71408;
+DELETE FROM `gameobject_addon` WHERE `guid` =75964;
+DELETE FROM `gameobject_addon` WHERE `guid` =71407;
+DELETE FROM `gameobject_addon` WHERE `guid` =75963;
+DELETE FROM `gameobject_addon` WHERE `guid` =71406;
+DELETE FROM `gameobject_addon` WHERE `guid` =75962;
+DELETE FROM `gameobject_addon` WHERE `guid` =75961;
+DELETE FROM `gameobject_addon` WHERE `guid` =71403;
+DELETE FROM `gameobject_addon` WHERE `guid` =75960;
+DELETE FROM `gameobject_addon` WHERE `guid` =75959;
+DELETE FROM `gameobject_addon` WHERE `guid` =75958;
+DELETE FROM `gameobject_addon` WHERE `guid` =75957;
+DELETE FROM `gameobject_addon` WHERE `guid` =75956;
+DELETE FROM `gameobject_addon` WHERE `guid` =75955;
+DELETE FROM `gameobject_addon` WHERE `guid` =75954;
+DELETE FROM `gameobject_addon` WHERE `guid` =75953;
+DELETE FROM `gameobject_addon` WHERE `guid` =75952;
+DELETE FROM `gameobject_addon` WHERE `guid` =75951;
+DELETE FROM `gameobject_addon` WHERE `guid` =75950;
+DELETE FROM `gameobject_addon` WHERE `guid` =75949;
+DELETE FROM `gameobject_addon` WHERE `guid` =75948;
+DELETE FROM `gameobject_addon` WHERE `guid` =75947;
+DELETE FROM `gameobject_addon` WHERE `guid` =75946;
+DELETE FROM `gameobject_addon` WHERE `guid` =75945;
+DELETE FROM `gameobject_addon` WHERE `guid` =75944;
+DELETE FROM `gameobject_addon` WHERE `guid` =75943;
+DELETE FROM `gameobject_addon` WHERE `guid` =75942;
+DELETE FROM `gameobject_addon` WHERE `guid` =75941;
+DELETE FROM `gameobject_addon` WHERE `guid` =75940;
+DELETE FROM `gameobject_addon` WHERE `guid` =75939;
+DELETE FROM `gameobject_addon` WHERE `guid` =74727;
+DELETE FROM `gameobject_addon` WHERE `guid` =74725;
+DELETE FROM `gameobject_addon` WHERE `guid` =74723;
+DELETE FROM `gameobject_addon` WHERE `guid` =74721;
+DELETE FROM `gameobject_addon` WHERE `guid` =74719;
+DELETE FROM `gameobject_addon` WHERE `guid` =74717;
+DELETE FROM `gameobject_addon` WHERE `guid` =74715;
+DELETE FROM `gameobject_addon` WHERE `guid` =74713;
+DELETE FROM `gameobject_addon` WHERE `guid` =74711;
+DELETE FROM `gameobject_addon` WHERE `guid` =76014;
+DELETE FROM `gameobject_addon` WHERE `guid` =74709;
+DELETE FROM `gameobject_addon` WHERE `guid` =74707;
+DELETE FROM `gameobject_addon` WHERE `guid` =74705;
+DELETE FROM `gameobject_addon` WHERE `guid` =74703;
+DELETE FROM `gameobject_addon` WHERE `guid` =74701;
+DELETE FROM `gameobject_addon` WHERE `guid` =74700;
+DELETE FROM `gameobject_addon` WHERE `guid` =74699;
+DELETE FROM `gameobject_addon` WHERE `guid` =74697;
+DELETE FROM `gameobject_addon` WHERE `guid` =74695;
+DELETE FROM `gameobject_addon` WHERE `guid` =74693;
+DELETE FROM `gameobject_addon` WHERE `guid` =74691;
+DELETE FROM `gameobject_addon` WHERE `guid` =74689;
+DELETE FROM `gameobject_addon` WHERE `guid` =74687;
+DELETE FROM `gameobject_addon` WHERE `guid` =74685;
+DELETE FROM `gameobject_addon` WHERE `guid` =76053;
+DELETE FROM `gameobject_addon` WHERE `guid` =76054;
+DELETE FROM `gameobject_addon` WHERE `guid` =17790;
+DELETE FROM `gameobject_addon` WHERE `guid` =17791;
+DELETE FROM `gameobject_addon` WHERE `guid` =71385;
+DELETE FROM `gameobject_addon` WHERE `guid` =71386;
+DELETE FROM `gameobject_addon` WHERE `guid` =71387;
+DELETE FROM `gameobject_addon` WHERE `guid` =71388;
+DELETE FROM `gameobject_addon` WHERE `guid` =71415;
+DELETE FROM `gameobject_addon` WHERE `guid` =71416;
+DELETE FROM `gameobject_addon` WHERE `guid` =71417;
+DELETE FROM `gameobject_addon` WHERE `guid` =71418;
+DELETE FROM `gameobject_addon` WHERE `guid` =71419;
+DELETE FROM `gameobject_addon` WHERE `guid` =71420;
+DELETE FROM `gameobject_addon` WHERE `guid` =71421;
+DELETE FROM `gameobject_addon` WHERE `guid` =71422;
+DELETE FROM `gameobject_addon` WHERE `guid` =71423;
+DELETE FROM `gameobject_addon` WHERE `guid` =71424;
+DELETE FROM `gameobject_addon` WHERE `guid` =71425;
+DELETE FROM `gameobject_addon` WHERE `guid` =71434;
+DELETE FROM `gameobject_addon` WHERE `guid` =71435;
+DELETE FROM `gameobject_addon` WHERE `guid` =71436;
+DELETE FROM `gameobject_addon` WHERE `guid` =71437;
+DELETE FROM `gameobject_addon` WHERE `guid` =71438;
+DELETE FROM `gameobject_addon` WHERE `guid` =71439;
+DELETE FROM `gameobject_addon` WHERE `guid` =71440;
+DELETE FROM `gameobject_addon` WHERE `guid` =71441;
+DELETE FROM `gameobject_addon` WHERE `guid` =71442;
+DELETE FROM `gameobject_addon` WHERE `guid` =71443;
+DELETE FROM `gameobject_addon` WHERE `guid` =71444;
+DELETE FROM `gameobject_addon` WHERE `guid` =74741;
+DELETE FROM `gameobject_addon` WHERE `guid` =74743;
+DELETE FROM `gameobject_addon` WHERE `guid` =74745;
+DELETE FROM `gameobject_addon` WHERE `guid` =74747;
+DELETE FROM `gameobject_addon` WHERE `guid` =74749;
+DELETE FROM `gameobject_addon` WHERE `guid` =74751;
+DELETE FROM `gameobject_addon` WHERE `guid` =74753;
+DELETE FROM `gameobject_addon` WHERE `guid` =74755;
+DELETE FROM `gameobject_addon` WHERE `guid` =74757;
+DELETE FROM `gameobject_addon` WHERE `guid` =74759;
+DELETE FROM `gameobject_addon` WHERE `guid` =74761;
+DELETE FROM `gameobject_addon` WHERE `guid` =74763;
+DELETE FROM `gameobject_addon` WHERE `guid` =74765;
+DELETE FROM `gameobject_addon` WHERE `guid` =74767;
+DELETE FROM `gameobject_addon` WHERE `guid` =74769;
+DELETE FROM `gameobject_addon` WHERE `guid` =74771;
+DELETE FROM `gameobject_addon` WHERE `guid` =75166;
+DELETE FROM `gameobject_addon` WHERE `guid` =75167;
+DELETE FROM `gameobject_addon` WHERE `guid` =75168;
+DELETE FROM `gameobject_addon` WHERE `guid` =75169;
+DELETE FROM `gameobject_addon` WHERE `guid` =75170;
+DELETE FROM `gameobject_addon` WHERE `guid` =75171;
+DELETE FROM `gameobject_addon` WHERE `guid` =75172;
+DELETE FROM `gameobject_addon` WHERE `guid` =75173;
+DELETE FROM `gameobject_addon` WHERE `guid` =75174;
+DELETE FROM `gameobject_addon` WHERE `guid` =75175;
+DELETE FROM `gameobject_addon` WHERE `guid` =75176;
+DELETE FROM `gameobject_addon` WHERE `guid` =75177;
+DELETE FROM `gameobject_addon` WHERE `guid` =75178;
+DELETE FROM `gameobject_addon` WHERE `guid` =75179;
+DELETE FROM `gameobject_addon` WHERE `guid` =75180;
+DELETE FROM `gameobject_addon` WHERE `guid` =75181;
+DELETE FROM `gameobject_addon` WHERE `guid` =75182;
+DELETE FROM `gameobject_addon` WHERE `guid` =75183;
+DELETE FROM `gameobject_addon` WHERE `guid` =75184;
+DELETE FROM `gameobject_addon` WHERE `guid` =75185;
+DELETE FROM `gameobject_addon` WHERE `guid` =75186;
+DELETE FROM `gameobject_addon` WHERE `guid` =75187;
+DELETE FROM `gameobject_addon` WHERE `guid` =75188;
+DELETE FROM `gameobject_addon` WHERE `guid` =75189;
+DELETE FROM `gameobject_addon` WHERE `guid` =75190;
+DELETE FROM `gameobject_addon` WHERE `guid` =75191;
+DELETE FROM `gameobject_addon` WHERE `guid` =75192;
+DELETE FROM `gameobject_addon` WHERE `guid` =75193;
+DELETE FROM `gameobject_addon` WHERE `guid` =75194;
