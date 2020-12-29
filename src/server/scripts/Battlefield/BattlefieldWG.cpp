@@ -24,6 +24,7 @@
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CreatureTextMgr.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameTime.h"
 #include "Log.h"
@@ -51,14 +52,14 @@ struct BfWGCoordGY
 
 // 7 in sql, 7 in header
 BfWGCoordGY const WGGraveyard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
-{
-    { { 5104.750f, 2300.940f, 368.579f, 0.733038f }, 1329, BATTLEFIELD_WG_GOSSIPTEXT_GY_NE,       TEAM_NEUTRAL  },
-    { { 5099.120f, 3466.036f, 368.484f, 5.317802f }, 1330, BATTLEFIELD_WG_GOSSIPTEXT_GY_NW,       TEAM_NEUTRAL  },
-    { { 4314.648f, 2408.522f, 392.642f, 6.268125f }, 1333, BATTLEFIELD_WG_GOSSIPTEXT_GY_SE,       TEAM_NEUTRAL  },
-    { { 4331.716f, 3235.695f, 390.251f, 0.008500f }, 1334, BATTLEFIELD_WG_GOSSIPTEXT_GY_SW,       TEAM_NEUTRAL  },
-    { { 5537.986f, 2897.493f, 517.057f, 4.819249f }, 1285, BATTLEFIELD_WG_GOSSIPTEXT_GY_KEEP,     TEAM_NEUTRAL  },
-    { { 5032.454f, 3711.382f, 372.468f, 3.971623f }, 1331, BATTLEFIELD_WG_GOSSIPTEXT_GY_HORDE,    TEAM_HORDE    },
-    { { 5140.790f, 2179.120f, 390.950f, 1.972220f }, 1332, BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE, TEAM_ALLIANCE },
+{    
+    { { 4317.97f, 2407.43f, 392.619f, 6.268125f }, 1333, BATTLEFIELD_WG_GOSSIPTEXT_GY_SE,       TEAM_NEUTRAL  },
+    { { 4335.81f, 3234.56f, 390.251f, 0.008500f }, 1334, BATTLEFIELD_WG_GOSSIPTEXT_GY_SW,       TEAM_NEUTRAL  },
+    { { 5104.35f, 2302.23f, 368.485f, 0.733038f }, 1329, BATTLEFIELD_WG_GOSSIPTEXT_GY_NE,       TEAM_NEUTRAL  },
+    { { 5101.04f, 3461.45f, 368.485f, 5.317802f }, 1330, BATTLEFIELD_WG_GOSSIPTEXT_GY_NW,       TEAM_NEUTRAL  },
+    { { 5537.46f, 2904.91f, 517.664f, 4.819249f }, 1285, BATTLEFIELD_WG_GOSSIPTEXT_GY_KEEP,     TEAM_NEUTRAL  },
+    { { 5031.5f, 3710.43f, 372.364f, 3.971623f }, 1331, BATTLEFIELD_WG_GOSSIPTEXT_GY_HORDE,    TEAM_HORDE    },
+    { { 5140.35f, 2182.01f, 390.751f, 1.972220f }, 1332, BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE, TEAM_ALLIANCE },
 };
 
 uint32 const ClockWorldState[]         = { 3781, 4354 };
@@ -67,74 +68,8 @@ uint32 const WintergraspFaction[]      = { FACTION_ALLIANCE_GENERIC_WG, FACTION_
 uint32 const NPCGuardFaction[] = { 1891, 1979 };
 //TEAM_ALLIANCE/TEAM_HORDE
 uint32 const NPCMechanicFaction[] = { 1732, 1735 };
-/*
-    WEST_TOWER_GUARD,
-    MIDDLE_TOWER_GUARD,
-    EAST_TOWER_GUARD,
-
-    WEST_BRIDGE_GUARD,
-    MIDDLE_BRIDGE_GUARD,
-    EAST_BRIDGE_GUARD,
-
-    WEST_TOWER_TURRET,
-    MIDDLE_TOWER_TURRET,
-    EAST_TOWER_TURRET,
-
-    // Defender sector
-    NE_TOWER_GUARD,
-    NW_TOWER_GUARD,
-    SE_TOWER_GUARD,
-    SW_TOWER_GUARD,
-    FORTRESS_GATE_GUARD,
-
-    FORTRESS_GATE_TURRET,
-    VAULT_GATE_TURRET,
-    NE_TOWER_TURRET,
-    NW_TOWER_TURRET,
-    SE_TOWER_TURRET,
-    SW_TOWER_TURRET,
-
-    //workshop sector
-    WG_WORKSHOP_SE_GUARD,
-    WG_WORKSHOP_SW_GUARD,
-    WG_WORKSHOP_NE_GUARD,
-    WG_WORKSHOP_NW_GUARD,
-    WG_WORKSHOP_KEEP_WEST_GUARD,
-    WG_WORKSHOP_KEEP_EAST_GUARD
-*/
-uint32 const NPCGroup[] = {
-GO_WINTERGRASP_SHADOWSIGHT_TOWER,
-GO_WINTERGRASP_WINTER_S_EDGE_TOWER,
-GO_WINTERGRASP_FLAMEWATCH_TOWER,
-
-GO_WINTERGRASP_FORTRESS_GATE,
-GO_WINTERGRASP_FORTRESS_GATE,
-GO_WINTERGRASP_FORTRESS_GATE,
-
-GO_WINTERGRASP_SHADOWSIGHT_TOWER,
-GO_WINTERGRASP_WINTER_S_EDGE_TOWER,
-GO_WINTERGRASP_FLAMEWATCH_TOWER,
-
-GO_WINTERGRASP_FORTRESS_TOWER_NE,
-GO_WINTERGRASP_FORTRESS_TOWER_NW,
-GO_WINTERGRASP_FORTRESS_TOWER_SE,
-GO_WINTERGRASP_FORTRESS_TOWER_SW,
-GO_WINTERGRASP_FORTRESS_GATE,
-GO_WINTERGRASP_VAULT_GATE,
-
-GO_WINTERGRASP_FORTRESS_GATE,
-GO_WINTERGRASP_VAULT_GATE,
-GO_WINTERGRASP_FORTRESS_TOWER_NE,
-GO_WINTERGRASP_FORTRESS_TOWER_NW,
-GO_WINTERGRASP_FORTRESS_TOWER_SE,
-GO_WINTERGRASP_FORTRESS_TOWER_SW,
-0,
-0,
-0,
-0,
-0,
-0
-};
+//TEAM_ALLIANCE/TEAM_HORDE
+uint32 const NPCSpiritGuardFaction[] = { 84, 83 };
 
 Position const WintergraspStalkerPos   = { 4948.985f, 2937.789f, 550.5172f,  1.815142f };
 
@@ -594,6 +529,14 @@ BattlefieldWG::~BattlefieldWG()
     m_KeepAllianceGameObjectList.clear();
     m_KeepHordeNPCList.clear();
     m_KeepAllianceNPCList.clear();
+
+    delete Grave_NW;
+    delete Grave_NE;
+    delete Grave_SW;
+    delete Grave_SE;
+    delete Grave_Keep;
+    delete Grave_Horde;
+    delete Grave_Alliance;
 }
 
 bool BattlefieldWG::SetupBattlefield()
@@ -634,7 +577,13 @@ bool BattlefieldWG::SetupBattlefield()
     m_saveTimer = 60000;
 
     // Init Graveyards
-    SetGraveyardNumber(BATTLEFIELD_WG_GRAVEYARD_MAX);
+    Grave_NW       = sDBCStoresMgr->GetWorldSafeLocsDBC(1330);
+    Grave_NE       = sDBCStoresMgr->GetWorldSafeLocsDBC(1329);
+    Grave_SW       = sDBCStoresMgr->GetWorldSafeLocsDBC(1334);
+    Grave_SE       = sDBCStoresMgr->GetWorldSafeLocsDBC(1333);
+    Grave_Keep     = sDBCStoresMgr->GetWorldSafeLocsDBC(1285);
+    Grave_Horde    = sDBCStoresMgr->GetWorldSafeLocsDBC(1331);
+    Grave_Alliance = sDBCStoresMgr->GetWorldSafeLocsDBC(1332);
 
     // Load from db
     if ((sWorld->getWorldState(WS_BATTLEFIELD_WG_ACTIVE) == 0) && (sWorld->getWorldState(WS_BATTLEFIELD_WG_DEFENDER) == 0)
@@ -670,8 +619,8 @@ bool BattlefieldWG::SetupBattlefield()
         else
             graveyard->Initialize(WGGraveyard[i].StartControl, WGGraveyard[i].GraveyardID);
 
+        m_graveyardMap[WGGraveyard[i].GraveyardID] = graveyard;
         graveyard->SetTextId(WGGraveyard[i].TextID);
-        m_GraveyardList[i] = graveyard;
     }
 
     Workshops.resize(WG_MAX_WORKSHOP);
@@ -776,6 +725,10 @@ void BattlefieldWG::OnBattleStart()
     // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->UpdateGraveyardAndWorkshop();
+
+    uint32 gyID = _GetGraveyardIDByType(BATTLEFIELD_WG_GY_KEEP);
+    if (BfGraveyard* gy = GetGraveyardById(gyID))
+        gy->GiveControlTo(GetDefenderTeam());
 
     for (PlayerHolderContainer::iterator itr = m_PlayerMap.begin(); itr != m_PlayerMap.end(); ++itr)
         if (Player* player = ObjectAccessor::FindPlayerByLowGUID(itr->first))
@@ -952,30 +905,69 @@ void BattlefieldWG::OnStartGrouping()
     SendWarning(BATTLEFIELD_WG_TEXT_START_GROUPING);
 }
 
-WGGraveyardId BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
+WGGraveyardId BattlefieldWG::GetSpiritGraveyardIdForCreature(Creature* creature) const
+{
+    if (creature->IsInDist2d(Grave_NW->Loc.X, Grave_NW->Loc.Y, 20.f))
+        return BATTLEFIELD_WG_GY_WORKSHOP_NW;
+
+    if (creature->IsInDist2d(Grave_NE->Loc.X, Grave_NE->Loc.Y, 20.f))
+        return BATTLEFIELD_WG_GY_WORKSHOP_NE;
+
+    if (creature->IsInDist2d(Grave_SW->Loc.X, Grave_SW->Loc.Y, 20.f))
+        return BATTLEFIELD_WG_GY_WORKSHOP_SW;
+
+    if (creature->IsInDist2d(Grave_SE->Loc.X, Grave_SE->Loc.Y, 20.f))
+        return BATTLEFIELD_WG_GY_WORKSHOP_SE;
+
+    if (creature->IsInDist2d(Grave_Keep->Loc.X, Grave_Keep->Loc.Y, 20.f))
+        return BATTLEFIELD_WG_GY_KEEP;
+
+    if (creature->IsInDist2d(Grave_Horde->Loc.X, Grave_Horde->Loc.Y, 20.f))
+        return BATTLEFIELD_WG_GY_HORDE;
+
+    if (creature->IsInDist2d(Grave_Alliance->Loc.X, Grave_Alliance->Loc.Y, 20.f))
+        return BATTLEFIELD_WG_GY_ALLIANCE;
+
+    TC_LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardIdForCreature: Unexpected SpiritCreature Id %u", creature->GetSpawnId());
+    return BATTLEFIELD_WG_GY_WORKSHOP_NE;
+}
+
+uint32 BattlefieldWG::GetSpiritGraveyardIdForData(uint32 areaId) const
 {
     switch (areaId)
     {
-        case AREA_WINTERGRASP_FORTRESS:
-            return BATTLEFIELD_WG_GY_KEEP;
         case AREA_THE_SUNKEN_RING:
             return BATTLEFIELD_WG_GY_WORKSHOP_NE;
+            break;
         case AREA_THE_BROKEN_TEMPLATE:
             return BATTLEFIELD_WG_GY_WORKSHOP_NW;
-        case AREA_WESTPARK_WORKSHOP:
-            return BATTLEFIELD_WG_GY_WORKSHOP_SW;
+            break;
         case AREA_EASTPARK_WORKSHOP:
             return BATTLEFIELD_WG_GY_WORKSHOP_SE;
-        case AREA_WINTERGRASP:
-            return BATTLEFIELD_WG_GY_ALLIANCE;
-        case AREA_THE_CHILLED_QUAGMIRE:
-            return BATTLEFIELD_WG_GY_HORDE;
-        default:
-            TC_LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id %u", areaId);
+            break;
+        case AREA_WESTPARK_WORKSHOP:
+            return BATTLEFIELD_WG_GY_WORKSHOP_SW;
             break;
     }
 
+    TC_LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardIdForData: Unexpected Area Id %u", areaId);
     return BATTLEFIELD_WG_GY_WORKSHOP_NE;
+}
+
+uint32 BattlefieldWG::_GetGraveyardIDByType(WGGraveyardId type)
+{
+    uint32 result = 0;
+    switch (type)
+    {
+        case BATTLEFIELD_WG_GY_WORKSHOP_NE: result = 1329; break;
+        case BATTLEFIELD_WG_GY_WORKSHOP_NW: result = 1330; break;
+        case BATTLEFIELD_WG_GY_WORKSHOP_SE: result = 1333; break;
+        case BATTLEFIELD_WG_GY_WORKSHOP_SW: result = 1334; break;
+        case BATTLEFIELD_WG_GY_KEEP: result = 1331; break;
+        case BATTLEFIELD_WG_GY_HORDE: result = 1331; break;
+        case BATTLEFIELD_WG_GY_ALLIANCE: result = 1332; break;
+    }
+    return result;
 }
 
 void BattlefieldWG::OnCreatureCreate(Creature* creature)
@@ -987,33 +979,36 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
         case NPC_TAUNKA_SPIRIT_GUIDE:
         {
             TeamId teamId = (creature->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE);
-            WGGraveyardId graveyardId = GetSpiritGraveyardId(creature->GetAreaId());
-            if (m_GraveyardList[uint8(graveyardId)])
+            WGGraveyardId graveyardId = GetSpiritGraveyardIdForCreature(creature);
+            for (auto& graveID : m_graveyardMap)
             {
-                m_GraveyardList[uint8(graveyardId)]->SetSpirit(creature, teamId);
-                switch (graveyardId)
+                if (graveID.first == _GetGraveyardIDByType(graveyardId))
                 {
-                    case BATTLEFIELD_WG_GY_WORKSHOP_NE:
-                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, teamId);
-                        break;
-                    case BATTLEFIELD_WG_GY_WORKSHOP_NW:
-                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, teamId);
-                        break;
-                    case BATTLEFIELD_WG_GY_WORKSHOP_SE:
-                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, teamId);
-                        break;
-                    case BATTLEFIELD_WG_GY_WORKSHOP_SW:
-                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, teamId);
-                        break;
-                    case BATTLEFIELD_WG_GY_KEEP:
-                        AddCreatureInHolderByGUID(creature, VAULT_KEEP, teamId);
-                        break;
-                    case BATTLEFIELD_WG_GY_HORDE:
-                        AddCreatureInHolderByGUID(creature, WG_HORDE_GRAVEYARD, teamId);
-                        break;
-                    case BATTLEFIELD_WG_GY_ALLIANCE:
-                        AddCreatureInHolderByGUID(creature, WG_ALLIANCE_GRAVEYARD, teamId);
-                        break;
+                    graveID.second->SetSpirit(creature, teamId);
+                    switch (graveyardId)
+                    {
+                        case BATTLEFIELD_WG_GY_WORKSHOP_NE:
+                            AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, teamId);
+                            break;
+                        case BATTLEFIELD_WG_GY_WORKSHOP_NW:
+                            AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, teamId);
+                            break;
+                        case BATTLEFIELD_WG_GY_WORKSHOP_SE:
+                            AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, teamId);
+                            break;
+                        case BATTLEFIELD_WG_GY_WORKSHOP_SW:
+                            AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, teamId);
+                            break;
+                        case BATTLEFIELD_WG_GY_KEEP:
+                            AddCreatureInHolderByGUID(creature, VAULT_KEEP, teamId);
+                            break;
+                        case BATTLEFIELD_WG_GY_HORDE:
+                            AddCreatureInHolderByGUID(creature, WG_HORDE_GRAVEYARD, teamId);
+                            break;
+                        case BATTLEFIELD_WG_GY_ALLIANCE:
+                            AddCreatureInHolderByGUID(creature, WG_ALLIANCE_GRAVEYARD, teamId);
+                            break;
+                    }
                 }
             }
             break;
@@ -1951,7 +1946,7 @@ uint32 BattlefieldWG::GetData(uint32 data) const
         case AREA_WESTPARK_WORKSHOP:
         case AREA_EASTPARK_WORKSHOP:
             // Graveyards and Workshops are controlled by the same team.
-            if (BfGraveyard const* graveyard = GetGraveyardById(uint32(GetSpiritGraveyardId(data))))
+            if (BfGraveyard const* graveyard = GetGraveyardById(GetSpiritGraveyardIdForData(data)))
                 return graveyard->GetControlTeamId();
             break;
         default:
@@ -2202,12 +2197,12 @@ void BattlefieldWG::UpdateTenacity()
         m_tenacityTeam = TEAM_NEUTRAL;
 }
 
-bool BattlefieldWG::IsCreatureInHolder(ObjectGuid::LowType spawnID)
+bool BattlefieldWG::IsCreatureInHolder(ObjectGuid guid)
 {
-    CreatureHolderContainer::const_iterator itr = m_CreatureMap.find(spawnID);
+    CreatureHolderContainer::const_iterator itr = m_CreatureMap.find(guid);
     if (itr != m_CreatureMap.end())
     {
-        if (Creature* creature = GetCreature(spawnID))
+        if (Creature* creature = GetCreature(guid))
         {
             if (itr->second.m_isActive)
                 ShowNpc(creature, true);
@@ -2230,125 +2225,160 @@ bool BattlefieldWG::AddCreatureInHolderByGUID(Creature* creature, uint8 npcType,
     ch.m_npcType = npcType;
     ch.m_team = team;
     ch.m_isActive = creature->IsVisible();
-    m_CreatureMap[creature->GetGUID().GetCounter()] = ch;
+    m_CreatureMap[creature->GetGUID()] = ch;
     return true;
+}
+
+void BattlefieldWG::_UpdateCreatureForBuildGO(WintergraspGameObject go, Creature* creature)
+{
+    for (BfWGGameObjectBuilding* building : BuildingsInZone)
+    {
+        if (building->GetID() == go)
+        {
+            if (!building->IsAlive())
+                HideNpc(creature);
+            else
+            {
+                creature->SetFaction(WintergraspFaction[building->GetTeamController()]);
+                ShowNpc(creature, true);
+            }
+        }
+    }
+}
+
+void BattlefieldWG::_UpdateCreatureForWorkshop(WintergraspWorkshopIds go, Creature* creature)
+{
+    for (WintergraspWorkshop* workshop : Workshops)
+    {
+        if (workshop->GetId() == go)
+        {
+            switch (creature->GetEntry())
+            {
+                case NPC_WORKSHOP_MECHANIC_HORDE:
+                case NPC_WORKSHOP_MECHANIC_ALLIANCE:
+                {
+                    if (creature->GetFaction() == NPCMechanicFaction[workshop->GetTeamControl()])
+                        ShowNpc(creature, true);
+                    else
+                        HideNpc(creature);
+                    break;
+                }
+                case BATTLEFIELD_WG_NPC_GUARD_H:
+                case BATTLEFIELD_WG_NPC_GUARD_A:
+                {
+                    if (creature->GetFaction() == NPCGuardFaction[workshop->GetTeamControl()])
+                        ShowNpc(creature, true);
+                    else
+                        HideNpc(creature);
+                    break;
+                }
+                case NPC_TAUNKA_SPIRIT_GUIDE:
+                case NPC_DWARVEN_SPIRIT_GUIDE:
+                {
+                    if (creature->GetFaction() == NPCSpiritGuardFaction[workshop->GetTeamControl()])
+                        ShowNpc(creature, true);
+                    else
+                        HideNpc(creature);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void BattlefieldWG::UpdateStatusForCreature(Creature* creature, uint8 npcType)
 {
     switch (npcType)
     {
-        // Turret sector
+        // Attacker sector
+        case WEST_TOWER_GUARD:
         case WEST_TOWER_TURRET:
-        case MIDDLE_TOWER_TURRET:
-        case EAST_TOWER_TURRET:
-        case FORTRESS_GATE_TURRET:
-        case VAULT_GATE_TURRET:
-        case NE_TOWER_TURRET:
-        case NW_TOWER_TURRET:
-        case SE_TOWER_TURRET:
-        case SW_TOWER_TURRET:
+        case WEST_BRIDGE_GUARD:
         {
-            for (BfWGGameObjectBuilding* building : BuildingsInZone)
-            {
-                if (building->GetID() == NPCGroup[npcType])
-                {
-                    if (!building->IsAlive())
-                        HideNpc(creature);
-                    else
-                    {
-                        creature->SetFaction(WintergraspFaction[building->GetTeamController()]);
-                        ShowNpc(creature, true);
-                    }
-                }
-            }
+            _UpdateCreatureForBuildGO(GO_WINTERGRASP_SHADOWSIGHT_TOWER, creature);
+            break;
+        }    
+        case MIDDLE_TOWER_GUARD:
+        case MIDDLE_TOWER_TURRET:
+        case MIDDLE_BRIDGE_GUARD:
+        {
+            _UpdateCreatureForBuildGO(GO_WINTERGRASP_WINTER_S_EDGE_TOWER, creature);
             break;
         }
-
-        // Bridge sector
-        case WEST_BRIDGE_GUARD:
-        case MIDDLE_BRIDGE_GUARD:
+        case EAST_TOWER_GUARD:
+        case EAST_TOWER_TURRET:
         case EAST_BRIDGE_GUARD:
         {
-            if (creature->GetFaction() == NPCGuardFaction[GetAttackerTeam()])
-                ShowNpc(creature, true);
-            else
-                HideNpc(creature);
+            _UpdateCreatureForBuildGO(GO_WINTERGRASP_FLAMEWATCH_TOWER, creature);
             break;
         }
-
-        // Guard sector
-        case WEST_TOWER_GUARD:
-        case MIDDLE_TOWER_GUARD:
-        case EAST_TOWER_GUARD:
+        // Defender sector
         case NE_TOWER_GUARD:
+        case NE_TOWER_TURRET:
+        {
+            _UpdateCreatureForBuildGO(GO_WINTERGRASP_FORTRESS_TOWER_NE, creature);
+            break;
+        }
         case NW_TOWER_GUARD:
+        case NW_TOWER_TURRET:
+        {
+            _UpdateCreatureForBuildGO(GO_WINTERGRASP_FORTRESS_TOWER_NW, creature);
+            break;
+        }
         case SE_TOWER_GUARD:
+        case SE_TOWER_TURRET:
+        {
+            _UpdateCreatureForBuildGO(GO_WINTERGRASP_FORTRESS_TOWER_SE, creature);
+            break;
+        }
         case SW_TOWER_GUARD:
+        case SW_TOWER_TURRET:
+        {
+            _UpdateCreatureForBuildGO(GO_WINTERGRASP_FORTRESS_TOWER_SW, creature);
+            break;
+        }
+        // keep inside
         case VAULT_KEEP:
         {
-            for (BfWGGameObjectBuilding* building : BuildingsInZone)
-            {
-                if (building->GetID() == NPCGroup[npcType])
-                {
-                    if (creature->GetFaction() == NPCGuardFaction[building->GetTeamController()])
-                    {
-                        if (building->IsAlive())
-                            ShowNpc(creature, true);
-                    }
-                    else
-                        HideNpc(creature);
-                }
-            }
+            _UpdateCreatureForBuildGO(GO_WINTERGRASP_VAULT_GATE, creature);
             break;
         }
-
+        // keep gate (outside)
+        case FORTRESS_GATE_TURRET:
+        case VAULT_GATE_TURRET:
+        {
+            _UpdateCreatureForBuildGO(GO_WINTERGRASP_FORTRESS_GATE, creature);
+            break;
+        }
         //workshop sector
         case WG_WORKSHOP_SE:
+        {
+            _UpdateCreatureForWorkshop(BATTLEFIELD_WG_WORKSHOP_SE, creature);
+            break;
+        }
         case WG_WORKSHOP_SW:
+        {
+            _UpdateCreatureForWorkshop(BATTLEFIELD_WG_WORKSHOP_SW, creature);
+            break;
+        }
         case WG_WORKSHOP_NE:
+        {
+            _UpdateCreatureForWorkshop(BATTLEFIELD_WG_WORKSHOP_NE, creature);
+            break;
+        }
         case WG_WORKSHOP_NW:
+        {
+            _UpdateCreatureForWorkshop(BATTLEFIELD_WG_WORKSHOP_NW, creature);
+            break;
+        }
         case WG_WORKSHOP_KEEP_WEST:
+        {
+            _UpdateCreatureForWorkshop(BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, creature);
+            break;
+        }
         case WG_WORKSHOP_KEEP_EAST:
         {
-            uint8 groupbyworkshopid = 0;
-            for (WintergraspWorkshop* workshop : Workshops)
-            {
-                groupbyworkshopid = npcType - 21;
-                if (workshop->GetId() == groupbyworkshopid)
-                {
-                    switch (creature->GetEntry())
-                    {
-                        case NPC_WORKSHOP_MECHANIC_HORDE:
-                        case NPC_WORKSHOP_MECHANIC_ALLIANCE:
-                        {
-                            if (creature->GetFaction() == NPCMechanicFaction[workshop->GetTeamControl()])
-                                ShowNpc(creature, true);
-                            else
-                                HideNpc(creature);
-                            break;
-                        }
-                        case BATTLEFIELD_WG_NPC_GUARD_H:
-                        case BATTLEFIELD_WG_NPC_GUARD_A:
-                        {
-                            if (creature->GetFaction() == NPCGuardFaction[workshop->GetTeamControl()])
-                                ShowNpc(creature, true);
-                            else
-                                HideNpc(creature);
-                            break;
-                        }
-                        case NPC_TAUNKA_SPIRIT_GUIDE:
-                        case NPC_DWARVEN_SPIRIT_GUIDE:
-                        {
-                            if (creature->GetFaction() == NPCGuardFaction[workshop->GetTeamControl()])
-                                ShowNpc(creature, true);
-                            else
-                                HideNpc(creature);
-                            break;
-                        }
-                    }
-                }
-            }
+            _UpdateCreatureForWorkshop(BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, creature);
             break;
         }
         case WG_ALLIANCE_GRAVEYARD:
@@ -2957,13 +2987,6 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
                 else
                     _wg->SendWarning(_staticInfo->TextIds.AllianceAttack); // workshop taken - alliance
             }
-
-            // Found associate graveyard and update it
-            if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-                if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
-                    gy->GiveControlTo(TEAM_NEUTRAL);
-
-            _teamControl = teamId;
             break;
         }
         case TEAM_ALLIANCE:
@@ -2975,13 +2998,6 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
             // Warning message
             if (!init)
                 _wg->SendWarning(_staticInfo->TextIds.AllianceCapture); // workshop taken - alliance
-
-            // Found associate graveyard and update it
-            if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-                if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
-                    gy->GiveControlTo(TEAM_ALLIANCE);
-
-            _teamControl = teamId;
             break;
         }
         case TEAM_HORDE:
@@ -2993,16 +3009,19 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
             // Warning message
             if (!init)
                 _wg->SendWarning(_staticInfo->TextIds.HordeCapture); // workshop taken - horde
-
-            // Update graveyard control
-            if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-                if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
-                    gy->GiveControlTo(TEAM_HORDE);
-
-            _teamControl = teamId;
             break;
         }
     }
+
+    // Found associate graveyard and update it
+    if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+    {
+        uint32 gyID = _wg->_GetGraveyardIDByType(WGGraveyardId(_staticInfo->WorkshopId));
+        if (BfGraveyard* gy = _wg->GetGraveyardById(gyID))
+            gy->GiveControlTo(teamId);
+    }
+
+    _teamControl = teamId;
 
     if (!init)
         _wg->UpdateCounterVehicle(false);
@@ -3144,7 +3163,7 @@ void WintergraspWorkshop::UpdateCreatureAndGo()
 
 void WintergraspWorkshop::UpdateGraveyardAndWorkshop()
 {
-    if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+    if (GetId() < BATTLEFIELD_WG_WORKSHOP_NE)
         GiveControlTo(_wg->GetAttackerTeam(), true);
     else
         GiveControlTo(_wg->GetDefenderTeam(), true);

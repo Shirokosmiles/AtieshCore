@@ -71,10 +71,13 @@ Battlefield::~Battlefield()
 {
     for (CapturePointContainer::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
         delete itr->second.pointer;
-    for (GraveyardVect::const_iterator itr = m_GraveyardList.begin(); itr != m_GraveyardList.end(); ++itr)
-        delete *itr;
+    m_capturePoints.clear();
 
     m_PlayerMap.clear();
+
+    for (GraveyardMap::const_iterator itr = m_graveyardMap.begin(); itr != m_graveyardMap.end(); ++itr)
+        delete itr->second;
+    m_graveyardMap.clear();
 }
 
 // Called when a player enters the zone
@@ -220,9 +223,11 @@ bool Battlefield::Update(uint32 diff)
 
     if (m_LastResurrectTimer <= diff)
     {
-        for (uint8 i = 0; i < m_GraveyardList.size(); i++)
-            if (GetGraveyardById(i))
-                m_GraveyardList[i]->Resurrect();
+        for (auto& graveID : m_graveyardMap)
+        {
+            if (BfGraveyard* grave = graveID.second)
+                grave->Resurrect();
+        }
         m_LastResurrectTimer = RESURRECTION_INTERVAL;
     }
     else
@@ -728,16 +733,9 @@ bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
 //--------------------
 BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
 {
-    if (id < m_GraveyardList.size())
-    {
-        if (BfGraveyard* graveyard = m_GraveyardList.at(id))
-            return graveyard;
-        else
-            TC_LOG_ERROR("bg.battlefield", "Battlefield::GetGraveyardById Id:%u does not exist.", id);
-    }
-    else
-        TC_LOG_ERROR("bg.battlefield", "Battlefield::GetGraveyardById Id:%u could not be found.", id);
-
+    GraveyardMap::const_iterator itr = m_graveyardMap.find(id);
+    if (itr != m_graveyardMap.end())
+        return itr->second;
     return nullptr;
 }
 
@@ -745,17 +743,17 @@ WorldSafeLocsDBC const* Battlefield::GetClosestGraveyard(Player* player)
 {
     BfGraveyard* closestGY = nullptr;
     float maxdist = -1;
-    for (uint8 i = 0; i < m_GraveyardList.size(); i++)
+    for (auto& graveID : m_graveyardMap)
     {
-        if (m_GraveyardList[i])
+        if (BfGraveyard* grave = graveID.second)
         {
-            if (m_GraveyardList[i]->GetControlTeamId() != player->GetTeamId())
+            if (grave->GetControlTeamId() != player->GetTeamId())
                 continue;
 
-            float dist = m_GraveyardList[i]->GetDistance(player);
+            float dist = grave->GetDistance(player);
             if (dist < maxdist || maxdist < 0)
             {
-                closestGY = m_GraveyardList[i];
+                closestGY = grave;
                 maxdist = dist;
             }
         }
@@ -769,30 +767,30 @@ WorldSafeLocsDBC const* Battlefield::GetClosestGraveyard(Player* player)
 
 void Battlefield::AddPlayerToResurrectQueue(ObjectGuid npcGuid, ObjectGuid playerGuid)
 {
-    for (uint8 i = 0; i < m_GraveyardList.size(); i++)
+    for (auto& graveID : m_graveyardMap)
     {
-        if (!m_GraveyardList[i])
-            continue;
-
-        if (m_GraveyardList[i]->HasNpc(npcGuid))
+        if (BfGraveyard* grave = graveID.second)
         {
-            m_GraveyardList[i]->AddPlayer(playerGuid);
-            break;
+            if (grave->HasNpc(npcGuid))
+            {
+                grave->AddPlayer(playerGuid);
+                break;
+            }
         }
     }
 }
 
 void Battlefield::RemovePlayerFromResurrectQueue(ObjectGuid playerGuid)
 {
-    for (uint8 i = 0; i < m_GraveyardList.size(); i++)
+    for (auto& graveID : m_graveyardMap)
     {
-        if (!m_GraveyardList[i])
-            continue;
-
-        if (m_GraveyardList[i]->HasPlayer(playerGuid))
+        if (BfGraveyard* grave = graveID.second)
         {
-            m_GraveyardList[i]->RemovePlayer(playerGuid);
-            break;
+            if (grave->HasPlayer(playerGuid))
+            {
+                grave->RemovePlayer(playerGuid);
+                break;
+            }
         }
     }
 }
@@ -995,11 +993,11 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, Position const& pos, Quat
     return go;
 }
 
-Creature* Battlefield::GetCreature(ObjectGuid::LowType spawnid)
+Creature* Battlefield::GetCreature(ObjectGuid guid)
 {
     if (!m_Map)
         return nullptr;
-    return m_Map->GetCreatureBySpawnId(spawnid);
+    return m_Map->GetCreature(guid);
 }
 
 GameObject* Battlefield::GetGameObject(ObjectGuid guid)

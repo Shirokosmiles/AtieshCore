@@ -88,7 +88,7 @@ struct CreatureHolder
     TeamId m_team;
     bool m_isActive;
 };
-typedef std::unordered_map<ObjectGuid::LowType, CreatureHolder> CreatureHolderContainer;
+typedef std::unordered_map<ObjectGuid, CreatureHolder> CreatureHolderContainer;
 
 enum WintergraspSpells
 {
@@ -181,6 +181,40 @@ enum WintergraspQuests
     QUEST_CREDIT_DEFEND_SIEGE     = 31284
 };
 
+enum WintergraspGameObject
+{
+    GO_WINTERGRASP_FACTORY_BANNER_NE             = 190475,
+    GO_WINTERGRASP_FACTORY_BANNER_NW             = 190487,
+    GO_WINTERGRASP_FACTORY_BANNER_SE             = 194959,
+    GO_WINTERGRASP_FACTORY_BANNER_SW             = 194962,
+
+    GO_WINTERGRASP_TITAN_S_RELIC                 = 192829,
+
+    GO_WINTERGRASP_FORTRESS_TOWER_NW             = 190221,
+    GO_WINTERGRASP_FORTRESS_TOWER_SW             = 190373,
+    GO_WINTERGRASP_FORTRESS_TOWER_SE             = 190377,
+    GO_WINTERGRASP_FORTRESS_TOWER_NE             = 190378,
+
+    GO_WINTERGRASP_SHADOWSIGHT_TOWER             = 190356,
+    GO_WINTERGRASP_WINTER_S_EDGE_TOWER           = 190357,
+    GO_WINTERGRASP_FLAMEWATCH_TOWER              = 190358,
+
+    GO_WINTERGRASP_FORTRESS_GATE                 = 190375,
+    GO_WINTERGRASP_VAULT_GATE                    = 191810,
+
+    GO_WINTERGRASP_KEEP_COLLISION_WALL           = 194323
+};
+
+enum WintergraspWorkshopIds
+{
+    BATTLEFIELD_WG_WORKSHOP_SE,
+    BATTLEFIELD_WG_WORKSHOP_SW,
+    BATTLEFIELD_WG_WORKSHOP_NE,
+    BATTLEFIELD_WG_WORKSHOP_NW,
+    BATTLEFIELD_WG_WORKSHOP_KEEP_WEST,
+    BATTLEFIELD_WG_WORKSHOP_KEEP_EAST
+};
+
 /*#########################
  *####### Graveyards ######
  *#########################*/
@@ -199,10 +233,10 @@ class BfGraveyardWG : public BfGraveyard
 
 enum WGGraveyardId
 {
-    BATTLEFIELD_WG_GY_WORKSHOP_NE,
-    BATTLEFIELD_WG_GY_WORKSHOP_NW,
     BATTLEFIELD_WG_GY_WORKSHOP_SE,
     BATTLEFIELD_WG_GY_WORKSHOP_SW,
+    BATTLEFIELD_WG_GY_WORKSHOP_NE,
+    BATTLEFIELD_WG_GY_WORKSHOP_NW,    
     BATTLEFIELD_WG_GY_KEEP,
     BATTLEFIELD_WG_GY_HORDE,
     BATTLEFIELD_WG_GY_ALLIANCE,
@@ -403,11 +437,12 @@ class BattlefieldWG : public Battlefield
         bool FindAndRemoveVehicleFromList(Unit* vehicle);
 
         // returns the graveyardId in the specified area.
-        WGGraveyardId GetSpiritGraveyardId(uint32 areaId) const;
+        WGGraveyardId GetSpiritGraveyardIdForCreature(Creature* creature) const;
+        uint32 GetSpiritGraveyardIdForData(uint32 areaId) const;
 
         uint32 GetData(uint32 data) const override;
 
-        bool IsCreatureInHolder(ObjectGuid::LowType guid);
+        bool IsCreatureInHolder(ObjectGuid guid);
         bool AddCreatureInHolderByGUID(Creature* creature, uint8 npcType, TeamId team = TEAM_NEUTRAL);
         void UpdateStatusForCreature(Creature* creature, uint8 npcType);
         void ShowCreatureByNPCType(uint8 npcType, TeamId team);
@@ -418,6 +453,12 @@ class BattlefieldWG : public Battlefield
         void UpdateAllGuardsAndTurretsBeforeBattle();
         void InitAllGOforKeep();
         void UpdateAllGOforKeep();
+
+        uint32 _GetGraveyardIDByType(WGGraveyardId type);
+
+    private:        
+        void _UpdateCreatureForBuildGO(WintergraspGameObject go, Creature* creature);
+        void _UpdateCreatureForWorkshop(WintergraspWorkshopIds go, Creature* creature);
 
     protected:
         bool m_isRelicInteractible;
@@ -441,6 +482,13 @@ class BattlefieldWG : public Battlefield
         GuidVector m_KeepAllianceGameObjectList;
         GuidVector m_KeepHordeNPCList;
         GuidVector m_KeepAllianceNPCList;
+        WorldSafeLocsDBC const* Grave_NW;
+        WorldSafeLocsDBC const* Grave_NE;
+        WorldSafeLocsDBC const* Grave_SW;
+        WorldSafeLocsDBC const* Grave_SE;
+        WorldSafeLocsDBC const* Grave_Keep;
+        WorldSafeLocsDBC const* Grave_Horde;
+        WorldSafeLocsDBC const* Grave_Alliance;
 };
 
 enum WintergraspGameObjectBuildingType
@@ -476,16 +524,6 @@ enum WintergraspTowerIds
     BATTLEFIELD_WG_TOWER_SHADOWSIGHT,
     BATTLEFIELD_WG_TOWER_WINTER_S_EDGE,
     BATTLEFIELD_WG_TOWER_FLAMEWATCH
-};
-
-enum WintergraspWorkshopIds
-{
-    BATTLEFIELD_WG_WORKSHOP_SE,
-    BATTLEFIELD_WG_WORKSHOP_SW,
-    BATTLEFIELD_WG_WORKSHOP_NE,
-    BATTLEFIELD_WG_WORKSHOP_NW,
-    BATTLEFIELD_WG_WORKSHOP_KEEP_WEST,
-    BATTLEFIELD_WG_WORKSHOP_KEEP_EAST
 };
 
 enum WintergraspTeamControl
@@ -539,30 +577,6 @@ enum WintergraspText
 
     BATTLEFIELD_WG_TEXT_RANK_CORPORAL                   = 37,
     BATTLEFIELD_WG_TEXT_RANK_FIRST_LIEUTENANT           = 38
-};
-
-enum WintergraspGameObject
-{
-    GO_WINTERGRASP_FACTORY_BANNER_NE             = 190475,
-    GO_WINTERGRASP_FACTORY_BANNER_NW             = 190487,
-    GO_WINTERGRASP_FACTORY_BANNER_SE             = 194959,
-    GO_WINTERGRASP_FACTORY_BANNER_SW             = 194962,
-
-    GO_WINTERGRASP_TITAN_S_RELIC                 = 192829,
-
-    GO_WINTERGRASP_FORTRESS_TOWER_NW             = 190221,
-    GO_WINTERGRASP_FORTRESS_TOWER_SW             = 190373,
-    GO_WINTERGRASP_FORTRESS_TOWER_SE             = 190377,
-    GO_WINTERGRASP_FORTRESS_TOWER_NE             = 190378,
-
-    GO_WINTERGRASP_SHADOWSIGHT_TOWER             = 190356,
-    GO_WINTERGRASP_WINTER_S_EDGE_TOWER           = 190357,
-    GO_WINTERGRASP_FLAMEWATCH_TOWER              = 190358,
-
-    GO_WINTERGRASP_FORTRESS_GATE                 = 190375,
-    GO_WINTERGRASP_VAULT_GATE                    = 191810,
-
-    GO_WINTERGRASP_KEEP_COLLISION_WALL           = 194323
 };
 
 // ********************************************************************

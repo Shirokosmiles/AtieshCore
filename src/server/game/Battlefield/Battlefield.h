@@ -79,7 +79,7 @@ class WorldPacket;
 struct QuaternionData;
 struct WorldSafeLocsDBC;
 
-typedef std::vector<BfGraveyard*> GraveyardVect;
+typedef std::unordered_map<uint32, BfGraveyard*> GraveyardMap;
 
 struct PlayerHolder
 {
@@ -310,15 +310,14 @@ class TC_GAME_API Battlefield : public ZoneScript
         WorldSafeLocsDBC const* GetClosestGraveyard(Player* player);
 
         virtual void AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid player_guid);
-        void RemovePlayerFromResurrectQueue(ObjectGuid player_guid);
-        void SetGraveyardNumber(uint32 number) { m_GraveyardList.resize(number); }
+        virtual void RemovePlayerFromResurrectQueue(ObjectGuid player_guid);
         BfGraveyard* GetGraveyardById(uint32 id) const;
 
         // Misc methods
         Creature* SpawnCreature(uint32 entry, Position const& pos);
         GameObject* SpawnGameObject(uint32 entry, Position const& pos, QuaternionData const& rot);
 
-        Creature* GetCreature(ObjectGuid::LowType spawnid);
+        Creature* GetCreature(ObjectGuid spawnid);
         GameObject* GetGameObject(ObjectGuid guid);
 
         // Script-methods
@@ -366,7 +365,7 @@ class TC_GAME_API Battlefield : public ZoneScript
         void HideNpc(Creature* creature);
         void ShowNpc(Creature* creature, bool aggressive);
 
-        GraveyardVect GetGraveyardVector() const { return m_GraveyardList; }
+        GraveyardMap GetGraveyardMap() const { return m_graveyardMap; }
 
         uint32 GetTimer() const { return m_Timer; }
         void SetTimer(uint32 timer) { m_Timer = timer; }
@@ -428,7 +427,7 @@ class TC_GAME_API Battlefield : public ZoneScript
         uint32 m_freeslots[PVP_TEAMS_COUNT];                    // Use it for skip unnessesary read of playerMap
 
         // Graveyard variables
-        GraveyardVect m_GraveyardList;                          // Vector witch contain the different GY of the battle
+        GraveyardMap m_graveyardMap;                          // Vector witch contain the different GY of the battle
         uint32 m_LastResurrectTimer;                            // Timer for resurrect player every 30 sec
 
         uint32 m_StartGroupingTimer;                            // Timer for invite players in area 15 minute before start battle

@@ -141,10 +141,13 @@ class npc_wg_spirit_guide : public CreatureScript
                 if (!wintergrasp)
                     return true;
 
-                GraveyardVect graveyard = wintergrasp->GetGraveyardVector();
-                for (uint8 i = 0; i < graveyard.size(); i++)
-                    if (graveyard[i]->GetControlTeamId() == player->GetTeamId())
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, player->GetSession()->GetTrinityString(((BfGraveyardWG*)graveyard[i])->GetTextId()), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + i);
+                GraveyardMap gMap = wintergrasp->GetGraveyardMap();
+                for (auto& gID : gMap)
+                {
+                    if (BfGraveyard* graveyard = gID.second)
+                        if (graveyard->GetControlTeamId() == player->GetTeamId())
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, player->GetSession()->GetTrinityString(((BfGraveyardWG*)graveyard)->GetTextId()), GOSSIP_SENDER_MAIN, gID.first);
+                }
 
                 SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
                 return true;
@@ -158,11 +161,14 @@ class npc_wg_spirit_guide : public CreatureScript
                 Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
                 if (wintergrasp)
                 {
-                    GraveyardVect gy = wintergrasp->GetGraveyardVector();
-                    for (uint8 i = 0; i < gy.size(); i++)
-                        if (action - GOSSIP_ACTION_INFO_DEF == i && gy[i]->GetControlTeamId() == player->GetTeamId())
-                            if (WorldSafeLocsDBC const* safeLoc = sDBCStoresMgr->GetWorldSafeLocsDBC(gy[i]->GetGraveyardId()))
+                    GraveyardMap gMap = wintergrasp->GetGraveyardMap();
+                    for (auto& gID : gMap)
+                    {
+                        if (action == gID.first &&
+                            gID.second->GetControlTeamId() == player->GetTeamId())
+                            if (WorldSafeLocsDBC const* safeLoc = sDBCStoresMgr->GetWorldSafeLocsDBC(gID.second->GetGraveyardId()))
                                 player->TeleportTo(safeLoc->Continent, safeLoc->Loc.X, safeLoc->Loc.Y, safeLoc->Loc.Z, 0);
+                    }
                 }
                 return true;
             }
