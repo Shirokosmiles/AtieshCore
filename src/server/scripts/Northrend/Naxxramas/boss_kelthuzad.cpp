@@ -293,6 +293,7 @@ public:
                     SelectTargetList(targets, 3, SelectTargetMethod::Random, 0, 0.0f, true, false);
                     for (Unit* target : targets)
                         DoCast(target, SPELL_CHAINS);
+                    targets.clear();
                 }
             }
 
@@ -337,17 +338,17 @@ public:
                             ++_skeletonCount;
                             if (_skeletonCount == 1) // the first skeleton is actually one of the pre-existing ones - I'm not sure why, but that's what the sniffs say
                             {
-                                std::list<Creature*> skeletons;
+                                std::vector<Creature*> skeletons;
                                 me->GetCreatureListWithEntryInGrid(skeletons, NPC_SKELETON2, 200.0f);
                                 if (skeletons.empty())
                                 { // prevent UB
                                     EnterEvadeMode(EVADE_REASON_OTHER);
                                     return;
                                 }
-                                std::list<Creature*>::iterator it = skeletons.begin();
-                                std::advance(it, urand(0, skeletons.size() - 1));
-                                (*it)->SetReactState(REACT_AGGRESSIVE);
-                                (*it)->AI()->DoZoneInCombat(); // will select a player on our threat list as we are the summoner
+                                uint32 randomIndex = rand() % skeletons.size();
+                                skeletons[randomIndex]->SetReactState(REACT_AGGRESSIVE);
+                                skeletons[randomIndex]->AI()->DoZoneInCombat(); // will select a player on our threat list as we are the summoner
+                                skeletons.clear();
                             }
                             else
                             {
@@ -620,7 +621,7 @@ struct npc_kelthuzad_minionAI : public ScriptedAI
             if (!pocketId)
                 return;
 
-            std::list<Creature*> others;
+            std::vector<Creature*> others;
             me->GetCreatureListWithEntryInGrid(others, me->GetEntry(), 80.0f);
             for (Creature* other : others)
                 if (other->AI()->GetData(DATA_MINION_POCKET_ID) == pocketId)
@@ -628,6 +629,7 @@ struct npc_kelthuzad_minionAI : public ScriptedAI
                     other->SetReactState(REACT_AGGRESSIVE);
                     other->AI()->AttackStart(who);
                 }
+            others.clear();
             me->SetReactState(REACT_AGGRESSIVE);
             AttackStart(who);
             ScriptedAI::JustEngagedWith(who);

@@ -336,7 +336,7 @@ struct npc_gatewatcher_petAI : public ScriptedAI
 
         if (me->HasReactState(REACT_PASSIVE))
         {
-            std::list<Creature*> others;
+            std::vector<Creature*> others;
             me->GetCreatureListWithEntryInGrid(others, 0, 40.0f);
             for (Creature* other : others)
                 if (other->AI()->GetData(DATA_PET_GROUP) == _petGroup)

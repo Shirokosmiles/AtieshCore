@@ -1611,13 +1611,14 @@ class npc_yogg_saron_keeper : public CreatureScript
 
                 if (me->GetEntry() == NPC_FREYA_YS)
                 {
-                    std::list<Creature*> wells;
+                    std::vector<Creature*> wells;
                     GetCreatureListWithEntryInGrid(wells, me, NPC_SANITY_WELL, 200.0f);
-                    for (std::list<Creature*>::const_iterator itr = wells.begin(); itr != wells.end(); ++itr)
+                    for (auto const& pointer : wells)
                     {
-                        (*itr)->RemoveAurasDueToSpell(SPELL_SANITY_WELL);
-                        (*itr)->RemoveAurasDueToSpell(SPELL_SANITY_WELL_VISUAL);
+                        pointer->RemoveAurasDueToSpell(SPELL_SANITY_WELL);
+                        pointer->RemoveAurasDueToSpell(SPELL_SANITY_WELL_VISUAL);
                     }
+                    wells.clear();
                 }
             }
 
@@ -1688,13 +1689,14 @@ class npc_yogg_saron_keeper : public CreatureScript
                         break;
                     case ACTION_SANITY_WELLS:
                     {
-                        std::list<Creature*> wells;
+                        std::vector<Creature*> wells;
                         GetCreatureListWithEntryInGrid(wells, me, NPC_SANITY_WELL, 200.0f);
-                        for (std::list<Creature*>::const_iterator itr = wells.begin(); itr != wells.end(); ++itr)
+                        for (auto const& pointer : wells)
                         {
-                            (*itr)->CastSpell(*itr, SPELL_SANITY_WELL);
-                            (*itr)->CastSpell(*itr, SPELL_SANITY_WELL_VISUAL);
+                            pointer->CastSpell(pointer, SPELL_SANITY_WELL);
+                            pointer->CastSpell(pointer, SPELL_SANITY_WELL_VISUAL);
                         }
+                        wells.clear();
                         break;
                     }
                     case ACTION_FLASH_FREEZE:

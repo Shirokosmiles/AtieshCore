@@ -672,7 +672,8 @@ struct boss_faction_championsAI : public BossAI
             return nullptr;
 
         uint32 randomIndex = rand() % lst.size();
-        return lst[randomIndex];
+        Creature* pointer = lst[randomIndex];
+        return pointer;
     }
 
     Unit* SelectEnemyCaster(bool /*casting*/)

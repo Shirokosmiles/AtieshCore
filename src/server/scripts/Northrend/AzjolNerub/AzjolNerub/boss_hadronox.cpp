@@ -258,7 +258,7 @@ public:
 
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            std::list<Creature*> triggers;
+            std::vector<Creature*> triggers;
             me->GetCreatureListWithEntryInGrid(triggers, NPC_WORLDTRIGGER_LARGE);
             for (Creature* trigger : triggers)
                 if (trigger->HasAura(SPELL_SUMMON_CHAMPION_PERIODIC) || trigger->HasAura(SPELL_WEB_FRONT_DOORS) || trigger->HasAura(SPELL_WEB_SIDE_DOORS))
@@ -443,7 +443,7 @@ struct npc_hadronox_crusherPackAI : public ScriptedAI
     {
         if (me->HasReactState(REACT_PASSIVE))
         {
-            std::list<Creature*> others;
+            std::vector<Creature*> others;
             me->GetCreatureListWithEntryInGrid(others, 0, 40.0f);
             for (Creature* other : others)
                 if (other->AI()->GetData(DATA_CRUSHER_PACK_ID) == _myPack)

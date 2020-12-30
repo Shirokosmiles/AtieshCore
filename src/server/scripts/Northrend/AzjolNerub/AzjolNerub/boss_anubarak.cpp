@@ -212,7 +212,7 @@ struct boss_anub_arak : public BossAI
                     break;
                 case EVENT_DARTER:
                 {
-                    std::list<Creature*> triggers;
+                    std::vector<Creature*> triggers;
                     me->GetCreatureListWithEntryInGrid(triggers, NPC_WORLD_TRIGGER);
                     if (!triggers.empty())
                     {
@@ -223,6 +223,7 @@ struct boss_anub_arak : public BossAI
                     }
                     else
                         EnterEvadeMode(EVADE_REASON_OTHER);
+                    triggers.clear();
                     break;
                 }
                 case EVENT_ASSASSIN:

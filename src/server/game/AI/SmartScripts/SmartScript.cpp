@@ -3421,11 +3421,12 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
             else if (e.event.distance.entry != 0)
             {
-                std::list<Creature*> list;
+                std::vector<Creature*> list;
                 me->GetCreatureListWithEntryInGrid(list, e.event.distance.entry, static_cast<float>(e.event.distance.dist));
 
                 if (!list.empty())
                     creature = list.front();
+                list.clear();
             }
 
             if (creature)
@@ -3451,11 +3452,12 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
             else if (e.event.distance.entry != 0)
             {
-                std::list<GameObject*> list;
+                std::vector<GameObject*> list;
                 me->GetGameObjectListWithEntryInGrid(list, e.event.distance.entry, static_cast<float>(e.event.distance.dist));
 
                 if (!list.empty())
                     gameobject = list.front();
+                list.clear();
             }
 
             if (gameobject)

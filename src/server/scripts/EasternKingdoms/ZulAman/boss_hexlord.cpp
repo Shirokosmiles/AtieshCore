@@ -333,12 +333,13 @@ class boss_hexlord_malacrass : public CreatureScript
 
             void SelectAddEntry()
             {
-                std::list<uint32> addList(&AddEntryList[0], &AddEntryList[AddCount]);
+                std::vector<uint32> addList(&AddEntryList[0], &AddEntryList[AddCount]);
                 Trinity::Containers::RandomResize(addList, 4);
 
                 uint8 i = 0;
-                for (auto itr = addList.begin(); itr != addList.end(); ++itr, ++i)
-                    AddEntry[i] = *itr;
+                for (auto const& pointer : addList)
+                    AddEntry[i] = pointer;
+                addList.clear();
             }
 
             void SpawnAdds()

@@ -907,12 +907,13 @@ public:
 
         Creature* SelectRandomSkullPile()
         {
-            std::list<Creature*> triggers;
+            std::vector<Creature*> triggers;
             me->GetCreatureListWithEntryInGrid(triggers, NPC_TRIGGER, 150.0f);
             uint32 targetDBGuid = CGUID_TRIGGER + urand(8, 12); // CGUID+8 to CGUID+12 are the triggers for the skull piles on dead side
             for (Creature* trigger : triggers)
                 if (trigger && trigger->GetSpawnId() == targetDBGuid)
                     return trigger;
+            triggers.clear();
 
             return nullptr;
         }
