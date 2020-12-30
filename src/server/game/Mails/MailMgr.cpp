@@ -129,7 +129,7 @@ void MailMgr::SendMailByGUID(ObjectGuid::LowType sender, ObjectGuid::LowType rec
     }
 }
 
-void MailMgr::SendMailWithItemsBy(Object* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::list<Item*> const& itemlist, MailCheckMask mask, uint32 deliver_delay, uint32 COD)
+void MailMgr::SendMailWithItemsBy(Object* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::vector<Item*> const& itemlist, MailCheckMask mask, uint32 deliver_delay, uint32 COD)
 {
     if (!sender || !receiver)
         return;
@@ -149,11 +149,8 @@ void MailMgr::SendMailWithItemsBy(Object* sender, ObjectGuid::LowType receiver, 
         if (!itemlist.empty()) // it's unreal, but possible to sent message with empty list
         {
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-            for (std::list<Item*>::const_iterator itr = itemlist.begin(); itr != itemlist.end(); ++itr)
-            {
-                if (*itr)
-                    AddNewMailItem(mail_id, (*itr), (*itr)->GetGUID(), receiver, trans);
-            }
+            for (auto const& pointer : itemlist)
+                AddNewMailItem(mail_id, pointer, pointer->GetGUID(), receiver, trans);
             CharacterDatabase.CommitTransaction(trans);
         }
 
@@ -163,7 +160,7 @@ void MailMgr::SendMailWithItemsBy(Object* sender, ObjectGuid::LowType receiver, 
     }
 }
 
-void MailMgr::SendMailWithItemsByGUID(ObjectGuid::LowType sender, ObjectGuid::LowType receiver, uint8 m_messageType, std::string const& subject, std::string const& body, uint32 money, std::list<Item*> const& itemlist, MailCheckMask mask, uint32 deliver_delay, uint32 COD)
+void MailMgr::SendMailWithItemsByGUID(ObjectGuid::LowType sender, ObjectGuid::LowType receiver, uint8 m_messageType, std::string const& subject, std::string const& body, uint32 money, std::vector<Item*> const& itemlist, MailCheckMask mask, uint32 deliver_delay, uint32 COD)
 {
     if (!receiver)
         return;
@@ -181,11 +178,8 @@ void MailMgr::SendMailWithItemsByGUID(ObjectGuid::LowType sender, ObjectGuid::Lo
         if (!itemlist.empty()) // it's unreal, but possible to sent message with empty list
         {
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-            for (std::list<Item*>::const_iterator itr = itemlist.begin(); itr != itemlist.end(); ++itr)
-            {
-                if (*itr)
-                    AddNewMailItem(mail_id, (*itr), (*itr)->GetGUID(), receiver, trans);
-            }
+            for (auto const& pointer : itemlist)
+                AddNewMailItem(mail_id, pointer, pointer->GetGUID(), receiver, trans);
             CharacterDatabase.CommitTransaction(trans);
         }
 
@@ -221,7 +215,7 @@ void MailMgr::SendMailByAuctionHouse(AuctionEntry* sender, ObjectGuid::LowType r
     }
 }
 
-void MailMgr::SendMailByAuctionHouseWithItems(AuctionEntry* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::list<Item*> const& itemlist, MailCheckMask mask, uint32 deliver_delay, uint32 COD)
+void MailMgr::SendMailByAuctionHouseWithItems(AuctionEntry* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::vector<Item*> const& itemlist, MailCheckMask mask, uint32 deliver_delay, uint32 COD)
 {
     if (!sender || !receiver)
         return;
@@ -244,11 +238,8 @@ void MailMgr::SendMailByAuctionHouseWithItems(AuctionEntry* sender, ObjectGuid::
         if (!itemlist.empty()) // it's unreal, but possible to sent message with empty list
         {
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-            for (std::list<Item*>::const_iterator itr = itemlist.begin(); itr != itemlist.end(); ++itr)
-            {
-                if (*itr)
-                    AddNewMailItem(mail_id, (*itr), (*itr)->GetGUID(), receiver, trans);
-            }
+            for (auto const& pointer : itemlist)
+                AddNewMailItem(mail_id, pointer, pointer->GetGUID(), receiver, trans);
             CharacterDatabase.CommitTransaction(trans);
         }
         // For online receiver update in game mail status and data
@@ -283,7 +274,7 @@ void MailMgr::SendMailByCalendarEvent(CalendarEvent* sender, ObjectGuid::LowType
     }
 }
 
-void MailMgr::SendMailByCalendarEventWithItems(CalendarEvent* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::list<Item*> const& itemlist, MailCheckMask mask, uint32 deliver_delay, uint32 COD)
+void MailMgr::SendMailByCalendarEventWithItems(CalendarEvent* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::vector<Item*> const& itemlist, MailCheckMask mask, uint32 deliver_delay, uint32 COD)
 {
     if (!sender || !receiver)
         return;
@@ -306,11 +297,8 @@ void MailMgr::SendMailByCalendarEventWithItems(CalendarEvent* sender, ObjectGuid
         if (!itemlist.empty()) // it's unreal, but possible to sent message with empty list
         {
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-            for (std::list<Item*>::const_iterator itr = itemlist.begin(); itr != itemlist.end(); ++itr)
-            {
-                if (*itr)
-                    AddNewMailItem(mail_id, (*itr), (*itr)->GetGUID(), receiver, trans);
-            }
+            for (auto const& pointer : itemlist)
+                AddNewMailItem(mail_id, pointer, pointer->GetGUID(), receiver, trans);
             CharacterDatabase.CommitTransaction(trans);
         }
         // For online receiver update in game mail status and data

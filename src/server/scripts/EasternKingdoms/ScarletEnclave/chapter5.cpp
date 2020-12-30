@@ -179,21 +179,21 @@ Unit* GetVictimInDistance(Unit* owner, float mindistance, float maxdistance)
 {
     Unit* victim = nullptr;
 
-    std::list<Unit*> targets;
+    std::vector<Unit*> targets;
     Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(owner, owner, maxdistance);
     Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(owner, targets, u_check);
     Cell::VisitAllObjects(owner, searcher, maxdistance);
-    if (!targets.empty())
+    Position ownerpos = owner->GetPosition();
+    for (auto const& pointer : targets)
     {
-        Position ownerpos = owner->GetPosition();
-        for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-            if ((*iter)->GetDistance(ownerpos) >= mindistance &&
-                (*iter)->GetDistance(ownerpos) <= maxdistance)
-            {
-                victim = (*iter);
-                break;
-            }
+        if (pointer->GetDistance(ownerpos) >= mindistance &&
+            pointer->GetDistance(ownerpos) <= maxdistance)
+        {
+            victim = pointer;
+            break;
+        }
     }
+    targets.clear();
 
     return victim;
 }

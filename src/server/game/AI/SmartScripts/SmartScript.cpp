@@ -2035,7 +2035,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_SUMMON_CREATURE_GROUP:
         {
-            std::list<TempSummon*> summonList;
+            std::vector<TempSummon*> summonList;
             GetBaseObject()->SummonCreatureGroup(e.action.creatureGroup.group, &summonList);
 
             for (TempSummon* summon : summonList)

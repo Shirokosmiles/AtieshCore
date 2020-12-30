@@ -1634,15 +1634,18 @@ class spell_q11010_q11102_q11023_choose_loc : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 // Check for player that is in 65 y range
-                std::list<Player*> playerList;
+                std::vector<Player*> _players;
                 Trinity::AnyPlayerInObjectRangeCheck checker(caster, 65.0f);
-                Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(caster, playerList, checker);
+                Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(caster, _players, checker);
                 Cell::VisitWorldObjects(caster, searcher, 65.0f);
-                for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
-                    // Check if found player target is on fly mount or using flying form
-                    if ((*itr)->HasAuraType(SPELL_AURA_FLY) || (*itr)->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+                for (auto const& pointer : _players)
+                {
+                    if (pointer->HasAuraType(SPELL_AURA_FLY) ||
+                        pointer->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
                         // Summom Fel Cannon (bunny version) at found player
-                        caster->SummonCreature(NPC_FEL_CANNON2, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ());
+                        caster->SummonCreature(NPC_FEL_CANNON2, pointer->GetPositionX(), pointer->GetPositionY(), pointer->GetPositionZ());
+                }
+                _players.clear();
             }
 
             void Register() override

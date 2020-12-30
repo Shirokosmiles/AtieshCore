@@ -1966,7 +1966,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
 * @param list  List to store pointers to summoned creatures.
 */
 
-void Map::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= nullptr*/)
+void Map::SummonCreatureGroup(uint8 group, std::vector<TempSummon*>* list /*= nullptr*/)
 {
     std::vector<TempSummonData> const* data = sObjectMgr->GetSummonGroup(GetId(), SUMMONER_TYPE_MAP, group);
     if (!data)
@@ -2097,7 +2097,7 @@ Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, Milli
 * @param group Id of group to summon.
 * @param list  List to store pointers to summoned creatures.
 */
-void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= nullptr*/)
+void WorldObject::SummonCreatureGroup(uint8 group, std::vector<TempSummon*>* list /*= nullptr*/)
 {
     ASSERT((GetTypeId() == TYPEID_GAMEOBJECT || GetTypeId() == TYPEID_UNIT) && "Only GOs and creatures can summon npc groups!");
 
@@ -3479,30 +3479,29 @@ void WorldObject::DestroyForNearbyPlayers()
     if (!IsInWorld())
         return;
 
-    std::list<Player*> targets;
+    std::vector<Player*> _players;
     Trinity::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange(), false);
-    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, _players, check);
     Cell::VisitWorldObjects(this, searcher, GetVisibilityRange());
-    for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+    for (auto const& pointer : _players)
     {
-        Player* player = (*iter);
-
-        if (player == this)
+        if (pointer == this)
             continue;
 
-        if (!player->HaveAtClient(this))
+        if (!pointer->HaveAtClient(this))
             continue;
 
-        if (isType(TYPEMASK_UNIT) && ToUnit()->GetCharmerGUID() == player->GetGUID()) /// @todo this is for puppet
+        if (isType(TYPEMASK_UNIT) && ToUnit()->GetCharmerGUID() == pointer->GetGUID()) /// @todo this is for puppet
             continue;
 
         if (GetTypeId() == TYPEID_UNIT)
-            DestroyForPlayer(player, ToUnit()->IsDuringRemoveFromWorld() && ToCreature()->isDead()); // at remove from world (destroy) show kill animation
+            DestroyForPlayer(pointer, ToUnit()->IsDuringRemoveFromWorld() && ToCreature()->isDead()); // at remove from world (destroy) show kill animation
         else
-            DestroyForPlayer(player);
+            DestroyForPlayer(pointer);
 
-        player->m_clientGUIDs.erase(GetGUID());
+        pointer->m_clientGUIDs.erase(GetGUID());
     }
+    _players.clear();
 }
 
 void WorldObject::UpdateObjectVisibility(bool /*forced*/)

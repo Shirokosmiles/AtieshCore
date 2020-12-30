@@ -770,7 +770,7 @@ struct MailLevelReward
     uint32 senderEntry;
 };
 
-typedef std::list<MailLevelReward> MailLevelRewardList;
+typedef std::vector<MailLevelReward> MailLevelRewardList;
 typedef std::unordered_map<uint8, MailLevelRewardList> MailLevelRewardContainer;
 
 // We assume the rate is in general the same for all three types below, but chose to keep three for scalability and customization

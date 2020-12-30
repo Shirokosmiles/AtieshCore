@@ -100,7 +100,7 @@ class boss_sulfuron : public CreatureScript
                             break;
                         case EVENT_INSPIRE:
                         {
-                            std::list<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
+                            std::vector<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
                             if (!healers.empty())
                                 DoCast(Trinity::Containers::SelectRandomContainerElement(healers), SPELL_INSPIRE);
 

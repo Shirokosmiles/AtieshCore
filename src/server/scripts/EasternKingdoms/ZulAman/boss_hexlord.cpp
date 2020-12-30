@@ -488,9 +488,10 @@ class boss_hexlord_malacrass : public CreatureScript
                         break;
                     case ABILITY_TARGET_BUFF:
                         {
-                            std::list<Creature*> templist = DoFindFriendlyMissingBuff(50.f, PlayerAbility[PlayerClass][random].spell);
+                            std::vector<Creature*> templist = DoFindFriendlyMissingBuff(50.f, PlayerAbility[PlayerClass][random].spell);
                             if (!templist.empty())
                                 target = *(templist.begin());
+                            templist.clear();
                         }
                         break;
                 }
@@ -540,12 +541,13 @@ class boss_thurg : public CreatureScript
 
                 if (bloodlust_timer <= diff)
                 {
-                    std::list<Creature*> templist = DoFindFriendlyMissingBuff(50, SPELL_BLOODLUST);
+                    std::vector<Creature*> templist = DoFindFriendlyMissingBuff(50, SPELL_BLOODLUST);
                     if (!templist.empty())
                     {
                         if (Unit* target = *(templist.begin()))
                             DoCast(target, SPELL_BLOODLUST, false);
                     }
+                    templist.clear();
                     bloodlust_timer = 12000;
                 }
                 else

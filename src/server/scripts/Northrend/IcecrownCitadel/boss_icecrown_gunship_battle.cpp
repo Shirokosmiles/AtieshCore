@@ -718,46 +718,44 @@ class npc_gunship : public CreatureScript
                 me->RemoveAurasDueToSpell(SPELL_CHECK_FOR_PLAYERS);
 
                 me->GetMap()->SetZoneMusic(AREA_ICECROWN_CITADEL, 0);
-                std::list<Creature*> creatures;
+                std::vector<Creature*> creatures;
                 GetCreatureListWithEntryInGrid(creatures, me, NPC_MARTYR_STALKER_IGB_SAURFANG, SIZE_OF_GRIDS);
-                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                for (auto const& pointer : creatures)
                 {
-                    Creature* stalker = *itr;
-                    stalker->RemoveAllAuras();
-                    stalker->CombatStop(true);
+                    pointer->RemoveAllAuras();
+                    pointer->CombatStop(true);
                 }
-
-                uint32 explosionSpell = isVictory ? SPELL_EXPLOSION_VICTORY : SPELL_EXPLOSION_WIPE;
                 creatures.clear();
+                uint32 explosionSpell = isVictory ? SPELL_EXPLOSION_VICTORY : SPELL_EXPLOSION_WIPE;
+
                 GetCreatureListWithEntryInGrid(creatures, me, NPC_GUNSHIP_HULL, 200.0f);
-                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                for (auto const& pointer : creatures)
                 {
-                    Creature* hull = *itr;
-                    if (hull->GetTransport() != me->GetTransport())
+                    if (pointer->GetTransport() != me->GetTransport())
                         continue;
 
-                    hull->CastSpell(hull, explosionSpell, TRIGGERED_FULL_MASK);
+                    pointer->CastSpell(pointer, explosionSpell, TRIGGERED_FULL_MASK);
                 }
-
                 creatures.clear();
+
                 GetCreatureListWithEntryInGrid(creatures, me, _teamInInstance == HORDE ? NPC_HORDE_GUNSHIP_CANNON : NPC_ALLIANCE_GUNSHIP_CANNON, 200.0f);
-                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                for (auto const& pointer : creatures)
                 {
-                    Creature* cannon = *itr;
                     if (isVictory)
                     {
-                        cannon->CastSpell(cannon, SPELL_EJECT_ALL_PASSENGERS_BELOW_ZERO, TRIGGERED_FULL_MASK);
+                        pointer->CastSpell(pointer, SPELL_EJECT_ALL_PASSENGERS_BELOW_ZERO, TRIGGERED_FULL_MASK);
 
-                        WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, cannon->GetPackGUID().size() + 4);
-                        data << cannon->GetPackGUID();
+                        WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, pointer->GetPackGUID().size() + 4);
+                        data << pointer->GetPackGUID();
                         data << uint32(0);
-                        cannon->SendMessageToSet(&data, true);
+                        pointer->SendMessageToSet(&data, true);
 
-                        cannon->RemoveVehicleKit();
+                        pointer->RemoveVehicleKit();
                     }
                     else
-                        cannon->CastSpell(cannon, SPELL_EJECT_ALL_PASSENGERS_WIPE, TRIGGERED_FULL_MASK);
+                        pointer->CastSpell(pointer, SPELL_EJECT_ALL_PASSENGERS_WIPE, TRIGGERED_FULL_MASK);
                 }
+                creatures.clear();
 
                 uint32 creatureEntry = NPC_IGB_MURADIN_BRONZEBEARD;
                 uint8 textId = isVictory ? SAY_MURADIN_VICTORY : SAY_MURADIN_WIPE;
@@ -784,13 +782,12 @@ class npc_gunship : public CreatureScript
                         ship->CastSpell(ship, SPELL_AWARD_REPUTATION_BOSS_KILL, TRIGGERED_FULL_MASK);
                     }
 
-                    creatures.clear();
                     GetCreatureListWithEntryInGrid(creatures, me, NPC_SKYBREAKER_MARINE, 200.0f);
                     GetCreatureListWithEntryInGrid(creatures, me, NPC_SKYBREAKER_SERGEANT, 200.0f);
                     GetCreatureListWithEntryInGrid(creatures, me, NPC_KOR_KRON_REAVER, 200.0f);
                     GetCreatureListWithEntryInGrid(creatures, me, NPC_KOR_KRON_SERGEANT, 200.0f);
-                    for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
-                        (*itr)->DespawnOrUnsummon(1ms);
+                    for (auto const& pointer : creatures)
+                        pointer->DespawnOrUnsummon(1ms);
                 }
                 else
                 {

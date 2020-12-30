@@ -79,14 +79,14 @@ public:
     void SendMailBy(Object* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
     void SendMailByGUID(ObjectGuid::LowType sender, ObjectGuid::LowType receiver, uint8 m_messageType, std::string const& subject, std::string const& body, uint32 money, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
 
-    void SendMailWithItemsBy(Object* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::list<Item*> const& itemlist, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
-    void SendMailWithItemsByGUID(ObjectGuid::LowType sender, ObjectGuid::LowType receiver, uint8 m_messageType, std::string const& subject, std::string const& body, uint32 money, std::list<Item*> const& itemlist, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
+    void SendMailWithItemsBy(Object* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::vector<Item*> const& itemlist, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
+    void SendMailWithItemsByGUID(ObjectGuid::LowType sender, ObjectGuid::LowType receiver, uint8 m_messageType, std::string const& subject, std::string const& body, uint32 money, std::vector<Item*> const& itemlist, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
 
     void SendMailByAuctionHouse(AuctionEntry* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
-    void SendMailByAuctionHouseWithItems(AuctionEntry* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::list<Item*> const& itemlist, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
+    void SendMailByAuctionHouseWithItems(AuctionEntry* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::vector<Item*> const& itemlist, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
 
     void SendMailByCalendarEvent(CalendarEvent* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
-    void SendMailByCalendarEventWithItems(CalendarEvent* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::list<Item*> const& itemlist, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
+    void SendMailByCalendarEventWithItems(CalendarEvent* sender, ObjectGuid::LowType receiver, std::string const& subject, std::string const& body, uint32 money, std::vector<Item*> const& itemlist, MailCheckMask mask = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 COD = 0);
 
     void SendMailWithTemplateBy(Object* sender, ObjectGuid::LowType receiver, uint16 mailTemplateId, MailCheckMask mask = MAIL_CHECK_MASK_HAS_BODY, uint32 deliver_delay = 0);
     void SendMailWithTemplateByGUID(ObjectGuid::LowType sender, ObjectGuid::LowType receiver, uint8 messageType, uint16 mailTemplateId, MailCheckMask mask = MAIL_CHECK_MASK_HAS_BODY, uint32 deliver_delay = 0);

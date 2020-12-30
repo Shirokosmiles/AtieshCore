@@ -177,7 +177,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
             bidder->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS, 1);
         }
 
-        std::list<Item*> itemlist;
+        std::vector<Item*> itemlist;
         itemlist.push_back(pItem);
         sMailMgr->SendMailByAuctionHouseWithItems(auction, auction->bidder, auction->BuildAuctionMailSubject(AUCTION_WON), AuctionEntry::BuildAuctionMailBody(auction->owner, auction->bid, auction->buyout, 0, 0), 0, itemlist, MAIL_CHECK_MASK_COPIED);
         itemlist.clear();
@@ -240,7 +240,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
         if (owner)
             owner->GetSession()->SendAuctionOwnerNotification(auction);
 
-        std::list<Item*> itemlist;
+        std::vector<Item*> itemlist;
         itemlist.push_back(pItem);
         sMailMgr->SendMailByAuctionHouseWithItems(auction, auction->owner, auction->BuildAuctionMailSubject(AUCTION_EXPIRED), AuctionEntry::BuildAuctionMailBody(0, 0, auction->buyout, auction->deposit, 0), 0, itemlist, MAIL_CHECK_MASK_COPIED);
         itemlist.clear();

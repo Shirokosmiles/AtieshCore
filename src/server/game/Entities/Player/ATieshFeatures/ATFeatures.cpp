@@ -771,17 +771,16 @@ void Player::UpdGuildQuery(Guild* guild)
     if (!IsInWorld())
         return;
 
-    std::list<Player*> targets;
+    std::vector<Player*> _players;
     Trinity::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange(), false);
-    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, _players, check);
     Cell::VisitWorldObjects(this, searcher, GetVisibilityRange());
-    for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+    for (auto const& pointer : _players)
     {
-        Player* player = (*iter);
-        if (!player->HaveAtClient(this))
+        if (!pointer->HaveAtClient(this))
             continue;
 
-        guild->HandleQuery(player->GetSession());
+        guild->HandleQuery(pointer->GetSession());
     }
 }
 

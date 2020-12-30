@@ -144,7 +144,7 @@ struct boss_anub_arak : public BossAI
         events.ScheduleEvent(EVENT_CARRION_BEETLES, 14s, 17s, 0, PHASE_EMERGE);
 
         // set up world triggers
-        std::list<TempSummon*> summoned;
+        std::vector<TempSummon*> summoned;
         me->SummonCreatureGroup(SUMMON_GROUP_WORLD_TRIGGER_GUARDIAN, &summoned);
         if (summoned.empty()) // something went wrong
         {
@@ -152,6 +152,7 @@ struct boss_anub_arak : public BossAI
             return;
         }
         _guardianTrigger = (*summoned.begin())->GetGUID();
+        summoned.clear();
 
         if (Creature* trigger = DoSummon(NPC_WORLD_TRIGGER, me->GetPosition(), 0s, TEMPSUMMON_MANUAL_DESPAWN))
             _assassinTrigger = trigger->GetGUID();

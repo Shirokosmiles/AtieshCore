@@ -295,20 +295,17 @@ bool OPvPCapturePoint::Update(uint32 diff)
         }
     }
 
-    std::list<Player*> players;
+    std::vector<Player*> _players;
     Trinity::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
-    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
+    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, _players, checker);
     Cell::VisitWorldObjects(m_capturePoint, searcher, radius);
-
-    for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
+    for (auto const& pointer : _players)
     {
-        Player* const player = *itr;
-        if (player->IsOutdoorPvPActive())
-        {
-            if (m_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second)
-                HandlePlayerEnter(*itr);
-        }
+        if (pointer->IsOutdoorPvPActive())
+            if (m_activePlayers[pointer->GetTeamId()].insert(pointer->GetGUID()).second)
+                HandlePlayerEnter(pointer);
     }
+    _players.clear();
 
     // get the difference of numbers
     float fact_diff = ((float)m_activePlayers[0].size() - (float)m_activePlayers[1].size()) * diff / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL;

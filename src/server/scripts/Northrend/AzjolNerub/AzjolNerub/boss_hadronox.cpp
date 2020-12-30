@@ -184,13 +184,14 @@ public:
 
         void SummonCrusherPack(SummonGroups group)
         {
-            std::list<TempSummon*> summoned;
+            std::vector<TempSummon*> summoned;
             me->SummonCreatureGroup(group, &summoned);
             for (TempSummon* summon : summoned)
             {
                 summon->AI()->SetData(DATA_CRUSHER_PACK_ID, group);
                 summon->AI()->DoAction(ACTION_PACK_WALK);
             }
+            summoned.clear();
         }
 
         void MovementInform(uint32 type, uint32 /*id*/) override

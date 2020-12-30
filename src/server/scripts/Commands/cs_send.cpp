@@ -186,7 +186,7 @@ public:
             }
         }
 
-        std::list<Item*>itemlist;
+        std::vector<Item*>itemlist;
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         for (ItemPairs::const_iterator itr = items.begin(); itr != items.end(); ++itr)
         {

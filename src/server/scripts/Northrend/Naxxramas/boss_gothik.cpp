@@ -807,7 +807,7 @@ class npc_gothik_minion_spectralrider : public CreatureScript
                 _frenzyTimer = 0;
             else
             { // target priority: knight > other rider > horse > gothik
-                std::list<Creature*> potentialTargets = DoFindFriendlyMissingBuff(30.0, SPELLHELPER_UNHOLY_FRENZY);
+                std::vector<Creature*> potentialTargets = DoFindFriendlyMissingBuff(30.0, SPELLHELPER_UNHOLY_FRENZY);
                 Creature *knightTarget = nullptr, *riderTarget = nullptr, *horseTarget = nullptr, *gothikTarget = nullptr;
                 for (Creature* pTarget : potentialTargets)
                 {
@@ -829,6 +829,8 @@ class npc_gothik_minion_spectralrider : public CreatureScript
                     if (knightTarget)
                         break;
                 }
+                potentialTargets.clear();
+
                 Creature* target = knightTarget ? knightTarget : riderTarget ? riderTarget : horseTarget ? horseTarget : gothikTarget ? gothikTarget : nullptr;
                 if (target)
                     DoCast(target, SPELL_UNHOLY_FRENZY);

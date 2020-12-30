@@ -155,24 +155,19 @@ public:
 
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
-            std::list<Player*> playerOnQuestList;
+            std::vector<Player*> _players;
             Trinity::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
-            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
+            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, _players, checker);
             Cell::VisitWorldObjects(me, searcher, 5.0f);
-            for (std::list<Player*>::const_iterator itr = playerOnQuestList.begin(); itr != playerOnQuestList.end(); ++itr)
+            for (auto const& pointer : _players)
             {
-                // Check if found player target has active quest
-                if (Player* player = (*itr))
+                if (pointer->GetQuestStatus(10965) == QUEST_STATUS_INCOMPLETE)
                 {
-                    if (player->GetQuestStatus(10965) == QUEST_STATUS_INCOMPLETE)
-                    {
-                        StartEvent(player);
-                        break;
-                    }
-                }
-                else
+                    StartEvent(pointer);
                     break;
+                }
             }
+            _players.clear();
         }
 
         void JustDied(Unit* /*killer*/) override

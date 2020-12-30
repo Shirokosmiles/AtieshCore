@@ -1563,7 +1563,7 @@ void AchievementMgr::CompletedAchievement(AchievementDBC const* achievement)
             }
         }
 
-        std::list<Item*>itemlist;
+        std::vector<Item*>itemlist;
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
         Item* item = reward->ItemId ? Item::CreateItem(reward->ItemId, 1, GetPlayer()) : nullptr;

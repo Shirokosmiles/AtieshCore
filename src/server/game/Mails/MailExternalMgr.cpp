@@ -71,7 +71,7 @@ void MailExternalMgr::_DoUpdate()
         uint32 itemId = fields[5].GetUInt32();
         uint32 itemCount = fields[6].GetUInt32();
 
-        std::list<Item*> itemlist;
+        std::vector<Item*> itemlist;
         if (itemId)
         {
             if (!sObjectMgr->GetItemTemplate(itemId))

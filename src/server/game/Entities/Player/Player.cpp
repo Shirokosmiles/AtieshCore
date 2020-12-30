@@ -18439,7 +18439,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
         {
             std::string subject = GetSession()->GetTrinityString(LANG_NOT_EQUIPPED_ITEM);
 
-            std::list<Item*> sendItems;
+            std::vector<Item*> sendItems;
             for (uint8 i = 0; !problematicItems.empty() && i < MAX_MAIL_ITEMS; ++i)
             {
                 sendItems.push_back(problematicItems.front());
@@ -23769,7 +23769,7 @@ void Player::AutoUnequipOffhandIfNeed(bool force /*= false*/)
         CharacterDatabase.CommitTransaction(trans);
 
         std::string subject = GetSession()->GetTrinityString(LANG_NOT_EQUIPPED_ITEM);
-        std::list<Item*> itemsInMail;
+        std::vector<Item*> itemsInMail;
         itemsInMail.push_back(offItem);
         sMailMgr->SendMailWithItemsBy(this, this->GetGUID().GetCounter(), subject, "There were problems with equipping one or several items", 0, itemsInMail);
         itemsInMail.clear();
@@ -26553,7 +26553,7 @@ void Player::RefundItem(Item* item)
 
 void Player::SendItemRetrievalMail(uint32 itemEntry, uint32 count)
 {
-    std::list<Item*> maillist;
+    std::vector<Item*> maillist;
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     if (Item* item = Item::CreateItem(itemEntry, count, nullptr))
     {

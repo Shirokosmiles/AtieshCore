@@ -431,24 +431,24 @@ Unit* ScriptedAI::DoSelectBelowHpPctFriendlyWithEntry(uint32 entry, float range,
     return unit;
 }
 
-std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
+std::vector<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
 {
-    std::list<Creature*> list;
+    std::vector<Creature*> vector;
     Trinity::FriendlyCCedInRange u_check(me, range);
-    Trinity::CreatureListSearcher<Trinity::FriendlyCCedInRange> searcher(me, list, u_check);
+    Trinity::CreatureListSearcher<Trinity::FriendlyCCedInRange> searcher(me, vector, u_check);
     Cell::VisitAllObjects(me, searcher, range);
 
-    return list;
+    return vector;
 }
 
-std::list<Creature*> ScriptedAI::DoFindFriendlyMissingBuff(float range, uint32 uiSpellid)
+std::vector<Creature*> ScriptedAI::DoFindFriendlyMissingBuff(float range, uint32 uiSpellid)
 {
-    std::list<Creature*> list;
+    std::vector<Creature*> vector;
     Trinity::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
-    Trinity::CreatureListSearcher<Trinity::FriendlyMissingBuffInRange> searcher(me, list, u_check);
+    Trinity::CreatureListSearcher<Trinity::FriendlyMissingBuffInRange> searcher(me, vector, u_check);
     Cell::VisitAllObjects(me, searcher, range);
 
-    return list;
+    return vector;
 }
 
 Player* ScriptedAI::GetPlayerAtMinimumRange(float minimumRange)

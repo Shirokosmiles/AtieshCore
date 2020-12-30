@@ -24,8 +24,10 @@ SDCategory: Dalaran
 Script Data End */
 
 #include "ScriptMgr.h"
+#include "CellImpl.h"
 #include "DatabaseEnv.h"
 #include "GameObject.h"
+#include "GridNotifiersImpl.h"
 #include "Mail.h"
 #include "MailMgr.h"
 #include "Map.h"
@@ -79,8 +81,8 @@ public:
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_NORMAL, true);
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
             checkdist = 0.f;
-            factionAlliance = me->GetEntry() == NPC_SILVER_COVENANT_GUARDIAN_MAGE;
-            spellid = factionAlliance ? SPELL_TRESPASSER_A : SPELL_TRESPASSER_H;
+            faction = me->GetEntry() == NPC_SILVER_COVENANT_GUARDIAN_MAGE ? TEAM_ALLIANCE : TEAM_HORDE;
+            spellid = faction == TEAM_ALLIANCE ? SPELL_TRESPASSER_A : SPELL_TRESPASSER_H;
             if (me->IsWithinDist2d(AllianceEnterPoint.GetPositionX(), AllianceEnterPoint.GetPositionY(), 15.f))
             {
                 checkdist = 7.0f;
@@ -120,23 +122,34 @@ public:
                 {
                     case 1:
                     {
-                        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                            if (Player* plr = itr->GetSource())
-                                if (plr->IsAlive() && !plr->IsGameMaster() && plr->IsWithinDist2d(point.GetPositionX(), point.GetPositionY(), checkdist) && (plr->GetPositionZ() < 670))
+                        std::vector<Player*> _players;
+                        Trinity::AnyPlayerInObjectRangeCheck checker(me, checkdist);
+                        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, _players, checker);
+                        Cell::VisitWorldObjects(me, searcher, checkdist);
+                        for (auto const& pointer : _players)
+                        {
+                            if (faction != pointer->GetTeamId())
+                            {
+                                if (pointer->IsAlive() &&
+                                    !pointer->IsGameMaster() &&
+                                    (pointer->GetPositionZ() < 670))
                                 {
-                                    if ((factionAlliance && plr->GetTeamId() == TEAM_HORDE) || (!factionAlliance && plr->GetTeamId() == TEAM_ALLIANCE))
+                                    if (pointer->IsWithinDist2d(point.GetPositionX(), point.GetPositionY(), checkdist))
                                     {
                                         if (// If player has Disguise aura for quest A Meeting With The Magister or An Audience With The Arcanist, do not teleport it away but let it pass
-                                            plr->HasAura(SPELL_SUNREAVER_DISGUISE_FEMALE) || plr->HasAura(SPELL_SUNREAVER_DISGUISE_MALE) ||
-                                            plr->HasAura(SPELL_SILVER_COVENANT_DISGUISE_FEMALE) || plr->HasAura(SPELL_SILVER_COVENANT_DISGUISE_MALE))
+                                            pointer->HasAura(SPELL_SUNREAVER_DISGUISE_FEMALE) ||
+                                            pointer->HasAura(SPELL_SUNREAVER_DISGUISE_MALE) ||
+                                            pointer->HasAura(SPELL_SILVER_COVENANT_DISGUISE_FEMALE) ||
+                                            pointer->HasAura(SPELL_SILVER_COVENANT_DISGUISE_MALE))
                                             continue;
 
-                                        DoCast(plr, spellid, TRIGGERED_FULL_MASK);
+                                        DoCast(pointer, spellid, TRIGGERED_FULL_MASK);
                                         me->CombatStop();
                                     }
                                 }
-
+                            }
+                        }
+                        _players.clear();
                         _events.ScheduleEvent(1, 1s);
                         break;
                     }
@@ -145,7 +158,7 @@ public:
         }
 
     private:
-        bool factionAlliance;
+        TeamId faction;
         Position point;
         uint32 spellid;
         float checkdist;

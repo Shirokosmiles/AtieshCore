@@ -141,10 +141,11 @@ class boss_krik_thir : public CreatureScript
 
                 for (uint8 i = 1; i <= 3; ++i)
                 {
-                    std::list<TempSummon*> adds;
+                    std::vector<TempSummon*> adds;
                     me->SummonCreatureGroup(i, &adds);
                     for (TempSummon* add : adds)
                         add->AI()->SetData(DATA_PET_GROUP, i);
+                    adds.clear();
                 }
             }
 

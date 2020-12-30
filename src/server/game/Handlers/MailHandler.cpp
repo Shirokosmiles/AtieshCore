@@ -249,7 +249,7 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMailClient& sendMail)
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    std::list<Item*> maillist;
+    std::vector<Item*> maillist;
     if (!sendMail.Attachments.empty() || sendMail.SendMoney > 0)
     {
         bool log = HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE);

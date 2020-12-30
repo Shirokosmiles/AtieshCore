@@ -498,14 +498,14 @@ class boss_voice_of_yogg_saron : public CreatureScript
                 Initialize();
 
                 bool clockwise = false;
-                std::list<TempSummon*> clouds;
+                std::vector<TempSummon*> clouds;
                 me->SummonCreatureGroup(CREATURE_GROUP_CLOUDS, &clouds);
-                clouds.sort(Trinity::ObjectDistanceOrderPred(me, true));
-                for (std::list<TempSummon*>::const_iterator itr = clouds.begin(); itr != clouds.end(); ++itr)
+                for (auto const& pointer : clouds)
                 {
-                    (*itr)->AI()->DoAction(int32(clockwise));
+                    pointer->AI()->DoAction(int32(clockwise));
                     clockwise = !clockwise;
                 }
+                clouds.clear();
             }
 
             void JustEngagedWith(Unit* /*who*/) override

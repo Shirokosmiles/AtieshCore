@@ -78,23 +78,26 @@ class spell_love_is_in_the_air_romantic_picnic : public SpellScriptLoader
                 bool foundSomeone = false;
                 // For nearby players, check if they have the same aura. If so, cast Romantic Picnic (45123)
                 // required by achievement and "hearts" visual
-                std::list<Player*> playerList;
+                std::vector<Player*> _players;
                 Trinity::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE*2);
-                Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
+                Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(target, _players, checker);
                 Cell::VisitWorldObjects(target, searcher, INTERACTION_DISTANCE * 2);
-                for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+                for (auto const& pointer : _players)
                 {
-                    if ((*itr) != target && (*itr)->HasAura(GetId())) // && (*itr)->GetStandState() == UNIT_STAND_STATE_SIT)
+                    if (pointer->GetGUID() == target->GetGUID())
+                        continue;
+
+                    if (pointer->HasAura(GetId())) // && (*itr)->GetStandState() == UNIT_STAND_STATE_SIT)
                     {
                         if (caster)
                         {
-                            caster->CastSpell(*itr, SPELL_ROMANTIC_PICNIC_ACHIEV, true);
+                            caster->CastSpell(pointer, SPELL_ROMANTIC_PICNIC_ACHIEV, true);
                             caster->CastSpell(target, SPELL_ROMANTIC_PICNIC_ACHIEV, true);
                         }
                         foundSomeone = true;
-                        // break;
                     }
                 }
+                _players.clear();
 
                 if (!foundSomeone && target->HasAura(SPELL_ROMANTIC_PICNIC_ACHIEV))
                     target->RemoveAura(SPELL_ROMANTIC_PICNIC_ACHIEV);

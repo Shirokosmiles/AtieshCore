@@ -1094,7 +1094,7 @@ class spell_dreamwalker_summon_suppresser : public AuraScript
         if (!caster || !caster->IsAIEnabled())
             return;
 
-        std::list<Creature*> summoners;
+        std::vector<Creature*> summoners;
         GetCreatureListWithEntryInGrid(summoners, caster, NPC_WORLD_TRIGGER, 90.0f);
         if (summoners.empty())
             return;
@@ -1102,6 +1102,7 @@ class spell_dreamwalker_summon_suppresser : public AuraScript
         uint8 suppresserNumber = caster->GetAI()->GetData(DATA_SUPPRESSERS_COUNT);
         for (uint8 i = 0; i < suppresserNumber; ++i)
             caster->CastSpell(Trinity::Containers::SelectRandomContainerElement(summoners), SPELL_SUMMON_SUPPRESSER, true);
+        summoners.clear();
     }
 
     void Register() override

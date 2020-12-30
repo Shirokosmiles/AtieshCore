@@ -667,15 +667,19 @@ struct npc_crok_scourgebane : public EscortAI
                 }
 
                 // get all nearby vrykul
-                std::list<Creature*> temp;
+                std::vector<Creature*> temp;
                 FrostwingVrykulSearcher check(me, 80.0f);
                 Trinity::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
                 Cell::VisitGridObjects(me, searcher, 80.0f);
 
                 _aliveTrash.clear();
-                for (auto itr = temp.begin(); itr != temp.end(); ++itr)
-                    if ((*itr)->GetHomePosition().GetPositionY() < maxY && (*itr)->GetHomePosition().GetPositionY() > minY)
-                        _aliveTrash.insert((*itr)->GetGUID());
+                for (auto const& pointer : temp)
+                {
+                    if (pointer->GetHomePosition().GetPositionY() < maxY &&
+                        pointer->GetHomePosition().GetPositionY() > minY)
+                        _aliveTrash.insert(pointer->GetGUID());
+                }
+                temp.clear();
                 break;
             }
             // at waypoints 1 and 2 she kills one captain
@@ -970,8 +974,9 @@ struct npc_captain_arnath : public npc_argent_captainAI
                     break;
                 case EVENT_ARNATH_PW_SHIELD:
                 {
-                    std::list<Creature*> targets = DoFindFriendlyMissingBuff(40.0f, SPELL_POWER_WORD_SHIELD);
+                    std::vector<Creature*> targets = DoFindFriendlyMissingBuff(40.0f, SPELL_POWER_WORD_SHIELD);
                     DoCast(Trinity::Containers::SelectRandomContainerElement(targets), SPELL_POWER_WORD_SHIELD);
+                    targets.clear();
                     Events.ScheduleEvent(EVENT_ARNATH_PW_SHIELD, 15s, 20s);
                     break;
                 }
