@@ -4505,7 +4505,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                 if (Battleground* bg = target->ToPlayer()->GetBattleground())
                                     bg->RemovePlayerFromResurrectQueue(target->GetGUID());
                                 if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId()))
-                                    battlefield->RemovePlayerFromResurrectQueue(target->GetGUID());
+                                    battlefield->HandleResurrectedPlayer(target->GetGUID());
                             }
                             break;
                         case 36730:                                     // Flame Strike

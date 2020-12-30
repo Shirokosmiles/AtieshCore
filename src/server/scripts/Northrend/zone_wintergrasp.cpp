@@ -19,11 +19,14 @@
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Battlefield/BattlefieldWG.h"
+#include "CellImpl.h"
 #include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
+#include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
+#include "ObjectGuid.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
@@ -124,10 +127,86 @@ class npc_wg_spirit_guide : public CreatureScript
 
         struct npc_wg_spirit_guideAI : public ScriptedAI
         {
-            npc_wg_spirit_guideAI(Creature* creature) : ScriptedAI(creature) { }
-
-            void UpdateAI(uint32 /*diff*/) override
+            npc_wg_spirit_guideAI(Creature* creature) : ScriptedAI(creature)
             {
+                _team = me->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE;
+                _WhoList.clear();
+                _Timer = 1000;
+            }
+
+            bool existInList(ObjectGuid guid)
+            {
+                return _WhoList.find(guid) != _WhoList.end();
+            }
+
+            void HandleSearchPlayers()
+            {
+                if (!_grave)
+                    return;
+                std::vector<Player*> _players;
+                Trinity::AnyPlayerInObjectRangeCheck check(me, 25.f, false);
+                Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, _players, check);
+                Cell::VisitWorldObjects(me, searcher, 25.f);
+                for (auto const& pointer : _players)
+                {
+                    if (pointer->GetTeamId() != _team)
+                        continue;
+
+                    if (existInList(pointer->GetGUID()))
+                        continue;
+
+                    if (pointer->IsAlive())
+                        continue;
+
+                    _grave->AddPlayer(pointer->GetGUID());
+                }
+                _players.clear();
+            }
+
+            void HandleCheckExistPlayers()
+            {
+                if (!_grave)
+                    return;
+                std::set<ObjectGuid> deletePlayers;
+                for (auto const& pointer : _WhoList)
+                {
+                    if (Player* player = ObjectAccessor::FindConnectedPlayer(pointer))
+                    {
+                        if (!me->IsWithinDist(player, 25.0f, false))
+                            deletePlayers.insert(pointer);
+
+                        if (player->IsAlive())
+                            deletePlayers.insert(pointer);
+                    }
+                    else
+                        deletePlayers.insert(pointer);
+                }
+
+                for (auto const& guid : deletePlayers)
+                {
+                    _grave->RemovePlayer(guid);
+                    _WhoList.erase(guid);
+                }
+                deletePlayers.clear();
+            }
+
+            void DoAction(int32 actionId) override
+            {
+                _wintergrasp = ASSERT_NOTNULL(sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG));
+                _grave = ASSERT_NOTNULL(_wintergrasp->GetGraveyardById(actionId));
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (_Timer <= diff)
+                {
+                    HandleSearchPlayers();
+                    HandleCheckExistPlayers();
+                    _Timer = 1000;
+                }
+                else
+                    _Timer -= diff;
+
                 if (!me->HasUnitState(UNIT_STATE_CASTING))
                     DoCast(me, SPELL_CHANNEL_SPIRIT_HEAL);
             }
@@ -137,12 +216,11 @@ class npc_wg_spirit_guide : public CreatureScript
                 if (me->IsQuestGiver())
                     player->PrepareQuestMenu(me->GetGUID());
 
-                Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-                if (!wintergrasp)
+                if (!_wintergrasp)
                     return true;
 
-                GraveyardMap gMap = wintergrasp->GetGraveyardMap();
-                for (auto& gID : gMap)
+                GraveyardMap const& gMap = _wintergrasp->GetGraveyardMap();
+                for (const auto& gID : gMap)
                 {
                     if (BfGraveyard* graveyard = gID.second)
                         if (graveyard->GetControlTeamId() == player->GetTeamId())
@@ -158,11 +236,10 @@ class npc_wg_spirit_guide : public CreatureScript
                 uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
                 CloseGossipMenuFor(player);
 
-                Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-                if (wintergrasp)
+                if (_wintergrasp)
                 {
-                    GraveyardMap gMap = wintergrasp->GetGraveyardMap();
-                    for (auto& gID : gMap)
+                    GraveyardMap const& gMap = _wintergrasp->GetGraveyardMap();
+                    for (const auto& gID : gMap)
                     {
                         if (action == gID.first &&
                             gID.second->GetControlTeamId() == player->GetTeamId())
@@ -172,6 +249,13 @@ class npc_wg_spirit_guide : public CreatureScript
                 }
                 return true;
             }
+
+        private:
+            Battlefield* _wintergrasp;
+            BfGraveyard* _grave;
+            TeamId _team;
+            uint32 _Timer;
+            GuidSet _WhoList;
         };
 
         CreatureAI* GetAI(Creature* creature) const override

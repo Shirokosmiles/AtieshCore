@@ -975,6 +975,11 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
     // Accessing to db spawned creatures
     switch (creature->GetEntry())
     {
+        case NPC_SPIRIT_HEALER:
+        {
+            HideNpc(creature);
+            break;
+        }
         case NPC_DWARVEN_SPIRIT_GUIDE:
         case NPC_TAUNKA_SPIRIT_GUIDE:
         {
@@ -989,24 +994,31 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                     {
                         case BATTLEFIELD_WG_GY_WORKSHOP_NE:
                             AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
                             break;
                         case BATTLEFIELD_WG_GY_WORKSHOP_NW:
                             AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
                             break;
                         case BATTLEFIELD_WG_GY_WORKSHOP_SE:
                             AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
                             break;
                         case BATTLEFIELD_WG_GY_WORKSHOP_SW:
                             AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
                             break;
                         case BATTLEFIELD_WG_GY_KEEP:
                             AddCreatureInHolderByGUID(creature, VAULT_KEEP, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
                             break;
                         case BATTLEFIELD_WG_GY_HORDE:
                             AddCreatureInHolderByGUID(creature, WG_HORDE_GRAVEYARD, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
                             break;
                         case BATTLEFIELD_WG_GY_ALLIANCE:
                             AddCreatureInHolderByGUID(creature, WG_ALLIANCE_GRAVEYARD, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
                             break;
                     }
                 }
@@ -2605,7 +2617,7 @@ void WintergraspCapturePoint::ChangeTeam(TeamId newTeam)
 
 BfGraveyardWG::BfGraveyardWG(BattlefieldWG* battlefield) : BfGraveyard(battlefield)
 {
-    m_Bf = battlefield;
+    _Bf = battlefield;
     m_GossipTextId = 0;
 }
 

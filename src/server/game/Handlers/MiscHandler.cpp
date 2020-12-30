@@ -19,6 +19,7 @@
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundPackets.h"
+#include "BattlefieldMgr.h"
 #include "CharacterPackets.h"
 #include "Chat.h"
 #include "CinematicMgr.h"
@@ -586,8 +587,11 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPackets::Battleground:
 
     if (Battleground * battleground = _player->GetBattleground())
         sBattlegroundMgr->SendAreaSpiritHealerQueryOpcode(_player, battleground, areaSpiritHealerQuery.HealerGuid);
-    else if (SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(_player->GetZoneId()))
-        battlefield->HandleAreaSpiritHealerQueryOpcode(_player, areaSpiritHealerQuery.HealerGuid);
+    else if (SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(_player->GetZoneId()))
+        se->HandleAreaSpiritHealerQueryOpcode(_player, areaSpiritHealerQuery.HealerGuid);
+    else if (_player->GetZoneId() == AREA_WINTERGRASP)
+        if (Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
+            wintergrasp->SendAreaSpiritHealerQueryOpcode(_player, areaSpiritHealerQuery.HealerGuid);
 }
 
 void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPackets::Battleground::AreaSpiritHealerQueue& areaSpiritHealerQueue)
@@ -601,8 +605,8 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPackets::Battleground:
 
     if (Battleground * battleground = _player->GetBattleground())
         battleground->AddPlayerToResurrectQueue(areaSpiritHealerQueue.HealerGuid, _player->GetGUID());
-    else if (SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(_player->GetZoneId()))
-        battlefield->HandleAddPlayerToResurrectionQueue(_player, areaSpiritHealerQueue.HealerGuid);
+    else if (SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(_player->GetZoneId()))
+        se->HandleAddPlayerToResurrectionQueue(_player, areaSpiritHealerQueue.HealerGuid);
 }
 
 void WorldSession::HandleHearthAndResurrect(WorldPackets::Battleground::HearthAndResurrect& /*hearthAndResurrect*/)

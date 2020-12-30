@@ -167,10 +167,11 @@ class TC_GAME_API BfGraveyard
 {
     public:
         BfGraveyard(Battlefield* Bf);
+        ~BfGraveyard();
 
         // Method to changing who controls the graveyard
         void GiveControlTo(TeamId team);
-        TeamId GetControlTeamId() const { return m_ControlTeam; }
+        TeamId GetControlTeamId() const { return _ControlTeam; }
 
         // Find the nearest graveyard to a player
         float GetDistance(Player* player);
@@ -197,17 +198,17 @@ class TC_GAME_API BfGraveyard
         bool HasNpc(ObjectGuid guid);
 
         // Check if a player is in this graveyard's resurrect queue
-        bool HasPlayer(ObjectGuid guid) { return m_ResurrectQueue.find(guid) != m_ResurrectQueue.end(); }
+        bool HasPlayer(ObjectGuid guid) const { return _resurrectQueue.find(guid) != _resurrectQueue.end(); }
 
         // Get the graveyard's ID.
-        uint32 GetGraveyardId() const { return m_GraveyardId; }
+        uint32 GetGraveyardId() const { return _GraveyardId; }
 
     protected:
-        TeamId m_ControlTeam;
-        uint32 m_GraveyardId;
-        ObjectGuid m_SpiritGuide[PVP_TEAMS_COUNT];
-        GuidSet m_ResurrectQueue;
-        Battlefield* m_Bf;
+        TeamId _ControlTeam;
+        uint32 _GraveyardId;
+        ObjectGuid _SpiritGuide[PVP_TEAMS_COUNT];
+        GuidUnorderedSet _resurrectQueue;
+        Battlefield* _Bf;
 };
 
 struct CapturePointHolder
@@ -308,9 +309,6 @@ class TC_GAME_API Battlefield : public ZoneScript
         // Graveyard methods
         // Find which graveyard the player must be teleported to to be resurrected by spiritguide
         WorldSafeLocsDBC const* GetClosestGraveyard(Player* player);
-
-        virtual void AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid player_guid);
-        virtual void RemovePlayerFromResurrectQueue(ObjectGuid player_guid);
         BfGraveyard* GetGraveyardById(uint32 id) const;
 
         // Misc methods
@@ -357,7 +355,8 @@ class TC_GAME_API Battlefield : public ZoneScript
         /// Return if we can use mount in battlefield
         bool CanFlyIn() { return !m_isActive; }
 
-        void SendAreaSpiritHealerQueryOpcode(Player* player, ObjectGuid guid);
+        void SendAreaSpiritHealerQueryOpcode(Player* player, ObjectGuid source);
+        void HandleResurrectedPlayer(ObjectGuid playerGuid);
 
         void StartBattle();
         void EndBattle(bool endByTimer);
@@ -365,7 +364,7 @@ class TC_GAME_API Battlefield : public ZoneScript
         void HideNpc(Creature* creature);
         void ShowNpc(Creature* creature, bool aggressive);
 
-        GraveyardMap GetGraveyardMap() const { return m_graveyardMap; }
+        GraveyardMap const& GetGraveyardMap() const { return m_graveyardMap; }
 
         uint32 GetTimer() const { return m_Timer; }
         void SetTimer(uint32 timer) { m_Timer = timer; }

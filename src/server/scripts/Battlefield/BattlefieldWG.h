@@ -256,6 +256,8 @@ enum WGGossipText
 
 enum WintergraspNpcs
 {
+    NPC_SPIRIT_HEALER                               = 6491,
+
     BATTLEFIELD_WG_NPC_GUARD_H                      = 30739,
     BATTLEFIELD_WG_NPC_GUARD_A                      = 30740,
     BATTLEFIELD_WG_NPC_STALKER                      = 15214,
