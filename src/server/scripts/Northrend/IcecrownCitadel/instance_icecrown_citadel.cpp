@@ -98,6 +98,7 @@ DoorData const doorData[] =
     { GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_03,  DATA_VALITHRIA_DREAMWALKER, DOOR_TYPE_SPAWN_HOLE },
     { GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_04,  DATA_VALITHRIA_DREAMWALKER, DOOR_TYPE_SPAWN_HOLE },
     { GO_SINDRAGOSA_ENTRANCE_DOOR,            DATA_SINDRAGOSA,            DOOR_TYPE_ROOM },
+    { GO_SINDRAGOSA_ENTRANCE_DOOR,            DATA_SINDRAGOSA_GAUNTLET,   DOOR_TYPE_PASSAGE },
     { GO_SINDRAGOSA_SHORTCUT_ENTRANCE_DOOR,   DATA_SINDRAGOSA,            DOOR_TYPE_PASSAGE },
     { GO_SINDRAGOSA_SHORTCUT_EXIT_DOOR,       DATA_SINDRAGOSA,            DOOR_TYPE_PASSAGE },
     { GO_ICE_WALL,                            DATA_SINDRAGOSA,            DOOR_TYPE_ROOM },
@@ -326,6 +327,9 @@ class instance_icecrown_citadel : public InstanceMapScript
                         // Remove corpse as soon as it dies (and respawn 10 seconds later)
                         creature->SetCorpseDelay(0);
                         creature->SetReactState(REACT_PASSIVE);
+                        break;
+                    case NPC_SINDRAGOSA_GAUNTLET:
+                        SindragosaGauntletGUID = creature->GetGUID();
                         break;
                     default:
                         break;
@@ -844,6 +848,8 @@ class instance_icecrown_citadel : public InstanceMapScript
                         return ArthasPlatformGUID;
                     case DATA_TERENAS_MENETHIL:
                         return TerenasMenethilGUID;
+                    case NPC_SINDRAGOSA_GAUNTLET:
+                        return SindragosaGauntletGUID;
                     default:
                         break;
                 }
@@ -1576,6 +1582,7 @@ class instance_icecrown_citadel : public InstanceMapScript
             ObjectGuid PillarsChainedGUID;
             ObjectGuid PillarsUnchainedGUID;
             ObjectGuid PutricideDoorGUID;
+            ObjectGuid SindragosaGauntletGUID;
             Team TeamInInstance;
             uint32 ColdflameJetsState;
             uint32 UpperSpireTeleporterActiveState;
