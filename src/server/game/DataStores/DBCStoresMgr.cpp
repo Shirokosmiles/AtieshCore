@@ -4058,18 +4058,12 @@ void DBCStoresMgr::_Load_Spell()
 
         _spellMap[id] = s;
 
-        if (_spellNumRow)
-        {
-            if (_spellNumRow < id)
-                _spellNumRow = id;
-        }
-        else
-            _spellNumRow = id;
+        if (!_spellNumRow || _spellNumRow <= id)
+            _spellNumRow = id + 1;
 
         ++count;
     } while (result->NextRow());
 
-    _spellNumRow++; // this _spellNumRow should be more then the last by 1 point
     //                                       1111111111111111111111111111111111
     TC_LOG_INFO("server.loading", ">> Loaded DBC_spell                         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
@@ -5413,7 +5407,10 @@ void DBCStoresMgr::_Handle_World_Spell()
         {
             SpellDBC s;
             s.ID = id;
-            //s.Category = fields[1].GetUInt32();
+
+            // ZERO
+            s.Category = 0;
+
             s.DispelType = fields[1].GetUInt32();
             s.Mechanic = fields[2].GetUInt32();
             s.Attributes = fields[3].GetUInt32();
@@ -5429,23 +5426,32 @@ void DBCStoresMgr::_Handle_World_Spell()
             s.ShapeshiftExclude[0] = fields[12].GetUInt32();
 
             s.Targets = fields[13].GetUInt32();
-            /*s.TargetCreatureType = fields[17].GetUInt32();
-            s.RequiresSpellFocus = fields[18].GetUInt32();
-            s.FacingCasterFlags = fields[19].GetUInt32();
-            s.CasterAuraState = fields[20].GetUInt32();
-            s.TargetAuraState = fields[21].GetUInt32();
-            s.ExcludeCasterAuraState = fields[22].GetUInt32();
-            s.ExcludeTargetAuraState = fields[23].GetUInt32();
-            s.CasterAuraSpell = fields[24].GetUInt32();
-            s.TargetAuraSpell = fields[25].GetUInt32();
-            s.ExcludeCasterAuraSpell = fields[26].GetUInt32();
-            s.ExcludeTargetAuraSpell = fields[27].GetUInt32();*/
+
+            // ZERO
+            s.TargetCreatureType     = 0;
+            s.RequiresSpellFocus     = 0;
+            s.FacingCasterFlags      = 0;
+            s.CasterAuraState        = 0;
+            s.TargetAuraState        = 0;
+            s.ExcludeCasterAuraState = 0;
+            s.ExcludeTargetAuraState = 0;
+            s.CasterAuraSpell        = 0;
+            s.TargetAuraSpell        = 0;
+            s.ExcludeCasterAuraSpell = 0;
+            s.ExcludeTargetAuraSpell = 0;
+
             s.CastingTimeIndex = fields[14].GetUInt32();
-            //s.RecoveryTime = fields[29].GetUInt32();
-            //s.CategoryRecoveryTime = fields[30].GetUInt32();
-            //s.InterruptFlags = fields[31].GetUInt32();
+
+            // ZERO
+            s.RecoveryTime         = 0;
+            s.CategoryRecoveryTime = 0;
+            s.InterruptFlags       = 0;
+
             s.AuraInterruptFlags = fields[15].GetUInt32();
-            //s.ChannelInterruptFlags = fields[33].GetUInt32();
+
+            // ZERO
+            s.ChannelInterruptFlags = 0;
+
             s.ProcTypeMask = fields[16].GetUInt32();
             s.ProcChance = fields[17].GetUInt32();
             s.ProcCharges = fields[18].GetUInt32();
@@ -5453,21 +5459,30 @@ void DBCStoresMgr::_Handle_World_Spell()
             s.BaseLevel = fields[20].GetUInt32();
             s.SpellLevel = fields[21].GetUInt32();
             s.DurationIndex = fields[22].GetUInt32();
-            /*s.PowerType = fields[41].GetUInt32();
-            s.ManaCost = fields[42].GetUInt32();
-            s.ManaCostPerLevel = fields[43].GetUInt32();
-            s.ManaPerSecond = fields[44].GetUInt32();
-            s.ManaPerSecondPerLevel = fields[45].GetUInt32();*/
+
+            // ZERO
+            s.PowerType             = 0;
+            s.ManaCost              = 0;
+            s.ManaCostPerLevel      = 0;
+            s.ManaPerSecond         = 0;
+            s.ManaPerSecondPerLevel = 0;
+
             s.RangeIndex = fields[23].GetUInt32();
-            //s.Speed = fields[47].GetFloat();
+
+            // ZERO
+            s.Speed = 0;
+
             //uint32 ModalNextSpell; (UNUSED)
+
             s.CumulativeAura = fields[24].GetUInt32();
-            /*for (uint8 i = 0; i < 2; i++)
-                s.Totem[i] = fields[49 + i].GetUInt32();
+
+            // ZERO
+            for (uint8 i = 0; i < 2; i++)
+                s.Totem[i] = 0;
             for (uint8 i = 0; i < MAX_SPELL_REAGENTS; i++)
-                s.Reagent[i] = fields[51 + i].GetInt32();
+                s.Reagent[i] = 0;
             for (uint8 i = 0; i < MAX_SPELL_REAGENTS; i++)
-                s.ReagentCount[i] = fields[59 + i].GetInt32();*/
+                s.ReagentCount[i] = 0;
 
             s.EquippedItemClass = fields[25].GetInt32();
             s.EquippedItemSubclass = fields[26].GetInt32();
@@ -5500,8 +5515,9 @@ void DBCStoresMgr::_Handle_World_Spell()
             for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
                 s.EffectAura[i] = fields[52 + i].GetUInt32();
 
-            /*for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
-                s.EffectAuraPeriod[i] = fields[97 + i].GetUInt32();*/
+            // ZERO
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectAuraPeriod[i] = 0;
 
             for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
                 s.EffectAmplitude[i] = fields[55 + i].GetFloat();
@@ -5521,8 +5537,9 @@ void DBCStoresMgr::_Handle_World_Spell()
             for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
                 s.EffectTriggerSpell[i] = fields[70 + i].GetUInt32();
 
-            /*for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
-                s.EffectPointsPerCombo[i] = fields[118 + i].GetFloat();*/
+            // ZERO
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectPointsPerCombo[i] = 0;
 
             // TODO: check this
             // variant 1 : flag = [A1, B1, C1], [A2,B2,C2]...
@@ -5535,28 +5552,33 @@ void DBCStoresMgr::_Handle_World_Spell()
             s.EffectSpellClassMask[1].Set(fields[76].GetUInt32(), fields[77].GetUInt32(), fields[78].GetUInt32());
             s.EffectSpellClassMask[2].Set(fields[79].GetUInt32(), fields[80].GetUInt32(), fields[81].GetUInt32());
 
-            /*for (uint8 i = 0; i < 2; i++)
-                s.SpellVisualID[i] = fields[130 + i].GetUInt32();*/
-
-            //s.SpellIconID = fields[132].GetUInt32();
-            //s.ActiveIconID = fields[133].GetUInt32();
-            //s.SpellPriority = fields[134].GetUInt32();
+            // ZERO
+            for (uint8 i = 0; i < 2; i++)
+                s.SpellVisualID[i] = 0;
+            s.SpellIconID   = 0;
+            s.ActiveIconID  = 0;
+            s.SpellPriority = 0;
 
             for (uint8 i = 0; i < TOTAL_LOCALES; i++)
                 s.Name[i] = fields[82].GetString();
 
             //uint32 Name_lang_mask; (UNUSED)
-            /*for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-                s.NameSubtext[i] = fields[144 + i].GetString();*/
+
+            // ZERO
+            for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+                s.NameSubtext[i] = "";
 
             //uint32 NameSubtext_lang_mask; (UNUSED)
             //std::array<char const*, 16> Description; (UNUSED)
             //uint32 Description_lang_mask; (UNUSED)
             //std::array<char const*, 16> AuraDescription; (UNUSED)
             //uint32 AuraDescription_lang_mask; (UNUSED)
-            /*s.ManaCostPct = fields[153].GetUInt32();
-            s.StartRecoveryCategory = fields[154].GetUInt32();
-            s.StartRecoveryTime = fields[155].GetUInt32();*/
+
+            // ZERO
+            s.ManaCostPct           = 0;
+            s.StartRecoveryCategory = 0;
+            s.StartRecoveryTime     = 0;
+
             s.MaxTargetLevel = fields[83].GetUInt32();
             s.SpellClassSet = fields[84].GetUInt32();
             s.SpellClassMask.Set(fields[85].GetUInt32(), fields[86].GetUInt32(), fields[87].GetUInt32());
@@ -5570,27 +5592,30 @@ void DBCStoresMgr::_Handle_World_Spell()
             //uint32 MinFactionID; (UNUSED)
             //uint32 MinReputation; (UNUSED)
             //uint32 RequiredAuraVision; (UNUSED)
-            /*for (uint8 i = 0; i < 2; i++)
-                s.RequiredTotemCategoryID[i] = fields[167].GetUInt32();*/
+
+            // ZERO
+            for (uint8 i = 0; i < 2; i++)
+                s.RequiredTotemCategoryID[i] = 0;
 
             s.RequiredAreasID = fields[94].GetUInt32();
             s.SchoolMask = fields[95].GetUInt32();
-            //s.RuneCostID = fields[171].GetUInt32();
+
+            // ZERO
+            s.RuneCostID = 0;
             //uint32 SpellMissileID; (UNUSED)
             //uint32 PowerDisplayID; (UNUSED)
-            /*for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
-                s.EffectBonusCoefficient[i] = fields[172 + i].GetFloat();*/
+
+            // ZERO
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
+                s.EffectBonusCoefficient[i] = 0;
 
             //uint32 DescriptionVariablesID; (UNUSED)
             //uint32 Difficulty; (UNUSED)
 
             _spellMap[id] = s;
 
-            if (_spellNumRow)
-            {
-                if (_spellNumRow < id)
-                    _spellNumRow = id + 1; // this _spellNumRow should be more then the last by 1 point    
-            }
+            if (!_spellNumRow || _spellNumRow <= id)
+                _spellNumRow = id + 1;
 
             ++count;
         }
