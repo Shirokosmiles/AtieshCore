@@ -28,28 +28,22 @@ BattlegroundGOSpawnPoint const BG_RV_GameObjects[BG_RV_OBJECT_MAX] =
 {
     { BG_RV_OBJECT_TYPE_BUFF_1,            { 735.551819f, -284.794678f, 28.276682f, 0.034906f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_BUFF_2,            { 791.224487f, -284.794464f, 28.276682f, 2.600535f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY },
-
     { BG_RV_OBJECT_TYPE_FIRE_1,            { 743.543457f, -283.799469f, 28.286655f, 3.141593f }, { 0.f, 0.f, -1.f, 0.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_FIRE_2,            { 782.971802f, -283.799469f, 28.286655f, 3.141593f }, { 0.f, 0.f, -1.f, 0.f }, RESPAWN_IMMEDIATELY },
-
     { BG_RV_OBJECT_TYPE_FIREDOOR_1,        { 743.711060f, -284.099609f, 27.542587f, 3.141593f }, { 0.f, 0.f, -1.f, 0.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_FIREDOOR_2,        { 783.221252f, -284.133362f, 27.535686f, 0.000000f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY },
-
     { BG_RV_OBJECT_TYPE_PILAR_1,           { 763.632385f, -306.162384f, 25.909504f, 3.141593f }, { 0.f, 0.f, -1.f, 0.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_PILAR_3,           { 763.611145f, -261.856750f, 25.909504f, 0.000000f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_GEAR_1,            { 763.664551f, -261.872986f, 26.686588f, 0.000000f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_GEAR_2,            { 763.578979f, -306.146149f, 26.665222f, 3.141593f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY },
-
     { BG_RV_OBJECT_TYPE_PILAR_2,           { 723.644287f, -284.493256f, 24.648525f, 3.141593f }, { 0.f, 0.f, -1.f, 0.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_PILAR_4,           { 802.211609f, -284.493256f, 24.648525f, 0.000000f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_PULLEY_1,          { 700.722290f, -283.990662f, 39.517582f, 3.141593f }, { 0.f, 0.f, -1.f, 0.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_PULLEY_2,          { 826.303833f, -283.996429f, 39.517582f, 0.000000f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY },
-
     { BG_RV_OBJECT_TYPE_PILAR_COLLISION_1, { 763.632385f, -306.162384f, 30.639660f, 3.141593f }, { 0.f, 0.f, -1.f, 0.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_PILAR_COLLISION_2, { 723.644287f, -284.493256f, 32.382710f, 0.000000f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_PILAR_COLLISION_3, { 763.611145f, -261.856750f, 30.639660f, 0.000000f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_PILAR_COLLISION_4, { 802.211609f, -284.493256f, 32.382710f, 3.141593f }, { 0.f, 0.f, -1.f, 0.f }, RESPAWN_IMMEDIATELY },
-
     { BG_RV_OBJECT_TYPE_ELEVATOR_1,        { 763.536377f, -294.535767f, 0.5053830f, 3.141593f }, { 0.f, 0.f, -1.f, 0.f }, RESPAWN_IMMEDIATELY },
     { BG_RV_OBJECT_TYPE_ELEVATOR_2,        { 763.506348f, -273.873352f, 0.5053830f, 0.000000f }, { 0.f, 0.f,  0.f, 1.f }, RESPAWN_IMMEDIATELY }
 };
@@ -58,9 +52,30 @@ BattlegroundRV::BattlegroundRV()
 {
     SetGameObjectsNumber(BG_RV_OBJECT_MAX);
 
-    _timer = 0;
+    _timer = BG_RV_TELEPORT_ON_ELEVATOR;
     _state = 0;
     _pillarCollision = false;
+}
+
+bool BattlegroundRV::PreUpdateImpl(uint32 diff)
+{
+    if (GetStatus() != STATUS_WAIT_JOIN)
+        return true;
+
+    if (_timer)
+    {
+        if (_timer <= diff)
+        {
+            for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+                    player->NearTeleportTo(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ() + 2.0f, player->GetOrientation());
+            _timer = 0;
+        }
+        else
+            _timer -= diff;
+    }    
+
+    return true;
 }
 
 void BattlegroundRV::PostUpdateImpl(uint32 diff)
@@ -68,7 +83,7 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    if (_timer < diff)
+    if (_timer <= diff)
     {
         switch (_state)
         {
@@ -175,7 +190,12 @@ void BattlegroundRV::TogglePillarCollision()
 
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
                 if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+                {
                     go->SendUpdateToPlayer(player);
+                    // just safe check each togglePillars for players which droped underground
+                    if (player->GetPositionZ() < 27.f)
+                        player->NearTeleportTo(player->GetPositionX(), player->GetPositionY(), 30.5f, player->GetOrientation());
+                }
         }
     }
 

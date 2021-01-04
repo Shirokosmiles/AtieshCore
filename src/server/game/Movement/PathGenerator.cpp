@@ -616,7 +616,16 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
         _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
     }
 
-    if (_type == PATHFIND_INCOMPLETE && _source->GetMapId() == 562) // Blade edge Arena
+    if (_source->GetMapId() == 618)
+    {
+        pointCount = 2;
+        _pathPoints.resize(pointCount);
+        _pathPoints[0] = GetStartPosition();
+        _pathPoints[1] = endPoint[1] < 28.0f ? G3D::Vector3(endPoint[2], endPoint[0], 30.5f) : GetEndPosition();
+        _type = PathType(PATHFIND_NORMAL);
+    }
+
+    if (_type & PATHFIND_INCOMPLETE && _source->GetMapId() == 562) // Blade edge Arena
     {
         if ((endPoint[1] - startPoint[1]) > 4.5f)
         {
@@ -635,7 +644,7 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
                 _pathPoints[2] = G3D::Vector3(6203.682617f, 281.374512f, 12.5f);
                 _pathPoints[3] = G3D::Vector3(6206.993164f, 280.087006f, 14.0f);
                 _pathPoints[4] = GetEndPosition();
-                _type = PATHFIND_NORMAL;
+                _type = PathType(PATHFIND_NORMAL);
             }
             //B (north-east)
             else if ((sX >= 6215.437500f && sX <= 6259.274902f) && (sY >= 205.504669f && sY <= 248.468872f))
@@ -648,7 +657,7 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
                 _pathPoints[2] = G3D::Vector3(6261.618652f, 232.819412f, 12.5f);
                 _pathPoints[3] = G3D::Vector3(6260.099121f, 236.207077f, 14.0f);
                 _pathPoints[4] = GetEndPosition();
-                _type = PATHFIND_NORMAL;
+                _type = PathType(PATHFIND_NORMAL);
             }
             //C (north-west)
             else if ((sX >= 6249.708496f && sX <= 6289.688965f) && (sY >= 247.162811f && sY <= 289.817505f))
@@ -661,7 +670,7 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
                 _pathPoints[2] = G3D::Vector3(6272.071289f, 243.330627f, 12.5f);
                 _pathPoints[3] = G3D::Vector3(6268.463867f, 245.091064f, 14.0f);
                 _pathPoints[4] = GetEndPosition();
-                _type = PATHFIND_NORMAL;
+                _type = PathType(PATHFIND_NORMAL);
             }
             //D (south-west)
             else if ((sX >= 6216.665039f && sX <= 6265.604980f) && (sY >= 274.625031f && sY <= 317.697571f))
@@ -674,7 +683,7 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
                 _pathPoints[2] = G3D::Vector3(6213.339355f, 292.441376f, 12.5f);
                 _pathPoints[3] = G3D::Vector3(6215.147949f, 289.954590f, 14.0f);
                 _pathPoints[4] = GetEndPosition();
-                _type = PATHFIND_NORMAL;
+                _type = PathType(PATHFIND_NORMAL);
             }
         }
     }
@@ -1104,7 +1113,7 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
 
 bool PathGenerator::IsInvalidDestinationZ(Unit const* target) const
 {
-    return (target->GetPositionZ() - GetActualEndPosition().z) > 5.0f && _source->GetMapId() != 562;
+    return (target->GetPositionZ() - GetActualEndPosition().z) > 5.0f && _source->GetMapId() != 562 && _source->GetMapId() != 618;
 }
 
 void PathGenerator::AddFarFromPolyFlags(bool startFarFromPoly, bool endFarFromPoly)

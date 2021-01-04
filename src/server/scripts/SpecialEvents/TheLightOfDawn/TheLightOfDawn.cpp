@@ -316,7 +316,7 @@ void TheLightOfDawnEvent::UpdateWorldState(uint32 id, uint32 state)
 {
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
-        if (Player* player = ObjectAccessor::FindPlayer(itr->second.guid))
+        if (Player* player = ObjectAccessor::FindPlayer(itr->first))
             player->SendUpdateWorldState(id, state);
     }
 }
@@ -366,7 +366,7 @@ void TheLightOfDawnEvent::BroadcastPacketToPlayersInArea(WorldPacket const* data
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
         if (itr->second.isInArea)
-            if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+            if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->first))
                 player->SendDirectMessage(data);
     }
 }
@@ -383,7 +383,7 @@ void TheLightOfDawnEvent::StopTheLightOfDawnEvent()
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
         if (itr->second.isInArea && itr->second.isDoingQuest)
-            if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+            if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->first))
                 player->KilledMonsterCredit(NPC_LIGHT_OF_DAWN_CREDIT);
     }
 
@@ -542,15 +542,13 @@ bool TheLightOfDawnEvent::SetupSpecialEvent(bool enabled, bool active, bool repe
 
 void TheLightOfDawnEvent::DoActionForMember(ObjectGuid playerGUID, uint32 param)
 {
-    for (PlayersDataContainer::iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
+    PlayersDataContainer::iterator itr = m_playersDataStore.find(playerGUID);
+    if (itr != m_playersDataStore.end())
     {
-        if (itr->second.guid == playerGUID)
-        {
-            if (!param) // if param == 0, we should set true isDoingQuest
-                itr->second.isDoingQuest = true;
-            else        // if param == 1, we should set false isDoingQuest
-                itr->second.isDoingQuest = false;
-        }
+        if (!param) // if param == 0, we should set true isDoingQuest
+            itr->second.isDoingQuest = true;
+        else        // if param == 1, we should set false isDoingQuest
+            itr->second.isDoingQuest = false;
     }
 }
 
@@ -792,9 +790,9 @@ void TheLightOfDawnEvent::OnSpecialEventEnd(bool /*endByTimer*/)
 void TheLightOfDawnEvent::AddPlayer(ObjectGuid playerGUID)
 {
     PlayersData pd;
-    pd.guid         = playerGUID;
     pd.isDoingQuest = false;
     pd.isInArea     = false;
+
     if (Player* player = ObjectAccessor::FindConnectedPlayer(playerGUID))
     {
         if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE)
@@ -806,38 +804,26 @@ void TheLightOfDawnEvent::AddPlayer(ObjectGuid playerGUID)
             pd.isInArea = true;
     }
 
-    // find max id
-    uint32 new_id = 0;
-    for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
-        if (itr->first > new_id)
-            new_id = itr->first;
-
-    // use next
-    ++new_id;
     // add in active player list of event
-    m_playersDataStore[new_id] = pd;
+    m_playersDataStore[playerGUID] = pd;
 }
 
 void TheLightOfDawnEvent::RemovePlayer(ObjectGuid playerGUID)
 {
-    uint32 id = 0;
-    for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
-    {
-        if (itr->second.guid == playerGUID)
-            id = itr->first;
-    }
+    bool founded = false;
+    PlayersDataContainer::const_iterator itr = m_playersDataStore.find(playerGUID);
+    if (itr != m_playersDataStore.end())
+        founded = true;
 
-    if (id)
-        m_playersDataStore.erase(id);
+    if (founded)
+        m_playersDataStore.erase(playerGUID);
 }
 
 bool TheLightOfDawnEvent::IsMemberOfEvent(Player* player)
 {
-    for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
-    {
-        if (itr->second.guid == player->GetGUID())
-            return true;
-    }
+    PlayersDataContainer::const_iterator itr = m_playersDataStore.find(player->GetGUID());
+    if (itr != m_playersDataStore.end())
+        return true;
 
     return false;
 }
@@ -876,13 +862,11 @@ void TheLightOfDawnEvent::HandlePlayerEnterArea(Player* player, uint32 zoneId, u
     if (!areaIdFounded)
         return;
 
-    for (PlayersDataContainer::iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
+    PlayersDataContainer::iterator itr = m_playersDataStore.find(player->GetGUID());
+    if (itr != m_playersDataStore.end())
     {
-        if (itr->second.guid == player->GetGUID())
-        {
-            if (!itr->second.isInArea)
-                itr->second.isInArea = true;
-        }
+        if (!itr->second.isInArea)
+            itr->second.isInArea = true;
     }
 }
 
@@ -895,13 +879,11 @@ void TheLightOfDawnEvent::HandlePlayerLeaveArea(Player* player, uint32 zoneId, u
     if (!areaIdFounded)
         return;
 
-    for (PlayersDataContainer::iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
+    PlayersDataContainer::iterator itr = m_playersDataStore.find(player->GetGUID());
+    if (itr != m_playersDataStore.end())
     {
-        if (itr->second.guid == player->GetGUID())
-        {
-            if (itr->second.isInArea)
-                itr->second.isInArea = false;
-        }
+        if (itr->second.isInArea)
+            itr->second.isInArea = false;
     }
 }
 

@@ -4443,16 +4443,17 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             unitCaster->ToPlayer()->ResetFallingData(unitCaster->GetPositionZ());
 
         float speed = G3D::fuzzyGt(m_spellInfo->Speed, 0.0f) ? m_spellInfo->Speed : SPEED_CHARGE;
-        // Spell is not using explicit target - no generated path
+        // Spell is not using explicit target - no generated path (if on transport or elevator)
         if (!m_preGeneratedPath)
         {
-            //unitTarget->GetContactPoint(m_caster, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
             Position pos;
-            if (unitCaster->GetTransport() || unitTarget->GetTransport())
+            float targetObjectSizeForZOffset = std::min(unitTarget->GetCombatReach(), 4.0f);
+
+            if (unitCaster->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) || unitTarget->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
                 pos = unitTarget->GetPosition();
             else
                 pos = unitTarget->GetFirstCollisionPosition(unitTarget->GetCombatReach(), unitTarget->GetRelativeAngle(unitCaster));
-            unitCaster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ, speed);
+            unitCaster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + targetObjectSizeForZOffset, speed);
         }
         else
             unitCaster->GetMotionMaster()->MoveCharge(*m_preGeneratedPath, speed);

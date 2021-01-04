@@ -49,11 +49,10 @@ enum BattlegroundRVObjectTypes
     BG_RV_OBJECT_ELEVATOR_1,
     BG_RV_OBJECT_ELEVATOR_2,
 
-    BG_RV_OBJECT_PILAR_FAKE_1,
-    BG_RV_OBJECT_PILAR_FAKE_2,
-    BG_RV_OBJECT_PILAR_FAKE_3,
-    BG_RV_OBJECT_PILAR_FAKE_4,
-
+    //BG_RV_OBJECT_PILAR_FAKE_1,
+    //BG_RV_OBJECT_PILAR_FAKE_2,
+    //BG_RV_OBJECT_PILAR_FAKE_3,
+    //BG_RV_OBJECT_PILAR_FAKE_4,
     BG_RV_OBJECT_MAX
 };
 
@@ -64,8 +63,9 @@ enum BattlegroundRVGameObjects
     BG_RV_OBJECT_TYPE_FIRE_1                     = 192704,
     BG_RV_OBJECT_TYPE_FIRE_2                     = 192705,
 
-    BG_RV_OBJECT_TYPE_FIREDOOR_2                 = 192387,
     BG_RV_OBJECT_TYPE_FIREDOOR_1                 = 192388,
+    BG_RV_OBJECT_TYPE_FIREDOOR_2                 = 192387,
+    
     BG_RV_OBJECT_TYPE_PULLEY_1                   = 192389,
     BG_RV_OBJECT_TYPE_PULLEY_2                   = 192390,
     BG_RV_OBJECT_TYPE_GEAR_1                     = 192393,
@@ -95,6 +95,8 @@ enum BattlegroundRVData
     BG_RV_CLOSE_FIRE_TIMER                       =  5000,
     BG_RV_FIRST_TIMER                            = 20133,
 
+    BG_RV_TELEPORT_ON_ELEVATOR                   = 20700,
+
     BG_RV_WORLD_STATE                            = 0xe1a
 };
 
@@ -111,6 +113,7 @@ class BattlegroundRV : public Arena
         bool SetupBattleground() override;
 
     private:
+        bool PreUpdateImpl(uint32 diff) override;
         void PostUpdateImpl(uint32 diff) override;
 
         void TogglePillarCollision();

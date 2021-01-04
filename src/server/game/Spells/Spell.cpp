@@ -5941,7 +5941,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                     if (!target->IsWithinDist3d(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), range))
                         return SPELL_FAILED_NOPATH;
 
-                    if (!m_caster->GetTransport() || !target->GetTransport())
+                    if (!unitCaster->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) || !target->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
                     {
                         m_preGeneratedPath = std::make_unique<PathGenerator>(unitCaster);
                         m_preGeneratedPath->SetPathLengthLimit(range * 2.0f);
@@ -5959,35 +5959,19 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                             return SPELL_FAILED_OUT_OF_RANGE;
                         else if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
                         {
-                            result = m_preGeneratedPath->CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + targetObjectSizeForZOffset, false);
-                            if (m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
-                                return SPELL_FAILED_OUT_OF_RANGE;
-                            else if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
-                            {
-                                bool arena = unitCaster->ToPlayer() && unitCaster->ToPlayer()->InArena();
-                                if (!arena)
-                                    return SPELL_FAILED_NOPATH;
-                                else
-                                {
-                                    float x, y, z;
-                                    target->GetClosePoint(x, y, z, targetObjectSizeForZOffset);
-                                    target->GetMap()->getObjectHitPos(target->GetPhaseMask(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + targetObjectSizeForZOffset, x, y, z + targetObjectSizeForZOffset, x, y, z, -targetObjectSizeForZOffset);
-                                    result = m_preGeneratedPath->CalculatePath(x, y, z + targetObjectSizeForZOffset, false);
+                            // second try with raycast for the closest position
+                            float x, y, z;
+                            target->GetClosePoint(x, y, z, targetObjectSizeForZOffset);
+                            target->GetMap()->getObjectHitPos(target->GetPhaseMask(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + targetObjectSizeForZOffset, x, y, z + targetObjectSizeForZOffset, x, y, z, -targetObjectSizeForZOffset);
+                            result = m_preGeneratedPath->CalculatePath(x, y, z + targetObjectSizeForZOffset, false);
 
-                                    if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
-                                        return SPELL_FAILED_NOPATH;
-                                    else
-                                        skipreduce = true;
-                                }
-                            }
-                            else if (m_preGeneratedPath->IsInvalidDestinationZ(target)) // Check position z, if not in a straight line
+                            if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
                                 return SPELL_FAILED_NOPATH;
                         }
-                        else if (m_preGeneratedPath->IsInvalidDestinationZ(target)) // Check position z, if in a straight line
+                        else if (m_preGeneratedPath->IsInvalidDestinationZ(target)) // Check position z, if not in a straight line
                             return SPELL_FAILED_NOPATH;
 
-                        if (!skipreduce)
-                            m_preGeneratedPath->ShortenPathUntilDist(PositionToVector3(target), objSize); // move back
+                        m_preGeneratedPath->ShortenPathUntilDist(PositionToVector3(target), objSize); // move back
                     }
                 }
                 break;
