@@ -72,11 +72,11 @@ void DalaranGEvent::Update(uint32 diff)
             playersTimer.Update(diff);
             if (playersTimer.Passed())
             {
-                std::list<Player*> playerList;
+                std::vector<Player*> playerList;
                 // First check on Map valid
                 for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
                 {
-                    if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+                    if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->first))
                     {
                         if (player->GetMapId() != 0)
                         {
@@ -92,10 +92,9 @@ void DalaranGEvent::Update(uint32 diff)
 
                 if (!playerList.empty())
                 {
-                    for (std::list<Player*>::const_iterator iter = playerList.begin(); iter != playerList.end(); ++iter)
-                        RemovePlayerFromQueue(*iter);
+                    for (const auto& plrUD : playerList)
+                        RemovePlayerFromQueue(plrUD);
                 }
-
                 playerList.clear();
 
                 if (alivePlayerCount == 1)
@@ -256,11 +255,9 @@ void DalaranGEvent::RemovePlayer(ObjectGuid playerGUID)
 
 bool DalaranGEvent::IsMemberOfEvent(Player* player)
 {
-    for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
-    {
-        if (itr->second.guid == player->GetGUID())
-            return true;
-    }
+    PlayersDataContainer::const_iterator itr = m_playersDataStore.find(player->GetGUID());
+    if (itr != m_playersDataStore.end())
+        return true;
 
     return false;
 }
@@ -278,7 +275,7 @@ void DalaranGEvent::StartFightEvent()
         m_DurationTimer = GetDurationTimer() - (IN_MILLISECONDS * MINUTE);
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
-        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->first))
             player->SetByteFlag(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG, UNIT_BYTE2_FLAG_FFA_PVP);
     }
 }
@@ -300,7 +297,7 @@ void DalaranGEvent::StopFightEvent()
     {
         for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
         {
-            if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+            if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->first))
                 player->RemoveByteFlag(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG, UNIT_BYTE2_FLAG_FFA_PVP);
         }
     }
@@ -310,7 +307,7 @@ void DalaranGEvent::SpawnGOLight()
 {
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
-        if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+        if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->first))
         {
             QuaternionData rotation = QuaternionData::fromEulerAnglesZYX(player->GetOrientation(), 0.f, 0.f);
             player->SummonGameObject(182483, DalaranCraterPoint, rotation, Minutes(GetDurationTimer()));
@@ -322,10 +319,10 @@ void DalaranGEvent::TeleportAllPlayersInZone()
 {
     registration = false;
 
-    std::list<Player*> playerList;
+    std::vector<Player*> playerList;
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
-        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->first))
         {
             if (!player->IsAlive())
             {
@@ -337,9 +334,9 @@ void DalaranGEvent::TeleportAllPlayersInZone()
             if (player->GetGroup())
             {
                 if (player->GetGroup()->isRaidGroup())
-                    player->GetGroup()->RemoveMember(itr->second.guid);
+                    player->GetGroup()->RemoveMember(itr->first);
                 else if (!sWorld->getBoolConfig(CONFIG_DALARAN_GAME_EVENTS_SQUAD_ENABLED))
-                    player->GetGroup()->RemoveMember(itr->second.guid);
+                    player->GetGroup()->RemoveMember(itr->first);
             }
 
             player->TeleportTo(DalaranCrater);
@@ -350,12 +347,9 @@ void DalaranGEvent::TeleportAllPlayersInZone()
     }
 
     if (!playerList.empty())
-    {
-        for (std::list<Player*>::const_iterator iter = playerList.begin(); iter != playerList.end(); ++iter)
-            RemovePlayerFromQueue(*iter);
-
-        playerList.clear();
-    }
+        for (const auto& plrUD : playerList)
+            RemovePlayerFromQueue(plrUD);        
+    playerList.clear();
 
     SpawnGOLight();
 }
@@ -364,7 +358,7 @@ void DalaranGEvent::TeleportAllPlayersBack()
 {
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
-        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->first))
         {
             uint32 mapid = itr->second.mapid;
             float x = itr->second.x;
@@ -383,7 +377,7 @@ void DalaranGEvent::BroadcastToMemberAboutLeavePlayer(std::string const& Name)
 {
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
-        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->first))
             ChatHandler(player->GetSession()).PSendSysMessage(LANG_DALARAN_CRATER_LEAVE_PLAYER_AND_COUNT, Name, alivePlayerCount);
     }
 }
@@ -392,7 +386,7 @@ void DalaranGEvent::BroadcastToMemberPrepare()
 {
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
-        if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+        if (Player * player = ObjectAccessor::FindConnectedPlayer(itr->first))
             ChatHandler(player->GetSession()).PSendSysMessage(LANG_DALARAN_CRATER_START_ANNOUNCE_30_SEC, GetCountPlayerInEvent());
     }
 }
@@ -402,42 +396,34 @@ void DalaranGEvent::RemovePlayerFromFight(Player* player, bool withteleport)
     if (!IsMemberOfEvent(player))
         return;
 
-    uint32 id = 0;
-    for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
+    PlayersDataContainer::const_iterator itr = m_playersDataStore.find(player->GetGUID());
+    if (itr != m_playersDataStore.end())
     {
-        if (itr->second.guid == player->GetGUID())
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(player->GetGUID()))
         {
-            if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+            if (withteleport)
             {
-                if (withteleport)
-                {
-                    uint32 mapid = itr->second.mapid;
-                    float x = itr->second.x;
-                    float y = itr->second.y;
-                    float z = itr->second.z;
-                    player->TeleportTo(mapid, x, y, z, player->GetOrientation());
-                    if (!sWorld->IsFFAPvPRealm())
-                        player->RemoveByteFlag(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG, UNIT_BYTE2_FLAG_FFA_PVP);
-                }
-
-                id = itr->first;
+                uint32 mapid = itr->second.mapid;
+                float x = itr->second.x;
+                float y = itr->second.y;
+                float z = itr->second.z;
+                player->TeleportTo(mapid, x, y, z, player->GetOrientation());
+                if (!sWorld->IsFFAPvPRealm())
+                    player->RemoveByteFlag(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG, UNIT_BYTE2_FLAG_FFA_PVP);
             }
         }
     }
 
-    if (id)
-    {
-        m_playersDataStore.erase(id);
-        BroadcastToMemberAboutLeavePlayer(player->GetName());
-        --alivePlayerCount;
-    }
+    m_playersDataStore.erase(player->GetGUID());
+    BroadcastToMemberAboutLeavePlayer(player->GetName());
+    --alivePlayerCount;
 }
 
 void DalaranGEvent::ReceiveWinnerName()
 {
     for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
     {
-        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->second.guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->first))
         {
             if (player->IsAlive())
             {
@@ -456,22 +442,13 @@ void DalaranGEvent::ReceiveWinnerName()
 void DalaranGEvent::InvitePlayerToQueue(Player* player)
 {
     PlayersData pd;
-    pd.guid = player->GetGUID();
     pd.mapid = player->GetMapId();
     pd.x = player->GetPositionX();
     pd.y = player->GetPositionY();
     pd.z = player->GetPositionZ();
 
-    // find max id
-    uint32 new_id = 0;
-    for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
-        if (itr->first > new_id)
-            new_id = itr->first;
-
-    // use next
-    ++new_id;
     // add in active player list of event
-    m_playersDataStore[new_id] = pd;
+    m_playersDataStore[player->GetGUID()] = pd;
 }
 
 void DalaranGEvent::RemovePlayerFromQueue(Player* player)
@@ -479,15 +456,7 @@ void DalaranGEvent::RemovePlayerFromQueue(Player* player)
     if (!IsMemberOfEvent(player))
         return;
 
-    uint32 id = 0;
-    for (PlayersDataContainer::const_iterator itr = m_playersDataStore.begin(); itr != m_playersDataStore.end(); ++itr)
-    {
-        if (itr->second.guid == player->GetGUID())
-            id = itr->first;
-    }
-
-    if (id)
-        m_playersDataStore.erase(id);
+    m_playersDataStore.erase(player->GetGUID());
 }
 
 class SpecialEvent_DalaranCrater : public SpecialEventScript

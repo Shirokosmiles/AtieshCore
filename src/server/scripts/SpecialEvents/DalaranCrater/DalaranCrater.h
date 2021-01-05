@@ -29,13 +29,12 @@ WorldLocation const DalaranCraterPoint(0, 287.2068f, 381.9773f, -67.5977f, 4.135
 
 struct PlayersData
 {
-    ObjectGuid guid;
     uint32 mapid;
     float x;
     float y;
     float z;
 };
-typedef std::unordered_map<uint32, PlayersData> PlayersDataContainer;
+typedef std::unordered_map<ObjectGuid, PlayersData> PlayersDataContainer;
 
 enum DalaranPhase
 {

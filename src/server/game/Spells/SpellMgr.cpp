@@ -2576,7 +2576,6 @@ void SpellMgr::LoadSpellInfoStore()
         }
     }
 
-
     TC_LOG_INFO("server.loading", ">> Loaded SpellInfo store in %u ms", GetMSTimeDiffToNow(oldMSTime));
 }
 
