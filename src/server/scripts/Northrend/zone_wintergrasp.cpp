@@ -129,9 +129,11 @@ class npc_wg_spirit_guide : public CreatureScript
         {
             npc_wg_spirit_guideAI(Creature* creature) : ScriptedAI(creature)
             {
+                _wintergrasp = nullptr;
+                _grave = nullptr;
                 _team = me->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE;
-                _WhoList.clear();
                 _Timer = 1000;
+                _WhoList.clear()
             }
 
             bool existInList(ObjectGuid guid)

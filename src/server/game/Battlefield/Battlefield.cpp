@@ -791,21 +791,23 @@ void Battlefield::HandleResurrectedPlayer(ObjectGuid guid)
 // - BfGraveyard Method -
 // ----------------------
 BfGraveyard::BfGraveyard(Battlefield* battlefield)
-{
-    _Bf = battlefield;
-    _GraveyardId = 0;
+{    
     _ControlTeam = TEAM_NEUTRAL;
+    _GraveyardId = 0;
+    for (uint8 i = 0; i < PVP_TEAMS_COUNT; i++)
+        _SpiritGuide[i].Clear();
     _resurrectQueue.clear();
+    _Bf = battlefield;
 }
 
 BfGraveyard::~BfGraveyard()
 {
-    _Bf = nullptr;
+    _ControlTeam = TEAM_ALLIANCE;
+    _GraveyardId = 0;
     for (uint8 i = 0; i < PVP_TEAMS_COUNT; i++)
         _SpiritGuide[i].Clear();
     _resurrectQueue.clear();
-    _GraveyardId = 0;
-    _ControlTeam = TEAM_ALLIANCE;
+    _Bf = nullptr;
 }
 
 void BfGraveyard::Initialize(TeamId startControl, uint32 graveyardId)

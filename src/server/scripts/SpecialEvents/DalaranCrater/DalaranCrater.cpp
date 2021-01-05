@@ -396,23 +396,20 @@ void DalaranGEvent::RemovePlayerFromFight(Player* player, bool withteleport)
     if (!IsMemberOfEvent(player))
         return;
 
-    PlayersDataContainer::const_iterator itr = m_playersDataStore.find(player->GetGUID());
-    if (itr != m_playersDataStore.end())
+    if (withteleport)
     {
-        if (Player* player = ObjectAccessor::FindConnectedPlayer(player->GetGUID()))
+        PlayersDataContainer::const_iterator itr = m_playersDataStore.find(player->GetGUID());
+        if (itr != m_playersDataStore.end())
         {
-            if (withteleport)
-            {
-                uint32 mapid = itr->second.mapid;
-                float x = itr->second.x;
-                float y = itr->second.y;
-                float z = itr->second.z;
-                player->TeleportTo(mapid, x, y, z, player->GetOrientation());
-                if (!sWorld->IsFFAPvPRealm())
-                    player->RemoveByteFlag(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG, UNIT_BYTE2_FLAG_FFA_PVP);
-            }
+            uint32 mapid = itr->second.mapid;
+            float x = itr->second.x;
+            float y = itr->second.y;
+            float z = itr->second.z;
+            player->TeleportTo(mapid, x, y, z, player->GetOrientation());
+            if (!sWorld->IsFFAPvPRealm())
+                player->RemoveByteFlag(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG, UNIT_BYTE2_FLAG_FFA_PVP);
         }
-    }
+    }    
 
     m_playersDataStore.erase(player->GetGUID());
     BroadcastToMemberAboutLeavePlayer(player->GetName());
