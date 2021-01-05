@@ -57,27 +57,6 @@ BattlegroundRV::BattlegroundRV()
     _pillarCollision = false;
 }
 
-bool BattlegroundRV::PreUpdateImpl(uint32 diff)
-{
-    if (GetStatus() != STATUS_WAIT_JOIN)
-        return true;
-
-    if (_timer)
-    {
-        if (_timer <= diff)
-        {
-            for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-                if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-                    player->NearTeleportTo(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ() + 2.0f, player->GetOrientation());
-            _timer = 0;
-        }
-        else
-            _timer -= diff;
-    }    
-
-    return true;
-}
-
 void BattlegroundRV::PostUpdateImpl(uint32 diff)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
@@ -117,6 +96,14 @@ void BattlegroundRV::StartingEventOpenDoors()
     SpawnBGObject(BG_RV_OBJECT_BUFF_1, 90);
     SpawnBGObject(BG_RV_OBJECT_BUFF_2, 90);
     // Elevators
+    for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+        if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+        {
+            // just safe check each togglePillars for players which droped underground
+            if (player->GetPositionZ() < 2.f)
+                player->NearTeleportTo(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ() + 3.0f, player->GetOrientation());
+        }
+
     DoorOpen(BG_RV_OBJECT_ELEVATOR_1);
     DoorOpen(BG_RV_OBJECT_ELEVATOR_2);
 
@@ -187,15 +174,6 @@ void BattlegroundRV::TogglePillarCollision()
                 GOState state = ((go->GetGOInfo()->door.startOpen != 0) == _pillarCollision) ? GO_STATE_ACTIVE : GO_STATE_READY;
                 go->SetGoState(state);
             }
-
-            for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-                if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-                {
-                    go->SendUpdateToPlayer(player);
-                    // just safe check each togglePillars for players which droped underground
-                    if (player->GetPositionZ() < 27.f)
-                        player->NearTeleportTo(player->GetPositionX(), player->GetPositionY(), 30.5f, player->GetOrientation());
-                }
         }
     }
 

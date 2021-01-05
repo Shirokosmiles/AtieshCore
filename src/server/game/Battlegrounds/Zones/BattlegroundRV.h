@@ -95,7 +95,7 @@ enum BattlegroundRVData
     BG_RV_CLOSE_FIRE_TIMER                       =  5000,
     BG_RV_FIRST_TIMER                            = 20133,
 
-    BG_RV_TELEPORT_ON_ELEVATOR                   = 20700,
+    BG_RV_TELEPORT_ON_ELEVATOR                   = 25000,
 
     BG_RV_WORLD_STATE                            = 0xe1a
 };
@@ -113,7 +113,6 @@ class BattlegroundRV : public Arena
         bool SetupBattleground() override;
 
     private:
-        bool PreUpdateImpl(uint32 diff) override;
         void PostUpdateImpl(uint32 diff) override;
 
         void TogglePillarCollision();
