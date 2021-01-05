@@ -23807,12 +23807,19 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
                     if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
                         return true;
 
-                // special check to filter things like Shield Wall, the aura is not permanent and must stay even without required item
+                // special check to filter things like ..., the aura is not permanent and must stay even without required item
                 if (!spellInfo->IsPassive())
                 {
                     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                         if (spellInfo->Effects[i].IsAura())
+                        {
+                            // Shield Wall, spell reflect should be removed
+                            if (spellInfo->HasAttribute(SPELL_ATTR0_ABILITY) &&
+                                spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT) &&
+                                spellInfo->HasAttribute(SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE))
+                                return false;
                             return true;
+                        }
                 }
             }
 
