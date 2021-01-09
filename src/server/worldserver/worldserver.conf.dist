@@ -1860,8 +1860,11 @@ Arena.ArenaWinRatingModifier1 = 48
 Arena.ArenaWinRatingModifier2 = 24
 >>>>>>> remotes/TC/3.3.5
 
+<<<<<<< HEAD
 Updates.CleanDeadRefMaxCount = 3
 
+=======
+>>>>>>> remotes/TC/3.3.5
 #
 ###################################################################################################
 

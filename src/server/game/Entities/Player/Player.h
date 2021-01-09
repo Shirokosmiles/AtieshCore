@@ -487,7 +487,6 @@ enum QuestSaveType
 //               quest
 typedef std::map<uint32, QuestSaveType> QuestStatusSaveMap;
 
-
 enum QuestSlotOffsets
 {
     QUEST_ID_OFFSET     = 0,

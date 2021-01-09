@@ -288,7 +288,7 @@ public:
                 transport->GetEntry(), transport->GetName().c_str());
         handler->PSendSysMessage(LANG_GRID_POSITION,
             cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
-            zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMap);
+            zoneX, zoneY, groundZ, floorZ, map->GetMinHeight(object->GetPositionX(), object->GetPositionY()), haveMap, haveVMap, haveMMap);
 
         if (Player* plr = object->ToPlayer()) // for OffSet coords on Elevators (not transport)
         {
@@ -1680,8 +1680,6 @@ public:
             banReason     = fields[3].GetString();
         }
 
-
-
         // Can be used to query data from Characters database
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_XP);
         stmt->setUInt32(0, lowguid);
@@ -1884,12 +1882,12 @@ public:
         Cell::VisitGridObjects(player, worker, player->GetGridActivationRange());
 
         // Now handle any that had despawned, but had respawn time logged.
-        std::vector<RespawnInfo*> data;
+        std::vector<RespawnInfo const*> data;
         player->GetMap()->GetRespawnInfo(data, SPAWN_TYPEMASK_ALL);
         if (!data.empty())
         {
             uint32 const gridId = Trinity::ComputeGridCoord(player->GetPositionX(), player->GetPositionY()).GetId();
-            for (RespawnInfo* info : data)
+            for (RespawnInfo const* info : data)
                 if (info->gridId == gridId)
                     player->GetMap()->Respawn(info->type, info->spawnId);
         }

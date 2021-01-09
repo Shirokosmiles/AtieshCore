@@ -837,7 +837,6 @@ class boss_darkheart : public CreatureScript
         }
 };
 
-
 class boss_slither : public CreatureScript
 {
     public:
