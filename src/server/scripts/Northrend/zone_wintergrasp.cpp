@@ -133,7 +133,7 @@ class npc_wg_spirit_guide : public CreatureScript
                 _grave = nullptr;
                 _team = me->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE;
                 _Timer = 1000;
-                _WhoList.clear()
+                _WhoList.clear();
             }
 
             bool existInList(ObjectGuid guid)

@@ -269,17 +269,18 @@ class boss_svala : public CreatureScript
                             pos.m_positionZ += 8.0f;
                             me->GetMotionMaster()->MoveTakeoff(0, pos);
                             // spectators flee event
-                            std::list<Creature*> lspectatorList;
+                            std::vector<Creature*> lspectatorList;
                             GetCreatureListWithEntryInGrid(lspectatorList, me, NPC_SPECTATOR, 100.0f);
-                            for (std::list<Creature*>::iterator itr = lspectatorList.begin(); itr != lspectatorList.end(); ++itr)
+                            for (auto const& pointer : lspectatorList)
                             {
-                                if ((*itr)->IsAlive())
+                                if (pointer->IsAlive())
                                 {
-                                    (*itr)->SetStandState(UNIT_STAND_STATE_STAND);
-                                    (*itr)->SetWalk(false);
-                                    (*itr)->GetMotionMaster()->MovePoint(1, spectatorWP[0]);
+                                    pointer->SetStandState(UNIT_STAND_STATE_STAND);
+                                    pointer->SetWalk(false);
+                                    pointer->GetMotionMaster()->MovePoint(1, spectatorWP[0]);
                                 }
                             }
+                            lspectatorList.clear();
                             events.ScheduleEvent(EVENT_INTRO_TRANSFORM_1, 4200ms);
                             break;
                         }
