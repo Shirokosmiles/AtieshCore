@@ -16,7 +16,6 @@
  */
 
 #include "Object.h"
-#include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "CinematicMgr.h"
@@ -51,6 +50,7 @@
 #include "Vehicle.h"
 #include "VMapFactory.h"
 #include "VMapManager2.h"
+#include "WintergraspMgr.h"
 #include "World.h"
 #include <G3D/Vector3.h>
 
@@ -1992,8 +1992,8 @@ void WorldObject::SetZoneScript()
     {
         if (SpecialEvent* SE = sSpecialEventMgr->GetSpecialEventByZoneId(GetZoneId()))
             m_zoneScript = SE;
-        else if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
-            m_zoneScript = battlefield;
+        else if (GetZoneId() == AREA_WINTERGRASP)
+            m_zoneScript = sWintergraspMgr;
         else
             m_zoneScript = sOutdoorPvPMgr->GetZoneScript(GetZoneId());
     }

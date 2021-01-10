@@ -17,8 +17,6 @@
 
 #include "AccountMgr.h"
 #include "Battleground.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "Common.h"
 #include "Corpse.h"
 #include "Creature.h"
@@ -41,6 +39,7 @@
 #include "Realm.h"
 #include "Transport.h"
 #include "Vehicle.h"
+#include "WintergraspMgr.h"
 #include "WorldSession.h"
 #include "World.h"
 
@@ -175,10 +174,6 @@ void WorldSession::HandleMoveWorldportAck()
         allowMount = mInstance->AllowMount;
     }
 
-    // mount allow check
-    if (!allowMount)
-        player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
     // update zone immediately, otherwise leave channel will cause crash in mtmap
     uint32 newzone, newarea;
     player->GetZoneAndAreaId(newzone, newarea);
@@ -187,13 +182,14 @@ void WorldSession::HandleMoveWorldportAck()
     bool InBattlefield = false;
     if (loc.GetMapId() == 571 && newzone == 4197)
     {
-        if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(newzone))
-        {
-            if (battlefield->IsWarTime())
-                _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-            InBattlefield = true;
-        }
+        if (sWintergraspMgr->IsWarTime())
+            allowMount = false;
+        InBattlefield = true;
     }
+
+    // mount allow check
+    if (!allowMount)
+        player->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
     // flight fast teleport case
     if (GetPlayer()->IsInFlight())

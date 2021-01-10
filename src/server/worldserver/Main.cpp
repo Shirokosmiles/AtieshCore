@@ -24,7 +24,6 @@
 #include "AsyncAcceptor.h"
 #include "Banner.h"
 #include "BattlegroundMgr.h"
-#include "BattlefieldMgr.h"
 #include "BigNumber.h"
 #include "CliRunnable.h"
 #include "Configuration/Config.h"

@@ -17,7 +17,6 @@
 
 #include "SpellMgr.h"
 #include "BattlegroundMgr.h"
-#include "BattlefieldMgr.h"
 #include "Chat.h"
 #include "Containers.h"
 #include "DatabaseEnv.h"
@@ -33,6 +32,7 @@
 #include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellInfo.h"
+#include "WintergraspMgr.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
 {
@@ -726,9 +726,9 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player || !player->IsAlive())
                 return false;
 
-            Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
-            if (!battlefield || battlefield->CanFlyIn() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
-                return false;
+            if (player->GetZoneId() == AREA_WINTERGRASP)
+                if (!sWintergraspMgr->IsWarTime() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
+                    return false;
             break;
         }
         case 56618: // Horde Controls Factory Phase Shift
@@ -737,12 +737,8 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player)
                 return false;
 
-            Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
-            if (!battlefield || battlefield->GetBattleId() != BATTLEFIELD_WG)
-                return false;
-
             // team that controls the workshop in the specified area
-            uint32 team = battlefield->GetData(newArea);
+            uint32 team = sWintergraspMgr->GetData(newArea);
 
             if (team == TEAM_HORDE)
                 return spellId == 56618;
@@ -756,17 +752,16 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player)
                 return false;
 
-            if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_WG))
-                return battlefield->IsEnabled() && player->GetTeamId() == battlefield->GetDefenderTeam() && !battlefield->IsWarTime();
+            return sWintergraspMgr->IsEnabled() &&
+                player->GetTeamId() == sWintergraspMgr->GetDefenderTeam() &&
+                !sWintergraspMgr->IsWarTime();
             break;
         }
         case 74411: // Battleground - Dampening
         {
             if (!player)
                 return false;
-
-            if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId()))
-                return battlefield->IsWarTime();
+            return sWintergraspMgr->IsWarTime();
             break;
         }
 

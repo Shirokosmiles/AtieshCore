@@ -62,7 +62,7 @@ Loot* Roll::getLoot()
 
 Group::Group() : m_leaderGuid(), m_leaderName(""), m_groupType(GROUPTYPE_NORMAL),
 m_dungeonDifficulty(DUNGEON_DIFFICULTY_NORMAL), m_raidDifficulty(RAID_DIFFICULTY_10MAN_NORMAL),
-m_bgGroup(nullptr), m_bfGroup(nullptr), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON), m_looterGuid(),
+m_bgGroup(nullptr), m_isBFGroup(false), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON), m_looterGuid(),
 m_masterLooterGuid(), m_subGroupsCounts(nullptr), m_guid(), m_counter(0), m_maxEnchantingLevel(0), m_dbStoreId(0), m_isLeaderOffline(false)
 {
     for (uint8 i = 0; i < TARGETICONCOUNT; ++i)
@@ -2428,7 +2428,7 @@ bool Group::isBGGroup() const
 
 bool Group::isBFGroup() const
 {
-    return m_bfGroup != nullptr;
+    return m_isBFGroup;
 }
 
 bool Group::IsCreated() const
@@ -2538,9 +2538,9 @@ void Group::SetBattlegroundGroup(Battleground* bg)
     m_bgGroup = bg;
 }
 
-void Group::SetBattlefieldGroup(Battlefield* bg)
+void Group::SetBattlefieldGroup(bool toggle)
 {
-    m_bfGroup = bg;
+    m_isBFGroup = toggle;
 }
 
 void Group::SetSpecialEventGroup(SpecialEvent* bf)

@@ -16,13 +16,12 @@
  */
 
 #include "WorldSession.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "BattlefieldPackets.h"
 #include "GameTime.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "WintergraspMgr.h"
 #include "WorldPacket.h"
 
  /**
@@ -141,14 +140,10 @@ void WorldSession::HandleBattlefieldEntryInviteResponse(WorldPackets::Battlefiel
     bool accepted = entryInviteResponse.AcceptedInvite;
     TC_LOG_DEBUG("network", "WorldSession::HandleBattlefieldEntryInviteResponse: battleId: %u, accepted: %u", battleId, accepted);
 
-    Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
-    if (!battlefield)
-        return;
-
     if (accepted)
-        battlefield->PlayerAcceptInviteToWar(_player);
+        sWintergraspMgr->PlayerAcceptInviteToWar(_player);
     else
-        battlefield->PlayerDeclineInviteToWar(_player);
+        sWintergraspMgr->PlayerDeclineInviteToWar(_player);
 }
 
 /**
@@ -162,14 +157,10 @@ void WorldSession::HandleBattlefieldQueueInviteResponse(WorldPackets::Battlefiel
     bool accepted = queueInviteResponse.AcceptedInvite;
     TC_LOG_DEBUG("network", "WorldSession::HandleBattlefieldQueueInviteResponse: battleId: %u, accepted: %u", battleId, accepted);
 
-    Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
-    if (!battlefield)
-        return;
-
     if (accepted)
-        battlefield->PlayerAcceptInviteToQueue(_player);
+        sWintergraspMgr->PlayerAcceptInviteToQueue(_player);
     else
-        battlefield->PlayerDeclineInviteToQueue(_player);
+        sWintergraspMgr->PlayerDeclineInviteToQueue(_player);
 }
 
 /**
@@ -182,9 +173,5 @@ void WorldSession::HandleBattlefieldExitRequest(WorldPackets::Battlefield::Battl
     uint32 battleId = exitRequest.BattleID;
     TC_LOG_DEBUG("network", "WorldSession::HandleBattlefieldExitRequest: battleId: %u ", battleId);
 
-    Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
-    if (!battlefield)
-        return;
-
-    battlefield->AskToLeaveQueue(_player);
+    sWintergraspMgr->AskToLeaveQueue(_player);
 }

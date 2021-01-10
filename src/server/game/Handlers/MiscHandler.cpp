@@ -19,7 +19,6 @@
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundPackets.h"
-#include "BattlefieldMgr.h"
 #include "CharacterPackets.h"
 #include "Chat.h"
 #include "CinematicMgr.h"
@@ -52,6 +51,7 @@
 #include "Spell.h"
 #include "SpellInfo.h"
 #include "WhoListStorage.h"
+#include "WintergraspMgr.h"
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldPacket.h"
@@ -590,8 +590,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPackets::Battleground:
     else if (SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(_player->GetZoneId()))
         se->HandleAreaSpiritHealerQueryOpcode(_player, areaSpiritHealerQuery.HealerGuid);
     else if (_player->GetZoneId() == AREA_WINTERGRASP)
-        if (Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
-            wintergrasp->SendAreaSpiritHealerQueryOpcode(_player, areaSpiritHealerQuery.HealerGuid);
+        sWintergraspMgr->SendAreaSpiritHealerQueryOpcode(_player, areaSpiritHealerQuery.HealerGuid);
 }
 
 void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPackets::Battleground::AreaSpiritHealerQueue& areaSpiritHealerQueue)
@@ -618,9 +617,16 @@ void WorldSession::HandleHearthAndResurrect(WorldPackets::Battleground::HearthAn
     if (!atEntry || !(atEntry->Flags & AREA_FLAG_CAN_HEARTH_AND_RESURRECT))
         return;
 
-    _player->BuildPlayerRepop();
-    _player->ResurrectPlayer(1.0f);
-    _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
+    if (_player->isDead())
+    {
+        _player->BuildPlayerRepop();
+        _player->ResurrectPlayer(1.0f);
+    }
+
+    if (_player->GetZoneId() == AREA_WINTERGRASP)
+        sWintergraspMgr->PlayerAskToLeave(_player);
+    else
+        _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
 }
 
 void WorldSession::HandleReclaimCorpse(WorldPackets::Misc::ReclaimCorpse& /*packet*/)

@@ -23,8 +23,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "DBCStoresMgr.h"
@@ -43,6 +41,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "WintergraspMgr.h"
 #include "Transmogrification.h"
 
 class spell_gen_absorb0_hitlimit1 : public AuraScript
@@ -2108,8 +2107,7 @@ private:
             target->GetZoneAndAreaId(zoneid, areaid);
             bool canFly = spellInfo && (spellInfo->CheckLocation(target->GetMapId(), zoneid, areaid, target) == SPELL_CAST_OK);
             // check battlefield
-            Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
-            if (canFly && battlefield && !battlefield->CanFlyIn())
+            if (target->GetZoneId() == AREA_WINTERGRASP && sWintergraspMgr->IsWarTime())
                 canFly = false;
 
             uint32 mount = 0;

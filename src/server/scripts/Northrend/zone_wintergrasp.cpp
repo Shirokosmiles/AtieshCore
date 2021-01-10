@@ -16,9 +16,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
-#include "Battlefield/BattlefieldWG.h"
 #include "CellImpl.h"
 #include "DBCStoresMgr.h"
 #include "GameObject.h"
@@ -35,6 +32,8 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "WintergraspMgr.h"
+#include "WGGraveyard.h"
 #include "WorldSession.h"
 
 #define GOSSIP_HELLO_DEMO1  "Build catapult."
@@ -129,7 +128,6 @@ class npc_wg_spirit_guide : public CreatureScript
         {
             npc_wg_spirit_guideAI(Creature* creature) : ScriptedAI(creature)
             {
-                _wintergrasp = nullptr;
                 _grave = nullptr;
                 _team = me->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE;
                 _Timer = 1000;
@@ -161,6 +159,7 @@ class npc_wg_spirit_guide : public CreatureScript
                         continue;
 
                     _grave->AddPlayer(pointer->GetGUID());
+                    _WhoList.insert(pointer->GetGUID());
                 }
                 _players.clear();
             }
@@ -194,8 +193,7 @@ class npc_wg_spirit_guide : public CreatureScript
 
             void DoAction(int32 actionId) override
             {
-                _wintergrasp = ASSERT_NOTNULL(sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG));
-                _grave = ASSERT_NOTNULL(_wintergrasp->GetGraveyardById(actionId));
+                _grave = ASSERT_NOTNULL(sWintergraspMgr->GetGraveyardById(actionId));
             }
 
             void UpdateAI(uint32 diff) override
@@ -218,15 +216,12 @@ class npc_wg_spirit_guide : public CreatureScript
                 if (me->IsQuestGiver())
                     player->PrepareQuestMenu(me->GetGUID());
 
-                if (!_wintergrasp)
-                    return true;
-
-                GraveyardMap const& gMap = _wintergrasp->GetGraveyardMap();
+                GraveyardMap const& gMap = sWintergraspMgr->GetGraveyardMap();
                 for (const auto& gID : gMap)
                 {
-                    if (BfGraveyard* graveyard = gID.second)
+                    if (WGGraveyard* graveyard = gID.second)
                         if (graveyard->GetControlTeamId() == player->GetTeamId())
-                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, player->GetSession()->GetTrinityString(((BfGraveyardWG*)graveyard)->GetTextId()), GOSSIP_SENDER_MAIN, gID.first);
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, player->GetSession()->GetTrinityString(graveyard->GetTextId()), GOSSIP_SENDER_MAIN, gID.first);
                 }
 
                 SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
@@ -238,23 +233,20 @@ class npc_wg_spirit_guide : public CreatureScript
                 uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
                 CloseGossipMenuFor(player);
 
-                if (_wintergrasp)
+                GraveyardMap const& gMap = sWintergraspMgr->GetGraveyardMap();
+                for (const auto& gID : gMap)
                 {
-                    GraveyardMap const& gMap = _wintergrasp->GetGraveyardMap();
-                    for (const auto& gID : gMap)
-                    {
-                        if (action == gID.first &&
-                            gID.second->GetControlTeamId() == player->GetTeamId())
-                            if (WorldSafeLocsDBC const* safeLoc = sDBCStoresMgr->GetWorldSafeLocsDBC(gID.second->GetGraveyardId()))
-                                player->TeleportTo(safeLoc->Continent, safeLoc->Loc.X, safeLoc->Loc.Y, safeLoc->Loc.Z, 0);
-                    }
+                    if (action == gID.first &&
+                        gID.second->GetControlTeamId() == player->GetTeamId())
+                        if (WorldSafeLocsDBC const* safeLoc = sDBCStoresMgr->GetWorldSafeLocsDBC(gID.second->GetGraveyardId()))
+                            player->TeleportTo(safeLoc->Continent, safeLoc->Loc.X, safeLoc->Loc.Y, safeLoc->Loc.Z, 0);
                 }
+
                 return true;
             }
 
         private:
-            Battlefield* _wintergrasp;
-            BfGraveyard* _grave;
+            WGGraveyard* _grave;
             TeamId _team;
             uint32 _Timer;
             GuidSet _WhoList;
@@ -309,26 +301,22 @@ class npc_wg_queue : public CreatureScript
                 if (me->IsQuestGiver())
                     player->PrepareQuestMenu(me->GetGUID());
 
-                Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-                if (!wintergrasp)
-                    return true;
-
-                if (wintergrasp->IsWarTime())
+                if (sWintergraspMgr->IsWarTime())
                 {
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, player->GetSession()->GetTrinityString(WG_NPCQUEUE_TEXTOPTION_JOIN), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                    SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_WAR : WG_NPCQUEUE_TEXT_A_WAR, me->GetGUID());
+                    SendGossipMenuFor(player, sWintergraspMgr->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_WAR : WG_NPCQUEUE_TEXT_A_WAR, me->GetGUID());
                 }
                 else
                 {
-                    uint32 timer = wintergrasp->GetTimer() / 1000;
+                    uint32 timer = sWintergraspMgr->GetTimer() / 1000;
                     player->SendUpdateWorldState(4354, GameTime::GetGameTime() + timer);
                     if (timer < 15 * MINUTE)
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, player->GetSession()->GetTrinityString(WG_NPCQUEUE_TEXTOPTION_JOIN), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                        SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_QUEUE : WG_NPCQUEUE_TEXT_A_QUEUE, me->GetGUID());
+                        SendGossipMenuFor(player, sWintergraspMgr->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_QUEUE : WG_NPCQUEUE_TEXT_A_QUEUE, me->GetGUID());
                     }
                     else
-                        SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_NOWAR : WG_NPCQUEUE_TEXT_A_NOWAR, me->GetGUID());
+                        SendGossipMenuFor(player, sWintergraspMgr->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_NOWAR : WG_NPCQUEUE_TEXT_A_NOWAR, me->GetGUID());
                 }
                 return true;
             }
@@ -337,22 +325,18 @@ class npc_wg_queue : public CreatureScript
             {
                 CloseGossipMenuFor(player);
 
-                Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-                if (!wintergrasp)
+                if (sWintergraspMgr->PlayerInBFPlayerMap(player))
                     return true;
 
-                if (wintergrasp->PlayerInBFPlayerMap(player))
-                    return true;
-
-                if (wintergrasp->GetFreeslot(player->GetCFSTeamId()))
+                if (sWintergraspMgr->GetFreeslot(player->GetCFSTeamId()))
                 {
-                    if (wintergrasp->IsWarTime())
-                        wintergrasp->InviteNewPlayerToWar(player, false);
+                    if (sWintergraspMgr->IsWarTime())
+                        sWintergraspMgr->InviteNewPlayerToWar(player, false);
                     else
                     {
-                        uint32 timer = wintergrasp->GetTimer() / 1000;
+                        uint32 timer = sWintergraspMgr->GetTimer() / 1000;
                         if (timer < 15 * MINUTE)
-                            wintergrasp->InviteNewPlayerToQueue(player, false);
+                            sWintergraspMgr->InviteNewPlayerToQueue(player, false);
                     }
                 }
                 return true;
@@ -377,23 +361,19 @@ class go_wg_vehicle_teleporter : public GameObjectScript
             bool IsFriendly(Unit* passenger)
             {
                 bool result = false;
-                Battlefield* wg = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-                if (!wg)
-                    return result;
-
                 if (passenger && passenger->ToPlayer())
                 {
                     switch (passenger->ToPlayer()->GetCFSTeamId())
                     {
                         case TEAM_HORDE:
                         {
-                            if (wg->GetDefenderTeam() == TEAM_HORDE)
+                            if (sWintergraspMgr->GetDefenderTeam() == TEAM_HORDE)
                                 result = true;
                             break;
                         }
                         case TEAM_ALLIANCE:
                         {
-                            if (wg->GetDefenderTeam() == TEAM_ALLIANCE)
+                            if (sWintergraspMgr->GetDefenderTeam() == TEAM_ALLIANCE)
                                 result = true;
                             break;
                         }
@@ -545,11 +525,10 @@ class spell_wintergrasp_defender_teleport : public SpellScriptLoader
 
             SpellCastResult CheckCast()
             {
-                if (Battlefield* wg = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
-                    if (Player* target = GetExplTargetUnit()->ToPlayer())
-                        // check if we are in Wintergrasp at all, SotA uses same teleport spells
-                        if ((target->GetZoneId() == AREA_WINTERGRASP && target->GetTeamId() != wg->GetDefenderTeam()) || target->HasAura(SPELL_WINTERGRASP_TELEPORT_TRIGGER))
-                            return SPELL_FAILED_BAD_TARGETS;
+                if (Player* target = GetExplTargetUnit()->ToPlayer())
+                    // check if we are in Wintergrasp at all, SotA uses same teleport spells
+                    if ((target->GetZoneId() == AREA_WINTERGRASP && target->GetTeamId() != sWintergraspMgr->GetDefenderTeam()) || target->HasAura(SPELL_WINTERGRASP_TELEPORT_TRIGGER))
+                        return SPELL_FAILED_BAD_TARGETS;
                 return SPELL_CAST_OK;
             }
 
@@ -647,8 +626,7 @@ class condition_is_wintergrasp_horde : public ConditionScript
 
         bool OnConditionCheck(Condition const* /* condition */, ConditionSourceInfo& /* sourceInfo */)
         {
-            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-            if (wintergrasp && wintergrasp->IsEnabled() && wintergrasp->GetDefenderTeam() == TEAM_HORDE)
+            if (sWintergraspMgr->IsEnabled() && sWintergraspMgr->GetDefenderTeam() == TEAM_HORDE)
                 return true;
             return false;
         }
@@ -661,8 +639,7 @@ class condition_is_wintergrasp_alliance : public ConditionScript
 
         bool OnConditionCheck(Condition const* /* condition */, ConditionSourceInfo& /* sourceInfo */)
         {
-            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-            if (wintergrasp && wintergrasp->IsEnabled() && wintergrasp->GetDefenderTeam() == TEAM_ALLIANCE)
+            if (sWintergraspMgr->IsEnabled() && sWintergraspMgr->GetDefenderTeam() == TEAM_ALLIANCE)
                 return true;
             return false;
         }
@@ -1254,18 +1231,14 @@ struct demolisher_engineerAI : public ScriptedAI
 private:
     bool CanBuild() const
     {
-        Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-        if (!wintergrasp)
-            return false;
-
         switch (me->GetEntry())
         {
-        case NPC_GOBLIN_MECHANIC:
-            return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
-        case NPC_GNOMISH_ENGINEER:
-            return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
-        default:
-            return false;
+            case NPC_GOBLIN_MECHANIC:
+                return (sWintergraspMgr->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H) > sWintergraspMgr->GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
+            case NPC_GNOMISH_ENGINEER:
+                return (sWintergraspMgr->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) > sWintergraspMgr->GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
+            default:
+                return false;
         }
     }
 };

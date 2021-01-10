@@ -28,7 +28,6 @@ class AccountMgr;
 class AuctionHouseObject;
 class Aura;
 class AuraScript;
-class Battlefield;
 class Battleground;
 class BattlegroundMap;
 class Channel;
@@ -482,17 +481,6 @@ class TC_GAME_API OnlyOnceAreaTriggerScript : public AreaTriggerScript
         virtual bool TryHandleOnce(Player* /*player*/, AreaTriggerDBC const* /*trigger*/) = 0;
         void ResetAreaTriggerDone(InstanceScript* /*instance*/, uint32 /*triggerId*/);
         void ResetAreaTriggerDone(Player const* /*player*/, AreaTriggerDBC const* /*trigger*/);
-};
-
-class TC_GAME_API BattlefieldScript : public ScriptObject
-{
-    protected:
-
-        BattlefieldScript(char const* name);
-
-    public:
-
-        virtual Battlefield* GetBattlefield() const = 0;
 };
 
 class TC_GAME_API BattlegroundScript : public ScriptObject
@@ -1010,10 +998,6 @@ class TC_GAME_API ScriptMgr
     public: /* AreaTriggerScript */
 
         bool OnAreaTrigger(Player* player, AreaTriggerDBC const* trigger);
-
-    public: /* BattlefieldScript */
-
-        Battlefield* CreateBattlefield(uint32 scriptId);
 
     public: /* BattlegroundScript */
 

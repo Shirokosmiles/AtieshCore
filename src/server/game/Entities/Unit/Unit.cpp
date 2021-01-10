@@ -17,8 +17,6 @@
 
 #include "Unit.h"
 #include "AbstractFollower.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "BattlegroundScore.h"
 #include "CellImpl.h"
@@ -74,6 +72,7 @@
 #include "UpdateFieldFlags.h"
 #include "Util.h"
 #include "Vehicle.h"
+#include "WintergraspMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -11460,8 +11459,8 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
     // SpecialEvent (battlefield)
     if (player && victim)
     {
-        if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId()))
-            battlefield->HandleKill(player, victim);
+        if (player->GetZoneId() == AREA_WINTERGRASP)
+            sWintergraspMgr->HandleKill(player, victim);
 
         if (SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(player->GetZoneId()))
             se->HandleKill(player, victim);

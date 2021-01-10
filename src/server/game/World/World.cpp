@@ -29,7 +29,6 @@
 #include "AuctionHouseBot.h"
 #include "AuctionHouseMgr.h"
 #include "BattlegroundMgr.h"
-#include "BattlefieldMgr.h"
 #include "CalendarMgr.h"
 #include "ChannelMgr.h"
 #include "CharacterCache.h"
@@ -95,6 +94,7 @@
 #include "WardenCheckMgr.h"
 #include "WaypointManager.h"
 #include "WeatherMgr.h"
+#include "WintergraspMgr.h"
 #include "WhoListStorage.h"
 #include "WorldConfigMgr.h"
 #include "WorldSession.h"
@@ -1307,7 +1307,7 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize Battlefield
     TC_LOG_INFO("server.loading", "Starting Battlefield System");
-    sBattlefieldMgr->InitBattlefield();
+    sWintergraspMgr->InitializeWG();
 
     ///- Initialize Special Events
     TC_LOG_INFO("server.loading", "Starting SpecialEvents System");
@@ -1626,7 +1626,7 @@ void World::Update(uint32 diff)
 
     {
         TC_METRIC_TIMER("world_update_time", TC_METRIC_TAG("type", "Update battlefields"));
-        sBattlefieldMgr->Update(diff);
+        sWintergraspMgr->Update(diff);
     }
 
     sSpecialEventMgr->Update(diff);

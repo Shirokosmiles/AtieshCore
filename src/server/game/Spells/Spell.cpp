@@ -17,8 +17,6 @@
 
 #include "Spell.h"
 #include "Battleground.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "CellImpl.h"
 #include "Common.h"
 #include "ConditionMgr.h"
@@ -60,6 +58,7 @@
 #include "Vehicle.h"
 #include "VMapFactory.h"
 #include "VMapManager2.h"
+#include "WintergraspMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -6398,14 +6397,14 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                 // allow always ghost flight spells
                 if (m_originalCaster && m_originalCaster->GetTypeId() == TYPEID_PLAYER && m_originalCaster->IsAlive())
                 {
-                    if (SpecialEvent* battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(m_originalCaster->GetZoneId()))
+                    if (SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(m_originalCaster->GetZoneId()))
                     {
-                        if (battlefield && !battlefield->IsFlyingMountAllowed())
+                        if (se && !se->IsFlyingMountAllowed())
                             return SPELL_FAILED_NOT_HERE;
                     }
-                    if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(m_originalCaster->GetZoneId()))
+                    if (m_originalCaster->GetZoneId() == AREA_WINTERGRASP)
                     {
-                        if (battlefield && !battlefield->CanFlyIn())
+                        if (sWintergraspMgr->IsWarTime())
                             return SPELL_FAILED_NOT_HERE;
                     }
                     if (AreaTableDBC const* area = sDBCStoresMgr->GetAreaTableDBC(m_originalCaster->GetAreaId()))

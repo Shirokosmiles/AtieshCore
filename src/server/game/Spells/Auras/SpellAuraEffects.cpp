@@ -17,8 +17,6 @@
 
 #include "SpellAuraEffects.h"
 #include "Battleground.h"
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "CellImpl.h"
 #include "Common.h"
 #include "DBCStoresMgr.h"
@@ -41,6 +39,7 @@
 #include "Unit.h"
 #include "Util.h"
 #include "Vehicle.h"
+#include "WintergraspMgr.h"
 #include "WorldPacket.h"
 #include <numeric>
 
@@ -4507,8 +4506,8 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             {
                                 if (Battleground* bg = target->ToPlayer()->GetBattleground())
                                     bg->RemovePlayerFromResurrectQueue(target->GetGUID());
-                                if (Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId()))
-                                    battlefield->HandleResurrectedPlayer(target->GetGUID());
+                                if (target->GetZoneId() == AREA_WINTERGRASP)
+                                    sWintergraspMgr->HandleResurrectedPlayer(target->GetGUID());
                             }
                             break;
                         case 36730:                                     // Flame Strike

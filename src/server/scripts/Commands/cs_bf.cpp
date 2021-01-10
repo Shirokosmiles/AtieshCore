@@ -23,7 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "ScriptMgr.h"
-#include "BattlefieldMgr.h"
+#include "WintergraspMgr.h"
 #include "Chat.h"
 #include "RBAC.h"
 
@@ -51,85 +51,50 @@ public:
         return commandTable;
     }
 
-    static bool HandleBattlefieldStart(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldStart(ChatHandler* handler)
     {
-        Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
-
-        if (!bf)
-            return false;
-
-        bf->StartBattle();
-
-        if (battleId == 1)
-            handler->SendGlobalGMSysMessage("Wintergrasp (Command start used)");
+        sWintergraspMgr->StartBattle();
+        handler->SendGlobalGMSysMessage("Wintergrasp (Command start used)");
 
         return true;
     }
 
-    static bool HandleBattlefieldEnd(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldEnd(ChatHandler* handler)
     {
-        Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
-
-        if (!bf)
-            return false;
-
-        bf->EndBattle(true);
-
-        if (battleId == 1)
-            handler->SendGlobalGMSysMessage("Wintergrasp (Command stop used)");
+        sWintergraspMgr->EndBattle(true);
+        handler->SendGlobalGMSysMessage("Wintergrasp (Command stop used)");
 
         return true;
     }
 
-    static bool HandleBattlefieldEnable(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldEnable(ChatHandler* handler)
     {
-        Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
-
-        if (!bf)
-            return false;
-
-        if (bf->IsEnabled())
+        if (sWintergraspMgr->IsEnabled())
         {
-            bf->ToggleBattlefield(false);
-            if (battleId == 1)
-                handler->SendGlobalGMSysMessage("Wintergrasp is disabled");
+            sWintergraspMgr->ToggleBattlefield(false);
+            handler->SendGlobalGMSysMessage("Wintergrasp is disabled");
         }
         else
         {
-            bf->ToggleBattlefield(true);
-            if (battleId == 1)
-                handler->SendGlobalGMSysMessage("Wintergrasp is enabled");
+            sWintergraspMgr->ToggleBattlefield(true);
+            handler->SendGlobalGMSysMessage("Wintergrasp is enabled");
         }
 
         return true;
     }
 
-    static bool HandleBattlefieldSwitch(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldSwitch(ChatHandler* handler)
     {
-        Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
-
-        if (!bf)
-            return false;
-
-        bf->EndBattle(false);
-        if (battleId == 1)
-            handler->SendGlobalGMSysMessage("Wintergrasp (Command switch used)");
-
+        sWintergraspMgr->EndBattle(false);
+        handler->SendGlobalGMSysMessage("Wintergrasp (Command switch used)");
         return true;
     }
 
-    static bool HandleBattlefieldTimer(ChatHandler* handler, uint32 battleId, uint32 time)
+    static bool HandleBattlefieldTimer(ChatHandler* handler,uint32 time)
     {
-        Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
-
-        if (!bf)
-            return false;
-
-        bf->SetTimer(time * IN_MILLISECONDS);
-        bf->SendInitWorldStatesToAll();
-        if (battleId == 1)
-            handler->SendGlobalGMSysMessage("Wintergrasp (Command timer used)");
-
+        sWintergraspMgr->SetTimer(time * IN_MILLISECONDS);
+        sWintergraspMgr->SendInitWorldStatesToAll();
+        handler->SendGlobalGMSysMessage("Wintergrasp (Command timer used)");
         return true;
     }
 };
