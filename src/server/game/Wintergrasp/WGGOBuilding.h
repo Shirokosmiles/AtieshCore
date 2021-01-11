@@ -19,8 +19,6 @@
 #include "SharedDefines.h"
 #include "WorldStatePackets.h"
 
-struct StaticWintergraspTowerInfo;
-
 class WGGameObjectBuilding
 {
 public:
@@ -28,7 +26,7 @@ public:
     ~WGGameObjectBuilding();
 
     void Init(GameObject* go);
-    ObjectGuid const& GetGUID() const { return _buildGUID; }
+    ObjectGuid const& GetGUID() const { return _GOGUID; }
 
     void Rebuild();
     void RebuildGate();
@@ -43,27 +41,34 @@ public:
 
     void Save();
 
-    uint32 GetID() { return _buildID; }
-    bool IsAttackTower() { return _buildID >= BATTLEFIELD_WG_TOWER_SHADOWSIGHT && _buildID <= BATTLEFIELD_WG_TOWER_FLAMEWATCH; }
-    bool IsAttackSide() { return IsAttackTower(); }
+    uint32 GetGOEntry() { return _GOentry; }
+    bool IsAttackTower() { return _type == BATTLEFIELD_WG_OBJECTTYPE_TOWER; }
+    bool IsDefenseTower() { return _type == BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER; }
     bool IsAlive() { return _state != BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_DESTROY && _state != BATTLEFIELD_WG_OBJECTSTATE_HORDE_DESTROY && _state != BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY; }
 
     TeamId GetTeamController() { return _teamControl; }
     WintergraspGameObjectBuildingType GetType() { return _type; }
 
 private:
+    uint8 _GetTextDamaged(WintergraspGameObjectBuildingType type);
+    uint8 _GetTextDestroyed(WintergraspGameObjectBuildingType type);
+
     // WG object
     WintergraspMgr* _wg;
     // Linked gameobject
-    ObjectGuid _buildGUID;
-    // ID building
-    uint32 _buildID;
+    ObjectGuid _GOGUID;
+    // linked gameobject ID building
+    uint32 _GOentry;
     // the team that controls this point
     TeamId _teamControl;
     WintergraspGameObjectBuildingType _type;
     uint32 _worldState;
     WintergraspGameObjectState _state;
-    StaticWintergraspTowerInfo const* _staticTowerInfo;
     // GameObject associations
     GuidVector m_GameObjectList[3];
+
+    bool _isTower;
+    WintergraspTowerIds _TowerId;
+    uint8 _TextDamaged;
+    uint8 _TextDestroyed;
 };

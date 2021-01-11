@@ -465,7 +465,7 @@ void WintergraspMgr::_UpdateCreatureForBuildGO(WintergraspGameObject go, Creatur
 {
     for (WGGameObjectBuilding* building : BuildingsInZone)
     {
-        if (building->GetID() == go)
+        if (building->GetGOEntry() == go)
         {
             if (!building->IsAlive())
                 HideNpc(creature);

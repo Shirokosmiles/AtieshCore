@@ -20,28 +20,6 @@
 #include "WintergraspMgr.h"
 #include "GameObject.h"
 
-struct StaticWintergraspTowerInfo
-{
-    uint8 TowerId;
-
-    struct
-    {
-        uint8 Damaged;
-        uint8 Destroyed;
-    } TextIds;
-};
-
-StaticWintergraspTowerInfo const TowerData[WG_MAX_TOWER] =
-{
-    { BATTLEFIELD_WG_TOWER_FORTRESS_NW,   { BATTLEFIELD_WG_TEXT_NW_KEEPTOWER_DAMAGE,   BATTLEFIELD_WG_TEXT_NW_KEEPTOWER_DESTROY   } },
-    { BATTLEFIELD_WG_TOWER_FORTRESS_SW,   { BATTLEFIELD_WG_TEXT_SW_KEEPTOWER_DAMAGE,   BATTLEFIELD_WG_TEXT_SW_KEEPTOWER_DESTROY   } },
-    { BATTLEFIELD_WG_TOWER_FORTRESS_SE,   { BATTLEFIELD_WG_TEXT_SE_KEEPTOWER_DAMAGE,   BATTLEFIELD_WG_TEXT_SE_KEEPTOWER_DESTROY   } },
-    { BATTLEFIELD_WG_TOWER_FORTRESS_NE,   { BATTLEFIELD_WG_TEXT_NE_KEEPTOWER_DAMAGE,   BATTLEFIELD_WG_TEXT_NE_KEEPTOWER_DESTROY   } },
-    { BATTLEFIELD_WG_TOWER_SHADOWSIGHT,   { BATTLEFIELD_WG_TEXT_WESTERN_TOWER_DAMAGE,  BATTLEFIELD_WG_TEXT_WESTERN_TOWER_DESTROY  } },
-    { BATTLEFIELD_WG_TOWER_WINTER_S_EDGE, { BATTLEFIELD_WG_TEXT_SOUTHERN_TOWER_DAMAGE, BATTLEFIELD_WG_TEXT_SOUTHERN_TOWER_DESTROY } },
-    { BATTLEFIELD_WG_TOWER_FLAMEWATCH,    { BATTLEFIELD_WG_TEXT_EASTERN_TOWER_DAMAGE,  BATTLEFIELD_WG_TEXT_EASTERN_TOWER_DESTROY  } }
-};
-
  // *********************************************************
  // **********Tower Element(GameObject, Creature)************
  // *********************************************************
@@ -187,29 +165,69 @@ WintergraspTowerData const DefenseTowers[WG_MAX_DEFENSETOWERS] =
     }
 };
 
+uint8 WGGameObjectBuilding::_GetTextDamaged(WintergraspGameObjectBuildingType type)
+{
+    switch (type)
+    {
+        case BATTLEFIELD_WG_TOWER_FORTRESS_NW: return BATTLEFIELD_WG_TEXT_NW_KEEPTOWER_DAMAGE; break;
+        case BATTLEFIELD_WG_TOWER_FORTRESS_SW: return BATTLEFIELD_WG_TEXT_SW_KEEPTOWER_DAMAGE; break;
+        case BATTLEFIELD_WG_TOWER_FORTRESS_SE: return BATTLEFIELD_WG_TEXT_SE_KEEPTOWER_DAMAGE; break;
+        case BATTLEFIELD_WG_TOWER_FORTRESS_NE: return BATTLEFIELD_WG_TEXT_NE_KEEPTOWER_DAMAGE; break;
+        case BATTLEFIELD_WG_TOWER_SHADOWSIGHT: return BATTLEFIELD_WG_TEXT_WESTERN_TOWER_DAMAGE; break;
+        case BATTLEFIELD_WG_TOWER_WINTER_S_EDGE: return BATTLEFIELD_WG_TEXT_SOUTHERN_TOWER_DAMAGE; break;
+        case BATTLEFIELD_WG_TOWER_FLAMEWATCH: return BATTLEFIELD_WG_TEXT_EASTERN_TOWER_DAMAGE; break;
+    }
+    return 0;
+}
+
+uint8 WGGameObjectBuilding::_GetTextDestroyed(WintergraspGameObjectBuildingType type)
+{
+    switch (type)
+    {
+        case BATTLEFIELD_WG_TOWER_FORTRESS_NW: return BATTLEFIELD_WG_TEXT_NW_KEEPTOWER_DESTROY; break;
+        case BATTLEFIELD_WG_TOWER_FORTRESS_SW: return BATTLEFIELD_WG_TEXT_SW_KEEPTOWER_DESTROY; break;
+        case BATTLEFIELD_WG_TOWER_FORTRESS_SE: return BATTLEFIELD_WG_TEXT_SE_KEEPTOWER_DESTROY; break;
+        case BATTLEFIELD_WG_TOWER_FORTRESS_NE: return BATTLEFIELD_WG_TEXT_NE_KEEPTOWER_DESTROY; break;
+        case BATTLEFIELD_WG_TOWER_SHADOWSIGHT: return BATTLEFIELD_WG_TEXT_WESTERN_TOWER_DESTROY; break;
+        case BATTLEFIELD_WG_TOWER_WINTER_S_EDGE: return BATTLEFIELD_WG_TEXT_SOUTHERN_TOWER_DESTROY; break;
+        case BATTLEFIELD_WG_TOWER_FLAMEWATCH: return BATTLEFIELD_WG_TEXT_EASTERN_TOWER_DESTROY; break;
+    }
+    return 0;
+}
+
 WGGameObjectBuilding::WGGameObjectBuilding(WintergraspMgr* wg, WintergraspGameObjectBuildingType type, uint32 worldState)
 {
     ASSERT(wg);
-    _wg = wg;
-    _buildID = 0;
-    _teamControl = TEAM_NEUTRAL;
-    _type = type;
-    _worldState = worldState;
+    _wg            = wg;
+    _GOGUID.Clear();
+    _GOentry       = 0;
+    _teamControl   = TEAM_NEUTRAL;
+    _type          = type;
+    _worldState    = worldState;
     _state = BATTLEFIELD_WG_OBJECTSTATE_NONE;
-    _staticTowerInfo = nullptr;
+    for (int8 i = 0; i < 3; i++)
+        m_GameObjectList[i].clear();
+    _isTower       = false;
+    _TowerId       = BATTLEFIELD_WG_TOWER_FORTRESS_NW;
+    _TextDamaged   = _GetTextDamaged(type);
+    _TextDestroyed = _GetTextDestroyed(type);
 }
 
 WGGameObjectBuilding::~WGGameObjectBuilding()
 {
-    _wg = nullptr;
-    _buildID = 0;
-    _teamControl = TEAM_ALLIANCE;
-    _type = BATTLEFIELD_WG_OBJECTTYPE_DOOR;
-    _worldState = 0;
-    _state = BATTLEFIELD_WG_OBJECTSTATE_NONE;
-    _staticTowerInfo = nullptr;
-    for (int8 i = 0; i < PVP_TEAMS_COUNT; i++)
+    _wg            = nullptr;
+    _GOGUID.Clear();
+    _GOentry       = 0;
+    _teamControl   = TEAM_ALLIANCE;
+    _type          = BATTLEFIELD_WG_OBJECTTYPE_DOOR;
+    _worldState    = 0;
+    _state         = BATTLEFIELD_WG_OBJECTSTATE_NONE;
+    for (int8 i = 0; i < 3; i++)
         m_GameObjectList[i].clear();
+    _isTower = false;
+    _TowerId       = BATTLEFIELD_WG_TOWER_FORTRESS_NW;
+    _TextDamaged   = 0;
+    _TextDestroyed = 0;
 }
 
 void WGGameObjectBuilding::Rebuild()
@@ -230,7 +248,7 @@ void WGGameObjectBuilding::Rebuild()
             break;
     }
 
-    if (GameObject* build = _wg->GetGameObject(_buildGUID))
+    if (GameObject* build = _wg->GetGameObject(_GOGUID))
     {
         // Rebuild gameobject
         if (build->IsDestructibleBuilding())
@@ -252,7 +270,7 @@ void WGGameObjectBuilding::Rebuild()
 
 void WGGameObjectBuilding::RebuildGate()
 {
-    if (GameObject* build = _wg->GetGameObject(_buildGUID))
+    if (GameObject* build = _wg->GetGameObject(_GOGUID))
     {
         if (build->IsDestructibleBuilding() && build->GetEntry() == GO_WINTERGRASP_VAULT_GATE)
         {
@@ -270,10 +288,10 @@ void WGGameObjectBuilding::Damaged()
     _wg->SendUpdateWorldState(_worldState, _state);
 
     // Send warning message
-    if (_staticTowerInfo)
-        _wg->SendWarning(_staticTowerInfo->TextIds.Damaged);
+    if (_isTower)
+        _wg->SendWarning(_TextDamaged);
 
-    switch (GetID())
+    switch (_GOentry)
     {
         // Attack Towers
         case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
@@ -327,8 +345,8 @@ void WGGameObjectBuilding::Destroyed()
     _wg->SendUpdateWorldState(_worldState, _state);
 
     // Warn players
-    if (_staticTowerInfo)
-        _wg->SendWarning(_staticTowerInfo->TextIds.Destroyed);
+    if (_isTower)
+        _wg->SendWarning(_TextDestroyed);
 
     switch (_type)
     {
@@ -338,7 +356,7 @@ void WGGameObjectBuilding::Destroyed()
             _wg->UpdateDestroyedTowerCount(_teamControl);
             break;
         case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
-            if (GameObject* build = _wg->GetGameObject(_buildGUID))
+            if (GameObject* build = _wg->GetGameObject(_GOGUID))
                 if (GameObject* go = build->FindNearestGameObject(GO_WINTERGRASP_KEEP_COLLISION_WALL, 50.0f))
                     go->SetGoState(GO_STATE_ACTIVE);
             _wg->SetRelicInteractible(true);
@@ -357,12 +375,11 @@ void WGGameObjectBuilding::Destroyed()
 
 void WGGameObjectBuilding::Init(GameObject* go)
 {
-    if (!go)
-        return;
-
+    ASSERT_NOTNULL(go);
+    go->setActive(true);
+    go->SetFarVisible(true);
     // GameObject associated to object
-    _buildGUID = go->GetGUID();
-
+    _GOGUID = go->GetGUID();
     switch (_type)
     {
         case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
@@ -401,93 +418,98 @@ void WGGameObjectBuilding::Init(GameObject* go)
             break;
     }
 
-    int32 towerId = -1;
-    _buildID = go->GetEntry();
-    switch (go->GetEntry())
+    _GOentry = go->GetEntry();
+    switch (_GOentry)
     {
         case GO_WINTERGRASP_FORTRESS_TOWER_NW:
-            towerId = BATTLEFIELD_WG_TOWER_FORTRESS_NW;
+            _isTower = true;
+            _TowerId = BATTLEFIELD_WG_TOWER_FORTRESS_NW;
             break;
         case GO_WINTERGRASP_FORTRESS_TOWER_SW:
-            towerId = BATTLEFIELD_WG_TOWER_FORTRESS_SW;
+            _isTower = true;
+            _TowerId = BATTLEFIELD_WG_TOWER_FORTRESS_SW;
             break;
         case GO_WINTERGRASP_FORTRESS_TOWER_SE:
-            towerId = BATTLEFIELD_WG_TOWER_FORTRESS_SE;
+            _isTower = true;
+            _TowerId = BATTLEFIELD_WG_TOWER_FORTRESS_SE;
             break;
         case GO_WINTERGRASP_FORTRESS_TOWER_NE:
-            towerId = BATTLEFIELD_WG_TOWER_FORTRESS_NE;
+            _isTower = true;
+            _TowerId = BATTLEFIELD_WG_TOWER_FORTRESS_NE;
             break;
         case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
-            towerId = BATTLEFIELD_WG_TOWER_SHADOWSIGHT;
+            _isTower = true;
+            _TowerId = BATTLEFIELD_WG_TOWER_SHADOWSIGHT;
             break;
         case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
-            towerId = BATTLEFIELD_WG_TOWER_WINTER_S_EDGE;
+            _isTower = true;
+            _TowerId = BATTLEFIELD_WG_TOWER_WINTER_S_EDGE;
             break;
         case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-            towerId = BATTLEFIELD_WG_TOWER_FLAMEWATCH;
+            _isTower = true;
+            _TowerId = BATTLEFIELD_WG_TOWER_FLAMEWATCH;
             break;
     }
 
-    if (towerId >= BATTLEFIELD_WG_TOWER_SHADOWSIGHT) // Attacker towers
+    if (_isTower)
     {
-        // Spawn associate gameobjects
-        for (WintergraspGameObjectData const& gobData : AttackTowers[towerId - 4].GameObject)
+        if (IsAttackTower())
         {
-            if (GameObject* goHorde = _wg->SpawnGameObject(gobData.HordeEntry, gobData.Pos, gobData.Rot))
-                m_GameObjectList[TEAM_HORDE].push_back(goHorde->GetGUID());
+            // Spawn associate gameobjects
+            for (WintergraspGameObjectData const& gobData : AttackTowers[_TowerId - 4].GameObject)
+            {
+                if (GameObject* goHorde = ASSERT_NOTNULL(_wg->SpawnGameObject(gobData.HordeEntry, gobData.Pos, gobData.Rot)))
+                    m_GameObjectList[TEAM_HORDE].push_back(goHorde->GetGUID());
 
-            if (GameObject* goAlliance = _wg->SpawnGameObject(gobData.AllianceEntry, gobData.Pos, gobData.Rot))
-                m_GameObjectList[TEAM_ALLIANCE].push_back(goAlliance->GetGUID());
+                if (GameObject* goAlliance = ASSERT_NOTNULL(_wg->SpawnGameObject(gobData.AllianceEntry, gobData.Pos, gobData.Rot)))
+                    m_GameObjectList[TEAM_ALLIANCE].push_back(goAlliance->GetGUID());
+            }
         }
-    }
-    else if (towerId != -1) // 0 - 3
-    {
-        // Spawn associate gameobjects
-        for (WintergraspGameObjectData const& gobData : DefenseTowers[towerId].GameObject)
+        else
         {
-            if (GameObject* goHorde = _wg->SpawnGameObject(gobData.HordeEntry, gobData.Pos, gobData.Rot))
-                m_GameObjectList[TEAM_HORDE].push_back(goHorde->GetGUID());
+            // Spawn associate gameobjects
+            for (WintergraspGameObjectData const& gobData : DefenseTowers[_TowerId].GameObject)
+            {
+                if (GameObject* goHorde = ASSERT_NOTNULL(_wg->SpawnGameObject(gobData.HordeEntry, gobData.Pos, gobData.Rot)))
+                    m_GameObjectList[TEAM_HORDE].push_back(goHorde->GetGUID());
 
-            if (GameObject* goAlliance = _wg->SpawnGameObject(gobData.AllianceEntry, gobData.Pos, gobData.Rot))
-                m_GameObjectList[TEAM_ALLIANCE].push_back(goAlliance->GetGUID());
-        }
+                if (GameObject* goAlliance = ASSERT_NOTNULL(_wg->SpawnGameObject(gobData.AllianceEntry, gobData.Pos, gobData.Rot)))
+                    m_GameObjectList[TEAM_ALLIANCE].push_back(goAlliance->GetGUID());
+            }
+        }        
     }
-
-    if (towerId >= 0)
-    {
-        ASSERT(towerId < WG_MAX_TOWER);
-        _staticTowerInfo = &TowerData[towerId];
-        UpdateGo();
-    }
+    UpdateGo();
 }
 
 void WGGameObjectBuilding::UpdateGo()
 {
-    if (_staticTowerInfo && _staticTowerInfo->TowerId < BATTLEFIELD_WG_TOWER_SHADOWSIGHT)
+    // Show GameObjects for TeamControll
+    if (!m_GameObjectList[_teamControl].empty())
+        for (ObjectGuid guid : m_GameObjectList[_teamControl])
+            if (GameObject* go = _wg->GetGameObject(guid))
+                go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+
+    // Hide GO for another teams
+    if (_teamControl != TEAM_NEUTRAL)
     {
-        // for defense towers we should hide attackerteam and set visible defense team
-        if (!m_GameObjectList[_wg->GetAttackerTeam()].empty())
-            for (ObjectGuid guid : m_GameObjectList[_wg->GetAttackerTeam()])
+        TeamId otherTeam = _wg->GetOtherTeam(_teamControl);
+        if (!m_GameObjectList[otherTeam].empty())
+            for (ObjectGuid guid : m_GameObjectList[otherTeam])
                 if (GameObject* go = _wg->GetGameObject(guid))
                     go->SetRespawnTime(RESPAWN_ONE_DAY);
-
-        if (!m_GameObjectList[_wg->GetDefenderTeam()].empty())
-            for (ObjectGuid guid : m_GameObjectList[_wg->GetDefenderTeam()])
-                if (GameObject* go = _wg->GetGameObject(guid))
-                    go->SetRespawnTime(RESPAWN_IMMEDIATELY);
     }
     else
     {
-        // for all others hide defesnse and set visible attacker
-        if (!m_GameObjectList[_wg->GetDefenderTeam()].empty())
-            for (ObjectGuid guid : m_GameObjectList[_wg->GetDefenderTeam()])
+        // Need to hide both GOs for alliance and horde
+        if (!m_GameObjectList[TEAM_ALLIANCE].empty())
+            for (ObjectGuid guid : m_GameObjectList[TEAM_ALLIANCE])
                 if (GameObject* go = _wg->GetGameObject(guid))
                     go->SetRespawnTime(RESPAWN_ONE_DAY);
 
-        if (!m_GameObjectList[_wg->GetAttackerTeam()].empty())
-            for (ObjectGuid guid : m_GameObjectList[_wg->GetAttackerTeam()])
+        if (!m_GameObjectList[TEAM_HORDE].empty())
+            for (ObjectGuid guid : m_GameObjectList[TEAM_HORDE])
                 if (GameObject* go = _wg->GetGameObject(guid))
-                    go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+                    go->SetRespawnTime(RESPAWN_ONE_DAY);
     }
 }
 

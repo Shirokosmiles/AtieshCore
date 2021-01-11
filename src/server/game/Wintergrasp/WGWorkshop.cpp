@@ -210,7 +210,7 @@ void WGWorkshop::InitialWorkshopAndCapturePoint(TeamId teamId, WintergraspWorksh
 {
     if (workshopType < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
     {
-        if (GameObject* goWorkshop = _wg->SpawnGameObject(WGworkshopData[workshopType].entry, WGworkshopData[workshopType].Pos, WGworkshopData[workshopType].Rot))
+        if (GameObject* goWorkshop = ASSERT_NOTNULL(_wg->SpawnGameObject(WGworkshopData[workshopType].entry, WGworkshopData[workshopType].Pos, WGworkshopData[workshopType].Rot)))
         {
             m_workshopGO.push_back(goWorkshop->GetGUID());
 
@@ -370,53 +370,34 @@ void WGWorkshop::UpdateCreatureAndGo()
         }
     }
 
-    switch (_teamControl)
-    {
-        case TEAM_NEUTRAL:
-        {
-            if (!m_GOList[TEAM_HORDE].empty())
-                for (ObjectGuid guid : m_GOList[TEAM_HORDE])
-                    if (GameObject* go = _wg->GetGameObject(guid))
-                        go->SetRespawnTime(RESPAWN_ONE_DAY);
-
-            if (!m_GOList[TEAM_ALLIANCE].empty())
-                for (ObjectGuid guid : m_GOList[TEAM_ALLIANCE])
-                    if (GameObject* go = _wg->GetGameObject(guid))
-                        go->SetRespawnTime(RESPAWN_ONE_DAY);
-            break;
-        }
-        case TEAM_ALLIANCE:
-        {
-            if (!m_GOList[TEAM_HORDE].empty())
-                for (ObjectGuid guid : m_GOList[TEAM_HORDE])
-                    if (GameObject* go = _wg->GetGameObject(guid))
-                        go->SetRespawnTime(RESPAWN_ONE_DAY);
-
-            if (!m_GOList[TEAM_NEUTRAL].empty())
-                for (ObjectGuid guid : m_GOList[TEAM_NEUTRAL])
-                    if (GameObject* go = _wg->GetGameObject(guid))
-                        go->SetRespawnTime(RESPAWN_ONE_DAY);
-            break;
-        }
-        case TEAM_HORDE:
-        {
-            if (!m_GOList[TEAM_ALLIANCE].empty())
-                for (ObjectGuid guid : m_GOList[TEAM_ALLIANCE])
-                    if (GameObject* go = _wg->GetGameObject(guid))
-                        go->SetRespawnTime(RESPAWN_ONE_DAY);
-
-            if (!m_GOList[TEAM_NEUTRAL].empty())
-                for (ObjectGuid guid : m_GOList[TEAM_NEUTRAL])
-                    if (GameObject* go = _wg->GetGameObject(guid))
-                        go->SetRespawnTime(RESPAWN_ONE_DAY);
-            break;
-        }
-    }
-
+    // Show GameObjects for TeamControll
     if (!m_GOList[_teamControl].empty())
         for (ObjectGuid guid : m_GOList[_teamControl])
             if (GameObject* go = _wg->GetGameObject(guid))
                 go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+
+    // Hide GO for another teams
+    if (_teamControl != TEAM_NEUTRAL)
+    {
+        TeamId otherTeam = _wg->GetOtherTeam(_teamControl);
+        if (!m_GOList[otherTeam].empty())
+            for (ObjectGuid guid : m_GOList[otherTeam])
+                if (GameObject* go = _wg->GetGameObject(guid))
+                    go->SetRespawnTime(RESPAWN_ONE_DAY);
+    }
+    else
+    {
+        // Need to hide both GOs for alliance and horde
+        if (!m_GOList[TEAM_ALLIANCE].empty())
+            for (ObjectGuid guid : m_GOList[TEAM_ALLIANCE])
+                if (GameObject* go = _wg->GetGameObject(guid))
+                    go->SetRespawnTime(RESPAWN_ONE_DAY);
+
+        if (!m_GOList[TEAM_HORDE].empty())
+            for (ObjectGuid guid : m_GOList[TEAM_HORDE])
+                if (GameObject* go = _wg->GetGameObject(guid))
+                    go->SetRespawnTime(RESPAWN_ONE_DAY);
+    }
 }
 
 void WGWorkshop::UpdateGraveyardAndWorkshop()

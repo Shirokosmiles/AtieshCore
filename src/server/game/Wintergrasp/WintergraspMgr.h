@@ -87,7 +87,7 @@ enum BattlefieldSounds
     BF_SOUND_START         = 3439
 };
 
-enum WintergraspGameObject
+enum WintergraspGameObject : uint32
 {
     GO_WINTERGRASP_FACTORY_BANNER_NE             = 190475,
     GO_WINTERGRASP_FACTORY_BANNER_NW             = 190487,
@@ -171,7 +171,7 @@ enum WintergraspQuests
     QUEST_CREDIT_DEFEND_SIEGE     = 31284
 };
 
-enum WintergraspText
+enum WintergraspText : uint8
 {
     // Invisible Stalker
     BATTLEFIELD_WG_TEXT_SOUTHERN_TOWER_DAMAGE           = 1,

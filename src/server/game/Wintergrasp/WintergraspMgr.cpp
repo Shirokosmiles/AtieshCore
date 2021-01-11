@@ -98,13 +98,14 @@ WintergraspMgr::WintergraspMgr()
     StalkerGuid.Clear();
     m_titansRelicGUID.Clear();
 
-    Grave_NW       = nullptr;
-    Grave_NE       = nullptr;
-    Grave_SW       = nullptr;
-    Grave_SE       = nullptr;
-    Grave_Keep     = nullptr;
-    Grave_Horde    = nullptr;
-    Grave_Alliance = nullptr;
+    // Init Graveyards
+    Grave_NW       = ASSERT_NOTNULL(sDBCStoresMgr->GetWorldSafeLocsDBC(1330));
+    Grave_NE       = ASSERT_NOTNULL(sDBCStoresMgr->GetWorldSafeLocsDBC(1329));
+    Grave_SW       = ASSERT_NOTNULL(sDBCStoresMgr->GetWorldSafeLocsDBC(1334));
+    Grave_SE       = ASSERT_NOTNULL(sDBCStoresMgr->GetWorldSafeLocsDBC(1333));
+    Grave_Keep     = ASSERT_NOTNULL(sDBCStoresMgr->GetWorldSafeLocsDBC(1285));
+    Grave_Horde    = ASSERT_NOTNULL(sDBCStoresMgr->GetWorldSafeLocsDBC(1331));
+    Grave_Alliance = ASSERT_NOTNULL(sDBCStoresMgr->GetWorldSafeLocsDBC(1332));
 
     m_Data32.clear();
 }
@@ -251,6 +252,7 @@ void WintergraspMgr::InitializeWG()
     m_Map = sMapMgr->FindMap(BATTLEFIELD_WG_MAPID, 0);
     if (!m_Map)
         m_Map = sMapMgr->CreateBaseMap(BATTLEFIELD_WG_MAPID);
+    //m_Map->LoadAllCells();
 
     m_isEnabled = sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE);
     m_isActive  = sWorld->getWorldState(WS_BATTLEFIELD_WG_ACTIVE) != 0;
@@ -278,16 +280,7 @@ void WintergraspMgr::InitializeWG()
     KickPosition.Relocate(5728.117f, 2714.346f, 697.733f, 0);
     KickPosition.m_mapId = BATTLEFIELD_WG_MAPID;
 
-    InitStalker(BATTLEFIELD_WG_NPC_STALKER, WintergraspStalkerPos);    
-
-    // Init Graveyards
-    Grave_NW              = sDBCStoresMgr->GetWorldSafeLocsDBC(1330);
-    Grave_NE              = sDBCStoresMgr->GetWorldSafeLocsDBC(1329);
-    Grave_SW              = sDBCStoresMgr->GetWorldSafeLocsDBC(1334);
-    Grave_SE              = sDBCStoresMgr->GetWorldSafeLocsDBC(1333);
-    Grave_Keep            = sDBCStoresMgr->GetWorldSafeLocsDBC(1285);
-    Grave_Horde           = sDBCStoresMgr->GetWorldSafeLocsDBC(1331);
-    Grave_Alliance        = sDBCStoresMgr->GetWorldSafeLocsDBC(1332);
+    InitStalker(BATTLEFIELD_WG_NPC_STALKER, WintergraspStalkerPos);
 
     m_Data32.resize(BATTLEFIELD_WG_DATA_MAX);
     // setup worldstate
@@ -361,7 +354,7 @@ void WintergraspMgr::InitializeWG()
     // Spawn all gameobjects
     for (uint8 i = 0; i < WG_MAX_OBJ; i++)
     {
-        if (GameObject* go = SpawnGameObject(WGGameObjectBuildings[i].entry, WGGameObjectBuildings[i].pos, WGGameObjectBuildings[i].rot))
+        if (GameObject* go = ASSERT_NOTNULL(SpawnGameObject(WGGameObjectBuildings[i].entry, WGGameObjectBuildings[i].pos, WGGameObjectBuildings[i].rot)))
         {
             WGGameObjectBuilding* b = new WGGameObjectBuilding(this, WGGameObjectBuildings[i].type, WGGameObjectBuildings[i].WorldState);
             b->Init(go);
@@ -376,13 +369,13 @@ void WintergraspMgr::InitializeWG()
     for (uint8 i = 0; i < WG_MAX_TELEPORTER; ++i)
     {
         WintergraspGameObjectData const& teleporter = WGPortalDefenderData[i];
-        if (GameObject* go = SpawnGameObject(teleporter.AllianceEntry, teleporter.Pos, teleporter.Rot))
+        if (GameObject* go = ASSERT_NOTNULL(SpawnGameObject(teleporter.AllianceEntry, teleporter.Pos, teleporter.Rot)))
         {
             DefenderPortalList[TEAM_ALLIANCE].push_back(go->GetGUID());
             go->SetRespawnTime(GetDefenderTeam() == TEAM_ALLIANCE ? RESPAWN_IMMEDIATELY : RESPAWN_ONE_DAY);
         }
 
-        if (GameObject* go = SpawnGameObject(teleporter.HordeEntry, teleporter.Pos, teleporter.Rot))
+        if (GameObject* go = ASSERT_NOTNULL(SpawnGameObject(teleporter.HordeEntry, teleporter.Pos, teleporter.Rot)))
         {
             DefenderPortalList[TEAM_HORDE].push_back(go->GetGUID());
             go->SetRespawnTime(GetDefenderTeam() == TEAM_HORDE ? RESPAWN_IMMEDIATELY : RESPAWN_ONE_DAY);
