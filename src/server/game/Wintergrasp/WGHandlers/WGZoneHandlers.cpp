@@ -56,7 +56,7 @@ void WintergraspMgr::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
                 AddPlayer(player, true, false, false, false);   // we should add him in playermap, when war will start, if level will lower - will be kicked
             else
             {
-                if (GetFreeslot(player->GetCFSTeamId()))
+                if (m_StartGrouping && GetFreeslot(player->GetCFSTeamId()))
                     InviteNewPlayerToQueue(player, true);
                 else
                     AddPlayer(player, true, false, false, false);   // we should add him in playermap, when war will start, we will try to add him in war and queue (if will exist free slot)
