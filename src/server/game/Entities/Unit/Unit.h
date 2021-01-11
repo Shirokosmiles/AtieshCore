@@ -1678,6 +1678,7 @@ class TC_GAME_API Unit : public WorldObject
         bool IsCharging() const { return _isCharging; }
         void SetIsCharging(bool jump) { _isCharging = jump; }
 
+        virtual bool CanEnterWater() const = 0;
         virtual bool CanSwim() const;
 
         float GetHoverOffset() const
