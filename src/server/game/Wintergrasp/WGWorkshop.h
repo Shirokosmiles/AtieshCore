@@ -19,18 +19,16 @@
 #include "SharedDefines.h"
 #include "WorldStatePackets.h"
 
-struct StaticWintergraspWorkshopInfo;
-
 class WGWorkshop
 {
 public:
-    WGWorkshop(WintergraspMgr* wg, uint8 type);
+    WGWorkshop(WintergraspMgr* wg, WintergraspWorkshopIds type);
     ~WGWorkshop();
 
-    uint8 GetId() const;
+    WintergraspWorkshopIds GetType() const { return _type; }
     TeamId GetTeamControl() const { return _teamControl; }
 
-    void InitialWorkshopAndCapturePoint(TeamId teamId, uint8 workshopId);
+    void InitialWorkshopAndCapturePoint(TeamId teamId, WintergraspWorkshopIds workshopType);
     // Called on change faction in CapturePoint class
     void GiveControlTo(TeamId teamId, bool init = false);
 
@@ -43,12 +41,23 @@ public:
     void UpdateCreatureAndGo();
 
 private:
+    uint32 _GetWorldStateForType(WintergraspWorkshopIds workshopType);
+    uint8 _GetAllianceCapture(WintergraspWorkshopIds workshopType);
+    uint8 _GetAllianceAttack(WintergraspWorkshopIds workshopType);
+    uint8 _GetHordeCapture(WintergraspWorkshopIds workshopType);
+    uint8 _GetHordeAttack(WintergraspWorkshopIds workshopType);
+
     WintergraspMgr* _wg;                            // Pointer to wintergrasp
     ObjectGuid _buildGUID;
-    WintergraspGameObjectState _state;                       // For worldstate
+    WintergraspGameObjectState _state;              // For worldstate
     TeamId _teamControl;                            // Team witch control the workshop
+    WintergraspWorkshopIds _type;
 
-    StaticWintergraspWorkshopInfo const* _staticInfo;
+    uint32 _worldStateId;
+    uint8 _AllianceCapture;
+    uint8 _AllianceAttack;
+    uint8 _HordeCapture;
+    uint8 _HordeAttack;
 
     // GameObject associations
     GuidVector m_GOList[3];

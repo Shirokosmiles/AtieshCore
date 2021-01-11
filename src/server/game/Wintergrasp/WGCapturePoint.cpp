@@ -26,8 +26,8 @@ WGCapturePoint::WGCapturePoint(WintergraspMgr* WG, TeamId team)
     m_value = 0;
     m_minValue = 0.0f;
     m_maxValue = 0.0f;
-    m_State = BattlefieldObjectiveStates(BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL);
-    m_OldState = BattlefieldObjectiveStates(BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL);
+    m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL;
+    m_OldState = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL;
     m_capturePointEntry = 0;
     m_neutralValuePct = 0;
     m_maxSpeed = 0;
@@ -36,21 +36,24 @@ WGCapturePoint::WGCapturePoint(WintergraspMgr* WG, TeamId team)
     m_WG = WG;
 }
 
-/*void Battlefield::AddCapturePoint(BfCapturePoint* cp, uint8 workshopId)
+WGCapturePoint::~WGCapturePoint()
 {
-    uint32 new_id = 0;
-    for (CapturePointContainer::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        if (itr->first > new_id)
-            new_id = itr->first;
+    for (uint8 i = 0; i < PVP_TEAMS_COUNT; i++)
+        m_activePlayers[i].clear();
 
-    // use next
-    ++new_id;
+    m_team = TEAM_ALLIANCE;
+    m_value = 0;
+    m_minValue = 0.0f;
+    m_maxValue = 0.0f;
+    m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL;
+    m_OldState = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL;
+    m_capturePointEntry = 0;
+    m_neutralValuePct = 0;
+    m_maxSpeed = 0;
 
-    CapturePointHolder cph;
-    cph.pointer = cp;
-    cph.workshopId = workshopId;
-    m_capturePoints[new_id] = cph;
-}*/
+    m_capturePointGUID.Clear();
+    m_WG = nullptr;
+}
 
 bool WGCapturePoint::HandlePlayerEnter(Player* player)
 {

@@ -113,10 +113,10 @@ enum WintergraspGameObject
 
 enum WGGossipText
 {
-    BATTLEFIELD_WG_GOSSIPTEXT_GY_NE              = 20071,
-    BATTLEFIELD_WG_GOSSIPTEXT_GY_NW              = 20072,
     BATTLEFIELD_WG_GOSSIPTEXT_GY_SE              = 20074,
     BATTLEFIELD_WG_GOSSIPTEXT_GY_SW              = 20073,
+    BATTLEFIELD_WG_GOSSIPTEXT_GY_NE              = 20071,
+    BATTLEFIELD_WG_GOSSIPTEXT_GY_NW              = 20072,
     BATTLEFIELD_WG_GOSSIPTEXT_GY_KEEP            = 20070,
     BATTLEFIELD_WG_GOSSIPTEXT_GY_HORDE           = 20075,
     BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE        = 20076
@@ -307,7 +307,8 @@ enum WintergraspWorkshopIds
     BATTLEFIELD_WG_WORKSHOP_NE,
     BATTLEFIELD_WG_WORKSHOP_NW,
     BATTLEFIELD_WG_WORKSHOP_KEEP_WEST,
-    BATTLEFIELD_WG_WORKSHOP_KEEP_EAST
+    BATTLEFIELD_WG_WORKSHOP_KEEP_EAST,
+    BATTLEFIELD_WG_WORKSHOP_MAX
 };
 
 enum WintergraspTowerIds
@@ -350,26 +351,6 @@ enum WintergraspTeamControl
     BATTLEFIELD_WG_TEAM_ALLIANCE,
     BATTLEFIELD_WG_TEAM_HORDE,
     BATTLEFIELD_WG_TEAM_NEUTRAL
-};
-
-struct BfWGCoordGY
-{
-    Position Pos;
-    uint32 GraveyardID;
-    uint32 TextID;          // for gossip menu
-    TeamId StartControl;
-};
-
-// 7 in sql, 7 in header
-BfWGCoordGY const BfWGGraveyards[BATTLEFIELD_WG_GRAVEYARD_MAX] =
-{
-    { { 4317.97f, 2407.43f, 392.619f, 6.268125f }, 1333, BATTLEFIELD_WG_GOSSIPTEXT_GY_SE,       TEAM_NEUTRAL  },
-    { { 4335.81f, 3234.56f, 390.251f, 0.008500f }, 1334, BATTLEFIELD_WG_GOSSIPTEXT_GY_SW,       TEAM_NEUTRAL  },
-    { { 5104.35f, 2302.23f, 368.485f, 0.733038f }, 1329, BATTLEFIELD_WG_GOSSIPTEXT_GY_NE,       TEAM_NEUTRAL  },
-    { { 5101.04f, 3461.45f, 368.485f, 5.317802f }, 1330, BATTLEFIELD_WG_GOSSIPTEXT_GY_NW,       TEAM_NEUTRAL  },
-    { { 5537.46f, 2904.91f, 517.664f, 4.819249f }, 1285, BATTLEFIELD_WG_GOSSIPTEXT_GY_KEEP,     TEAM_NEUTRAL  },
-    { { 5031.5f, 3710.43f, 372.364f, 3.971623f }, 1331, BATTLEFIELD_WG_GOSSIPTEXT_GY_HORDE,    TEAM_HORDE    },
-    { { 5140.35f, 2182.01f, 390.751f, 1.972220f }, 1332, BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE, TEAM_ALLIANCE },
 };
 
 // *****************************************************
@@ -446,7 +427,6 @@ Position const WintergraspRelicPos = { 5440.379f, 2840.493f, 430.2816f, -1.83259
 QuaternionData const WintergraspRelicRot = { 0.f, 0.f, -0.7933531f, 0.6087617f };
 
 uint8 const WG_MAX_TELEPORTER = 12;
-uint8 const WG_MAX_WORKSHOP = 6;
 uint8 const WG_MAX_TOWER = 7;
 
 struct WintergraspObjectPositionData
@@ -540,7 +520,7 @@ WintergraspGameObjectKeepData const WGKeepAllianceData[WG_MAX_KEEPGO_ALLIANCE] =
 class WGGraveyard;
 class WGCapturePoint;
 typedef std::unordered_map<uint32, WGGraveyard*> GraveyardMap;
-typedef std::unordered_map<uint8, WGCapturePoint*> CapturePointContainer;
+typedef std::unordered_map<WintergraspWorkshopIds, WGCapturePoint*> CapturePointContainer;
 
 class WGGameObjectBuilding;
 class WGWorkshop;
@@ -580,6 +560,7 @@ public:
     static WintergraspMgr* instance();
 
     void InitializeWG();
+    void SetupWG(TeamId defender, bool StartWar);
     void Update(uint32 diff);
 
     void StartBattle();
@@ -606,10 +587,10 @@ public:
     WorldSafeLocsDBC const* GetClosestGraveyard(Player* player);
     WGGraveyardId GetSpiritGraveyardIdForCreature(Creature* creature) const;
     GraveyardMap const& GetGraveyardMap() const { return m_graveyardMap; }
-    void AddCapturePoint(WGCapturePoint* cp, uint8 workshopId);
-    WGCapturePoint* GetCapturePoint(uint32 workshop) const
+    void AddCapturePoint(WGCapturePoint* cp, WintergraspWorkshopIds workshopId);
+    WGCapturePoint* GetCapturePoint(WintergraspWorkshopIds workshop) const
     {
-        CapturePointContainer::const_iterator itr = m_capturePoints.find(uint8(workshop));
+        CapturePointContainer::const_iterator itr = m_capturePoints.find(workshop);
         if (itr != m_capturePoints.end())
                 return itr->second;
         return nullptr;
@@ -724,7 +705,7 @@ public:
     void ShowNpc(Creature* creature, bool aggressive);
 
     void _UpdateCreatureForBuildGO(WintergraspGameObject go, Creature* creature, TeamId team);
-    void _UpdateCreatureForWorkshop(WintergraspWorkshopIds go, Creature* creature, TeamId team);
+    void _UpdateCreatureForWorkshop(WintergraspWorkshopIds workshopType, Creature* creature, TeamId team);
     /// </Spawn section>
 
     /// <Group section>

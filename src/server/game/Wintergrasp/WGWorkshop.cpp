@@ -23,34 +23,6 @@
 #include "GameObject.h"
 #include "World.h"
 
- // *********************************************************
- // *****************WorkShop Data & Element*****************
- // *********************************************************
-struct StaticWintergraspWorkshopInfo
-{
-    uint8 WorkshopId;
-    uint32 WorldStateId;
-
-    struct
-    {
-        uint8 AllianceCapture;
-        uint8 AllianceAttack;
-        uint8 HordeCapture;
-        uint8 HordeAttack;
-    } TextIds;
-};
-
-StaticWintergraspWorkshopInfo const WorkshopData[WG_MAX_WORKSHOP] =
-{
-    { BATTLEFIELD_WG_WORKSHOP_SE, WS_BATTLEFIELD_WG_WORKSHOP_SE, { BATTLEFIELD_WG_TEXT_EASTSPARK_CAPTURE_ALLIANCE,     BATTLEFIELD_WG_TEXT_EASTSPARK_ATTACK_ALLIANCE,     BATTLEFIELD_WG_TEXT_EASTSPARK_CAPTURE_HORDE,     BATTLEFIELD_WG_TEXT_EASTSPARK_ATTACK_HORDE     } },
-    { BATTLEFIELD_WG_WORKSHOP_SW, WS_BATTLEFIELD_WG_WORKSHOP_SW, { BATTLEFIELD_WG_TEXT_WESTSPARK_CAPTURE_ALLIANCE,     BATTLEFIELD_WG_TEXT_WESTSPARK_ATTACK_ALLIANCE,     BATTLEFIELD_WG_TEXT_WESTSPARK_CAPTURE_HORDE,     BATTLEFIELD_WG_TEXT_WESTSPARK_ATTACK_HORDE     } },
-    { BATTLEFIELD_WG_WORKSHOP_NE, WS_BATTLEFIELD_WG_WORKSHOP_NE, { BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_ALLIANCE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_ALLIANCE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_HORDE,   BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_HORDE   } },
-    { BATTLEFIELD_WG_WORKSHOP_NW, WS_BATTLEFIELD_WG_WORKSHOP_NW, { BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_ALLIANCE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_ALLIANCE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_HORDE, BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_HORDE } },
-    // KEEP WORKSHOPS - It can't be taken, so it doesn't have a textids
-    { BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, WS_BATTLEFIELD_WG_WORKSHOP_K_W, { 0, 0, 0, 0 } },
-    { BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WS_BATTLEFIELD_WG_WORKSHOP_K_E, { 0, 0, 0, 0 } }
-};
-
 struct WintergraspWorkshopData
 {
     uint32 WorkshopEntry;                                // id of Workshop
@@ -122,19 +94,95 @@ WintergraspWorkshopData const WorksshopGO[WG_MAX_WORKSHOPS] =
     }
 };
 
-WGWorkshop::WGWorkshop(WintergraspMgr* wg, uint8 type)
+uint32 WGWorkshop::_GetWorldStateForType(WintergraspWorkshopIds type)
 {
-    ASSERT(wg && type < WG_MAX_WORKSHOP);
-    _wg = wg;
-    _buildGUID.Clear();
-    _state = WintergraspGameObjectState(BATTLEFIELD_WG_OBJECTSTATE_NONE);
-    _teamControl = TEAM_NEUTRAL;
-    _staticInfo = &WorkshopData[type];
+    switch (type)
+    {
+        case BATTLEFIELD_WG_WORKSHOP_SE: return WS_BATTLEFIELD_WG_WORKSHOP_SE; break;
+        case BATTLEFIELD_WG_WORKSHOP_SW: return WS_BATTLEFIELD_WG_WORKSHOP_SW; break;
+        case BATTLEFIELD_WG_WORKSHOP_NE: return WS_BATTLEFIELD_WG_WORKSHOP_NE; break;
+        case BATTLEFIELD_WG_WORKSHOP_NW: return WS_BATTLEFIELD_WG_WORKSHOP_NW; break;
+        case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST: return WS_BATTLEFIELD_WG_WORKSHOP_K_W; break;
+        case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST: return WS_BATTLEFIELD_WG_WORKSHOP_K_E; break;
+    }
 
-    if (GetId() < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+    return 0;
+}
+
+uint8 WGWorkshop::_GetAllianceCapture(WintergraspWorkshopIds type)
+{
+    switch (type)
+    {
+        case BATTLEFIELD_WG_WORKSHOP_SE: return BATTLEFIELD_WG_TEXT_EASTSPARK_CAPTURE_ALLIANCE; break;
+        case BATTLEFIELD_WG_WORKSHOP_SW: return BATTLEFIELD_WG_TEXT_WESTSPARK_CAPTURE_ALLIANCE; break;
+        case BATTLEFIELD_WG_WORKSHOP_NE: return BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_ALLIANCE; break;
+        case BATTLEFIELD_WG_WORKSHOP_NW: return BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_ALLIANCE; break;
+        case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST: return 0; break;
+        case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST: return 0; break;
+    }
+    return 0;
+}
+
+uint8 WGWorkshop::_GetAllianceAttack(WintergraspWorkshopIds type)
+{
+    switch (type)
+    {
+        case BATTLEFIELD_WG_WORKSHOP_SE: return BATTLEFIELD_WG_TEXT_EASTSPARK_ATTACK_ALLIANCE; break;
+        case BATTLEFIELD_WG_WORKSHOP_SW: return BATTLEFIELD_WG_TEXT_WESTSPARK_ATTACK_ALLIANCE; break;
+        case BATTLEFIELD_WG_WORKSHOP_NE: return BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_ALLIANCE; break;
+        case BATTLEFIELD_WG_WORKSHOP_NW: return BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_ALLIANCE; break;
+        case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST: return 0; break;
+        case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST: return 0; break;
+    }
+    return 0;
+}
+
+uint8 WGWorkshop::_GetHordeCapture(WintergraspWorkshopIds type)
+{
+    switch (type)
+    {
+        case BATTLEFIELD_WG_WORKSHOP_SE: return BATTLEFIELD_WG_TEXT_EASTSPARK_CAPTURE_HORDE; break;
+        case BATTLEFIELD_WG_WORKSHOP_SW: return BATTLEFIELD_WG_TEXT_WESTSPARK_CAPTURE_HORDE; break;
+        case BATTLEFIELD_WG_WORKSHOP_NE: return BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_HORDE; break;
+        case BATTLEFIELD_WG_WORKSHOP_NW: return BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_HORDE; break;
+        case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST: return 0; break;
+        case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST: return 0; break;
+    }
+    return 0;
+}
+
+uint8 WGWorkshop::_GetHordeAttack(WintergraspWorkshopIds type)
+{
+    switch (type)
+    {
+        case BATTLEFIELD_WG_WORKSHOP_SE: return BATTLEFIELD_WG_TEXT_EASTSPARK_ATTACK_HORDE; break;
+        case BATTLEFIELD_WG_WORKSHOP_SW: return BATTLEFIELD_WG_TEXT_WESTSPARK_ATTACK_HORDE; break;
+        case BATTLEFIELD_WG_WORKSHOP_NE: return BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_HORDE; break;
+        case BATTLEFIELD_WG_WORKSHOP_NW: return BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_HORDE; break;
+        case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST: return 0; break;
+        case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST: return 0; break;
+    }
+    return 0;
+}
+
+WGWorkshop::WGWorkshop(WintergraspMgr* wg, WintergraspWorkshopIds type)
+{
+    ASSERT(wg && type < BATTLEFIELD_WG_WORKSHOP_MAX);
+    _wg              = wg;
+    _buildGUID.Clear();
+    _state           = BATTLEFIELD_WG_OBJECTSTATE_NONE;
+    _teamControl     = TEAM_NEUTRAL;
+    _type            = type;
+    _worldStateId    = _GetWorldStateForType(type);
+    _AllianceCapture = _GetAllianceCapture(type);
+    _AllianceAttack  = _GetAllianceAttack(type);
+    _HordeCapture    = _GetHordeCapture(type);
+    _HordeAttack     = _GetHordeAttack(type);
+
+    if (type < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
     {
         // Spawn associate gameobjects
-        for (WintergraspGameObjectData const& gobData : WorksshopGO[GetId()].GameObject)
+        for (WintergraspGameObjectData const& gobData : WorksshopGO[type].GameObject)
         {
             if (GameObject* goHorde = _wg->SpawnGameObject(gobData.HordeEntry, gobData.Pos, gobData.Rot))
                 m_GOList[TEAM_HORDE].push_back(goHorde->GetGUID());
@@ -149,25 +197,20 @@ WGWorkshop::~WGWorkshop()
 {
     _wg = nullptr;
     _buildGUID.Clear();
-    _state = WintergraspGameObjectState(BATTLEFIELD_WG_OBJECTSTATE_NONE);
+    _state = BATTLEFIELD_WG_OBJECTSTATE_NONE;
     _teamControl = TEAM_ALLIANCE;
-    _staticInfo = nullptr;
+    _type = BATTLEFIELD_WG_WORKSHOP_SE;
     // note : in WintergraspWorkshop  in m_GameObjectList we have 3 team (TEAM_NEUTRALL) too
     for (int8 i = 0; i < 3; i++)
         m_GOList[i].clear();
     m_workshopGO.clear();
 }
 
-uint8 WGWorkshop::GetId() const
+void WGWorkshop::InitialWorkshopAndCapturePoint(TeamId teamId, WintergraspWorkshopIds workshopType)
 {
-    return _staticInfo->WorkshopId;
-}
-
-void WGWorkshop::InitialWorkshopAndCapturePoint(TeamId teamId, uint8 workshopId)
-{
-    if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+    if (workshopType < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
     {
-        if (GameObject* goWorkshop = _wg->SpawnGameObject(WGworkshopData[workshopId].entry, WGworkshopData[workshopId].Pos, WGworkshopData[workshopId].Rot))
+        if (GameObject* goWorkshop = _wg->SpawnGameObject(WGworkshopData[workshopType].entry, WGworkshopData[workshopType].Pos, WGworkshopData[workshopType].Rot))
         {
             m_workshopGO.push_back(goWorkshop->GetGUID());
 
@@ -176,7 +219,7 @@ void WGWorkshop::InitialWorkshopAndCapturePoint(TeamId teamId, uint8 workshopId)
                 capturePoint->SetCapturePointData(goWorkshop);
                 capturePoint->LinkToWorkshop(this);
                 capturePoint->SetInitialData(teamId);
-                _wg->AddCapturePoint(capturePoint, workshopId);
+                _wg->AddCapturePoint(capturePoint, workshopType);
             }
         }
     }
@@ -192,14 +235,14 @@ void WGWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
         {
             // Updating worldstate
             _state = WintergraspGameObjectState(BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_INTACT);
-            _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
+            _wg->SendUpdateWorldState(_worldStateId, _state);
 
             if (!init)
             {
                 if (_teamControl == TEAM_ALLIANCE)
-                    _wg->SendWarning(_staticInfo->TextIds.HordeAttack); // workshop taken - horde
+                    _wg->SendWarning(_HordeAttack); // workshop taken - horde
                 else
-                    _wg->SendWarning(_staticInfo->TextIds.AllianceAttack); // workshop taken - alliance
+                    _wg->SendWarning(_AllianceAttack); // workshop taken - alliance
             }
             break;
         }
@@ -207,30 +250,30 @@ void WGWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
         {
             // Updating worldstate
             _state = WintergraspGameObjectState(BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT);
-            _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
+            _wg->SendUpdateWorldState(_worldStateId, _state);
 
             // Warning message
             if (!init)
-                _wg->SendWarning(_staticInfo->TextIds.AllianceCapture); // workshop taken - alliance
+                _wg->SendWarning(_AllianceCapture); // workshop taken - alliance
             break;
         }
         case TEAM_HORDE:
         {
             // Update worldstate
             _state = WintergraspGameObjectState(BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT);
-            _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
+            _wg->SendUpdateWorldState(_worldStateId, _state);
 
             // Warning message
             if (!init)
-                _wg->SendWarning(_staticInfo->TextIds.HordeCapture); // workshop taken - horde
+                _wg->SendWarning(_HordeCapture); // workshop taken - horde
             break;
         }
     }
 
     // Found associate graveyard and update it
-    if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+    if (_type < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
     {
-        uint32 gyID = _wg->_GetGraveyardIDByType(WGGraveyardId(_staticInfo->WorkshopId));
+        uint32 gyID = _wg->_GetGraveyardIDByType(WGGraveyardId(_type));
         if (WGGraveyard* gy = _wg->GetGraveyardById(gyID))
             gy->GiveControlTo(teamId);
     }
@@ -241,7 +284,7 @@ void WGWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
         _wg->UpdateCounterVehicle(false);
     else
     {
-        if (WGCapturePoint* cp = _wg->GetCapturePoint(GetId()))
+        if (WGCapturePoint* cp = _wg->GetCapturePoint(_type))
             cp->SetInitialData(_teamControl);
     }
 
@@ -251,7 +294,7 @@ void WGWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
 
 void WGWorkshop::UpdateCreatureAndGo()
 {
-    switch (GetId())
+    switch (_type)
     {
         case BATTLEFIELD_WG_WORKSHOP_SE:
         {
@@ -378,7 +421,7 @@ void WGWorkshop::UpdateCreatureAndGo()
 
 void WGWorkshop::UpdateGraveyardAndWorkshop()
 {
-    if (GetId() < BATTLEFIELD_WG_WORKSHOP_NE)
+    if (_type < BATTLEFIELD_WG_WORKSHOP_NE)
         GiveControlTo(_wg->GetAttackerTeam(), true);
     else
         GiveControlTo(_wg->GetDefenderTeam(), true);
@@ -386,10 +429,10 @@ void WGWorkshop::UpdateGraveyardAndWorkshop()
 
 void WGWorkshop::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    packet.Worldstates.emplace_back(_staticInfo->WorldStateId, _state);
+    packet.Worldstates.emplace_back(_worldStateId, _state);
 }
 
 void WGWorkshop::Save()
 {
-    sWorld->setWorldState(_staticInfo->WorldStateId, _state);
+    sWorld->setWorldState(_worldStateId, _state);
 }

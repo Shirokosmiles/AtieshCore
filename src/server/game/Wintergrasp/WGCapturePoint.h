@@ -28,7 +28,7 @@ class TC_GAME_API WGCapturePoint
 {
 public:
     WGCapturePoint(WintergraspMgr* WG, TeamId team);
-    ~WGCapturePoint() { }
+    ~WGCapturePoint();
 
     void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) { }
 

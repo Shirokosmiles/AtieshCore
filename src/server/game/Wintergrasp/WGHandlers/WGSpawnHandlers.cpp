@@ -483,11 +483,11 @@ void WintergraspMgr::_UpdateCreatureForBuildGO(WintergraspGameObject go, Creatur
     }
 }
 
-void WintergraspMgr::_UpdateCreatureForWorkshop(WintergraspWorkshopIds go, Creature* creature, TeamId team)
+void WintergraspMgr::_UpdateCreatureForWorkshop(WintergraspWorkshopIds workshopType, Creature* creature, TeamId team)
 {
     for (WGWorkshop* workshop : Workshops)
     {
-        if (workshop->GetId() == go)
+        if (workshop->GetType() == workshopType)
         {
             switch (creature->GetEntry())
             {

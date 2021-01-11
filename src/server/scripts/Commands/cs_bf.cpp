@@ -85,7 +85,8 @@ public:
 
     static bool HandleBattlefieldSwitch(ChatHandler* handler)
     {
-        sWintergraspMgr->EndBattle(false);
+        sWintergraspMgr->SetupWG(sWintergraspMgr->GetAttackerTeam(), false);
+        
         handler->SendGlobalGMSysMessage("Wintergrasp (Command switch used)");
         return true;
     }
