@@ -21,6 +21,7 @@
 #include "WGGraveyard.h"
 #include "ScriptedCreature.h"
 #include "TemporarySummon.h"
+#include "Log.h"
 
  // Called when a player enters the zone
 void WintergraspMgr::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)

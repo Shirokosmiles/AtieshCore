@@ -374,7 +374,11 @@ void WGWorkshop::UpdateCreatureAndGo()
     if (!m_GOList[_teamControl].empty())
         for (ObjectGuid guid : m_GOList[_teamControl])
             if (GameObject* go = _wg->GetGameObject(guid))
+            {
                 go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+                go->setActive(true);
+                go->SetFarVisible(true);
+            }
 
     // Hide GO for another teams
     if (_teamControl != TEAM_NEUTRAL)

@@ -487,7 +487,11 @@ void WGGameObjectBuilding::UpdateGo()
     if (!m_GameObjectList[_teamControl].empty())
         for (ObjectGuid guid : m_GameObjectList[_teamControl])
             if (GameObject* go = _wg->GetGameObject(guid))
+            {
                 go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+                go->setActive(true);
+                go->SetFarVisible(true);
+            }
 
     // Hide GO for another teams
     if (_teamControl != TEAM_NEUTRAL)
