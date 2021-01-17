@@ -148,7 +148,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 }
                 break;
             }
-            case WorldFloatConfigs::CONFIG_VISIBLITY_DISTANCE_CONTINENTS:
+            case WorldFloatConfigs::CONFIG_VISIBILITY_DISTANCE_CONTINENTS:
             {
                 if (value < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
                 {
