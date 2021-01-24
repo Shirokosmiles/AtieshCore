@@ -658,7 +658,8 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
     if (vendor)
     {
         // Stop the npc if moving
-        vendor->PauseMovement(sWorld->getIntConfig(CONFIG_CREATURE_STOP_FOR_PLAYER));
+        if (uint32 pause = vendor->GetMovementTemplate().GetInteractionPauseTimer())
+           vendor->PauseMovement(pause);
         vendor->SetHomePosition(vendor->GetPosition());
     }
 
