@@ -808,4 +808,7 @@ INSERT INTO `warden_checks` VALUES (0, 178, '', 710730, 23, NULL, 0x07F223143C69
 (787, 243, NULL, 8714336, NULL, 'FrameScript::lua_loadbuffer', NULL, 0x558BEC8B4D108B450C83EC0883F903),
 (788, 139, 'forceinsecure() return issecure()', NULL, NULL, 'Detects naive Lua unlockers', NULL, NULL),
 (789, 139, 'return not not PQR_IsMoving', NULL, NULL, 'Detects PQR', NULL, NULL),
-(790, 139, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find(\"|cffffd200PQR|r\") then return true end end', NULL, NULL, 'Detects PQR', NULL, NULL);
+(790, 139, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find(\"|cffffd200PQR|r\") then return true end end', NULL, NULL, 'Detects PQR', NULL, NULL),
+(791, 243, '', '', '5316832', '1', '56', '0x005120E0');
+(792, 243, '', '', '8714336', '1', '55', '0x0084F860');
+(793, 243, null, null, '8491536', '1', '55', '0x00819210');
