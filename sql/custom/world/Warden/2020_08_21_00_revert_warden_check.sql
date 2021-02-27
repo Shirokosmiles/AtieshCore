@@ -4,7 +4,7 @@
 DROP TABLE IF EXISTS `warden`;
 DROP TABLE IF EXISTS `warden_checks`;
 CREATE TABLE `warden_checks`  (
-  `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) UNSIGNED NOT NULL,
   `type` tinyint(3) UNSIGNED NULL DEFAULT NULL,
   `str` varchar(170) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `address` int(10) UNSIGNED NULL DEFAULT NULL,
@@ -13,12 +13,13 @@ CREATE TABLE `warden_checks`  (
   `data` binary(24) NULL DEFAULT NULL,
   `result` varbinary(24) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 791 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of warden_checks
 -- ----------------------------
-INSERT INTO `warden_checks` VALUES (0, 178, '', 710730, 23, NULL, 0x07F223143C69271AA2A851FECF6DC883A9D3A7DBA6FE26CC, NULL),
+INSERT INTO `warden_checks` VALUES 
+(0, 178, '', 710730, 23, NULL, 0x07F223143C69271AA2A851FECF6DC883A9D3A7DBA6FE26CC, NULL),
 (1, 191, '', 28940, 17, NULL, 0xC7D18F99DBC446A4B36E78B9130B6FA2E365B3D2D4199DF5, NULL),
 (2, 191, '', 21826, 11, NULL, 0xAA1A8559776F873F26954F15E49E6041EDC2C3766AD87A59, NULL),
 (3, 178, '', 676970, 23, NULL, 0x5F342A4D0EA9DB35F93FAE6E32670D810F017309817AA7C0, NULL),
@@ -809,6 +810,6 @@ INSERT INTO `warden_checks` VALUES (0, 178, '', 710730, 23, NULL, 0x07F223143C69
 (788, 139, 'forceinsecure() return issecure()', NULL, NULL, 'Detects naive Lua unlockers', NULL, NULL),
 (789, 139, 'return not not PQR_IsMoving', NULL, NULL, 'Detects PQR', NULL, NULL),
 (790, 139, 'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find(\"|cffffd200PQR|r\") then return true end end', NULL, NULL, 'Detects PQR', NULL, NULL),
-(791, 243, '', '', '5316832', '1', '56', '0x005120E0');
-(792, 243, '', '', '8714336', '1', '55', '0x0084F860');
-(793, 243, null, null, '8491536', '1', '55', '0x00819210');
+(791, 243, '', 5316832, '1', '56', NULL, '0x005120E0'),
+(792, 243, '', 8714336, '1', '55', NULL, '0x0084F860'),
+(793, 243, NULL, 8491536, '1', '55', NULL, '0x00819210');
