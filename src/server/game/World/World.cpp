@@ -603,7 +603,7 @@ void World::LoadConfigSettings(bool reload)
 
     //###               FLOAT configs:
     ///-visibility on continents
-    m_MaxVisibleDistanceOnContinents = m_float_configs[CONFIG_VISIBLITY_DISTANCE_CONTINENTS];
+    m_MaxVisibleDistanceOnContinents = m_float_configs[CONFIG_VISIBILITY_DISTANCE_CONTINENTS];
     ///-visibility in instances
     m_MaxVisibleDistanceInInstances = m_float_configs[CONFIG_VISIBILITY_DISTANCE_INSTANCES];
     ///-visibility in BG/Arenas

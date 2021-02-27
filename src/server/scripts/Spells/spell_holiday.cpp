@@ -42,78 +42,73 @@ enum SpellsPicnic
     SPELL_ROMANTIC_PICNIC_ACHIEV    = 45123, // Romantic Picnic periodic = 5000
 };
 
-class spell_love_is_in_the_air_romantic_picnic : public SpellScriptLoader
+class spell_love_is_in_the_air_romantic_picnic : public AuraScript
 {
-    public:
-        spell_love_is_in_the_air_romantic_picnic() : SpellScriptLoader("spell_love_is_in_the_air_romantic_picnic") { }
+    PrepareAuraScript(spell_love_is_in_the_air_romantic_picnic);
 
-        class spell_love_is_in_the_air_romantic_picnic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
         {
-            PrepareAuraScript(spell_love_is_in_the_air_romantic_picnic_AuraScript);
+            SPELL_BASKET_CHECK,
+            SPELL_MEAL_PERIODIC,
+            SPELL_MEAL_EAT_VISUAL,
+            SPELL_DRINK_VISUAL,
+            SPELL_ROMANTIC_PICNIC_ACHIEV
+        });
+    }
 
-            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                Unit* target = GetTarget();
-                target->SetStandState(UNIT_STAND_STATE_SIT);
-                target->CastSpell(target, SPELL_MEAL_PERIODIC, false);
-            }
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        target->SetStandState(UNIT_STAND_STATE_SIT);
+        target->CastSpell(target, SPELL_MEAL_PERIODIC);
+    }
 
-            void OnPeriodic(AuraEffect const* /*aurEff*/)
-            {
-                // Every 5 seconds
-                Unit* target = GetTarget();
-                Unit* caster = GetCaster();
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        // Every 5 seconds
+        Unit* target = GetTarget();
 
-                // If our player is no longer sit, remove all auras
-                if (target->GetStandState() != UNIT_STAND_STATE_SIT)
-                {
-                    target->RemoveAura(SPELL_ROMANTIC_PICNIC_ACHIEV);
-                    target->RemoveAura(GetAura());
-                    return;
-                }
-
-                target->CastSpell(target, SPELL_BASKET_CHECK, false); // unknown use, it targets Romantic Basket
-                target->CastSpell(target, RAND(SPELL_MEAL_EAT_VISUAL, SPELL_DRINK_VISUAL), false);
-
-                bool foundSomeone = false;
-                // For nearby players, check if they have the same aura. If so, cast Romantic Picnic (45123)
-                // required by achievement and "hearts" visual
-                std::vector<Player*> _players;
-                Trinity::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE*2);
-                Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(target, _players, checker);
-                Cell::VisitWorldObjects(target, searcher, INTERACTION_DISTANCE * 2);
-                for (auto const& pointer : _players)
-                {
-                    if (pointer->GetGUID() == target->GetGUID())
-                        continue;
-
-                    if (pointer->HasAura(GetId())) // && (*itr)->GetStandState() == UNIT_STAND_STATE_SIT)
-                    {
-                        if (caster)
-                        {
-                            caster->CastSpell(pointer, SPELL_ROMANTIC_PICNIC_ACHIEV, true);
-                            caster->CastSpell(target, SPELL_ROMANTIC_PICNIC_ACHIEV, true);
-                        }
-                        foundSomeone = true;
-                    }
-                }
-                _players.clear();
-
-                if (!foundSomeone && target->HasAura(SPELL_ROMANTIC_PICNIC_ACHIEV))
-                    target->RemoveAura(SPELL_ROMANTIC_PICNIC_ACHIEV);
-            }
-
-            void Register() override
-            {
-                AfterEffectApply += AuraEffectApplyFn(spell_love_is_in_the_air_romantic_picnic_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_love_is_in_the_air_romantic_picnic_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
+        // If our player is no longer sit, remove all auras
+        if (target->GetStandState() != UNIT_STAND_STATE_SIT)
         {
-            return new spell_love_is_in_the_air_romantic_picnic_AuraScript();
+            target->RemoveAurasDueToSpell(SPELL_ROMANTIC_PICNIC_ACHIEV);
+            target->RemoveAura(GetAura());
+            return;
         }
+
+        target->CastSpell(target, SPELL_BASKET_CHECK); // unknown use, it targets Romantic Basket
+        target->CastSpell(target, RAND(SPELL_MEAL_EAT_VISUAL, SPELL_DRINK_VISUAL));
+
+        bool foundSomeone = false;
+        // For nearby players, check if they have the same aura. If so, cast Romantic Picnic (45123)
+        // required by achievement and "hearts" visual
+        std::vector<Player*> playerList;
+        Trinity::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE * 2);
+        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
+        Cell::VisitWorldObjects(target, searcher, INTERACTION_DISTANCE * 2);
+        for (auto const& pointer : playerList)
+        {
+            if (target != pointer && pointer->HasAura(GetId()))
+            {
+                pointer->CastSpell(pointer, SPELL_ROMANTIC_PICNIC_ACHIEV, true);
+                target->CastSpell(target, SPELL_ROMANTIC_PICNIC_ACHIEV, true);
+                foundSomeone = true;
+                break;
+            }
+        }
+        playerList.clear();
+
+        if (!foundSomeone && target->HasAura(SPELL_ROMANTIC_PICNIC_ACHIEV))
+            target->RemoveAurasDueToSpell(SPELL_ROMANTIC_PICNIC_ACHIEV);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_love_is_in_the_air_romantic_picnic::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_love_is_in_the_air_romantic_picnic::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
 };
 
 enum HallowEndCandysSpells
@@ -1921,7 +1916,7 @@ class spell_midsummer_fling_torch_missed : public SpellScript
 void AddSC_holiday_spell_scripts()
 {
     // Love is in the Air
-    new spell_love_is_in_the_air_romantic_picnic();
+    RegisterSpellScript(spell_love_is_in_the_air_romantic_picnic);
     // Hallow's End
     new spell_hallow_end_candy();
     new spell_hallow_end_candy_pirate();
