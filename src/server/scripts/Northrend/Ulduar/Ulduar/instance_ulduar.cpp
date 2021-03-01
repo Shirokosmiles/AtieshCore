@@ -15,22 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "ulduar.h"
 #include "AreaBoundary.h"
 #include "CreatureAI.h"
-#include "CombatAI.h"
 #include "GameObject.h"
-#include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "Item.h"
 #include "Map.h"
 #include "Player.h"
-#include "Spell.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "TemporarySummon.h"
-#include "ulduar.h"
 #include "Vehicle.h"
-#include "WorldPacket.h"
 #include "WorldStatePackets.h"
 
 static BossBoundaryData const boundaries =
@@ -1088,41 +1083,6 @@ class instance_ulduar : public InstanceMapScript
         }
 };
 
-class spell_ulduar_teleporter : public SpellScriptLoader
-{
-    public:
-        spell_ulduar_teleporter() : SpellScriptLoader("spell_ulduar_teleporter") { }
-
-        class spell_ulduar_teleporter_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_ulduar_teleporter_SpellScript);
-
-            SpellCastResult CheckRequirement()
-            {
-                if (GetExplTargetUnit()->GetTypeId() != TYPEID_PLAYER)
-                    return SPELL_FAILED_DONT_REPORT;
-
-                if (GetExplTargetUnit()->IsInCombat())
-                {
-                    Spell::SendCastResult(GetExplTargetUnit()->ToPlayer(), GetSpellInfo(), 0, SPELL_FAILED_AFFECTING_COMBAT);
-                    return SPELL_FAILED_AFFECTING_COMBAT;
-                }
-
-                return SPELL_CAST_OK;
-            }
-
-            void Register() override
-            {
-                OnCheckCast += SpellCheckCastFn(spell_ulduar_teleporter_SpellScript::CheckRequirement);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_ulduar_teleporter_SpellScript();
-        }
-};
-
 /*
 enum TramEvents
 {
@@ -1270,7 +1230,4 @@ public:
 void AddSC_instance_ulduar()
 {
     new instance_ulduar();
-    new spell_ulduar_teleporter();
-    //new go_transport_to_mimiron();
-    //new go_mimiron_activate_tram();
 }
