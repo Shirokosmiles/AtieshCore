@@ -1887,7 +1887,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
 
             if (Creature* creatureTarget = unit->ToCreature())
             {
-                if (!(creatureTarget->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_CAN_COLLIDE_WITH_MISSILES))
+                if (!(creatureTarget->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_COLLIDE_WITH_MISSILES))
                     continue;
             }
         }
@@ -2982,7 +2982,7 @@ SpellMissInfo Spell::PreprocessSpellHit(Unit* unit, bool scaleAura, TargetInfo& 
 
             if (unit->IsTotem() && unit->IsMagnet())
             {
-                bool AttributeForMagnet = m_spellInfo->HasAttribute(SPELL_ATTR1_UNK18) || m_spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT);
+                bool AttributeForMagnet = m_spellInfo->HasAttribute(SPELL_ATTR1_PREVENTS_ANIM) || m_spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT);
                 if (AttributeForMagnet || m_damage > 0)
                 {
                     unit->KillSelf();
@@ -4506,8 +4506,8 @@ void Spell::SendSpellStart()
     uint32 mechanicImmunityMask = 0;
     if (Unit* unitCaster = m_caster->ToUnit())
     {
-        schoolImmunityMask = unitCaster->GetSchoolImmunityMask();
-        mechanicImmunityMask = unitCaster->GetMechanicImmunityMask();
+        schoolImmunityMask = m_timer!= 0 ? unitCaster->GetSchoolImmunityMask() : 0;
+        mechanicImmunityMask = m_timer != 0 ? m_spellInfo->GetMechanicImmunityMask(unitCaster) : 0;
     }
 
     if (schoolImmunityMask || mechanicImmunityMask)

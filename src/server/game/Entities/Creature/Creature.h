@@ -25,6 +25,7 @@
 #include "Duration.h"
 #include "GameTime.h"
 #include "Loot.h"
+#include "GridObject.h"
 #include "MapObject.h"
 #include <list>
 
