@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Battleground.h"
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
@@ -218,6 +219,30 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     Unit* TargetUnit = ObjectAccessor::GetUnit(*_player, guid2);
                     if (!TargetUnit)
                         return;
+
+                    if (TargetUnit->IsPlayer() || TargetUnit->IsPet())
+                    {
+                        if (Unit* petOwner = TargetUnit->GetCharmerOrOwnerOrSelf())
+                        {
+                            if (Player* targetPlayer = petOwner->ToPlayer())
+                            {
+                                if (Battleground* bg = targetPlayer->GetBattleground())
+                                {
+                                    if (bg->isArena() && bg->GetStatus() < STATUS_IN_PROGRESS)
+                                        return;
+                                }
+                            }
+                        }
+
+                        if (Player* targetPlayer = TargetUnit->ToPlayer())
+                        {
+                            if (Battleground* bg = targetPlayer->GetBattleground())
+                            {
+                                if (bg->isArena() && bg->GetStatus() < STATUS_IN_PROGRESS)
+                                    return;
+                            }
+                        }
+                    }
 
                     if (Unit* owner = pet->GetOwner())
                         if (!owner->IsValidAttackTarget(TargetUnit))
