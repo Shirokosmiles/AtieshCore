@@ -162,6 +162,19 @@ bool SpellMgr::IsSpellValid(SpellInfo const* spellInfo, Player* player, bool msg
     return true;
 }
 
+uint32 SpellMgr::GetSpellDifficultyId(uint32 spellId) const
+{
+    SpellDifficultySearcherMap::const_iterator i = mSpellDifficultySearcherMap.find(spellId);
+    return i == mSpellDifficultySearcherMap.end() ? 0 : i->second;
+}
+
+void SpellMgr::SetSpellDifficultyId(uint32 spellId, uint32 id)
+{
+    if (uint32 i = GetSpellDifficultyId(spellId))
+        TC_LOG_ERROR("spells", "SpellMgr::SetSpellDifficultyId: The spell %u already has spellDifficultyId %u. Will override with spellDifficultyId %u.", spellId, i, id);
+    mSpellDifficultySearcherMap[spellId] = id;
+}
+
 uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, WorldObject const* caster) const
 {
     if (!GetSpellInfo(spellId))
@@ -177,7 +190,11 @@ uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, WorldObject const* cast
         return spellId; //return source spell
     }
 
-    SpellDifficultyDBC const* difficultyEntry = sDBCStoresMgr->GetSpellDifficultyDBC(spellId);
+    uint32 difficultyId = GetSpellDifficultyId(spellId);
+    if (!difficultyId)
+        return spellId; //return source spell, it has only REGULAR_DIFFICULTY
+
+    SpellDifficultyDBC const* difficultyEntry = sDBCStoresMgr->GetSpellDifficultyDBC(difficultyId);
     if (!difficultyEntry)
     {
         TC_LOG_ERROR("spells", "SpellMgr::GetSpellIdForDifficulty: SpellDifficultyEntry was not found for spell %u. This should never happen.", spellId);
@@ -699,11 +716,11 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
 
     if (player)
     {
-        if (Battleground * battleground = player->GetBattleground())
+        if (Battleground* battleground = player->GetBattleground())
             return battleground->IsSpellAllowed(spellId, player);
 
-        if (SpecialEvent * battlefield = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(newZone))
-            return battlefield->IsSpellAreaAllowed(spellId, player, newArea);
+        if (SpecialEvent* se = sSpecialEventMgr->GetEnabledSpecialEventByZoneId(newZone))
+            return se->IsSpellAreaAllowed(spellId, player, newArea);
     }
 
     // Extra conditions
@@ -711,7 +728,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
     {
         case 58600: // No fly Zone - Dalaran
         {
-            if (!player || !player->IsAlive())
+            if (!player)
                 return false;
 
             AreaTableDBC const* pArea = sDBCStoresMgr->GetAreaTableDBC(player->GetAreaId());
@@ -723,11 +740,11 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
         }
         case 58730: // No fly Zone - Wintergrasp
         {
-            if (!player || !player->IsAlive())
+            if (!player)
                 return false;
 
             if (player->GetZoneId() == AREA_WINTERGRASP)
-                if (!sWintergraspMgr->IsWarTime() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
+                if (sWintergraspMgr->IsWarTime() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
                     return false;
             break;
         }
@@ -761,10 +778,10 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
         {
             if (!player)
                 return false;
+
             return sWintergraspMgr->IsWarTime();
             break;
         }
-
     }
 
     return true;
@@ -786,55 +803,56 @@ void SpellMgr::LoadSpellTalentRanks()
     TalentDBCMap const& talentMap = sDBCStoresMgr->GetTalentDBCMap();
     for (const auto& tID : talentMap)
     {
-        if (TalentDBC const* talentInfo = &tID.second)
+        TalentDBC const* talentInfo = &tID.second;
+        if (!talentInfo)
+            continue;
+
+        SpellInfo const* lastSpell = nullptr;
+        for (uint8 rank = MAX_TALENT_RANK - 1; rank > 0; --rank)
         {
-            SpellInfo const* lastSpell = nullptr;
-            for (uint8 rank = MAX_TALENT_RANK - 1; rank > 0; --rank)
+            if (talentInfo->SpellRank[rank])
             {
-                if (talentInfo->SpellRank[rank])
-                {
-                    lastSpell = GetSpellInfo(talentInfo->SpellRank[rank]);
-                    break;
-                }
+                lastSpell = GetSpellInfo(talentInfo->SpellRank[rank]);
+                break;
+            }
+        }
+
+        if (!lastSpell)
+            continue;
+
+        SpellInfo const* firstSpell = GetSpellInfo(talentInfo->SpellRank[0]);
+        if (!firstSpell)
+        {
+            TC_LOG_ERROR("spells", "SpellMgr::LoadSpellTalentRanks: First Rank Spell %u for TalentEntry %u does not exist.", talentInfo->SpellRank[0], talentInfo->ID);
+            continue;
+        }
+
+        SpellInfo const* prevSpell = nullptr;
+        for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
+        {
+            uint32 spellId = talentInfo->SpellRank[rank];
+            if (!spellId)
+                break;
+
+            SpellInfo const* currentSpell = GetSpellInfo(spellId);
+            if (!currentSpell)
+            {
+                TC_LOG_ERROR("spells", "SpellMgr::LoadSpellTalentRanks: Spell %u (Rank: %u) for TalentEntry %u does not exist.", spellId, rank + 1, talentInfo->ID);
+                break;
             }
 
-            if (!lastSpell)
-                continue;
+            SpellChainNode node;
+            node.first = firstSpell;
+            node.last  = lastSpell;
+            node.rank  = rank + 1;
 
-            SpellInfo const* firstSpell = GetSpellInfo(talentInfo->SpellRank[0]);
-            if (!firstSpell)
-            {
-                TC_LOG_ERROR("spells", "SpellMgr::LoadSpellTalentRanks: First Rank Spell %u for TalentEntry %u does not exist.", talentInfo->SpellRank[0], talentInfo->ID);
-                continue;
-            }
+            node.prev = prevSpell;
+            node.next = node.rank < MAX_TALENT_RANK ? GetSpellInfo(talentInfo->SpellRank[node.rank]) : nullptr;
 
-            SpellInfo const* prevSpell = nullptr;
-            for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
-            {
-                uint32 spellId = talentInfo->SpellRank[rank];
-                if (!spellId)
-                    break;
+            mSpellChains[spellId] = node;
+            mSpellInfoMap[spellId]->ChainEntry = &mSpellChains[spellId];
 
-                SpellInfo const* currentSpell = GetSpellInfo(spellId);
-                if (!currentSpell)
-                {
-                    TC_LOG_ERROR("spells", "SpellMgr::LoadSpellTalentRanks: Spell %u (Rank: %u) for TalentEntry %u does not exist.", spellId, rank + 1, talentInfo->ID);
-                    break;
-                }
-
-                SpellChainNode node;
-                node.first = firstSpell;
-                node.last = lastSpell;
-                node.rank = rank + 1;
-
-                node.prev = prevSpell;
-                node.next = node.rank < MAX_TALENT_RANK ? GetSpellInfo(talentInfo->SpellRank[node.rank]) : nullptr;
-
-                mSpellChains[spellId] = node;
-                mSpellInfoMap[spellId]->ChainEntry = &mSpellChains[spellId];
-
-                prevSpell = currentSpell;
-            }
+            prevSpell = currentSpell;
         }
     }
 }
@@ -2170,47 +2188,49 @@ void SpellMgr::LoadPetLevelupSpellMap()
     uint32 count = 0;
     uint32 family_count = 0;
 
-    CreatureFamilyDBCMap const& entryMap = sDBCStoresMgr->GetCreatureFamilyDBCMap();
-    for (const auto& indexID : entryMap)
+    SkillLineAbilityDBCMap const& skilllineMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();    
+    CreatureFamilyDBCMap const& cfMap = sDBCStoresMgr->GetCreatureFamilyDBCMap();
+
+    for (const auto& indexID : cfMap)
     {
-        if (CreatureFamilyDBC const* creatureFamily = &indexID.second)
+        CreatureFamilyDBC const* creatureFamily = &indexID.second;
+        if (!creatureFamily)                                     // not exist
+            continue;
+
+        for (uint8 j = 0; j < 2; ++j)
         {
-            for (uint8 j = 0; j < 2; ++j)
+            if (!creatureFamily->SkillLine[j])
+                continue;
+
+            for (const auto& skaID : skilllineMap)
             {
-                if (!creatureFamily->SkillLine[j])
+                SkillLineAbilityDBC const* skillLine = &skaID.second;
+                if (!skillLine)
                     continue;
 
-                SkillLineAbilityDBCMap const& skilllineMap = sDBCStoresMgr->GetSkillLineAbilityDBCMap();
-                for (const auto& skaID : skilllineMap)
-                {
-                    SkillLineAbilityDBC const* skillLine = &skaID.second;
-                    if (!skillLine)
-                        continue;
+                //if (skillLine->skillId != creatureFamily->SkillLine[0] &&
+                //    (!creatureFamily->SkillLine[1] || skillLine->skillId != creatureFamily->SkillLine[1]))
+                //    continue;
 
-                    //if (skillLine->skillId != creatureFamily->SkillLine[0] &&
-                    //    (!creatureFamily->SkillLine[1] || skillLine->skillId != creatureFamily->SkillLine[1]))
-                    //    continue;
+                if (skillLine->SkillLine != creatureFamily->SkillLine[j])
+                    continue;
 
-                    if (skillLine->SkillLine != creatureFamily->SkillLine[j])
-                        continue;
+                if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+                    continue;
 
-                    if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
-                        continue;
+                SpellInfo const* spell = GetSpellInfo(skillLine->Spell);
+                if (!spell) // not exist or triggered or talent
+                    continue;
 
-                    SpellInfo const* spell = GetSpellInfo(skillLine->Spell);
-                    if (!spell) // not exist or triggered or talent
-                        continue;
+                if (!spell->SpellLevel)
+                    continue;
 
-                    if (!spell->SpellLevel)
-                        continue;
+                PetLevelupSpellSet& spellSet = mPetLevelupSpellMap[creatureFamily->ID];
+                if (spellSet.empty())
+                    ++family_count;
 
-                    PetLevelupSpellSet& spellSet = mPetLevelupSpellMap[creatureFamily->ID];
-                    if (spellSet.empty())
-                        ++family_count;
-
-                    spellSet.insert(PetLevelupSpellSet::value_type(spell->SpellLevel, spell->Id));
-                    ++count;
-                }
+                spellSet.insert(PetLevelupSpellSet::value_type(spell->SpellLevel, spell->Id));
+                ++count;
             }
         }
     }
@@ -2548,6 +2568,7 @@ void SpellMgr::LoadSpellInfoStore()
 
     UnloadSpellInfoStore();
     mSpellInfoMap.resize(sDBCStoresMgr->GetNumRowSpellDBCMap(), nullptr);
+    sDBCStoresMgr->Handle_SpellDifficultyInSpellMgr();
 
     SpellDBCMap const& spellMap = sDBCStoresMgr->GetSpellDBCMap();
     for (const auto& sID : spellMap)
@@ -2580,6 +2601,7 @@ void SpellMgr::UnloadSpellInfoStore()
         delete mSpellInfoMap[i];
 
     mSpellInfoMap.clear();
+    mSpellDifficultySearcherMap.clear();
 }
 
 void SpellMgr::UnloadSpellInfoImplicitTargetConditionLists()
@@ -2933,8 +2955,8 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
     {
         if (LiquidTypeDBC const* liquid = &indexID.second)
         {
-            if (liquid->SpellID)
-                if (SpellInfo* spellInfo = _GetSpellInfo(liquid->SpellID))
+            if (uint32 spellId = liquid->SpellID)
+                if (SpellInfo* spellInfo = _GetSpellInfo(spellId))
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_LIQUID_AURA;
         }
     }

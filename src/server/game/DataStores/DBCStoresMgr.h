@@ -1397,7 +1397,9 @@ public:
     TaxiMask const GetDeathKnightTaxiNodesMask() { return _DeathKnightTaxiNodesMask; }
 
     TaxiPathSetBySource const& GetTaxiPathSetBySource() { return _taxiPathSetBySource; }
-    TaxiPathNodesByPath const& GetTaxiPathNodesByPath() { return _taxiPathNodesByPath; }    
+    TaxiPathNodesByPath const& GetTaxiPathNodesByPath() { return _taxiPathNodesByPath; }
+
+    void Handle_SpellDifficultyInSpellMgr();
 
 protected:
     void _Load_Achievement();

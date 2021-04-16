@@ -18,6 +18,7 @@
 #include "DBCStoresMgr.h"
 #include "DatabaseEnv.h"
 #include "SpellMgr.h"
+#include "Log.h"
 
 DBCStoresMgr* DBCStoresMgr::instance()
 {
@@ -4214,7 +4215,7 @@ void DBCStoresMgr::_Load_SpellDifficulty()
         SpellDifficultyDBC sd;
         sd.ID = id;
         for (uint8 i = 0; i < MAX_DIFFICULTY; i++)
-            sd.DifficultySpellID[i] = fields[1].GetInt32();
+            sd.DifficultySpellID[i] = fields[1 + i].GetInt32();
 
         _spellDiffucultyMap[id] = sd;
 
@@ -5650,7 +5651,7 @@ void DBCStoresMgr::_Handle_World_SpellDifficulty()
             SpellDifficultyDBC sd;
             sd.ID = id;
             for (uint8 i = 0; i < MAX_DIFFICULTY; i++)
-                sd.DifficultySpellID[i] = fields[1].GetInt32();
+                sd.DifficultySpellID[i] = fields[1 + i].GetInt32();
 
             _spellDiffucultyMap[id] = sd;
 
@@ -5733,6 +5734,35 @@ void DBCStoresMgr::_Handle_PetFamilySpellsStore()
                     }
                 }
             }
+        }
+    }
+}
+
+void DBCStoresMgr::Handle_SpellDifficultyInSpellMgr()
+{
+    for (const auto& sdID : _spellDiffucultyMap)
+    {
+        if (SpellDifficultyDBC const* spellDiff = &sdID.second)
+        {
+            SpellDifficultyDBC newEntry;
+            memset(newEntry.DifficultySpellID, 0, 4 * sizeof(uint32));
+            for (uint8 x = 0; x < MAX_DIFFICULTY; ++x)
+            {
+                if (spellDiff->DifficultySpellID[x] <= 0 || !GetSpellDBC(spellDiff->DifficultySpellID[x]))
+                {
+                    if (spellDiff->DifficultySpellID[x] > 0)//don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
+                        TC_LOG_ERROR("sql.sql", "spelldifficulty_dbc: spell %i at field id:%u at spellid%i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->DifficultySpellID[x], spellDiff->ID, x);
+                    newEntry.DifficultySpellID[x] = 0;//spell was <= 0 or invalid, set to 0
+                }
+                else
+                    newEntry.DifficultySpellID[x] = spellDiff->DifficultySpellID[x];
+            }
+            if (newEntry.DifficultySpellID[0] <= 0 || newEntry.DifficultySpellID[1] <= 0)//id0-1 must be always set!
+                continue;
+
+            for (uint8 x = 0; x < MAX_DIFFICULTY; ++x)
+                if (newEntry.DifficultySpellID[x])
+                    sSpellMgr->SetSpellDifficultyId(uint32(newEntry.DifficultySpellID[x]), spellDiff->ID);
         }
     }
 }
