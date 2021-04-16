@@ -47,7 +47,8 @@
 
 #define GTS session->GetTrinityString
 
-uint32 aurass[] = { 15366, 16609, 48162, 48074, 48170, 43223, 36880, 69994, 33081, 26035, 48469, 57623, 47440 };
+uint32 constexpr aurassSize = 13;
+uint32 aurass[aurassSize] = { 15366, 16609, 48162, 48074, 48170, 43223, 36880, 69994, 33081, 26035, 48469, 57623, 47440 };
 
 std::string getString(std::string string, uint32 number)
 {
@@ -1218,7 +1219,7 @@ public:
                         else
                         {
                             player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-                            for (size_t i = 0; i < sizeof(aurass); ++i)
+                            for (size_t i = 0; i < aurassSize; ++i)
                                 player->AddAura(aurass[i], player);
                             player->GetSession()->SendNotification("|cffC67171Buffs received!");
                             player->CastSpell(player, 45523, true);
