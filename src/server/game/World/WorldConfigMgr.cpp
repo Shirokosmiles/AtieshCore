@@ -51,13 +51,6 @@ void WorldConfig::AddOption(WorldConfigType type, uint32 IDinTypeGroup, std::str
     case WorldConfigType::GAME_CONFIG_TYPE_RATES:
         AddRateOption(IDinTypeGroup, value.empty() ? std::stof(defaultValue) : std::stof(value));
         break;
-    case WorldConfigType::GAME_CONFIG_TYPE_STRINGS:
-    {
-        bool bothEmpty = defaultValue.empty() && value.empty();
-        if (!bothEmpty)
-            AddStringOption(IDinTypeGroup, value.empty() ? defaultValue : value);
-        break;
-    }
     default:
         ABORT();
         break;
@@ -87,8 +80,6 @@ void WorldConfig::Load()
             return WorldConfigType::GAME_CONFIG_TYPE_FLOAT;
         else if (optionType == "rate")
             return WorldConfigType::GAME_CONFIG_TYPE_RATES;
-        else if (optionType == "string")
-            return WorldConfigType::GAME_CONFIG_TYPE_STRINGS;
         else
             return WorldConfigType::GAME_CONFIG_TYPE_UNKNOWN;
     };
@@ -752,15 +743,6 @@ void WorldConfig::AddRateOption(uint32 IDinTypeGroup, float const& value)
     if (!sWorld->setRate(Rates(IDinTypeGroup), value))
     {
         TC_LOG_ERROR("config", "> Rate option (%u) did not registered in core!", IDinTypeGroup);
-        return;
-    }
-}
-
-void WorldConfig::AddStringOption(uint32 IDinTypeGroup, std::string const& value)
-{
-    if (!sWorld->setStringConfig(WorldStringConfigs(IDinTypeGroup), value))
-    {
-        TC_LOG_ERROR("config", "> String option (%u) did not registered in core!", IDinTypeGroup);
         return;
     }
 }

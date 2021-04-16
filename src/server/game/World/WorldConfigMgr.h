@@ -27,7 +27,6 @@ enum class WorldConfigType : uint8
     GAME_CONFIG_TYPE_INT,
     GAME_CONFIG_TYPE_FLOAT,
     GAME_CONFIG_TYPE_RATES,
-    GAME_CONFIG_TYPE_STRINGS,
 
     GAME_CONFIG_TYPE_UNKNOWN
 };
@@ -49,7 +48,6 @@ private:
     void AddIntOption(uint32 IDinTypeGroup, uint32 const& value);
     void AddFloatOption(uint32 IDinTypeGroup, float const& value);
     void AddRateOption(uint32 IDinTypeGroup, float const& value);
-    void AddStringOption(uint32 IDinTypeGroup, std::string const& value);
 };
 
 #define sWorldConfig WorldConfig::instance()

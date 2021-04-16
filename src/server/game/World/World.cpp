@@ -155,7 +155,6 @@ World::World()
     memset(m_int_configs, 0, sizeof(m_int_configs));
     memset(m_bool_configs, 0, sizeof(m_bool_configs));
     memset(m_float_configs, 0, sizeof(m_float_configs));
-    memset(m_string_configs, 0, sizeof(m_string_configs));
 
     _guidWarn = false;
     _guidAlert = false;
@@ -199,8 +198,6 @@ World::~World()
         m_bool_configs[i] = 0;
     for (uint32 i = 0; i < FLOAT_CONFIG_VALUE_COUNT; i++)
         m_float_configs[i] = 0;
-    for (uint32 i = 0; i < STRING_CONFIG_VALUE_COUNT; i++)
-        m_string_configs[i].clear();
 
     VMAP::VMapFactory::clear();
     MMAP::MMapFactory::clear();
@@ -245,6 +242,7 @@ World::~World()
     _warnShutdownTime = 0;
     excludeACMapsId.clear();
     mapbankBagsId.clear();
+    creatureRatesInZoneId.clear();
 }
 
 World* World::instance()
@@ -626,18 +624,21 @@ void World::LoadConfigSettings(bool reload)
     //###      End
 
     //###               STRING configs:
-    _guidWarningMsg = m_string_configs[CONFIG_RESPAWN_WARNING_MESSAGE];
-    _alertRestartReason = m_string_configs[CONFIG_RESPAWN_ALERT_RESTART_REASON];
+    _guidWarningMsg = sConfigMgr->GetStringDefault("Respawn.WarningMessage", "There will be an unscheduled server restart at 03:00. The server will be available again shortly after.");
+    _alertRestartReason = sConfigMgr->GetStringDefault("Respawn.AlertRestartReason", "Urgent Maintenance");
     ///- Get string for new MOTD
-    Motd::SetMotd(m_string_configs[CONFIG_MOTD]);
+    Motd::SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to a Trinity Core Server."));
     ///- Get string for new logins (newly created characters)
-    SetNewCharString(m_string_configs[CONFIG_PLAYER_START_STRING]);
+    SetNewCharString(sConfigMgr->GetStringDefault("PlayerStart.String", ""));
     ///- Get string for anticheat excluded mapids
-    SetACMapExcludes(m_string_configs[CONFIG_ANTICHEAT_EXCLUDES_MAPIDS]);
+    SetACMapExcludes(sConfigMgr->GetStringDefault("AntiCheats.forceExcludeMapsid", ""));
     TC_LOG_INFO("server.loading", "AntiCheats disabled for %u maps", (uint32)excludeACMapsId.size());
     ///- Get string for gather safe deposit box items (bag which can be opened only in bank)
-    SetBankBagsIdMap(m_string_configs[CONFIG_SAFE_DEPOSIT_BOX_IDS]);
+    SetBankBagsIdMap(sConfigMgr->GetStringDefault("BAG.Script.BankBagsID", ""));
     TC_LOG_INFO("server.loading", "BAG.ScriptBankBagsID for %u bankBagsId", (uint32)mapbankBagsId.size());
+    ///- Get string for gather zone for special Creature Rates
+    SetCreatureRatesInZone(sConfigMgr->GetStringDefault("VAS.CreatureRatesInZoneID", ""));
+    TC_LOG_INFO("server.loading", "VAS.CreatureRatesInZoneID for %u zoneList", (uint32)creatureRatesInZoneId.size());
     //###      End
 
     //###               BOOL configs:
@@ -2795,6 +2796,16 @@ void World::SetBankBagsIdMap(const std::string& bankBagsId)
     std::string temp;
     while (std::getline(excludeStream, temp, ','))
         mapbankBagsId.insert(atoi(temp.c_str()));
+}
+
+void World::SetCreatureRatesInZone(const std::string& zoneList)
+{
+    creatureRatesInZoneId.clear();
+
+    std::stringstream excludeStream(zoneList);
+    std::string temp;
+    while (std::getline(excludeStream, temp, ','))
+        creatureRatesInZoneId.insert(atoi(temp.c_str()));
 }
 
 Realm realm;

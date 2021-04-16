@@ -312,9 +312,6 @@ void Creature::AddToWorld()
                     transport->AddPassenger(this);
             }
         }
-
-        if (GetMap()->IsDungeon())
-            sScriptMgr->OnInstanceCreatureAddToWorld(this->ToUnit());
     }
 }
 
@@ -1526,7 +1523,7 @@ void Creature::UpdateLevelDependantStats()
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), cInfo->unit_class);
 
     // health
-    float healthmod = _GetHealthMod(rank);
+    float healthmod = _GetHealthMod(rank, GetZoneId());
 
     uint32 basehp = stats->GenerateHealth(cInfo);
     uint32 health = uint32(basehp * healthmod);
@@ -1575,23 +1572,34 @@ void Creature::UpdateLevelDependantStats()
     SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
 }
 
-float Creature::_GetHealthMod(int32 Rank)
+float Creature::_GetHealthMod(int32 Rank, uint32 ZoneId)
 {
-    switch (Rank)                                           // define rates for each elite rank
+    float result = 1.f;
+    switch (Rank)                                     // define rates for each elite rank
     {
         case CREATURE_ELITE_NORMAL:
-            return sWorld->getRate(RATE_CREATURE_NORMAL_HP);
+            result = sWorld->getRate(RATE_CREATURE_NORMAL_HP);
+            break;
         case CREATURE_ELITE_ELITE:
-            return sWorld->getRate(RATE_CREATURE_ELITE_ELITE_HP);
+            result = sWorld->getRate(RATE_CREATURE_ELITE_ELITE_HP);
+            break;
         case CREATURE_ELITE_RAREELITE:
-            return sWorld->getRate(RATE_CREATURE_ELITE_RAREELITE_HP);
+            result = sWorld->getRate(RATE_CREATURE_ELITE_RAREELITE_HP);
+            break;
         case CREATURE_ELITE_WORLDBOSS:
-            return sWorld->getRate(RATE_CREATURE_ELITE_WORLDBOSS_HP);
+            result = sWorld->getRate(RATE_CREATURE_ELITE_WORLDBOSS_HP);
+            break;
         case CREATURE_ELITE_RARE:
-            return sWorld->getRate(RATE_CREATURE_ELITE_RARE_HP);
+            result = sWorld->getRate(RATE_CREATURE_ELITE_RARE_HP);
+            break;
         default:
-            return sWorld->getRate(RATE_CREATURE_ELITE_ELITE_HP);
+            result = sWorld->getRate(RATE_CREATURE_ELITE_ELITE_HP);
+            break;
     }
+
+    if (sWorld->isZoneforCreatureRates(ZoneId))
+        result *= sWorld->getRate(RATE_CREATURE_IN_ZONE_HEALTH);
+    return result;
 }
 
 void Creature::LowerPlayerDamageReq(uint32 unDamage)
@@ -1619,23 +1627,33 @@ float Creature::_GetDamageMod(int32 Rank)
     }
 }
 
-float Creature::GetSpellDamageMod(int32 Rank) const
+float Creature::GetSpellDamageMod(int32 Rank, uint32 ZoneId) const
 {
+    float result = 1.f;
     switch (Rank)                                           // define rates for each elite rank
     {
         case CREATURE_ELITE_NORMAL:
-            return sWorld->getRate(RATE_CREATURE_NORMAL_SPELLDAMAGE);
+            result = sWorld->getRate(RATE_CREATURE_NORMAL_SPELLDAMAGE);
+            break;
         case CREATURE_ELITE_ELITE:
-            return sWorld->getRate(RATE_CREATURE_ELITE_ELITE_SPELLDAMAGE);
+            result = sWorld->getRate(RATE_CREATURE_ELITE_ELITE_SPELLDAMAGE);
+            break;
         case CREATURE_ELITE_RAREELITE:
-            return sWorld->getRate(RATE_CREATURE_ELITE_RAREELITE_SPELLDAMAGE);
+            result = sWorld->getRate(RATE_CREATURE_ELITE_RAREELITE_SPELLDAMAGE);
+            break;
         case CREATURE_ELITE_WORLDBOSS:
-            return sWorld->getRate(RATE_CREATURE_ELITE_WORLDBOSS_SPELLDAMAGE);
+            result = sWorld->getRate(RATE_CREATURE_ELITE_WORLDBOSS_SPELLDAMAGE);
+            break;
         case CREATURE_ELITE_RARE:
-            return sWorld->getRate(RATE_CREATURE_ELITE_RARE_SPELLDAMAGE);
+            result = sWorld->getRate(RATE_CREATURE_ELITE_RARE_SPELLDAMAGE);
+            break;
         default:
-            return sWorld->getRate(RATE_CREATURE_ELITE_ELITE_SPELLDAMAGE);
+            result = sWorld->getRate(RATE_CREATURE_ELITE_ELITE_SPELLDAMAGE);
+            break;
     }
+    if (sWorld->isZoneforCreatureRates(ZoneId))
+        result *= sWorld->getRate(RATE_CREATURE_IN_ZONE_SPELLDAMAGE);
+    return result;
 }
 
 bool Creature::CreateFromProto(ObjectGuid::LowType guidlow, uint32 entry, CreatureData const* data /*= nullptr*/, uint32 vehId /*= 0*/)
@@ -1824,7 +1842,7 @@ void Creature::SetSpawnHealth()
         curhealth = m_creatureData->curhealth;
         if (curhealth)
         {
-            curhealth = uint32(curhealth*_GetHealthMod(GetCreatureTemplate()->rank));
+            curhealth = uint32(curhealth*_GetHealthMod(GetCreatureTemplate()->rank, GetZoneId()));
             if (curhealth < 1)
                 curhealth = 1;
         }

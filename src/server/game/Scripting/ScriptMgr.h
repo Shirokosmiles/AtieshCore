@@ -412,12 +412,6 @@ class TC_GAME_API UnitScript : public ScriptObject
         // Called when DoT's Tick Damage is being Dealt
         virtual void ModifyPeriodicDamageAurasTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
 
-        // Called when DoT's Tick Damage is being Dealt
-        virtual void ModifyPeriodicHealthLeechAuraTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
-
-        // Called when DoT's Tick Damage is being Dealt
-        virtual void ModifyPeriodicHealAurasTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
-
         // Called when Melee Damage is being Dealt
         virtual void ModifyMeleeDamage(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
 
@@ -426,9 +420,6 @@ class TC_GAME_API UnitScript : public ScriptObject
 
         // Called when an unit exits a vehicle
         virtual void ModifyVehiclePassengerExitPos(Unit* /*passenger*/, Vehicle* /*vehicle*/, Position& /*pos*/) { }
-
-        // Called when an unit added in world
-        virtual void InstanceCreatureAddToWorld(Unit* /*unit*/) { }
 };
 
 class TC_GAME_API CreatureScript : public ScriptObject
@@ -1142,12 +1133,9 @@ class TC_GAME_API ScriptMgr
         void OnHeal(Unit* healer, Unit* reciever, uint32& gain);
         void OnDamage(Unit* attacker, Unit* victim, uint32& damage);
         void ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage);
-        void ModifyPeriodicHealthLeechAuraTick(Unit* target, Unit* attacker, uint32& damage);
-        void ModifyPeriodicHealAurasTick(Unit* target, Unit* attacker, uint32& damage);
         void ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage);
         void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage);
         void ModifyVehiclePassengerExitPos(Unit* passenger, Vehicle* vehicle, Position& pos);
-        void OnInstanceCreatureAddToWorld(Unit* unit);
 
     private:
         uint32 _scriptCount;

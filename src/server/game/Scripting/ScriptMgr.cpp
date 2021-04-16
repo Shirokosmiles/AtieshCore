@@ -2234,16 +2234,6 @@ void ScriptMgr::ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint
     FOREACH_SCRIPT(UnitScript)->ModifyPeriodicDamageAurasTick(target, attacker, damage);
 }
 
-void ScriptMgr::ModifyPeriodicHealthLeechAuraTick(Unit* target, Unit* attacker, uint32& damage)
-{
-    FOREACH_SCRIPT(UnitScript)->ModifyPeriodicHealthLeechAuraTick(target, attacker, damage);
-}
-
-void ScriptMgr::ModifyPeriodicHealAurasTick(Unit* target, Unit* attacker, uint32& damage)
-{
-    FOREACH_SCRIPT(UnitScript)->ModifyPeriodicHealAurasTick(target, attacker, damage);
-}
-
 void ScriptMgr::ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage)
 {
     FOREACH_SCRIPT(UnitScript)->ModifyMeleeDamage(target, attacker, damage);
@@ -2258,11 +2248,6 @@ void ScriptMgr::ModifyVehiclePassengerExitPos(Unit* passenger, Vehicle* vehicle,
 {
     FOREACH_SCRIPT(UnitScript)->ModifyVehiclePassengerExitPos(passenger, vehicle, pos);
     FOREACH_SCRIPT(CreatureScript)->ModifyVehiclePassengerExitPos(passenger, vehicle, pos);
-}
-
-void ScriptMgr::OnInstanceCreatureAddToWorld(Unit* unit)
-{
-    FOREACH_SCRIPT(UnitScript)->InstanceCreatureAddToWorld(unit);
 }
 
 SpellScriptLoader::SpellScriptLoader(char const* name)

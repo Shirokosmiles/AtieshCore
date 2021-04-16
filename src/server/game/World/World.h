@@ -266,17 +266,6 @@ enum WorldFloatConfigs
     FLOAT_CONFIG_VALUE_COUNT
 };
 
-enum WorldStringConfigs
-{
-    CONFIG_RESPAWN_WARNING_MESSAGE = 0,
-    CONFIG_RESPAWN_ALERT_RESTART_REASON,
-    CONFIG_MOTD,
-    CONFIG_PLAYER_START_STRING,
-    CONFIG_ANTICHEAT_EXCLUDES_MAPIDS, // AT
-    CONFIG_SAFE_DEPOSIT_BOX_IDS,      // AT
-    STRING_CONFIG_VALUE_COUNT
-};
-
 enum WorldIntConfigs
 {
     CONFIG_COMPRESSION = 0,
@@ -571,10 +560,9 @@ enum Rates
     RATE_VIP_HONOR,
     RATE_VIP_REPUTATION,
     RATE_GSYSTEM_BONUS_EXP,
-    RATE_VAS_DAMAGE_PERCENT,
-    RATE_VAS_HEAL_PERCENT,
-    RATE_VAS_MAXHP_PERCENT,
-    RATE_VAS_MAXMP_PERCENT,
+    RATE_CREATURE_IN_ZONE_DAMAGE,
+    RATE_CREATURE_IN_ZONE_SPELLDAMAGE,
+    RATE_CREATURE_IN_ZONE_HEALTH,
     // END AT custom
     MAX_RATES
 };
@@ -854,24 +842,6 @@ class TC_GAME_API World
             return index < INT_CONFIG_VALUE_COUNT ? m_int_configs[index] : 0;
         }
 
-        bool setStringConfig(WorldStringConfigs index, std::string const& value)
-        {
-            bool result = false;
-            if (index < STRING_CONFIG_VALUE_COUNT)
-            {
-                m_string_configs[index] = value;
-                result = true;
-            }
-
-            return result;
-        }
-
-        /// Get a server configuration element (see #WorldConfigs)
-        std::string getStringConfig(WorldStringConfigs index) const
-        {
-            return index < STRING_CONFIG_VALUE_COUNT ? m_string_configs[index] : "";
-        }
-
         void setWorldState(uint32 index, uint64 value);
         uint64 getWorldState(uint32 index) const;
         void LoadWorldStates();
@@ -934,6 +904,9 @@ class TC_GAME_API World
         void SetBankBagsIdMap(const std::string& bankBagsId);
         bool isBankBagsID(uint32 id) const { return mapbankBagsId.count(id); }
 
+        void SetCreatureRatesInZone(const std::string& zoneList);
+        bool isZoneforCreatureRates(uint32 zoneId) const { return creatureRatesInZoneId.count(zoneId); }
+
     protected:
         void _UpdateGameTime();
 
@@ -981,7 +954,6 @@ class TC_GAME_API World
         uint32 m_int_configs[INT_CONFIG_VALUE_COUNT];
         bool m_bool_configs[BOOL_CONFIG_VALUE_COUNT];
         float m_float_configs[FLOAT_CONFIG_VALUE_COUNT];
-        std::string m_string_configs[STRING_CONFIG_VALUE_COUNT];
 
         typedef std::map<uint32, uint64> WorldStatesMap;
         WorldStatesMap m_worldstates;
@@ -1049,6 +1021,7 @@ class TC_GAME_API World
         time_t _warnShutdownTime;
         std::unordered_set<uint32> excludeACMapsId;
         std::unordered_set<uint32> mapbankBagsId;
+        std::unordered_set<uint32> creatureRatesInZoneId;
 
     friend class debug_commandscript;
 };
