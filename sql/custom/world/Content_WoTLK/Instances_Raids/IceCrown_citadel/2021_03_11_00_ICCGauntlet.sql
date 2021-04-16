@@ -20,8 +20,8 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_icc_nerubar_webweaver' WHERE 
 -- Nerub'ar Broodling
 UPDATE `creature_template` SET `ScriptName` = 'npc_icc_nerubar_broodling' WHERE `entry` = 37232;
 
-UPDATE `creature_template` SET `flags_extra` = 512 WHERE `entry` IN (37501, 37502);
-UPDATE `creature_template` SET `unit_flags` = 64 WHERE `entry` IN (37501, 37502);
+-- UPDATE `creature_template` SET `flags_extra` = 512 WHERE `entry` IN (37501, 37502);
+-- UPDATE `creature_template` SET `unit_flags` = 64 WHERE `entry` IN (37501, 37502);
 
 -- Frostwarden Warrior
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 37228;

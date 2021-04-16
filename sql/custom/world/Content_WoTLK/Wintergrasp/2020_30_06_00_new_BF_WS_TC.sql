@@ -4,6 +4,12 @@ DELETE FROM `creature` WHERE `id` = 30740 AND map = 571;
 DELETE FROM `creature` WHERE `id` = 30400 AND map = 571;
 DELETE FROM `creature` WHERE `id` = 30499 AND map = 571;
 
+UPDATE `creature_template` SET `ScriptName`='' WHERE (`entry`='30739');
+UPDATE `creature_template` SET `ScriptName`='' WHERE (`entry`='30740');
+UPDATE `creature_template` SET `ScriptName`='' WHERE (`entry`='30400');
+UPDATE `creature_template` SET `ScriptName`='' WHERE (`entry`='30499');
+UPDATE `creature_template` SET `ScriptName`='' WHERE (`ScriptName`='npc_wg_give_promotion_credit');
+
 -- remove all towers and builds from DB
 -- Walls
 DELETE FROM `gameobject` WHERE `id` = 190219 AND map = 571;
@@ -1146,7 +1152,6 @@ INSERT INTO `creature`(`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `ph
 (@CGUID+713, 30499, 571, 0, 0, 1, 1, 0, 0, 5390.05, 2974.65, 415.141, 1.43343, 300, 0, 0, 6986, 0, 0, 0, 0, 0, 'wg_ke_workshop_mechanic', 0),
 (@CGUID+714, 30499, 571, 0, 0, 1, 1, 0, 0, 5388.26, 2707.6, 414.969, 1.58265, 300, 0, 0, 6986, 0, 0, 0, 0, 0, 'wg_kw_workshop_mechanic', 0);
 
-UPDATE `creature` SET `ScriptName` = '' WHERE `ScriptName` = 'npc_wg_give_promotion_credit';
 UPDATE `spell_area` SET `autocast` = 0 WHERE `spell` = 56618;
 UPDATE `spell_area` SET `autocast` = 0 WHERE `spell` = 56617;
 
@@ -1310,9 +1315,6 @@ DELETE FROM `gameobject_addon` WHERE `guid` =75191;
 DELETE FROM `gameobject_addon` WHERE `guid` =75192;
 DELETE FROM `gameobject_addon` WHERE `guid` =75193;
 DELETE FROM `gameobject_addon` WHERE `guid` =75194;
-
-UPDATE `creature_template` SET `ScriptName`='' WHERE (`entry`='30400');
-UPDATE `creature_template` SET `ScriptName`='' WHERE (`entry`='30499');
 
 -- workshop NE
 -- 31842 alliance 88318
