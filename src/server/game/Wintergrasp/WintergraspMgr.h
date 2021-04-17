@@ -622,7 +622,7 @@ public:
     // Called when player (player) leave the zone
     void HandlePlayerLeaveZone(Player* player, uint32 /*zone*/);
     // Called when a Unit is kill in battlefield zone
-    void HandleKill(Player* /*killer*/, Unit* /*killed*/);
+    void HandleKill(Player* killer, Unit* killed);
 
     //helpers
     void OnPlayerLeaveZone(Player* player);
@@ -674,6 +674,8 @@ public:
     //helpers
     void OnPlayerJoinWar(Player* player);
     void OnPlayerLeaveWar(Player* player);
+    void HandlePromotion(Player* killer, Unit* killed);
+    void PromotePlayer(Player* killer);
     /// </Player section>
 
     /// <Spawn section>

@@ -19,6 +19,7 @@
 #include "AchievementMgr.h"
 #include "CreatureTextMgr.h"
 #include "SharedDefines.h"
+#include "SpellAuras.h"
 #include "ObjectAccessor.h"
 #include "WGGOBuilding.h"
 #include "WGWorkshop.h"
@@ -564,4 +565,52 @@ void WintergraspMgr::OnPlayerLeaveWar(Player* player)
     player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROL_PHASE_SHIFT);
     player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);*/
     UpdateTenacity();
+}
+
+void WintergraspMgr::HandlePromotion(Player* playerKiller, Unit* unitKilled)
+{
+    uint32 teamId = playerKiller->GetTeamId();
+
+    for (PlayerHolderContainer::const_iterator itr = m_PlayerMap.begin(); itr != m_PlayerMap.end(); ++itr)
+    {
+        if (itr->second.inWar)
+        {
+            if (itr->second.team == teamId)
+                if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+                    if (player->GetDistance2d(unitKilled) < 40.0f)
+                        PromotePlayer(player);
+        }
+    }
+}
+
+// Update rank for player
+void WintergraspMgr::PromotePlayer(Player* killer)
+{
+    if (!m_isActive)
+        return;
+    // Updating rank of player
+    if (Aura* auraRecruit = killer->GetAura(SPELL_RECRUIT))
+    {
+        if (auraRecruit->GetStackAmount() >= 5)
+        {
+            killer->RemoveAura(SPELL_RECRUIT);
+            killer->CastSpell(killer, SPELL_CORPORAL, true);
+            if (Creature* stalker = GetCreature(StalkerGuid))
+                sCreatureTextMgr->SendChat(stalker, BATTLEFIELD_WG_TEXT_RANK_CORPORAL, killer, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_OTHER, false, killer);
+        }
+        else
+            killer->CastSpell(killer, SPELL_RECRUIT, true);
+    }
+    else if (Aura* auraCorporal = killer->GetAura(SPELL_CORPORAL))
+    {
+        if (auraCorporal->GetStackAmount() >= 5)
+        {
+            killer->RemoveAura(SPELL_CORPORAL);
+            killer->CastSpell(killer, SPELL_LIEUTENANT, true);
+            if (Creature* stalker = GetCreature(StalkerGuid))
+                sCreatureTextMgr->SendChat(stalker, BATTLEFIELD_WG_TEXT_RANK_FIRST_LIEUTENANT, killer, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_OTHER, false, killer);
+        }
+        else
+            killer->CastSpell(killer, SPELL_CORPORAL, true);
+    }
 }

@@ -669,6 +669,17 @@ struct wg_guardAI : public ScriptedAI
         events.ScheduleEvent(EVENT_BLOOD_HOWL, randtime(10s, 17s));
     }
 
+    void JustDied(Unit* killer) override
+    {
+        if (!killer || killer->GetTypeId() != TYPEID_PLAYER)
+            return;
+
+        if (!sWintergraspMgr->IsWarTime())
+            return;
+
+        sWintergraspMgr->HandlePromotion(killer->ToPlayer(), me);
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!me || !me->IsAlive())
@@ -709,6 +720,7 @@ struct wg_guardAI : public ScriptedAI
         if (UpdateVictim())
             DoMeleeAttackIfReady();
     }
+
 private:
     EventMap events;
     bool _enraged;

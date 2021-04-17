@@ -110,8 +110,25 @@ void WintergraspMgr::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
 }
 
 // Called when a Unit is kill in battlefield zone
-void WintergraspMgr::HandleKill(Player* /*player*/, Unit* /*killed*/)
+void WintergraspMgr::HandleKill(Player* killer, Unit* victim)
 {
+    if (killer == victim)
+        return;
+
+    if (victim->GetTypeId() == TYPEID_PLAYER)
+    {
+        HandlePromotion(killer, victim);
+
+        // Allow to Skin non-released corpse
+        victim->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+    }
+    else if (victim->GetTypeId() == TYPEID_UNIT)
+    {
+        if (victim->ToCreature() && victim->ToCreature()->GetCreatureType() == CREATURE_TYPE_HUMANOID)
+            HandlePromotion(killer, victim);
+    }
+
+    /// @todoRecent PvP activity worldstate
 }
 
 // Helpers section
