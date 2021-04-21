@@ -158,7 +158,7 @@ std::string Transmogrification::GetItemIcon(uint32 entry, uint32 width, uint32 h
     {
         dispInfo = sDBCStoresMgr->GetItemDisplayInfoDBC(temp->DisplayInfoID);
         if (dispInfo)
-            ss << "/ICONS/" << dispInfo->InventoryIcon;
+            ss << "/ICONS/" << dispInfo->InventoryIcon[0];
     }
     if (!dispInfo)
         ss << "/InventoryItems/WoWUnknownItem01";
