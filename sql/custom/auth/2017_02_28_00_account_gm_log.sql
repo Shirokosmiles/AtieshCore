@@ -34,10 +34,6 @@ CREATE TABLE `account_gm_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
--- Records of account_gm_log
--- ----------------------------
-
--- ----------------------------
 -- Table structure for account_gm_log_item
 -- ----------------------------
 DROP TABLE IF EXISTS `account_gm_log_item`;

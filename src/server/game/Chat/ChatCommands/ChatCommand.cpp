@@ -24,8 +24,10 @@
 #include "Log.h"
 #include "Map.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 #include "WorldSession.h"
+#include "World.h"
 
 using ChatSubCommandMap = std::map<std::string_view, Trinity::Impl::ChatCommands::ChatCommandNode, StringCompareLessI_T>;
 
@@ -155,6 +157,21 @@ static void LogCommandUsage(WorldSession const& session, uint32 permission, std:
         if (AreaTableDBC const* zone = sDBCStoresMgr->GetAreaTableDBC(area->ParentAreaID))
             zoneName = zone->AreaName[locale];
     }
+
+    // Database Logging
+    ObjectGuid sel_guid = player->GetTarget();
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_LOG);
+    stmt->setString(0, player->GetName());
+    stmt->setUInt32(1, session.GetAccountId());
+    stmt->setString(2, cmdStr.data());
+    char position[96];
+    sprintf(position, "X: %f Y: %f Z: %f Map: %u", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId());
+    stmt->setString(3, position);
+    char selection[96];
+    sprintf(selection, "%s: %s (GUID: %u)", sel_guid.GetTypeName(), (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "", sel_guid.GetCounter());
+    stmt->setString(4, selection);
+    stmt->setInt32(5, int32(realm.Id.Realm));
+    LoginDatabase.Execute(stmt);
 
     sLog->outCommand(session.GetAccountId(), "Command: " STRING_VIEW_FMT " [Player: %s (%s) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected: %s (%s)]",
         STRING_VIEW_FMT_ARG(cmdStr), player->GetName().c_str(), player->GetGUID().ToString().c_str(),
