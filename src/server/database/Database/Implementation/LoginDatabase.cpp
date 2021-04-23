@@ -122,7 +122,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET, "UPDATE account SET totp_secret = ? WHERE id = ?", CONNECTION_ASYNC);
 
     PrepareStatement(LOGIN_INS_GM_CHAR_ITEM_ADD, "INSERT INTO account_gm_log_item (guid, player, account, item, item_guid, count, position, target, realmId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
-    PrepareStatement(LOGIN_INS_GM_CHAR_LOG, "INSERT INTO account_gm_log (player, account, command, basecmd, subcmd, valuescmd, position, selected, realmId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_INS_GM_CHAR_LOG, "INSERT INTO account_gm_log (player, account, command, position, selected, realmId) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
 
     // VIP system
     PrepareStatement(LOGIN_SET_ACCOUNT_PREMIUM, "INSERT INTO account_premium (id, setdate, unsetdate, active) VALUES (?, unix_timestamp(NOW()), ?, ?)", CONNECTION_ASYNC);
