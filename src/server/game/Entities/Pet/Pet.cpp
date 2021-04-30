@@ -1131,15 +1131,16 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 }
                 case 19668: // Shadowfiend
                 {
-                    if (!pInfo)
-                    {
-                        SetCreateMana(28 + 10*petlevel);
-                        SetCreateHealth(28 + 30*petlevel);
-                    }
-                    int32 bonus_dmg = int32(GetOwner()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW)* 0.3f);
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel * 4 - petlevel) + bonus_dmg));
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel * 4 + petlevel) + bonus_dmg));
+                    SetCreateHealth(30 + 35 * petlevel);
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - petlevel));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + petlevel));
 
+                    AddAura(32233, this); // SPELL_PET_AVOIDANCE
+                    AddAura(61017, this); //
+                    AddAura(35661, this); // SPELL_PRIEST_PET_SCALING_01
+                    AddAura(35662, this); // SPELL_PRIEST_PET_SCALING_02
+                    AddAura(35663, this); // SPELL_PRIEST_PET_SCALING_03
+                    AddAura(35664, this); // SPELL_PRIEST_PET_SCALING_04
                     break;
                 }
                 case 19833: //Snake Trap - Venomous Snake

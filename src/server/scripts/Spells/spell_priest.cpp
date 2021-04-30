@@ -74,6 +74,10 @@ enum PriestSpells
     SPELL_PRIEST_LIGHTWELL_RENEW_R4                 = 28276,
     SPELL_PRIEST_LIGHTWELL_RENEW_R5                 = 48084,
     SPELL_PRIEST_LIGHTWELL_RENEW_R6                 = 48085,
+    SPELL_PRIEST_PET_SCALING_01                     = 35661,
+    SPELL_PRIEST_PET_SCALING_02                     = 35662,
+    SPELL_PRIEST_PET_SCALING_03                     = 35663,
+    SPELL_PRIEST_PET_SCALING_04                     = 35664,
 };
 
 enum PriestSpellIcons
@@ -1267,6 +1271,86 @@ class spell_pri_power_infusion : public SpellScript
     }
 };
 
+class spell_pri_pet_scaling : public AuraScript
+{
+public:
+        PrepareAuraScript(spell_pri_pet_scaling);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_PET_SCALING_01) || !sSpellMgr->GetSpellInfo(SPELL_PRIEST_PET_SCALING_02) ||
+                !sSpellMgr->GetSpellInfo(SPELL_PRIEST_PET_SCALING_03) || !sSpellMgr->GetSpellInfo(SPELL_PRIEST_PET_SCALING_04))
+                return false;
+            return true;
+        }
+
+        void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* owner = GetUnitOwner()->GetOwner())
+            {
+                Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                float ownerStat = owner->GetStat(stat);
+                int32 mod = 30;
+                amount = CalculatePct(std::max<int32>(0, ownerStat), mod);
+            }
+        }
+
+        void CalculateAPAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* owner = GetUnitOwner()->GetOwner())
+            {
+                int32 mod = 300;
+                int32 shadowMod = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
+
+                amount = CalculatePct(std::max<int32>(0, shadowMod), mod);
+            }
+        }
+
+        void CalculateSPAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* owner = GetUnitOwner()->GetOwner())
+            {
+                int32 mod = 30;
+                int32 shadowMod = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
+
+                amount = CalculatePct(std::max<int32>(0, shadowMod), mod);
+
+                if (owner->GetTypeId() == TYPEID_PLAYER)
+                    owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
+            }
+        }
+
+        void CalculateResistanceAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (Unit* owner = GetUnitOwner()->GetOwner())
+            {
+                SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetMiscValue());
+                // 35% for Armor and 40% for Magic Resistance
+                int32 mod = schoolMask == SPELL_SCHOOL_NORMAL ? 35 : 40;
+
+                float ownerResistance = owner->GetResistance(schoolMask);
+
+                amount = CalculatePct(std::max<int32>(0, ownerResistance), mod);
+            }
+        }
+
+        void Register() override
+        {
+            if (m_scriptSpellId != SPELL_PRIEST_PET_SCALING_01)
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_pet_scaling::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
+
+            if (m_scriptSpellId == SPELL_PRIEST_PET_SCALING_01 || m_scriptSpellId == SPELL_PRIEST_PET_SCALING_02)
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_pet_scaling::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
+
+            if (m_scriptSpellId == SPELL_PRIEST_PET_SCALING_01)
+            {
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_pet_scaling::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_pet_scaling::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
+            }
+        }
+};
+
+
 void AddSC_priest_spell_scripts()
 {
     RegisterSpellScript(spell_pri_aq_3p_bonus);
@@ -1300,4 +1384,5 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_t5_heal_2p_bonus);
     RegisterSpellScript(spell_pri_t10_heal_2p_bonus);
     RegisterSpellScript(spell_pri_power_infusion);
+    RegisterSpellScript(spell_pri_pet_scaling);
 }

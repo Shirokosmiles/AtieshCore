@@ -1189,27 +1189,6 @@ bool Guardian::UpdateStats(Stats stat)
             ownersBonus = CalculatePct(owner->GetStat(STAT_STAMINA), 75);
             value += ownersBonus;
         }
-        else
-        {
-            mod = 0.45f;
-            if (IsPet())
-            {
-                PetSpellMap::const_iterator itr = (ToPet()->m_spells.find(62758));  // Wild Hunt rank 1
-                if (itr == ToPet()->m_spells.end())
-                    itr = ToPet()->m_spells.find(62762);                            // Wild Hunt rank 2
-
-                if (itr != ToPet()->m_spells.end())                                 // If pet has Wild Hunt
-                {
-                    SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first); // Then get the SpellProto and add the dummy effect value
-                    float ownerwildhuntbonus = owner->GetTotalAuraModValue(UnitMods(UNIT_MOD_STAT_STAMINA));
-                    float bonusval = CalculatePct(ownerwildhuntbonus, spellInfo->Effects[EFFECT_0].CalcValue());
-                    value += bonusval;
-                    //TC_LOG_ERROR("server", "Wild Hunt STAT_STAMINA :  ownerbonus = %f, bonusval = %f", ownerwildhuntbonus, bonusval);
-                }
-            }
-            ownersBonus = float(owner->GetStat(stat)) * mod;
-            value += ownersBonus;
-        }
     }
                                                             //warlock's and mage's pets gain 30% of owner's intellect
     else if (stat == STAT_INTELLECT)
@@ -1366,7 +1345,6 @@ void Guardian::UpdateAttackPowerAndDamage(bool ranged)
         if (IsHunterPet())                      //hunter pets benefit from owner's attack power
         {
             float mod = 1.0f;                                                 //Hunter contribution modifier
-            bonusAP = owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.22f * mod;
             if (IsPet())
             {
                 PetSpellMap::const_iterator itr = ToPet()->m_spells.find(62758);    //Wild Hunt rank 1
@@ -1376,13 +1354,11 @@ void Guardian::UpdateAttackPowerAndDamage(bool ranged)
                 if (itr != ToPet()->m_spells.end())                                 // If pet has Wild Hunt
                 {
                     SpellInfo const* sProto = sSpellMgr->AssertSpellInfo(itr->first); // Then get the SpellProto and add the dummy effect value
-                    float ownerbonus = owner->GetModsAttackPowerValue(RANGED_ATTACK);
-                    float bAPWH = CalculatePct(ownerbonus, sProto->Effects[1].CalcValue());
-                    bonusAP += bAPWH;
-                    //TC_LOG_ERROR("server", "Wild Hunt UpdateAttackPowerAndDamage:  ownerbonus = %f, bonusAP = %f", ownerbonus, bonusAP);
+                    mod += CalculatePct(1.0f, sProto->Effects[1].CalcValue());
                 }
             }
 
+            bonusAP = owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.22f * mod;
             if (AuraEffect* aurEff = owner->GetAuraEffectOfRankedSpell(34453, EFFECT_1, owner->GetGUID())) // Animal Handler
             {
                 AddPct(bonusAP, aurEff->GetAmount());
