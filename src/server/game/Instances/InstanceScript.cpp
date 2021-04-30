@@ -369,7 +369,7 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
                             return false;
 
                 Map::PlayerList const& lPlayers = instance->GetPlayers();
-                std::list<ObjectGuid::LowType> playerIDs;
+                std::vector<ObjectGuid::LowType> playerIDs;
                 if (!lPlayers.isEmpty())
                 {
                     for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)

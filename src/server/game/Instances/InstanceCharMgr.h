@@ -52,14 +52,14 @@ public:
     //void Update(uint32 diff);
 
     void HandlePlayerEnterInInstance(Player* player, uint32 mapID, uint8 difficulty);
-    void HandleDoneEncounterInInstance(std::list<ObjectGuid::LowType> const& plrlist, uint32 mapID, uint8 difficulty, uint8 encounterID, uint32 bossEntry);
+    void HandleDoneEncounterInInstance(std::vector<ObjectGuid::LowType> const& plrlist, uint32 mapID, uint8 difficulty, uint8 encounterID, uint32 bossEntry);
 
 protected:
     //void _DoUpdate();
     void _AddPlayer(ObjectGuid::LowType plrGUID, uint32 mapID, uint8 mapDifficulty);
 
     std::string GetUpdatedData(std::string const data, uint8 encounterID, uint32 bossEntry);
-    void AddPlrForUpdate(std::string data, ObjectGuid::LowType plrGUID, CharacterDatabaseTransaction& trans);
+    void AddPlrForUpdate(std::string data, ObjectGuid::LowType plrGUID, CharacterDatabaseTransaction& trans, uint32 mapID, uint8 difficulty);
 
 private:
     //uint32 m_updateTimer;

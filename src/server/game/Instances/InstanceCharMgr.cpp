@@ -206,7 +206,7 @@ std::string InstanceCharMgr::GetUpdatedData(std::string const data, uint8 encoun
     return saveStream.str();
 }
 
-void InstanceCharMgr::HandleDoneEncounterInInstance(std::list<ObjectGuid::LowType> const& plrlist, uint32 mapID, uint8 difficulty, uint8 encounterID, uint32 bossEntry)
+void InstanceCharMgr::HandleDoneEncounterInInstance(std::vector<ObjectGuid::LowType> const& plrlist, uint32 mapID, uint8 difficulty, uint8 encounterID, uint32 bossEntry)
 {
     if (!plrlist.empty()) // it's unreal, but possible to sent message with empty list
     {
@@ -216,7 +216,7 @@ void InstanceCharMgr::HandleDoneEncounterInInstance(std::list<ObjectGuid::LowTyp
 
         for (InstanceCharContainer::iterator itr = m_instanceCharStore.begin(); itr != m_instanceCharStore.end(); ++itr)
         {
-            for (std::list<ObjectGuid::LowType>::const_iterator itr2 = plrlist.begin(); itr2 != plrlist.end(); ++itr2)
+            for (std::vector<ObjectGuid::LowType>::const_iterator itr2 = plrlist.begin(); itr2 != plrlist.end(); ++itr2)
             {
                 if (itr->second.guid == (*itr2) &&
                     itr->second.m_mapID == mapID &&
@@ -224,7 +224,7 @@ void InstanceCharMgr::HandleDoneEncounterInInstance(std::list<ObjectGuid::LowTyp
                 {
                     data = GetUpdatedData(itr->second.data, encounterID, bossEntry);
                     itr->second.data = data;
-                    AddPlrForUpdate(data, (*itr2), trans);
+                    AddPlrForUpdate(data, (*itr2), trans, mapID, difficulty);
                 }
             }
         }
@@ -232,10 +232,12 @@ void InstanceCharMgr::HandleDoneEncounterInInstance(std::list<ObjectGuid::LowTyp
     }
 }
 
-void InstanceCharMgr::AddPlrForUpdate(std::string data, ObjectGuid::LowType plrGUID, CharacterDatabaseTransaction& trans)
+void InstanceCharMgr::AddPlrForUpdate(std::string data, ObjectGuid::LowType plrGUID, CharacterDatabaseTransaction& trans, uint32 mapID, uint8 difficulty)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_WEB_DATA);
     stmt->setString(0, data);
     stmt->setUInt32(1, plrGUID);
+    stmt->setUInt32(2, mapID);
+    stmt->setUInt32(3, difficulty);
     trans->Append(stmt);
 }
