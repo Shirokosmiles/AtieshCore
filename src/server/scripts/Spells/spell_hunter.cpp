@@ -1413,7 +1413,7 @@ class spell_hun_pet_scaling : public AuraScript
         return true;
     }
 
-    void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateStatAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
@@ -1428,7 +1428,7 @@ class spell_hun_pet_scaling : public AuraScript
         }
     }
 
-    void CalculateAPAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateAPAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
@@ -1451,7 +1451,7 @@ class spell_hun_pet_scaling : public AuraScript
         }
     }
 
-    void CalculateSPAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateSPAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
@@ -1475,7 +1475,7 @@ class spell_hun_pet_scaling : public AuraScript
         {
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetMiscValue());
             // 35% for Armor and 40% for Magic Resistance
-            int32 mod = schoolMask == SPELL_SCHOOL_NORMAL ? 35 : 40;
+            int32 mod = schoolMask == GetMaskForSchool(SPELL_SCHOOL_NORMAL) ? 35 : 40;
 
             float ownerResistance = owner->GetResistance(schoolMask);
 
@@ -1488,19 +1488,19 @@ class spell_hun_pet_scaling : public AuraScript
         return (hitChance / cap) * maxChance;
     }
 
-    void CalculateHitAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateHitAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
             amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 8.0f);
     }
 
-    void CalculateSpellHitAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateSpellHitAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
             amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 17.0f);
     }
 
-    void CalculateExpertiseAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateExpertiseAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
             amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 26.0f);

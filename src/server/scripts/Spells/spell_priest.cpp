@@ -1295,7 +1295,7 @@ public:
             }
         }
 
-        void CalculateAPAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        void CalculateAPAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
             if (Unit* owner = GetUnitOwner()->GetOwner())
             {
@@ -1306,7 +1306,7 @@ public:
             }
         }
 
-        void CalculateSPAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        void CalculateSPAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
             if (Unit* owner = GetUnitOwner()->GetOwner())
             {
@@ -1326,7 +1326,7 @@ public:
             {
                 SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetMiscValue());
                 // 35% for Armor and 40% for Magic Resistance
-                int32 mod = schoolMask == SPELL_SCHOOL_NORMAL ? 35 : 40;
+                int32 mod = schoolMask == GetMaskForSchool(SPELL_SCHOOL_NORMAL) ? 35 : 40;
 
                 float ownerResistance = owner->GetResistance(schoolMask);
 
