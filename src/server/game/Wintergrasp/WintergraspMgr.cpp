@@ -620,6 +620,8 @@ uint32 WintergraspMgr::_GetGraveyardIDByType(WGGraveyardId type)
         case BATTLEFIELD_WG_GY_KEEP: result = 1285; break;
         case BATTLEFIELD_WG_GY_HORDE: result = 1331; break;
         case BATTLEFIELD_WG_GY_ALLIANCE: result = 1332; break;
+        default:
+            break;
     }
     return result;
 }

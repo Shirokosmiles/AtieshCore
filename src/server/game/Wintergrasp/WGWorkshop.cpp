@@ -104,6 +104,8 @@ uint32 WGWorkshop::_GetWorldStateForType(WintergraspWorkshopIds type)
         case BATTLEFIELD_WG_WORKSHOP_NW: return WS_BATTLEFIELD_WG_WORKSHOP_NW; break;
         case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST: return WS_BATTLEFIELD_WG_WORKSHOP_K_W; break;
         case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST: return WS_BATTLEFIELD_WG_WORKSHOP_K_E; break;
+        default:
+            break;
     }
 
     return 0;
@@ -117,8 +119,8 @@ uint8 WGWorkshop::_GetAllianceCapture(WintergraspWorkshopIds type)
         case BATTLEFIELD_WG_WORKSHOP_SW: return BATTLEFIELD_WG_TEXT_WESTSPARK_CAPTURE_ALLIANCE; break;
         case BATTLEFIELD_WG_WORKSHOP_NE: return BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_ALLIANCE; break;
         case BATTLEFIELD_WG_WORKSHOP_NW: return BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_ALLIANCE; break;
-        case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST: return 0; break;
-        case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST: return 0; break;
+        default:
+            break;
     }
     return 0;
 }
@@ -131,8 +133,8 @@ uint8 WGWorkshop::_GetAllianceAttack(WintergraspWorkshopIds type)
         case BATTLEFIELD_WG_WORKSHOP_SW: return BATTLEFIELD_WG_TEXT_WESTSPARK_ATTACK_ALLIANCE; break;
         case BATTLEFIELD_WG_WORKSHOP_NE: return BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_ALLIANCE; break;
         case BATTLEFIELD_WG_WORKSHOP_NW: return BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_ALLIANCE; break;
-        case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST: return 0; break;
-        case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST: return 0; break;
+        default:
+            break;
     }
     return 0;
 }
@@ -145,8 +147,8 @@ uint8 WGWorkshop::_GetHordeCapture(WintergraspWorkshopIds type)
         case BATTLEFIELD_WG_WORKSHOP_SW: return BATTLEFIELD_WG_TEXT_WESTSPARK_CAPTURE_HORDE; break;
         case BATTLEFIELD_WG_WORKSHOP_NE: return BATTLEFIELD_WG_TEXT_SUNKEN_RING_CAPTURE_HORDE; break;
         case BATTLEFIELD_WG_WORKSHOP_NW: return BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_CAPTURE_HORDE; break;
-        case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST: return 0; break;
-        case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST: return 0; break;
+        default:
+            break;
     }
     return 0;
 }
@@ -159,8 +161,8 @@ uint8 WGWorkshop::_GetHordeAttack(WintergraspWorkshopIds type)
         case BATTLEFIELD_WG_WORKSHOP_SW: return BATTLEFIELD_WG_TEXT_WESTSPARK_ATTACK_HORDE; break;
         case BATTLEFIELD_WG_WORKSHOP_NE: return BATTLEFIELD_WG_TEXT_SUNKEN_RING_ATTACK_HORDE; break;
         case BATTLEFIELD_WG_WORKSHOP_NW: return BATTLEFIELD_WG_TEXT_BROKEN_TEMPLE_ATTACK_HORDE; break;
-        case BATTLEFIELD_WG_WORKSHOP_KEEP_WEST: return 0; break;
-        case BATTLEFIELD_WG_WORKSHOP_KEEP_EAST: return 0; break;
+        default:
+            break;
     }
     return 0;
 }
@@ -368,6 +370,8 @@ void WGWorkshop::UpdateCreatureAndGo()
             }
             break;
         }
+        default:
+            break;
     }
 
     // Show GameObjects for TeamControll

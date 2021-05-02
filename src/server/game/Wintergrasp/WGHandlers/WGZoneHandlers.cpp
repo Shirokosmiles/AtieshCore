@@ -175,34 +175,36 @@ void WintergraspMgr::OnCreatureCreate(Creature* creature)
                     graveID.second->SetSpirit(creature, teamId);
                     switch (graveyardId)
                     {
-                    case BATTLEFIELD_WG_GY_WORKSHOP_NE:
-                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, teamId);
-                        creature->GetAI()->DoAction(graveID.first);
-                        break;
-                    case BATTLEFIELD_WG_GY_WORKSHOP_NW:
-                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, teamId);
-                        creature->GetAI()->DoAction(graveID.first);
-                        break;
-                    case BATTLEFIELD_WG_GY_WORKSHOP_SE:
-                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, teamId);
-                        creature->GetAI()->DoAction(graveID.first);
-                        break;
-                    case BATTLEFIELD_WG_GY_WORKSHOP_SW:
-                        AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, teamId);
-                        creature->GetAI()->DoAction(graveID.first);
-                        break;
-                    case BATTLEFIELD_WG_GY_KEEP:
-                        AddCreatureInHolderByGUID(creature, VAULT_KEEP, teamId);
-                        creature->GetAI()->DoAction(graveID.first);
-                        break;
-                    case BATTLEFIELD_WG_GY_HORDE:
-                        AddCreatureInHolderByGUID(creature, WG_HORDE_GRAVEYARD, teamId);
-                        creature->GetAI()->DoAction(graveID.first);
-                        break;
-                    case BATTLEFIELD_WG_GY_ALLIANCE:
-                        AddCreatureInHolderByGUID(creature, WG_ALLIANCE_GRAVEYARD, teamId);
-                        creature->GetAI()->DoAction(graveID.first);
-                        break;
+                        case BATTLEFIELD_WG_GY_WORKSHOP_NE:
+                            AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NE, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
+                            break;
+                        case BATTLEFIELD_WG_GY_WORKSHOP_NW:
+                            AddCreatureInHolderByGUID(creature, WG_WORKSHOP_NW, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
+                            break;
+                        case BATTLEFIELD_WG_GY_WORKSHOP_SE:
+                            AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SE, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
+                            break;
+                        case BATTLEFIELD_WG_GY_WORKSHOP_SW:
+                            AddCreatureInHolderByGUID(creature, WG_WORKSHOP_SW, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
+                            break;
+                        case BATTLEFIELD_WG_GY_KEEP:
+                            AddCreatureInHolderByGUID(creature, VAULT_KEEP, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
+                            break;
+                        case BATTLEFIELD_WG_GY_HORDE:
+                            AddCreatureInHolderByGUID(creature, WG_HORDE_GRAVEYARD, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
+                            break;
+                        case BATTLEFIELD_WG_GY_ALLIANCE:
+                            AddCreatureInHolderByGUID(creature, WG_ALLIANCE_GRAVEYARD, teamId);
+                            creature->GetAI()->DoAction(graveID.first);
+                            break;
+                        default:
+                            break;
                     }
                 }
             }

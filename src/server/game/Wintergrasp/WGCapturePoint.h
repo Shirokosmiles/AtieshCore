@@ -30,7 +30,7 @@ public:
     WGCapturePoint(WintergraspMgr* WG, TeamId team);
     ~WGCapturePoint();
 
-    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) { }
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
 
     void LinkToWorkshop(WGWorkshop* workshop) { m_Workshop = workshop; }
 
