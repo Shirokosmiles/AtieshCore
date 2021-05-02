@@ -5936,7 +5936,6 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
 
                     float objSize = target->GetCombatReach();
                     float range = m_spellInfo->GetMaxRange(true, unitCaster, this) * 1.5f + objSize; // can't be overly strict
-                    bool skipreduce = false;
                     if (!target->IsWithinDist3d(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), range))
                         return SPELL_FAILED_NOPATH;
 
