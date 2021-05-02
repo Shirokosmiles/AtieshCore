@@ -328,7 +328,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
 void WorldSession::SendSpiritResurrect()
 {
     _player->ResurrectPlayer(0.5f, true);
-    _player->DurabilityLossAll(0.25f, true);
+    _player->DurabilityLossAll(25.f, true);
 
     // get corpse nearest graveyard
     WorldSafeLocsDBC const* corpseGrave = nullptr;

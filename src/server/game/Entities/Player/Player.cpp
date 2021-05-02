@@ -4910,7 +4910,7 @@ void Player::DurabilityLoss(Item* item, double percent)
     if (!pMaxDurability)
         return;
 
-    uint32 pDurabilityLoss = uint32(pMaxDurability / percent);
+    uint32 pDurabilityLoss = CalculatePct(pMaxDurability, percent);
 
     if (pDurabilityLoss < 1)
         pDurabilityLoss = 1;
