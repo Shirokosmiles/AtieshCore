@@ -25593,7 +25593,10 @@ void Player::UnsummonPetTemporaryIfAny()
         m_oldpetspell = pet->GetUInt32Value(UNIT_CREATED_BY_SPELL);
     }
 
-    RemovePet(pet, PET_SAVE_AS_CURRENT);
+    if (pet->IsHunterPet())
+        RemovePet(pet, PET_SAVE_AS_CURRENT);
+    else
+        RemovePet(pet, PET_SAVE_NOT_IN_SLOT);
 }
 
 void Player::ResummonPetTemporaryUnSummonedIfAny()
