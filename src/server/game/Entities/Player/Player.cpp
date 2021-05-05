@@ -5523,9 +5523,9 @@ float Player::GetRatingMultiplier(CombatRating cr) const
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtCombatRatingsDBC const* Rating = sDBCStoresMgr->GetGtCombatRatingsDBC(cr * GT_MAX_LEVEL + level - 1);
+    GtCombatRatingsDBC const* Rating = sDBCStoresMgr->GetGtCombatRatingsDBC(cr * GT_MAX_LEVEL + level);
     // gtOCTClassCombatRatingScalarStore.dbc starts with 1, CombatRating with zero, so cr+1
-    GtOCTClassCombatRatingScalarDBC const* classRating = sDBCStoresMgr->GetGtOCTClassCombatRatingScalarDBC((GetClass() - 1) * GT_MAX_RATING + cr + 1);
+    GtOCTClassCombatRatingScalarDBC const* classRating = sDBCStoresMgr->GetGtOCTClassCombatRatingScalarDBC((GetClass() - 1) * GT_MAX_RATING + cr);
     if (!Rating || !classRating)
         return 1.0f;                                        // By default use minimum coefficient (not must be called)
 
