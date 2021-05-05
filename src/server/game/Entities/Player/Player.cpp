@@ -5429,13 +5429,14 @@ uint32 Player::GetShieldBlockValue() const
 float Player::GetMeleeCritFromAgility() const
 {
     uint8 level = GetLevel();
-    uint32 pclass = GetClass();
+    uint8 pclass = GetClass();
 
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtChanceToMeleeCritBaseDBC const* critBase  = sDBCStoresMgr->GetGtChanceToMeleeCritBaseDBC(pclass - 1);
-    GtChanceToMeleeCritDBC const* critRatio = sDBCStoresMgr->GetGtChanceToMeleeCritDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
+    GtChanceToMeleeCritBaseDBC const* critBase  = sDBCStoresMgr->GetGtChanceToMeleeCritBaseDBC(pclass);
+    uint32 IDentry = ((pclass - 1) * GT_MAX_LEVEL) + level;
+    GtChanceToMeleeCritDBC const* critRatio = sDBCStoresMgr->GetGtChanceToMeleeCritDBC(IDentry);
     if (critBase == nullptr || critRatio == nullptr)
         return 0.0f;
 
@@ -5483,7 +5484,8 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing) cons
         level = GT_MAX_LEVEL;
 
     // Dodge per agility is proportional to crit per agility, which is available from DBC files
-    GtChanceToMeleeCritDBC const* dodgeRatio = sDBCStoresMgr->GetGtChanceToMeleeCritDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
+    uint32 IDentry = ((pclass - 1) * GT_MAX_LEVEL) + level;
+    GtChanceToMeleeCritDBC const* dodgeRatio = sDBCStoresMgr->GetGtChanceToMeleeCritDBC(IDentry);
     if (dodgeRatio == nullptr || pclass > MAX_CLASSES)
         return;
 
@@ -5504,8 +5506,9 @@ float Player::GetSpellCritFromIntellect() const
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtChanceToSpellCritBaseDBC const* critBase = sDBCStoresMgr->GetGtChanceToSpellCritBaseDBC(pclass - 1);
-    GtChanceToSpellCritDBC const* critRatio = sDBCStoresMgr->GetGtChanceToSpellCritDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
+    GtChanceToSpellCritBaseDBC const* critBase = sDBCStoresMgr->GetGtChanceToSpellCritBaseDBC(pclass);
+    uint32 IDentry = ((pclass - 1) * GT_MAX_LEVEL) + level;
+    GtChanceToSpellCritDBC const* critRatio = sDBCStoresMgr->GetGtChanceToSpellCritDBC(IDentry);
     if (critBase == nullptr || critRatio == nullptr)
         return 0.0f;
 
@@ -5556,8 +5559,8 @@ float Player::OCTRegenHPPerSpirit() const
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtOCTRegenHPDBC const* baseRatio = sDBCStoresMgr->GetGtOCTRegenHPDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    GtRegenHPPerSptDBC const* moreRatio = sDBCStoresMgr->GetGtRegenHPPerSptDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
+    GtOCTRegenHPDBC const* baseRatio = sDBCStoresMgr->GetGtOCTRegenHPDBC((pclass - 1) * GT_MAX_LEVEL + level);
+    GtRegenHPPerSptDBC const* moreRatio = sDBCStoresMgr->GetGtRegenHPPerSptDBC((pclass - 1) * GT_MAX_LEVEL + level);
     if (baseRatio == nullptr || moreRatio == nullptr)
         return 0.0f;
 
@@ -5580,7 +5583,7 @@ float Player::OCTRegenMPPerSpirit() const
         level = GT_MAX_LEVEL;
 
 //    GtOCTRegenMPEntry     const* baseRatio = sGtOCTRegenMPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
-    GtRegenMPPerSptDBC const* moreRatio = sDBCStoresMgr->GetGtRegenMPPerSptDBC((pclass - 1) * GT_MAX_LEVEL + level - 1);
+    GtRegenMPPerSptDBC const* moreRatio = sDBCStoresMgr->GetGtRegenMPPerSptDBC((pclass - 1) * GT_MAX_LEVEL + level);
     if (moreRatio == nullptr)
         return 0.0f;
 
@@ -6104,6 +6107,8 @@ void Player::UpdateWeaponsSkillsToMaxSkillsForLevel()
         if (pskill == SKILL_DEFENSE)
             UpdateDefenseBonusesMod();
     }
+
+    UpdateAllStats();
 }
 
 // This functions sets a skill line value (and adds if doesn't exist yet)
@@ -6214,6 +6219,8 @@ void Player::SetSkill(uint32 id, uint16 step, uint16 newVal, uint16 maxVal)
             }
         }
     }
+
+    UpdateAllStats();
 }
 
 bool Player::HasSkill(uint32 skill) const
@@ -24591,8 +24598,6 @@ uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 n
 
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;                               // max level in this dbc
-    else if (level == 1)
-        level++;
 
     uint8 hairstyle = GetHairStyleId();
     uint8 haircolor = GetHairColorId();
@@ -24602,7 +24607,7 @@ uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 n
     if ((hairstyle == newhairstyle) && (haircolor == newhaircolor) && (facialhair == newfacialhair) && (!newSkin || (newSkin->Data == skincolor)))
         return 0;
 
-    GtBarberShopCostBaseDBC const* bsc = sDBCStoresMgr->GetGtBarberShopCostBaseDBC(level - 1);
+    GtBarberShopCostBaseDBC const* bsc = sDBCStoresMgr->GetGtBarberShopCostBaseDBC(level);
 
     if (!bsc)                                                // shouldn't happen
         return 0xFFFFFFFF;
