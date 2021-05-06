@@ -3413,9 +3413,10 @@ void DBCStoresMgr::_Load_ScalingStatValues()
         Field* fields = result->Fetch();
 
         uint32 id = fields[0].GetUInt32();
+        uint32 charlevel = fields[1].GetUInt32();
         ScalingStatValuesDBC ssv;
-        ssv.ID = id;
-        ssv.Charlevel            = fields[1].GetUInt32();
+        ssv.ID        = id;
+        ssv.Charlevel = charlevel;
         ssv.ShoulderBudget       = fields[2].GetUInt32();
         ssv.TrinketBudget        = fields[3].GetUInt32();
         ssv.WeaponBudget1H       = fields[4].GetUInt32();
@@ -3439,7 +3440,7 @@ void DBCStoresMgr::_Load_ScalingStatValues()
         ssv.MailChestArmor       = fields[22].GetUInt32();
         ssv.PlateChestArmor      = fields[23].GetUInt32();
 
-        _scalingStatValuesMap[id] = ssv;
+        _scalingStatValuesMap[charlevel] = ssv;
 
         ++count;
     } while (result->NextRow());
