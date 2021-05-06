@@ -2555,7 +2555,7 @@ void DBCStoresMgr::_Load_ItemExtendedCost()
         for (uint8 i = 0; i < MAX_ITEM_EXTENDED_COST_REQUIREMENTS; i++)
             iec.ItemID[i] = fields[4 + i].GetUInt32();
         for (uint8 i = 0; i < MAX_ITEM_EXTENDED_COST_REQUIREMENTS; i++)
-            iec.ItemCount[i] = fields[10 + i].GetUInt32();
+            iec.ItemCount[i] = fields[9 + i].GetUInt32();
         iec.RequiredArenaRating = fields[14].GetUInt32();
 
         _itemExtendedCostMap[id] = iec;
