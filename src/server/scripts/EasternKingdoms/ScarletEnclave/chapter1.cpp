@@ -1020,7 +1020,7 @@ struct npc_scarlet_ghoul : public ScriptedAI
 
     void FindMinions(Unit* owner)
     {
-        std::list<Creature*> MinionList;
+        std::vector<Creature*> MinionList;
         owner->GetAllMinionsByEntry(MinionList, NPC_GHOULS);
 
         if (!MinionList.empty())
@@ -1036,6 +1036,7 @@ struct npc_scarlet_ghoul : public ScriptedAI
                 }
             }
         }
+        MinionList.clear();
     }
 
     void UpdateAI(uint32 /*diff*/) override

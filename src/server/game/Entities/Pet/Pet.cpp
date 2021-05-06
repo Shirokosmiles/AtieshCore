@@ -1183,6 +1183,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     }
                     break;
                 }
+                case 27893: // dancing weapon
                 case 27829: // Ebon Gargoyle
                 {
                     if (!pInfo)
@@ -1191,8 +1192,16 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         SetCreateHealth(28 + 30 * petlevel);
                     }
 
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+                    if (GetEntry() == 27893)
+                    {
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, m_owner->GetFloatValue(UNIT_FIELD_MINDAMAGE) / 2);
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, m_owner->GetFloatValue(UNIT_FIELD_MAXDAMAGE) / 2);
+                    }
+                    else
+                    {
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+                    }
 
                     if (GetOwner())
                     {

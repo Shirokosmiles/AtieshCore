@@ -3031,89 +3031,69 @@ public:
     }
 };
 
+// 49028 - Dancing Rune Weapon
 enum DancingRuneWeapon
 {
-    NPC_DANCING_RUNE_WEAPON  = 27893,
+    DATA_INITIAL_TARGET_GUID    = 1,
 
-    DATA_INITIAL_TARGET_GUID = 1,
+    NPC_DK_DANCING_RUNE_WEAPON  = 27893,
 
-    SPELL_DK_BLOOD_STRIKE    = 45902,
-    SPELL_DK_ICY_TOUCH       = 45477,
-    SPELL_DK_PLAGUE_STRIKE   = 45462
+    SPELL_DK_BLOOD_STRIKE       = 45902,
+    SPELL_DK_ICY_TOUCH          = 45477,
+    SPELL_DK_PLAGUE_STRIKE      = 45462,
+    SPELL_DK_HEART_STRIKE       = 55050,
+    SPELL_DK_DEATH_STRIKE       = 49998
 };
 
-// 49028 - SPELL_DK_DANCING_RUNE_WEAPON
-class spell_dk_dancing_rune_weapon : public SpellScriptLoader
+class spell_dk_dancing_rune_weapon : public AuraScript
 {
-public:
-    spell_dk_dancing_rune_weapon() : SpellScriptLoader("spell_dk_dancing_rune_weapon") { }
+    PrepareAuraScript(spell_dk_dancing_rune_weapon);
 
-    class spell_dk_dancing_rune_weapon_AuraScript : public AuraScript
+    void HandleTarget(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_dk_dancing_rune_weapon_AuraScript);
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
 
-        void HandleTarget(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
+        std::vector<Creature*> runeWeapons;
+        caster->GetAllMinionsByEntry(runeWeapons, NPC_DK_DANCING_RUNE_WEAPON);
+        for (Creature* temp : runeWeapons)
+            temp->AI()->SetGUID(GetTarget()->GetGUID(), DATA_INITIAL_TARGET_GUID);
+        runeWeapons.clear();
+    }
 
-            std::list<Creature*> runeWeapons;
-            caster->GetAllMinionsByEntry(runeWeapons, NPC_DANCING_RUNE_WEAPON);
-            for (Creature* temp : runeWeapons)
-                temp->AI()->SetGUID(GetTarget()->GetGUID(), DATA_INITIAL_TARGET_GUID);
-        }
-
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
-                if (procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_STRIKE)) ||
-                    procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_ICY_TOUCH)) ||
-                    procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_PLAGUE_STRIKE)))
-                    return true;
-
-            return false;
-        }
-
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-
-            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-            if (!procSpell)
-                return;
-
-            Unit* runeWeapon = nullptr;
-            for (auto itr = GetTarget()->m_Controlled.begin(); itr != GetTarget()->m_Controlled.end() && !runeWeapon; itr++)
-                if ((*itr)->GetEntry() == NPC_DANCING_RUNE_WEAPON)
-                    runeWeapon = *itr;
-
-            if (!runeWeapon)
-                return;
-
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-            if (!damageInfo || !damageInfo->GetDamage())
-                return;
-
-            if (runeWeapon->GetVictim())
-            {
-                CastSpellExtraArgs args(aurEff);
-                args.AddSpellBP0(damageInfo->GetDamage() / 2); // Runic Weapon should damage only 0.5 dmg? right?
-                runeWeapon->CastSpell(runeWeapon->GetVictim(), procSpell->Id, args);
-            }
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_dk_dancing_rune_weapon_AuraScript::HandleTarget, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            DoCheckProc += AuraCheckProcFn(spell_dk_dancing_rune_weapon_AuraScript::CheckProc);
-            OnEffectProc += AuraEffectProcFn(spell_dk_dancing_rune_weapon_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return new spell_dk_dancing_rune_weapon_AuraScript();
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
+            if (procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_STRIKE)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_ICY_TOUCH)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_PLAGUE_STRIKE)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_HEART_STRIKE)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_STRIKE)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_COIL_DAMAGE)))
+                return true;
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return;
+
+        for (Unit* controlled : GetTarget()->m_Controlled)
+            if (controlled->GetEntry() == NPC_DK_DANCING_RUNE_WEAPON)
+                controlled->CastSpell(controlled->GetVictim(), procSpell->Id);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_dk_dancing_rune_weapon::HandleTarget, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        DoCheckProc += AuraCheckProcFn(spell_dk_dancing_rune_weapon::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dk_dancing_rune_weapon::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
 };
 
@@ -3346,7 +3326,7 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_raise_ally_initial();
     new spell_dk_raise_ally();
     new spell_dk_ghoul_thrash();
-    new spell_dk_dancing_rune_weapon();
+    RegisterSpellScript(spell_dk_dancing_rune_weapon);
     new spell_dk_summon_gargoyle();
     new spell_dk_blood_tap();
 }

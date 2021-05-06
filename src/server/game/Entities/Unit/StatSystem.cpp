@@ -1439,7 +1439,7 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
             int32 spellDmg = m_owner->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FIRE) - m_owner->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FIRE);
             if (spellDmg > 0)
                 bonusDamage = spellDmg * 0.4f;
-        }
+        }        
     }
 
     UnitMods unitMod = UNIT_MOD_DAMAGE_MAINHAND;
@@ -1493,6 +1493,13 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
                 break;
         }
     }
+
+    /*if (GetEntry() == 27893)
+    {        
+        float mindamage = m_owner->GetFloatValue(UNIT_FIELD_MINDAMAGE) / 2;
+        float maxdamage = m_owner->GetFloatValue(UNIT_FIELD_MAXDAMAGE) / 2;
+        TC_LOG_ERROR("server", "PET WEAPON DANCINGS : min = %f, max = %f", mindamage, maxdamage);
+    }*/
 
     SetStatFloatValue(UNIT_FIELD_MINDAMAGE, mindamage);
     SetStatFloatValue(UNIT_FIELD_MAXDAMAGE, maxdamage);

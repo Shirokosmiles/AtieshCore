@@ -45,14 +45,11 @@ enum DeathKnightSpells
     // Dancing Rune Weapon
     SPELL_DK_DANCING_RUNE_WEAPON        = 49028,
     SPELL_COPY_WEAPON                   = 63416,
-    SPELL_DK_RUNE_WEAPON_MARK           = 50474, // doesn't exist in dbc
-    SPELL_DK_DANCING_RUNE_WEAPON_VISUAL = 53160, // doesn't exist in dbc
-    SPELL_FAKE_AGGRO_RADIUS_8_YARD      = 49812, // doesn't exist in dbc
-    SPELL_DK_RUNE_WEAPON_SCALING_01     = 51905, // doesn't exist in dbc
-    SPELL_DK_RUNE_WEAPON_SCALING_02     = 51906, // Death Knight Rune Weapon Scaling 02
-    SPELL_PET_SCALING__MASTER_SPELL_06__SPELL_HIT_EXPERTISE_SPELL_PENETRATION = 67561, // doesn't exist in dbc
-    SPELL_DK_PET_SCALING_03             = 61697, // Death Knight Pet Scaling 03
-    SPELL_AGGRO_8_YD_PBAE               = 49813, // doesn't exist in dbc
+    SPELL_DK_RUNE_WEAPON_MARK           = 50474,
+    SPELL_DK_DANCING_RUNE_WEAPON_VISUAL = 53160,
+    SPELL_FAKE_AGGRO_RADIUS_8_YARD      = 49812,
+    SPELL_RUNE_WEAPON_SCALING_02        = 51906,
+
     // Main Spells
     SPELL_BLOOD_STRIKE                  = 49926,
     SPELL_PLAGUE_STRIKE                 = 49917,
@@ -273,237 +270,104 @@ enum DancingRuneWeapon
 {
     DATA_INITIAL_TARGET_GUID = 1,
 
-    EVENT_SPELL_CAST_1 = 1,
+    EVENT_ENGAGE_VICTIM = 1,
     EVENT_SPELL_CAST_2 = 2
 };
 
 class npc_pet_dk_rune_weapon : public CreatureScript
 {
-    public:
-        npc_pet_dk_rune_weapon() : CreatureScript("npc_pet_dk_rune_weapon") { }
+public:
+    npc_pet_dk_rune_weapon() : CreatureScript("npc_pet_dk_rune_weapon") { }
 
-        struct npc_pet_dk_rune_weaponAI : ScriptedAI
+    struct npc_pet_dk_rune_weaponAI : ScriptedAI
+    {
+        npc_pet_dk_rune_weaponAI(Creature* creature) : ScriptedAI(creature) { }
+
+    void InitializeAI() override
+    {
+        // prevent early victim engage
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        if (Unit* ownercaster = summoner->ToUnit())
         {
-            npc_pet_dk_rune_weaponAI(Creature* creature) : ScriptedAI(creature)
-            {
-                // Prevent early victim engage
-                creature->SetReactState(REACT_PASSIVE);
-                _engageTimer = 0;
-            }
-
-            void IsSummonedBy(WorldObject* summoner) override
-            {
-                if (Unit* ownercaster = summoner->ToUnit())
-                {
-                    if (ownercaster->ToPlayer())
-                    {
-                        me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, ownercaster->GetFloatValue(UNIT_FIELD_MINDAMAGE) / 2);
-                        me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, ownercaster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) / 2);
-                    }
-
-                    DoCast(ownercaster, SPELL_COPY_WEAPON, true);
-                    DoCast(ownercaster, SPELL_DK_RUNE_WEAPON_MARK, true);
-                }
-                //DoCast(me, SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
-                DoCast(me, SPELL_FAKE_AGGRO_RADIUS_8_YARD, true);
-                //DoCast(me, SPELL_DK_RUNE_WEAPON_SCALING_01, true);
-                DoCast(me, SPELL_DK_RUNE_WEAPON_SCALING_02, true);
-                DoCast(me, SPELL_PET_SCALING__MASTER_SPELL_06__SPELL_HIT_EXPERTISE_SPELL_PENETRATION, true);
-                DoCast(me, SPELL_DK_PET_SCALING_03, true);
-
-                _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6s);
-                _engageTimer = 1 * IN_MILLISECONDS;
-
-                me->GetThreatManager().RegisterRedirectThreat(SPELL_FAKE_AGGRO_RADIUS_8_YARD, summoner->GetGUID(), 100);
-            }
-
-            void SetGUID(ObjectGuid const& guid, int32 type) override
-            {
-                switch (type)
-                {
-                    case DATA_INITIAL_TARGET_GUID:
-                        _targetGUID = guid;
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
-                            DoWeaponAttack(target);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            void UpdateAI(uint32 diff) override
-            {
-                if (!me || !me->IsAlive())
-                    return;
-
-                if (me->HasReactState(REACT_PASSIVE))
-                {
-                    if (_engageTimer <= diff)
-                        me->SetReactState(REACT_AGGRESSIVE);
-                    else
-                    {
-                        _engageTimer -= diff;
-                        return;
-                    }
-                }
-
-                if (me->IsInCombat() && (!me->GetVictim() || !me->IsValidAttackTarget(me->GetVictim())))
-                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-
-                if (!me->IsInCombat())
-                {
-                    Unit* ownerTarget = nullptr;
-                    if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
-                        ownerTarget = owner->GetSelectedUnit();
-
-                    // recognize which victim will be choosen
-                    if (ownerTarget && ownerTarget->GetTypeId() == TYPEID_PLAYER)
-                    {
-                        if (!ownerTarget->HasBreakableByDamageCrowdControlAura(ownerTarget))
-                            DoWeaponAttack(ownerTarget);
-                    }
-                    else if (ownerTarget && (ownerTarget->GetTypeId() != TYPEID_PLAYER) && IsInThreatList(ownerTarget))
-                    {
-                        if (!ownerTarget->HasBreakableByDamageCrowdControlAura(ownerTarget))
-                            DoWeaponAttack(ownerTarget);
-                    }
-                    else
-                        Init();
-                }
-
-                /*
-                    Investigate further if these casts are done by
-                    any owned aura, eitherway SMSG_SPELL_GO
-                    is sent every X seconds.
-                */
-                _events.Update(diff);
-
-                while (uint32 _eventId = _events.ExecuteEvent())
-                {
-                    switch (_eventId)
-                    {
-                        case EVENT_SPELL_CAST_1:
-                            // Cast every second
-                            if (Unit* victim = me->GetVictim())
-                                DoCast(victim, SPELL_AGGRO_8_YD_PBAE, true);
-                            _events.ScheduleEvent(EVENT_SPELL_CAST_1, 1s);
-                            break;
-                        case EVENT_SPELL_CAST_2:
-                            // Cast every 6 seconds
-                            DoCast(me, SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
-                            _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6s);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                if (me->IsInCombat() && me->GetVictim() && me->IsValidAttackTarget(me->GetVictim()))
-                    DoMeleeAttackIfReady();
-            }
-
-            void DoWeaponAttack(Unit* who)
-            {
-                if (me->Attack(who, true))
-                {
-                    me->GetMotionMaster()->MoveChase(who);
-                    DoCast(who, SPELL_AGGRO_8_YD_PBAE, true);
-                    _events.RescheduleEvent(EVENT_SPELL_CAST_1, 1s);
-                }
-            }
-
-            void EnterEvadeMode(EvadeReason /*why*/) override
-            {
-                if (!me->IsAlive())
-                    return;
-
-                Unit* owner = me->GetCharmerOrOwner();
-
-                _events.CancelEvent(EVENT_SPELL_CAST_1);
-                me->CombatStop(true);
-                if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW))
-                {
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
-                }
-                Init();
-            }
-
-            void Init()
-            {
-                Unit* owner = me->GetCharmerOrOwner();
-
-                std::list<Unit*> targets;
-                Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
-                Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-                Cell::VisitAllObjects(me, searcher, 30.0f);
-
-                Unit* highestThreatUnit = nullptr;
-                float highestThreat = 0.0f;
-                Unit* nearestPlayer = nullptr;
-
-                if (!targets.empty())
-                {
-                    for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                    {
-                        // Consider only units without CC
-                        if (!(*iter)->HasBreakableByDamageCrowdControlAura((*iter)))
-                        {
-                            // Take first found unit
-                            if (!highestThreatUnit && (*iter)->GetTypeId() != TYPEID_PLAYER)
-                            {
-                                highestThreatUnit = (*iter);
-                                continue;
-                            }
-                            if (!nearestPlayer && ((*iter)->GetTypeId() == TYPEID_PLAYER))
-                            {
-                                nearestPlayer = (*iter);
-                                continue;
-                            }
-                            // else compare best fit unit with current unit
-                            float threat = (*iter)->GetThreatManager().GetThreat(owner);
-                            // Check if best fit hostile unit hs lower threat than this current unit
-                            if (highestThreat < threat)
-                            {
-                                // If so, update best fit unit
-                                highestThreat = threat;
-                                highestThreatUnit = (*iter);
-                            }
-                            // In case no unit with threat was found so far, always check for nearest unit (only for players)
-                            if ((*iter)->GetTypeId() == TYPEID_PLAYER)
-                            {
-                                // If this player is closer than the previous one, update it
-                                if (me->GetDistance((*iter)->GetPosition()) < me->GetDistance(nearestPlayer->GetPosition()))
-                                    nearestPlayer = (*iter);
-                            }
-                        }
-                    }
-                }
-                // Prioritize units with threat referenced to owner
-                if (highestThreat > 0.0f && highestThreatUnit)
-                    DoWeaponAttack(highestThreatUnit);
-                // If there is no such target, try to attack nearest hostile unit if such exists
-                else if (nearestPlayer)
-                    DoWeaponAttack(nearestPlayer);
-            }
-
-            bool IsInThreatList(Unit* target)
-            {
-                Unit* owner = me->GetCharmerOrOwner();
-                return owner && target->IsThreatenedBy(owner);
-            }
-
-        private:
-            ObjectGuid _targetGUID;
-            EventMap _events;
-            uint32 _engageTimer;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const override
-        {
-            return new npc_pet_dk_rune_weaponAI(creature);
+            DoCast(ownercaster, SPELL_COPY_WEAPON, true);
+            DoCast(ownercaster, SPELL_DK_RUNE_WEAPON_MARK, true);
+            DoCastSelf(SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
+            DoCastSelf(SPELL_FAKE_AGGRO_RADIUS_8_YARD, true);
+            DoCastSelf(SPELL_RUNE_WEAPON_SCALING_02, true);
         }
+        _events.ScheduleEvent(EVENT_ENGAGE_VICTIM, 1s);
+        _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6s);
+
+        me->GetThreatManager().RegisterRedirectThreat(SPELL_DK_DANCING_RUNE_WEAPON, summoner->GetGUID(), 100);
+    }
+
+    void SetGUID(ObjectGuid const& guid, int32 id) override
+    {
+        if (id == DATA_INITIAL_TARGET_GUID)
+        {
+            _targetGUID = guid;
+            if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
+                AttackStart(target);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (me->IsInCombat() && !me->GetVictim())
+            EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+
+        if (!me->IsInCombat())
+        {
+            Unit* owner = me->GetCharmerOrOwner();
+            Unit* ownerTarget = nullptr;
+            if (Player* playerOwner = owner->ToPlayer())
+                ownerTarget = playerOwner->GetSelectedUnit();
+
+            // recognize which victim will be choosen
+            if (ownerTarget && !ownerTarget->HasBreakableByDamageCrowdControlAura(ownerTarget))
+            {
+                if (ownerTarget->GetTypeId() == TYPEID_PLAYER)
+                    AttackStart(ownerTarget);
+                else if (ownerTarget->GetTypeId() != TYPEID_PLAYER && ownerTarget->GetThreatManager().IsThreatenedBy(owner))
+                    AttackStart(ownerTarget);
+                else
+                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+            }
+        }
+
+        _events.Update(diff);
+
+        while (uint32 _eventId = _events.ExecuteEvent())
+        {
+            switch (_eventId)
+            {
+            case EVENT_ENGAGE_VICTIM:
+                me->SetReactState(REACT_AGGRESSIVE);
+                break;
+            case EVENT_SPELL_CAST_2:
+                // every 6 seconds
+                DoCastSelf(SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
+                _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6s);
+                break;
+            }
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    ObjectGuid _targetGUID;
+    EventMap _events;
+};
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_pet_dk_rune_weaponAI(creature);
+    }
 };
 
 class spell_pet_dk_gargoyle_strike : public SpellScript

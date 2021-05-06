@@ -2547,13 +2547,14 @@ class spell_item_gift_of_the_harvester : public SpellScript
 
     SpellCastResult CheckRequirement()
     {
-        std::list<Creature*> ghouls;
+        std::vector<Creature*> ghouls;
         GetCaster()->GetAllMinionsByEntry(ghouls, NPC_GHOUL);
         if (ghouls.size() >= MAX_GHOULS)
         {
             SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TOO_MANY_GHOULS);
             return SPELL_FAILED_CUSTOM_ERROR;
         }
+        ghouls.clear();
 
         return SPELL_CAST_OK;
     }
