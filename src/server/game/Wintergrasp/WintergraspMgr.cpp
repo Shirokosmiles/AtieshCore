@@ -127,8 +127,8 @@ WintergraspMgr::~WintergraspMgr()
         delete workshop;
     Workshops.clear();
 
-    for (WGGameObjectBuilding* building : BuildingsInZone)
-        delete building;    
+    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+        delete itr->second;
     BuildingsInZone.clear();
 
     for (uint8 i = 0; i < PVP_TEAMS_COUNT; i++)
@@ -209,8 +209,8 @@ void WintergraspMgr::SetupWG(TeamId defender, bool StartWar)
             TC_LOG_ERROR("bg.battlefield", "WG: Failed to spawn titan relic.");
     }
     // Rebuild all wall
-    for (WGGameObjectBuilding* building : BuildingsInZone)
-        building->Rebuild();
+    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+        itr->second->Rebuild();
 
     UpdateAllGuardsAndTurretsBeforeBattle();
     UpdateAllGOforKeep();
@@ -350,18 +350,22 @@ void WintergraspMgr::InitializeWG()
     if (WGGraveyard* gy = GetGraveyardById(gyID))
         gy->GiveControlTo(GetDefenderTeam());
 
-    BuildingsInZone.resize(WG_MAX_OBJ);
+    //BuildingsInZone.resize(WG_MAX_OBJ);
     // Spawn all gameobjects
     for (uint8 i = 0; i < WG_MAX_OBJ; i++)
     {
         if (GameObject* go = ASSERT_NOTNULL(SpawnGameObject(WGGameObjectBuildings[i].entry, WGGameObjectBuildings[i].pos, WGGameObjectBuildings[i].rot)))
         {
-            WGGameObjectBuilding* b = new WGGameObjectBuilding(this, WGGameObjectBuildings[i].type, WGGameObjectBuildings[i].WorldState);
-            b->Init(go);
-            if (!IsEnabled() && go->GetEntry() == GO_WINTERGRASP_VAULT_GATE)
-                go->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
+            if (WGGameObjectBuilding* b = new WGGameObjectBuilding(this, WGGameObjectBuildings[i].type, WGGameObjectBuildings[i].WorldState))
+            {
+                b->Init(go);
+                if (!IsEnabled() && go->GetEntry() == GO_WINTERGRASP_VAULT_GATE)
+                    go->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
 
-            BuildingsInZone[i] = b;
+                BuildingsInZone[go->GetGUID()] = b;
+            }
+            else
+                TC_LOG_ERROR("server", "WintergraspMgr: new WGGameObjectBuilding not created");
         }
     }
 
@@ -524,8 +528,8 @@ void WintergraspMgr::OnBattleEnd(bool endByTimer)
     m_titansRelicGUID.Clear();
 
     // change collision wall state closed
-    for (WGGameObjectBuilding* building : BuildingsInZone)
-        building->RebuildGate();
+    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+        itr->second->RebuildGate();
 
     // successful defense
     if (endByTimer)

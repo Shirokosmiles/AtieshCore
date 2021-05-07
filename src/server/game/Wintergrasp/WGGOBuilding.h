@@ -42,12 +42,15 @@ public:
     void Save();
 
     uint32 GetGOEntry() { return _GOentry; }
+    bool IsTower() { return _isTower; }
     bool IsAttackTower() { return _type == BATTLEFIELD_WG_OBJECTTYPE_TOWER; }
     bool IsDefenseTower() { return _type == BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER; }
     bool IsAlive() { return _state != BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_DESTROY && _state != BATTLEFIELD_WG_OBJECTSTATE_HORDE_DESTROY && _state != BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY; }
 
     TeamId GetTeamController() { return _teamControl; }
     WintergraspGameObjectBuildingType GetType() { return _type; }
+    WintergraspTowerIds GetTowerId() { return _TowerId; }
+    ObjectGuid GetGUID() { return _GOGUID; }
 
 private:
     uint8 _GetTextDamaged(WintergraspGameObjectBuildingType type);

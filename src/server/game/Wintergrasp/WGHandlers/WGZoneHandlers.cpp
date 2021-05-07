@@ -19,6 +19,7 @@
 #include "Group.h"
 #include "WGCapturePoint.h"
 #include "WGGraveyard.h"
+#include "WGGOBuilding.h"
 #include "ScriptedCreature.h"
 #include "TemporarySummon.h"
 #include "Log.h"
@@ -918,38 +919,47 @@ void WintergraspMgr::OnCreatureRemove(Creature* /*creature*/)
 void WintergraspMgr::OnGameObjectCreate(GameObject* go)
 {
     go->SetPhaseMask(1, true);
-    /*
-    uint8 workshopId = 0;
+    go->SetFarVisible(true);
+    go->setActive(true);
 
+    RecheckForTowerGORespawn(go);
+}
+
+void WintergraspMgr::OnGameObjectRemove(GameObject* go)
+{
+    /*possibly can be used later*/
+}
+
+void WintergraspMgr::RecheckForTowerGORespawn(GameObject* go)
+{
+    bool _isGOTower = false;
     switch (go->GetEntry())
     {
-        case GO_WINTERGRASP_FACTORY_BANNER_NE:
-            workshopId = BATTLEFIELD_WG_WORKSHOP_NE;
-            break;
-        case GO_WINTERGRASP_FACTORY_BANNER_NW:
-            workshopId = BATTLEFIELD_WG_WORKSHOP_NW;
-            break;
-        case GO_WINTERGRASP_FACTORY_BANNER_SE:
-            workshopId = BATTLEFIELD_WG_WORKSHOP_SE;
-            break;
-        case GO_WINTERGRASP_FACTORY_BANNER_SW:
-            workshopId = BATTLEFIELD_WG_WORKSHOP_SW;
+        case GO_WINTERGRASP_FORTRESS_TOWER_NW:
+        case GO_WINTERGRASP_FORTRESS_TOWER_SW:
+        case GO_WINTERGRASP_FORTRESS_TOWER_SE:
+        case GO_WINTERGRASP_FORTRESS_TOWER_NE:
+        case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
+        case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
+        case GO_WINTERGRASP_FLAMEWATCH_TOWER:
+            _isGOTower = true;
             break;
         default:
-            return;
+            break;
     }
 
-    for (WintergraspWorkshop* workshop : Workshops)
+    if (!_isGOTower)
+        return;
+
+    WGGameObjectBuilding* towerBuilding = GetBuildingTowerByGOEntry(go->GetEntry());
+    if (towerBuilding)
     {
-        if (workshop->GetId() == workshopId)
-        {
-            TeamId team = workshopId < BATTLEFIELD_WG_WORKSHOP_NE ? GetAttackerTeam() : GetDefenderTeam();
-            WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, team);
-            capturePoint->SetCapturePointData(go);
-            capturePoint->LinkToWorkshop(workshop);
-            capturePoint->SetInitialData(team);
-            AddCapturePoint(capturePoint, workshopId);
-        }
+        // remove WGGameObjectBuilding with old GUID from map
+        BuildingsInZone.erase(towerBuilding->GetGUID());
+        // init GO for exist WGGameObjectBuilding
+        towerBuilding->Init(go);
+        // add updated WGGameObjectBuilding in map again
+        BuildingsInZone[go->GetGUID()] = towerBuilding;
+        TC_LOG_ERROR("system", "WintergraspMgr::RecheckForTowerGORespawn(GameObject %u) : %u", go->GetEntry());
     }
-    */
 }

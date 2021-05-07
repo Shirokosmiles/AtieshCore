@@ -99,6 +99,28 @@ GameObject* WintergraspMgr::GetGameObject(ObjectGuid guid)
     return m_Map->GetGameObject(guid);
 }
 
+GameObject* WintergraspMgr::GetTowerGObyTowerID(WintergraspTowerIds towerID)
+{
+    if (!m_Map)
+        return nullptr;
+    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+    {
+        if (itr->second->IsTower() && itr->second->GetTowerId() == towerID)
+            return m_Map->GetGameObject(itr->first);
+    }
+    return nullptr;    
+}
+
+WGGameObjectBuilding* WintergraspMgr::GetBuildingTowerByGOEntry(uint32 entry)
+{
+    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+    {
+        if (itr->second->IsTower() && itr->second->GetGOEntry() == entry)
+            return itr->second;
+    }
+    return nullptr;
+}
+
 bool WintergraspMgr::IsCreatureInHolder(ObjectGuid guid)
 {
     CreatureHolderContainer::const_iterator itr = m_CreatureMap.find(guid);
@@ -461,19 +483,19 @@ void WintergraspMgr::ShowNpc(Creature* creature, bool aggressive)
     }
 }
 
-void WintergraspMgr::_UpdateCreatureForBuildGO(WintergraspGameObject go, Creature* creature, TeamId team)
+void WintergraspMgr::_UpdateCreatureForBuildGO(WintergraspGameObject GOentry, Creature* creature, TeamId team)
 {
-    for (WGGameObjectBuilding* building : BuildingsInZone)
+    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
     {
-        if (building->GetGOEntry() == go)
+        if (itr->second->GetGOEntry() == GOentry)
         {
-            if (!building->IsAlive())
+            if (!itr->second->IsAlive())
                 HideNpc(creature);
             else
             {
-                if (building->GetTeamController() == team || creature->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
+                if (itr->second->GetTeamController() == team || creature->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
                 {
-                    creature->SetFaction(WintergraspFaction[building->GetTeamController()]);
+                    creature->SetFaction(WintergraspFaction[itr->second->GetTeamController()]);
                     ShowNpc(creature, true);
                 }
                 else

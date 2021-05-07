@@ -524,7 +524,7 @@ typedef std::unordered_map<WintergraspWorkshopIds, WGCapturePoint*> CapturePoint
 
 class WGGameObjectBuilding;
 class WGWorkshop;
-typedef std::vector<WGGameObjectBuilding*> GameObjectBuildingVect;
+typedef std::unordered_map<ObjectGuid, WGGameObjectBuilding*> WGGameObjectBuildingMap;
 typedef std::vector<WGWorkshop*> WorkshopVect;
 
 struct PlayerHolder
@@ -616,6 +616,9 @@ public:
     void OnCreatureCreate(Creature* creature) override;
     void OnCreatureRemove(Creature* creature) override;
     void OnGameObjectCreate(GameObject* go) override;
+    void OnGameObjectRemove(GameObject* go) override;
+
+    void RecheckForTowerGORespawn(GameObject* go);
 
     // Called when player (player) enter in zone
     void HandlePlayerEnterZone(Player* player, uint32 /*zone*/);
@@ -689,6 +692,9 @@ public:
     GameObject* SpawnGameObject(uint32 entry, Position const& pos, QuaternionData const& rot);
     Creature* GetCreature(ObjectGuid spawnid);
     GameObject* GetGameObject(ObjectGuid guid);
+    GameObject* GetTowerGObyTowerID(WintergraspTowerIds towerID);
+    // Tower have only 1 GO by entry on map
+    WGGameObjectBuilding* GetBuildingTowerByGOEntry(uint32 entry);
 
     bool IsCreatureInHolder(ObjectGuid guid);
     bool AddCreatureInHolderByGUID(Creature* creature, uint8 npcType, TeamId team = TEAM_NEUTRAL);
@@ -706,7 +712,7 @@ public:
     void HideNpc(Creature* creature);
     void ShowNpc(Creature* creature, bool aggressive);
 
-    void _UpdateCreatureForBuildGO(WintergraspGameObject go, Creature* creature, TeamId team);
+    void _UpdateCreatureForBuildGO(WintergraspGameObject GOentry, Creature* creature, TeamId team);
     void _UpdateCreatureForWorkshop(WintergraspWorkshopIds workshopType, Creature* creature, TeamId team);
     /// </Spawn section>
 
@@ -726,7 +732,7 @@ private:
 
     //vectors
     WorkshopVect Workshops;
-    GameObjectBuildingVect BuildingsInZone;
+    WGGameObjectBuildingMap BuildingsInZone;
     GuidVector DefenderPortalList[PVP_TEAMS_COUNT];
     GuidVector m_KeepHordeGameObjectList;
     GuidVector m_KeepAllianceGameObjectList;
