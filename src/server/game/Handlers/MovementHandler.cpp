@@ -520,7 +520,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         }
     }
 
-    if (plrMover && !sWorld->isMapDisabledForAC(plrMover->GetMapId()))
+    if (plrMover && !sWorld->isAreaDisabledForAC(plrMover->GetAreaId()))
     {
         if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED) && plrMover && !movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
         {

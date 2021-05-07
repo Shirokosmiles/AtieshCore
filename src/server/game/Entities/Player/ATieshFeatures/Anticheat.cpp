@@ -54,7 +54,7 @@ void Player::StartWaitingLandOrSwimOpcode()
 
 bool Player::CheckOnFlyHack()
 {
-    if (sWorld->isMapDisabledForAC(GetMapId()))
+    if (sWorld->isAreaDisabledForAC(GetAreaId()))
         return true;
 
     if (IsCanFlybyServer())
@@ -164,7 +164,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
     if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_SPEEDHACK_ENABLED))
         return true;
 
-    if (sWorld->isMapDisabledForAC(GetMapId()))
+    if (sWorld->isAreaDisabledForAC(GetAreaId()))
         return true;
 
     uint32 oldctime = GetLastMoveClientTimestamp();

@@ -899,7 +899,7 @@ class TC_GAME_API World
         bool IsGuidAlert() { return _guidAlert; }
 
         void SetACMapExcludes(const std::string& mapIdExcludes);
-        bool isMapDisabledForAC(uint32 mapid) const { return excludeACMapsId.count(mapid); }
+        bool isAreaDisabledForAC(uint32 areaid) const { return excludeACMapsId.count(areaid); }
 
         void SetBankBagsIdMap(const std::string& bankBagsId);
         bool isBankBagsID(uint32 id) const { return mapbankBagsId.count(id); }
