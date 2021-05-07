@@ -517,6 +517,7 @@ void WintergraspMgr::OnBattleStart()
     SetupWG(m_DefenderTeam, true);
     // Send start warning to all players
     SendWarning(BATTLEFIELD_WG_TEXT_START_BATTLE);
+    _OnBattleStartPlayers();
 }
 
 void WintergraspMgr::OnBattleEnd(bool endByTimer)

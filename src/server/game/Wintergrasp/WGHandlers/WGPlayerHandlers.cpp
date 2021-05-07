@@ -614,3 +614,20 @@ void WintergraspMgr::PromotePlayer(Player* killer)
             killer->CastSpell(killer, SPELL_CORPORAL, true);
     }
 }
+
+void WintergraspMgr::_OnBattleStartPlayers()
+{
+    // Dismount players in zone when start WG
+    for (PlayerHolderContainer::const_iterator itr = m_PlayerMap.begin(); itr != m_PlayerMap.end(); ++itr)
+    {
+        if (itr->second.inZone)
+        {
+            if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+            {
+                if (player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+                    player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+                player->AddAura(12438, player);
+            }
+        }
+    }
+}

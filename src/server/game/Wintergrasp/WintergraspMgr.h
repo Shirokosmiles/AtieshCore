@@ -560,26 +560,23 @@ public:
     static WintergraspMgr* instance();
 
     void InitializeWG();
-    void SetupWG(TeamId defender, bool StartWar);
     void Update(uint32 diff);
 
+    //used by commands
     void StartBattle();
     void EndBattle(bool endByTimer);
-
-    void OnBattleStart();
-    void OnBattleEnd(bool endByTimer);
-
     // Enable or Disable battlefield
-    void ToggleBattlefield(bool enable) { m_isEnabled = enable; }
+    void ToggleBattlefield(bool enable) { m_isEnabled = enable; }    
+    
+    void SetTimer(uint32 timer) { m_Timer = timer; }
+    void SetupWG(TeamId defender, bool StartWar);
+    
     // Return if battlefield is enable
     bool IsEnabled() const { return m_isEnabled; }
     // Return true if battle is start, false if battle is not started
     bool IsWarTime() const { return m_isActive; }
 
-    // Define if player can interact with the relic
-    void SetRelicInteractible(bool allow) { m_isRelicInteractible = allow; }
-    void InitStalker(uint32 entry, Position const& pos);
-    void SetTimer(uint32 timer) { m_Timer = timer; }
+    uint32 GetData(uint32 dataId) const  override { return m_Data32[dataId]; }
     uint32 GetTimer() const { return m_Timer; }
     uint32 GetFreeslot(TeamId team) const { return m_freeslots[team]; }
     uint32 _GetGraveyardIDByType(WGGraveyardId type);
@@ -587,38 +584,37 @@ public:
     WorldSafeLocsDBC const* GetClosestGraveyard(Player* player);
     WGGraveyardId GetSpiritGraveyardIdForCreature(Creature* creature) const;
     GraveyardMap const& GetGraveyardMap() const { return m_graveyardMap; }
-    void AddCapturePoint(WGCapturePoint* cp, WintergraspWorkshopIds workshopId);
+    Creature* GetCreature(ObjectGuid spawnid);
+    GameObject* GetGameObject(ObjectGuid guid);
+    GameObject* GetTowerGObyTowerID(WintergraspTowerIds towerID);
+    // Return pointer to relic object
+    GameObject* GetRelic() { return GetGameObject(m_titansRelicGUID); }
+    // Tower have only 1 GO by entry on map
+    WGGameObjectBuilding* GetBuildingTowerByGOEntry(uint32 entry);
     WGCapturePoint* GetCapturePoint(WintergraspWorkshopIds workshop) const
     {
         CapturePointContainer::const_iterator itr = m_capturePoints.find(workshop);
         if (itr != m_capturePoints.end())
-                return itr->second;
+            return itr->second;
         return nullptr;
-    }
+    }    
 
     // Teams
     TeamId GetDefenderTeam() const { return m_DefenderTeam; }
     TeamId GetAttackerTeam() const { return TeamId(1 - m_DefenderTeam); }
     TeamId GetOtherTeam(TeamId team) const { return (team == TEAM_HORDE ? TEAM_ALLIANCE : TEAM_HORDE); }
-    void SetDefenderTeam(TeamId team) { m_DefenderTeam = team; }   
 
-    void UpdateDamagedTowerCount(TeamId team);
-    void UpdateDestroyedTowerCount(TeamId team);
-    void UpdateCounterVehicle(bool init);
-    void UpdateVehicleCountWG();
+    bool PlayerInBFPlayerMap(Player* plr);
+    void InviteNewPlayerToQueue(Player* player, bool isInZone);
+    void InviteNewPlayerToWar(Player* player, bool isInZone);
+    void KickPlayerFromBattlefield(ObjectGuid guid);
 
-    /// <Zone section>
-    // All-purpose data storage 32 bit
-    uint32 GetData(uint32 dataId) const  override { return m_Data32[dataId]; }
-    void SetData(uint32 dataId, uint32 value) override { m_Data32[dataId] = value; }
-    void UpdateData(uint32 index, int32 pad) { m_Data32[index] += pad; }
-
-    void OnCreatureCreate(Creature* creature) override;
-    void OnCreatureRemove(Creature* creature) override;
-    void OnGameObjectCreate(GameObject* go) override;
-    void OnGameObjectRemove(GameObject* go) override;
-
-    void RecheckForTowerGORespawn(GameObject* go);
+    void PlayerAcceptInviteToQueue(Player* player);
+    void PlayerAcceptInviteToWar(Player* player);
+    void PlayerDeclineInviteToQueue(Player* player);
+    void PlayerDeclineInviteToWar(Player* player);
+    void AskToLeaveQueue(Player* player);
+    void PlayerAskToLeave(Player* player);
 
     // Called when player (player) enter in zone
     void HandlePlayerEnterZone(Player* player, uint32 /*zone*/);
@@ -626,104 +622,99 @@ public:
     void HandlePlayerLeaveZone(Player* player, uint32 /*zone*/);
     // Called when a Unit is kill in battlefield zone
     void HandleKill(Player* killer, Unit* killed);
+    // Called when a ressurect in battlefield zone
+    void HandleResurrectedPlayer(ObjectGuid playerGuid);
 
-    //helpers
-    void OnPlayerLeaveZone(Player* player);
-    void OnPlayerEnterZone(Player* player);
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet);
+    void SendInitWorldStatesToAll();
+    void SendUpdateWorldState(uint32 field, uint32 value);
+    void SendAreaSpiritHealerQueryOpcode(Player* player, ObjectGuid source);
+    void SendWarning(uint8 id, WorldObject const* target = nullptr);
+
+    Creature* SpawnCreature(uint32 entry, Position const& pos);
+    GameObject* SpawnGameObject(uint32 entry, Position const& pos, QuaternionData const& rot);
+
+    void SetRelicInteractible(bool allow) { m_isRelicInteractible = allow; }
+
+    void ShowCreatureByNPCType(uint8 npcType, TeamId team);
+    void HideCreatureByNPCType(uint8 npcType, TeamId team);
+    void HideCreatureTurretByNPCType(uint8 npcType);
+
+    void UpdateDamagedTowerCount(TeamId team);
+    void UpdateDestroyedTowerCount(TeamId team);
+    void UpdateCounterVehicle(bool init);
+    void BrokenWallOrTower(TeamId team, WGGameObjectBuilding* building);
+
+    void AddCapturePoint(WGCapturePoint* cp, WintergraspWorkshopIds workshopId);
+
+private:    
+
+    void OnBattleStart();
+    void _OnBattleStartPlayers();
+    void OnBattleEnd(bool endByTimer);    
+    // Define if player can interact with the relic
+    void SetRelic(ObjectGuid relicGUID) { m_titansRelicGUID = relicGUID; }    
+    void InitStalker(uint32 entry, Position const& pos);
+    void SetDefenderTeam(TeamId team) { m_DefenderTeam = team; } 
+    void UpdateVehicleCountWG();
+
+    /// <Zone section>
+        // All-purpose data storage 32 bit
+        void SetData(uint32 dataId, uint32 value) override { m_Data32[dataId] = value; }
+        void UpdateData(uint32 index, int32 pad) { m_Data32[index] += pad; }
+        void OnCreatureCreate(Creature* creature) override;
+        void OnCreatureRemove(Creature* creature) override;
+        void OnGameObjectCreate(GameObject* go) override;
+        void OnGameObjectRemove(GameObject* go) override;
+        void RecheckForTowerGORespawn(GameObject* go);
+        //helpers
+        void OnPlayerLeaveZone(Player* player);
+        void OnPlayerEnterZone(Player* player);
     /// </Zone section>
 
     /// <Player section>
-    void AddPlayer(Player* plr, bool InZone, bool IsWaitingQueue, bool IsWaitingWar, bool IsWaitingKick, time_t time = 0);
-    void UpdateZoneStatusInPlayerMap(Player* plr, bool inZone);
-    bool PlayerInBFPlayerMap(Player* plr);
-    void RemovePlayer(Player* plr);
-
-    void InviteNewPlayerToQueue(Player* player, bool isInZone);
-    void InviteNewPlayerToWar(Player* player, bool isInZone);
-
-    // Invite all players in zone to join the queue, called x minutes before battle start in Update()
-    void InvitePlayersInZoneToQueue();
-    // Invite all players in queue to join battle on battle start
-    void InvitePlayersInQueueToWar();
-    // Invite all players not in queue to join battle on battle start
-    void TryInvitePlayersNotInQueueToWarOrKickThem();
-
-    void KickPlayerFromBattlefield(ObjectGuid guid);
-
-    void PlayerAcceptInviteToQueue(Player* player);
-    void PlayerAcceptInviteToWar(Player* player);
-    void PlayerDeclineInviteToQueue(Player* player);
-    void PlayerDeclineInviteToWar(Player* player);
-
-    // use for switch off all worldstate for client
-    void SendRemoveWorldStates(Player* /*player*/); //UNUSED
-    void SendInitWorldStatesTo(Player* player);
-    void SendInitWorldStatesToAll();
-    void SendAreaSpiritHealerQueryOpcode(Player* player, ObjectGuid source);
-    void HandleResurrectedPlayer(ObjectGuid playerGuid);
-    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet);
-    void SendWarning(uint8 id, WorldObject const* target = nullptr);
-    // Update data of a worldstate to all players present in zone
-    void SendUpdateWorldState(uint32 field, uint32 value);    
-
-    void RemoveAurasFromPlayer(Player* player);
-    void UpdateTenacity();
-    void BrokenWallOrTower(TeamId team, WGGameObjectBuilding* building);
-    void DoCompleteOrIncrementAchievement(uint32 achievement, Player* player, uint8 incrementNumber = 1);
-
-    void AskToLeaveQueue(Player* player);
-    void PlayerAskToLeave(Player* player);
-
-    //helpers
-    void OnPlayerJoinWar(Player* player);
-    void OnPlayerLeaveWar(Player* player);
-    void HandlePromotion(Player* killer, Unit* killed);
-    void PromotePlayer(Player* killer);
+        void AddPlayer(Player* plr, bool InZone, bool IsWaitingQueue, bool IsWaitingWar, bool IsWaitingKick, time_t time = 0);
+        void RemovePlayer(Player* plr);
+        void UpdateZoneStatusInPlayerMap(Player* plr, bool inZone);
+        // Invite all players in zone to join the queue, called x minutes before battle start in Update()
+        void InvitePlayersInZoneToQueue();
+        // Invite all players in queue to join battle on battle start
+        void InvitePlayersInQueueToWar();
+        // Invite all players not in queue to join battle on battle start
+        void TryInvitePlayersNotInQueueToWarOrKickThem();
+        // use for switch off all worldstate for client
+        void SendRemoveWorldStates(Player* /*player*/); //UNUSED
+        void SendInitWorldStatesTo(Player* player);
+        void RemoveAurasFromPlayer(Player* player);
+        void UpdateTenacity();        
+        void DoCompleteOrIncrementAchievement(uint32 achievement, Player* player, uint8 incrementNumber = 1);
+        //helpers
+        void OnPlayerJoinWar(Player* player);
+        void OnPlayerLeaveWar(Player* player);
+        void HandlePromotion(Player* killer, Unit* killed);
+        void PromotePlayer(Player* killer);
     /// </Player section>
 
     /// <Spawn section>
-    // Return pointer to relic object
-    GameObject* GetRelic() { return GetGameObject(m_titansRelicGUID); }
-    // Define relic object
-    void SetRelic(ObjectGuid relicGUID) { m_titansRelicGUID = relicGUID; }
-
-    // Misc methods
-    Creature* SpawnCreature(uint32 entry, Position const& pos);
-    GameObject* SpawnGameObject(uint32 entry, Position const& pos, QuaternionData const& rot);
-    Creature* GetCreature(ObjectGuid spawnid);
-    GameObject* GetGameObject(ObjectGuid guid);
-    GameObject* GetTowerGObyTowerID(WintergraspTowerIds towerID);
-    // Tower have only 1 GO by entry on map
-    WGGameObjectBuilding* GetBuildingTowerByGOEntry(uint32 entry);
-
-    bool IsCreatureInHolder(ObjectGuid guid);
-    bool AddCreatureInHolderByGUID(Creature* creature, uint8 npcType, TeamId team = TEAM_NEUTRAL);
-    void UpdateStatusForCreature(Creature* creature, uint8 npcType, TeamId team);
-    void ShowCreatureByNPCType(uint8 npcType, TeamId team);
-    void HideCreatureByNPCType(uint8 npcType, TeamId team);
-    void UpdateCreatureTurretByNPCType(uint8 npcType, TeamId team);
-    void HideCreatureTurretByNPCType(uint8 npcType);
-
-    void UpdateAllGuardsAndTurretsBeforeBattle();
-
-    void InitAllGOforKeep();
-    void UpdateAllGOforKeep();
-
-    void HideNpc(Creature* creature);
-    void ShowNpc(Creature* creature, bool aggressive);
-
-    void _UpdateCreatureForBuildGO(WintergraspGameObject GOentry, Creature* creature, TeamId team);
-    void _UpdateCreatureForWorkshop(WintergraspWorkshopIds workshopType, Creature* creature, TeamId team);
+        bool IsCreatureInHolder(ObjectGuid guid);
+        bool AddCreatureInHolderByGUID(Creature* creature, uint8 npcType, TeamId team = TEAM_NEUTRAL);
+        void UpdateStatusForCreature(Creature* creature, uint8 npcType, TeamId team);
+        void UpdateCreatureTurretByNPCType(uint8 npcType, TeamId team);
+        void UpdateAllGuardsAndTurretsBeforeBattle();
+        void InitAllGOforKeep();
+        void UpdateAllGOforKeep();
+        void HideNpc(Creature* creature);
+        void ShowNpc(Creature* creature, bool aggressive);
+        void _UpdateCreatureForBuildGO(WintergraspGameObject GOentry, Creature* creature, TeamId team);
+        void _UpdateCreatureForWorkshop(WintergraspWorkshopIds workshopType, Creature* creature, TeamId team);
     /// </Spawn section>
 
     /// <Group section>
-    void OnStartGrouping();
-    bool AddOrSetPlayerToCorrectBfGroup(Player* player);
-    Group* GetFreeBfRaid(TeamId TeamId);
+        void OnStartGrouping();
+        bool AddOrSetPlayerToCorrectBfGroup(Player* player);
+        Group* GetFreeBfRaid(TeamId TeamId);
     /// </Group section>
 
-private:
-    
     CapturePointContainer m_capturePoints;  // Map of the objectives belonging to this OutdoorPvP    
     GraveyardMap m_graveyardMap;            // Graveyards
 

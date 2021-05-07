@@ -180,7 +180,7 @@ void WorldSession::HandleMoveWorldportAck()
     player->UpdateZone(newzone, newarea);
 
     bool InBattlefield = false;
-    if (loc.GetMapId() == 571 && newzone == 4197)
+    if (newzone == 4197)
     {
         if (sWintergraspMgr->IsWarTime())
             allowMount = false;
