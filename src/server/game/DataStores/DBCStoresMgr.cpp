@@ -600,7 +600,7 @@ void DBCStoresMgr::_Load_AreaTrigger()
     uint32 oldMSTime = getMSTime();
 
     _areaTriggerMap.clear();
-    //                                                0     1         2  3  4     5        6          7          8           9
+    //                                                0     1       2  3  4     5        6          7          8           9
     QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, X, Y, Z, Radius, Box_Length, Box_Width, Box_Height, Box_Yaw FROM dbc_areatrigger");
     if (!result)
     {
@@ -624,6 +624,7 @@ void DBCStoresMgr::_Load_AreaTrigger()
         at.BoxLength   = fields[6].GetFloat();
         at.BoxWidth    = fields[7].GetFloat();
         at.BoxHeight   = fields[8].GetFloat();
+        at.BoxYaw      = fields[9].GetFloat();
 
         _areaTriggerMap[id] = at;
 
