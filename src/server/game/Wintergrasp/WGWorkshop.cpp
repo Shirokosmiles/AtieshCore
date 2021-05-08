@@ -263,11 +263,6 @@ void WGWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
 
     if (!init)
         _wg->UpdateCounterVehicle(false);
-    else
-    {
-        if (WGCapturePoint* cp = _wg->GetCapturePoint(_type))
-            cp->SetInitialData(_teamControl);
-    }
 
     UpdateCreatureAndGo();
     Save();
