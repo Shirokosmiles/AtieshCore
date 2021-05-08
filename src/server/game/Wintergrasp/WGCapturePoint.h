@@ -27,12 +27,10 @@ class WGWorkshop;
 class TC_GAME_API WGCapturePoint
 {
 public:
-    WGCapturePoint(WintergraspMgr* WG, TeamId team);
+    WGCapturePoint(WintergraspMgr* WG, WintergraspWorkshopIds workshoptype, TeamId team);
     ~WGCapturePoint();
 
     void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
-
-    void LinkToWorkshop(WGWorkshop* workshop) { m_Workshop = workshop; }
 
     // Send world state update to all players present
     void SendUpdateWorldState(uint32 field, uint32 value);
@@ -50,7 +48,7 @@ public:
 
     // Returns true if the state of the objective has changed, in this case, the OutdoorPvP must send a world state ui update.
     bool Update(uint32 diff);
-    void ChangeTeam(TeamId /*newTeam*/) { }
+    void ChangeTeam(TeamId newTeam);
     void SendChangePhase();
     bool ChangeState();
 
@@ -92,6 +90,4 @@ protected:
 
     // Gameobject related to that capture point
     ObjectGuid m_capturePointGUID;
-
-    WGWorkshop* m_Workshop;
 };

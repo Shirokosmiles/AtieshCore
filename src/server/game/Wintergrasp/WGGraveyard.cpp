@@ -41,10 +41,48 @@ WGGraveyard::~WGGraveyard()
     _WG = nullptr;
 }
 
-void WGGraveyard::Initialize(TeamId startControl, uint32 graveyardId)
+void WGGraveyard::Initialize(WGGraveyardId type)
 {
-    _ControlTeam = startControl;
-    _GraveyardId = graveyardId;
+    switch (type)
+    {
+        case BATTLEFIELD_WG_GY_WORKSHOP_SE:
+            _ControlTeam = _WG->GetAttackerTeam();
+            _GraveyardId = 1333;
+            SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_SE);
+            break;
+        case BATTLEFIELD_WG_GY_WORKSHOP_SW:
+            _ControlTeam = _WG->GetAttackerTeam();
+            _GraveyardId = 1334;
+            SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_SW);
+            break;
+        case BATTLEFIELD_WG_GY_WORKSHOP_NE:
+            _ControlTeam = _WG->GetDefenderTeam();
+            _GraveyardId = 1329;
+            SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_NE);
+            break;
+        case BATTLEFIELD_WG_GY_WORKSHOP_NW:
+            _ControlTeam = _WG->GetDefenderTeam();
+            _GraveyardId = 1330;
+            SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_NW);
+            break;
+        case BATTLEFIELD_WG_GY_KEEP:
+            _ControlTeam = _WG->GetDefenderTeam();
+            _GraveyardId = 1285;
+            SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_KEEP);
+            break;
+        case BATTLEFIELD_WG_GY_HORDE:
+            _ControlTeam = TEAM_HORDE;
+            _GraveyardId = 1331;
+            SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_HORDE);
+            break;
+        case BATTLEFIELD_WG_GY_ALLIANCE:
+            _ControlTeam = TEAM_ALLIANCE;
+            _GraveyardId = 1332;
+            SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE);
+            break;
+        default:
+            break;
+    }    
 }
 
 void WGGraveyard::SetSpirit(Creature* spirit, TeamId team)

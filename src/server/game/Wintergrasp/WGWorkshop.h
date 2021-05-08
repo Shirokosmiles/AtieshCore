@@ -28,7 +28,6 @@ public:
     WintergraspWorkshopIds GetType() const { return _type; }
     TeamId GetTeamControl() const { return _teamControl; }
 
-    void InitialWorkshopAndCapturePoint(TeamId teamId, WintergraspWorkshopIds workshopType);
     // Called on change faction in CapturePoint class
     void GiveControlTo(TeamId teamId, bool init = false);
 

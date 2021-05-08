@@ -300,7 +300,7 @@ enum WGGraveyardId
     BATTLEFIELD_WG_GRAVEYARD_MAX
 };
 
-enum WintergraspWorkshopIds
+enum WintergraspWorkshopIds : uint8
 {
     BATTLEFIELD_WG_WORKSHOP_SE,
     BATTLEFIELD_WG_WORKSHOP_SW,
@@ -518,14 +518,20 @@ WintergraspGameObjectKeepData const WGKeepAllianceData[WG_MAX_KEEPGO_ALLIANCE] =
     { { 5293.66f, 2924.44f, 409.293f, 1.20427f }, { 0.f, 0.f, 0.566403f, 0.824128f }, 193124 }
 };
 class WGGraveyard;
-class WGCapturePoint;
 typedef std::unordered_map<uint32, WGGraveyard*> GraveyardMap;
-typedef std::unordered_map<WintergraspWorkshopIds, WGCapturePoint*> CapturePointContainer;
+//typedef std::unordered_map<WintergraspWorkshopIds, WGCapturePoint*> CapturePointContainer;
 
 class WGGameObjectBuilding;
-class WGWorkshop;
 typedef std::unordered_map<ObjectGuid, WGGameObjectBuilding*> WGGameObjectBuildingMap;
-typedef std::vector<WGWorkshop*> WorkshopVect;
+
+class WGWorkshop;
+class WGCapturePoint;
+struct WorkshopAndCapturePointPAIR
+{
+    WGWorkshop* _workshopPoint;
+    WGCapturePoint* _capturePoint;
+};
+typedef std::unordered_map<WintergraspWorkshopIds, WorkshopAndCapturePointPAIR> WorkshopAndCapturePointMap;
 
 struct PlayerHolder
 {
@@ -593,11 +599,18 @@ public:
     WGGameObjectBuilding* GetBuildingTowerByGOEntry(uint32 entry);
     WGCapturePoint* GetCapturePoint(WintergraspWorkshopIds workshop) const
     {
-        CapturePointContainer::const_iterator itr = m_capturePoints.find(workshop);
-        if (itr != m_capturePoints.end())
-            return itr->second;
+        WorkshopAndCapturePointMap::const_iterator itr = m_workshopAndCaptures.find(workshop);
+        if (itr != m_workshopAndCaptures.end())
+            return itr->second._capturePoint;
         return nullptr;
-    }    
+    }
+    WGWorkshop* GetWGWorkshopByCapturePoint(WGCapturePoint* cp) const
+    {
+        for (auto const pointer : m_workshopAndCaptures)
+            if (pointer.second._capturePoint == cp)
+                return pointer.second._workshopPoint;
+        return nullptr;
+    }
 
     // Teams
     TeamId GetDefenderTeam() const { return m_DefenderTeam; }
@@ -645,8 +658,6 @@ public:
     void UpdateCounterVehicle(bool init);
     void BrokenWallOrTower(TeamId team, WGGameObjectBuilding* building);
 
-    void AddCapturePoint(WGCapturePoint* cp, WintergraspWorkshopIds workshopId);
-
 private:    
 
     void OnBattleStart();
@@ -666,7 +677,7 @@ private:
         void OnCreatureRemove(Creature* creature) override;
         void OnGameObjectCreate(GameObject* go) override;
         void OnGameObjectRemove(GameObject* go) override;
-        void RecheckForTowerGORespawn(GameObject* go);
+        void RecheckImportantGORespawn(GameObject* go);
         //helpers
         void OnPlayerLeaveZone(Player* player);
         void OnPlayerEnterZone(Player* player);
@@ -715,15 +726,13 @@ private:
         Group* GetFreeBfRaid(TeamId TeamId);
     /// </Group section>
 
-    CapturePointContainer m_capturePoints;  // Map of the objectives belonging to this OutdoorPvP    
-    GraveyardMap m_graveyardMap;            // Graveyards
-
-    PlayerHolderContainer m_PlayerMap;
-    CreatureHolderContainer m_CreatureMap;
+    WGGameObjectBuildingMap    m_buildingsInZone;
+    WorkshopAndCapturePointMap m_workshopAndCaptures;  // Workshop and CapturePoint PAIR
+    GraveyardMap               m_graveyardMap;         // Graveyards
+    PlayerHolderContainer      m_PlayerMap;
+    CreatureHolderContainer    m_CreatureMap;
 
     //vectors
-    WorkshopVect Workshops;
-    WGGameObjectBuildingMap BuildingsInZone;
     GuidVector DefenderPortalList[PVP_TEAMS_COUNT];
     GuidVector m_KeepHordeGameObjectList;
     GuidVector m_KeepAllianceGameObjectList;

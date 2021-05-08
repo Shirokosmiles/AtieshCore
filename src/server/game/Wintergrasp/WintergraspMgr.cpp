@@ -48,14 +48,12 @@ WintergraspGameObjectData const WGPortalDefenderData[WG_MAX_TELEPORTER] =
 
 WintergraspMgr::WintergraspMgr()
 {
-    m_capturePoints.clear();
+    m_buildingsInZone.clear();
+    m_workshopAndCaptures.clear();
     m_graveyardMap.clear();
-
     m_PlayerMap.clear();
     m_CreatureMap.clear();
 
-    Workshops.clear();
-    BuildingsInZone.clear();
     for (uint8 i = 0; i < PVP_TEAMS_COUNT; i++)
         DefenderPortalList[i].clear();
     m_KeepHordeGameObjectList.clear();
@@ -112,24 +110,22 @@ WintergraspMgr::WintergraspMgr()
 
 WintergraspMgr::~WintergraspMgr()
 {
-    for (auto& pointer : m_capturePoints)
+    for (auto pointer : m_buildingsInZone)
         delete pointer.second;
-    m_capturePoints.clear();
+    m_buildingsInZone.clear();
 
-    for (auto& pointer : m_graveyardMap)
+    for (auto pointer : m_workshopAndCaptures)
+    {
+        delete pointer.second._capturePoint;
+        delete pointer.second._workshopPoint;
+    }        
+    m_workshopAndCaptures.clear();
+
+    for (auto pointer : m_graveyardMap)
         delete pointer.second;
     m_graveyardMap.clear();
-
     m_PlayerMap.clear();
     m_CreatureMap.clear();
-
-    for (WGWorkshop* workshop : Workshops)
-        delete workshop;
-    Workshops.clear();
-
-    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
-        delete itr->second;
-    BuildingsInZone.clear();
 
     for (uint8 i = 0; i < PVP_TEAMS_COUNT; i++)
         DefenderPortalList[i].clear();
@@ -209,7 +205,7 @@ void WintergraspMgr::SetupWG(TeamId defender, bool StartWar)
             TC_LOG_ERROR("bg.battlefield", "WG: Failed to spawn titan relic.");
     }
     // Rebuild all wall
-    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+    for (WGGameObjectBuildingMap::const_iterator itr = m_buildingsInZone.begin(); itr != m_buildingsInZone.end(); ++itr)
         itr->second->Rebuild();
 
     UpdateAllGuardsAndTurretsBeforeBattle();
@@ -221,8 +217,8 @@ void WintergraspMgr::SetupWG(TeamId defender, bool StartWar)
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
     // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
-    for (WGWorkshop* workshop : Workshops)
-        workshop->UpdateGraveyardAndWorkshop();
+    for (WorkshopAndCapturePointMap::const_iterator itr = m_workshopAndCaptures.begin(); itr != m_workshopAndCaptures.end(); ++itr)
+        itr->second._workshopPoint->UpdateGraveyardAndWorkshop();
 
     uint32 gyID = _GetGraveyardIDByType(WGGraveyardId(BATTLEFIELD_WG_GY_KEEP));
     if (WGGraveyard* gy = GetGraveyardById(gyID))
@@ -293,65 +289,48 @@ void WintergraspMgr::InitializeWG()
     SetData(BATTLEFIELD_WG_DATA_WON_H, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_ATTACKED_H)));
     SetData(BATTLEFIELD_WG_DATA_DEF_H, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_DEFENDED_H)));
 
+    //part 1 - create pointer at graveyard
     for (uint8 i = 0; i < BATTLEFIELD_WG_GRAVEYARD_MAX; i++)
     {
         WGGraveyard* graveyard = new WGGraveyard(this);
-        switch (i)
-        {
-            case BATTLEFIELD_WG_GY_WORKSHOP_SE:
-                graveyard->Initialize(TEAM_NEUTRAL, Grave_SE->ID);
-                graveyard->SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_SE);
-                break;
-            case BATTLEFIELD_WG_GY_WORKSHOP_SW:
-                graveyard->Initialize(TEAM_NEUTRAL, Grave_SW->ID);
-                graveyard->SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_SW);
-                break;
-            case BATTLEFIELD_WG_GY_WORKSHOP_NE:
-                graveyard->Initialize(TEAM_NEUTRAL, Grave_NE->ID);
-                graveyard->SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_NE);
-                break;
-            case BATTLEFIELD_WG_GY_WORKSHOP_NW:
-                graveyard->Initialize(TEAM_NEUTRAL, Grave_NW->ID);
-                graveyard->SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_NW);
-                break;
-            case BATTLEFIELD_WG_GY_KEEP:
-                graveyard->Initialize(TEAM_NEUTRAL, Grave_Keep->ID);
-                graveyard->SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_KEEP);
-                break;
-            case BATTLEFIELD_WG_GY_HORDE:
-                graveyard->Initialize(TEAM_HORDE, Grave_Horde->ID);
-                graveyard->SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_HORDE);
-                break;
-            case BATTLEFIELD_WG_GY_ALLIANCE:
-                graveyard->Initialize(TEAM_ALLIANCE, Grave_Alliance->ID);
-                graveyard->SetTextId(BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE);
-                break;
-        }
+        graveyard->Initialize(WGGraveyardId(i));
         m_graveyardMap[graveyard->GetGraveyardId()] = graveyard;
     }
 
-    Workshops.resize(BATTLEFIELD_WG_WORKSHOP_MAX);
-    // Spawn workshop creatures and gameobjects
+    //part 2 - create workshop with capturepoint
     for (uint8 i = 0; i < BATTLEFIELD_WG_WORKSHOP_MAX; i++)
     {
-        if (WGWorkshop* workshop = new WGWorkshop(this, WintergraspWorkshopIds(i)))
-        {
-            if (workshop->GetType() < BATTLEFIELD_WG_WORKSHOP_NE)
-                workshop->InitialWorkshopAndCapturePoint(GetAttackerTeam(), workshop->GetType());
-            else
-                workshop->InitialWorkshopAndCapturePoint(GetDefenderTeam(), workshop->GetType());
+        WorkshopAndCapturePointPAIR wc;
+        WGWorkshop* workshop         = nullptr;
+        WGCapturePoint* capturePoint = nullptr;
 
-            // Note: Capture point is added once the gameobject is created.
-            Workshops[i] = workshop;
+        workshop = ASSERT_NOTNULL(new WGWorkshop(this, WintergraspWorkshopIds(i)));
+
+        // capture point should be only in first 4 workshops : SE/SW/NE/NW
+        if (i < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+        {
+            capturePoint = ASSERT_NOTNULL(new WGCapturePoint(this, WintergraspWorkshopIds(i), TEAM_NEUTRAL));
+
+            if (i < BATTLEFIELD_WG_WORKSHOP_NE)
+            {
+                workshop->GiveControlTo(GetAttackerTeam(), true);
+                capturePoint->SetInitialData(GetAttackerTeam());
+            }
+            else
+            {
+                workshop->GiveControlTo(GetDefenderTeam(), true);
+                capturePoint->SetInitialData(GetDefenderTeam());
+            }
         }
+        else
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        wc._capturePoint  = capturePoint;
+        wc._workshopPoint = workshop;
+        m_workshopAndCaptures[WintergraspWorkshopIds(i)] = wc;
     }
 
-    uint32 gyID = _GetGraveyardIDByType(WGGraveyardId(BATTLEFIELD_WG_GY_KEEP));
-    if (WGGraveyard* gy = GetGraveyardById(gyID))
-        gy->GiveControlTo(GetDefenderTeam());
-
-    //BuildingsInZone.resize(WG_MAX_OBJ);
-    // Spawn all gameobjects
+    //part 3 - create towers, walls and etc
     for (uint8 i = 0; i < WG_MAX_OBJ; i++)
     {
         if (GameObject* go = ASSERT_NOTNULL(SpawnGameObject(WGGameObjectBuildings[i].entry, WGGameObjectBuildings[i].pos, WGGameObjectBuildings[i].rot)))
@@ -362,7 +341,7 @@ void WintergraspMgr::InitializeWG()
                 if (!IsEnabled() && go->GetEntry() == GO_WINTERGRASP_VAULT_GATE)
                     go->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
 
-                BuildingsInZone[go->GetGUID()] = b;
+                m_buildingsInZone[go->GetGUID()] = b;
             }
             else
                 TC_LOG_ERROR("server", "WintergraspMgr: new WGGameObjectBuilding not created");
@@ -436,8 +415,9 @@ void WintergraspMgr::Update(uint32 diff)
     else
         m_uiAcceptTimer -= diff;
 
-    for (CapturePointContainer::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        itr->second->Update(diff);
+    for (auto pointer : m_workshopAndCaptures)
+        if (pointer.second._capturePoint)
+            pointer.second._capturePoint->Update(diff);
 
     if (m_LastResurrectTimer <= diff)
     {
@@ -529,8 +509,8 @@ void WintergraspMgr::OnBattleEnd(bool endByTimer)
     m_titansRelicGUID.Clear();
 
     // change collision wall state closed
-    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
-        itr->second->RebuildGate();
+    for (auto pointer : m_buildingsInZone)
+        pointer.second->RebuildGate();
 
     // successful defense
     if (endByTimer)
@@ -694,11 +674,6 @@ WGGraveyardId WintergraspMgr::GetSpiritGraveyardIdForCreature(Creature* creature
     return BATTLEFIELD_WG_GY_WORKSHOP_SE;
 }
 
-void WintergraspMgr::AddCapturePoint(WGCapturePoint* cp, WintergraspWorkshopIds workshopId)
-{
-    m_capturePoints[workshopId] = cp;
-}
-
 // Called when a tower is damaged, used for honor reward calcul
 void WintergraspMgr::UpdateDamagedTowerCount(TeamId team)
 {
@@ -760,19 +735,20 @@ void WintergraspMgr::UpdateDestroyedTowerCount(TeamId team)
 
 void WintergraspMgr::UpdateCounterVehicle(bool init)
 {
+    SetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H, 0);
+    SetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A, 0);
+
     if (init)
     {
         SetData(BATTLEFIELD_WG_DATA_VEHICLE_H, 0);
         SetData(BATTLEFIELD_WG_DATA_VEHICLE_A, 0);
-    }
-    SetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H, 0);
-    SetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A, 0);
+    }    
 
-    for (WGWorkshop* workshop : Workshops)
+    for (auto pointer : m_workshopAndCaptures)
     {
-        if (workshop->GetTeamControl() == TEAM_ALLIANCE)
+        if (pointer.second._workshopPoint->GetTeamControl() == TEAM_ALLIANCE)
             UpdateData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A, 4);
-        else if (workshop->GetTeamControl() == TEAM_HORDE)
+        else if (pointer.second._workshopPoint->GetTeamControl() == TEAM_HORDE)
             UpdateData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H, 4);
     }
 
@@ -787,5 +763,3 @@ void WintergraspMgr::UpdateVehicleCountWG()
     SendUpdateWorldState(WS_BATTLEFIELD_WG_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
     SendUpdateWorldState(WS_BATTLEFIELD_WG_MAX_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A));
 }
-
-

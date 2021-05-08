@@ -103,7 +103,7 @@ GameObject* WintergraspMgr::GetTowerGObyTowerID(WintergraspTowerIds towerID)
 {
     if (!m_Map)
         return nullptr;
-    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+    for (WGGameObjectBuildingMap::const_iterator itr = m_buildingsInZone.begin(); itr != m_buildingsInZone.end(); ++itr)
     {
         if (itr->second->IsTower() && itr->second->GetTowerId() == towerID)
             return m_Map->GetGameObject(itr->first);
@@ -113,7 +113,7 @@ GameObject* WintergraspMgr::GetTowerGObyTowerID(WintergraspTowerIds towerID)
 
 WGGameObjectBuilding* WintergraspMgr::GetBuildingTowerByGOEntry(uint32 entry)
 {
-    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+    for (WGGameObjectBuildingMap::const_iterator itr = m_buildingsInZone.begin(); itr != m_buildingsInZone.end(); ++itr)
     {
         if (itr->second->IsTower() && itr->second->GetGOEntry() == entry)
             return itr->second;
@@ -485,7 +485,7 @@ void WintergraspMgr::ShowNpc(Creature* creature, bool aggressive)
 
 void WintergraspMgr::_UpdateCreatureForBuildGO(WintergraspGameObject GOentry, Creature* creature, TeamId team)
 {
-    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+    for (WGGameObjectBuildingMap::const_iterator itr = m_buildingsInZone.begin(); itr != m_buildingsInZone.end(); ++itr)
     {
         if (itr->second->GetGOEntry() == GOentry)
         {
@@ -507,16 +507,16 @@ void WintergraspMgr::_UpdateCreatureForBuildGO(WintergraspGameObject GOentry, Cr
 
 void WintergraspMgr::_UpdateCreatureForWorkshop(WintergraspWorkshopIds workshopType, Creature* creature, TeamId team)
 {
-    for (WGWorkshop* workshop : Workshops)
+    for (auto pointer : m_workshopAndCaptures)
     {
-        if (workshop->GetType() == workshopType)
+        if (pointer.second._workshopPoint->GetType() == workshopType)
         {
             switch (creature->GetEntry())
             {
                 case NPC_WORKSHOP_MECHANIC_HORDE:
                 case NPC_WORKSHOP_MECHANIC_ALLIANCE:
                 {
-                    if (workshop->GetTeamControl() == team)
+                    if (pointer.second._workshopPoint->GetTeamControl() == team)
                         ShowNpc(creature, true);
                     else
                         HideNpc(creature);
@@ -525,7 +525,7 @@ void WintergraspMgr::_UpdateCreatureForWorkshop(WintergraspWorkshopIds workshopT
                 case BATTLEFIELD_WG_NPC_GUARD_H:
                 case BATTLEFIELD_WG_NPC_GUARD_A:
                 {
-                    if (workshop->GetTeamControl() == team)
+                    if (pointer.second._workshopPoint->GetTeamControl() == team)
                         ShowNpc(creature, true);
                     else
                         HideNpc(creature);
@@ -534,7 +534,7 @@ void WintergraspMgr::_UpdateCreatureForWorkshop(WintergraspWorkshopIds workshopT
                 case NPC_TAUNKA_SPIRIT_GUIDE:
                 case NPC_DWARVEN_SPIRIT_GUIDE:
                 {
-                    if (workshop->GetTeamControl() == team)
+                    if (pointer.second._workshopPoint->GetTeamControl() == team)
                         ShowNpc(creature, true);
                     else
                         HideNpc(creature);

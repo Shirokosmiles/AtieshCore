@@ -17,10 +17,11 @@
 
 #include "WGCapturePoint.h"
 #include "WintergraspMgr.h"
+#include "WGWorkshop.h"
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
 
-WGCapturePoint::WGCapturePoint(WintergraspMgr* WG, TeamId team)
+WGCapturePoint::WGCapturePoint(WintergraspMgr* WG, WintergraspWorkshopIds workshopType, TeamId team)
 {
     m_team = team;
     m_value = 0;
@@ -34,6 +35,10 @@ WGCapturePoint::WGCapturePoint(WintergraspMgr* WG, TeamId team)
 
     m_capturePointGUID.Clear();
     m_WG = WG;
+
+    GameObject* goWorkshop = ASSERT_NOTNULL(WG->SpawnGameObject(WGworkshopData[workshopType].entry, WGworkshopData[workshopType].Pos, WGworkshopData[workshopType].Rot));
+    SetCapturePointData(goWorkshop);
+    SetInitialData(team);
 }
 
 WGCapturePoint::~WGCapturePoint()
@@ -325,6 +330,12 @@ bool WGCapturePoint::Update(uint32 diff)
     }
 
     return false;
+}
+
+void WGCapturePoint::ChangeTeam(TeamId newTeam)
+{
+    WGWorkshop* ws = ASSERT_NOTNULL(m_WG->GetWGWorkshopByCapturePoint(this));
+    ws->GiveControlTo(newTeam);
 }
 
 void WGCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)

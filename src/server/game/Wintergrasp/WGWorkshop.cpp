@@ -208,27 +208,6 @@ WGWorkshop::~WGWorkshop()
     m_workshopGO.clear();
 }
 
-void WGWorkshop::InitialWorkshopAndCapturePoint(TeamId teamId, WintergraspWorkshopIds workshopType)
-{
-    if (workshopType < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-    {
-        if (GameObject* goWorkshop = ASSERT_NOTNULL(_wg->SpawnGameObject(WGworkshopData[workshopType].entry, WGworkshopData[workshopType].Pos, WGworkshopData[workshopType].Rot)))
-        {
-            m_workshopGO.push_back(goWorkshop->GetGUID());
-
-            if (WGCapturePoint* capturePoint = new WGCapturePoint(_wg, teamId))
-            {
-                capturePoint->SetCapturePointData(goWorkshop);
-                capturePoint->LinkToWorkshop(this);
-                capturePoint->SetInitialData(teamId);
-                _wg->AddCapturePoint(capturePoint, workshopType);
-            }
-        }
-    }
-
-    GiveControlTo(teamId, true);
-}
-
 void WGWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
 {
     switch (teamId)

@@ -333,11 +333,11 @@ void WintergraspMgr::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
     packet.Worldstates.emplace_back(WS_BATTLEFIELD_WG_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
     packet.Worldstates.emplace_back(WS_BATTLEFIELD_WG_MAX_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A));
 
-    for (WGGameObjectBuildingMap::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
-        itr->second->FillInitialWorldStates(packet);
+    for (auto pointer : m_buildingsInZone)
+        pointer.second->FillInitialWorldStates(packet);
 
-    for (WGWorkshop* workshop : Workshops)
-        workshop->FillInitialWorldStates(packet);
+    for (auto pointer : m_workshopAndCaptures)
+        pointer.second._workshopPoint->FillInitialWorldStates(packet);
 }
 
 void WintergraspMgr::SendWarning(uint8 id, WorldObject const* target /*= nullptr*/)

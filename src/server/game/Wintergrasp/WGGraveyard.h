@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WintergraspMgr.h"
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
 
  // some class predefs
 class Creature;
 class Player;
-class WintergraspMgr;
 
 class TC_GAME_API WGGraveyard
 {
@@ -37,7 +37,7 @@ public:
     float GetDistance(Player* player);
 
     // Initialize the graveyard
-    void Initialize(TeamId startcontrol, uint32 gy);
+    void Initialize(WGGraveyardId type);
 
     // Set spirit service for the graveyard
     void SetSpirit(Creature* spirit, TeamId team);

@@ -102,8 +102,9 @@ void WintergraspMgr::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
                 RemovePlayer(player);
         }
 
-        for (CapturePointContainer::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-            itr->second->HandlePlayerLeave(player);
+        for (auto pointer : m_workshopAndCaptures)
+            if (pointer.second._capturePoint)
+                pointer.second._capturePoint->HandlePlayerLeave(player);
     }
 
     SendRemoveWorldStates(player);
@@ -922,19 +923,44 @@ void WintergraspMgr::OnGameObjectCreate(GameObject* go)
     go->SetFarVisible(true);
     go->setActive(true);
 
-    RecheckForTowerGORespawn(go);
+    RecheckImportantGORespawn(go);
 }
 
-void WintergraspMgr::OnGameObjectRemove(GameObject* go)
+void WintergraspMgr::OnGameObjectRemove(GameObject* oldGO)
 {
-    /*possibly can be used later*/
+    //if (idk why) some GO from static (buildings) will be removed -> we will create a new copy
+    for (uint8 i = 0; i < WG_MAX_OBJ; i++)
+    {
+        if (oldGO->GetEntry() == WGGameObjectBuildings[i].entry)
+            SpawnGameObject(WGGameObjectBuildings[i].entry, WGGameObjectBuildings[i].pos, WGGameObjectBuildings[i].rot);
+    }    
 }
 
-void WintergraspMgr::RecheckForTowerGORespawn(GameObject* go)
+void WintergraspMgr::RecheckImportantGORespawn(GameObject* go)
 {
-    bool _isGOTower = false;
+    bool _isGOTower      = false;
+    bool _isCapturePoint = false;
     switch (go->GetEntry())
     {
+        // capture point sections
+        case GO_WINTERGRASP_FACTORY_BANNER_NE:
+            if (GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_NE))
+                GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_NE)->SetCapturePointData(go);
+            break;
+        case GO_WINTERGRASP_FACTORY_BANNER_NW:
+            if (GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_NW))
+                GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_NW)->SetCapturePointData(go);
+            break;
+        case GO_WINTERGRASP_FACTORY_BANNER_SE:
+            if (GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_SE))
+                GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_SE)->SetCapturePointData(go);
+            break;
+        case GO_WINTERGRASP_FACTORY_BANNER_SW:
+            if (GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_SW))
+                GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_SW)->SetCapturePointData(go);
+            break;
+
+        // tower sections
         case GO_WINTERGRASP_FORTRESS_TOWER_NW:
         case GO_WINTERGRASP_FORTRESS_TOWER_SW:
         case GO_WINTERGRASP_FORTRESS_TOWER_SE:
@@ -948,18 +974,18 @@ void WintergraspMgr::RecheckForTowerGORespawn(GameObject* go)
             break;
     }
 
-    if (!_isGOTower)
-        return;
-
-    WGGameObjectBuilding* towerBuilding = GetBuildingTowerByGOEntry(go->GetEntry());
-    if (towerBuilding)
+    if (_isGOTower)
     {
-        // remove WGGameObjectBuilding with old GUID from map
-        BuildingsInZone.erase(towerBuilding->GetGUID());
-        // init GO for exist WGGameObjectBuilding
-        towerBuilding->Init(go);
-        // add updated WGGameObjectBuilding in map again
-        BuildingsInZone[go->GetGUID()] = towerBuilding;
-        TC_LOG_ERROR("system", "WintergraspMgr::RecheckForTowerGORespawn(GameObject %u) : %u", go->GetEntry());
+        WGGameObjectBuilding* towerBuilding = GetBuildingTowerByGOEntry(go->GetEntry());
+        if (towerBuilding)
+        {
+            // remove WGGameObjectBuilding with old GUID from map
+            m_buildingsInZone.erase(towerBuilding->GetGUID());
+            // init GO for exist WGGameObjectBuilding
+            towerBuilding->Init(go);
+            // add updated WGGameObjectBuilding in map again
+            m_buildingsInZone[go->GetGUID()] = towerBuilding;
+            TC_LOG_ERROR("system", "WintergraspMgr::RecheckForTowerGORespawn(GameObject %u) : %u", go->GetEntry());
+        }
     }
 }
