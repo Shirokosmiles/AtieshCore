@@ -216,6 +216,9 @@ bool WGCapturePoint::DelCapturePoint()
 
 bool WGCapturePoint::Update(uint32 diff)
 {
+    if (!m_WG->IsWarTime())
+        return false;
+
     GameObject* capturePoint = m_WG->GetGameObject(m_capturePointGUID);
     if (!capturePoint)
         return false;
