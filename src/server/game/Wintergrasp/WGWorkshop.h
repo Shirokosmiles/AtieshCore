@@ -39,6 +39,8 @@ public:
 
     void UpdateCreatureAndGo();
 
+    void CleanBeforeDelete();
+
 private:
     uint32 _GetWorldStateForType(WintergraspWorkshopIds workshopType);
     uint8 _GetAllianceCapture(WintergraspWorkshopIds workshopType);
@@ -60,6 +62,4 @@ private:
 
     // GameObject associations
     GuidVector m_GOList[3];
-    // Flag banner GO with CapturePoint for spawn and despawn
-    GuidVector m_workshopGO;
 };

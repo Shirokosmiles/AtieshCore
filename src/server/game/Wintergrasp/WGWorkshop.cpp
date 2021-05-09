@@ -203,9 +203,7 @@ WGWorkshop::~WGWorkshop()
     _teamControl = TEAM_ALLIANCE;
     _type = BATTLEFIELD_WG_WORKSHOP_SE;
     // note : in WintergraspWorkshop  in m_GameObjectList we have 3 team (TEAM_NEUTRALL) too
-    for (int8 i = 0; i < 3; i++)
-        m_GOList[i].clear();
-    m_workshopGO.clear();
+    CleanBeforeDelete();
 }
 
 void WGWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
@@ -398,4 +396,15 @@ void WGWorkshop::FillInitialWorldStates(WorldPackets::WorldState::InitWorldState
 void WGWorkshop::Save()
 {
     sWorld->setWorldState(_worldStateId, _state);
+}
+
+void WGWorkshop::CleanBeforeDelete()
+{
+    for (int8 i = 0; i < 3; i++)
+    {
+        for (ObjectGuid guid : m_GOList[i])
+            if (GameObject* go = _wg->GetGameObject(guid))
+                go->DespawnOrUnsummon();
+        m_GOList[i].clear();
+    }
 }
