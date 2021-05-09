@@ -985,7 +985,7 @@ void WintergraspMgr::RecheckImportantGORespawn(GameObject* go)
             towerBuilding->Init(go);
             // add updated WGGameObjectBuilding in map again
             m_buildingsInZone[go->GetGUID()] = towerBuilding;
-            TC_LOG_ERROR("system", "WintergraspMgr::RecheckForTowerGORespawn(GameObject %u) : %u", go->GetEntry());
+            TC_LOG_ERROR("system", "WintergraspMgr::RecheckForTowerGORespawn(GameObject %u)", go->GetEntry());
         }
     }
 }
