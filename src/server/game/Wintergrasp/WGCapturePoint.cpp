@@ -56,6 +56,8 @@ WGCapturePoint::~WGCapturePoint()
     m_neutralValuePct = 0;
     m_maxSpeed = 0;
 
+    if (GameObject* capturePoint = m_WG->GetGameObject(m_capturePointGUID))
+        capturePoint->DespawnOrUnsummon();
     m_capturePointGUID.Clear();
     m_WG = nullptr;
 }

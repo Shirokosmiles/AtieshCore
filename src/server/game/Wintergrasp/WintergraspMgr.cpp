@@ -93,6 +93,8 @@ WintergraspMgr::WintergraspMgr()
     m_DefenderTeam = TEAM_ALLIANCE;
     m_tenacityTeam = TEAM_ALLIANCE;
 
+    if (Creature* StalkerCreature = GetCreature(StalkerGuid))
+        StalkerCreature->DespawnOrUnsummon();
     StalkerGuid.Clear();
     m_titansRelicGUID.Clear();
 
