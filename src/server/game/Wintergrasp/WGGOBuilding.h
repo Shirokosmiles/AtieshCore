@@ -52,6 +52,8 @@ public:
     WintergraspTowerIds GetTowerId() { return _TowerId; }
     ObjectGuid GetGUID() { return _GOGUID; }
 
+    void CleanBeforeDelete();
+
 private:
     uint8 _GetTextDamaged(WintergraspGameObjectBuildingType type);
     uint8 _GetTextDestroyed(WintergraspGameObjectBuildingType type);

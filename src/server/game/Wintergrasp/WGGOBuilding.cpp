@@ -242,8 +242,7 @@ WGGameObjectBuilding::~WGGameObjectBuilding()
     _type          = BATTLEFIELD_WG_OBJECTTYPE_DOOR;
     _worldState    = 0;
     _state         = BATTLEFIELD_WG_OBJECTSTATE_NONE;
-    for (int8 i = 0; i < 3; i++)
-        m_GameObjectList[i].clear();
+    CleanBeforeDelete();
     _isTower = false;
     _TowerId       = BATTLEFIELD_WG_TOWER_FORTRESS_NW;
     _TextDamaged   = 0;
@@ -545,4 +544,15 @@ void WGGameObjectBuilding::FillInitialWorldStates(WorldPackets::WorldState::Init
 void WGGameObjectBuilding::Save()
 {
     sWorld->setWorldState(_worldState, _state);
+}
+
+void WGGameObjectBuilding::CleanBeforeDelete()
+{
+    for (int8 i = 0; i < 3; i++)
+    {
+        for (ObjectGuid guid : m_GameObjectList[i])
+            if (GameObject* go = _wg->GetGameObject(guid))
+                go->DespawnOrUnsummon();
+        m_GameObjectList[i].clear();
+    }
 }

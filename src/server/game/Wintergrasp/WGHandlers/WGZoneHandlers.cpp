@@ -928,12 +928,9 @@ void WintergraspMgr::OnGameObjectCreate(GameObject* go)
 
 void WintergraspMgr::OnGameObjectRemove(GameObject* oldGO)
 {
-    //if (idk why) some GO from static (buildings) will be removed -> we will create a new copy
-    for (uint8 i = 0; i < WG_MAX_OBJ; i++)
-    {
-        if (oldGO->GetEntry() == WGGameObjectBuildings[i].entry)
-            SpawnGameObject(WGGameObjectBuildings[i].entry, WGGameObjectBuildings[i].pos, WGGameObjectBuildings[i].rot);
-    }    
+    WGGameObjectBuilding* towerBuilding = GetBuildingTowerByGOEntry(oldGO->GetEntry());
+    if (towerBuilding)
+        towerBuilding->CleanBeforeDelete();
 }
 
 void WintergraspMgr::RecheckImportantGORespawn(GameObject* go)
