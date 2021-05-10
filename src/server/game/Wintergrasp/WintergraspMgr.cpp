@@ -93,10 +93,9 @@ WintergraspMgr::WintergraspMgr()
     m_DefenderTeam = TEAM_ALLIANCE;
     m_tenacityTeam = TEAM_ALLIANCE;
 
-    if (Creature* StalkerCreature = GetCreature(StalkerGuid))
-        StalkerCreature->DespawnOrUnsummon();
-    StalkerGuid.Clear();
-    m_titansRelicGUID.Clear();
+    m_StalkerGuid.Clear();
+    m_TitansRelicGUID.Clear();
+    m_KeepCollisionWall.Clear();
 
     // Init Graveyards
     Grave_NW       = ASSERT_NOTNULL(sDBCStoresMgr->GetWorldSafeLocsDBC(1330));
@@ -168,8 +167,11 @@ WintergraspMgr::~WintergraspMgr()
     m_DefenderTeam = TEAM_ALLIANCE;
     m_tenacityTeam = TEAM_ALLIANCE;
 
-    StalkerGuid.Clear();
-    m_titansRelicGUID.Clear();
+    if (Creature* StalkerCreature = GetCreature(m_StalkerGuid))
+        StalkerCreature->DespawnOrUnsummon();
+    m_StalkerGuid.Clear();
+    m_TitansRelicGUID.Clear();
+    m_KeepCollisionWall.Clear();
 
     Grave_NW       = nullptr;
     Grave_NE       = nullptr;
@@ -201,14 +203,14 @@ void WintergraspMgr::SetupWG(TeamId defender, bool StartWar)
             relic->SetFaction(WintergraspFaction[GetAttackerTeam()]);
             // Set in use (not allow to click on before last door is broken)
             relic->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
-            m_titansRelicGUID = relic->GetGUID();
+            m_TitansRelicGUID = relic->GetGUID();
         }
         else
             TC_LOG_ERROR("bg.battlefield", "WG: Failed to spawn titan relic.");
     }
     // Rebuild all wall
-    for (WGGameObjectBuildingMap::const_iterator itr = m_buildingsInZone.begin(); itr != m_buildingsInZone.end(); ++itr)
-        itr->second->Rebuild();
+    for (auto pointer : m_buildingsInZone)
+        pointer.second->Rebuild();
 
     UpdateAllGuardsAndTurretsBeforeBattle();
     UpdateAllGOforKeep();
@@ -219,26 +221,12 @@ void WintergraspMgr::SetupWG(TeamId defender, bool StartWar)
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
     // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
-    for (WorkshopAndCapturePointMap::const_iterator itr = m_workshopAndCaptures.begin(); itr != m_workshopAndCaptures.end(); ++itr)
-        itr->second._workshopPoint->UpdateGraveyardAndWorkshop();
+    for (auto pointer : m_workshopAndCaptures)
+        pointer.second._workshopPoint->UpdateGraveyardAndWorkshop();
 
     uint32 gyID = _GetGraveyardIDByType(WGGraveyardId(BATTLEFIELD_WG_GY_KEEP));
     if (WGGraveyard* gy = GetGraveyardById(gyID))
         gy->GiveControlTo(GetDefenderTeam());
-
-    for (PlayerHolderContainer::iterator itr = m_PlayerMap.begin(); itr != m_PlayerMap.end(); ++itr)
-        if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-        {
-            SendInitWorldStatesTo(player);
-
-            if (itr->second.inZone)
-            {
-                float x, y, z;
-                player->GetPosition(x, y, z);
-                if (5500 > x && x > 5392 && y < 2880 && y > 2800 && z < 480)
-                    player->TeleportTo(571, 5349.8686f, 2838.481f, 409.240f, 0.046328f);
-            }
-        }
 
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
@@ -335,19 +323,8 @@ void WintergraspMgr::InitializeWG()
     //part 3 - create towers, walls and etc
     for (uint8 i = 0; i < WG_MAX_OBJ; i++)
     {
-        if (GameObject* go = ASSERT_NOTNULL(SpawnGameObject(WGGameObjectBuildings[i].entry, WGGameObjectBuildings[i].pos, WGGameObjectBuildings[i].rot)))
-        {
-            if (WGGameObjectBuilding* b = new WGGameObjectBuilding(this, WGGameObjectBuildings[i].type, WGGameObjectBuildings[i].WorldState))
-            {
-                b->Init(go);
-                if (!IsEnabled() && go->GetEntry() == GO_WINTERGRASP_VAULT_GATE)
-                    go->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
-
-                m_buildingsInZone[go->GetGUID()] = b;
-            }
-            else
-                TC_LOG_ERROR("server", "WintergraspMgr: new WGGameObjectBuilding not created");
-        }
+        if (WGGameObjectBuilding* b = new WGGameObjectBuilding(this, WGGameObjectBuildings[i].type, WGGameObjectBuildings[i].WorldState))
+            m_buildingsInZone[WGGameObjectBuildings[i].entry] = b;
     }
 
     // Spawning portal defender
@@ -505,14 +482,14 @@ void WintergraspMgr::OnBattleStart()
 void WintergraspMgr::OnBattleEnd(bool endByTimer)
 {
     // Remove relic
-    if (m_titansRelicGUID)
-        if (GameObject* relic = GetGameObject(m_titansRelicGUID))
+    if (m_TitansRelicGUID)
+        if (GameObject* relic = GetGameObject(m_TitansRelicGUID))
             relic->RemoveFromWorld();
-    m_titansRelicGUID.Clear();
+    m_TitansRelicGUID.Clear();
 
     // change collision wall state closed
-    for (auto pointer : m_buildingsInZone)
-        pointer.second->RebuildGate();
+    if (GameObject* kGO = GetGameObject(m_KeepCollisionWall))
+        kGO->SetGoState(GO_STATE_READY); //not GO_STATE_ACTIVE
 
     // successful defense
     if (endByTimer)

@@ -26,7 +26,7 @@
 void WintergraspMgr::InitStalker(uint32 entry, Position const& pos)
 {
     if (Creature* creature = SpawnCreature(entry, pos))
-        StalkerGuid = creature->GetGUID();
+        m_StalkerGuid = creature->GetGUID();
     else
         TC_LOG_ERROR("bg.battlefield", "Battlefield::InitStalker: Could not spawn Stalker (Creature entry %u), zone messages will be unavailable!", entry);
 }
@@ -106,18 +106,17 @@ GameObject* WintergraspMgr::GetTowerGObyTowerID(WintergraspTowerIds towerID)
     for (WGGameObjectBuildingMap::const_iterator itr = m_buildingsInZone.begin(); itr != m_buildingsInZone.end(); ++itr)
     {
         if (itr->second->IsTower() && itr->second->GetTowerId() == towerID)
-            return m_Map->GetGameObject(itr->first);
+            if (itr->second->GetGUID())
+                return m_Map->GetGameObject(itr->second->GetGUID());
     }
-    return nullptr;    
+    return nullptr;
 }
 
-WGGameObjectBuilding* WintergraspMgr::GetBuildingTowerByGOEntry(uint32 entry)
+WGGameObjectBuilding* WintergraspMgr::GetBuildingByGOEntry(uint32 entry)
 {
-    for (WGGameObjectBuildingMap::const_iterator itr = m_buildingsInZone.begin(); itr != m_buildingsInZone.end(); ++itr)
-    {
-        if (itr->second->IsTower() && itr->second->GetGOEntry() == entry)
+    WGGameObjectBuildingMap::const_iterator itr = m_buildingsInZone.find(entry);
+    if (itr != m_buildingsInZone.end())
             return itr->second;
-    }
     return nullptr;
 }
 
@@ -485,62 +484,60 @@ void WintergraspMgr::ShowNpc(Creature* creature, bool aggressive)
 
 void WintergraspMgr::_UpdateCreatureForBuildGO(WintergraspGameObject GOentry, Creature* creature, TeamId team)
 {
-    for (WGGameObjectBuildingMap::const_iterator itr = m_buildingsInZone.begin(); itr != m_buildingsInZone.end(); ++itr)
+    WGGameObjectBuildingMap::const_iterator itr = m_buildingsInZone.find(GOentry);
+    if (itr != m_buildingsInZone.end())
     {
-        if (itr->second->GetGOEntry() == GOentry)
+        if (!itr->second->IsAlive())
+            HideNpc(creature);
+        else
         {
-            if (!itr->second->IsAlive())
-                HideNpc(creature);
-            else
+            if (itr->second->GetTeamController() == team || creature->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
             {
-                if (itr->second->GetTeamController() == team || creature->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
-                {
-                    creature->SetFaction(WintergraspFaction[itr->second->GetTeamController()]);
-                    ShowNpc(creature, true);
-                }
-                else
-                    HideNpc(creature);
+                creature->SetFaction(WintergraspFaction[itr->second->GetTeamController()]);
+                ShowNpc(creature, true);
             }
+            else
+                HideNpc(creature);
         }
     }
 }
 
 void WintergraspMgr::_UpdateCreatureForWorkshop(WintergraspWorkshopIds workshopType, Creature* creature, TeamId team)
 {
-    for (auto pointer : m_workshopAndCaptures)
+    WorkshopAndCapturePointMap::const_iterator itr = m_workshopAndCaptures.find(workshopType);
+    if (itr != m_workshopAndCaptures.end())
     {
-        if (pointer.second._workshopPoint->GetType() == workshopType)
+        switch (creature->GetEntry())
         {
-            switch (creature->GetEntry())
+            case NPC_WORKSHOP_MECHANIC_HORDE:
+            case NPC_WORKSHOP_MECHANIC_ALLIANCE:
             {
-                case NPC_WORKSHOP_MECHANIC_HORDE:
-                case NPC_WORKSHOP_MECHANIC_ALLIANCE:
-                {
-                    if (pointer.second._workshopPoint->GetTeamControl() == team)
-                        ShowNpc(creature, true);
-                    else
-                        HideNpc(creature);
-                    break;
-                }
-                case BATTLEFIELD_WG_NPC_GUARD_H:
-                case BATTLEFIELD_WG_NPC_GUARD_A:
-                {
-                    if (pointer.second._workshopPoint->GetTeamControl() == team)
-                        ShowNpc(creature, true);
-                    else
-                        HideNpc(creature);
-                    break;
-                }
-                case NPC_TAUNKA_SPIRIT_GUIDE:
-                case NPC_DWARVEN_SPIRIT_GUIDE:
-                {
-                    if (pointer.second._workshopPoint->GetTeamControl() == team)
-                        ShowNpc(creature, true);
-                    else
-                        HideNpc(creature);
-                    break;
-                }
+                if (itr->second._workshopPoint->GetTeamControl() == team)
+                    ShowNpc(creature, true);
+                else
+                    HideNpc(creature);
+                break;
             }
+            case BATTLEFIELD_WG_NPC_GUARD_H:
+            case BATTLEFIELD_WG_NPC_GUARD_A:
+            {
+                if (itr->second._workshopPoint->GetTeamControl() == team)
+                    ShowNpc(creature, true);
+                else
+                    HideNpc(creature);
+                break;
+            }
+            case NPC_TAUNKA_SPIRIT_GUIDE:
+            case NPC_DWARVEN_SPIRIT_GUIDE:
+            {
+                if (itr->second._workshopPoint->GetTeamControl() == team)
+                    ShowNpc(creature, true);
+                else
+                    HideNpc(creature);
+                break;
+            }
+            default:
+                break;
         }
     }
 }

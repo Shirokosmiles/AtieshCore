@@ -342,7 +342,7 @@ void WintergraspMgr::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
 
 void WintergraspMgr::SendWarning(uint8 id, WorldObject const* target /*= nullptr*/)
 {
-    if (Creature* stalker = GetCreature(StalkerGuid))
+    if (Creature* stalker = GetCreature(m_StalkerGuid))
         sCreatureTextMgr->SendChat(stalker, id, target);
 }
 
@@ -595,7 +595,7 @@ void WintergraspMgr::PromotePlayer(Player* killer)
         {
             killer->RemoveAura(SPELL_RECRUIT);
             killer->CastSpell(killer, SPELL_CORPORAL, true);
-            if (Creature* stalker = GetCreature(StalkerGuid))
+            if (Creature* stalker = GetCreature(m_StalkerGuid))
                 sCreatureTextMgr->SendChat(stalker, BATTLEFIELD_WG_TEXT_RANK_CORPORAL, killer, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_OTHER, false, killer);
         }
         else
@@ -607,7 +607,7 @@ void WintergraspMgr::PromotePlayer(Player* killer)
         {
             killer->RemoveAura(SPELL_CORPORAL);
             killer->CastSpell(killer, SPELL_LIEUTENANT, true);
-            if (Creature* stalker = GetCreature(StalkerGuid))
+            if (Creature* stalker = GetCreature(m_StalkerGuid))
                 sCreatureTextMgr->SendChat(stalker, BATTLEFIELD_WG_TEXT_RANK_FIRST_LIEUTENANT, killer, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_OTHER, false, killer);
         }
         else
@@ -617,16 +617,24 @@ void WintergraspMgr::PromotePlayer(Player* killer)
 
 void WintergraspMgr::_OnBattleStartPlayers()
 {
-    // Dismount players in zone when start WG
     for (PlayerHolderContainer::const_iterator itr = m_PlayerMap.begin(); itr != m_PlayerMap.end(); ++itr)
     {
         if (itr->second.inZone)
         {
             if (Player* player = ObjectAccessor::FindPlayer(itr->first))
             {
+                // Dismount players in zone when start WG
                 if (player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
                     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
                 player->AddAura(12438, player);
+
+                SendInitWorldStatesTo(player);
+
+                // Teleport outzoned guys?
+                float x, y, z;
+                player->GetPosition(x, y, z);
+                if (5500 > x && x > 5392 && y < 2880 && y > 2800 && z < 480)
+                    player->TeleportTo(571, 5349.8686f, 2838.481f, 409.240f, 0.046328f);
             }
         }
     }

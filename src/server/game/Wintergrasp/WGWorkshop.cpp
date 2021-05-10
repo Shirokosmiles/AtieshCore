@@ -382,10 +382,15 @@ void WGWorkshop::UpdateCreatureAndGo()
 
 void WGWorkshop::UpdateGraveyardAndWorkshop()
 {
+    TeamId team = TEAM_NEUTRAL;
     if (_type < BATTLEFIELD_WG_WORKSHOP_NE)
-        GiveControlTo(_wg->GetAttackerTeam(), true);
+        team = _wg->GetAttackerTeam();
     else
-        GiveControlTo(_wg->GetDefenderTeam(), true);
+        team = _wg->GetDefenderTeam();
+
+    GiveControlTo(team, true);
+    if (_wg->GetCapturePoint(_type))
+        _wg->GetCapturePoint(_type)->SetInitialData(team);
 }
 
 void WGWorkshop::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)

@@ -224,7 +224,7 @@ WGGameObjectBuilding::WGGameObjectBuilding(WintergraspMgr* wg, WintergraspGameOb
     _teamControl   = TEAM_NEUTRAL;
     _type          = type;
     _worldState    = worldState;
-    _state = BATTLEFIELD_WG_OBJECTSTATE_NONE;
+    _state = WintergraspGameObjectState(sWorld->getWorldState(worldState));
     for (int8 i = 0; i < 3; i++)
         m_GameObjectList[i].clear();
     _isTower       = false;
@@ -267,6 +267,10 @@ void WGGameObjectBuilding::Rebuild()
             break;
     }
 
+    // Update worldstate
+    _state = WintergraspGameObjectState(BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT - (_teamControl * 3));
+    _wg->SendUpdateWorldState(_worldState, _state);
+
     if (GameObject* build = _wg->GetGameObject(_GOGUID))
     {
         // Rebuild gameobject
@@ -274,28 +278,11 @@ void WGGameObjectBuilding::Rebuild()
         {
             build->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
             if (build->GetEntry() == GO_WINTERGRASP_VAULT_GATE)
-                if (GameObject* go = build->FindNearestGameObject(GO_WINTERGRASP_KEEP_COLLISION_WALL, 50.0f))
+                if (GameObject* go = _wg->GetKeepCollisionWall())
                     go->SetGoState(GO_STATE_ACTIVE);
-
-            // Update worldstate
-            _state = WintergraspGameObjectState(BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT - (_teamControl * 3));
-            _wg->SendUpdateWorldState(_worldState, _state);
         }
         build->SetFaction(WintergraspFaction[_teamControl]);
         UpdateGo();
-    }
-    Save();
-}
-
-void WGGameObjectBuilding::RebuildGate()
-{
-    if (GameObject* build = _wg->GetGameObject(_GOGUID))
-    {
-        if (build->IsDestructibleBuilding() && build->GetEntry() == GO_WINTERGRASP_VAULT_GATE)
-        {
-            if (GameObject* go = build->FindNearestGameObject(GO_WINTERGRASP_KEEP_COLLISION_WALL, 50.0f))
-                go->SetGoState(GO_STATE_READY); //not GO_STATE_ACTIVE
-        }
     }
     Save();
 }
@@ -331,23 +318,8 @@ void WGGameObjectBuilding::Damaged()
             _wg->HideCreatureTurretByNPCType(EAST_TOWER_TURRET);
             break;
         }
-
-        case GO_WINTERGRASP_FACTORY_BANNER_NE: break;
-        case GO_WINTERGRASP_FACTORY_BANNER_NW: break;
-        case GO_WINTERGRASP_FACTORY_BANNER_SE: break;
-        case GO_WINTERGRASP_FACTORY_BANNER_SW: break;
-
-        case GO_WINTERGRASP_TITAN_S_RELIC: break;
-
-        case GO_WINTERGRASP_FORTRESS_TOWER_NW: break;
-        case GO_WINTERGRASP_FORTRESS_TOWER_SW: break;
-        case GO_WINTERGRASP_FORTRESS_TOWER_SE: break;
-        case GO_WINTERGRASP_FORTRESS_TOWER_NE: break;
-
-        case GO_WINTERGRASP_FORTRESS_GATE: break;
-        case GO_WINTERGRASP_VAULT_GATE: break;
-
-        case GO_WINTERGRASP_KEEP_COLLISION_WALL: break;
+        default:
+            break;
     }
 
     if (_type == BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER)
@@ -375,8 +347,7 @@ void WGGameObjectBuilding::Destroyed()
             _wg->UpdateDestroyedTowerCount(_teamControl);
             break;
         case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
-            if (GameObject* build = _wg->GetGameObject(_GOGUID))
-                if (GameObject* go = build->FindNearestGameObject(GO_WINTERGRASP_KEEP_COLLISION_WALL, 50.0f))
+            if (GameObject* go = _wg->GetKeepCollisionWall())
                     go->SetGoState(GO_STATE_ACTIVE);
             _wg->SetRelicInteractible(true);
             if (_wg->GetRelic())
@@ -395,8 +366,6 @@ void WGGameObjectBuilding::Destroyed()
 void WGGameObjectBuilding::Init(GameObject* go)
 {
     ASSERT_NOTNULL(go);
-    go->setActive(true);
-    go->SetFarVisible(true);
     // GameObject associated to object
     _GOGUID = go->GetGUID();
     switch (_type)
@@ -415,7 +384,6 @@ void WGGameObjectBuilding::Init(GameObject* go)
             break;
     }
 
-    _state = WintergraspGameObjectState(sWorld->getWorldState(_worldState));
     switch (_state)
     {
         case BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_INTACT:

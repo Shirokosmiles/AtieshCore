@@ -89,25 +89,54 @@ enum BattlefieldSounds
 
 enum WintergraspGameObject : uint32
 {
+    // Walls
+    GO_WINTERGRASP_WALL_1 = 190219,
+    GO_WINTERGRASP_WALL_2 = 190220,
+    GO_WINTERGRASP_WALL_3 = 191795,
+    GO_WINTERGRASP_WALL_4 = 191796,
+    GO_WINTERGRASP_WALL_5 = 191799,
+    GO_WINTERGRASP_WALL_6 = 191800,
+    GO_WINTERGRASP_WALL_7 = 191801,
+    GO_WINTERGRASP_WALL_8 = 191802,
+    GO_WINTERGRASP_WALL_9 = 191803,
+    GO_WINTERGRASP_WALL_10 = 191804,
+    GO_WINTERGRASP_WALL_11 = 191806,
+    GO_WINTERGRASP_WALL_12 = 191807,
+    GO_WINTERGRASP_WALL_13 = 191808,
+    GO_WINTERGRASP_WALL_14 = 191809,
+    GO_WINTERGRASP_WALL_15 = 190369,
+    GO_WINTERGRASP_WALL_16 = 190370,
+    GO_WINTERGRASP_WALL_17 = 190371,
+    GO_WINTERGRASP_WALL_18 = 190372,
+    GO_WINTERGRASP_WALL_19 = 190374,
+    GO_WINTERGRASP_WALL_20 = 190376,
+    GO_WINTERGRASP_WALL_21 = 191797,
+    GO_WINTERGRASP_WALL_22 = 191798,
+    GO_WINTERGRASP_WALL_23 = 191805,
+
+    // Tower of keep (spawned in db)
+    GO_WINTERGRASP_FORTRESS_TOWER_NW = 190221,
+    GO_WINTERGRASP_FORTRESS_TOWER_SW = 190373,
+    GO_WINTERGRASP_FORTRESS_TOWER_SE = 190377,
+    GO_WINTERGRASP_FORTRESS_TOWER_NE = 190378,    
+
+    // South tower (spawned in db)
+    GO_WINTERGRASP_SHADOWSIGHT_TOWER             = 190356, // W
+    GO_WINTERGRASP_WINTER_S_EDGE_TOWER           = 190357, // S
+    GO_WINTERGRASP_FLAMEWATCH_TOWER              = 190358, // E
+
+    // Workshop banners (spawned in db)
     GO_WINTERGRASP_FACTORY_BANNER_NE             = 190475,
     GO_WINTERGRASP_FACTORY_BANNER_NW             = 190487,
     GO_WINTERGRASP_FACTORY_BANNER_SE             = 194959,
     GO_WINTERGRASP_FACTORY_BANNER_SW             = 194962,
 
+    // TitanRelic GO (not spawned in db)
     GO_WINTERGRASP_TITAN_S_RELIC                 = 192829,
 
-    GO_WINTERGRASP_FORTRESS_TOWER_NW             = 190221,
-    GO_WINTERGRASP_FORTRESS_TOWER_SW             = 190373,
-    GO_WINTERGRASP_FORTRESS_TOWER_SE             = 190377,
-    GO_WINTERGRASP_FORTRESS_TOWER_NE             = 190378,
-
-    GO_WINTERGRASP_SHADOWSIGHT_TOWER             = 190356,
-    GO_WINTERGRASP_WINTER_S_EDGE_TOWER           = 190357,
-    GO_WINTERGRASP_FLAMEWATCH_TOWER              = 190358,
-
+    // Misc GO (spawned in db)
     GO_WINTERGRASP_FORTRESS_GATE                 = 190375,
     GO_WINTERGRASP_VAULT_GATE                    = 191810,
-
     GO_WINTERGRASP_KEEP_COLLISION_WALL           = 194323
 };
 
@@ -368,7 +397,7 @@ struct WintergraspBuildingSpawnData
 uint8 const WG_MAX_OBJ = 32;
 WintergraspBuildingSpawnData const WGGameObjectBuildings[WG_MAX_OBJ] =
 {
-    // Wall (Not spawned in db)
+    // Wall (spawned in db)
     // Entry  WS      X          Y          Z           O                rX   rY   rZ             rW             Type
     { 190219, 3749, { 5371.457f, 3047.472f, 407.5710f,  3.14159300f }, { 0.f, 0.f, -1.000000000f, 0.00000000f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
     { 190220, 3750, { 5331.264f, 3047.105f, 407.9228f,  0.05235888f }, { 0.f, 0.f,  0.026176450f, 0.99965730f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
@@ -390,27 +419,25 @@ WintergraspBuildingSpawnData const WGGameObjectBuildings[WG_MAX_OBJ] =
     { 190372, 3757, { 5215.821f, 2747.566f, 409.1884f, -3.13285800f }, { 0.f, 0.f, -0.999990500f, 0.00436732f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
     { 190374, 3755, { 5162.273f, 2883.043f, 410.2556f,  1.57952200f }, { 0.f, 0.f,  0.710185100f, 0.70401500f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
     { 190376, 3756, { 5163.724f, 2799.838f, 409.2270f,  1.57952200f }, { 0.f, 0.f,  0.710185100f, 0.70401500f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
+    { 191797, 3765, { 5343.290f, 2908.860f, 409.5757f, 0.00872424f }, { 0.f, 0.f,  0.004362106f, 0.9999905f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
+    { 191798, 3771, { 5342.719f, 2771.386f, 409.6249f, 3.14159300f }, { 0.f, 0.f, -1.000000000f, 0.0000000f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
+    { 191805, 3768, { 5279.126f, 2840.797f, 409.7826f, 1.57952200f }, { 0.f, 0.f,  0.710185100f, 0.7040150f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
 
-    // Tower of keep (Not spawned in db)
+    // Tower of keep (spawned in db)
     { 190221, 3711, { 5281.154f, 3044.588f, 407.8434f,  3.115388f }, { 0.f, 0.f,  0.9999142f, 0.013101960f }, BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER }, // NW
     { 190373, 3713, { 5163.757f, 2932.228f, 409.1904f,  3.124123f }, { 0.f, 0.f,  0.9999619f, 0.008734641f }, BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER }, // SW
     { 190377, 3714, { 5166.397f, 2748.368f, 409.1884f, -1.570796f }, { 0.f, 0.f, -0.7071066f, 0.707106900f }, BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER }, // SE
     { 190378, 3712, { 5281.192f, 2632.479f, 409.0985f, -1.588246f }, { 0.f, 0.f, -0.7132492f, 0.700910500f }, BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER }, // NE
 
-    // Wall (with passage) (Not spawned in db)
-    { 191797, 3765, { 5343.290f, 2908.860f, 409.5757f, 0.00872424f }, { 0.f, 0.f,  0.004362106f, 0.9999905f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
-    { 191798, 3771, { 5342.719f, 2771.386f, 409.6249f, 3.14159300f }, { 0.f, 0.f, -1.000000000f, 0.0000000f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
-    { 191805, 3768, { 5279.126f, 2840.797f, 409.7826f, 1.57952200f }, { 0.f, 0.f,  0.710185100f, 0.7040150f }, BATTLEFIELD_WG_OBJECTTYPE_WALL },
-
-    // South tower (Not spawned in db)
+    // South tower (spawned in db)
     { 190356, 3704, { 4557.173f, 3623.943f, 395.8828f,  1.675516f }, { 0.f, 0.f,  0.7431450f, 0.669130400f }, BATTLEFIELD_WG_OBJECTTYPE_TOWER }, // W
     { 190357, 3705, { 4398.172f, 2822.497f, 405.6270f, -3.124123f }, { 0.f, 0.f, -0.9999619f, 0.008734641f }, BATTLEFIELD_WG_OBJECTTYPE_TOWER }, // S
     { 190358, 3706, { 4459.105f, 1944.326f, 434.9912f, -2.002762f }, { 0.f, 0.f, -0.8422165f, 0.539139500f }, BATTLEFIELD_WG_OBJECTTYPE_TOWER }, // E
 
-    // Door of forteress (Not spawned in db)
+    // Door of forteress (spawned in db)
     { GO_WINTERGRASP_FORTRESS_GATE, 3763, { 5162.991f, 2841.232f, 410.1892f, -3.132858f }, { 0.f, 0.f, -0.9999905f, 0.00436732f }, BATTLEFIELD_WG_OBJECTTYPE_DOOR },
 
-    // Last door (Not spawned in db)
+    // Last door (pawned in db)
     { GO_WINTERGRASP_VAULT_GATE, 3773, { 5397.108f, 2841.54f, 425.9014f, 3.141593f }, { 0.f, 0.f, -1.f, 0.f }, BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST },
 };
 
@@ -522,7 +549,7 @@ typedef std::unordered_map<uint32, WGGraveyard*> GraveyardMap;
 //typedef std::unordered_map<WintergraspWorkshopIds, WGCapturePoint*> CapturePointContainer;
 
 class WGGameObjectBuilding;
-typedef std::unordered_map<ObjectGuid, WGGameObjectBuilding*> WGGameObjectBuildingMap;
+typedef std::unordered_map<uint32 /*GOentry*/, WGGameObjectBuilding*> WGGameObjectBuildingMap;
 
 class WGWorkshop;
 class WGCapturePoint;
@@ -594,9 +621,9 @@ public:
     GameObject* GetGameObject(ObjectGuid guid);
     GameObject* GetTowerGObyTowerID(WintergraspTowerIds towerID);
     // Return pointer to relic object
-    GameObject* GetRelic() { return GetGameObject(m_titansRelicGUID); }
-    // Tower have only 1 GO by entry on map
-    WGGameObjectBuilding* GetBuildingTowerByGOEntry(uint32 entry);
+    GameObject* GetRelic() { return GetGameObject(m_TitansRelicGUID); }
+    GameObject* GetKeepCollisionWall() { return GetGameObject(m_KeepCollisionWall); }
+    WGGameObjectBuilding* GetBuildingByGOEntry(uint32 entry);
     WGCapturePoint* GetCapturePoint(WintergraspWorkshopIds workshop) const
     {
         WorkshopAndCapturePointMap::const_iterator itr = m_workshopAndCaptures.find(workshop);
@@ -664,7 +691,7 @@ private:
     void _OnBattleStartPlayers();
     void OnBattleEnd(bool endByTimer);    
     // Define if player can interact with the relic
-    void SetRelic(ObjectGuid relicGUID) { m_titansRelicGUID = relicGUID; }    
+    void SetRelic(ObjectGuid relicGUID) { m_TitansRelicGUID = relicGUID; }
     void InitStalker(uint32 entry, Position const& pos);
     void SetDefenderTeam(TeamId team) { m_DefenderTeam = team; } 
     void UpdateVehicleCountWG();
@@ -769,8 +796,9 @@ private:
     TeamId m_DefenderTeam;
     TeamId m_tenacityTeam;
 
-    ObjectGuid StalkerGuid;
-    ObjectGuid m_titansRelicGUID;
+    ObjectGuid m_StalkerGuid;
+    ObjectGuid m_TitansRelicGUID;
+    ObjectGuid m_KeepCollisionWall;
 
     WorldSafeLocsDBC const* Grave_NW;
     WorldSafeLocsDBC const* Grave_NE;

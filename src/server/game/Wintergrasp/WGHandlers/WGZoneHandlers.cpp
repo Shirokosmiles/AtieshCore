@@ -928,61 +928,150 @@ void WintergraspMgr::OnGameObjectCreate(GameObject* go)
 
 void WintergraspMgr::OnGameObjectRemove(GameObject* oldGO)
 {
-    WGGameObjectBuilding* towerBuilding = GetBuildingTowerByGOEntry(oldGO->GetEntry());
-    if (towerBuilding)
-        towerBuilding->CleanBeforeDelete();
+    WGGameObjectBuilding* Building = GetBuildingByGOEntry(oldGO->GetEntry());
+    if (Building)
+        Building->CleanBeforeDelete();
 }
 
 void WintergraspMgr::RecheckImportantGORespawn(GameObject* go)
 {
-    bool _isGOTower      = false;
-    bool _isCapturePoint = false;
+    bool _isBuildingGO      = false;
     switch (go->GetEntry())
     {
         // capture point sections
         case GO_WINTERGRASP_FACTORY_BANNER_NE:
             if (GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_NE))
                 GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_NE)->SetCapturePointData(go);
+            ShowCreatureByNPCType(WG_WORKSHOP_NE, GetDefenderTeam()); // workshop on north should be owned by defender team by default
+            HideCreatureByNPCType(WG_WORKSHOP_NE, GetAttackerTeam());
             break;
         case GO_WINTERGRASP_FACTORY_BANNER_NW:
             if (GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_NW))
                 GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_NW)->SetCapturePointData(go);
+            ShowCreatureByNPCType(WG_WORKSHOP_NW, GetDefenderTeam()); // workshop on north should be owned by defender team by default
+            HideCreatureByNPCType(WG_WORKSHOP_NW, GetAttackerTeam());
             break;
         case GO_WINTERGRASP_FACTORY_BANNER_SE:
             if (GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_SE))
                 GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_SE)->SetCapturePointData(go);
+            ShowCreatureByNPCType(WG_WORKSHOP_SE, GetAttackerTeam()); // workshop on south should be owned by attacker team by default
+            HideCreatureByNPCType(WG_WORKSHOP_SE, GetDefenderTeam());
             break;
         case GO_WINTERGRASP_FACTORY_BANNER_SW:
             if (GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_SW))
                 GetCapturePoint(BATTLEFIELD_WG_WORKSHOP_SW)->SetCapturePointData(go);
+            ShowCreatureByNPCType(WG_WORKSHOP_SW, GetAttackerTeam()); // workshop on south should be owned by attacker team by default
+            HideCreatureByNPCType(WG_WORKSHOP_SW, GetDefenderTeam());
             break;
 
-        // tower sections
+        // walls
+        case GO_WINTERGRASP_WALL_1:
+        case GO_WINTERGRASP_WALL_2:
+        case GO_WINTERGRASP_WALL_3:
+        case GO_WINTERGRASP_WALL_4:
+        case GO_WINTERGRASP_WALL_5:
+        case GO_WINTERGRASP_WALL_6:
+        case GO_WINTERGRASP_WALL_7:
+        case GO_WINTERGRASP_WALL_8:
+        case GO_WINTERGRASP_WALL_9:
+        case GO_WINTERGRASP_WALL_10:
+        case GO_WINTERGRASP_WALL_11:
+        case GO_WINTERGRASP_WALL_12:
+        case GO_WINTERGRASP_WALL_13:
+        case GO_WINTERGRASP_WALL_14:
+        case GO_WINTERGRASP_WALL_15:
+        case GO_WINTERGRASP_WALL_16:
+        case GO_WINTERGRASP_WALL_17:
+        case GO_WINTERGRASP_WALL_18:
+        case GO_WINTERGRASP_WALL_19:
+        case GO_WINTERGRASP_WALL_20:
+        case GO_WINTERGRASP_WALL_21:
+        case GO_WINTERGRASP_WALL_22:
+        case GO_WINTERGRASP_WALL_23:
+            _isBuildingGO = true;
+            break;
+        // fortress tower sections
         case GO_WINTERGRASP_FORTRESS_TOWER_NW:
+            ShowCreatureByNPCType(NW_TOWER_GUARD, GetDefenderTeam());
+            HideCreatureByNPCType(NW_TOWER_GUARD, GetAttackerTeam());
+            _isBuildingGO = true;
+            UpdateCreatureTurretByNPCType(NW_TOWER_TURRET, GetDefenderTeam());
+            ShowCreatureByNPCType(WG_WORKSHOP_KEEP_WEST, GetDefenderTeam());
+            HideCreatureByNPCType(WG_WORKSHOP_KEEP_WEST, GetAttackerTeam());
+            break;
         case GO_WINTERGRASP_FORTRESS_TOWER_SW:
+            ShowCreatureByNPCType(SW_TOWER_GUARD, GetDefenderTeam());
+            HideCreatureByNPCType(SW_TOWER_GUARD, GetAttackerTeam());
+            _isBuildingGO = true;
+            UpdateCreatureTurretByNPCType(SW_TOWER_TURRET, GetDefenderTeam());
+            break;
         case GO_WINTERGRASP_FORTRESS_TOWER_SE:
+            ShowCreatureByNPCType(SE_TOWER_GUARD, GetDefenderTeam());
+            HideCreatureByNPCType(SE_TOWER_GUARD, GetAttackerTeam());
+            _isBuildingGO = true;
+            UpdateCreatureTurretByNPCType(SE_TOWER_TURRET, GetDefenderTeam());
+            break;
         case GO_WINTERGRASP_FORTRESS_TOWER_NE:
+            ShowCreatureByNPCType(NE_TOWER_GUARD, GetDefenderTeam());
+            HideCreatureByNPCType(NE_TOWER_GUARD, GetAttackerTeam());
+            _isBuildingGO = true;
+            UpdateCreatureTurretByNPCType(NE_TOWER_TURRET, GetDefenderTeam());
+            ShowCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, GetDefenderTeam());
+            HideCreatureByNPCType(WG_WORKSHOP_KEEP_EAST, GetAttackerTeam());
+            break;
+        // attack tower sections
         case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
+            ShowCreatureByNPCType(WEST_TOWER_GUARD, GetAttackerTeam());
+            HideCreatureByNPCType(WEST_TOWER_GUARD, GetDefenderTeam());
+            _isBuildingGO = true;
+            UpdateCreatureTurretByNPCType(WEST_TOWER_TURRET, GetAttackerTeam());
+            ShowCreatureByNPCType(WEST_BRIDGE_GUARD, GetAttackerTeam());
+            HideCreatureByNPCType(WEST_BRIDGE_GUARD, GetDefenderTeam());
+            break;
         case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
+            ShowCreatureByNPCType(MIDDLE_TOWER_GUARD, GetAttackerTeam());
+            HideCreatureByNPCType(MIDDLE_TOWER_GUARD, GetDefenderTeam());
+            _isBuildingGO = true;
+            UpdateCreatureTurretByNPCType(MIDDLE_TOWER_TURRET, GetAttackerTeam());
+            ShowCreatureByNPCType(MIDDLE_BRIDGE_GUARD, GetAttackerTeam());
+            HideCreatureByNPCType(MIDDLE_BRIDGE_GUARD, GetDefenderTeam());
+            break;
         case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-            _isGOTower = true;
+            ShowCreatureByNPCType(EAST_TOWER_GUARD, GetAttackerTeam());
+            HideCreatureByNPCType(EAST_TOWER_GUARD, GetDefenderTeam());
+            _isBuildingGO = true;
+            UpdateCreatureTurretByNPCType(EAST_TOWER_TURRET, GetAttackerTeam());
+            ShowCreatureByNPCType(EAST_BRIDGE_GUARD, GetAttackerTeam());
+            HideCreatureByNPCType(EAST_BRIDGE_GUARD, GetDefenderTeam());
+            break;
+        // keep sections
+        case GO_WINTERGRASP_FORTRESS_GATE:
+            UpdateCreatureTurretByNPCType(FORTRESS_GATE_TURRET, GetDefenderTeam());
+            _isBuildingGO = true;
+            break;
+        case GO_WINTERGRASP_VAULT_GATE:
+            UpdateCreatureTurretByNPCType(VAULT_GATE_TURRET, GetDefenderTeam());
+            _isBuildingGO = true;
+            ShowCreatureByNPCType(VAULT_KEEP, GetDefenderTeam());
+            HideCreatureByNPCType(VAULT_KEEP, GetAttackerTeam());
+            break;
+
+        // MISC
+        case GO_WINTERGRASP_KEEP_COLLISION_WALL:
+            m_KeepCollisionWall = go->GetGUID();
+            if (!IsWarTime())
+                go->SetGoState(GO_STATE_READY); //not GO_STATE_ACTIVE)
+            else
+                go->SetGoState(GO_STATE_ACTIVE);
             break;
         default:
             break;
     }
 
-    if (_isGOTower)
+    if (_isBuildingGO)
     {
-        WGGameObjectBuilding* towerBuilding = GetBuildingTowerByGOEntry(go->GetEntry());
-        if (towerBuilding)
-        {
-            // remove WGGameObjectBuilding with old GUID from map
-            m_buildingsInZone.erase(towerBuilding->GetGUID());
-            // init GO for exist WGGameObjectBuilding
-            towerBuilding->Init(go);
-            // add updated WGGameObjectBuilding in map again
-            m_buildingsInZone[go->GetGUID()] = towerBuilding;
-            TC_LOG_ERROR("system", "WintergraspMgr::RecheckForTowerGORespawn(GameObject %u)", go->GetEntry());
-        }
+        WGGameObjectBuilding* towerBuilding = ASSERT_NOTNULL(GetBuildingByGOEntry(go->GetEntry()));
+        // init GO for exist WGGameObjectBuilding
+        towerBuilding->Init(go);
     }
 }
