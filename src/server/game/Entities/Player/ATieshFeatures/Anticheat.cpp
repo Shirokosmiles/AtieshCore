@@ -65,11 +65,11 @@ bool Player::CheckOnFlyHack()
 
     if (IsFlying() && !CanFly()) // kick flyhacks
     {
-        TC_LOG_INFO("anticheat", "Player::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+        TC_LOG_INFO("anticheat", "Player::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
         TC_LOG_INFO("anticheat", "Player::========================================================");
         TC_LOG_INFO("anticheat", "Player IsFlying but CanFly is false");
 
-        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH_CANFLYWRONG, GetPlayerMovingMe()->GetName().c_str());
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH_CANFLYWRONG, GetName().c_str());
         AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(1), GetPositionACForLogs(), int32(realm.Id.Realm));
         return false;
     }
@@ -92,15 +92,10 @@ bool Player::CheckOnFlyHack()
     if (GetAreaId() == 4859) // Area: 4859 (Frozen Throne)
         return true;
 
-    if (GetPlayerMovingMe())
-    {
-        if (GetPlayerMovingMe()->UnderACKmount())
-            return true;
+    if (UnderACKmount())
+        return true;
 
-        if (GetPlayerMovingMe()->IsSkipOnePacketForASH())
-            return true;
-    }
-    else
+    if (IsSkipOnePacketForASH())
         return true;
 
     Position npos = GetPosition();
@@ -112,11 +107,11 @@ bool Player::CheckOnFlyHack()
         if (waterlevel && (pz - waterlevel) <= (hovergaura ? GetCollisionHeight() + 1.5f + GetHoverOffset() : GetCollisionHeight() + GetHoverOffset()))
             return true;
 
-        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
         TC_LOG_INFO("anticheat", "Player::========================================================");
         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
 
-        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetPlayerMovingMe()->GetName().c_str());
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetName().c_str());
         AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(2), GetPositionACForLogs(), int32(realm.Id.Realm));
         return false;
     }
@@ -143,12 +138,12 @@ bool Player::CheckOnFlyHack()
 
                     if (pz - cz > 6.8f)
                     {
-                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetPlayerMovingMe()->GetSession()->GetAccountId(), GetPlayerMovingMe()->GetName().c_str());
+                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
                         TC_LOG_INFO("anticheat", "Player::========================================================");
                         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = %f", pz);
                         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
                         TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  checkz = %f", cz);
-                        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetPlayerMovingMe()->GetName().c_str());
+                        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetName().c_str());
                         AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(3, pz, z), GetPositionACForLogs(), int32(realm.Id.Realm));
                         return false;
                     }
@@ -186,16 +181,11 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
             return true;
 
-        if (GetPlayerMovingMe())
+        if (IsSkipOnePacketForASH())
         {
-            if (GetPlayerMovingMe()->IsSkipOnePacketForASH())
-            {
-                GetPlayerMovingMe()->SetSkipOnePacketForASH(false);
-                return true;
-            }
-        }
-        else
+            SetSkipOnePacketForASH(false);
             return true;
+        }
 
         bool transportflag = movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         float x, y, z;
@@ -279,7 +269,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
                 runspeed = GetVehicleKit()->GetBase()->GetSpeed(MOVE_SWIM);
         }
 
-        if (IsFlying() || GetPlayerMovingMe()->CanFly())
+        if (IsFlying() || CanFly())
         {
             if (!vehicle)
                 flyspeed = GetSpeed(MOVE_FLIGHT);
@@ -303,7 +293,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 
         // if movetime faked and lower, difftime should be with "-"
         normaldistance = (runspeed * difftime) + 0.002f; // 0.002f a little safe temporary hack
-        if (GetPlayerMovingMe()->UnderACKmount())
+        if (UnderACKmount())
             normaldistance += 20.0f;
         if (distance < normaldistance)
             return true;
