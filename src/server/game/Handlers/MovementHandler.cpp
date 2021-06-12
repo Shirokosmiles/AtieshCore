@@ -1021,10 +1021,11 @@ void WorldSession::HandleMoveSetCollisionHgtAck(WorldPacket& recvData)
     }
 
     recvData.read_skip<uint32>();                           // movement counter
-    recvData >> newValue;
 
     MovementInfo movementInfo;
     ReadMovementInfo(recvData, &movementInfo);
+
+    recvData >> newValue;
 }
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)

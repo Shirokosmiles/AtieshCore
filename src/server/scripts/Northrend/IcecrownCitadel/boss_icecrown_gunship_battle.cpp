@@ -1712,6 +1712,7 @@ struct npc_gunship_cannon : public PassiveAI
     }
 };
 
+// 68721 - Rocket Pack
 class spell_igb_rocket_pack : public AuraScript
 {
     PrepareAuraScript(spell_igb_rocket_pack);
@@ -1743,6 +1744,7 @@ class spell_igb_rocket_pack : public AuraScript
     }
 };
 
+// 70348 - Rocket Pack Useable
 class spell_igb_rocket_pack_useable : public AuraScript
 {
     PrepareAuraScript(spell_igb_rocket_pack_useable);
@@ -1781,6 +1783,8 @@ class spell_igb_rocket_pack_useable : public AuraScript
     }
 };
 
+// 70120 - On Skybreaker Deck
+// 70121 - On Orgrim's Hammer Deck
 class spell_igb_on_gunship_deck : public AuraScript
 {
     PrepareAuraScript(spell_igb_on_gunship_deck);
@@ -1822,6 +1826,8 @@ private:
     uint32 _teamInInstance;
 };
 
+// 69470 - Heat Drain
+// 69487 - Overheat
 class spell_igb_periodic_trigger_with_power_cost : public AuraScript
 {
     PrepareAuraScript(spell_igb_periodic_trigger_with_power_cost);
@@ -1838,6 +1844,7 @@ class spell_igb_periodic_trigger_with_power_cost : public AuraScript
     }
 };
 
+// 69399, 70172 - Cannon Blast
 class spell_igb_cannon_blast : public SpellScript
 {
     PrepareSpellScript(spell_igb_cannon_blast);
@@ -1864,6 +1871,7 @@ class spell_igb_cannon_blast : public SpellScript
     }
 };
 
+// 69402, 70175 - Incinerating Blast
 class spell_igb_incinerating_blast : public SpellScript
 {
     PrepareSpellScript(spell_igb_incinerating_blast);
@@ -1900,6 +1908,7 @@ private:
     uint32 _energyLeft;
 };
 
+// 69487 - Overheat
 class spell_igb_overheat : public AuraScript
 {
     PrepareAuraScript(spell_igb_overheat);
@@ -1945,6 +1954,7 @@ class spell_igb_overheat : public AuraScript
     }
 };
 
+// 69705 - Below Zero
 class spell_igb_below_zero : public SpellScript
 {
     PrepareSpellScript(spell_igb_below_zero);
@@ -1963,6 +1973,7 @@ class spell_igb_below_zero : public SpellScript
     }
 };
 
+// 70104 - Teleport to Enemy Ship
 class spell_igb_teleport_to_enemy_ship : public SpellScript
 {
     PrepareSpellScript(spell_igb_teleport_to_enemy_ship);
@@ -1986,6 +1997,7 @@ class spell_igb_teleport_to_enemy_ship : public SpellScript
     }
 };
 
+// 70397, 70403 - Burning Pitch
 class spell_igb_burning_pitch_selector : public SpellScript
 {
     PrepareSpellScript(spell_igb_burning_pitch_selector);
@@ -2024,6 +2036,7 @@ class spell_igb_burning_pitch_selector : public SpellScript
     }
 };
 
+// 71335, 71339 - Burning Pitch
 class spell_igb_burning_pitch : public SpellScript
 {
     PrepareSpellScript(spell_igb_burning_pitch);
@@ -2043,6 +2056,7 @@ class spell_igb_burning_pitch : public SpellScript
     }
 };
 
+// 69678, 70609 - Rocket Artillery
 class spell_igb_rocket_artillery : public SpellScript
 {
     PrepareSpellScript(spell_igb_rocket_artillery);
@@ -2070,6 +2084,7 @@ class spell_igb_rocket_artillery : public SpellScript
     }
 };
 
+// 69679 - Rocket Artillery
 class spell_igb_rocket_artillery_explosion : public SpellScript
 {
     PrepareSpellScript(spell_igb_rocket_artillery_explosion);
@@ -2090,6 +2105,7 @@ class spell_igb_rocket_artillery_explosion : public SpellScript
     }
 };
 
+// 67335 - Gunship Fall Teleport
 class spell_igb_gunship_fall_teleport : public SpellScript
 {
     PrepareSpellScript(spell_igb_gunship_fall_teleport);
@@ -2120,6 +2136,7 @@ class spell_igb_gunship_fall_teleport : public SpellScript
     }
 };
 
+// 70331 - Check for Players
 class spell_igb_check_for_players : public SpellScript
 {
     PrepareSpellScript(spell_igb_check_for_players);
@@ -2163,6 +2180,7 @@ private:
     uint32 _playerCount;
 };
 
+// 72340 - Teleport Players on Victory
 class spell_igb_teleport_players_on_victory : public SpellScript
 {
     PrepareSpellScript(spell_igb_teleport_players_on_victory);

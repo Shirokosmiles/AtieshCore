@@ -915,6 +915,7 @@ class npc_gatewatcher_web_wrap : public CreatureScript
         }
 };
 
+// 52343 - Krik'Thir Subboss Aggro Trigger
 class spell_gatewatcher_subboss_trigger : public SpellScriptLoader
 {
     public:
@@ -967,6 +968,7 @@ class spell_gatewatcher_subboss_trigger : public SpellScriptLoader
         }
 };
 
+// 52536 - Fixate Trigger
 class spell_anub_ar_skirmisher_fixate : public SpellScriptLoader
 {
     public:
@@ -999,6 +1001,7 @@ class spell_anub_ar_skirmisher_fixate : public SpellScriptLoader
         }
 };
 
+// 52086 - Web Wrap
 class spell_gatewatcher_web_wrap : public SpellScriptLoader
 {
     public:

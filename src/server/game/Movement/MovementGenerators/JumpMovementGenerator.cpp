@@ -31,7 +31,7 @@ JumpMovementGenerator<T>::JumpMovementGenerator(uint32 id, float x, float y, flo
 {
     this->Mode = MOTION_MODE_DEFAULT;
     this->Priority = MOTION_PRIORITY_HIGHEST;
-    this->Flags = MOVEMENTGENERATOR_FLAG_INITIALIZATION_PENDING;
+    this->Flags = MOVEMENTGENERATOR_FLAG_PERSIST_ON_DEATH;
     this->BaseUnitState = UNIT_STATE_JUMPING;
 }
 
@@ -44,7 +44,7 @@ MovementGeneratorType JumpMovementGenerator<T>::GetMovementGeneratorType() const
 template<class T>
 void JumpMovementGenerator<T>::DoInitialize(T* owner)
 {
-    MovementGenerator::RemoveFlag(MOVEMENTGENERATOR_FLAG_INITIALIZATION_PENDING | MOVEMENTGENERATOR_FLAG_DEACTIVATED);
+    MovementGenerator::RemoveFlag(MOVEMENTGENERATOR_FLAG_PERSIST_ON_DEATH | MOVEMENTGENERATOR_FLAG_DEACTIVATED);
     MovementGenerator::AddFlag(MOVEMENTGENERATOR_FLAG_INITIALIZED);
 
     if (!owner)

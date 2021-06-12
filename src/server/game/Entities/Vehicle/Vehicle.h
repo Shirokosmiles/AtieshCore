@@ -74,6 +74,8 @@ class TC_GAME_API Vehicle : public TransportBase
 
         Milliseconds GetDespawnDelay();
 
+        std::string GetDebugInfo() const;
+
     protected:
         friend class VehicleJoinEvent;
         uint32 UsableSeatNum;                               ///< Number of seats that match VehicleSeatDBC::UsableByPlayer, used for proper display flags

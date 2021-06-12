@@ -989,6 +989,7 @@ class spell_hadronox_periodic_summon_template_AuraScript : public AuraScript
         uint32 _bottomSpellId;
 };
 
+// 53035 - Summon Anub'ar Champion Periodic
 class spell_hadronox_periodic_summon_champion : public SpellScriptLoader
 {
     public:
@@ -1006,6 +1007,7 @@ class spell_hadronox_periodic_summon_champion : public SpellScriptLoader
         }
 };
 
+// 53037 - Summon Anub'ar Crypt Fiend Periodic
 class spell_hadronox_periodic_summon_crypt_fiend : public SpellScriptLoader
 {
     public:
@@ -1023,6 +1025,7 @@ class spell_hadronox_periodic_summon_crypt_fiend : public SpellScriptLoader
         }
 };
 
+// 53036 - Summon Anub'ar Necromancer Periodic
 class spell_hadronox_periodic_summon_necromancer : public SpellScriptLoader
 {
     public:
@@ -1040,6 +1043,7 @@ class spell_hadronox_periodic_summon_necromancer : public SpellScriptLoader
         }
 };
 
+// 53030, 59417 - Leech Poison
 class spell_hadronox_leeching_poison : public SpellScriptLoader
 {
     public:
@@ -1078,6 +1082,8 @@ class spell_hadronox_leeching_poison : public SpellScriptLoader
     }
 };
 
+// 53177 - Web Front Doors
+// 53185 - Web Side Door
 class spell_hadronox_web_doors : public SpellScriptLoader
 {
     public:

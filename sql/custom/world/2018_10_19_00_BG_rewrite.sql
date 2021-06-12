@@ -340,7 +340,7 @@ UPDATE `trinity_string` SET `content_default`='The north gate of the %s is destr
 UPDATE `creature_template` SET `unit_flags`=16640 WHERE `entry` IN (34776,35069,35431,35433);
 UPDATE `creature_template` SET `VehicleId`=435 WHERE `entry`=35431;
 UPDATE `creature_template` SET `VehicleId`=514 WHERE `entry`=35433;
-UPDATE `creature_template` SET `ScriptName`='npc_ioc_siege_engine' WHERE `entry` IN (34776,35069);
+-- UPDATE `creature_template` SET `ScriptName`='npc_ioc_siege_engine' WHERE `entry` IN (34776,35069);
 DELETE FROM `creature_template_addon` WHERE `entry` IN (35431,35433);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES
 (35431, 0, 0, 0, 1, 0, ''),
@@ -351,6 +351,6 @@ SELECT 35431, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype
 INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer`)
 SELECT 35433, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer` FROM `vehicle_template_accessory` WHERE `entry`=35069;
 
-DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_ioc_damaged';
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(67323, 'spell_ioc_damaged');
+-- DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_ioc_damaged';
+-- INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+-- (67323, 'spell_ioc_damaged');

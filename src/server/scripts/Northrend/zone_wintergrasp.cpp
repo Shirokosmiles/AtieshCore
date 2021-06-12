@@ -420,6 +420,11 @@ class go_wg_vehicle_teleporter : public GameObjectScript
         }
 };
 
+/* 49899 - Activate Robotic Arms
+   56659 - Build Demolisher (Force)
+   56662 - Build Siege Vehicle (Force)
+   56664 - Build Catapult (Force)
+   61409 - Build Siege Vehicle (Force) */
 class spell_wintergrasp_force_building : public SpellScriptLoader
 {
     public:
@@ -458,6 +463,7 @@ class spell_wintergrasp_force_building : public SpellScriptLoader
         }
 };
 
+// 61178 - Grab Passenger
 class spell_wintergrasp_grab_passenger : public SpellScriptLoader
 {
     public:
@@ -514,6 +520,7 @@ enum WgTeleport
     SPELL_WINTERGRASP_TELEPORT_TRIGGER = 54643,
 };
 
+// 54640 - Teleport
 class spell_wintergrasp_defender_teleport : public SpellScriptLoader
 {
     public:
@@ -544,6 +551,7 @@ class spell_wintergrasp_defender_teleport : public SpellScriptLoader
         }
 };
 
+// 54643 - Teleport
 class spell_wintergrasp_defender_teleport_trigger : public SpellScriptLoader
 {
     public:
@@ -574,8 +582,8 @@ class spell_wintergrasp_defender_teleport_trigger : public SpellScriptLoader
         }
 };
 
-// 58549 Tenacity
-// 59911 Tenacity
+// 58549 - Tenacity
+// 59911 - Tenacity
 class spell_wintergrasp_tenacity_refresh : public AuraScript
 {
     PrepareAuraScript(spell_wintergrasp_tenacity_refresh);

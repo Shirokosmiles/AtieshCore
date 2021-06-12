@@ -996,6 +996,7 @@ enum JokkumScriptcast
     EVENT_KROLMIR_9                  = 24,
 };
 
+// 61319 - Jokkum Scriptcast
 class spell_jokkum_scriptcast : public SpellScriptLoader
 {
     public: spell_jokkum_scriptcast() : SpellScriptLoader("spell_jokkum_scriptcast") { }
@@ -1027,6 +1028,7 @@ class spell_jokkum_scriptcast : public SpellScriptLoader
         }
 };
 
+// 56650 - Player Cast Veranus Summon
 class spell_veranus_summon : public SpellScriptLoader
 {
     public: spell_veranus_summon() : SpellScriptLoader("spell_veranus_summon") { }
@@ -1063,6 +1065,7 @@ enum CloseRift
     SPELL_DESPAWN_RIFT          = 61665
 };
 
+// 56763 - Close Rift
 class spell_close_rift : public SpellScriptLoader
 {
     public:
