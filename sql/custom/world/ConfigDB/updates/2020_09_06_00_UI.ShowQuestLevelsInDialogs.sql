@@ -1,1 +1,0 @@
-UPDATE `world_config` SET `OptionName` = 'UI.ShowQuestLevelsInDialogs_DELETED', `Description` = 'DELETED and FREE SLOT' WHERE `OptionName` = 'UI.ShowQuestLevelsInDialogs';

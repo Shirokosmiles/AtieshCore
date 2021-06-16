@@ -1,4 +1,4 @@
-INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+INSERT INTO `world`.`world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
 ('MaxGroupXPDistance', 'float', 0, '74', NULL, 'Max distance to creature for group member to get experience at creature death.'),
 ('MaxRecruitAFriendBonusDistance', 'float', 1, '100', NULL, 'Max distance between character and and group to gain the Recruit-A-Friend XP multiplier.'),
 ('MonsterSight', 'float', 2, '50', NULL, 'The maximum distance in yards that a \"monster\" creature can see regardless of level difference (through CreatureAI::IsVisible). Increases CONFIG_SIGHT_MONSTER to 50 yards. Used to be 20 yards. #Default:     50.000000'),
@@ -21,4 +21,5 @@ INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`
 ('Respawn.DynamicRateGameObject', 'float', 19, '10', NULL, 'The rate at which the respawn time is adjusted for high player counts in a zone (for gameobjects). Up to this number of players, the respawn rate is unchanged. At double this number in players, you get twice as many respawns, at three times this number, three times the respawns, and so forth. #Default: 10'),
 ('Visibility.Distance.Continents', 'float', 20, '100', NULL, 'Visibility on continents on retail ~100 yards.'),
 ('Visibility.Distance.Instances', 'float', 21, '170', NULL, 'For instances default ~170.'),
-('Visibility.Distance.BGArenas', 'float', 22, '533', NULL, 'Max limited by grid size: 533.33333');
+('Visibility.Distance.BG', 'float', 22, '533', NULL, 'Max limited by grid size: 533.33333'),
+('Visibility.Distance.Arenas', 'float', 23, '533', NULL, 'Max limited by grid size: 533.33333');

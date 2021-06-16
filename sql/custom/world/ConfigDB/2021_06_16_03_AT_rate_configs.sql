@@ -1,4 +1,5 @@
-INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+INSERT INTO `world`.`world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+-- TC configs
 ('Rate.Health', 'rate', 0, '1', NULL, 'Multiplier to configure health, mana, incoming rage, loss of rage, focus energy and loyalty increase or decrease.'),
 ('Rate.Mana', 'rate', 1, '1', NULL, 'Multiplier to configure health, mana, incoming rage, loss of rage, focus energy and loyalty increase or decrease.'),
 ('Rate.Rage.Income', 'rate', 2, '1', NULL, 'Multiplier to configure health, mana, incoming rage, loss of rage, focus energy and loyalty increase or decrease.'),
@@ -63,4 +64,13 @@ INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`
 ('Rate.MoveSpeed', 'rate', 61, '1', NULL, 'Movement speed rate.'),
 ('XP.Boost.Rate', 'rate', 62, '2', NULL, 'The boost multiplier for experience gain during XP boosted days. #Default:     2.0 - (Double experience)'),
 ('Rate.Quest.Money.Reward', 'rate', 63, '1', NULL, 'Multiplier for money quest rewards. Can not be below 0.'),
-('Rate.Quest.Money.Max.Level.Reward', 'rate', 64, '1', NULL, 'Multiplier for money quest rewards. Can not be below 0.');
+('Rate.Quest.Money.Max.Level.Reward', 'rate', 64, '1', NULL, 'Multiplier for money quest rewards. Can not be below 0.'),
+-- AT configs
+('Rate.XP.Kill.Premium', 'rate', 65, '1', NULL, 'Individual rate for vip player'),
+('Rate.XP.Quest.Premium', 'rate', 66, '1', NULL, 'Individual rate for vip player'),
+('Rate.Honor.Premium', 'rate', 67, '1', NULL, 'Individual rate for vip player'),
+('Rate.Reputation.Gain.Premium', 'rate', 68, '1', NULL, 'Individual rate for vip player'),
+('GSystem.GuildLevel.Rate.XP.Bonus', 'rate', 69, '2', NULL, 'Rate for character experience when guild >= 2 level'),
+('VAS.Creature.InZone.Damage', 'rate', 70, '1', NULL, 'Change HP and Damage value for Units in Dungeons in % #Default: 100 - (full HP and Damage) 10 - (units have only 10% of HP or can deal damage 10% of base damage value)'),
+('VAS.Creature.InZone.SpellDamage', 'rate', 71, '1', NULL, 'Change HP and Damage value for Units in Dungeons in % #Default: 100 - (full HP and Damage) 10 - (units have only 10% of HP or can deal damage 10% of base damage value)'),
+('VAS.Creature.InZone.Health', 'rate', 72, '1', NULL, 'Change HP and Damage value for Units in Dungeons in % #Default: 100 - (full HP and Damage) 10 - (units have only 10% of HP or can deal damage 10% of base damage value)');

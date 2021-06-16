@@ -1,4 +1,5 @@
-INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+INSERT INTO `world`.`world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+-- TC configs
 ('Compression', 'int', 0, '1', NULL, 'Compression level for client update packages. (1   - (Speed) -- 9   - (Best compression))'),
 ('PlayerSaveInterval', 'int', 1, '90000', NULL, 'Time (in milliseconds) for player save interval.'),
 ('GridCleanUpDelay', 'int', 2, '300000', NULL, 'Time (in milliseconds) grid clean up delay.'),
@@ -185,5 +186,32 @@ INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`
 ('Respawn.WarningFrequency', 'int', 183, '1800', NULL, 'The frequency (in seconds) that the warning message will be sent to users after a quiet time restart is triggered. The message will repeat each time this many seconds passed until the server is restarted. If set to 0, no warnings will be sent. #Default: 1800 - (30 minutes)'),
 ('Visibility.Notify.Period.OnContinents', 'int', 184, '1000', NULL, 'Time (in milliseconds) for visibility update period. Lower values may have performance impact.'),
 ('Visibility.Notify.Period.InInstances', 'int', 185, '1000', NULL, 'Time (in milliseconds) for visibility update period. Lower values may have performance impact.'),
-('Visibility.Notify.Period.InBGArenas', 'int', 186, '1000', NULL, 'Time (in milliseconds) for visibility update period. Lower values may have performance impact.'),
-('PlayerLimit', 'int', 187, '5000', NULL, 'Maximum number of players in the world. Excluding Mods, GMs and Admins.');
+('Visibility.Notify.Period.InBG', 'int', 186, '1000', NULL, 'Time (in milliseconds) for visibility update period. Lower values may have performance impact.'),
+('Visibility.Notify.Period.InArenas', 'int', 187, '1000', NULL, 'Time (in milliseconds) for visibility update period. Lower values may have performance impact.'),
+('PlayerLimit', 'int', 188, '5000', NULL, 'Maximum number of players in the world. Excluding Mods, GMs and Admins.'),
+-- AT configs
+('AntiCheat.PendingMoveChangesTimeoutTime', 'int', 189, '0', NULL, 'Time each client has to acknowledge a movement change until they are kicked.'),
+('VanishVisionTimer', 'int', 190, '600', NULL, 'Vanish Fade Delay (vanish evade all spells without CC control in this time) (in ms)'),
+('VanishCCbreakTimer', 'int', 191, '300', NULL, 'Vanish Should evade CC spells too, when casted, but it\'s a little lime.'),
+('AntiCheats.FlyHackTimer', 'int', 192, '3000', NULL, 'Timer for AntiCheat FlyHack check #Default: 3000 - 1 check in 1 second'),
+('FLAB.Script.MaxChars', 'int', 193, '0', NULL, 'Count of characters for give a bonus #Default:     0 - it should be a first character on acc, right?'),
+('FLAB.Script.BonusMoney', 'int', 194, '10000000', NULL, 'Count of money ( 1000 gold )'),
+('PVPBonusCapReward.MaxCap', 'int', 195, '1500', NULL, 'Max values for Weekly Cap'),
+('PVPBonusCapReward.CapChanges.Win', 'int', 196, '180', NULL, 'Value for cap after Win'),
+('PVPBonusCapReward.CapChanges.Lose', 'int', 197, '60', NULL, 'Value for cap after Lose'),
+('Antispam.Mail.Timer', 'int', 198, '3600', NULL, 'Timer for possible next sending count of mails by mailbox'),
+('Antispam.Mail.Count', 'int', 199, '10', NULL, 'How many mails you can sent in game in 1 period of timer'),
+('Antispam.Mail.Controller', 'int', 200, '100', NULL, 'How many mails player can hold in mailbox, include mail in future (from auctionhouse and calendar).'),
+('BAG.Script.BonusBagsID', 'int', 201, '51809', NULL, 'itemid of bags ( 51809 )'),
+('GSystem.GuildWars.Minimal.PlayerCount', 'int', 202, '10', NULL, 'minimal count of members in guild for participation in GW'),
+('GSystem.GuildWars.Minimal.Delta.PreviousStartTimer', 'int', 202, '3600', NULL, 'minimal timer for guild from previous start war time for starting a new war'),
+('GSystem.GuildWars.Minimal.Delta.PreviousEndTimer', 'int', 203, '3600', NULL, 'minimal timer for guild from previous end war time for starting a new war'),
+('GSystem.GuildLevel.Exp.ForArena', 'int', 204, '5', NULL, 'exp of guild for Win on Arena of each guild member'),
+('GSystem.GuildLevel.Exp.ForBG', 'int', 205, '1', NULL, 'exp of guild for Win on BG of each guild member'),
+('GSystem.GuildLevel.Exp.ForLFG', 'int', 206, '1', NULL, 'exp of guild for Win on LFG of each guild member'),
+('GSystem.GuildWars.Exp.ForEnemyGuildKill', 'int', 207, '1', NULL, 'reward guild by exp for killing members of enemy guild (in GW status). Depend from GSystem.GuildLevel.Enabled'),
+('GSystem.GuildWars.Exp.ForWinnerOfGW', 'int', 208, '250', NULL, 'reward winner guild by exp for Win in Guild Wars'),
+('GSystem.GuildWars.Exp.ForLoserOfGW', 'int', 209, '100', NULL, 'reward winner guild by exp for Lose in Guild Wars'),
+('GSystem.GuildLevel.LvL.ForMyBank', 'int', 210, '5', NULL, 'Level of guild for opening MyBank func'),
+('GSystem.GuildLevel.LvL.ForRepair', 'int', 211, '3', NULL, 'Level of guild for opening Repair func'),
+('DalaranGEvent.Min.Players', 'int', 212, '5', NULL, 'DalaranCrater Event minimal players');
