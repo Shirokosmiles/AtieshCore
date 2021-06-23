@@ -1,7 +1,7 @@
 -- Vip LANG_PINFO_CHR_VIP_MODE
-DELETE FROM `trinity_string` WHERE entry = 883;
+DELETE FROM `trinity_string` WHERE entry = 884;
 INSERT INTO `trinity_string` VALUES
-(883,'The character has VIP privileges: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Игрок имеет VIP привилегии: %s');
+(884,'The character has VIP privileges: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Игрок имеет VIP привилегии: %s');
 
 -- Vip LANG_PLAYER_VIP_TIME_EXIST
 DELETE FROM `trinity_string` WHERE entry = 11120;

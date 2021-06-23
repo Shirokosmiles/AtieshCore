@@ -1671,13 +1671,16 @@ public:
             stmt->setUInt32(0, lowguid);
             result2 = CharacterDatabase.Query(stmt);
         }
+        else
+            banType = handler->GetTrinityString(LANG_ACCOUNT);
 
         if (result2)
         {
-            Field* fields = result2->Fetch();
-            banTime       = int64(fields[1].GetUInt64() ? 0 : fields[0].GetUInt32());
-            bannedBy      = fields[2].GetString();
-            banReason     = fields[3].GetString();
+            Field* fields  = result2->Fetch();
+            bool permanent = fields[1].GetBool();
+            banTime        = !permanent ? int64(fields[0].GetUInt32()) : 0;
+            bannedBy       = fields[2].GetString();
+            banReason      = fields[3].GetString();
         }
 
         // Can be used to query data from Characters database
@@ -1822,7 +1825,7 @@ public:
         if (target)
         {
             std::string _canfly = target->IsCanFlybyServer() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
-            handler->PSendSysMessage(LANG_PINFO_CHR_FLY_MODE, _canfly.c_str());
+            handler->PSendSysMessage(LANG_PINFO_CHR_ANTICHEAT_FLY_MODE, _canfly.c_str());
 
             std::string _hasvip = target->IsPremium() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
             handler->PSendSysMessage(LANG_PINFO_CHR_VIP_MODE, _hasvip.c_str());
