@@ -144,7 +144,7 @@ struct boss_anub_arak : public BossAI
         events.ScheduleEvent(EVENT_CARRION_BEETLES, 14s, 17s, 0, PHASE_EMERGE);
 
         // set up world triggers
-        std::list<TempSummon*> summoned;
+        std::vector<TempSummon*> summoned;
         me->SummonCreatureGroup(SUMMON_GROUP_WORLD_TRIGGER_GUARDIAN, &summoned);
         if (summoned.empty()) // something went wrong
         {
@@ -160,6 +160,7 @@ struct boss_anub_arak : public BossAI
             EnterEvadeMode(EVADE_REASON_OTHER);
             return;
         }
+        summoned.clear();
     }
 
     void EnterEvadeMode(EvadeReason /*why*/) override

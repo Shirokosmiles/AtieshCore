@@ -16,7 +16,7 @@
  */
 
 #include "ScriptMgr.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
@@ -1609,7 +1609,7 @@ class spell_halion_damage_aoe_summon : public SpellScriptLoader
                 PreventHitDefaultEffect(effIndex);
                 Unit* caster = GetCaster();
                 uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
-                SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
+                SummonPropertiesDBC const* properties = sDBCStoresMgr->GetSummonPropertiesDBC(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
                 uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
                 Position pos = caster->GetPosition();

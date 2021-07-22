@@ -620,14 +620,11 @@ class spell_dk_corpse_explosion : public SpellScript
 enum DancingRuneWeapon
 {
     DATA_INITIAL_TARGET_GUID = 1,
-
-    NPC_DK_DANCING_RUNE_WEAPON = 27893,
-
-    SPELL_DK_BLOOD_STRIKE = 45902,
-    SPELL_DK_ICY_TOUCH = 45477,
-    SPELL_DK_PLAGUE_STRIKE = 45462,
-    SPELL_DK_HEART_STRIKE = 55050,
-    SPELL_DK_DEATH_STRIKE = 49998
+    SPELL_DK_BLOOD_STRIKE    = 45902,
+    SPELL_DK_ICY_TOUCH       = 45477,
+    SPELL_DK_PLAGUE_STRIKE   = 45462,
+    SPELL_DK_HEART_STRIKE    = 55050,
+    SPELL_DK_DEATH_STRIKE    = 49998
 };
 
 class spell_dk_dancing_rune_weapon : public AuraScript
