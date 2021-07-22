@@ -144,7 +144,7 @@ struct boss_anub_arak : public BossAI
         events.ScheduleEvent(EVENT_CARRION_BEETLES, 14s, 17s, 0, PHASE_EMERGE);
 
         // set up world triggers
-        std::vector<TempSummon*> summoned;
+        std::list<TempSummon*> summoned;
         me->SummonCreatureGroup(SUMMON_GROUP_WORLD_TRIGGER_GUARDIAN, &summoned);
         if (summoned.empty()) // something went wrong
         {
@@ -152,7 +152,6 @@ struct boss_anub_arak : public BossAI
             return;
         }
         _guardianTrigger = (*summoned.begin())->GetGUID();
-        summoned.clear();
 
         if (Creature* trigger = DoSummon(NPC_WORLD_TRIGGER, me->GetPosition(), 0s, TEMPSUMMON_MANUAL_DESPAWN))
             _assassinTrigger = trigger->GetGUID();
@@ -212,7 +211,7 @@ struct boss_anub_arak : public BossAI
                     break;
                 case EVENT_DARTER:
                 {
-                    std::vector<Creature*> triggers;
+                    std::list<Creature*> triggers;
                     me->GetCreatureListWithEntryInGrid(triggers, NPC_WORLD_TRIGGER);
                     if (!triggers.empty())
                     {
@@ -223,7 +222,6 @@ struct boss_anub_arak : public BossAI
                     }
                     else
                         EnterEvadeMode(EVADE_REASON_OTHER);
-                    triggers.clear();
                     break;
                 }
                 case EVENT_ASSASSIN:

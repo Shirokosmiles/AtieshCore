@@ -16,7 +16,7 @@
  */
 
 #include "ScriptMgr.h"
-#include "DBCStoresMgr.h"
+#include "DBCStores.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
@@ -453,7 +453,7 @@ class boss_twilight_halion : public CreatureScript
                     if (me->IsDamageEnoughForLootingAndReward())
                         halion->LowerPlayerDamageReq(halion->GetMaxHealth());
 
-                    if (halion->IsAlive() && killer)
+                    if (halion->IsAlive())
                         Unit::Kill(killer, halion);
                 }
 
@@ -1609,7 +1609,7 @@ class spell_halion_damage_aoe_summon : public SpellScriptLoader
                 PreventHitDefaultEffect(effIndex);
                 Unit* caster = GetCaster();
                 uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
-                SummonPropertiesDBC const* properties = sDBCStoresMgr->GetSummonPropertiesDBC(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
+                SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
                 uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
                 Position pos = caster->GetPosition();
