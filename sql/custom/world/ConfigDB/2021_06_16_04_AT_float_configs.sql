@@ -1,4 +1,5 @@
-INSERT INTO `world`.`world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+DELETE FROM `world_config` WHERE `Type` = 'float' AND `IDInTypeGroup` between 0 and 23;
+INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
 ('MaxGroupXPDistance', 'float', 0, '74', NULL, 'Max distance to creature for group member to get experience at creature death.'),
 ('MaxRecruitAFriendBonusDistance', 'float', 1, '100', NULL, 'Max distance between character and and group to gain the Recruit-A-Friend XP multiplier.'),
 ('MonsterSight', 'float', 2, '50', NULL, 'The maximum distance in yards that a \"monster\" creature can see regardless of level difference (through CreatureAI::IsVisible). Increases CONFIG_SIGHT_MONSTER to 50 yards. Used to be 20 yards. #Default:     50.000000'),

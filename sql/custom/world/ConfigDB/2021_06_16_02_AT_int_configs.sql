@@ -1,4 +1,5 @@
-INSERT INTO `world`.`world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+DELETE FROM `world_config` WHERE `Type` = 'int' AND `IDInTypeGroup` between 0 and 212;
+INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
 -- TC configs
 ('Compression', 'int', 0, '1', NULL, 'Compression level for client update packages. (1   - (Speed) -- 9   - (Best compression))'),
 ('PlayerSaveInterval', 'int', 1, '90000', NULL, 'Time (in milliseconds) for player save interval.'),

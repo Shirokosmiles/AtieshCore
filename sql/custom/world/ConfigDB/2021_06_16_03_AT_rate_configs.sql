@@ -1,4 +1,5 @@
-INSERT INTO `world`.`world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+DELETE FROM `world_config` WHERE `Type` = 'rate' AND `IDInTypeGroup` between 0 and 72;
+INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
 -- TC configs
 ('Rate.Health', 'rate', 0, '1', NULL, 'Multiplier to configure health, mana, incoming rage, loss of rage, focus energy and loyalty increase or decrease.'),
 ('Rate.Mana', 'rate', 1, '1', NULL, 'Multiplier to configure health, mana, incoming rage, loss of rage, focus energy and loyalty increase or decrease.'),

@@ -1,4 +1,5 @@
-INSERT INTO `world`.`world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+DELETE FROM `world_config` WHERE `Type` = 'bool' AND `IDInTypeGroup` between 0 and 142;
+INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
 -- TC configs
 ('DurabilityLoss.InPvP', 'bool', 0, '0', NULL, 'Durability loss on death during PvP.'),
 ('AddonChannel', 'bool', 1, '1', NULL, 'Configure the use of the addon channel through the server (some client side addons will not work correctly with disabled addon channel)'),
