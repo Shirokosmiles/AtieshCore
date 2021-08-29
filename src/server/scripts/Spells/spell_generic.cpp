@@ -3582,7 +3582,7 @@ class spell_gen_upper_deck_create_foam_sword : public SpellScript
 {
     PrepareSpellScript(spell_gen_upper_deck_create_foam_sword);
 
-    void HandleScript(SpellEffIndex effIndex)
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (Player* player = GetHitPlayer())
         {
@@ -3594,7 +3594,7 @@ class spell_gen_upper_deck_create_foam_sword : public SpellScript
                     return;
             }
 
-            CreateItem(effIndex, itemId[urand(0, 4)]);
+            CreateItem(itemId[urand(0, 4)]);
         }
     }
 
