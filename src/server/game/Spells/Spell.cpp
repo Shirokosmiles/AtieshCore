@@ -5466,12 +5466,12 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
         return SPELL_FAILED_CUSTOM_ERROR;
     }
 
-    for (uint8 j = EFFECT_0; j < MAX_SPELL_EFFECTS; ++j) // Faire Fire should not restrict to cast stealth
+    for (SpellEffectInfo const& spellEffectInfo : m_spellInfo->GetEffects())
     {
-        if (!m_spellInfo->Effects[j].IsAura())
+        if (!spellEffectInfo.IsAura())
             continue;
 
-        if (m_spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_MOD_STEALTH)
+        if (spellEffectInfo.ApplyAuraName == SPELL_AURA_MOD_STEALTH)
         {
             if (m_caster->ToUnit() &&
                 m_caster->ToUnit()->HasAuraFaireFire())

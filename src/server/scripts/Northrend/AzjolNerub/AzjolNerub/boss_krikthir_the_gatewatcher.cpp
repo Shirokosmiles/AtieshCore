@@ -140,7 +140,6 @@ struct boss_krik_thir : public BossAI
             me->SummonCreatureGroup(i, &adds);
             for (TempSummon* add : adds)
                 add->AI()->SetData(DATA_PET_GROUP, i);
-            adds.clear();
         }
     }
 

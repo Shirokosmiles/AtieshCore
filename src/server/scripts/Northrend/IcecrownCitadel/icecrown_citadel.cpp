@@ -1381,7 +1381,7 @@ class spell_icc_sprit_alarm : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         uint32 trapId = 0;
-        switch (GetSpellInfo()->Effects[effIndex].MiscValue)
+        switch (GetEffectInfo().MiscValue)
         {
             case EVENT_AWAKEN_WARD_1:
                 trapId = GO_SPIRIT_ALARM_1;
@@ -1800,8 +1800,8 @@ public:
             if (!instance)
                 return;
 
-            uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
-            SummonPropertiesDBC const* properties = sDBCStoresMgr->GetSummonPropertiesDBC(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
+            uint32 entry = uint32(GetEffectInfo(effIndex).MiscValue);
+            SummonPropertiesDBC const* properties = sDBCStoresMgr->GetSummonPropertiesDBC(uint32(GetEffectInfo(effIndex).MiscValueB));
 
             Position pos = caster->GetPosition();
             if (caster->GetOrientation() < 1.8f)

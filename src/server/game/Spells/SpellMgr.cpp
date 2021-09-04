@@ -2991,9 +2991,9 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Shaman Dual Wield has skill
     ApplySpellFix({ 674 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[1].Effect = SPELL_EFFECT_SKILL;
-        spellInfo->Effects[1].BasePoints = 1;
-        spellInfo->Effects[1].MiscValue = 118; // Dual Wield skill
+        spellInfo->_GetEffect(EFFECT_1).Effect = SPELL_EFFECT_SKILL;
+        spellInfo->_GetEffect(EFFECT_1).BasePoints = 1;
+        spellInfo->_GetEffect(EFFECT_1).MiscValue = 118; // Dual Wield skill
     });
 
     // Some spells have no amplitude set
@@ -3950,7 +3950,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         67546,                  // Warrior Grand Champion - Rolling Throw
         }, [](SpellInfo* spellInfo) // Should hit both caster and target
     {
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+        spellInfo->_GetEffect(EFFECT_0).TargetB = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
     });
 
     ApplySpellFix({
@@ -3978,7 +3978,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
         // in 3.3.5 there is only one radius in dbc which is 0 yards in this case
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_7_YARDS); // use max radius from 4.3.4
+        spellInfo->_GetEffect(EFFECT_0).RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_7_YARDS); // use max radius from 4.3.4
     });
     // END OF TRIAL OF THE CHAMPION SPELLS
 
@@ -4425,7 +4425,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Putrice-pre event leap spell
     ApplySpellFix({ 70485 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_10_YARDS);
+        spellInfo->_GetEffect(EFFECT_0).RadiusEntry = sDBCStoresMgr->GetSpellRadiusDBC(EFFECT_RADIUS_10_YARDS);
     });
 
     ApplySpellFix({
@@ -5067,10 +5067,10 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Wild Hunt (Rank 1) Wild Hunt (Rank 2)
     ApplySpellFix({ 62758, 62762 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
-        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
+        spellInfo->_GetEffect(EFFECT_0).Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->_GetEffect(EFFECT_0).ApplyAuraName = SPELL_AURA_DUMMY;
+        spellInfo->_GetEffect(EFFECT_1).Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->_GetEffect(EFFECT_1).ApplyAuraName = SPELL_AURA_DUMMY;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

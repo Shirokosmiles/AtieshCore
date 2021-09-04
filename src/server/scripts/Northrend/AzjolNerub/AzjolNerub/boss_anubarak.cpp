@@ -160,7 +160,6 @@ struct boss_anub_arak : public BossAI
             EnterEvadeMode(EVADE_REASON_OTHER);
             return;
         }
-        summoned.clear();
     }
 
     void EnterEvadeMode(EvadeReason /*why*/) override
@@ -343,7 +342,8 @@ struct boss_anub_arak : public BossAI
         }
     }
 
-    void DamageTaken(Unit* /*source*/, uint32& damage) override
+    //void DamageTaken(Unit* /*source*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage) override
     {
         if (me->HasAura(SPELL_SUBMERGE))
             damage = 0;

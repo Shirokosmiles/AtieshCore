@@ -1198,7 +1198,7 @@ class spell_paletress_reflective_shield : public SpellScriptLoader
                 if (dmgInfo.GetAttacker() == GetTarget())
                     return;
 
-                int32 bp = CalculatePct(absorbAmount, GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                int32 bp = CalculatePct(absorbAmount, GetSpellInfo()->GetEffect(EFFECT_0).CalcValue());
                 GetTarget()->CastSpell(dmgInfo.GetAttacker(), SPELL_SHIELD_REFLECT, CastSpellExtraArgs(aurEff).AddSpellBP0(bp));
             }
 

@@ -186,7 +186,6 @@ struct boss_hadronox : public BossAI
             summon->AI()->SetData(DATA_CRUSHER_PACK_ID, group);
             summon->AI()->DoAction(ACTION_PACK_WALK);
         }
-        summoned.clear();
     }
 
     void MovementInform(uint32 type, uint32 /*id*/) override
@@ -354,9 +353,10 @@ struct boss_hadronox : public BossAI
     }
 
     // Safeguard to prevent Hadronox dying to NPCs
-    void DamageTaken(Unit* who, uint32& damage) override
+    //void DamageTaken(Unit* who, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+    void DamageTaken(Unit* attacker, uint32& damage) override
     {
-        if ((!who || !who->IsControlledByPlayer()) && me->HealthBelowPct(70))
+        if ((!attacker || !attacker->IsControlledByPlayer()) && me->HealthBelowPct(70))
         {
             if (me->HealthBelowPctDamaged(5, damage))
                 damage = 0;
@@ -515,7 +515,8 @@ struct npc_anub_ar_crusher : public npc_hadronox_crusherPackAI
         Talk(CRUSHER_SAY_AGGRO);
     }
 
-    void DamageTaken(Unit* /*source*/, uint32& damage) override
+    //void DamageTaken(Unit* /*source*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage) override
     {
         if (_hadFrenzy || !me->HealthBelowPctDamaged(25, damage))
             return;

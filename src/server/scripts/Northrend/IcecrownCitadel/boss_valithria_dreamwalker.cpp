@@ -1068,7 +1068,7 @@ class spell_dreamwalker_summoner : public SpellScript
         if (!GetHitUnit())
             return;
 
-        GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
+        GetHitUnit()->CastSpell(GetCaster(), GetEffectInfo().TriggerSpell, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
     }
 
     void Register() override
@@ -1140,7 +1140,7 @@ class spell_dreamwalker_summon_suppresser_effect : public SpellScript
         if (!GetHitUnit())
             return;
 
-        GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
+        GetHitUnit()->CastSpell(GetCaster(), GetEffectInfo().TriggerSpell, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
     }
 
     void Register() override
@@ -1233,7 +1233,7 @@ class spell_dreamwalker_twisted_nightmares : public SpellScript
         PreventHitDefaultEffect(effIndex);
 
         if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-            GetHitUnit()->CastSpell(nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
+            GetHitUnit()->CastSpell(nullptr, GetEffectInfo().TriggerSpell, instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
     }
 
     void Register() override

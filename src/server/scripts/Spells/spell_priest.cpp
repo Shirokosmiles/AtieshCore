@@ -1288,7 +1288,7 @@ public:
         {
             if (Unit* owner = GetUnitOwner()->GetOwner())
             {
-                Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                Stats stat = Stats(aurEff->GetSpellEffectInfo().MiscValue);
                 float ownerStat = owner->GetStat(stat);
                 int32 mod = 30;
                 amount = CalculatePct(std::max<int32>(0, ownerStat), mod);

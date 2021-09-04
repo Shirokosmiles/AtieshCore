@@ -397,7 +397,7 @@ class go_wg_vehicle_teleporter : public GameObjectScript
                 return nullptr;
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 _checkTimer += diff;
                 if (_checkTimer >= 1000)
@@ -590,7 +590,7 @@ class spell_wintergrasp_tenacity_refresh : public AuraScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        uint32 triggeredSpellId = spellInfo->Effects[EFFECT_2].CalcValue();
+        uint32 triggeredSpellId = spellInfo->GetEffect(EFFECT_2).CalcValue();
         return !triggeredSpellId || ValidateSpellInfo({ triggeredSpellId });
     }
 
@@ -598,7 +598,7 @@ class spell_wintergrasp_tenacity_refresh : public AuraScript
     {
         PreventDefaultAction();
 
-        if (uint32 triggeredSpellId = GetSpellInfo()->Effects[aurEff->GetEffIndex()].CalcValue())
+        if (uint32 triggeredSpellId = aurEff->GetSpellEffectInfo().CalcValue())
         {
             int32 bp = 0;
             if (AuraEffect const* healEffect = GetEffect(EFFECT_0))
@@ -616,7 +616,7 @@ class spell_wintergrasp_tenacity_refresh : public AuraScript
 
     void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        if (uint32 triggeredSpellId = GetSpellInfo()->Effects[aurEff->GetEffIndex()].CalcValue())
+        if (uint32 triggeredSpellId = aurEff->GetSpellEffectInfo().CalcValue())
             GetTarget()->RemoveAurasDueToSpell(triggeredSpellId);
     }
 
@@ -632,7 +632,7 @@ class condition_is_wintergrasp_horde : public ConditionScript
     public:
         condition_is_wintergrasp_horde() : ConditionScript("condition_is_wintergrasp_horde") { }
 
-        bool OnConditionCheck(Condition const* /* condition */, ConditionSourceInfo& /* sourceInfo */)
+        bool OnConditionCheck(Condition const* /* condition */, ConditionSourceInfo& /* sourceInfo */) override
         {
             if (sWintergraspMgr->IsEnabled() && sWintergraspMgr->GetDefenderTeam() == TEAM_HORDE)
                 return true;
@@ -645,7 +645,7 @@ class condition_is_wintergrasp_alliance : public ConditionScript
     public:
         condition_is_wintergrasp_alliance() : ConditionScript("condition_is_wintergrasp_alliance") { }
 
-        bool OnConditionCheck(Condition const* /* condition */, ConditionSourceInfo& /* sourceInfo */)
+        bool OnConditionCheck(Condition const* /* condition */, ConditionSourceInfo& /* sourceInfo */) override
         {
             if (sWintergraspMgr->IsEnabled() && sWintergraspMgr->GetDefenderTeam() == TEAM_ALLIANCE)
                 return true;

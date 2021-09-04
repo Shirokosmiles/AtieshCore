@@ -135,6 +135,7 @@ struct boss_baltharus_the_warborn : public BossAI
         events.ScheduleEvent(EVENT_SUMMONS_ATTACK, 2s);
     }
 
+    //void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
     void DamageTaken(Unit* /*attacker*/, uint32& damage) override
     {
         if (GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
@@ -247,6 +248,7 @@ struct npc_baltharus_the_warborn_clone : public BossAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override { }
 
+    //void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
     void DamageTaken(Unit* /*attacker*/, uint32& damage) override
     {
         // Setting DATA_BALTHARUS_SHARED_HEALTH to 0 when killed would bug the boss.
