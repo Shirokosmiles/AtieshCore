@@ -744,7 +744,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
     uint32 rage_damage = damage + (cleanDamage ? cleanDamage->absorbed_damage : 0);
 
     if (UnitAI* victimAI = victim->GetAI())
-        victimAI->DamageTaken(attacker, damage);
+        victimAI->DamageTaken(attacker, damage, damagetype, spellProto);
 
     if (UnitAI* attackerAI = attacker ? attacker->GetAI() : nullptr)
         attackerAI->DamageDealt(victim, damage, damagetype);
@@ -7963,14 +7963,14 @@ uint32 Unit::GetMechanicImmunityMask() const
 
 bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, SpellEffectInfo const& spellEffectInfo, WorldObject const* caster) const
 {
-    if (!spellInfo || !spellEffectInfo.IsEffect())
+    if (!spellInfo)
         return false;
 
     if (spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
         return false;
 
     // If m_immuneToEffect type contain this effect type, IMMUNE effect.
-    SpellImmuneContainer const& effectList = m_spellImmune[IMMUNITY_EFFECT];
+    auto const& effectList = m_spellImmune[IMMUNITY_EFFECT];
     if (effectList.count(spellEffectInfo.Effect) > 0)
         return true;
 

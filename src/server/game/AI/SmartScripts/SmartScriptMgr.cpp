@@ -486,9 +486,6 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has abs(`target.o` = %f) > 2*PI (orientation is expressed in radians)",
             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.target.o);
 
-    if (e.GetActionType() == SMART_ACTION_INSTALL_AI_TEMPLATE)
-        return true; // AI template has special handling
-
     switch (e.GetTargetType())
     {
         case SMART_TARGET_CREATURE_DISTANCE:
@@ -797,19 +794,17 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
     static size_t rawCount = sizeof(SmartEvent::raw) / sizeof(uint32);
     size_t paramsCount = paramsStructSize / sizeof(uint32);
 
-    bool valid = true;
     for (size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.event.raw)[index];
         if (value != 0)
         {
-            TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has unused event_param%zu with value %u, it must be 0, skipped.",
+            TC_LOG_WARN("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has unused event_param%zu with value %u, it should be 0.",
                 e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), index + 1, value);
-            valid = false;
         }
     }
 
-    return valid;
+    return true;
 }
 
 bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
@@ -877,7 +872,6 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_WP_STOP: return sizeof(SmartAction::wpStop);
             case SMART_ACTION_ADD_ITEM: return sizeof(SmartAction::item);
             case SMART_ACTION_REMOVE_ITEM: return sizeof(SmartAction::item);
-            case SMART_ACTION_INSTALL_AI_TEMPLATE: return sizeof(SmartAction::installTtemplate);
             case SMART_ACTION_SET_RUN: return sizeof(SmartAction::setRun);
             case SMART_ACTION_SET_DISABLE_GRAVITY: return sizeof(SmartAction::setDisableGravity);
             case SMART_ACTION_SET_SWIM: return sizeof(SmartAction::setSwim);
@@ -913,7 +907,6 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_REMOVE_UNIT_FIELD_BYTES_1: return sizeof(SmartAction::delunitByte);
             case SMART_ACTION_INTERRUPT_SPELL: return sizeof(SmartAction::interruptSpellCasting);
             case SMART_ACTION_SEND_GO_CUSTOM_ANIM: return sizeof(SmartAction::sendGoCustomAnim);
-            case SMART_ACTION_SET_DYNAMIC_FLAG: return sizeof(SmartAction::flag);
             case SMART_ACTION_ADD_DYNAMIC_FLAG: return sizeof(SmartAction::flag);
             case SMART_ACTION_REMOVE_DYNAMIC_FLAG: return sizeof(SmartAction::flag);
             case SMART_ACTION_JUMP_TO_POS: return sizeof(SmartAction::jump);
@@ -973,19 +966,17 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
     static size_t rawCount = sizeof(SmartAction::raw) / sizeof(uint32);
     size_t paramsCount = paramsStructSize / sizeof(uint32);
 
-    bool valid = true;
     for (size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.action.raw)[index];
         if (value != 0)
         {
-            TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has unused action_param%zu with value %u, it must be 0, skipped.",
+            TC_LOG_WARN("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has unused action_param%zu with value %u, it should be 0.",
                 e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), index + 1, value);
-            valid = false;
         }
     }
 
-    return valid;
+    return true;
 }
 
 bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
@@ -1036,19 +1027,17 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
     static size_t rawCount = sizeof(SmartTarget::raw) / sizeof(uint32);
     size_t paramsCount = paramsStructSize / sizeof(uint32);
 
-    bool valid = true;
     for (size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.target.raw)[index];
         if (value != 0)
         {
-            TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has unused target_param%zu with value %u, it must be 0, skipped.",
+            TC_LOG_WARN("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has unused target_param%zu with value %u, it should be 0.",
                 e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), index + 1, value);
-            valid = false;
         }
     }
 
-    return valid;
+    return true;
 }
 
 bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
@@ -1465,6 +1454,19 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 TC_LOG_ERROR("sql.sql", "SmartAIMgr: Not handled event_type(%u), Entry %d SourceType %u Event %u Action %u, skipped.", e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                 return false;
         }
+
+        // Additional check for deprecated
+        switch (e.GetEventType())
+        {
+            // Deprecated
+            case SMART_EVENT_FRIENDLY_HEALTH:
+            case SMART_EVENT_TARGET_HEALTH_PCT:
+            case SMART_EVENT_IS_BEHIND_TARGET:
+                TC_LOG_WARN("sql.sql.deprecation", "SmartAIMgr: Deprecated event_type(%u), Entry %d SourceType %u Event %u Action %u, it might be removed in the future, loaded for now.", e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                break;
+            default:
+                break;
+        }
     }
 
     if (!CheckUnusedEventParams(e))
@@ -1793,13 +1795,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             if (!sDBCStoresMgr->GetMapDBC(e.action.teleport.mapID))
             {
                 TC_LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Map entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.teleport.mapID);
-                return false;
-            }
-            break;
-        case SMART_ACTION_INSTALL_AI_TEMPLATE:
-            if (e.action.installTtemplate.id >= SMARTAI_TEMPLATE_END)
-            {
-                TC_LOG_ERROR("sql.sql", "SmartAIMgr: Creature %d Event %u Action %u uses non-existent AI template id %u, skipped.", e.entryOrGuid, e.event_id, e.GetActionType(), e.action.installTtemplate.id);
                 return false;
             }
             break;
@@ -2171,7 +2166,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_UNIT_FIELD_BYTES_1:
         case SMART_ACTION_REMOVE_UNIT_FIELD_BYTES_1:
         case SMART_ACTION_SEND_GO_CUSTOM_ANIM:
-        case SMART_ACTION_SET_DYNAMIC_FLAG:
         case SMART_ACTION_ADD_DYNAMIC_FLAG:
         case SMART_ACTION_REMOVE_DYNAMIC_FLAG:
         case SMART_ACTION_JUMP_TO_POS:
@@ -2195,6 +2189,11 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_DESPAWN_SPAWNGROUP:
         case SMART_ACTION_PLAY_CINEMATIC:
             break;
+        // No longer supported
+        case SMART_ACTION_INSTALL_AI_TEMPLATE:
+        case SMART_ACTION_SET_DYNAMIC_FLAG:
+            TC_LOG_ERROR("sql.sql.nolongersupported", "SmartAIMgr: No longer supported action_type(%u), event_type(%u), Entry %d SourceType %u Event %u, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);
+            return false;
         default:
             TC_LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type(%u), event_type(%u), Entry %d SourceType %u Event %u, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);
             return false;

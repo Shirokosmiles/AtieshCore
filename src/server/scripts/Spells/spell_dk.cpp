@@ -101,7 +101,14 @@ enum DeathKnightSpells
     SPELL_DK_RUNIC_RETURN                       = 61258,
     SPELL_DK_WANDERING_PLAGUE_DAMAGE            = 50526,
     SPELL_DK_DEATH_COIL_R1                      = 47541,
-    SPELL_DK_DEATH_GRIP_INITIAL                 = 49576
+    SPELL_DK_DEATH_GRIP_INITIAL                 = 49576,
+    SPELL_DK_BLOOD_STRIKE                       = 45902,
+    SPELL_DK_ICY_TOUCH                          = 45477,
+    SPELL_DK_PLAGUE_STRIKE                      = 45462,
+    SPELL_DK_DEATH_STRIKE                       = 49998,
+    SPELL_DK_HEART_STRIKE                       = 55050,
+    SPELL_DK_OBLITERATE                         = 49020,
+    SPELL_DK_RUNE_STRIKE                        = 56815
 };
 
 enum DeathKnightSpellIcons
@@ -110,7 +117,7 @@ enum DeathKnightSpellIcons
     DK_ICON_ID_IMPROVED_DEATH_STRIKE            = 2751
 };
 
-enum Misc
+enum DeathKnightMisc
 {
     NPC_DK_GHOUL                                = 26125,
     NPC_DK_DANCING_RUNE_WEAPON                  = 27893,
@@ -345,7 +352,7 @@ private:
         return ValidateSpellInfo({ SPELL_DK_ANTI_MAGIC_SHELL_TALENT });
     }
 
-    void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
         Unit* owner = GetCaster()->GetOwner();
@@ -357,7 +364,7 @@ private:
             amount += int32(2 * player->GetTotalAttackPowerValue(BASE_ATTACK));
     }
 
-    void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32 &absorbAmount)
     {
         absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
     }
@@ -618,69 +625,6 @@ class spell_dk_corpse_explosion : public SpellScript
     }
 
     WorldObject* _target = nullptr;
-};
-
-// 49028 - Dancing Rune Weapon
-enum DancingRuneWeapon
-{
-    DATA_INITIAL_TARGET_GUID = 1,
-    SPELL_DK_BLOOD_STRIKE    = 45902,
-    SPELL_DK_ICY_TOUCH       = 45477,
-    SPELL_DK_PLAGUE_STRIKE   = 45462,
-    SPELL_DK_HEART_STRIKE    = 55050,
-    SPELL_DK_DEATH_STRIKE    = 49998
-};
-
-class spell_dk_dancing_rune_weapon : public AuraScript
-{
-    PrepareAuraScript(spell_dk_dancing_rune_weapon);
-
-    void HandleTarget(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* caster = GetCaster();
-        if (!caster)
-            return;
-
-        std::vector<Creature*> runeWeapons;
-        caster->GetAllMinionsByEntry(runeWeapons, NPC_DK_DANCING_RUNE_WEAPON);
-        for (Creature* temp : runeWeapons)
-            temp->AI()->SetGUID(GetTarget()->GetGUID(), DATA_INITIAL_TARGET_GUID);
-        runeWeapons.clear();
-    }
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
-            if (procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_STRIKE)) ||
-                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_ICY_TOUCH)) ||
-                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_PLAGUE_STRIKE)) ||
-                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_HEART_STRIKE)) ||
-                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_STRIKE)) ||
-                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_COIL_DAMAGE)))
-                return true;
-
-        return false;
-    }
-
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-
-        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-        if (!procSpell)
-            return;
-
-        for (Unit* controlled : GetTarget()->m_Controlled)
-            if (controlled->GetEntry() == NPC_DK_DANCING_RUNE_WEAPON)
-                controlled->CastSpell(controlled->GetVictim(), procSpell->Id);
-    }
-
-    void Register() override
-    {
-        AfterEffectApply += AuraEffectApplyFn(spell_dk_dancing_rune_weapon::HandleTarget, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        DoCheckProc += AuraCheckProcFn(spell_dk_dancing_rune_weapon::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_dk_dancing_rune_weapon::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
-    }
 };
 
 // -43265 - Death and Decay
@@ -2708,6 +2652,116 @@ public:
     }
 };
 
+// 51963 - Gargoyle Strike
+class spell_pet_dk_gargoyle_strike : public SpellScript
+{
+    PrepareSpellScript(spell_pet_dk_gargoyle_strike);
+
+    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
+    {
+        int32 damage = 60;
+        if (Unit* caster = GetCaster())
+        {
+            if (caster->GetLevel() >= 60)
+                damage += (caster->GetLevel() - 60) * 4;
+        }
+
+        SetEffectValue(damage);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_pet_dk_gargoyle_strike::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
+enum DancingRuneWeaponMisc
+{
+    DATA_INITIAL_TARGET_GUID = 1,
+};
+
+// 49028 - Dancing Rune Weapon
+class spell_dk_dancing_rune_weapon : public AuraScript
+{
+    PrepareAuraScript(spell_dk_dancing_rune_weapon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_DK_BLOOD_STRIKE,
+            SPELL_DK_ICY_TOUCH,
+            SPELL_DK_PLAGUE_STRIKE,
+            SPELL_DK_DEATH_COIL_DAMAGE,
+            SPELL_DK_DEATH_STRIKE,
+            SPELL_DK_HEART_STRIKE,
+            SPELL_DK_OBLITERATE,
+            SPELL_DK_RUNE_STRIKE
+        });
+    }
+
+    void HandleTarget(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        std::vector<Creature*> runeWeapons;
+        caster->GetAllMinionsByEntry(runeWeapons, NPC_DK_DANCING_RUNE_WEAPON);
+        for (Creature* temp : runeWeapons)
+        {
+            if (temp->IsAIEnabled())
+                temp->AI()->SetGUID(GetTarget()->GetGUID(), DATA_INITIAL_TARGET_GUID);
+            temp->GetThreatManager().RegisterRedirectThreat(GetId(), caster->GetGUID(), 100);
+        }
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
+        {
+            if (procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_STRIKE)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_ICY_TOUCH)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_PLAGUE_STRIKE)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_COIL_DAMAGE)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_STRIKE)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_HEART_STRIKE)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_OBLITERATE)) ||
+                procSpell->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_DK_RUNE_STRIKE)))
+                return true;
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* owner = GetUnitOwner();
+        if (!owner)
+            return;
+
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        Unit* runeWeapon = nullptr;
+        for (auto itr = owner->m_Controlled.begin(); itr != owner->m_Controlled.end() && !runeWeapon; itr++)
+            if ((*itr)->GetEntry() == NPC_DK_DANCING_RUNE_WEAPON)
+                runeWeapon = *itr;
+
+        if (!runeWeapon)
+            return;
+
+        if (runeWeapon->IsInCombat() && runeWeapon->GetVictim())
+            runeWeapon->CastSpell(runeWeapon->GetVictim(), procSpell->Id, CastSpellExtraArgs(TriggerCastFlags::TRIGGERED_IGNORE_POWER_AND_REAGENT_COST));
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_dk_dancing_rune_weapon::HandleTarget, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        DoCheckProc += AuraCheckProcFn(spell_dk_dancing_rune_weapon::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dk_dancing_rune_weapon::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     RegisterSpellScript(spell_dk_acclimation);
@@ -2721,7 +2775,6 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_bloodworms);
     RegisterSpellScript(spell_dk_butchery);
     RegisterSpellScript(spell_dk_corpse_explosion);
-    RegisterSpellScript(spell_dk_dancing_rune_weapon);
     RegisterSpellScript(spell_dk_death_and_decay);
     RegisterSpellScript(spell_dk_death_coil);
     RegisterSpellScript(spell_dk_death_gate);
@@ -2766,4 +2819,6 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_ghoul_thrash);
     new spell_dk_summon_gargoyle();
     new spell_dk_blood_tap();
+    RegisterSpellScript(spell_pet_dk_gargoyle_strike);
+    RegisterSpellScript(spell_dk_dancing_rune_weapon);
 }

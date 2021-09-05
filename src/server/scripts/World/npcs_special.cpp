@@ -1464,11 +1464,16 @@ struct npc_training_dummy : NullCreatureAI
 {
     npc_training_dummy(Creature* creature) : NullCreatureAI(creature) { }
 
-    void DamageTaken(Unit* attacker, uint32& damage) override
+    void JustEnteredCombat(Unit* who) override
+    {
+        _combatTimer[who->GetGUID()] = 5s;
+    }
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageType, SpellInfo const* /*spellInfo = nullptr*/) override
     {
         damage = 0;
 
-        if (!attacker)
+        if (!attacker || damageType == DOT)
             return;
 
         _combatTimer[attacker->GetGUID()] = 5s;
@@ -2213,7 +2218,6 @@ enum TrainWrecker
     GO_TOY_TRAIN          = 193963,
     SPELL_TOY_TRAIN_PULSE =  61551,
     SPELL_WRECK_TRAIN     =  62943,
-    ACTION_WRECKED        =      1,
     EVENT_DO_JUMP         =      1,
     EVENT_DO_FACING       =      2,
     EVENT_DO_WRECK        =      3,
@@ -2287,7 +2291,6 @@ class npc_train_wrecker : public CreatureScript
                             if (GameObject* target = VerifyTarget())
                             {
                                 me->CastSpell(target, SPELL_WRECK_TRAIN, false);
-                                target->AI()->DoAction(ACTION_WRECKED);
                                 _timer = 2 * IN_MILLISECONDS;
                                 _nextAction = EVENT_DO_DANCE;
                             }

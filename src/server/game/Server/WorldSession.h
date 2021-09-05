@@ -255,6 +255,8 @@ enum AccountDataType
 #define GLOBAL_CACHE_MASK           0x15
 #define PER_CHARACTER_CACHE_MASK    0xEA
 
+uint32 constexpr MAX_CHARACTERS_PER_REALM = 10; // max supported by client in char enum
+
 struct AccountData
 {
     AccountData() : Time(0), Data("") { }
@@ -457,6 +459,7 @@ class TC_GAME_API WorldSession
 
         AccountTypes GetSecurity() const { return _security; }
         uint32 GetAccountId() const { return _accountId; }
+        std::string const& GetAccountName() const { return _accountName; }
         Player* GetPlayer() const { return _player; }
         std::string const& GetPlayerName() const;
         std::string GetPlayerInfo() const;

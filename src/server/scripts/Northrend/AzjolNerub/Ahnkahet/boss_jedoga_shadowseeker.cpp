@@ -210,8 +210,7 @@ struct boss_jedoga_shadowseeker : public BossAI
         return 0;
     }
 
-    //void DamageTaken(Unit* /*done_by*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
-    void DamageTaken(Unit* /*attacker*/, uint32& damage) override
+    void DamageTaken(Unit* /*done_by*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
     {
         if (HealthBelowPct(55) && events.IsInPhase(PHASE_ONE))
         {

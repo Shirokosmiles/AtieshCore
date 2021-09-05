@@ -436,7 +436,7 @@ struct boss_grand_championAI : BossAI
             me->DisappearAndDie();
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage) override
+    void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
     {
         if (damage >= me->GetHealth() && me->GetVehicleBase())
         {

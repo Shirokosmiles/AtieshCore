@@ -176,7 +176,7 @@ public:
                 Talk(urand(0, 2));
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/) override
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
         {
             if (HealthBelowPct(31) && !doExplode)
             {
@@ -394,7 +394,7 @@ public:
             summons.Despawn(summon);
         }
 
-        void DamageTaken(Unit* /*done_by*/, uint32& damage) override
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
         {
             if (damage >= me->GetHealth() && uiPhase < PHASE_GHOST)
             {

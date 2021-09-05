@@ -455,7 +455,7 @@ struct boss_algalon_the_observer : public BossAI
         me->SetSheath(SHEATH_STATE_UNARMED);
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
     {
         if (_fightWon)
         {
@@ -860,7 +860,7 @@ struct npc_collapsing_star : public PassiveAI
         me->DespawnOrUnsummon(1ms);
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
     {
         if (_dying)
         {

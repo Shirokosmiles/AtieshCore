@@ -48,13 +48,17 @@ enum DeathKnightSpells
     SPELL_DK_RUNE_WEAPON_MARK           = 50474,
     SPELL_DK_DANCING_RUNE_WEAPON_VISUAL = 53160,
     SPELL_FAKE_AGGRO_RADIUS_8_YARD      = 49812,
-    SPELL_RUNE_WEAPON_SCALING_02        = 51906,
+    SPELL_DK_RUNE_WEAPON_SCALING_01     = 51905,
+    SPELL_DK_RUNE_WEAPON_SCALING        = 51906,
+    SPELL_PET_SCALING__MASTER_SPELL_06__SPELL_HIT_EXPERTISE_SPELL_PENETRATION = 67561,
+    SPELL_DK_PET_SCALING_03             = 61697,
+    SPELL_AGGRO_8_YD_PBAE               = 49813,
+    SPELL_DISMISS_RUNEBLADE             = 50707, // Right now despawn is done by its duration
 
     // Main Spells
     SPELL_BLOOD_STRIKE                  = 49926,
     SPELL_PLAGUE_STRIKE                 = 49917,
 
-    SPELL_DISMISS_RUNEBLADE             = 50707, // Right now despawn is done by its duration,
     // Gargoyle attack
     SPELL_ATTACK_GARGOYLE               = 51963
 };
@@ -240,163 +244,230 @@ public:
     }
 };
 
-class npc_pet_dk_guardian : public CreatureScript
+struct npc_pet_dk_guardian : public AggressorAI
 {
-    public:
-        npc_pet_dk_guardian() : CreatureScript("npc_pet_dk_guardian") { }
+    npc_pet_dk_guardian(Creature* creature) : AggressorAI(creature) { }
 
-        struct npc_pet_dk_guardianAI : public AggressorAI
-        {
-            npc_pet_dk_guardianAI(Creature* creature) : AggressorAI(creature) { }
-
-            bool CanAIAttack(Unit const* target) const override
-            {
-                if (!target)
-                    return false;
-                Unit* owner = me->GetOwner();
-                if (owner && !target->IsInCombatWith(owner))
-                    return false;
-                return AggressorAI::CanAIAttack(target);
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const override
-        {
-            return new npc_pet_dk_guardianAI(creature);
-        }
-};
-
-enum DancingRuneWeapon
-{
-    DATA_INITIAL_TARGET_GUID = 1,
-
-    EVENT_ENGAGE_VICTIM = 1,
-    EVENT_SPELL_CAST_2 = 2
-};
-
-class npc_pet_dk_rune_weapon : public CreatureScript
-{
-public:
-    npc_pet_dk_rune_weapon() : CreatureScript("npc_pet_dk_rune_weapon") { }
-
-    struct npc_pet_dk_rune_weaponAI : ScriptedAI
+    bool CanAIAttack(Unit const* target) const override
     {
-        npc_pet_dk_rune_weaponAI(Creature* creature) : ScriptedAI(creature) { }
-
-    void InitializeAI() override
-    {
-        // prevent early victim engage
-        me->SetReactState(REACT_PASSIVE);
+        if (!target)
+            return false;
+        Unit* owner = me->GetOwner();
+        if (owner && !target->IsInCombatWith(owner))
+            return false;
+        return AggressorAI::CanAIAttack(target);
     }
+};
+
+enum DancingRuneWeaponMisc
+{
+    TASK_GROUP_COMBAT = 1,
+    DATA_INITIAL_TARGET_GUID = 1,
+};
+
+struct npc_pet_dk_rune_weapon : ScriptedAI
+{
+    npc_pet_dk_rune_weapon(Creature* creature) : ScriptedAI(creature) { }
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        if (Unit* ownercaster = summoner->ToUnit())
-        {
-            DoCast(ownercaster, SPELL_COPY_WEAPON, true);
-            DoCast(ownercaster, SPELL_DK_RUNE_WEAPON_MARK, true);
-            DoCastSelf(SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
-            DoCastSelf(SPELL_FAKE_AGGRO_RADIUS_8_YARD, true);
-            DoCastSelf(SPELL_RUNE_WEAPON_SCALING_02, true);
-        }
-        _events.ScheduleEvent(EVENT_ENGAGE_VICTIM, 1s);
-        _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6s);
+        me->SetReactState(REACT_PASSIVE);
 
-        me->GetThreatManager().RegisterRedirectThreat(SPELL_DK_DANCING_RUNE_WEAPON, summoner->GetGUID(), 100);
+        if (summoner->GetTypeId() != TYPEID_UNIT)
+            return;
+
+        Unit* unitSummoner = summoner->ToUnit();
+
+        DoCast(unitSummoner, SPELL_COPY_WEAPON, true);
+        DoCast(unitSummoner, SPELL_DK_RUNE_WEAPON_MARK, true);
+        DoCastSelf(SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
+        DoCastSelf(SPELL_FAKE_AGGRO_RADIUS_8_YARD, true);
+        DoCastSelf(SPELL_DK_RUNE_WEAPON_SCALING_01, true);
+        DoCastSelf(SPELL_DK_RUNE_WEAPON_SCALING, true);
+        DoCastSelf(SPELL_PET_SCALING__MASTER_SPELL_06__SPELL_HIT_EXPERTISE_SPELL_PENETRATION, true);
+        DoCastSelf(SPELL_DK_PET_SCALING_03, true);
+
+        _scheduler.Schedule(500ms, [this](TaskContext /*activate*/)
+            {
+                me->SetReactState(REACT_AGGRESSIVE);
+                if (!_targetGUID.IsEmpty())
+                {
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
+                        me->EngageWithTarget(target);
+                }
+            }).Schedule(6s, [this](TaskContext visual)
+                {
+                    // Cast every 6 seconds
+                    DoCastSelf(SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
+                    visual.Repeat();
+                });
     }
 
     void SetGUID(ObjectGuid const& guid, int32 id) override
     {
         if (id == DATA_INITIAL_TARGET_GUID)
-        {
             _targetGUID = guid;
-            if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
-                AttackStart(target);
-        }
+    }
+
+    void JustEnteredCombat(Unit* who) override
+    {
+        ScriptedAI::JustEnteredCombat(who);
+
+        // Investigate further if these casts are done by any owned aura, eitherway SMSG_SPELL_GO is sent every X seconds.
+        _scheduler.Schedule(1s, TASK_GROUP_COMBAT, [this](TaskContext aggro8YD)
+            {
+                // Cast every second
+                if (Unit* victim = me->GetVictim())
+                    DoCast(victim, SPELL_AGGRO_8_YD_PBAE, true);
+                aggro8YD.Repeat();
+            });
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (me->IsInCombat() && !me->GetVictim())
-            EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-
-        if (!me->IsInCombat())
+        Unit* owner = me->GetOwner();
+        if (!owner)
         {
-            Unit* owner = me->GetCharmerOrOwner();
-            Unit* ownerTarget = nullptr;
-            if (Player* playerOwner = owner->ToPlayer())
-                ownerTarget = playerOwner->GetSelectedUnit();
-
-            // recognize which victim will be choosen
-            if (ownerTarget && !ownerTarget->HasBreakableByDamageCrowdControlAura(ownerTarget))
-            {
-                if (ownerTarget->GetTypeId() == TYPEID_PLAYER)
-                    AttackStart(ownerTarget);
-                else if (ownerTarget->GetTypeId() != TYPEID_PLAYER && ownerTarget->GetThreatManager().IsThreatenedBy(owner))
-                    AttackStart(ownerTarget);
-                else
-                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-            }
+            me->DespawnOrUnsummon();
+            return;
         }
 
-        _events.Update(diff);
+        _scheduler.Update(diff);
 
-        while (uint32 _eventId = _events.ExecuteEvent())
-        {
-            switch (_eventId)
-            {
-            case EVENT_ENGAGE_VICTIM:
-                me->SetReactState(REACT_AGGRESSIVE);
-                break;
-            case EVENT_SPELL_CAST_2:
-                // every 6 seconds
-                DoCastSelf(SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
-                _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6s);
-                break;
-            }
-        }
+        if (!UpdateRuneWeaponVictim())
+            return;
 
         DoMeleeAttackIfReady();
     }
 
-private:
-    ObjectGuid _targetGUID;
-    EventMap _events;
-};
-
-    CreatureAI* GetAI(Creature* creature) const override
+    bool CanAIAttack(Unit const* who) const override
     {
-        return new npc_pet_dk_rune_weaponAI(creature);
+        Unit* owner = me->GetOwner();
+        return owner && who->IsAlive() && me->IsValidAttackTarget(who) && !who->HasBreakableByDamageCrowdControlAura() && who->IsInCombatWith(owner) && ScriptedAI::CanAIAttack(who);
     }
-};
 
-// 51963 - Gargoyle Strike
-class spell_pet_dk_gargoyle_strike : public SpellScript
-{
-    PrepareSpellScript(spell_pet_dk_gargoyle_strike);
-
-    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
+    // Do not reload Creature templates on evade mode enter - prevent visual lost
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        int32 damage = 60;
-        if (Unit* caster = GetCaster())
+        _scheduler.CancelGroup(TASK_GROUP_COMBAT);
+
+        if (!me->IsAlive())
         {
-            if (caster->GetLevel() >= 60)
-                damage += (caster->GetLevel() - 60) * 4;
+            EngagementOver();
+            return;
         }
 
-        SetEffectValue(damage);
+        Unit* owner = me->GetCharmerOrOwner();
+
+        me->CombatStop(true);
+        me->SetLootRecipient(nullptr);
+        me->ResetPlayerDamageReq();
+        me->SetLastDamagedTime(0);
+        me->SetCannotReachTarget(false);
+        me->DoNotReacquireSpellFocusTarget();
+        me->SetTarget(ObjectGuid::Empty);
+        EngagementOver();
+
+        if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW))
+        {
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+        }
     }
 
-    void Register() override
+private:
+    // custom UpdateVictim implementation to handle special target selection
+    // we prioritize between things that are in combat with owner based on the owner's threat to them
+    bool UpdateRuneWeaponVictim()
     {
-        OnEffectLaunchTarget += SpellEffectFn(spell_pet_dk_gargoyle_strike::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        Unit* owner = me->GetOwner();
+        if (!owner)
+            return false;
+
+        if (!me->IsEngaged() && !owner->IsInCombat())
+            return false;
+
+        Unit* currentTarget = me->GetVictim();
+        if (currentTarget && !CanAIAttack(currentTarget))
+        {
+            me->InterruptNonMeleeSpells(true); // do not finish casting on invalid targets
+            me->AttackStop();
+            currentTarget = nullptr;
+        }
+
+        Unit* selectedTarget = nullptr;
+
+        // first, try to get the initial target
+        if (Unit* initialTarget = ObjectAccessor::GetUnit(*me, _targetGUID))
+        {
+            if (CanAIAttack(initialTarget))
+                selectedTarget = initialTarget;
+        }
+        else if (!_targetGUID.IsEmpty())
+            _targetGUID.Clear();
+
+        CombatManager const& mgr = owner->GetCombatManager();
+        if (!selectedTarget)
+        {
+            if (mgr.HasPvPCombat())
+            {
+                // select pvp target
+                float minDistance = 0.f;
+                for (auto const& pair : mgr.GetPvPCombatRefs())
+                {
+                    Unit* target = pair.second->GetOther(owner);
+                    if (target->GetTypeId() != TYPEID_PLAYER)
+                        continue;
+                    if (!CanAIAttack(target))
+                        continue;
+
+                    float dist = owner->GetDistance(target);
+                    if (!selectedTarget || dist < minDistance)
+                    {
+                        selectedTarget = target;
+                        minDistance = dist;
+                    }
+                }
+            }
+        }
+
+        if (!selectedTarget)
+        {
+            // select pve target
+            float maxThreat = 0.f;
+            for (auto const& pair : mgr.GetPvECombatRefs())
+            {
+                Unit* target = pair.second->GetOther(owner);
+                if (!CanAIAttack(target))
+                    continue;
+
+                float threat = target->GetThreatManager().GetThreat(owner);
+                if (threat >= maxThreat)
+                {
+                    selectedTarget = target;
+                    maxThreat = threat;
+                }
+            }
+        }
+
+        if (!selectedTarget)
+        {
+            EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+            return false;
+        }
+
+        if (selectedTarget != me->GetVictim())
+            AttackStart(selectedTarget);
+        return true;
     }
+
+    TaskScheduler _scheduler;
+    ObjectGuid _targetGUID;
 };
 
 void AddSC_deathknight_pet_scripts()
 {
     new npc_pet_dk_ebon_gargoyle();
-    new npc_pet_dk_rune_weapon();
-    new npc_pet_dk_guardian();
-    RegisterSpellScript(spell_pet_dk_gargoyle_strike);
+    RegisterCreatureAI(npc_pet_dk_guardian);
+    RegisterCreatureAI(npc_pet_dk_rune_weapon);
 }

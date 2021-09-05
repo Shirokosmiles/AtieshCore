@@ -695,7 +695,7 @@ class boss_leviathan_mk_ii : public CreatureScript
                 _setupRocket = true;
             }
 
-            void DamageTaken(Unit* who, uint32 &damage) override
+            void DamageTaken(Unit* who, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
             {
                 if (damage >= me->GetHealth())
                 {
@@ -939,9 +939,10 @@ class boss_vx_001 : public CreatureScript
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SPECIAL_UNARMED); // This is a hack to force the yet to be unfolded visual state.
                 me->SetReactState(REACT_PASSIVE);
                 _fireFighter = false;
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
 
-            void DamageTaken(Unit* who, uint32 &damage) override
+            void DamageTaken(Unit* who, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
             {
                 if (damage >= me->GetHealth())
                 {
@@ -1124,7 +1125,7 @@ class boss_aerial_command_unit : public CreatureScript
                 fireFigther = false;
             }
 
-            void DamageTaken(Unit* who, uint32 &damage) override
+            void DamageTaken(Unit* who, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
             {
                 if (damage >= me->GetHealth())
                 {

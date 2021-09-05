@@ -287,7 +287,7 @@ class boss_eadric : public CreatureScript
                 argent_challenge_baseAI::OnReset();
             }
 
-            void DamageTaken(Unit* /*done_by*/, uint32& damage) override
+            void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
             {
                 if (instance->GetBossState(DATA_ARGENT_CHALLENGE) == DONE)
                 {
@@ -431,7 +431,7 @@ class boss_paletress : public CreatureScript
                 return _memoryGuid.GetEntry();
             }
 
-            void DamageTaken(Unit* /*done_by*/, uint32 &damage) override
+            void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
             {
                 if (instance->GetBossState(DATA_ARGENT_CHALLENGE) == DONE)
                 {
@@ -687,7 +687,7 @@ class npc_argent_soldier : public CreatureScript
                     _fountainGuid = summon->GetGUID();
             }
 
-            void DamageTaken(Unit* /*attacker*/, uint32& damage) override
+            void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
             {
                 if (me->GetEntry() == NPC_ARGENT_MONK && damage >= me->GetHealth() && !_shielded)
                 {
