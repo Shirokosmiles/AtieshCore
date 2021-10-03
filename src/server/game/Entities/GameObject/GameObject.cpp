@@ -2700,10 +2700,7 @@ GameObjectModel* GameObject::CreateModel()
 
 std::string GameObject::GetDebugInfo() const
 {
-    std::stringstream sstr;
-    sstr << WorldObject::GetDebugInfo() << "\n"
-        << "SpawnId: " << GetSpawnId() << " GoState: " << std::to_string(GetGoState()) << " ScriptId: " << GetScriptId() << " AIName: " << GetAIName();
-    return sstr.str();
+    return fmt::format("{}\nSpawnId: {} GoState: {} ScriptId: {} AIName: {}", WorldObject::GetDebugInfo(), GetSpawnId(), std::to_string(GetGoState()), GetScriptId(), GetAIName());
 }
 
 bool GameObject::IsAtInteractDistance(Player const* player, SpellInfo const* spell) const

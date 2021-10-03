@@ -1084,10 +1084,8 @@ void Guild::RemoveGuildLevel(uint32 value, Player* player)
 
 std::string Guild::PrepareGuildNameByIdWithLvl(WorldSession* session, std::string const& guildName, uint32 level)
 {
-    std::ostringstream str;
-    str << guildName << " (" << level << session->GetTrinityString(LANG_GSYSTEM_NAME_WITH_LEVEL) << ")";
-
-    return str.str();
+    // guildname (1 level)
+    return fmt::format("{} ({} {})", guildName, level, session->GetTrinityString(LANG_GSYSTEM_NAME_WITH_LEVEL));
 }
 
 std::string Guild::NotEnough(WorldSession* session, uint32 need, uint32 guildcount, bool defendGuild)
@@ -1095,18 +1093,14 @@ std::string Guild::NotEnough(WorldSession* session, uint32 need, uint32 guildcou
     if (defendGuild)
         return session->GetTrinityString(LANG_GSYSTEM_MIN_PLAYERS_DEF);
 
-    std::ostringstream str;
-    str << session->GetTrinityString(LANG_GSYSTEM_MIN_PLAYERS) << " ( " << guildcount << " / " << need << " )";
-
-    return str.str();
+    //Not enough guild members for start Guild War (guildcount/need)
+    return fmt::format("{} ( {}/{} )", session->GetTrinityString(LANG_GSYSTEM_MIN_PLAYERS), guildcount, need);
 }
 
 std::string Guild::NotEnoughTimer(WorldSession* session, time_t possible)
 {
-    std::ostringstream str;
-    str << session->GetTrinityString(LANG_GSYSTEM_MIN_TIMER) << " ( " << TimeToHumanReadable(possible) << " )";
-
-    return str.str();
+    // You can start new Guild War only (d:h:m)
+    return fmt::format("{} ( {} )", session->GetTrinityString(LANG_GSYSTEM_MIN_TIMER), TimeToHumanReadable(possible));
 }
 
 bool Guild::CanStartGuildWarByGuildRights(WorldSession* session)

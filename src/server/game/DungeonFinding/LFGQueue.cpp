@@ -661,9 +661,7 @@ std::string LFGQueue::DumpQueueInfo() const
                 players++;
         }
     }
-    std::ostringstream o;
-    o << "Queued Players: " << players << " (in group: " << playersInGroup << ") Groups: " << groups << "\n";
-    return o.str();
+    return fmt::format("Queued Players: {} (in group: {}) Groups: {}\n");
 }
 
 std::string LFGQueue::DumpCompatibleInfo(bool full /* = false */) const

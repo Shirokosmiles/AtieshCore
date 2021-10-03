@@ -19,7 +19,6 @@
 #define TRINITY_ARENA_SCORE_H
 
 #include "BattlegroundScore.h"
-#include <sstream>
 
 struct TC_GAME_API ArenaScore : public BattlegroundScore
 {
@@ -34,9 +33,7 @@ struct TC_GAME_API ArenaScore : public BattlegroundScore
         // For Logging purpose
         std::string ToString() const override
         {
-            std::ostringstream stream;
-            stream << "Damage done: " << DamageDone << ", Healing done: " << HealingDone << ", Killing blows: " << KillingBlows;
-            return stream.str();
+            return fmt::format("Damage done: {}, Healing done: {}, Killing blows: {}", DamageDone, HealingDone, KillingBlows);
         }
 
         uint8 TeamId; // PvPTeamId

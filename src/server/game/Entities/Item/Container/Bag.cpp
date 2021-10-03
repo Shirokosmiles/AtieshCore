@@ -247,7 +247,5 @@ Item* Bag::GetItemByPos(uint8 slot) const
 
 std::string Bag::GetDebugInfo() const
 {
-    std::stringstream sstr;
-    sstr << Item::GetDebugInfo();
-    return sstr.str();
+    return Item::GetDebugInfo();
 }

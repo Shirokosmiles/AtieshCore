@@ -55,35 +55,32 @@ std::string GuildMgr::GetGuildNameByIdWithLvl(ObjectGuid::LowType guildId) const
 
 std::string GuildMgr::GetGuildNameWithGLvl(std::string const& guildName, uint32 level) const
 {
-    std::ostringstream str;
-    str << guildName << " (" << level << " level)";
-
-    return str.str();
+    return fmt::format("{} ({} level)", guildName, level);
 }
 
 std::string GuildMgr::GetGuildEnemy(ObjectGuid::LowType guildId) const
 {
-    std::ostringstream str;
+    std::string str;
     for (GuildWarsContainer::const_iterator itr = _guildWarStore.begin(); itr != _guildWarStore.end(); ++itr)
     {
         if (itr->second.attackerGuildId == guildId)
         {
             if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
-                str << GetGuildNameByIdWithLvl(itr->second.defenderGuildId) << "\n|cFFF00000";
+                str = fmt::format("{}\n|cFFF00000", GetGuildNameByIdWithLvl(itr->second.defenderGuildId));
             else
-                str << GetGuildNameById(itr->second.defenderGuildId) << "\n|cFFF00000";
+                str = fmt::format("{}\n|cFFF00000", GetGuildNameById(itr->second.defenderGuildId));
         }
 
         if (itr->second.defenderGuildId == guildId)
         {
             if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
-                str << GetGuildNameByIdWithLvl(itr->second.attackerGuildId) << "\n|cFFF00000";
+                str = fmt::format("{}\n|cFFF00000", GetGuildNameByIdWithLvl(itr->second.attackerGuildId));
             else
-                str << GetGuildNameById(itr->second.attackerGuildId) << "\n|cFFF00000";
+                str = fmt::format("{}\n|cFFF00000", GetGuildNameById(itr->second.attackerGuildId));
         }
     }
 
-    return str.str();
+    return str;
 }
 
 

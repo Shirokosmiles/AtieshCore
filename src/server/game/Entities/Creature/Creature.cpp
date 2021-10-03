@@ -3507,11 +3507,7 @@ bool Creature::IsEscorted() const
 
 std::string Creature::GetDebugInfo() const
 {
-    std::stringstream sstr;
-    sstr << Unit::GetDebugInfo() << "\n"
-        << "AIName: " << GetAIName() << " ScriptName: " << GetScriptName()
-        << " WaypointPath: " << GetWaypointPath() << " SpawnId: " << GetSpawnId();
-    return sstr.str();
+    return fmt::format("{}\n AIName: {} ScriptName: {} WaypointPath: {} SpawnId: {}", Unit::GetDebugInfo(), GetAIName(), GetScriptName(), GetWaypointPath(), GetSpawnId());
 }
 
 void Creature::ExitVehicle(Position const* /*exitPosition*/)

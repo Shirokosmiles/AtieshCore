@@ -223,9 +223,8 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
                     }
                     else
                     {
-                        std::ostringstream ss;
-                        ss << "|cffff0000[BG Queue Announcer]:|r " << bgName << " -- [" << q_min_level << "-" << q_max_level << "] " << qPlayers << "/" << MinPlayers;
-                        sWorld->SendGlobalText(ss.str().c_str(), NULL);
+                        std::string str = fmt::format("|cffff0000[BG Queue Announcer]:|r {} -- [{}-{}] {}/{}", bgName, q_min_level, q_max_level, qPlayers, MinPlayers);
+                        sWorld->SendGlobalText(str.c_str(), NULL);
                     }
                 }
                 // System message

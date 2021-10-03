@@ -328,64 +328,63 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 
 std::string Player::GetDescriptionACForLogs(uint8 type, float param1, float param2) const
 {
-    std::ostringstream str;
-
+    std::string str = "";
     switch (type)
-    {
+    {        
         case 0: // ASH
         {
-            str << "AntiSpeedHack: distance from packet = " << param1 << ", available distance = " << param2;
+            str = fmt::format("AntiSpeedHack: distance from packet =  {}, available distance = {}", param1, param2);
             break;
         }
         case 1: // AFH - IsFlying but CanFly is false
         {
-            str << "AntiFlyHack: Player IsFlying but CanFly is false";
+            str = "AntiFlyHack: Player IsFlying but CanFly is false";
             break;
         }
         case 2: // AFH - Player has a MOVEMENTFLAG_SWIMMING, but not in water
         {
-            str << "AntiFlyHack: Player has a MOVEMENTFLAG_SWIMMING, but not in water";
+            str = "AntiFlyHack: Player has a MOVEMENTFLAG_SWIMMING, but not in water";
             break;
         }
         case 3: // AFH - just z checks (smaughack)
         {
-            str << "AntiFlyHack: Player::CheckOnFlyHack : playerZ = " << param1 << ", but normalZ = " << param2;
+            str = fmt::format("AntiFlyHack: Player::CheckOnFlyHack : playerZ = {}, but normalZ = {}", param1, param2);
             break;
         }
         case 4: // Ignore control Hack
         {
-            str << "Ignore controll Hack detected";
+            str = "Ignore controll Hack detected";
             break;
         }
         case 5: // Climb-Hack
         {
-            str << "Climb-Hack detected , diffZ = " << param1 << ", distance = " << param2;
+            str = fmt::format("Climb-Hack detected , diffZ =  {}, distance = {}", param1, param2);
             break;
         }
         case 6: // doublejumper
         {
-            str << "Double-jump detected";
+            str = "Double-jump detected";
             break;
         }
         case 7: // fakejumper
         {
-            str << "FakeJumper detected";
+            str = "FakeJumper detected";
             break;
         }
         case 8: // fakeflying
         {
-            str << "FakeFlying mode detected";
+            str = "FakeFlying mode detected";
             break;
         }
         case 9: // NoFallingDmg
         {
-            str << "NoFallingDamage mode detected";
+            str = "NoFallingDamage mode detected";
             break;
         }
         default:
             break;
     }
-    return str.str();
+    return str;
 }
 
 std::string Player::GetPositionACForLogs() const
@@ -401,7 +400,5 @@ std::string Player::GetPositionACForLogs() const
             zoneName = zone->AreaName[locale];
     }
 
-    std::ostringstream str;
-    str << "Map: " << GetMapId() << " (" << (FindMap() ? FindMap()->GetMapName() : "Unknown") << ") Area: " << areaId << " (" << areaName.c_str() << ") Zone: " << zoneName.c_str() << " XYZ: " << GetPositionX() << " " << GetPositionY() << " " << GetPositionZ();
-    return str.str();
+    return fmt::format("Map: {} ({}) Area: {} ({}) Zone: {} XYZ: {} {} {}", GetMapId(), FindMap() ? FindMap()->GetMapName() : "Unknown", areaId, areaName.c_str(), zoneName.c_str(), GetPositionX(), GetPositionY(), GetPositionZ());
 }

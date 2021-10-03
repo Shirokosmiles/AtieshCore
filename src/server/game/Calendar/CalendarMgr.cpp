@@ -467,22 +467,18 @@ uint32 CalendarMgr::GetPlayerNumPending(ObjectGuid guid)
 
 std::string CalendarEvent::BuildCalendarMailSubject(ObjectGuid remover) const
 {
-    std::ostringstream strm;
-    strm << remover.GetRawValue() << ':' << _title;
-    return strm.str();
+    return fmt::format("{}:{}", remover.GetRawValue(), _title);
 }
 
 std::string CalendarEvent::BuildCalendarMailBody() const
 {
     WorldPacket data;
     uint32 time;
-    std::ostringstream strm;
 
     // we are supposed to send PackedTime so i used WorldPacket to pack it
     data.AppendPackedTime(_eventTime);
     data >> time;
-    strm << time;
-    return strm.str();
+    return fmt::format("{}", time);
 }
 
 void CalendarMgr::SendCalendarEventInvite(CalendarInvite const& invite)
