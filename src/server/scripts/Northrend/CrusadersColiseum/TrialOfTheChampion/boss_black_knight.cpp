@@ -608,7 +608,7 @@ class spell_black_knight_deaths_push : public SpellScriptLoader
                 // when the dummy aura is removed, announcer 'dies'
                 GetTarget()->RemoveAura(SPELL_DEATH_RESPITE_DND);
                 GetTarget()->CastSpell(GetTarget(), SPELL_FEIGN_DEATH, true);
-                GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
             }
 
             void Register() override

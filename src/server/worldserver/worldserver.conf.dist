@@ -1389,6 +1389,7 @@ Transmogrification.SetCopperCost = 0
 Respawn.WarningMessage = "There will be an unscheduled server restart at 03:00. The server will be available again shortly after."
 Respawn.AlertRestartReason = "Urgent Maintenance"
 Motd = "Welcome to a Trinity Core server."
+FlashAtStart = 1
 PlayerStart.String = ""
 AntiCheats.forceExcludeMapsid = ""
 BAG.Script.BankBagsID = "304005"

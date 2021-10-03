@@ -460,7 +460,7 @@ void WintergraspMgr::HideNpc(Creature* creature)
 {
     creature->CombatStop();
     creature->SetReactState(REACT_PASSIVE);
-    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_UNINTERACTIBLE);
     creature->SetPhaseMask(2, true);
     //creature->DisappearAndDie();
     creature->SetVisible(false);
@@ -470,7 +470,7 @@ void WintergraspMgr::ShowNpc(Creature* creature, bool aggressive)
 {
     creature->SetPhaseMask(1, true);
     creature->SetVisible(true);
-    creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+    creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_UNINTERACTIBLE);
     if (!creature->IsAlive())
         creature->Respawn(true);
     if (aggressive)

@@ -1737,7 +1737,7 @@ SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject co
        return SPELL_FAILED_BAD_TARGETS;
 
     // checked in Unit::IsValidAttack/AssistTarget, shouldn't be checked for ENTRY targets
-    //if (!HasAttribute(SPELL_ATTR6_CAN_TARGET_UNTARGETABLE) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+    //if (!HasAttribute(SPELL_ATTR6_CAN_TARGET_UNTARGETABLE) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE))
     //    return SPELL_FAILED_BAD_TARGETS;
 
     //if (!HasAttribute(SPELL_ATTR6_CAN_TARGET_POSSESSED_FRIENDS))
@@ -1789,7 +1789,7 @@ SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject co
     if (ExcludeTargetAuraSpell && unitTarget->HasAura(sSpellMgr->GetSpellIdForDifficulty(ExcludeTargetAuraSpell, caster)))
         return SPELL_FAILED_TARGET_AURASTATE;
 
-    if (unitTarget->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION))
+    if (unitTarget->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION) && !HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECT_AURA))
         if (HasEffect(SPELL_EFFECT_SELF_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT_NEW))
             return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
 
@@ -3037,7 +3037,7 @@ bool SpellInfo::SpellCancelsAuraEffect(AuraEffect const* aurEff) const
 
     for (SpellEffectInfo const& effect : GetEffects())
     {
-        if (effect.IsEffect(SPELL_EFFECT_APPLY_AURA))
+        if (!effect.IsEffect(SPELL_EFFECT_APPLY_AURA))
             continue;
 
         uint32 const miscValue = static_cast<uint32>(effect.MiscValue);

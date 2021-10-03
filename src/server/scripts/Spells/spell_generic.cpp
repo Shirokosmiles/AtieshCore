@@ -1958,6 +1958,52 @@ class spell_gen_gnomish_transporter : public SpellScript
     }
 };
 
+// 69641 - Gryphon/Wyvern Pet - Mounting Check Aura
+class spell_gen_gryphon_wyvern_mount_check : public AuraScript
+{
+    PrepareAuraScript(spell_gen_gryphon_wyvern_mount_check);
+
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        Unit* owner = target->GetOwner();
+
+        if (!owner)
+            return;
+
+        if (owner->IsMounted())
+        {
+            target->SetAnimationTier(AnimationTier::Fly);
+            target->SetDisableGravity(true);
+        }
+        else
+        {
+            target->SetAnimationTier(AnimationTier::Ground);
+            target->SetDisableGravity(false);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_gryphon_wyvern_mount_check::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+class spell_gen_injured : public SpellScript
+{
+    PrepareSpellScript(spell_gen_injured);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->SetHealth(GetCaster()->CountPctFromMaxHealth(30));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_injured::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 enum LichPet
 {
     NPC_LICH_PET                = 36979,
@@ -4627,6 +4673,8 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_gadgetzan_transporter_backfire);
     RegisterSpellScript(spell_gen_gift_of_naaru);
     RegisterSpellScript(spell_gen_gnomish_transporter);
+    RegisterSpellScript(spell_gen_gryphon_wyvern_mount_check);
+    RegisterSpellScript(spell_gen_injured);
     RegisterSpellScript(spell_gen_lich_pet_aura);
     RegisterSpellScript(spell_gen_lich_pet_onsummon);
     RegisterSpellScript(spell_gen_lich_pet_aura_remove);

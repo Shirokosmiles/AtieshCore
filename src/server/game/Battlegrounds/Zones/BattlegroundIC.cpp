@@ -435,9 +435,9 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                     {
                         if (siege->IsAlive())
                         {
-                            if (siege->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_CANNOT_SWIM | UNIT_FLAG_IMMUNE_TO_PC))
+                            if (siege->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE|UNIT_FLAG_CANNOT_SWIM|UNIT_FLAG_IMMUNE_TO_PC))
                                 // following sniffs the vehicle always has UNIT_FLAG_CANNOT_SWIM
-                                siege->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                                siege->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE|UNIT_FLAG_IMMUNE_TO_PC);
                             else
                                 siege->SetHealth(siege->GetMaxHealth());
                         }
@@ -955,7 +955,7 @@ void BattlegroundIC::HandleContestedNodes(ICNodePoint const* node)
         for (Creature* cannon : cannons)
         {
             cannon->GetVehicleKit()->RemoveAllPassengers();
-            cannon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            cannon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
         }
     }
     else if (node->nodeType == NODE_TYPE_WORKSHOP)
@@ -994,7 +994,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint const* node, bool recapture
                 gunshipHorde->GetCreatureListWithEntryInGrid(cannons, NPC_HORDE_GUNSHIP_CANNON, 150.0f);
 
             for (Creature* cannon : cannons)
-                cannon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                cannon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
 
             for (uint8 u = BG_IC_GO_HANGAR_TELEPORTER_1_A; u < BG_IC_GO_HANGAR_TELEPORTER_1_A + MAX_HANGAR_TELEPORTERS_SPAWNS; u += PVP_TEAMS_COUNT)
             {

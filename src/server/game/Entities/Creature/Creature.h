@@ -388,11 +388,11 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         void AtEngage(Unit* target) override;
         void AtDisengage() override;
 
-        bool HasSwimmingFlagOutOfCombat() const
+        bool HasCanSwimFlagOutOfCombat() const
         {
-            return !_isMissingSwimmingFlagOutOfCombat;
+            return !_isMissingCanSwimFlagOutOfCombat;
         }
-        void RefreshSwimmingFlag(bool recheck = false);
+        void RefreshCanSwimFlag(bool recheck = false);
 
         std::string GetDebugInfo() const override;
 
@@ -480,7 +480,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         // Regenerate health
         bool _regenerateHealth; // Set on creation
         bool _regenerateHealthLock; // Dynamically set
-        bool _isMissingSwimmingFlagOutOfCombat;
+        bool _isMissingCanSwimFlagOutOfCombat;
 
         // custom ATiesh features
         uint32 m_masterCallTime;

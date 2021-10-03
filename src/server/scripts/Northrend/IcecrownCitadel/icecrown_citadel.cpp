@@ -1348,7 +1348,7 @@ class spell_icc_stoneform : public AuraScript
         if (Creature* target = GetTarget()->ToCreature())
         {
             target->SetReactState(REACT_PASSIVE);
-            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
             target->SetImmuneToPC(true);
             target->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_02);
         }
@@ -1359,7 +1359,7 @@ class spell_icc_stoneform : public AuraScript
         if (Creature* target = GetTarget()->ToCreature())
         {
             target->SetReactState(REACT_AGGRESSIVE);
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
             target->SetImmuneToPC(false);
             target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
         }
@@ -2168,7 +2168,7 @@ struct npc_icc_nerubar_champion : public ScriptedAI
         if (type == EFFECT_MOTION_TYPE && id == POINT_LAND)
         {
             me->SetImmuneToAll(false);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
             me->SetDisableGravity(false);
             me->SetHover(false);
         }
@@ -2283,7 +2283,7 @@ struct npc_icc_nerubar_webweaver : public ScriptedAI
         if (type == EFFECT_MOTION_TYPE && id == POINT_LAND)
         {
             me->SetImmuneToAll(false);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
             me->SetDisableGravity(false);
             me->SetHover(false);
         }
@@ -2335,7 +2335,7 @@ struct npc_icc_nerubar_broodling : public ScriptedAI
         if (type == EFFECT_MOTION_TYPE && id == POINT_LAND)
         {
             me->SetImmuneToAll(false);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
             me->SetDisableGravity(false);
             me->SetHover(false);
         }

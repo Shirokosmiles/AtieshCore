@@ -473,8 +473,8 @@ enum SMART_ACTION
     SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS    = 15,     // QuestID
     SMART_ACTION_RESERVED_16                        = 16,     // used on 4.3.4 and higher scripts
     SMART_ACTION_SET_EMOTE_STATE                    = 17,     // emoteID
-    SMART_ACTION_SET_UNIT_FLAG                      = 18,     // Flags (may be more than one field OR'd together), Target
-    SMART_ACTION_REMOVE_UNIT_FLAG                   = 19,     // Flags (may be more than one field OR'd together), Target
+    SMART_ACTION_SET_UNIT_FLAG                      = 18,     // Flags
+    SMART_ACTION_REMOVE_UNIT_FLAG                   = 19,     // Flags
     SMART_ACTION_AUTO_ATTACK                        = 20,     // AllowAttackState (0 = stop attack, anything else means continue attacking)
     SMART_ACTION_ALLOW_COMBAT_MOVEMENT              = 21,     // AllowCombatMovement (0 = stop combat based movement, anything else continue attacking)
     SMART_ACTION_SET_EVENT_PHASE                    = 22,     // Phase
@@ -599,8 +599,11 @@ enum SMART_ACTION
     SMART_ACTION_SET_HOVER                          = 141,    // 0/1
     SMART_ACTION_SET_HEALTH_PCT                     = 142,    // percent
     SMART_ACTION_CREATE_CONVERSATION                = 143,    // don't use on 3.3.5a
+    SMART_ACTION_SET_IMMUNE_PC                      = 144,    // 0/1
+    SMART_ACTION_SET_IMMUNE_NPC                     = 145,    // 0/1
+    SMART_ACTION_SET_UNINTERACTIBLE                 = 146,    // 0/1
 
-    SMART_ACTION_END                                = 144
+    SMART_ACTION_END                                = 147
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -947,7 +950,6 @@ struct SmartAction
         struct
         {
             uint32 flag;
-            uint32 type;
         } unitFlag;
 
         struct
@@ -1197,6 +1199,21 @@ struct SmartAction
         {
             uint32 percent;
         } setHealthPct;
+
+        struct
+        {
+            SAIBool immunePC;
+        } setImmunePC;
+
+        struct
+        {
+            SAIBool immuneNPC;
+        } setImmuneNPC;
+
+        struct
+        {
+            SAIBool uninteractible;
+        } setUninteractible;
 
         //! Note for any new future actions
         //! All parameters must have type uint32

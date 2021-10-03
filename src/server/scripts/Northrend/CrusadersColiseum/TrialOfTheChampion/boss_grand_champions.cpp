@@ -406,7 +406,7 @@ struct boss_grand_championAI : BossAI
                 me->SetHealth(me->GetMaxHealth());
                 me->SetRegenerateHealth(true);
                 me->SetWalk(false);
-                mount->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                mount->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
                 // sometimes a player can trample champion right when he is about to enter in vehicle
                 // it will bug the boss and you can kill him without the need to kill others as well
                 // so we remove the stun aura just incase
@@ -602,7 +602,7 @@ struct boss_grand_championAI : BossAI
                     if (Creature* mount = FindMyMount(me))
                     {
                         me->ApplySpellImmune(SPELL_TRAMPLE_AURA, IMMUNITY_ID, SPELL_TRAMPLE_AURA, false);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
                         DoCastPennant(me);
                         EnterAggressiveMode(me);
                         EnterAggressiveMode(mount);
