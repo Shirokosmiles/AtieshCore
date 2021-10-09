@@ -1926,26 +1926,26 @@ public:
         {
             if (sGuildMgr->IsGuildsInWar(player->GetGuildId(), targetGuild->GetId()))
             {
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_ALREADY_ENEMY, guildName.c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_ALREADY_ENEMY, guildName);
                 return;
             }
 
             std::string msg;
             if (!ownGuild->CanStartGuildWarByCount(player->GetSession(), msg, false))
             {
-                ChatHandler(player->GetSession()).PSendSysMessage("%s", msg.c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage("{}", msg);
                 return;
             }
 
             if (!ownGuild->CanStartGuildWarByTimer(player->GetSession(), msg))
             {
-                ChatHandler(player->GetSession()).PSendSysMessage("%s", msg.c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage("{}", msg);
                 return;
             }
 
             if (!targetGuild->CanStartGuildWarByCount(player->GetSession(), msg, true))
             {
-                ChatHandler(player->GetSession()).PSendSysMessage("%s", msg.c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage("{}", msg);
                 return;
             }
 
@@ -1953,19 +1953,19 @@ public:
             data.attackerGuildId = ownGuild->GetId();
             data.defenderGuildId = targetGuild->GetId();
             if (sGuildMgr->StartNewWar(data))
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_START, guildName.c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_START, guildName);
 
         }
         else if (action == 107)
         {
             if (!sGuildMgr->IsGuildsInWar(ownGuild->GetId(), targetGuild->GetId()))
             {
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_NOT_ENEMY, guildName.c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_NOT_ENEMY, guildName);
                 return;
             }
 
             sGuildMgr->StopWarBetween(ownGuild->GetId(), targetGuild->GetId(), targetGuild->GetId());
-            ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_STOP, guildName.c_str());
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_GSYSTEM_GW_STOP, guildName);
         }
 
         player->PlayerTalkClass->SendCloseGossip();

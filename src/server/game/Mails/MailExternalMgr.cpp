@@ -48,13 +48,13 @@ void MailExternalMgr::Update(uint32 diff)
 
 void MailExternalMgr::_DoUpdate()
 {
-    TC_LOG_DEBUG("mailexternal", "External Mail> Sending mails in queue...");
+    FMT_LOG_DEBUG("mailexternal", "External Mail> Sending mails in queue...");
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_GET_EXTERNAL_MAIL);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
-        TC_LOG_DEBUG("mailexternal", "External Mail> No mails in queue...");
+        FMT_LOG_DEBUG("mailexternal", "External Mail> No mails in queue...");
         return;
     }
 
@@ -75,14 +75,14 @@ void MailExternalMgr::_DoUpdate()
         if (itemId)
         {
             if (!sObjectMgr->GetItemTemplate(itemId))
-                TC_LOG_ERROR("mailexternal", "External Mail> Item entry %u from `mail_external` doesn't exist in DB, skipped.", itemId);
+                FMT_LOG_ERROR("mailexternal", "External Mail> Item entry {} from `mail_external` doesn't exist in DB, skipped.", itemId);
             else
             {
                 if (Item* mailItem = Item::CreateItem(itemId, itemCount))
                 {
                     itemlist.push_back(mailItem);
                     mailItem->SaveToDB(trans);
-                    TC_LOG_INFO("mailexternal", "External Mail> Adding %u of item with id %u for player_id %u", itemCount, itemId, receiver_guid);
+                    FMT_LOG_INFO("mailexternal", "External Mail> Adding {} of item with id {} for player_id {}", itemCount, itemId, receiver_guid);
                 }
             }
         }
@@ -94,9 +94,9 @@ void MailExternalMgr::_DoUpdate()
         stmt2->setUInt32(0, id);
         trans->Append(stmt2);
 
-        TC_LOG_DEBUG("mailexternal", "External Mail> Mail sent");
+        FMT_LOG_DEBUG("mailexternal", "External Mail> Mail sent");
     } while (result->NextRow());
 
     CharacterDatabase.CommitTransaction(trans);
-    TC_LOG_DEBUG("mailexternal", "External Mail> All Mails Sent...");
+    FMT_LOG_DEBUG("mailexternal", "External Mail> All Mails Sent...");
 }

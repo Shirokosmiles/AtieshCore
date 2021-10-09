@@ -437,7 +437,7 @@ void World::AddSession_(WorldSession* s)
     {
         AddQueuedPlayer(s);
         UpdateMaxSessionCounters();
-        TC_LOG_INFO("misc", "PlayerQueue: Account id %u is in Queue Position (%u).", s->GetAccountId(), ++QueueSize);
+        FMT_LOG_INFO("misc", "PlayerQueue: Account id {} is in Queue Position ({}).", s->GetAccountId(), ++QueueSize);
         return;
     }
 
@@ -451,7 +451,7 @@ void World::AddSession_(WorldSession* s)
         float popu = (float)GetActiveSessionCount();              // updated number of users on the server
         popu /= pLimit;
         popu *= 2;
-        TC_LOG_INFO("misc", "Server Population (%f).", popu);
+        FMT_LOG_INFO("misc", "Server Population ({}).", popu);
     }
 }
 
@@ -556,7 +556,7 @@ void World::LoadConfigSettings(bool reload)
         if (!sConfigMgr->Reload(configErrors))
         {
             for (std::string const& configError : configErrors)
-                TC_LOG_ERROR("misc", "World settings reload fail: %s.", configError.c_str());
+                FMT_LOG_ERROR("misc", "World settings reload fail: {}.", configError);
 
             return;
         }
@@ -582,18 +582,18 @@ void World::LoadConfigSettings(bool reload)
     if (reload)
     {
         if (dataPath != m_dataPath)
-            TC_LOG_ERROR("server.loading", "DataDir option can't be changed at worldserver.conf reload, using current value (%s).", m_dataPath.c_str());
+            FMT_LOG_ERROR("server.loading", "DataDir option can't be changed at worldserver.conf reload, using current value ({}).", m_dataPath);
     }
     else
     {
         m_dataPath = dataPath;
-        TC_LOG_INFO("server.loading", "Using DataDir %s", m_dataPath.c_str());
+        FMT_LOG_INFO("server.loading", "Using DataDir {}", m_dataPath);
     }
 
-    TC_LOG_INFO("server.loading", "WORLD: Cameras data directory is: %sCameras", m_dataPath.c_str());
-    TC_LOG_INFO("server.loading", "WORLD: Maps    data directory is: %smaps", m_dataPath.c_str());
-    TC_LOG_INFO("server.loading", "WORLD: VMap    data directory is: %svmaps", m_dataPath.c_str());
-    TC_LOG_INFO("server.loading", "WORLD: MMap    data directory is: %smmaps", m_dataPath.c_str());
+    FMT_LOG_INFO("server.loading", "WORLD: Cameras data directory is: {}Cameras", m_dataPath);
+    FMT_LOG_INFO("server.loading", "WORLD: Maps    data directory is: {}maps", m_dataPath);
+    FMT_LOG_INFO("server.loading", "WORLD: VMap    data directory is: {}vmaps", m_dataPath);
+    FMT_LOG_INFO("server.loading", "WORLD: MMap    data directory is: {}mmaps", m_dataPath);
 
     // STAGE 2 - Load all others from DB
     sWorldConfig->Load();
@@ -619,8 +619,8 @@ void World::LoadConfigSettings(bool reload)
     m_visibility_notify_periodInInstances = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_ININSTANCES];
     m_visibility_notify_periodInBG = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_INBG];
     m_visibility_notify_periodInArenas = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_INARENAS];
-    TC_LOG_INFO("server.loading", "Will clear `logs` table of entries older than %i seconds every %u minutes.", m_int_configs[CONFIG_LOGDB_CLEARTIME], m_int_configs[CONFIG_LOGDB_CLEARINTERVAL]);
-    TC_LOG_INFO("server.loading", "Client cache version set to: %u", m_int_configs[CONFIG_CLIENTCACHE_VERSION]);
+    FMT_LOG_INFO("server.loading", "Will clear `logs` table of entries older than {} seconds every {} minutes.", m_int_configs[CONFIG_LOGDB_CLEARTIME], m_int_configs[CONFIG_LOGDB_CLEARINTERVAL]);
+    FMT_LOG_INFO("server.loading", "Client cache version set to: {}", m_int_configs[CONFIG_CLIENTCACHE_VERSION]);
     //###      End
 
     //###               STRING configs:
@@ -632,13 +632,13 @@ void World::LoadConfigSettings(bool reload)
     SetNewCharString(sConfigMgr->GetStringDefault("PlayerStart.String", ""));
     ///- Get string for anticheat excluded mapids
     SetACMapExcludes(sConfigMgr->GetStringDefault("AntiCheats.forceExcludeMapsid", ""));
-    TC_LOG_INFO("server.loading", "AntiCheats disabled for %u maps", (uint32)excludeACMapsId.size());
+    FMT_LOG_INFO("server.loading", "AntiCheats disabled for {} maps", (uint32)excludeACMapsId.size());
     ///- Get string for gather safe deposit box items (bag which can be opened only in bank)
     SetBankBagsIdMap(sConfigMgr->GetStringDefault("BAG.Script.BankBagsID", ""));
-    TC_LOG_INFO("server.loading", "BAG.ScriptBankBagsID for %u bankBagsId", (uint32)mapbankBagsId.size());
+    FMT_LOG_INFO("server.loading", "BAG.ScriptBankBagsID for {} bankBagsId", (uint32)mapbankBagsId.size());
     ///- Get string for gather zone for special Creature Rates
     SetCreatureRatesInZone(sConfigMgr->GetStringDefault("VAS.CreatureRatesInZoneID", ""));
-    TC_LOG_INFO("server.loading", "VAS.CreatureRatesInZoneID for %u zoneList", (uint32)creatureRatesInZoneId.size());
+    FMT_LOG_INFO("server.loading", "VAS.CreatureRatesInZoneID for {} zoneList", (uint32)creatureRatesInZoneId.size());
     //###      End
 
     //###               BOOL configs:
@@ -646,11 +646,11 @@ void World::LoadConfigSettings(bool reload)
     bool enableLOS = m_bool_configs[CONFIG_VMAP_ENABLE_LOS];
     bool enableHeight = m_bool_configs[CONFIG_VMAP_ENABLE_HEIGHT_CALCULATION];
     if (!enableHeight)
-        TC_LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
+        FMT_LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
 
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableLineOfSightCalc(enableLOS);
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
-    TC_LOG_INFO("server.loading", "VMap support included. LineOfSight: %i, getHeight: %i, indoorCheck: %i", enableLOS, enableHeight, enableIndoor);
+    FMT_LOG_INFO("server.loading", "VMap support included. LineOfSight: {}, getHeight: {}, indoorCheck: {}", enableLOS, enableHeight, enableIndoor);
     //###      End
 
     if (reload)
@@ -712,7 +712,7 @@ void World::SetInitialWorldSettings()
             !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
             !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
     {
-        TC_LOG_FATAL("server.loading", "Unable to load critical files - server shutting down !!!");
+        FMT_LOG_FATAL("server.loading", "Unable to load critical files - server shutting down !!!");
         exit(1);
     }
 
@@ -724,7 +724,7 @@ void World::SetInitialWorldSettings()
 
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
 
-    TC_LOG_INFO("server.loading", "Loading Trinity strings...");
+    FMT_LOG_INFO("server.loading", "Loading Trinity strings...");
     if (!sObjectMgr->LoadTrinityStrings())
         exit(1);                                            // Error message displayed in function already
 
@@ -738,11 +738,11 @@ void World::SetInitialWorldSettings()
     LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realm.Id.Realm);      // One-time query    
 
     ///- Load the DBC files
-    TC_LOG_INFO("server.loading", "Initialize DBC data stores...");
+    FMT_LOG_INFO("server.loading", "Initialize DBC data stores...");
     sDBCStoresMgr->Initialize();
     DetectDBCLang();
 
-    TC_LOG_INFO("server.loading", "Initialize data stores...");
+    FMT_LOG_INFO("server.loading", "Initialize data stores...");
     // Load cinematic cameras
     LoadM2Cameras(m_dataPath);
 
@@ -762,55 +762,55 @@ void World::SetInitialWorldSettings()
     MMAP::MMapManager* mmmgr = MMAP::MMapFactory::createOrGetMMapManager();
     mmmgr->InitializeThreadUnsafe(mapIds);
 
-    TC_LOG_INFO("server.loading", "Initializing PlayerDump tables...");
+    FMT_LOG_INFO("server.loading", "Initializing PlayerDump tables...");
     PlayerDump::InitializeTables();
 
     ///- Initialize static helper structures
     AIRegistry::Initialize();
 
-    TC_LOG_INFO("server.loading", "Loading SpellInfo store...");
+    FMT_LOG_INFO("server.loading", "Loading SpellInfo store...");
     sSpellMgr->LoadSpellInfoStore();
 
-    TC_LOG_INFO("server.loading", "Loading SpellInfo corrections...");
+    FMT_LOG_INFO("server.loading", "Loading SpellInfo corrections...");
     sSpellMgr->LoadSpellInfoCorrections();
 
-    TC_LOG_INFO("server.loading", "Loading SkillLineAbilityMultiMap Data...");
+    FMT_LOG_INFO("server.loading", "Loading SkillLineAbilityMultiMap Data...");
     sSpellMgr->LoadSkillLineAbilityMap();
 
-    TC_LOG_INFO("server.loading", "Loading SpellInfo custom attributes...");
+    FMT_LOG_INFO("server.loading", "Loading SpellInfo custom attributes...");
     sSpellMgr->LoadSpellInfoCustomAttributes();
 
-    TC_LOG_INFO("server.loading", "Loading SpellInfo diminishing infos...");
+    FMT_LOG_INFO("server.loading", "Loading SpellInfo diminishing infos...");
     sSpellMgr->LoadSpellInfoDiminishing();
 
-    TC_LOG_INFO("server.loading", "Loading SpellInfo immunity infos...");
+    FMT_LOG_INFO("server.loading", "Loading SpellInfo immunity infos...");
     sSpellMgr->LoadSpellInfoImmunities();
 
-    TC_LOG_INFO("server.loading", "Loading Player Totem models...");
+    FMT_LOG_INFO("server.loading", "Loading Player Totem models...");
     sObjectMgr->LoadPlayerTotemModels();
 
-    TC_LOG_INFO("server.loading", "Loading GameObject models...");
+    FMT_LOG_INFO("server.loading", "Loading GameObject models...");
     LoadGameObjectModelList(m_dataPath);
 
-    TC_LOG_INFO("server.loading", "Loading Script Names...");
+    FMT_LOG_INFO("server.loading", "Loading Script Names...");
     sObjectMgr->LoadScriptNames();
 
-    TC_LOG_INFO("server.loading", "Loading Instance Template...");
+    FMT_LOG_INFO("server.loading", "Loading Instance Template...");
     sObjectMgr->LoadInstanceTemplate();
 
     // Must be called before `respawn` data
-    TC_LOG_INFO("server.loading", "Loading instances...");
+    FMT_LOG_INFO("server.loading", "Loading instances...");
     sInstanceSaveMgr->LoadInstances();
 
     // Load before guilds and arena teams
-    TC_LOG_INFO("server.loading", "Loading character cache store...");
+    FMT_LOG_INFO("server.loading", "Loading character cache store...");
     sCharacterCache->LoadCharacterCacheStorage();
 
-    TC_LOG_INFO("server.loading", "Loading Broadcast texts...");
+    FMT_LOG_INFO("server.loading", "Loading Broadcast texts...");
     sObjectMgr->LoadBroadcastTexts();
     sObjectMgr->LoadBroadcastTextLocales();
 
-    TC_LOG_INFO("server.loading", "Loading Localization strings...");
+    FMT_LOG_INFO("server.loading", "Loading Localization strings...");
     uint32 oldMSTime = getMSTime();
     sObjectMgr->LoadCreatureLocales();
     sObjectMgr->LoadGameObjectLocales();
@@ -826,379 +826,379 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadQuestGreetingLocales();
 
     sObjectMgr->SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
-    TC_LOG_INFO("server.loading", ">> Localization strings loaded in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Localization strings loaded in {} ms", GetMSTimeDiffToNow(oldMSTime));
 
-    TC_LOG_INFO("server.loading", "Loading Account Roles and Permissions...");
+    FMT_LOG_INFO("server.loading", "Loading Account Roles and Permissions...");
     sAccountMgr->LoadRBAC();
 
-    TC_LOG_INFO("server.loading", "Loading Page Texts...");
+    FMT_LOG_INFO("server.loading", "Loading Page Texts...");
     sObjectMgr->LoadPageTexts();
 
-    TC_LOG_INFO("server.loading", "Loading Game Object Templates...");         // must be after LoadPageTexts
+    FMT_LOG_INFO("server.loading", "Loading Game Object Templates...");         // must be after LoadPageTexts
     sObjectMgr->LoadGameObjectTemplate();
 
-    TC_LOG_INFO("server.loading", "Loading Game Object template addons...");
+    FMT_LOG_INFO("server.loading", "Loading Game Object template addons...");
     sObjectMgr->LoadGameObjectTemplateAddons();
 
-    TC_LOG_INFO("server.loading", "Loading Transport templates...");
+    FMT_LOG_INFO("server.loading", "Loading Transport templates...");
     sTransportMgr->LoadTransportTemplates();
 
-    TC_LOG_INFO("server.loading", "Loading Transport animations and rotations...");
+    FMT_LOG_INFO("server.loading", "Loading Transport animations and rotations...");
     sTransportMgr->LoadTransportAnimationAndRotation();
 
-    TC_LOG_INFO("server.loading", "Loading Spell Rank Data...");
+    FMT_LOG_INFO("server.loading", "Loading Spell Rank Data...");
     sSpellMgr->LoadSpellRanks();
 
-    TC_LOG_INFO("server.loading", "Loading Spell Required Data...");
+    FMT_LOG_INFO("server.loading", "Loading Spell Required Data...");
     sSpellMgr->LoadSpellRequired();
 
-    TC_LOG_INFO("server.loading", "Loading Spell Group types...");
+    FMT_LOG_INFO("server.loading", "Loading Spell Group types...");
     sSpellMgr->LoadSpellGroups();
 
-    TC_LOG_INFO("server.loading", "Loading Spell Learn Skills...");
+    FMT_LOG_INFO("server.loading", "Loading Spell Learn Skills...");
     sSpellMgr->LoadSpellLearnSkills();                           // must be after LoadSpellRanks
 
-    TC_LOG_INFO("server.loading", "Loading SpellInfo SpellSpecific and AuraState...");
+    FMT_LOG_INFO("server.loading", "Loading SpellInfo SpellSpecific and AuraState...");
     sSpellMgr->LoadSpellInfoSpellSpecificAndAuraState();         // must be after LoadSpellRanks
 
-    TC_LOG_INFO("server.loading", "Loading Spell Learn Spells...");
+    FMT_LOG_INFO("server.loading", "Loading Spell Learn Spells...");
     sSpellMgr->LoadSpellLearnSpells();
 
-    TC_LOG_INFO("server.loading", "Loading Spell Proc conditions and data...");
+    FMT_LOG_INFO("server.loading", "Loading Spell Proc conditions and data...");
     sSpellMgr->LoadSpellProcs();
 
-    TC_LOG_INFO("server.loading", "Loading Spell Bonus Data...");
+    FMT_LOG_INFO("server.loading", "Loading Spell Bonus Data...");
     sSpellMgr->LoadSpellBonuses();
 
-    TC_LOG_INFO("server.loading", "Loading Aggro Spells Definitions...");
+    FMT_LOG_INFO("server.loading", "Loading Aggro Spells Definitions...");
     sSpellMgr->LoadSpellThreats();
 
-    TC_LOG_INFO("server.loading", "Loading Spell Group Stack Rules...");
+    FMT_LOG_INFO("server.loading", "Loading Spell Group Stack Rules...");
     sSpellMgr->LoadSpellGroupStackRules();
 
-    TC_LOG_INFO("server.loading", "Loading NPC Texts...");
+    FMT_LOG_INFO("server.loading", "Loading NPC Texts...");
     sObjectMgr->LoadGossipText();
 
-    TC_LOG_INFO("server.loading", "Loading Enchant Spells Proc datas...");
+    FMT_LOG_INFO("server.loading", "Loading Enchant Spells Proc datas...");
     sSpellMgr->LoadSpellEnchantProcData();
 
-    TC_LOG_INFO("server.loading", "Loading Item Random Enchantments Table...");
+    FMT_LOG_INFO("server.loading", "Loading Item Random Enchantments Table...");
     LoadRandomEnchantmentsTable();
 
-    TC_LOG_INFO("server.loading", "Loading Disables");                         // must be before loading quests and items
+    FMT_LOG_INFO("server.loading", "Loading Disables");                         // must be before loading quests and items
     DisableMgr::LoadDisables();
 
-    TC_LOG_INFO("server.loading", "Loading Items...");                         // must be after LoadRandomEnchantmentsTable and LoadPageTexts
+    FMT_LOG_INFO("server.loading", "Loading Items...");                         // must be after LoadRandomEnchantmentsTable and LoadPageTexts
     sObjectMgr->LoadItemTemplates();
 
-    TC_LOG_INFO("server.loading", "Loading Item set names...");                // must be after LoadItemPrototypes
+    FMT_LOG_INFO("server.loading", "Loading Item set names...");                // must be after LoadItemPrototypes
     sObjectMgr->LoadItemSetNames();
 
-    TC_LOG_INFO("server.loading", "Loading Creature Model Based Info Data...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Model Based Info Data...");
     sObjectMgr->LoadCreatureModelInfo();
 
-    TC_LOG_INFO("server.loading", "Loading Creature templates...");
+    FMT_LOG_INFO("server.loading", "Loading Creature templates...");
     sObjectMgr->LoadCreatureTemplates();
 
-    TC_LOG_INFO("server.loading", "Loading Equipment templates...");           // must be after LoadCreatureTemplates
+    FMT_LOG_INFO("server.loading", "Loading Equipment templates...");           // must be after LoadCreatureTemplates
     sObjectMgr->LoadEquipmentTemplates();
 
-    TC_LOG_INFO("server.loading", "Loading Creature template addons...");
+    FMT_LOG_INFO("server.loading", "Loading Creature template addons...");
     sObjectMgr->LoadCreatureTemplateAddons();
 
-    TC_LOG_INFO("server.loading", "Loading Reputation Reward Rates...");
+    FMT_LOG_INFO("server.loading", "Loading Reputation Reward Rates...");
     sObjectMgr->LoadReputationRewardRate();
 
-    TC_LOG_INFO("server.loading", "Loading Creature Reputation OnKill Data...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Reputation OnKill Data...");
     sObjectMgr->LoadReputationOnKill();
 
-    TC_LOG_INFO("server.loading", "Loading Reputation Spillover Data...");
+    FMT_LOG_INFO("server.loading", "Loading Reputation Spillover Data...");
     sObjectMgr->LoadReputationSpilloverTemplate();
 
-    TC_LOG_INFO("server.loading", "Loading Points Of Interest Data...");
+    FMT_LOG_INFO("server.loading", "Loading Points Of Interest Data...");
     sObjectMgr->LoadPointsOfInterest();
 
-    TC_LOG_INFO("server.loading", "Loading Creature Base Stats...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Base Stats...");
     sObjectMgr->LoadCreatureClassLevelStats();
 
-    TC_LOG_INFO("server.loading", "Loading Spawn Group Templates...");
+    FMT_LOG_INFO("server.loading", "Loading Spawn Group Templates...");
     sObjectMgr->LoadSpawnGroupTemplates();
 
-    TC_LOG_INFO("server.loading", "Loading instance spawn groups...");
+    FMT_LOG_INFO("server.loading", "Loading instance spawn groups...");
     sObjectMgr->LoadInstanceSpawnGroups();
 
-    TC_LOG_INFO("server.loading", "Loading Creature Data...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Data...");
     sObjectMgr->LoadCreatures();
 
-    TC_LOG_INFO("server.loading", "Loading Temporary Summon Data...");
+    FMT_LOG_INFO("server.loading", "Loading Temporary Summon Data...");
     sObjectMgr->LoadTempSummons();                               // must be after LoadCreatureTemplates() and LoadGameObjectTemplates()
 
-    TC_LOG_INFO("server.loading", "Loading pet levelup spells...");
+    FMT_LOG_INFO("server.loading", "Loading pet levelup spells...");
     sSpellMgr->LoadPetLevelupSpellMap();
 
-    TC_LOG_INFO("server.loading", "Loading pet default spells additional to levelup spells...");
+    FMT_LOG_INFO("server.loading", "Loading pet default spells additional to levelup spells...");
     sSpellMgr->LoadPetDefaultSpells();
 
-    TC_LOG_INFO("server.loading", "Loading Creature Addon Data...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Addon Data...");
     sObjectMgr->LoadCreatureAddons();                            // must be after LoadCreatureTemplates() and LoadCreatures()
 
-    TC_LOG_INFO("server.loading", "Loading Creature Movement Overrides...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Movement Overrides...");
     sObjectMgr->LoadCreatureMovementOverrides();                 // must be after LoadCreatures()
 
-    TC_LOG_INFO("server.loading", "Loading Gameobject Data...");
+    FMT_LOG_INFO("server.loading", "Loading Gameobject Data...");
     sObjectMgr->LoadGameObjects();
 
-    TC_LOG_INFO("server.loading", "Loading Spawn Group Data...");
+    FMT_LOG_INFO("server.loading", "Loading Spawn Group Data...");
     sObjectMgr->LoadSpawnGroups();
 
-    TC_LOG_INFO("server.loading", "Loading GameObject Addon Data...");
+    FMT_LOG_INFO("server.loading", "Loading GameObject Addon Data...");
     sObjectMgr->LoadGameObjectAddons();                          // must be after LoadGameObjects()
 
-    TC_LOG_INFO("server.loading", "Loading GameObject faction and flags overrides...");
+    FMT_LOG_INFO("server.loading", "Loading GameObject faction and flags overrides...");
     sObjectMgr->LoadGameObjectOverrides();                       // must be after LoadGameObjects()
 
-    TC_LOG_INFO("server.loading", "Loading GameObject Quest Items...");
+    FMT_LOG_INFO("server.loading", "Loading GameObject Quest Items...");
     sObjectMgr->LoadGameObjectQuestItems();
 
-    TC_LOG_INFO("server.loading", "Loading Creature Quest Items...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Quest Items...");
     sObjectMgr->LoadCreatureQuestItems();
 
-    TC_LOG_INFO("server.loading", "Loading Creature Linked Respawn...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Linked Respawn...");
     sObjectMgr->LoadLinkedRespawn();                             // must be after LoadCreatures(), LoadGameObjects()
 
-    TC_LOG_INFO("server.loading", "Loading Weather Data...");
+    FMT_LOG_INFO("server.loading", "Loading Weather Data...");
     WeatherMgr::LoadWeatherData();
 
-    TC_LOG_INFO("server.loading", "Loading Quests...");
+    FMT_LOG_INFO("server.loading", "Loading Quests...");
     sObjectMgr->LoadQuests();                                    // must be loaded after DBCs, creature_template, item_template, gameobject tables
 
-    TC_LOG_INFO("server.loading", "Checking Quest Disables");
+    FMT_LOG_INFO("server.loading", "Checking Quest Disables");
     DisableMgr::CheckQuestDisables();                           // must be after loading quests
 
-    TC_LOG_INFO("server.loading", "Loading Quest POI");
+    FMT_LOG_INFO("server.loading", "Loading Quest POI");
     sObjectMgr->LoadQuestPOI();
 
-    TC_LOG_INFO("server.loading", "Loading Quests Starters and Enders...");
+    FMT_LOG_INFO("server.loading", "Loading Quests Starters and Enders...");
     sObjectMgr->LoadQuestStartersAndEnders();                    // must be after quest load
 
-    TC_LOG_INFO("server.loading", "Loading Quests Greetings...");
+    FMT_LOG_INFO("server.loading", "Loading Quests Greetings...");
     sObjectMgr->LoadQuestGreetings();                           // must be loaded after creature_template, gameobject_template tables
 
-    TC_LOG_INFO("server.loading", "Loading Objects Pooling Data...");
+    FMT_LOG_INFO("server.loading", "Loading Objects Pooling Data...");
     sPoolMgr->LoadFromDB();
-    TC_LOG_INFO("server.loading", "Loading Quest Pooling Data...");
+    FMT_LOG_INFO("server.loading", "Loading Quest Pooling Data...");
     sQuestPoolMgr->LoadFromDB();                                // must be after quest templates
 
-    TC_LOG_INFO("server.loading", "Loading Game Event Data...");               // must be after loading pools fully
+    FMT_LOG_INFO("server.loading", "Loading Game Event Data...");               // must be after loading pools fully
     sGameEventMgr->LoadHolidayDates();                           // Must be after loading DBC
     sGameEventMgr->LoadFromDB();                                 // Must be after loading holiday dates
 
-    TC_LOG_INFO("server.loading", "Loading UNIT_NPC_FLAG_SPELLCLICK Data..."); // must be after LoadQuests
+    FMT_LOG_INFO("server.loading", "Loading UNIT_NPC_FLAG_SPELLCLICK Data..."); // must be after LoadQuests
     sObjectMgr->LoadNPCSpellClickSpells();
 
-    TC_LOG_INFO("server.loading", "Loading Vehicle Templates...");
+    FMT_LOG_INFO("server.loading", "Loading Vehicle Templates...");
     sObjectMgr->LoadVehicleTemplate();                          // must be after LoadCreatureTemplates()
 
-    TC_LOG_INFO("server.loading", "Loading Vehicle Template Accessories...");
+    FMT_LOG_INFO("server.loading", "Loading Vehicle Template Accessories...");
     sObjectMgr->LoadVehicleTemplateAccessories();                // must be after LoadCreatureTemplates() and LoadNPCSpellClickSpells()
 
-    TC_LOG_INFO("server.loading", "Loading Vehicle Accessories...");
+    FMT_LOG_INFO("server.loading", "Loading Vehicle Accessories...");
     sObjectMgr->LoadVehicleAccessories();                       // must be after LoadCreatureTemplates() and LoadNPCSpellClickSpells()
 
-    TC_LOG_INFO("server.loading", "Loading Vehicle Seat Addon Data...");
+    FMT_LOG_INFO("server.loading", "Loading Vehicle Seat Addon Data...");
     sObjectMgr->LoadVehicleSeatAddon();                         // must be after loading DBC
 
-    TC_LOG_INFO("server.loading", "Loading Item Presents...");
+    FMT_LOG_INFO("server.loading", "Loading Item Presents...");
     sObjectMgr->LoadItemPresents();                             // must be after LoadItemTemplates()
 
-    TC_LOG_INFO("server.loading", "Loading SpellArea Data...");                // must be after quest load
+    FMT_LOG_INFO("server.loading", "Loading SpellArea Data...");                // must be after quest load
     sSpellMgr->LoadSpellAreas();
 
-    TC_LOG_INFO("server.loading", "Loading AreaTrigger definitions...");
+    FMT_LOG_INFO("server.loading", "Loading AreaTrigger definitions...");
     sObjectMgr->LoadAreaTriggerTeleports();
 
-    TC_LOG_INFO("server.loading", "Loading Access Requirements...");
+    FMT_LOG_INFO("server.loading", "Loading Access Requirements...");
     sObjectMgr->LoadAccessRequirements();                        // must be after item template load
 
-    TC_LOG_INFO("server.loading", "Loading Quest Area Triggers...");
+    FMT_LOG_INFO("server.loading", "Loading Quest Area Triggers...");
     sObjectMgr->LoadQuestAreaTriggers();                         // must be after LoadQuests
 
-    TC_LOG_INFO("server.loading", "Loading Tavern Area Triggers...");
+    FMT_LOG_INFO("server.loading", "Loading Tavern Area Triggers...");
     sObjectMgr->LoadTavernAreaTriggers();
 
-    TC_LOG_INFO("server.loading", "Loading AreaTrigger script names...");
+    FMT_LOG_INFO("server.loading", "Loading AreaTrigger script names...");
     sObjectMgr->LoadAreaTriggerScripts();
 
-    TC_LOG_INFO("server.loading", "Loading LFG entrance positions..."); // Must be after areatriggers
+    FMT_LOG_INFO("server.loading", "Loading LFG entrance positions..."); // Must be after areatriggers
     sLFGMgr->LoadLFGDungeons();
 
-    TC_LOG_INFO("server.loading", "Loading Dungeon boss data...");
+    FMT_LOG_INFO("server.loading", "Loading Dungeon boss data...");
     sObjectMgr->LoadInstanceEncounters();
 
-    TC_LOG_INFO("server.loading", "Loading LFG rewards...");
+    FMT_LOG_INFO("server.loading", "Loading LFG rewards...");
     sLFGMgr->LoadRewards();
 
-    TC_LOG_INFO("server.loading", "Loading Graveyard-zone links...");
+    FMT_LOG_INFO("server.loading", "Loading Graveyard-zone links...");
     sObjectMgr->LoadGraveyardZones();
 
-    TC_LOG_INFO("server.loading", "Loading spell pet auras...");
+    FMT_LOG_INFO("server.loading", "Loading spell pet auras...");
     sSpellMgr->LoadSpellPetAuras();
 
-    TC_LOG_INFO("server.loading", "Loading Spell target coordinates...");
+    FMT_LOG_INFO("server.loading", "Loading Spell target coordinates...");
     sSpellMgr->LoadSpellTargetPositions();
 
-    TC_LOG_INFO("server.loading", "Loading enchant custom attributes...");
+    FMT_LOG_INFO("server.loading", "Loading enchant custom attributes...");
     sSpellMgr->LoadEnchantCustomAttr();
 
-    TC_LOG_INFO("server.loading", "Loading linked spells...");
+    FMT_LOG_INFO("server.loading", "Loading linked spells...");
     sSpellMgr->LoadSpellLinked();
 
-    TC_LOG_INFO("server.loading", "Loading Player Create Data...");
+    FMT_LOG_INFO("server.loading", "Loading Player Create Data...");
     sObjectMgr->LoadPlayerInfo();
 
-    TC_LOG_INFO("server.loading", "Loading Exploration BaseXP Data...");
+    FMT_LOG_INFO("server.loading", "Loading Exploration BaseXP Data...");
     sObjectMgr->LoadExplorationBaseXP();
 
-    TC_LOG_INFO("server.loading", "Loading Pet Name Parts...");
+    FMT_LOG_INFO("server.loading", "Loading Pet Name Parts...");
     sObjectMgr->LoadPetNames();
 
     CharacterDatabaseCleaner::CleanDatabase();
 
-    TC_LOG_INFO("server.loading", "Loading the max pet number...");
+    FMT_LOG_INFO("server.loading", "Loading the max pet number...");
     sObjectMgr->LoadPetNumber();
 
-    TC_LOG_INFO("server.loading", "Loading pet level stats...");
+    FMT_LOG_INFO("server.loading", "Loading pet level stats...");
     sObjectMgr->LoadPetLevelInfo();
 
-    TC_LOG_INFO("server.loading", "Loading Player level dependent mail rewards...");
+    FMT_LOG_INFO("server.loading", "Loading Player level dependent mail rewards...");
     sObjectMgr->LoadMailLevelRewards();
 
     // Loot tables
     LoadLootTables();
 
-    TC_LOG_INFO("server.loading", "Loading Skill Discovery Table...");
+    FMT_LOG_INFO("server.loading", "Loading Skill Discovery Table...");
     LoadSkillDiscoveryTable();
 
-    TC_LOG_INFO("server.loading", "Loading Skill Extra Item Table...");
+    FMT_LOG_INFO("server.loading", "Loading Skill Extra Item Table...");
     LoadSkillExtraItemTable();
 
-    TC_LOG_INFO("server.loading", "Loading Skill Perfection Data Table...");
+    FMT_LOG_INFO("server.loading", "Loading Skill Perfection Data Table...");
     LoadSkillPerfectItemTable();
 
-    TC_LOG_INFO("server.loading", "Loading Skill Fishing base level requirements...");
+    FMT_LOG_INFO("server.loading", "Loading Skill Fishing base level requirements...");
     sObjectMgr->LoadFishingBaseSkillLevel();
 
-    TC_LOG_INFO("server.loading", "Loading Achievements...");
+    FMT_LOG_INFO("server.loading", "Loading Achievements...");
     sAchievementMgr->LoadAchievementReferenceList();
-    TC_LOG_INFO("server.loading", "Loading Achievement Criteria Lists...");
+    FMT_LOG_INFO("server.loading", "Loading Achievement Criteria Lists...");
     sAchievementMgr->LoadAchievementCriteriaList();
-    TC_LOG_INFO("server.loading", "Loading Achievement Criteria Data...");
+    FMT_LOG_INFO("server.loading", "Loading Achievement Criteria Data...");
     sAchievementMgr->LoadAchievementCriteriaData();
-    TC_LOG_INFO("server.loading", "Loading Achievement Rewards...");
+    FMT_LOG_INFO("server.loading", "Loading Achievement Rewards...");
     sAchievementMgr->LoadRewards();
-    TC_LOG_INFO("server.loading", "Loading Achievement Reward Locales...");
+    FMT_LOG_INFO("server.loading", "Loading Achievement Reward Locales...");
     sAchievementMgr->LoadRewardLocales();
-    TC_LOG_INFO("server.loading", "Loading Completed Achievements...");
+    FMT_LOG_INFO("server.loading", "Loading Completed Achievements...");
     sAchievementMgr->LoadCompletedAchievements();
 
     ///- Load dynamic data tables from the database
-    TC_LOG_INFO("server.loading", "Loading Item Auctions...");
+    FMT_LOG_INFO("server.loading", "Loading Item Auctions...");
     sAuctionMgr->LoadAuctionItems();
 
-    TC_LOG_INFO("server.loading", "Loading Auctions...");
+    FMT_LOG_INFO("server.loading", "Loading Auctions...");
     sAuctionMgr->LoadAuctions();
 
-    TC_LOG_INFO("server.loading", "Loading Guilds...");
+    FMT_LOG_INFO("server.loading", "Loading Guilds...");
     sGuildMgr->LoadGuilds();
 
-    TC_LOG_INFO("server.loading", "Loading Guilds Wars...");
+    FMT_LOG_INFO("server.loading", "Loading Guilds Wars...");
     sGuildMgr->LoadGuildWarData();
 
-    TC_LOG_INFO("server.loading", "Loading Guilds Wars History...");
+    FMT_LOG_INFO("server.loading", "Loading Guilds Wars History...");
     sGuildMgr->LoadGuildWarHistory();
 
-    TC_LOG_INFO("server.loading", "Loading ArenaTeams...");
+    FMT_LOG_INFO("server.loading", "Loading ArenaTeams...");
     sArenaTeamMgr->LoadArenaTeams();
 
-    TC_LOG_INFO("server.loading", "Loading Groups...");
+    FMT_LOG_INFO("server.loading", "Loading Groups...");
     sGroupMgr->LoadGroups();
 
-    TC_LOG_INFO("server.loading", "Loading ReservedNames...");
+    FMT_LOG_INFO("server.loading", "Loading ReservedNames...");
     sObjectMgr->LoadReservedPlayersNames();
 
-    TC_LOG_INFO("server.loading", "Loading GameObjects for quests...");
+    FMT_LOG_INFO("server.loading", "Loading GameObjects for quests...");
     sObjectMgr->LoadGameObjectForQuests();
 
-    TC_LOG_INFO("server.loading", "Loading BattleMasters...");
+    FMT_LOG_INFO("server.loading", "Loading BattleMasters...");
     sBattlegroundMgr->LoadBattleMastersEntry();                 // must be after load CreatureTemplate
 
-    TC_LOG_INFO("server.loading", "Loading GameTeleports...");
+    FMT_LOG_INFO("server.loading", "Loading GameTeleports...");
     sObjectMgr->LoadGameTele();
 
-    TC_LOG_INFO("server.loading", "Loading Guild Spell Auras...");
+    FMT_LOG_INFO("server.loading", "Loading Guild Spell Auras...");
     sObjectMgr->LoadGuildSpellAuras();
 
-    TC_LOG_INFO("server.loading", "Loading Player Auto Learn spells...");
+    FMT_LOG_INFO("server.loading", "Loading Player Auto Learn spells...");
     sObjectMgr->LoadPlayerAutoLearnSpells();
 
-    TC_LOG_INFO("server.loading", "Loading Trainers...");       // must be after LoadCreatureTemplates
+    FMT_LOG_INFO("server.loading", "Loading Trainers...");       // must be after LoadCreatureTemplates
     sObjectMgr->LoadTrainers();
 
-    TC_LOG_INFO("server.loading", "Loading Creature default trainers...");
+    FMT_LOG_INFO("server.loading", "Loading Creature default trainers...");
     sObjectMgr->LoadCreatureDefaultTrainers();
 
-    TC_LOG_INFO("server.loading", "Loading Gossip menu...");
+    FMT_LOG_INFO("server.loading", "Loading Gossip menu...");
     sObjectMgr->LoadGossipMenu();
 
-    TC_LOG_INFO("server.loading", "Loading Gossip menu options...");
+    FMT_LOG_INFO("server.loading", "Loading Gossip menu options...");
     sObjectMgr->LoadGossipMenuItems();                           // must be after LoadTrainers
 
-    TC_LOG_INFO("server.loading", "Loading Vendors...");
+    FMT_LOG_INFO("server.loading", "Loading Vendors...");
     sObjectMgr->LoadVendors();                                   // must be after load CreatureTemplate and ItemTemplate
 
-    TC_LOG_INFO("server.loading", "Loading Waypoints...");
+    FMT_LOG_INFO("server.loading", "Loading Waypoints...");
     sWaypointMgr->Load();
 
-    TC_LOG_INFO("server.loading", "Loading SmartAI Waypoints...");
+    FMT_LOG_INFO("server.loading", "Loading SmartAI Waypoints...");
     sSmartWaypointMgr->LoadFromDB();
 
-    TC_LOG_INFO("server.loading", "Loading Creature Formations...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Formations...");
     sFormationMgr->LoadCreatureFormations();
 
-    TC_LOG_INFO("server.loading", "Loading World States...");              // must be loaded before battleground, outdoor PvP and conditions
+    FMT_LOG_INFO("server.loading", "Loading World States...");              // must be loaded before battleground, outdoor PvP and conditions
     LoadWorldStates();
 
-    TC_LOG_INFO("server.loading", "Loading Conditions...");
+    FMT_LOG_INFO("server.loading", "Loading Conditions...");
     sConditionMgr->LoadConditions();
 
-    TC_LOG_INFO("server.loading", "Loading faction change achievement pairs...");
+    FMT_LOG_INFO("server.loading", "Loading faction change achievement pairs...");
     sObjectMgr->LoadFactionChangeAchievements();
 
-    TC_LOG_INFO("server.loading", "Loading faction change spell pairs...");
+    FMT_LOG_INFO("server.loading", "Loading faction change spell pairs...");
     sObjectMgr->LoadFactionChangeSpells();
 
-    TC_LOG_INFO("server.loading", "Loading faction change quest pairs...");
+    FMT_LOG_INFO("server.loading", "Loading faction change quest pairs...");
     sObjectMgr->LoadFactionChangeQuests();
 
-    TC_LOG_INFO("server.loading", "Loading faction change item pairs...");
+    FMT_LOG_INFO("server.loading", "Loading faction change item pairs...");
     sObjectMgr->LoadFactionChangeItems();
 
-    TC_LOG_INFO("server.loading", "Loading faction change reputation pairs...");
+    FMT_LOG_INFO("server.loading", "Loading faction change reputation pairs...");
     sObjectMgr->LoadFactionChangeReputations();
 
-    TC_LOG_INFO("server.loading", "Loading faction change title pairs...");
+    FMT_LOG_INFO("server.loading", "Loading faction change title pairs...");
     sObjectMgr->LoadFactionChangeTitles();
 
-    TC_LOG_INFO("server.loading", "Loading GM tickets...");
+    FMT_LOG_INFO("server.loading", "Loading GM tickets...");
     sTicketMgr->LoadTickets();
 
-    TC_LOG_INFO("server.loading", "Loading GM surveys...");
+    FMT_LOG_INFO("server.loading", "Loading GM surveys...");
     sTicketMgr->LoadSurveys();
 
-    TC_LOG_INFO("server.loading", "Loading client addons...");
+    FMT_LOG_INFO("server.loading", "Loading client addons...");
     AddonMgr::LoadFromDB();
 
-    TC_LOG_INFO("server.loading", "Loading Autobroadcasts...");
+    FMT_LOG_INFO("server.loading", "Loading Autobroadcasts...");
     LoadAutobroadcasts();
 
     ///- Load and initialize scripts
@@ -1206,45 +1206,45 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadEventScripts();                              // must be after load Creature/Gameobject(Template/Data)
     sObjectMgr->LoadWaypointScripts();
 
-    TC_LOG_INFO("server.loading", "Loading spell script names...");
+    FMT_LOG_INFO("server.loading", "Loading spell script names...");
     sObjectMgr->LoadSpellScriptNames();
 
-    TC_LOG_INFO("server.loading", "Loading Creature Texts...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Texts...");
     sCreatureTextMgr->LoadCreatureTexts();
 
-    TC_LOG_INFO("server.loading", "Loading Creature Text Locales...");
+    FMT_LOG_INFO("server.loading", "Loading Creature Text Locales...");
     sCreatureTextMgr->LoadCreatureTextLocales();
 
-    TC_LOG_INFO("server.loading", "Initializing Scripts...");
+    FMT_LOG_INFO("server.loading", "Initializing Scripts...");
     sScriptMgr->Initialize();
     sScriptMgr->OnConfigLoad(false);                                // must be done after the ScriptMgr has been properly initialized
 
-    TC_LOG_INFO("server.loading", "Validating spell scripts...");
+    FMT_LOG_INFO("server.loading", "Validating spell scripts...");
     sObjectMgr->ValidateSpellScripts();
 
-    TC_LOG_INFO("server.loading", "Loading SmartAI scripts...");
+    FMT_LOG_INFO("server.loading", "Loading SmartAI scripts...");
     sSmartScriptMgr->LoadSmartAIFromDB();
 
-    TC_LOG_INFO("server.loading", "Loading Calendar data...");
+    FMT_LOG_INFO("server.loading", "Loading Calendar data...");
     sCalendarMgr->LoadFromDB();
 
-    TC_LOG_INFO("server.loading", "Loading Petitions...");
+    FMT_LOG_INFO("server.loading", "Loading Petitions...");
     sPetitionMgr->LoadPetitions();
 
-    TC_LOG_INFO("server.loading", "Loading Signatures...");
+    FMT_LOG_INFO("server.loading", "Loading Signatures...");
     sPetitionMgr->LoadSignatures();
 
-    TC_LOG_INFO("server.loading", "Loading Item loot...");
+    FMT_LOG_INFO("server.loading", "Loading Item loot...");
     sLootItemStorage->LoadStorageFromDB();
 
-    TC_LOG_INFO("server.loading", "Initialize query data...");
+    FMT_LOG_INFO("server.loading", "Initialize query data...");
     sObjectMgr->InitializeQueriesData(QUERY_DATA_ALL);
 
-    TC_LOG_INFO("server.loading", "Initialize commands...");
+    FMT_LOG_INFO("server.loading", "Initialize commands...");
     Trinity::ChatCommands::LoadCommandMap();
 
     ///- Initialize game time and timers
-    TC_LOG_INFO("server.loading", "Initialize game time and timers");
+    FMT_LOG_INFO("server.loading", "Initialize game time and timers");
     GameTime::UpdateGameTimers();
 
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
@@ -1273,88 +1273,88 @@ void World::SetInitialWorldSettings()
     m_timers[WUPDATE_CHANNEL_SAVE].SetInterval(getIntConfig(CONFIG_PRESERVE_CUSTOM_CHANNEL_INTERVAL) * MINUTE * IN_MILLISECONDS);
 
     ///- Initialize MapManager
-    TC_LOG_INFO("server.loading", "Starting Map System");
+    FMT_LOG_INFO("server.loading", "Starting Map System");
     sMapMgr->Initialize();
 
-    TC_LOG_INFO("server.loading", "Starting Game Event system...");
+    FMT_LOG_INFO("server.loading", "Starting Game Event system...");
     uint32 nextGameEvent = sGameEventMgr->StartSystem();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
 
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
 
-    TC_LOG_INFO("server.loading", "Initialize AuctionHouseBot...");
+    FMT_LOG_INFO("server.loading", "Initialize AuctionHouseBot...");
     sAuctionBot->Initialize();
 
-    TC_LOG_INFO("server.loading", "Initializing chat channels...");
+    FMT_LOG_INFO("server.loading", "Initializing chat channels...");
     ChannelMgr::LoadFromDB();
 
-    TC_LOG_INFO("server.loading", "Initializing Opcodes...");
+    FMT_LOG_INFO("server.loading", "Initializing Opcodes...");
     opcodeTable.Initialize();
 
-    TC_LOG_INFO("server.loading", "Starting Arena Season...");
+    FMT_LOG_INFO("server.loading", "Starting Arena Season...");
     sGameEventMgr->StartArenaSeason();
 
     sTicketMgr->Initialize();
 
     ///- Initialize Battlegrounds
-    TC_LOG_INFO("server.loading", "Starting Battleground System");
+    FMT_LOG_INFO("server.loading", "Starting Battleground System");
     sBattlegroundMgr->LoadBattlegroundTemplates();
     sBattlegroundMgr->InitAutomaticArenaPointDistribution();
 
     ///- Initialize outdoor pvp
-    TC_LOG_INFO("server.loading", "Starting Outdoor PvP System");
+    FMT_LOG_INFO("server.loading", "Starting Outdoor PvP System");
     sOutdoorPvPMgr->InitOutdoorPvP();
 
     ///- Initialize Battlefield
-    TC_LOG_INFO("server.loading", "Starting Battlefield System");
+    FMT_LOG_INFO("server.loading", "Starting Battlefield System");
     sWintergraspMgr->InitializeWG();
 
     ///- Initialize Special Events
-    TC_LOG_INFO("server.loading", "Starting SpecialEvents System");
+    FMT_LOG_INFO("server.loading", "Starting SpecialEvents System");
     sSpecialEventMgr->InitSpecialEvents();
 
     ///- Initialize Special Events
-    TC_LOG_INFO("server.loading", "Starting Instance Character manager history System");
+    FMT_LOG_INFO("server.loading", "Starting Instance Character manager history System");
     sInstanceCharMgr->Initialize();
 
     ///- Initialize Mails
-    TC_LOG_INFO("server.loading", "Starting Mail System");
+    FMT_LOG_INFO("server.loading", "Starting Mail System");
     sMailMgr->Initialize();
 
     ///- Initialize Mails
-    TC_LOG_INFO("server.loading", "Starting Mail External System");
+    FMT_LOG_INFO("server.loading", "Starting Mail External System");
     sMailExternalMgr->Initialize();
 
     ///- Initialize PromoCodes data
-    TC_LOG_INFO("server.loading", "Loading Promo Codes...");
+    FMT_LOG_INFO("server.loading", "Loading Promo Codes...");
     sPromotionCodeMgr->Initialize();
 
     ///- Initialize PromoCodes data
-    TC_LOG_INFO("server.loading", "Loading ItemShop items...");
+    FMT_LOG_INFO("server.loading", "Loading ItemShop items...");
     sItemShopMgr->Initialize();
 
     ///- Initialize Warden
-    TC_LOG_INFO("server.loading", "Loading Warden Checks...");
+    FMT_LOG_INFO("server.loading", "Loading Warden Checks...");
     sWardenCheckMgr->LoadWardenChecks();
 
-    TC_LOG_INFO("server.loading", "Loading Warden Action Overrides...");
+    FMT_LOG_INFO("server.loading", "Loading Warden Action Overrides...");
     sWardenCheckMgr->LoadWardenOverrides();
 
-    TC_LOG_INFO("server.loading", "Deleting expired bans...");
+    FMT_LOG_INFO("server.loading", "Deleting expired bans...");
     LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate <= UNIX_TIMESTAMP() AND unbandate<>bandate");      // One-time query
 
-    TC_LOG_INFO("server.loading", "Initializing quest reset times...");
+    FMT_LOG_INFO("server.loading", "Initializing quest reset times...");
     InitQuestResetTimes();
     CheckQuestResetTimes();
 
-    TC_LOG_INFO("server.loading", "Calculate random battleground reset time...");
+    FMT_LOG_INFO("server.loading", "Calculate random battleground reset time...");
     InitRandomBGResetTime();
 
-    TC_LOG_INFO("server.loading", "Calculate deletion of old calendar events time...");
+    FMT_LOG_INFO("server.loading", "Calculate deletion of old calendar events time...");
     InitCalendarOldEventsDeletionTime();
 
-    TC_LOG_INFO("server.loading", "Calculate guild limitation(s) reset time...");
+    FMT_LOG_INFO("server.loading", "Calculate guild limitation(s) reset time...");
     InitGuildResetTime();
 
     // Preload all cells, if required for the base maps
@@ -1364,18 +1364,18 @@ void World::SetInitialWorldSettings()
         {
             if (!map->Instanceable())
             {
-                TC_LOG_INFO("server.loading", "Pre-loading base map data for map %u", map->GetId());
+                FMT_LOG_INFO("server.loading", "Pre-loading base map data for map {}", map->GetId());
                 map->LoadAllCells();
             }
         });
     }
 
-    TC_LOG_INFO("server.loading", "Loading Transports...");
+    FMT_LOG_INFO("server.loading", "Loading Transports...");
     sTransportMgr->SpawnContinentTransports();
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
 
-    TC_LOG_INFO("server.worldserver", "World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
+    FMT_LOG_INFO("server.worldserver", "World initialized in {} minutes {} seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
 
     TC_METRIC_EVENT("events", "World initialized", "World initialized in " + std::to_string(startupDuration / 60000) + " minutes " + std::to_string((startupDuration % 60000) / 1000) + " seconds");
 }
@@ -1386,7 +1386,7 @@ void World::DetectDBCLang()
 
     if (m_lang_confid != 255 && m_lang_confid >= TOTAL_LOCALES)
     {
-        TC_LOG_ERROR("server.loading", "Incorrect DBC.Locale! Must be >= 0 and < %d (set to 0)", TOTAL_LOCALES);
+        FMT_LOG_ERROR("server.loading", "Incorrect DBC.Locale! Must be >= 0 and < {} (set to 0)", TOTAL_LOCALES);
         m_lang_confid = LOCALE_enUS;
     }
 
@@ -1414,13 +1414,13 @@ void World::DetectDBCLang()
 
     if (default_locale >= TOTAL_LOCALES)
     {
-        TC_LOG_ERROR("server.loading", "Unable to determine your DBC Locale! (corrupt DBC?)");
+        FMT_LOG_ERROR("server.loading", "Unable to determine your DBC Locale! (corrupt DBC?)");
         exit(1);
     }
 
     m_defaultDbcLocale = LocaleConstant(default_locale);
 
-    TC_LOG_INFO("server.loading", "Using %s DBC Locale as default. All available DBC locales: %s", localeNames[m_defaultDbcLocale], availableLocalsStr.empty() ? "<none>" : availableLocalsStr.c_str());
+    FMT_LOG_INFO("server.loading", "Using {} DBC Locale as default. All available DBC locales: {}", localeNames[m_defaultDbcLocale], availableLocalsStr.empty() ? "<none>" : availableLocalsStr);
 }
 
 void World::LoadAutobroadcasts()
@@ -1437,7 +1437,7 @@ void World::LoadAutobroadcasts()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 autobroadcasts definitions. DB table `autobroadcast` is empty for this realm!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 autobroadcasts definitions. DB table `autobroadcast` is empty for this realm!");
         return;
     }
 
@@ -1454,7 +1454,7 @@ void World::LoadAutobroadcasts()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u autobroadcast definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} autobroadcast definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 /// Update the World !
@@ -1689,7 +1689,7 @@ void World::Update(uint32 diff)
     {
         TC_METRIC_TIMER("world_update_time", TC_METRIC_TAG("type", "Ping MySQL"));
         m_timers[WUPDATE_PINGDB].Reset();
-        TC_LOG_DEBUG("misc", "Ping MySQL to keep connection alive");
+        FMT_LOG_DEBUG("misc", "Ping MySQL to keep connection alive");
         CharacterDatabase.KeepAlive();
         LoginDatabase.KeepAlive();
         WorldDatabase.KeepAlive();
@@ -2238,7 +2238,7 @@ void World::ShutdownMsg(bool show, Player* player, const std::string& reason)
         ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
 
         SendServerMessage(msgid, str, player);
-        TC_LOG_DEBUG("misc", "Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str.c_str());
+        FMT_LOG_DEBUG("misc", "Server is {} in {}", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str);
     }
 }
 
@@ -2257,7 +2257,7 @@ uint32 World::ShutdownCancel()
     m_ExitCode = SHUTDOWN_EXIT_CODE;                       // to default value
     SendServerMessage(msgid);
 
-    TC_LOG_DEBUG("misc", "Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"));
+    FMT_LOG_DEBUG("misc", "Server {} cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"));
 
     sScriptMgr->OnShutdownCancel();
     return oldTimer;
@@ -2322,7 +2322,7 @@ void World::ProcessCliCommands()
     CliCommandHolder* command = nullptr;
     while (cliCmdQueue.next(command))
     {
-        TC_LOG_INFO("misc", "CLI command under processing...");
+        FMT_LOG_INFO("misc", "CLI command under processing...");
         zprint = command->m_print;
         callbackArg = command->m_callbackArg;
         CliHandler handler(callbackArg, zprint);
@@ -2387,7 +2387,7 @@ void World::SendAutoBroadcast()
         sWorld->SendGlobalMessage(&data);
     }
 
-    TC_LOG_DEBUG("misc", "AutoBroadcast: '%s'", msg.c_str());
+    FMT_LOG_DEBUG("misc", "AutoBroadcast: '{}'", msg);
 }
 
 void World::UpdateRealmCharCount(uint32 accountId)
@@ -2450,7 +2450,7 @@ void World::ResetDailyQuests()
     m_NextDailyQuestReset = next;
     sWorld->setWorldState(WS_DAILY_QUEST_RESET_TIME, uint64(next));
 
-    TC_LOG_INFO("misc", "Daily quests for all characters have been reset.");
+    FMT_LOG_INFO("misc", "Daily quests for all characters have been reset.");
 }
 
 static time_t GetNextWeeklyResetTime(time_t t)
@@ -2486,7 +2486,7 @@ void World::ResetWeeklyQuests()
     m_NextWeeklyQuestReset = next;
     sWorld->setWorldState(WS_WEEKLY_QUEST_RESET_TIME, uint64(next));
 
-    TC_LOG_INFO("misc", "Weekly quests for all characters have been reset.");
+    FMT_LOG_INFO("misc", "Weekly quests for all characters have been reset.");
 }
 
 static time_t GetNextMonthlyResetTime(time_t t)
@@ -2522,7 +2522,7 @@ void World::ResetMonthlyQuests()
     m_NextMonthlyQuestReset = next;
     sWorld->setWorldState(WS_MONTHLY_QUEST_RESET_TIME, uint64(next));
 
-    TC_LOG_INFO("misc", "Monthly quests for all characters have been reset.");
+    FMT_LOG_INFO("misc", "Monthly quests for all characters have been reset.");
 }
 
 void World::CheckQuestResetTimes()
@@ -2611,7 +2611,7 @@ void World::InitGuildResetTime()
 
 void World::ResetEventSeasonalQuests(uint16 event_id)
 {
-    TC_LOG_INFO("misc", "Seasonal quests reset for all characters.");
+    FMT_LOG_INFO("misc", "Seasonal quests reset for all characters.");
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RESET_CHARACTER_QUESTSTATUS_SEASONAL_BY_EVENT);
     stmt->setUInt16(0, event_id);
@@ -2624,7 +2624,7 @@ void World::ResetEventSeasonalQuests(uint16 event_id)
 
 void World::ResetRandomBG()
 {
-    TC_LOG_INFO("misc", "Random BG status reset for all characters.");
+    FMT_LOG_INFO("misc", "Random BG status reset for all characters.");
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_BATTLEGROUND_RANDOM_ALL);
     CharacterDatabase.Execute(stmt);
@@ -2639,7 +2639,7 @@ void World::ResetRandomBG()
 
 void World::CalendarDeleteOldEvents()
 {
-    TC_LOG_INFO("misc", "Calendar deletion of old events.");
+    FMT_LOG_INFO("misc", "Calendar deletion of old events.");
 
     m_NextCalendarOldEventsDeletionTime = time_t(m_NextCalendarOldEventsDeletionTime + DAY);
     sWorld->setWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, uint64(m_NextCalendarOldEventsDeletionTime));
@@ -2648,7 +2648,7 @@ void World::CalendarDeleteOldEvents()
 
 void World::ResetGuildCap()
 {
-    TC_LOG_INFO("misc", "Guild Daily Cap reset.");
+    FMT_LOG_INFO("misc", "Guild Daily Cap reset.");
 
     m_NextGuildReset = time_t(m_NextGuildReset + DAY);
     sWorld->setWorldState(WS_GUILD_DAILY_RESET_TIME, uint64(m_NextGuildReset));
@@ -2696,7 +2696,7 @@ void World::LoadWorldStates()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 world states. DB table `worldstates` is empty!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 world states. DB table `worldstates` is empty!");
 
         return;
     }
@@ -2711,7 +2711,7 @@ void World::LoadWorldStates()
     }
     while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u world states in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} world states in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 
 }
 
@@ -2767,7 +2767,7 @@ void World::ProcessQueryCallbacks()
 void World::ReloadRBAC()
 {
     // Passive reload, we mark the data as invalidated and next time a permission is checked it will be reloaded
-    TC_LOG_INFO("rbac", "World::ReloadRBAC()");
+    FMT_LOG_INFO("rbac", "World::ReloadRBAC()");
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         if (WorldSession* session = itr->second)
             session->InvalidateRBACData();

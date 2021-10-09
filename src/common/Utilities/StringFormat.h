@@ -28,6 +28,21 @@ namespace Trinity
     {
         try
         {
+            return fmt::format(std::forward<Format>(fmt), std::forward<Args>(args)...);
+        }
+        catch (const fmt::format_error& formatError)
+        {
+            std::string error = "An error occurred formatting string \"" + std::string(fmt) + "\" : " + std::string(formatError.what());
+            return error;
+        }
+    }
+
+    /// OLD TC string format function.
+    template<typename Format, typename... Args>
+    inline std::string SQLStringFormat(Format&& fmt, Args&&... args)
+    {
+        try
+        {
             return fmt::sprintf(std::forward<Format>(fmt), std::forward<Args>(args)...);
         }
         catch (const fmt::format_error& formatError)

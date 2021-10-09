@@ -52,7 +52,7 @@ void ItemShopMgr::_LoadItemsFromShop()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 item from shop. DB table `item_shop` is empty!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 item from shop. DB table `item_shop` is empty!");
         return;
     }
 
@@ -76,7 +76,7 @@ void ItemShopMgr::_LoadItemsFromShop()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u Items from Shop in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} Items from Shop in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 bool ItemShopMgr::AddItemFromShop(ItemFromShop& data)

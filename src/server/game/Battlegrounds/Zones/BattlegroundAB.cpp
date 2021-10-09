@@ -477,7 +477,7 @@ void BattlegroundAB::_SendNodeUpdate(uint8 node)
 void BattlegroundAB::_NodeOccupied(uint8 node, TeamId teamIndex)
 {
     if (!AddSpiritGuide(node, BG_AB_SpiritGuidePos[node], teamIndex))
-        TC_LOG_ERROR("bg.battleground", "Failed to spawn spirit guide! point: %u, teamId: %u, ", node, teamIndex);
+        FMT_LOG_ERROR("bg.battleground", "Failed to spawn spirit guide! point: {}, teamId: {}, ", node, teamIndex);
 
     if (node >= BG_AB_DYNAMIC_NODES_COUNT) //only dynamic nodes, no start points
         return;
@@ -681,7 +681,7 @@ bool BattlegroundAB::SetupBattleground()
         BattlegroundGOSpawnPoint const& nodeSpawn = BG_AB_NodePositions[nodeID];
         if (!AddObject(BG_AB_OBJECT_FIRST + i, entry, nodeSpawn.Pos, nodeSpawn.Rot, nodeSpawn.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "BattleGroundAB: Failed to spawn GameObject! (Entry: %u)", entry);
+            FMT_LOG_ERROR("bg.battleground", "BattleGroundAB: Failed to spawn GameObject! (Entry: {})", entry);
             return false;
         }
     }
@@ -691,7 +691,7 @@ bool BattlegroundAB::SetupBattleground()
         BattlegroundGOSpawnPoint const& door = BattlegroundABDoors[i];
         if (!AddObject(BG_AB_OBJECT_GATE_A + i, door.Entry, door.Pos, door.Rot, door.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "BattleGroundAB: Failed to spawn door object (Entry: %u). Battleground not created!", door.Entry);
+            FMT_LOG_ERROR("bg.battleground", "BattleGroundAB: Failed to spawn door object (Entry: {}). Battleground not created!", door.Entry);
             return false;
         }
     }
@@ -707,7 +707,7 @@ bool BattlegroundAB::SetupBattleground()
         BattlegroundGOSpawnPoint const& nodeBuff = BG_AB_BuffPositions[nodeID];
         if (!AddObject(BG_AB_OBJECT_BUFF_FIRST + i, entry, nodeBuff.Pos, nodeBuff.Rot, nodeBuff.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "BattleGroundAB: Failed to spawn buff object (Entry: %u). Battleground not created!", entry);
+            FMT_LOG_ERROR("bg.battleground", "BattleGroundAB: Failed to spawn buff object (Entry: {}). Battleground not created!", entry);
             return false;
         }
     }

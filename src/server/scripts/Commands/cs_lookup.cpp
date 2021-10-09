@@ -148,7 +148,7 @@ public:
                     else
                         ss << areaEntry->ID << " - " << name << ' ' << localeNames[locale];
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    handler->SendSysMessage(ss.str());
 
                     if (!found)
                         found = true;
@@ -200,9 +200,9 @@ public:
                         }
 
                         if (handler->GetSession())
-                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
+                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name);
                         else
-                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
+                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name);
 
                         if (!found)
                             found = true;
@@ -225,9 +225,9 @@ public:
                 }
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
+                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name);
                 else
-                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
+                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name);
 
                 if (!found)
                     found = true;
@@ -280,9 +280,9 @@ public:
                 char const* active = activeEvents.find(id) != activeEvents.end() ? handler->GetTrinityString(LANG_ACTIVE) : "";
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description.c_str(), active);
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description, active);
                 else
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.description.c_str(), active);
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.description, active);
 
                 if (!found)
                     found = true;
@@ -384,7 +384,7 @@ public:
                     else
                         ss << handler->GetTrinityString(LANG_FACTION_NOREPUTATION);
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    handler->SendSysMessage(ss.str());
 
                     if (!found)
                         found = true;
@@ -435,9 +435,9 @@ public:
                         }
 
                         if (handler->GetSession())
-                            handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplatePair.first, itemTemplatePair.first, name.c_str());
+                            handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplatePair.first, itemTemplatePair.first, name);
                         else
-                            handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplatePair.first, name.c_str());
+                            handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplatePair.first, name);
 
                         if (!found)
                             found = true;
@@ -460,9 +460,9 @@ public:
                 }
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplatePair.first, itemTemplatePair.first, name.c_str());
+                    handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplatePair.first, itemTemplatePair.first, name);
                 else
-                    handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplatePair.first, name.c_str());
+                    handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplatePair.first, name);
 
                 if (!found)
                     found = true;
@@ -493,9 +493,9 @@ public:
             }
 
             if (handler->GetSession())
-                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, id, id, name.c_str());
+                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, id, id, name);
             else
-                handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, id, name.c_str());
+                handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, id, name);
         }
         else
             handler->SendSysMessage(LANG_COMMAND_NOITEMFOUND);
@@ -559,9 +559,9 @@ public:
 
                     // send item set in "id - [namedlink locale]" format
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CHAT, set->ID, set->ID, name.c_str(), localeNames[locale]);
+                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CHAT, set->ID, set->ID, name, localeNames[locale]);
                     else
-                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CONSOLE, set->ID, name.c_str(), localeNames[locale]);
+                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CONSOLE, set->ID, name, localeNames[locale]);
 
                     if (!found)
                         found = true;
@@ -611,9 +611,9 @@ public:
                         }
 
                         if (handler->GetSession())
-                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplatePair.first, gameObjectTemplatePair.first, name.c_str());
+                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplatePair.first, gameObjectTemplatePair.first, name);
                         else
-                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplatePair.first, name.c_str());
+                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplatePair.first, name);
 
                         if (!found)
                             found = true;
@@ -636,9 +636,9 @@ public:
                 }
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplatePair.first, gameObjectTemplatePair.first, name.c_str());
+                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplatePair.first, gameObjectTemplatePair.first, name);
                 else
-                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplatePair.first, name.c_str());
+                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplatePair.first, name);
 
                 if (!found)
                     found = true;
@@ -711,9 +711,9 @@ public:
                         }
 
                         if (handler->GetSession())
-                            handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, questTemplatePair.first, questTemplatePair.first, questTemplatePair.second.GetQuestLevel(), title.c_str(), statusStr);
+                            handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, questTemplatePair.first, questTemplatePair.first, questTemplatePair.second.GetQuestLevel(), title, statusStr);
                         else
-                            handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, questTemplatePair.first, title.c_str(), statusStr);
+                            handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, questTemplatePair.first, title, statusStr);
 
                         if (!found)
                             found = true;
@@ -756,9 +756,9 @@ public:
                 }
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, questTemplatePair.first, questTemplatePair.first, questTemplatePair.second.GetQuestLevel(), title.c_str(), statusStr);
+                    handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, questTemplatePair.first, questTemplatePair.first, questTemplatePair.second.GetQuestLevel(), title, statusStr);
                 else
-                    handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, questTemplatePair.first, title.c_str(), statusStr);
+                    handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, questTemplatePair.first, title, statusStr);
 
                 if (!found)
                     found = true;
@@ -811,9 +811,9 @@ public:
             }
 
             if (handler->GetSession())
-                handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, id, id, quest->GetQuestLevel(), title.c_str(), statusStr);
+                handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, id, id, quest->GetQuestLevel(), title, statusStr);
             else
-                handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, id, title.c_str(), statusStr);
+                handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, id, title, statusStr);
         }
         else
             handler->SendSysMessage(LANG_COMMAND_NOQUESTFOUND);
@@ -894,9 +894,9 @@ public:
 
                     // send skill in "id - [namedlink locale]" format
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_SKILL_LIST_CHAT, skillInfo->ID, skillInfo->ID, name.c_str(), localeNames[locale], knownStr, valStr);
+                        handler->PSendSysMessage(LANG_SKILL_LIST_CHAT, skillInfo->ID, skillInfo->ID, name, localeNames[locale], knownStr, valStr);
                     else
-                        handler->PSendSysMessage(LANG_SKILL_LIST_CONSOLE, skillInfo->ID, name.c_str(), localeNames[locale], knownStr, valStr);
+                        handler->PSendSysMessage(LANG_SKILL_LIST_CONSOLE, skillInfo->ID, name, localeNames[locale], knownStr, valStr);
 
                     if (!found)
                         found = true;
@@ -1011,7 +1011,7 @@ public:
                     if (active)
                         ss << handler->GetTrinityString(LANG_ACTIVE);
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    handler->SendSysMessage(ss.str());
 
                     if (!found)
                         found = true;
@@ -1088,7 +1088,7 @@ public:
             if (active)
                 ss << handler->GetTrinityString(LANG_ACTIVE);
 
-            handler->SendSysMessage(ss.str().c_str());
+            handler->SendSysMessage(ss.str());
         }
         else
             handler->SendSysMessage(LANG_COMMAND_NOSPELLFOUND);
@@ -1152,10 +1152,10 @@ public:
 
                     // send taxinode in "id - [name] (Map:m X:x Y:y Z:z)" format
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CHAT, nodeEntry->ID, nodeEntry->ID, name.c_str(), localeNames[locale],
+                        handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CHAT, nodeEntry->ID, nodeEntry->ID, name, localeNames[locale],
                             nodeEntry->ContinentID, nodeEntry->Pos.X, nodeEntry->Pos.Y, nodeEntry->Pos.Z);
                     else
-                        handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CONSOLE, nodeEntry->ID, name.c_str(), localeNames[locale],
+                        handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CONSOLE, nodeEntry->ID, name, localeNames[locale],
                             nodeEntry->ContinentID, nodeEntry->Pos.X, nodeEntry->Pos.Y, nodeEntry->Pos.Z);
 
                     if (!found)
@@ -1220,7 +1220,7 @@ public:
         if (reply.str().empty())
             handler->SendSysMessage(LANG_COMMAND_TELE_NOLOCATION);
         else
-            handler->PSendSysMessage(LANG_COMMAND_TELE_LOCATION, reply.str().c_str());
+            handler->PSendSysMessage(LANG_COMMAND_TELE_LOCATION, reply.str());
 
         if (limitReached)
             handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
@@ -1375,7 +1375,7 @@ public:
                         break;
                     }
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    handler->SendSysMessage(ss.str());
 
                     ++counter;
                 }
@@ -1427,7 +1427,7 @@ public:
                 break;
             }
 
-            handler->SendSysMessage(ss.str().c_str());
+            handler->SendSysMessage(ss.str());
         }
         else
             handler->SendSysMessage(LANG_COMMAND_NOMAPFOUND);
@@ -1532,7 +1532,7 @@ public:
 
             if (result2)
             {
-                handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName.c_str(), accountId);
+                handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName, accountId);
 
                 do
                 {
@@ -1541,7 +1541,7 @@ public:
                     std::string name        = characterFields[1].GetString();
                     uint8 online = characterFields[2].GetUInt8();
 
-                    handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name.c_str(), guid, online ? handler->GetTrinityString(LANG_ONLINE) : "");
+                    handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name, guid, online ? handler->GetTrinityString(LANG_ONLINE) : "");
                     ++counter;
                 }
                 while (result2->NextRow() && (limit == -1 || counter < limit));

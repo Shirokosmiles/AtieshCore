@@ -98,7 +98,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    TC_LOG_DEBUG("network", "WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, castCount: %u, spellId: %u, Item: %u, glyphIndex: %u, data length = %i", bagIndex, slot, castCount, spellId, pItem->GetEntry(), glyphIndex, (uint32)recvPacket.size());
+    FMT_LOG_DEBUG("network", "WORLD: CMSG_USE_ITEM packet, bagIndex: {}, slot: {}, castCount: {}, spellId: {}, Item: {}, glyphIndex: {}, data length = {}", bagIndex, slot, castCount, spellId, pItem->GetEntry(), glyphIndex, (uint32)recvPacket.size());
 
     ItemTemplate const* proto = pItem->GetTemplate();
     if (!proto)
@@ -174,7 +174,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 {
-    TC_LOG_DEBUG("network", "WORLD: CMSG_OPEN_ITEM packet, data length = %i", (uint32)recvPacket.size());
+    FMT_LOG_DEBUG("network", "WORLD: CMSG_OPEN_ITEM packet, data length = {}", (uint32)recvPacket.size());
 
     Player* player = GetPlayer();
 
@@ -192,7 +192,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     uint8 bagIndex, slot;
     recvPacket >> bagIndex >> slot;
 
-    TC_LOG_INFO("network", "bagIndex: %u, slot: %u", bagIndex, slot);
+    FMT_LOG_INFO("network", "bagIndex: {}, slot: {}", bagIndex, slot);
 
     Item* item = player->GetItemByPos(bagIndex, slot);
     if (!item)
@@ -212,8 +212,8 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     if (!proto->HasFlag(ITEM_FLAG_HAS_LOOT) && !item->IsWrapped())
     {
         player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
-        TC_LOG_ERROR("entities.player.cheat", "Possible hacking attempt: Player %s %s tried to open item [%s, entry: %u] which is not openable!",
-            player->GetName().c_str(), player->GetGUID().ToString().c_str(), item->GetGUID().ToString().c_str(), proto->ItemId);
+        FMT_LOG_ERROR("entities.player.cheat", "Possible hacking attempt: Player {} {} tried to open item [{}, entry: {}] which is not openable!",
+            player->GetName(), player->GetGUID().ToString(), item->GetGUID().ToString(), proto->ItemId);
         return;
     }
 
@@ -226,7 +226,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         if (!lockInfo)
         {
             player->SendEquipError(EQUIP_ERR_ITEM_LOCKED, item, nullptr);
-            TC_LOG_ERROR("network", "WORLD::OpenItem: item %s has an unknown lockId: %u!", item->GetGUID().ToString().c_str(), lockId);
+            FMT_LOG_ERROR("network", "WORLD::OpenItem: item {} has an unknown lockId: {}!", item->GetGUID().ToString(), lockId);
             return;
         }
 
@@ -263,7 +263,7 @@ void WorldSession::HandleOpenWrappedItemCallback(uint16 pos, ObjectGuid itemGuid
 
     if (!result)
     {
-        TC_LOG_ERROR("network", "Wrapped item %s does't have record in character_gifts table and will deleted", itemGuid.ToString().c_str());
+        FMT_LOG_ERROR("network", "Wrapped item {} does't have record in character_gifts table and will deleted", itemGuid.ToString());
         GetPlayer()->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
         return;
     }
@@ -294,7 +294,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
-    TC_LOG_DEBUG("network", "WORLD: Recvd CMSG_GAMEOBJ_USE Message [%s]", guid.ToString().c_str());
+    FMT_LOG_DEBUG("network", "WORLD: Recvd CMSG_GAMEOBJ_USE Message [{}]", guid.ToString());
 
     if (GameObject* obj = GetPlayer()->GetGameObjectIfCanInteractWith(guid))
     {
@@ -312,7 +312,7 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
     ObjectGuid guid;
     recvPacket >> guid;
 
-    TC_LOG_DEBUG("network", "WORLD: Recvd CMSG_GAMEOBJ_REPORT_USE Message [%s]", guid.ToString().c_str());
+    FMT_LOG_DEBUG("network", "WORLD: Recvd CMSG_GAMEOBJ_REPORT_USE Message [{}]", guid.ToString());
 
     // ignore for remote control state
     if (_player->IsCharming())
@@ -334,7 +334,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     recvPacket >> castCount >> spellId >> castFlags;
     TriggerCastFlags triggerFlag = TRIGGERED_NONE;
 
-    TC_LOG_DEBUG("network", "WORLD: got cast spell packet, castCount: %u, spellId: %u, castFlags: %u, data length = %u", castCount, spellId, castFlags, (uint32)recvPacket.size());
+    FMT_LOG_DEBUG("network", "WORLD: got cast spell packet, castCount: {}, spellId: {}, castFlags: {}, data length = {}", castCount, spellId, castFlags, (uint32)recvPacket.size());
 
     // ignore for remote control state (for player case)
     Unit* mover = _player->GetCharmedOrSelf();
@@ -347,7 +347,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
     {
-        TC_LOG_ERROR("network", "WORLD: unknown spell id %u", spellId);
+        FMT_LOG_ERROR("network", "WORLD: unknown spell id {}", spellId);
         recvPacket.rfinish(); // prevent spam at ignore packet
         return;
     }
@@ -503,7 +503,7 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPackets::Spells::PetCancelAura
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(packet.SpellID);
     if (!spellInfo)
     {
-        TC_LOG_ERROR("network", "WORLD: unknown PET spell id %u", packet.SpellID);
+        FMT_LOG_ERROR("network", "WORLD: unknown PET spell id {}", packet.SpellID);
         return;
     }
 
@@ -511,13 +511,13 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPackets::Spells::PetCancelAura
 
     if (!pet)
     {
-        TC_LOG_ERROR("network", "HandlePetCancelAura: Attempt to cancel an aura for non-existant %s by player '%s'", packet.PetGUID.ToString().c_str(), GetPlayer()->GetName().c_str());
+        FMT_LOG_ERROR("network", "HandlePetCancelAura: Attempt to cancel an aura for non-existant {} by player '{}'", packet.PetGUID.ToString(), GetPlayer()->GetName());
         return;
     }
 
     if (pet != GetPlayer()->GetGuardianPet() && pet != GetPlayer()->GetCharmed())
     {
-        TC_LOG_ERROR("network", "HandlePetCancelAura: %s is not a pet of player '%s'", packet.PetGUID.ToString().c_str(), GetPlayer()->GetName().c_str());
+        FMT_LOG_ERROR("network", "HandlePetCancelAura: {} is not a pet of player '{}'", packet.PetGUID.ToString(), GetPlayer()->GetName());
         return;
     }
 
@@ -600,7 +600,7 @@ void WorldSession::HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& tot
 
 void WorldSession::HandleSelfResOpcode(WorldPacket & /*recvData*/)
 {
-    TC_LOG_DEBUG("network", "WORLD: CMSG_SELF_RES");                  // empty opcode
+    FMT_LOG_DEBUG("network", "WORLD: CMSG_SELF_RES");                  // empty opcode
 
     if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL)))
     {
@@ -632,7 +632,7 @@ void WorldSession::HandleSpellClick(WorldPacket& recvData)
 
 void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: CMSG_GET_MIRRORIMAGE_DATA");
+    FMT_LOG_DEBUG("network", "WORLD: CMSG_GET_MIRRORIMAGE_DATA");
     ObjectGuid guid;
     recvData >> guid;
 
@@ -723,7 +723,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
 
 void WorldSession::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
 {
-    TC_LOG_DEBUG("network", "WORLD: CMSG_UPDATE_PROJECTILE_POSITION");
+    FMT_LOG_DEBUG("network", "WORLD: CMSG_UPDATE_PROJECTILE_POSITION");
 
     ObjectGuid casterGuid;
     uint32 spellId;

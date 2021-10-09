@@ -1498,7 +1498,7 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
     {        
         float mindamage = m_owner->GetFloatValue(UNIT_FIELD_MINDAMAGE) / 2;
         float maxdamage = m_owner->GetFloatValue(UNIT_FIELD_MAXDAMAGE) / 2;
-        TC_LOG_ERROR("server", "PET WEAPON DANCINGS : min = %f, max = %f", mindamage, maxdamage);
+        FMT_LOG_ERROR("server", "PET WEAPON DANCINGS : min = {}, max = {}", mindamage, maxdamage);
     }*/
 
     SetStatFloatValue(UNIT_FIELD_MINDAMAGE, mindamage);

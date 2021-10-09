@@ -89,7 +89,7 @@ void WGGraveyard::SetSpirit(Creature* spirit, TeamId team)
 {
     if (!spirit)
     {
-        TC_LOG_ERROR("bg.battlefield", "BfGraveyard::SetSpirit: Invalid Spirit.");
+        FMT_LOG_ERROR("bg.battlefield", "BfGraveyard::SetSpirit: Invalid Spirit.");
         return;
     }
 

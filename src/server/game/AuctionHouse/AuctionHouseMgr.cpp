@@ -108,11 +108,11 @@ uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseDBC const* entry, uint32 t
     if (i)
         deposit += remainderbase * i * timeHr;
 
-    TC_LOG_DEBUG("auctionHouse", "MSV:        %u", MSV);
-    TC_LOG_DEBUG("auctionHouse", "Items:      %u", count);
-    TC_LOG_DEBUG("auctionHouse", "Multiplier: %f", multiplier);
-    TC_LOG_DEBUG("auctionHouse", "Deposit:    %u", deposit);
-    TC_LOG_DEBUG("auctionHouse", "Deposit rm: %f", remainderbase * count);
+    FMT_LOG_DEBUG("auctionHouse", "MSV:        {}", MSV);
+    FMT_LOG_DEBUG("auctionHouse", "Items:      {}", count);
+    FMT_LOG_DEBUG("auctionHouse", "Multiplier: {}", multiplier);
+    FMT_LOG_DEBUG("auctionHouse", "Deposit:    {}", deposit);
+    FMT_LOG_DEBUG("auctionHouse", "Deposit rm: {}", remainderbase * count);
 
     if (deposit < AH_MINIMUM_DEPOSIT * sWorld->getRate(RATE_AUCTION_DEPOSIT))
         return AH_MINIMUM_DEPOSIT * sWorld->getRate(RATE_AUCTION_DEPOSIT);
@@ -156,8 +156,8 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
 
         uint32 ownerAccId = sCharacterCache->GetCharacterAccountIdByGuid(ownerGuid);
 
-        sLog->outCommand(bidderAccId, "GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
-            bidderName.c_str(), bidderAccId, pItem->GetTemplate()->Name1.c_str(), pItem->GetEntry(), pItem->GetCount(), auction->bid, ownerName.c_str(), ownerAccId);
+        sLog->outCommand(bidderAccId, "GM {} (Account: {}) won item in auction: {} (Entry: {} Count: {}) and pay money: {}. Original owner {} (Account: {})",
+            bidderName, bidderAccId, pItem->GetTemplate()->Name1, pItem->GetEntry(), pItem->GetCount(), auction->bid, ownerName, ownerAccId);
     }
 
     // receiver exist
@@ -306,7 +306,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 auction items. DB table `auctionhouse` or `item_instance` is empty!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 auction items. DB table `auctionhouse` or `item_instance` is empty!");
         return;
     }
 
@@ -322,7 +322,7 @@ void AuctionHouseMgr::LoadAuctionItems()
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry);
         if (!proto)
         {
-            TC_LOG_ERROR("misc", "AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u item entry: #%u) in auction, skipped.", item_guid, itemEntry);
+            FMT_LOG_ERROR("misc", "AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: {} item entry: #{}) in auction, skipped.", item_guid, itemEntry);
             continue;
         }
 
@@ -338,7 +338,7 @@ void AuctionHouseMgr::LoadAuctionItems()
     }
     while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u auction items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} auction items in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void AuctionHouseMgr::LoadAuctions()
@@ -350,7 +350,7 @@ void AuctionHouseMgr::LoadAuctions()
 
     if (!resultAuctions)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 auctions. DB table `auctionhouse` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 auctions. DB table `auctionhouse` is empty.");
         return;
     }
 
@@ -395,7 +395,7 @@ void AuctionHouseMgr::LoadAuctions()
 
     CharacterDatabase.CommitTransaction(trans);
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u auctions with %u bidders in %u ms", countAuctions, countBidders, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} auctions with {} bidders in {} ms", countAuctions, countBidders, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void AuctionHouseMgr::AddAItem(Item* it)
@@ -522,7 +522,7 @@ void AuctionHouseMgr::UpdatePendingAuctions()
         else
         {
             // Expire any auctions that we couldn't get a deposit for
-            TC_LOG_WARN("auctionHouse", "Player %s was offline, unable to retrieve deposit!", playerGUID.ToString().c_str());
+            FMT_LOG_WARN("auctionHouse", "Player {} was offline, unable to retrieve deposit!", playerGUID.ToString());
             PlayerAuctions* thisAH = itr->second.first;
             ++itr;
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
@@ -853,7 +853,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data, Item* sourceItem) const
     Item* item = (sourceItem) ? sourceItem : sAuctionMgr->GetAItem(itemGUIDLow);
     if (!item)
     {
-        TC_LOG_ERROR("misc", "AuctionEntry::BuildAuctionInfo: Auction %u has a non-existent item: %u", Id, itemGUIDLow);
+        FMT_LOG_ERROR("misc", "AuctionEntry::BuildAuctionInfo: Auction {} has a non-existent item: {}", Id, itemGUIDLow);
         return false;
     }
     data << uint32(Id);
@@ -944,7 +944,7 @@ bool AuctionEntry::LoadFromDB(Field* fields)
     auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntryFromHouse(houseId);
     if (!auctionHouseEntry)
     {
-        TC_LOG_ERROR("misc", "Auction %u has invalid house id %u", Id, houseId);
+        FMT_LOG_ERROR("misc", "Auction {} has invalid house id {}", Id, houseId);
         return false;
     }
 
@@ -952,7 +952,7 @@ bool AuctionEntry::LoadFromDB(Field* fields)
     // and itemEntry in fact (GetAItem will fail if problematic in result check in AuctionHouseMgr::LoadAuctionItems)
     if (!sAuctionMgr->GetAItem(itemGUIDLow))
     {
-        TC_LOG_ERROR("misc", "Auction %u has not a existing item : %u", Id, itemGUIDLow);
+        FMT_LOG_ERROR("misc", "Auction {} has not a existing item : {}", Id, itemGUIDLow);
         return false;
     }
 

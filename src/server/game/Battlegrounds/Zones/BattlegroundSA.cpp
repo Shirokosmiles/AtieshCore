@@ -448,7 +448,7 @@ bool BattlegroundSA::ResetObjs()
     BattlegroundSpawnPoint const& kanrethad = BG_SA_Creatures[BG_SA_NPC_KANRETHAD];
     if (!AddCreature(kanrethad.Entry, BG_SA_NPC_KANRETHAD, kanrethad.Pos, kanrethad.SpawnTime))
     {
-        TC_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn Kanrethad, aborted. Entry: %u", kanrethad.Entry);
+        FMT_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn Kanrethad, aborted. Entry: {}", kanrethad.Entry);
         return false;
     }
 
@@ -459,7 +459,7 @@ bool BattlegroundSA::ResetObjs()
             SpawnBGObject(i, object.SpawnTime);
         else if (!AddObject(i, object.Entry, object.Pos, object.Rot, object.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn GameObject! (Entry: %u). Aborted.", object.Entry);
+            FMT_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn GameObject! (Entry: {}). Aborted.", object.Entry);
             return false;
         }
     }
@@ -483,7 +483,7 @@ bool BattlegroundSA::ResetObjs()
         GameObject* ship = AddObject(i, boat.Entry, boat.Pos, boat.Rot, boat.SpawnTime);
         if (!ship)
         {
-            TC_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn ship! (Entry: %u). Aborted.", boatId);
+            FMT_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn ship! (Entry: {}). Aborted.", boatId);
             return false;
         }
 
@@ -498,7 +498,7 @@ bool BattlegroundSA::ResetObjs()
         BattlegroundSpawnPoint const& creature = BG_SA_Creatures[i];
         if (!AddCreature(creature.Entry, i, creature.Pos, creature.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn Cannon or demolisher! (Entry: %u, Attackers: %s). Aborted.", creature.Entry, Attackers == TEAM_ALLIANCE ? "Horde(1)" : "Alliance(0)");
+            FMT_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn Cannon or demolisher! (Entry: {}, Attackers: {}). Aborted.", creature.Entry, Attackers == TEAM_ALLIANCE ? "Horde(1)" : "Alliance(0)");
             return false;
         }
     }
@@ -518,7 +518,7 @@ bool BattlegroundSA::ResetObjs()
         BattlegroundSpawnPoint const& trigger = BG_SA_Creatures[i];
         if (!AddCreature(trigger.Entry, i, trigger.Pos, trigger.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn trigger! (Entry: %u). Aborted.", trigger.Entry);
+            FMT_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn trigger! (Entry: {}). Aborted.", trigger.Entry);
             return false;
         }
     }
@@ -555,7 +555,7 @@ bool BattlegroundSA::ResetObjs()
 
         if (!sg)
         {
-            TC_LOG_ERROR("bg.battleground", "SOTA: Can't find GY entry %u", BG_SA_GYEntries[i]);
+            FMT_LOG_ERROR("bg.battleground", "SOTA: Can't find GY entry {}", BG_SA_GYEntries[i]);
             return false;
         }
 
@@ -566,7 +566,7 @@ bool BattlegroundSA::ResetObjs()
         GraveyardStatus[i] = graveyardTeam;
         if (!AddSpiritGuide(i + BG_SA_MAXNPC, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, BG_SA_GYOrientation[i]), graveyardTeam))
         {
-            TC_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn GY: %u", i);
+            FMT_LOG_ERROR("bg.battleground", "SOTA: couldn't spawn GY: {}", i);
             return false;
         }
     }
@@ -1206,7 +1206,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
     WorldSafeLocsDBC const* sg = sDBCStoresMgr->GetWorldSafeLocsDBC(BG_SA_GYEntries[i]);
     if (!sg)
     {
-        TC_LOG_ERROR("bg.battleground", "BattlegroundSA::CaptureGraveyard: non-existant GY entry: %u", BG_SA_GYEntries[i]);
+        FMT_LOG_ERROR("bg.battleground", "BattlegroundSA::CaptureGraveyard: non-existant GY entry: {}", BG_SA_GYEntries[i]);
         return;
     }
 

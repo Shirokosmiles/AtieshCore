@@ -608,7 +608,7 @@ bool BattlegroundIC::SetupBattleground()
         BattlegroundGOSpawnPoint const& object = BG_IC_ObjSpawnlocs[i];
         if (!AddObject(i, object.Entry, object.Pos, object.Rot, object.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning gameobject %u. Battleground not Created!", object.Entry);
+            FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning gameobject {}. Battleground not Created!", object.Entry);
             return false;
         }
     }
@@ -619,7 +619,7 @@ bool BattlegroundIC::SetupBattleground()
         GameObject* teleporter = AddObject(i, teleportSpawn.Entry, teleportSpawn.Pos, teleportSpawn.Rot, teleportSpawn.SpawnTime);
         if (!teleporter)
         {
-            TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning gameobject %u. Battleground not Created!", teleportSpawn.Entry);
+            FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning gameobject {}. Battleground not Created!", teleportSpawn.Entry);
             return false;
         }
 
@@ -631,7 +631,7 @@ bool BattlegroundIC::SetupBattleground()
         BattlegroundGOSpawnPoint const& teleporterEffect = BG_IC_ObjSpawnlocs[i];
         if (!AddObject(i, teleporterEffect.Entry, teleporterEffect.Pos, teleporterEffect.Rot, teleporterEffect.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning gameobject %u. Battleground not Created!", teleporterEffect.Entry);
+            FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning gameobject {}. Battleground not Created!", teleporterEffect.Entry);
             return false;
         }
     }
@@ -641,7 +641,7 @@ bool BattlegroundIC::SetupBattleground()
         BattlegroundGOSpawnPoint const& teleporter = BG_IC_ObjSpawnlocs[i];
         if (!AddObject(i, teleporter.Entry, teleporter.Pos, teleporter.Rot, teleporter.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning gameobject %u. Battleground not Created!", teleporter.Entry);
+            FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning gameobject {}. Battleground not Created!", teleporter.Entry);
             return false;
         }
     }
@@ -651,7 +651,7 @@ bool BattlegroundIC::SetupBattleground()
         BattlegroundGOSpawnPoint const& teleporterEffect = BG_IC_ObjSpawnlocs[i];
         if (!AddObject(i, teleporterEffect.Entry, teleporterEffect.Pos, teleporterEffect.Rot, teleporterEffect.SpawnTime, GO_STATE_ACTIVE))
         {
-            TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning gameobject %u. Battleground not Created!", teleporterEffect.Entry);
+            FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning gameobject {}. Battleground not Created!", teleporterEffect.Entry);
             return false;
         }
     }
@@ -661,7 +661,7 @@ bool BattlegroundIC::SetupBattleground()
         BattlegroundSpawnPoint const& creature = BG_IC_NpcSpawnlocs[i];
         if (!AddCreature(creature.Entry, i, creature.Pos, creature.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning creature %u", creature.Entry);
+            FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning creature {}", creature.Entry);
             return false;
         }
     }
@@ -671,7 +671,7 @@ bool BattlegroundIC::SetupBattleground()
         || !AddSpiritGuide(BG_IC_NPC_SPIRIT_GUIDE_1+5, BG_IC_SpiritGuidePos[7], TEAM_ALLIANCE)
         || !AddSpiritGuide(BG_IC_NPC_SPIRIT_GUIDE_1+6, BG_IC_SpiritGuidePos[8], TEAM_HORDE))
     {
-        TC_LOG_ERROR("bg.battleground", "Isle of Conquest: Failed to spawn initial spirit guide!");
+        FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: Failed to spawn initial spirit guide!");
         return false;
     }
 
@@ -679,7 +679,7 @@ bool BattlegroundIC::SetupBattleground()
     Transport* gunshipAlliance = sTransportMgr->CreateTransport(GO_ALLIANCE_GUNSHIP, 0, GetBgMap());
     if (!gunshipAlliance || !gunshipHorde)
     {
-        TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error creating gunships!");
+        FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error creating gunships!");
         return false;
     }
 
@@ -874,7 +874,7 @@ uint32 BattlegroundIC::GetNextBanner(ICNodePoint const* node, TeamId team, bool 
         return node->last_entry;
 
     // we should never be here...
-    TC_LOG_ERROR("bg.battleground", "Isle Of Conquest: Unexpected return in GetNextBanner function (node %u)", node->gameobjectId);
+    FMT_LOG_ERROR("bg.battleground", "Isle Of Conquest: Unexpected return in GetNextBanner function (node {})", node->gameobjectId);
     return 0;
 }
 
@@ -970,7 +970,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint const* node, bool recapture
     if (node->nodeType > NODE_TYPE_QUARRY)
     {
         if (!AddSpiritGuide(BG_IC_NPC_SPIRIT_GUIDE_1 + node->nodeType - (NODE_TYPE_QUARRY + 1), BG_IC_SpiritGuidePos[node->nodeType], node->faction))
-            TC_LOG_ERROR("bg.battleground", "Isle of Conquest: Failed to spawn spirit guide! point: %u, team: %u, ", node->nodeType, node->faction);
+            FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: Failed to spawn spirit guide! point: {}, team: {}, ", node->nodeType, node->faction);
     }
 
     // We may get called from update or from EventPlayerClickedOnFlag in recapture case, in that case gameobjectId is not yet updated and we need to match against contested GO type
@@ -1012,7 +1012,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint const* node, bool recapture
             {
                 DelCreature(BG_IC_NPC_WORLD_TRIGGER_NOT_FLOATING);
                 if (!AddCreature(NPC_WORLD_TRIGGER_NOT_FLOATING, BG_IC_NPC_WORLD_TRIGGER_NOT_FLOATING, BG_IC_HangarTrigger[node->faction], RESPAWN_ONE_DAY, node->faction == TEAM_ALLIANCE ? gunshipAlliance : gunshipHorde))
-                    TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning a world trigger. Type: %u", BG_IC_NPC_WORLD_TRIGGER_NOT_FLOATING);
+                    FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning a world trigger. Type: {}", BG_IC_NPC_WORLD_TRIGGER_NOT_FLOATING);
             }
 
             for (uint8 u = 0; u < MAX_CAPTAIN_SPAWNS_PER_FACTION; ++u)
@@ -1026,7 +1026,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint const* node, bool recapture
 
                 if (type == BG_IC_NPC_GUNSHIP_CAPTAIN_2)
                     if (!AddCreature(node->faction == TEAM_ALLIANCE ? NPC_ALLIANCE_GUNSHIP_CAPTAIN : NPC_HORDE_GUNSHIP_CAPTAIN, type, BG_IC_HangarCaptains[node->faction == TEAM_ALLIANCE ? 3 : 1], RESPAWN_ONE_DAY, node->faction == TEAM_ALLIANCE ? gunshipAlliance : gunshipHorde))
-                        TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning a world trigger. Type: %u", BG_IC_NPC_GUNSHIP_CAPTAIN_2);
+                        FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning a world trigger. Type: {}", BG_IC_NPC_GUNSHIP_CAPTAIN_2);
             }
 
             if (node->faction == TEAM_ALLIANCE)
@@ -1276,7 +1276,7 @@ void BattlegroundIC::DestroyGate(Player* player, GameObject* go)
             {
                 BattlegroundSpawnPoint const& agmar = BG_IC_NpcSpawnlocs[BG_IC_NPC_OVERLORD_AGMAR];
                 if (!AddCreature(agmar.Entry, BG_IC_NPC_OVERLORD_AGMAR, agmar.Pos, agmar.SpawnTime))
-                    TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning creature %u", agmar.Entry);
+                    FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning creature {}", agmar.Entry);
             }
             break;
         case GO_ALLIANCE_GATE_1:
@@ -1286,7 +1286,7 @@ void BattlegroundIC::DestroyGate(Player* player, GameObject* go)
             {
                 BattlegroundSpawnPoint const& halford = BG_IC_NpcSpawnlocs[BG_IC_NPC_HIGH_COMMANDER_HALFORD_WYRMBANE];
                 if (!AddCreature(halford.Entry, BG_IC_NPC_HIGH_COMMANDER_HALFORD_WYRMBANE, halford.Pos, halford.SpawnTime))
-                    TC_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning creature %u", halford.Entry);
+                    FMT_LOG_ERROR("bg.battleground", "Isle of Conquest: There was an error spawning creature {}", halford.Entry);
             }
             break;
         default:

@@ -289,8 +289,8 @@ public:
     {
         // See if the script is using the same memory as another script. If this happens, it means that
         // someone forgot to allocate new memory for a script.
-        TC_LOG_ERROR("scripts", "Script '%s' has same memory pointer as '%s'.",
-            first->GetName().c_str(), second->GetName().c_str());
+        FMT_LOG_ERROR("scripts", "Script '{}' has same memory pointer as '{}'.",
+            first->GetName(), second->GetName());
     }
 };
 
@@ -845,8 +845,8 @@ public:
         else
         {
             // The script uses a script name from database, but isn't assigned to anything.
-            TC_LOG_ERROR("sql.sql", "Script '%s' exists in the core, but the database does not assign it to any creature.",
-                script->GetName().c_str());
+            FMT_LOG_ERROR("sql.sql", "Script '{}' exists in the core, but the database does not assign it to any creature.",
+                script->GetName());
 
             // Avoid calling "delete script;" because we are currently in the script constructor
             // In a valid scenario this will not happen because every script has a name assigned in the database
@@ -1065,7 +1065,7 @@ void ScriptMgr::Initialize()
 
     LoadDatabase();
 
-    TC_LOG_INFO("server.loading", "Loading C++ scripts");
+    FMT_LOG_INFO("server.loading", "Loading C++ scripts");
 
     FillSpellSummary();
 
@@ -1106,10 +1106,10 @@ void ScriptMgr::Initialize()
         if (scriptName.empty())
             continue;
 
-        TC_LOG_ERROR("sql.sql", "Script '%s' is referenced by the database, but does not exist in the core!", scriptName.c_str());
+        FMT_LOG_ERROR("sql.sql", "Script '{}' is referenced by the database, but does not exist in the core!", scriptName);
     }
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u C++ scripts in %u ms",
+    FMT_LOG_INFO("server.loading", ">> Loaded {} C++ scripts in {} ms",
         GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
 }
 
@@ -2284,10 +2284,10 @@ WorldMapScript::WorldMapScript(char const* name, uint32 mapId)
     : ScriptObject(name), MapScript<Map>(sDBCStoresMgr->GetMapDBC(mapId))
 {
     if (!GetEntry())
-        TC_LOG_ERROR("scripts", "Invalid WorldMapScript for %u; no such map ID.", mapId);
+        FMT_LOG_ERROR("scripts", "Invalid WorldMapScript for {}; no such map ID.", mapId);
 
     if (GetEntry() && !GetEntry()->IsWorldMap())
-        TC_LOG_ERROR("scripts", "WorldMapScript for map %u is invalid.", mapId);
+        FMT_LOG_ERROR("scripts", "WorldMapScript for map {} is invalid.", mapId);
 
     ScriptRegistry<WorldMapScript>::Instance()->AddScript(this);
 }
@@ -2296,10 +2296,10 @@ InstanceMapScript::InstanceMapScript(char const* name, uint32 mapId)
     : ScriptObject(name), MapScript<InstanceMap>(sDBCStoresMgr->GetMapDBC(mapId))
 {
     if (!GetEntry())
-        TC_LOG_ERROR("scripts", "Invalid InstanceMapScript for %u; no such map ID.", mapId);
+        FMT_LOG_ERROR("scripts", "Invalid InstanceMapScript for {}; no such map ID.", mapId);
 
     if (GetEntry() && !GetEntry()->IsDungeon())
-        TC_LOG_ERROR("scripts", "InstanceMapScript for map %u is invalid.", mapId);
+        FMT_LOG_ERROR("scripts", "InstanceMapScript for map {} is invalid.", mapId);
 
     ScriptRegistry<InstanceMapScript>::Instance()->AddScript(this);
 }
@@ -2308,10 +2308,10 @@ BattlegroundMapScript::BattlegroundMapScript(char const* name, uint32 mapId)
     : ScriptObject(name), MapScript<BattlegroundMap>(sDBCStoresMgr->GetMapDBC(mapId))
 {
     if (!GetEntry())
-        TC_LOG_ERROR("scripts", "Invalid BattlegroundMapScript for %u; no such map ID.", mapId);
+        FMT_LOG_ERROR("scripts", "Invalid BattlegroundMapScript for {}; no such map ID.", mapId);
 
     if (GetEntry() && !GetEntry()->IsBattleground())
-        TC_LOG_ERROR("scripts", "BattlegroundMapScript for map %u is invalid.", mapId);
+        FMT_LOG_ERROR("scripts", "BattlegroundMapScript for map {} is invalid.", mapId);
 
     ScriptRegistry<BattlegroundMapScript>::Instance()->AddScript(this);
 }

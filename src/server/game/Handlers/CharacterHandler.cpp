@@ -227,7 +227,7 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
         do
         {
             ObjectGuid guid(HighGuid::Player, (*result)[0].GetUInt32());
-            TC_LOG_INFO("network", "Loading %s from account %u.", guid.ToString().c_str(), GetAccountId());
+            FMT_LOG_INFO("network", "Loading {} from account {}.", guid.ToString(), GetAccountId());
             if (Player::BuildEnumData(result, &data))
             {
                 // Do not allow banned characters to log in
@@ -308,7 +308,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     ChrClassesDBC const* classEntry = sDBCStoresMgr->GetChrClassesDBC(createInfo->Class);
     if (!classEntry)
     {
-        TC_LOG_ERROR("network", "Class (%u) not found in DBC while creating new char for account (ID: %u): wrong DBC files or cheater?", createInfo->Class, GetAccountId());
+        FMT_LOG_ERROR("network", "Class ({}) not found in DBC while creating new char for account (ID: {}): wrong DBC files or cheater?", createInfo->Class, GetAccountId());
         SendCharCreate(CHAR_CREATE_FAILED);
         return;
     }
@@ -316,7 +316,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(createInfo->Race);
     if (!raceEntry)
     {
-        TC_LOG_ERROR("network", "Race (%u) not found in DBC while creating new char for account (ID: %u): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
+        FMT_LOG_ERROR("network", "Race ({}) not found in DBC while creating new char for account (ID: {}): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
         SendCharCreate(CHAR_CREATE_FAILED);
         return;
     }
@@ -324,7 +324,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     // prevent character creating Expansion race without Expansion account
     if (raceEntry->RequiredExpansion > Expansion())
     {
-        TC_LOG_ERROR("entities.player.cheat", "Expansion %u account:[%d] tried to Create character with expansion %u race (%u)", Expansion(), GetAccountId(), raceEntry->RequiredExpansion, createInfo->Race);
+        FMT_LOG_ERROR("entities.player.cheat", "Expansion {} account:[{}] tried to Create character with expansion {} race ({})", Expansion(), GetAccountId(), raceEntry->RequiredExpansion, createInfo->Race);
         SendCharCreate(CHAR_CREATE_EXPANSION);
         return;
     }
@@ -332,7 +332,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     // prevent character creating Expansion class without Expansion account
     if (classEntry->RequiredExpansion > Expansion())
     {
-        TC_LOG_ERROR("entities.player.cheat", "Expansion %u account:[%d] tried to Create character with expansion %u class (%u)", Expansion(), GetAccountId(), classEntry->RequiredExpansion, createInfo->Class);
+        FMT_LOG_ERROR("entities.player.cheat", "Expansion {} account:[{}] tried to Create character with expansion {} class ({})", Expansion(), GetAccountId(), classEntry->RequiredExpansion, createInfo->Class);
         SendCharCreate(CHAR_CREATE_EXPANSION_CLASS);
         return;
     }
@@ -341,7 +341,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     {
         if (raceEntry->Alliance == CHRRACES_ALLIANCE_TYPE_NOT_PLAYABLE || raceEntry->HasFlag(CHRRACES_FLAGS_NOT_PLAYABLE))
         {
-            TC_LOG_ERROR("network", "Race (%u) was not playable but requested while creating new char for account (ID: %u): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
+            FMT_LOG_ERROR("network", "Race ({}) was not playable but requested while creating new char for account (ID: {}): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
             SendCharCreate(CHAR_CREATE_DISABLED);
             return;
         }
@@ -367,7 +367,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     // prevent character creating with invalid name
     if (!normalizePlayerName(createInfo->Name))
     {
-        TC_LOG_ERROR("entities.player.cheat", "Account:[%d] but tried to Create character with empty [name] ", GetAccountId());
+        FMT_LOG_ERROR("entities.player.cheat", "Account:[{}] but tried to Create character with empty [name] ", GetAccountId());
         SendCharCreate(CHAR_NAME_NO_NAME);
         return;
     }
@@ -605,7 +605,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             {
                 if (success)
                 {
-                    TC_LOG_INFO("entities.player.character", "Account: %u (IP: %s) Create Character: %s %s", GetAccountId(), GetRemoteAddress().c_str(), newChar->GetName().c_str(), newChar->GetGUID().ToString().c_str());
+                    FMT_LOG_INFO("entities.player.character", "Account: {} (IP: {}) Create Character: {} {}", GetAccountId(), GetRemoteAddress(), newChar->GetName(), newChar->GetGUID().ToString());
                     sScriptMgr->OnPlayerCreate(newChar.get());
                     sCharacterCache->AddCharacterCacheEntry(newChar->GetGUID(), GetAccountId(), newChar->GetName(), newChar->GetNativeGender(), newChar->GetRace(), newChar->GetClass(), newChar->GetLevel());
 
@@ -681,7 +681,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
         return;
     }
 
-    TC_LOG_INFO("entities.player.character", "Account: %d, IP: %s deleted character: %s, %s, Level: %u", accountId, GetRemoteAddress().c_str(), name.c_str(), guid.ToString().c_str(), level);
+    FMT_LOG_INFO("entities.player.character", "Account: {}, IP: {} deleted character: {}, {}, Level: {}", accountId, GetRemoteAddress(), name, guid.ToString(), level);
 
     // To prevent hook failure, place hook before removing reference from DB
     sScriptMgr->OnPlayerDelete(guid, initAccountId); // To prevent race conditioning, but as it also makes sense, we hand the accountId over for successful delete.
@@ -704,7 +704,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 {
     if (PlayerLoading() || GetPlayer() != nullptr)
     {
-        TC_LOG_ERROR("network", "Player tries to login again, AccountId = %d", GetAccountId());
+        FMT_LOG_ERROR("network", "Player tries to login again, AccountId = {}", GetAccountId());
         KickPlayer("WorldSession::HandlePlayerLoginOpcode Another client logging in");
         return;
     }
@@ -716,7 +716,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
     if (!IsLegitCharacterForAccount(playerGuid))
     {
-        TC_LOG_ERROR("network", "Account (%u) can't login with that character (%s).", GetAccountId(), playerGuid.ToString().c_str());
+        FMT_LOG_ERROR("network", "Account ({}) can't login with that character ({}).", GetAccountId(), playerGuid.ToString());
         KickPlayer("WorldSession::HandlePlayerLoginOpcode Trying to login with a character of another account");
         return;
     }
@@ -795,7 +795,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         else
         {
             // remove wrong guild data
-            TC_LOG_ERROR("network", "Player %s %s marked as member of not existing guild (id: %u), removing guild membership for player.", pCurrChar->GetName().c_str(), pCurrChar->GetGUID().ToString().c_str(), pCurrChar->GetGuildId());
+            FMT_LOG_ERROR("network", "Player {} {} marked as member of not existing guild (id: {}), removing guild membership for player.", pCurrChar->GetName(), pCurrChar->GetGUID().ToString(), pCurrChar->GetGuildId());
             pCurrChar->SetInGuild(0);
         }
     }
@@ -821,7 +821,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
             // send new char string if not empty
             if (!sWorld->GetNewCharString().empty())
-                chH.PSendSysMessage("%s", sWorld->GetNewCharString().c_str());
+                chH.PSendSysMessage("{}", sWorld->GetNewCharString());
         }
     }
 
@@ -835,7 +835,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     }
 
     ObjectAccessor::AddObject(pCurrChar);
-    //TC_LOG_DEBUG("Player %s added to Map.", pCurrChar->GetName().c_str());
+    //FMT_LOG_DEBUG("Player {} added to Map.", pCurrChar->GetName());
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
 
@@ -1048,8 +1048,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     }
 
     std::string IP_str = GetRemoteAddress();
-    TC_LOG_INFO("entities.player.character", "Account: %d (IP: %s) Login Character:[%s] %s Level: %d, XP: %u/%u (%u left)",
-        GetAccountId(), IP_str.c_str(), pCurrChar->GetName().c_str(), pCurrChar->GetGUID().ToString().c_str(), pCurrChar->GetLevel(),
+    FMT_LOG_INFO("entities.player.character", "Account: {} (IP: {}) Login Character:[{}] {} Level: {}, XP: {}/{} ({} left)",
+        GetAccountId(), IP_str, pCurrChar->GetName(), pCurrChar->GetGUID().ToString(), pCurrChar->GetLevel(),
         _player->GetXP(), _player->GetXPForNextLevel(), std::max(0, (int32)_player->GetXPForNextLevel() - (int32)_player->GetXP()));
 
     if (!pCurrChar->IsStandState() && !pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
@@ -1085,7 +1085,7 @@ void WorldSession::SendFeatureSystemStatus()
 
 void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: Received CMSG_SET_FACTION_ATWAR");
+    FMT_LOG_DEBUG("network", "WORLD: Received CMSG_SET_FACTION_ATWAR");
 
     uint32 repListID;
     uint8  flag;
@@ -1099,7 +1099,7 @@ void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 //I think this function is never used :/ I dunno, but i guess this opcode not exists
 void WorldSession::HandleSetFactionCheat(WorldPacket& /*recvData*/)
 {
-    TC_LOG_ERROR("network", "WORLD SESSION: HandleSetFactionCheat, not expected call, please report.");
+    FMT_LOG_ERROR("network", "WORLD SESSION: HandleSetFactionCheat, not expected call, please report.");
     GetPlayer()->GetReputationMgr().SendState(nullptr);
 }
 
@@ -1133,7 +1133,7 @@ void WorldSession::HandleTutorialReset(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: Received CMSG_SET_WATCHED_FACTION");
+    FMT_LOG_DEBUG("network", "WORLD: Received CMSG_SET_WATCHED_FACTION");
     uint32 fact;
     recvData >> fact;
     GetPlayer()->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fact);
@@ -1141,7 +1141,7 @@ void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: Received CMSG_SET_FACTION_INACTIVE");
+    FMT_LOG_DEBUG("network", "WORLD: Received CMSG_SET_FACTION_INACTIVE");
     uint32 replistid;
     uint8 inactive;
     recvData >> replistid >> inactive;
@@ -1245,7 +1245,7 @@ void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo>
 
     CharacterDatabase.Execute(stmt);
 
-    TC_LOG_INFO("entities.player.character", "Account: %d (IP: %s) Character:[%s] (%s) Changed name to: %s", GetAccountId(), GetRemoteAddress().c_str(), oldName.c_str(), renameInfo->Guid.ToString().c_str(), renameInfo->Name.c_str());
+    FMT_LOG_INFO("entities.player.character", "Account: {} (IP: {}) Character:[{}] ({}) Changed name to: {}", GetAccountId(), GetRemoteAddress(), oldName, renameInfo->Guid.ToString(), renameInfo->Name);
 
     SendCharRename(RESPONSE_SUCCESS, renameInfo.get());
 
@@ -1330,7 +1330,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
 
 void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "CMSG_ALTER_APPEARANCE");
+    FMT_LOG_DEBUG("network", "CMSG_ALTER_APPEARANCE");
 
     uint32 Hair, Color, FacialHair, SkinColor;
     recvData >> Hair >> Color >> FacialHair >> SkinColor;
@@ -1402,7 +1402,7 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
 
     if (slot >= MAX_GLYPH_SLOT_INDEX)
     {
-        TC_LOG_DEBUG("network", "Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH %u", slot);
+        FMT_LOG_DEBUG("network", "Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH {}", slot);
         return;
     }
 
@@ -1424,8 +1424,8 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     recvData >> customizeInfo->Guid;
     if (!IsLegitCharacterForAccount(customizeInfo->Guid))
     {
-        TC_LOG_ERROR("entities.player.cheat", "Account %u, IP: %s tried to customise %s, but it does not belong to their account!",
-            GetAccountId(), GetRemoteAddress().c_str(), customizeInfo->Guid.ToString().c_str());
+        FMT_LOG_ERROR("entities.player.cheat", "Account {}, IP: {} tried to customise {}, but it does not belong to their account!",
+            GetAccountId(), GetRemoteAddress(), customizeInfo->Guid.ToString());
         recvData.rfinish();
         KickPlayer("WorldSession::HandleCharCustomize Trying to customise character of another account");
         return;
@@ -1542,13 +1542,13 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
 
     SendCharCustomize(RESPONSE_SUCCESS, customizeInfo.get());
 
-    TC_LOG_INFO("entities.player.character", "Account: %d (IP: %s), Character[%s] (%s) Customized to: %s",
-        GetAccountId(), GetRemoteAddress().c_str(), oldName.c_str(), customizeInfo->Guid.ToString().c_str(), customizeInfo->Name.c_str());
+    FMT_LOG_INFO("entities.player.character", "Account: {} (IP: {}), Character[{}] ({}) Customized to: {}",
+        GetAccountId(), GetRemoteAddress(), oldName, customizeInfo->Guid.ToString(), customizeInfo->Name);
 }
 
 void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_SAVE");
+    FMT_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_SAVE");
 
     uint64 setGuid;
     recvData.readPackGUID(setGuid);
@@ -1600,7 +1600,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
 
 void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_DELETE");
+    FMT_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_DELETE");
 
     uint64 setGuid;
     recvData.readPackGUID(setGuid);
@@ -1610,7 +1610,7 @@ void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
 
 void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_USE");
+    FMT_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_USE");
 
     for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
@@ -1620,7 +1620,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
         uint8 srcbag, srcslot;
         recvData >> srcbag >> srcslot;
 
-        TC_LOG_DEBUG("entities.player.items", "%s: srcbag %u, srcslot %u", itemGuid.ToString().c_str(), srcbag, srcslot);
+        FMT_LOG_DEBUG("entities.player.items", "{}: srcbag {}, srcslot {}", itemGuid.ToString(), srcbag, srcslot);
 
         // check if item slot is set to "ignored" (raw value == 1), must not be unequipped then
         if (itemGuid.GetRawValue() == 1)
@@ -1677,8 +1677,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 
     if (!IsLegitCharacterForAccount(factionChangeInfo->Guid))
     {
-        TC_LOG_ERROR("entities.player.cheat", "Account %u, IP: %s tried to factionchange character %s, but it does not belong to their account!",
-            GetAccountId(), GetRemoteAddress().c_str(), factionChangeInfo->Guid.ToString().c_str());
+        FMT_LOG_ERROR("entities.player.cheat", "Account {}, IP: {} tried to factionchange character {}, but it does not belong to their account!",
+            GetAccountId(), GetRemoteAddress(), factionChangeInfo->Guid.ToString());
         recvData.rfinish();
         KickPlayer("WorldSession::HandleCharFactionOrRaceChange Trying to change faction of character of another account");
         return;
@@ -2134,8 +2134,8 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                         knownTitles[index] = *thisMask;
                     else
                     {
-                        TC_LOG_WARN("entities.player", "%s has invalid title data '%s' at index %u - skipped, this may result in titles being lost",
-                            GetPlayerInfo().c_str(), (index < tokens.size()) ? std::string(tokens[index]).c_str() : "<none>", index);
+                        FMT_LOG_WARN("entities.player", "{} has invalid title data '{}' at index {} - skipped, this may result in titles being lost",
+                            GetPlayerInfo(), (index < tokens.size()) ? std::string(tokens[index]) : "<none>", index);
                         knownTitles[index] = 0;
                     }
                 }
@@ -2197,7 +2197,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
     CharacterDatabase.CommitTransaction(trans);
 
-    TC_LOG_DEBUG("entities.player", "%s (IP: %s) changed race from %u to %u", GetPlayerInfo().c_str(), GetRemoteAddress().c_str(), oldRace, factionChangeInfo->Race);
+    FMT_LOG_DEBUG("entities.player", "{} (IP: {}) changed race from {} to {}", GetPlayerInfo(), GetRemoteAddress(), oldRace, factionChangeInfo->Race);
 
     SendCharFactionChange(RESPONSE_SUCCESS, factionChangeInfo.get());
 }

@@ -104,7 +104,7 @@ public:
             stmt->setUInt8 (0, 1);
             stmt->setString(1, channelName);
             CharacterDatabase.Execute(stmt);
-            handler->PSendSysMessage(LANG_CHANNEL_ENABLE_OWNERSHIP, channelName.c_str());
+            handler->PSendSysMessage(LANG_CHANNEL_ENABLE_OWNERSHIP, channelName);
         }
         else
         {
@@ -114,7 +114,7 @@ public:
             stmt->setUInt8 (0, 0);
             stmt->setString(1, channelName);
             CharacterDatabase.Execute(stmt);
-            handler->PSendSysMessage(LANG_CHANNEL_DISABLE_OWNERSHIP, channelName.c_str());
+            handler->PSendSysMessage(LANG_CHANNEL_DISABLE_OWNERSHIP, channelName);
         }
 
         return true;

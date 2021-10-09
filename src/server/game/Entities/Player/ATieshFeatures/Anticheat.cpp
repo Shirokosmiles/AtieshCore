@@ -65,9 +65,9 @@ bool Player::CheckOnFlyHack()
 
     if (IsFlying() && !CanFly()) // kick flyhacks
     {
-        TC_LOG_INFO("anticheat", "Player::CheckMovementInfo :  FlyHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
-        TC_LOG_INFO("anticheat", "Player::========================================================");
-        TC_LOG_INFO("anticheat", "Player IsFlying but CanFly is false");
+        FMT_LOG_INFO("anticheat", "Player::CheckMovementInfo :  FlyHack Detected for Account id : {}, Player {}", GetSession()->GetAccountId(), GetName());
+        FMT_LOG_INFO("anticheat", "Player::========================================================");
+        FMT_LOG_INFO("anticheat", "Player IsFlying but CanFly is false");
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH_CANFLYWRONG, GetName().c_str());
         AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(1), GetPositionACForLogs(), int32(realm.Id.Realm));
@@ -107,9 +107,9 @@ bool Player::CheckOnFlyHack()
         if (waterlevel && (pz - waterlevel) <= (hovergaura ? GetCollisionHeight() + 1.5f + GetHoverOffset() : GetCollisionHeight() + GetHoverOffset()))
             return true;
 
-        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
-        TC_LOG_INFO("anticheat", "Player::========================================================");
-        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
+        FMT_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : {}, Player {}", GetSession()->GetAccountId(), GetName());
+        FMT_LOG_INFO("anticheat", "Player::========================================================");
+        FMT_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetName().c_str());
         AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(2), GetPositionACForLogs(), int32(realm.Id.Realm));
@@ -138,11 +138,11 @@ bool Player::CheckOnFlyHack()
 
                     if (pz - cz > 6.8f)
                     {
-                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
-                        TC_LOG_INFO("anticheat", "Player::========================================================");
-                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = %f", pz);
-                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = %f", z);
-                        TC_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  checkz = %f", cz);
+                        FMT_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  FlyHack Detected for Account id : {}, Player {}", GetSession()->GetAccountId(), GetName());
+                        FMT_LOG_INFO("anticheat", "Player::========================================================");
+                        FMT_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  playerZ = {}", pz);
+                        FMT_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  normalZ = {}", z);
+                        FMT_LOG_INFO("anticheat", "Player::CheckOnFlyHack :  checkz = {}", cz);
                         sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetName().c_str());
                         AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(3, pz, z), GetPositionACForLogs(), int32(realm.Id.Realm));
                         return false;
@@ -218,7 +218,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
                 bool unrestricted = npos.GetPositionX() != x || npos.GetPositionY() != y;
                 if (unrestricted)
                 {
-                    TC_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore controll Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+                    FMT_LOG_INFO("anticheat", "CheckMovementInfo :  Ignore controll Hack detected for Account id : {}, Player {}", GetSession()->GetAccountId(), GetName());
                     sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, GetSession()->GetAccountId(), GetName().c_str());
                     AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(4), GetPositionACForLogs(), int32(realm.Id.Realm));
                     return false;
@@ -243,8 +243,8 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
                 diffz > 1.87f &&
                 tanangle < 0.57735026919f) // 30 degrees
             {
-                TC_LOG_INFO("anticheat", "Player::CheckMovementInfo :  Climb-Hack detected for Account id : %u, Player %s, diffZ = %f, distance = %f, angle = %f, Map = %s, mapId = %u, X = %f, Y = %f, Z = %f",
-                    GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle, mapname.c_str(), GetMapId(), x, y, z);
+                FMT_LOG_INFO("anticheat", "Player::CheckMovementInfo :  Climb-Hack detected for Account id : {}, Player {}, diffZ = {}, distance = {}, angle = {}, Map = {}, mapId = {}, X = {}, Y = {}, Z = {}",
+                    GetSession()->GetAccountId(), GetName(), diffz, distance, tanangle, mapname, GetMapId(), x, y, z);
                 sWorld->SendGMText(LANG_GM_ANNOUNCE_WALLCLIMB, GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle, mapname.c_str(), GetMapId(), x, y, z);
                 AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(5, diffz, distance), GetPositionACForLogs(), int32(realm.Id.Realm));
                 return false;
@@ -285,7 +285,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 
         if (oldctime > ptime)
         {
-            TC_LOG_INFO("anticheat", "oldctime > ptime");
+            FMT_LOG_INFO("anticheat", "oldctime > ptime");
             delay = 0;
         }
         diffPacketdelay = diffPacketdelay * 0.0000000001f;
@@ -300,22 +300,22 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 
         ping = uint32(diffPacketdelay * 10000.f);
 
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  SpeedHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
-        TC_LOG_INFO("anticheat", "Unit::========================================================");
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldX = %f", x);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldY = %f", y);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  newX = %f", npos.GetPositionX());
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  newY = %f", npos.GetPositionY());
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  packetdistance = %f", distance);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  available distance = %f", normaldistance);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldStime = %u", oldstime);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldCtime = %u", oldctime);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  serverTime = %u", stime);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  packetTime = %u", ptime);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  diff delay between old ptk and current pkt = %f", diffPacketdelay);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  FullDelay = %f", delay / 1000.f);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  difftime = %f", difftime);
-        TC_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  ping = %u", ping);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  SpeedHack Detected for Account id : {}, Player {}", GetSession()->GetAccountId(), GetName());
+        FMT_LOG_INFO("anticheat", "Unit::========================================================");
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldX = {}", x);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldY = {}", y);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  newX = {}", npos.GetPositionX());
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  newY = {}", npos.GetPositionY());
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  packetdistance = {}", distance);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  available distance = {}", normaldistance);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldStime = {}", oldstime);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  oldCtime = {}", oldctime);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  serverTime = {}", stime);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  packetTime = {}", ptime);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  diff delay between old ptk and current pkt = {}", diffPacketdelay);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  FullDelay = {}", delay / 1000.f);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  difftime = {}", difftime);
+        FMT_LOG_INFO("anticheat", "Unit::CheckMovementInfo :  ping = {}", ping);
 
         sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, GetName().c_str(), normaldistance, distance);
         AccountMgr::RecordAntiCheatLog(GetSession()->GetAccountId(), GetName().c_str(), GetDescriptionACForLogs(0, distance, normaldistance), GetPositionACForLogs(), int32(realm.Id.Realm));

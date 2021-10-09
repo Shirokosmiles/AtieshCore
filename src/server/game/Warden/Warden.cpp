@@ -44,7 +44,7 @@ Warden::~Warden()
 
 void Warden::MakeModuleForClient()
 {
-    TC_LOG_DEBUG("warden", "Make module for client");
+    FMT_LOG_DEBUG("warden", "Make module for client");
     InitializeModuleForClient(_module.emplace());
 
     MD5_CTX ctx;
@@ -55,7 +55,7 @@ void Warden::MakeModuleForClient()
 
 void Warden::SendModuleToClient()
 {
-    TC_LOG_DEBUG("warden", "Send module to client");
+    FMT_LOG_DEBUG("warden", "Send module to client");
 
     // Create packet structure
     WardenModuleTransfer packet;
@@ -83,7 +83,7 @@ void Warden::SendModuleToClient()
 
 void Warden::RequestModule()
 {
-    TC_LOG_DEBUG("warden", "Request module");
+    FMT_LOG_DEBUG("warden", "Request module");
 
     // Create packet structure
     WardenModuleUse request;
@@ -117,8 +117,8 @@ void Warden::Update(uint32 diff)
             // Kick player if client response delays more than set in config
             if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
             {
-                TC_LOG_WARN("warden", "%s (latency: %u, IP: %s) exceeded Warden module response delay (%s) - disconnecting client",
-                                _session->GetPlayerInfo().c_str(), _session->GetLatency(), _session->GetRemoteAddress().c_str(), secsToTimeString(maxClientResponseDelay, TimeFormat::ShortText).c_str());
+                FMT_LOG_WARN("warden", "{} (latency: {}, IP: {}) exceeded Warden module response delay ({}) - disconnecting client",
+                                _session->GetPlayerInfo(), _session->GetLatency(), _session->GetRemoteAddress(), secsToTimeString(maxClientResponseDelay, TimeFormat::ShortText));
                 _session->KickPlayer("Warden::Update Warden module response delay exceeded");
             }
             else
@@ -150,12 +150,12 @@ bool Warden::IsValidCheckSum(uint32 checksum, uint8 const* data, const uint16 le
 
     if (checksum != newChecksum)
     {
-        TC_LOG_DEBUG("warden", "CHECKSUM IS NOT VALID");
+        FMT_LOG_DEBUG("warden", "CHECKSUM IS NOT VALID");
         return false;
     }
     else
     {
-        TC_LOG_DEBUG("warden", "CHECKSUM IS VALID");
+        FMT_LOG_DEBUG("warden", "CHECKSUM IS VALID");
         return true;
     }
 }
@@ -226,7 +226,7 @@ void Warden::HandleData(ByteBuffer& buff)
     DecryptData(buff.contents(), buff.size());
     uint8 opcode;
     buff >> opcode;
-    TC_LOG_DEBUG("warden", "Got packet, opcode %02X, size %u", opcode, uint32(buff.size() - 1));
+    FMT_LOG_DEBUG("warden", "Got packet, opcode {:02X}, size {}", opcode, uint32(buff.size() - 1));
     buff.hexlike();
 
     switch (opcode)
@@ -241,17 +241,17 @@ void Warden::HandleData(ByteBuffer& buff)
         HandleCheckResult(buff);
         break;
     case WARDEN_CMSG_MEM_CHECKS_RESULT:
-        TC_LOG_DEBUG("warden", "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
+        FMT_LOG_DEBUG("warden", "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
         break;
     case WARDEN_CMSG_HASH_RESULT:
         HandleHashResult(buff);
         InitializeModule();
         break;
     case WARDEN_CMSG_MODULE_FAILED:
-        TC_LOG_DEBUG("warden", "NYI WARDEN_CMSG_MODULE_FAILED received!");
+        FMT_LOG_DEBUG("warden", "NYI WARDEN_CMSG_MODULE_FAILED received!");
         break;
     default:
-        TC_LOG_WARN("warden", "Got unknown warden opcode %02X of size %u.", opcode, uint32(buff.size() - 1));
+        FMT_LOG_WARN("warden", "Got unknown warden opcode {:02X} of size {}.", opcode, uint32(buff.size() - 1));
         break;
     }
 }
@@ -270,13 +270,13 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
         if (check.Type == LUA_EVAL_CHECK)
         {
             char const* penalty = ApplyPenalty(&check);
-            TC_LOG_WARN("warden", "%s failed Warden check %u (%s). Action: %s", _session->GetPlayerInfo().c_str(), id, EnumUtils::ToConstant(check.Type), penalty);
+            FMT_LOG_WARN("warden", "{} failed Warden check {} ({}). Action: {}", _session->GetPlayerInfo(), id, EnumUtils::ToConstant(check.Type), penalty);
             return true;
         }
     }
 
     char const* penalty = ApplyPenalty(nullptr);
-    TC_LOG_WARN("warden", "%s sent bogus Lua check response for Warden. Action: %s", _session->GetPlayerInfo().c_str(), penalty);
+    FMT_LOG_WARN("warden", "{} sent bogus Lua check response for Warden. Action: {}", _session->GetPlayerInfo(), penalty);
     return true;
 }
 

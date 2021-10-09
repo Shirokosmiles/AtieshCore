@@ -23,6 +23,7 @@
 #include "Util.h"
 #include <boost/filesystem.hpp>
 #include <unordered_map>
+#include <fmt/core.h>
 
 using namespace MMAP;
 
@@ -283,7 +284,7 @@ std::unordered_map<uint32, uint8> LoadLiquid()
 
 int main(int argc, char** argv)
 {
-    Trinity::Banner::Show("MMAP generator", [](char const* text) { printf("%s\n", text); }, nullptr);
+    Trinity::Banner::Show("MMAP generator", [](std::string_view text) { fmt::print("{}\n", text); }, nullptr);
 
     unsigned int threads = std::thread::hardware_concurrency();
     int mapnum = -1;

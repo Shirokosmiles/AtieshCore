@@ -67,13 +67,13 @@ class TC_GAME_API ChatHandler
         template<typename... Args>
         void PSendSysMessage(char const* fmt, Args&&... args)
         {
-            SendSysMessage(Trinity::StringFormat(fmt, std::forward<Args>(args)...).c_str());
+            SendSysMessage(Trinity::StringFormat(fmt, std::forward<Args>(args)...));
         }
 
         template<typename... Args>
         void PSendSysMessage(uint32 entry, Args&&... args)
         {
-            SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...).c_str());
+            SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...));
         }
 
         template<typename... Args>

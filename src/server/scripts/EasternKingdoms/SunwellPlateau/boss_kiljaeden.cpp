@@ -764,7 +764,7 @@ public:
                                 if (pRandomPlayer)
                                     DoCast(pRandomPlayer, SPELL_LEGION_LIGHTNING, false);
                                 else
-                                    TC_LOG_ERROR("scripts", "try to cast SPELL_LEGION_LIGHTNING on invalid target");
+                                    FMT_LOG_ERROR("scripts", "try to cast SPELL_LEGION_LIGHTNING on invalid target");
 
                                 Timer[TIMER_LEGION_LIGHTNING] = (Phase == PHASE_SACRIFICE) ? 18000 : 30000; // 18 seconds in PHASE_SACRIFICE
                                 Timer[TIMER_SOUL_FLAY] = 2500;
@@ -1454,7 +1454,7 @@ public:
                     DoMeleeAttackIfReady();
                     break;
             }
-            TC_LOG_DEBUG("scripts", "Sinister-Timer");
+            FMT_LOG_DEBUG("scripts", "Sinister-Timer");
             for (uint8 i = 0; i < 3; ++i)
                 uiTimer[i] -= diff;
         }

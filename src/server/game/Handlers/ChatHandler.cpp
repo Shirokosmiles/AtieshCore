@@ -69,7 +69,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
-        TC_LOG_ERROR("network", "CHAT: Wrong message type received: %u", type);
+        FMT_LOG_ERROR("network", "CHAT: Wrong message type received: {}", type);
         recvData.rfinish();
         return;
     }
@@ -88,13 +88,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (lang == LANG_UNIVERSAL && !correcttype)
     {
-        TC_LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: %s tried to send a message in universal language", GetPlayerInfo().c_str());
+        FMT_LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: {} tried to send a message in universal language", GetPlayerInfo());
         SendNotification(LANG_UNKNOWN_LANGUAGE);
         recvData.rfinish();
         return;
     }
 
-    //TC_LOG_DEBUG("CHAT: packet received. type %u, lang %u", type, lang);
+    //FMT_LOG_DEBUG("CHAT: packet received. type {}, lang {}", type, lang);
 
     // prevent talking at unknown language (cheating)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
@@ -144,8 +144,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
                 break;
             default:
-                TC_LOG_ERROR("network", "Player %s%s sent a chatmessage with an invalid language/message type combination",
-                                                     GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
+                FMT_LOG_ERROR("network", "Player {}{} sent a chatmessage with an invalid language/message type combination",
+                                                     GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
 
                 recvData.rfinish();
                 return;
@@ -368,7 +368,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     bool senderinbattleground = sender->InBattleground() && !sender->InArena();
 
-    TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received : sender = %s, type = %u, lang = %u, to = %s, channel = %s, text : %s", sender->GetName().c_str(), type, lang, to.c_str(), channel.c_str(), msg.c_str());
+    FMT_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received : sender = {}, type = {}, lang = {}, to = {}, channel = {}, text : {}", sender->GetName(), type, lang, to, channel, msg);
     switch (type)
     {
         case CHAT_MSG_SAY:
@@ -713,11 +713,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         default:
             if (channel != "")
             {
-                TC_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received unhandled type of message from %s", sender->GetName().c_str());
+                FMT_LOG_DEBUG("chatmessage", "CHAT: HandleMessagechatOpcode received unhandled type of message from {}", sender->GetName());
                 recvData.rfinish();
                 return;
             }
-            TC_LOG_ERROR("network", "CHAT: unknown message type %u, lang: %u", type, lang);
+            FMT_LOG_ERROR("network", "CHAT: unknown message type {}, lang: {}", type, lang);
             break;
     }
 }
@@ -731,7 +731,7 @@ void WorldSession::HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet)
         ++countMessageChannelOpcode;
         if (countMessageChannelOpcode > 1)
         {
-            TC_LOG_DEBUG("chatmessage", "CHAT: HandleEmoteOpcode received many packets from %s", GetPlayer()->GetName().c_str());
+            FMT_LOG_DEBUG("chatmessage", "CHAT: HandleEmoteOpcode received many packets from {}", GetPlayer()->GetName());
             return;
         }
     }
@@ -798,7 +798,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
         ++countMessageChannelOpcode;
         if (countMessageChannelOpcode > 1)
         {
-            TC_LOG_DEBUG("chatmessage", "CHAT: HandleTextEmoteOpcode received many packets from %s", GetPlayer()->GetName().c_str());
+            FMT_LOG_DEBUG("chatmessage", "CHAT: HandleTextEmoteOpcode received many packets from {}", GetPlayer()->GetName());
             recvData.rfinish();
             return;
         }
@@ -889,7 +889,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
         ++countMessageChannelOpcode;
         if (countMessageChannelOpcode > 1)
         {
-            TC_LOG_DEBUG("chatmessage", "CHAT: HandleChatIgnoredOpcode received many packets from %s", GetPlayer()->GetName().c_str());
+            FMT_LOG_DEBUG("chatmessage", "CHAT: HandleChatIgnoredOpcode received many packets from {}", GetPlayer()->GetName());
             recvData.rfinish();
             return;
         }
@@ -902,7 +902,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 
     ObjectGuid iguid;
     uint8 unk;
-    //TC_LOG_DEBUG("network", "WORLD: Received CMSG_CHAT_IGNORED");
+    //FMT_LOG_DEBUG("network", "WORLD: Received CMSG_CHAT_IGNORED");
 
     recvData >> iguid;
     recvData >> unk;                                       // probably related to spam reporting
@@ -928,7 +928,7 @@ void WorldSession::HandleChannelDeclineInvite(WorldPacket &recvPacket)
         ++countMessageChannelOpcode;
         if (countMessageChannelOpcode > 1)
         {
-            TC_LOG_DEBUG("chatmessage", "CHAT: HandleChatIgnoredOpcode received many packets from %s", GetPlayer()->GetName().c_str());
+            FMT_LOG_DEBUG("chatmessage", "CHAT: HandleChatIgnoredOpcode received many packets from {}", GetPlayer()->GetName());
             recvPacket.rfinish();
             return;
         }
@@ -939,7 +939,7 @@ void WorldSession::HandleChannelDeclineInvite(WorldPacket &recvPacket)
         countMessageChannelOpcode = 1;
     }
 
-    TC_LOG_DEBUG("chatmessage", "Opcode %u", recvPacket.GetOpcode());
+    FMT_LOG_DEBUG("chatmessage", "Opcode {}", recvPacket.GetOpcode());
 }
 
 void WorldSession::SendPlayerNotFoundNotice(std::string const& name)

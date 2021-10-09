@@ -28,7 +28,7 @@ void WintergraspMgr::InitStalker(uint32 entry, Position const& pos)
     if (Creature* creature = SpawnCreature(entry, pos))
         m_StalkerGuid = creature->GetGUID();
     else
-        TC_LOG_ERROR("bg.battlefield", "Battlefield::InitStalker: Could not spawn Stalker (Creature entry %u), zone messages will be unavailable!", entry);
+        FMT_LOG_ERROR("bg.battlefield", "Battlefield::InitStalker: Could not spawn Stalker (Creature entry {}), zone messages will be unavailable!", entry);
 }
 
 Creature* WintergraspMgr::SpawnCreature(uint32 entry, Position const& pos)
@@ -37,14 +37,14 @@ Creature* WintergraspMgr::SpawnCreature(uint32 entry, Position const& pos)
     Map* map = sMapMgr->CreateBaseMap(BATTLEFIELD_WG_MAPID);
     if (!map)
     {
-        TC_LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: %u, map not found.", entry);
+        FMT_LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {}, map not found.", entry);
         return nullptr;
     }
 
     Creature* creature = new Creature();
     if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, pos))
     {
-        TC_LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: %u", entry);
+        FMT_LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {}", entry);
         delete creature;
         return nullptr;
     }
@@ -71,8 +71,8 @@ GameObject* WintergraspMgr::SpawnGameObject(uint32 entry, Position const& pos, Q
     GameObject* go = new GameObject;
     if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, PHASEMASK_NORMAL, pos, rot, 255, GO_STATE_READY))
     {
-        TC_LOG_ERROR("bg.battlefield", "Battlefield::SpawnGameObject: Gameobject template %u could not be found in the database! Battlefield has not been created!", entry);
-        TC_LOG_ERROR("bg.battlefield", "Battlefield::SpawnGameObject: Could not create gameobject template %u! Battlefield has not been created!", entry);
+        FMT_LOG_ERROR("bg.battlefield", "Battlefield::SpawnGameObject: Gameobject template {} could not be found in the database! Battlefield has not been created!", entry);
+        FMT_LOG_ERROR("bg.battlefield", "Battlefield::SpawnGameObject: Could not create gameobject template {}! Battlefield has not been created!", entry);
         delete go;
         return nullptr;
     }

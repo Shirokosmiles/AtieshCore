@@ -99,7 +99,7 @@ static ChatSubCommandMap COMMAND_MAP;
                 }
                 else
                 {
-                    TC_LOG_ERROR("sql.sql", "Table `command` contains data for non-existant command '" STRING_VIEW_FMT "'. Skipped.", STRING_VIEW_FMT_ARG(name));
+                    FMT_LOG_ERROR("sql.sql", "Table `command` contains data for non-existant command '{}'. Skipped.", (name));
                     cmd = nullptr;
                     break;
                 }
@@ -109,12 +109,12 @@ static ChatSubCommandMap COMMAND_MAP;
                 continue;
 
             if (std::holds_alternative<std::string>(cmd->_help))
-                TC_LOG_ERROR("sql.sql", "Table `command` contains duplicate data for command '" STRING_VIEW_FMT "'. Skipped.", STRING_VIEW_FMT_ARG(name));
+                FMT_LOG_ERROR("sql.sql", "Table `command` contains duplicate data for command '{}'. Skipped.", (name));
 
             if (std::holds_alternative<std::monostate>(cmd->_help))
                 cmd->_help.emplace<std::string>(help);
             else
-                TC_LOG_ERROR("sql.sql", "Table `command` contains legacy help text for command '" STRING_VIEW_FMT "', which uses `trinity_string`. Skipped.", STRING_VIEW_FMT_ARG(name));
+                FMT_LOG_ERROR("sql.sql", "Table `command` contains legacy help text for command '{}', which uses `trinity_string`. Skipped.", (name));
         } while (result->NextRow());
     }
 
@@ -125,7 +125,7 @@ static ChatSubCommandMap COMMAND_MAP;
 void Trinity::Impl::ChatCommands::ChatCommandNode::ResolveNames(std::string name)
 {
     if (_invoker && std::holds_alternative<std::monostate>(_help))
-        TC_LOG_WARN("sql.sql", "Table `command` is missing help text for command '" STRING_VIEW_FMT "'.", STRING_VIEW_FMT_ARG(name));
+        FMT_LOG_WARN("sql.sql", "Table `command` is missing help text for command '{}'.", (name));
 
     _name = name;
     for (auto& [subToken, cmd] : _subCommands)
@@ -173,14 +173,14 @@ static void LogCommandUsage(WorldSession const& session, uint32 permission, std:
     stmt->setInt32(5, int32(realm.Id.Realm));
     LoginDatabase.Execute(stmt);
 
-    sLog->outCommand(session.GetAccountId(), "Command: " STRING_VIEW_FMT " [Player: %s (%s) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected: %s (%s)]",
-        STRING_VIEW_FMT_ARG(cmdStr), player->GetName().c_str(), player->GetGUID().ToString().c_str(),
+    sLog->outCommand(session.GetAccountId(), "Command: {} [Player: {} ({}) (Account: {}) X: {} Y: {} Z: {} Map: {} ({}) Area: {} ({}) Zone: {} Selected: {} ({})]",
+        (cmdStr), player->GetName(), player->GetGUID().ToString(),
         session.GetAccountId(), player->GetPositionX(), player->GetPositionY(),
         player->GetPositionZ(), player->GetMapId(),
         player->FindMap() ? player->FindMap()->GetMapName() : "Unknown",
-        areaId, areaName.c_str(), zoneName.c_str(),
-        (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
-        targetGuid.ToString().c_str());
+        areaId, areaName, zoneName,
+        (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName() : "",
+        targetGuid.ToString());
 }
 
 void Trinity::Impl::ChatCommands::ChatCommandNode::SendCommandHelp(ChatHandler& handler) const
@@ -194,8 +194,8 @@ void Trinity::Impl::ChatCommands::ChatCommandNode::SendCommandHelp(ChatHandler& 
             handler.SendSysMessage(std::get<std::string>(_help));
         else
         {
-            handler.PSendSysMessage(LANG_CMD_HELP_GENERIC, STRING_VIEW_FMT_ARG(_name));
-            handler.PSendSysMessage(LANG_CMD_NO_HELP_AVAILABLE, STRING_VIEW_FMT_ARG(_name));
+            handler.PSendSysMessage(LANG_CMD_HELP_GENERIC, (_name));
+            handler.PSendSysMessage(LANG_CMD_NO_HELP_AVAILABLE, (_name));
         }
     }
 
@@ -208,11 +208,11 @@ void Trinity::Impl::ChatCommands::ChatCommandNode::SendCommandHelp(ChatHandler& 
         if (!header)
         {
             if (!hasInvoker)
-                handler.PSendSysMessage(LANG_CMD_HELP_GENERIC, STRING_VIEW_FMT_ARG(_name));
+                handler.PSendSysMessage(LANG_CMD_HELP_GENERIC, (_name));
             handler.SendSysMessage(LANG_SUBCMDS_LIST);
             header = true;
         }
-        handler.PSendSysMessage(subCommandHasSubCommand ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it->second._name));
+        handler.PSendSysMessage(subCommandHasSubCommand ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, (it->second._name));
     }
 }
 
@@ -284,14 +284,14 @@ namespace Trinity::Impl::ChatCommands
             if (it2)
             { /* there are multiple matching subcommands - print possibilities and return */
                 if (cmd)
-                    handler.PSendSysMessage(LANG_SUBCMD_AMBIGUOUS, STRING_VIEW_FMT_ARG(cmd->_name), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(token));
+                    handler.PSendSysMessage(LANG_SUBCMD_AMBIGUOUS, (cmd->_name), COMMAND_DELIMITER, (token));
                 else
-                    handler.PSendSysMessage(LANG_CMD_AMBIGUOUS, STRING_VIEW_FMT_ARG(token));
+                    handler.PSendSysMessage(LANG_CMD_AMBIGUOUS, (token));
 
-                handler.PSendSysMessage(it1->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it1->first));
+                handler.PSendSysMessage(it1->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, (it1->first));
                 do
                 {
-                    handler.PSendSysMessage(it2->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it2->first));
+                    handler.PSendSysMessage(it2->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, (it2->first));
                 } while (++it2);
 
                 return true;
@@ -336,10 +336,10 @@ namespace Trinity::Impl::ChatCommands
             if (cmd)
             {
                 cmd->SendCommandHelp(handler);
-                handler.PSendSysMessage(LANG_SUBCMD_INVALID, STRING_VIEW_FMT_ARG(cmd->_name), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(token));
+                handler.PSendSysMessage(LANG_SUBCMD_INVALID, (cmd->_name), COMMAND_DELIMITER, (token));
             }
             else
-                handler.PSendSysMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(token));
+                handler.PSendSysMessage(LANG_CMD_INVALID, (token));
             return;
         }
 
@@ -351,14 +351,14 @@ namespace Trinity::Impl::ChatCommands
             if (it2)
             { /* there are multiple matching subcommands - print possibilities and return */
                 if (cmd)
-                    handler.PSendSysMessage(LANG_SUBCMD_AMBIGUOUS, STRING_VIEW_FMT_ARG(cmd->_name), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(token));
+                    handler.PSendSysMessage(LANG_SUBCMD_AMBIGUOUS, (cmd->_name), COMMAND_DELIMITER, (token));
                 else
-                    handler.PSendSysMessage(LANG_CMD_AMBIGUOUS, STRING_VIEW_FMT_ARG(token));
+                    handler.PSendSysMessage(LANG_CMD_AMBIGUOUS, (token));
 
-                handler.PSendSysMessage(it1->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it1->first));
+                handler.PSendSysMessage(it1->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, (it1->first));
                 do
                 {
-                    handler.PSendSysMessage(it2->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it2->first));
+                    handler.PSendSysMessage(it2->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, (it2->first));
                 } while (++it2);
 
                 return;
@@ -379,11 +379,11 @@ namespace Trinity::Impl::ChatCommands
         handler.SendSysMessage(LANG_AVAILABLE_CMDS);
         do
         {
-            handler.PSendSysMessage(it->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, STRING_VIEW_FMT_ARG(it->second._name));
+            handler.PSendSysMessage(it->second.HasVisibleSubCommands(handler) ? LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS : LANG_SUBCMDS_LIST_ENTRY, (it->second._name));
         } while (++it);
     }
     else
-        handler.PSendSysMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(cmdStr));
+        handler.PSendSysMessage(LANG_CMD_INVALID, (cmdStr));
 }
 
 /*static*/ std::vector<std::string> Trinity::Impl::ChatCommands::ChatCommandNode::GetAutoCompletionsFor(ChatHandler const& handler, std::string_view cmdStr)

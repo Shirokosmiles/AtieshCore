@@ -98,7 +98,7 @@ public:
         sMailMgr->SendMailByGUID(pguid, targetGuid.GetCounter(), MAIL_NORMAL, subject, text, 0);
 
         std::string nameLink = handler->playerLink(targetName);
-        handler->PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
+        handler->PSendSysMessage(LANG_MAIL_SENT, nameLink);
         return true;
     }
 
@@ -206,7 +206,7 @@ public:
         itemlist.clear();
 
         std::string nameLink = handler->playerLink(receiverName);
-        handler->PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
+        handler->PSendSysMessage(LANG_MAIL_SENT, nameLink);
         return true;
     }
     /// Send money by mail
@@ -253,7 +253,7 @@ public:
         sMailMgr->SendMailByGUID(pguid, receiverGuid.GetCounter(), MAIL_NORMAL, subject, text, money);
 
         std::string nameLink = handler->playerLink(receiverName);
-        handler->PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
+        handler->PSendSysMessage(LANG_MAIL_SENT, nameLink);
         return true;
     }
     /// Send a message to a player in game
@@ -283,7 +283,7 @@ public:
 
         // Confirmation message
         std::string nameLink = handler->GetNameLink(player);
-        handler->PSendSysMessage(LANG_SENDMESSAGE, nameLink.c_str(), msgStr);
+        handler->PSendSysMessage(LANG_SENDMESSAGE, nameLink, msgStr);
 
         return true;
     }
@@ -293,7 +293,7 @@ public:
         time_t expTime = sMailMgr->GetMailMgrExpiryTimer();
         /// - Send the message
         std::string time = secsToTimeString(uint64(expTime));
-        handler->PSendSysMessage("|cffff0000[next ExpiryMail will in]:|r %s", time);
+        handler->PSendSysMessage("|cffff0000[next ExpiryMail will in]:|r {}", time);
 
         return true;
     }

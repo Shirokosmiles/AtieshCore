@@ -106,9 +106,9 @@ public:
                 if (handler->needReportToTarget(target))
                 {
                     if (oldlevel < static_cast<uint8>(level))
-                        ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_LEVEL_UP, handler->GetNameLink().c_str(), level);
+                        ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_LEVEL_UP, handler->GetNameLink(), level);
                     else                                                // if (oldlevel > newlevel)
-                        ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_LEVEL_DOWN, handler->GetNameLink().c_str(), level);
+                        ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_LEVEL_DOWN, handler->GetNameLink(), level);
                 }
             }
         }
@@ -179,7 +179,7 @@ public:
 
         if (!group)
         {
-            handler->PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
+            handler->PSendSysMessage(LANG_NOT_IN_GROUP, nameLink);
             return false;
         }
 
@@ -216,7 +216,7 @@ public:
 
             if (player->IsBeingTeleported())
             {
-                handler->PSendSysMessage(LANG_IS_TELEPORTED, plNameLink.c_str());
+                handler->PSendSysMessage(LANG_IS_TELEPORTED, plNameLink);
                 continue;
             }
 
@@ -230,14 +230,14 @@ public:
                     )
                 {
                     // cannot summon from instance to instance
-                    handler->PSendSysMessage(LANG_CANNOT_SUMMON_INST_INST, plNameLink.c_str());
+                    handler->PSendSysMessage(LANG_CANNOT_SUMMON_INST_INST, plNameLink);
                     continue;
                 }
             }
 
-            handler->PSendSysMessage(LANG_SUMMONING, plNameLink.c_str(), "");
+            handler->PSendSysMessage(LANG_SUMMONING, plNameLink, "");
             if (handler->needReportToTarget(player))
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->GetNameLink().c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->GetNameLink());
 
             // stop flight if need
             if (player->IsInFlight())
@@ -266,7 +266,7 @@ public:
 
         if (!group)
         {
-            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, player->GetName().c_str());
+            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, player->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -292,21 +292,21 @@ public:
 
         if (!group)
         {
-            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, player->GetName().c_str());
+            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, player->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!group->isRaidGroup())
         {
-            handler->PSendSysMessage(LANG_GROUP_NOT_IN_RAID_GROUP, player->GetName().c_str());
+            handler->PSendSysMessage(LANG_GROUP_NOT_IN_RAID_GROUP, player->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (flag == MEMBER_FLAG_ASSISTANT && group->IsLeader(guid))
         {
-            handler->PSendSysMessage(LANG_LEADER_CANNOT_BE_ASSISTANT, player->GetName().c_str());
+            handler->PSendSysMessage(LANG_LEADER_CANNOT_BE_ASSISTANT, player->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -314,12 +314,12 @@ public:
         if (group->GetMemberFlags(guid) & flag)
         {
             group->SetGroupMemberFlag(guid, false, flag);
-            handler->PSendSysMessage(LANG_GROUP_ROLE_CHANGED, player->GetName().c_str(), "no longer", what);
+            handler->PSendSysMessage(LANG_GROUP_ROLE_CHANGED, player->GetName(), "no longer", what);
         }
         else
         {
             group->SetGroupMemberFlag(guid, true, flag);
-            handler->PSendSysMessage(LANG_GROUP_ROLE_CHANGED, player->GetName().c_str(), "now", what);
+            handler->PSendSysMessage(LANG_GROUP_ROLE_CHANGED, player->GetName(), "now", what);
         }
         return true;
     }
@@ -351,7 +351,7 @@ public:
 
         if (!group)
         {
-            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, player->GetName().c_str());
+            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, player->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -372,7 +372,7 @@ public:
 
         if (!group)
         {
-            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, player->GetName().c_str());
+            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, player->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -400,7 +400,7 @@ public:
 
         if (!groupSource)
         {
-            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, playerSource->GetName().c_str());
+            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, playerSource->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -410,7 +410,7 @@ public:
 
         if (groupTarget || playerTarget->GetGroup() == groupSource)
         {
-            handler->PSendSysMessage(LANG_GROUP_ALREADY_IN_GROUP, playerTarget->GetName().c_str());
+            handler->PSendSysMessage(LANG_GROUP_ALREADY_IN_GROUP, playerTarget->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -424,7 +424,7 @@ public:
 
         groupSource->AddMember(playerTarget);
         groupSource->BroadcastGroupUpdate();
-        handler->PSendSysMessage(LANG_GROUP_PLAYER_JOINED, playerTarget->GetName().c_str(), playerSource->GetName().c_str());
+        handler->PSendSysMessage(LANG_GROUP_PLAYER_JOINED, playerTarget->GetName(), playerSource->GetName());
         return true;
     }
 
@@ -471,7 +471,7 @@ public:
         // If both fails, players simply has no party. Return false.
         if (!groupTarget)
         {
-            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, nameTarget.c_str());
+            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, nameTarget);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -537,9 +537,9 @@ public:
             }
 
             // Now we can print those informations for every single member of each group!
-            handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
-                zoneName.c_str(), phase, slot.guid.GetCounter(), flags.c_str(),
-                lfg::GetRolesString(slot.roles).c_str());
+            handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name, onlineState,
+                zoneName, phase, slot.guid.GetCounter(), flags,
+                lfg::GetRolesString(slot.roles));
         }
 
         // And finish after every iterator is done.

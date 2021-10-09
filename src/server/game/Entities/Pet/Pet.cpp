@@ -255,8 +255,8 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
         if (!IsPositionValid())
         {
-            TC_LOG_ERROR("entities.pet", "Pet%s not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
-                GetGUID().ToString().c_str(), GetPositionX(), GetPositionY());
+            FMT_LOG_ERROR("entities.pet", "Pet{} not loaded. Suggested coordinates isn't valid (X: {} Y: {})",
+                GetGUID().ToString(), GetPositionX(), GetPositionY());
             return false;
         }
 
@@ -294,7 +294,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
             break;
         default:
             if (!IsPetGhoul())
-                TC_LOG_ERROR("entities.pet", "Pet have incorrect type (%u) for pet loading.", getPetType());
+                FMT_LOG_ERROR("entities.pet", "Pet have incorrect type ({}) for pet loading.", getPetType());
             break;
     }
 
@@ -317,8 +317,8 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     Relocate(px, py, pz + 1.0f, owner->GetOrientation());
     if (!IsPositionValid())
     {
-        TC_LOG_ERROR("entities.pet", "Pet %s not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
-            GetGUID().ToString().c_str(), GetPositionX(), GetPositionY());
+        FMT_LOG_ERROR("entities.pet", "Pet {} not loaded. Suggested coordinates isn't valid (X: {} Y: {})",
+            GetGUID().ToString(), GetPositionX(), GetPositionY());
         return false;
     }
 
@@ -433,7 +433,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
         CleanupActionBar();                                     // remove unknown spells from action bar after load
 
-        TC_LOG_DEBUG("entities.pet", "New Pet has %s", GetGUID().ToString().c_str());
+        FMT_LOG_DEBUG("entities.pet", "New Pet has {}", GetGUID().ToString());
 
         owner->PetSpellInitialize();
 
@@ -665,7 +665,7 @@ void Pet::Update(uint32 diff)
             {
                 if (owner->GetPetGUID() != GetGUID())
                 {
-                    TC_LOG_ERROR("entities.pet", "Pet %u is not pet of owner %s, removed", GetEntry(), GetOwner()->GetName().c_str());
+                    FMT_LOG_ERROR("entities.pet", "Pet {} is not pet of owner {}, removed", GetEntry(), GetOwner()->GetName());
                     ASSERT(getPetType() != HUNTER_PET, "Unexpected unlinked pet found for owner %s", owner->GetSession()->GetPlayerInfo().c_str());
                     Remove(PET_SAVE_NOT_IN_SLOT);
                     return;
@@ -918,15 +918,15 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 
     if (!IsPositionValid())
     {
-        TC_LOG_ERROR("entities.pet", "Pet %s not created base at creature. Suggested coordinates isn't valid (X: %f Y: %f)",
-            GetGUID().ToString().c_str(), GetPositionX(), GetPositionY());
+        FMT_LOG_ERROR("entities.pet", "Pet {} not created base at creature. Suggested coordinates isn't valid (X: {} Y: {})",
+            GetGUID().ToString(), GetPositionX(), GetPositionY());
         return false;
     }
 
     CreatureTemplate const* cinfo = GetCreatureTemplate();
     if (!cinfo)
     {
-        TC_LOG_ERROR("entities.pet", "CreateBaseAtCreature() failed, creatureInfo is missing!");
+        FMT_LOG_ERROR("entities.pet", "CreateBaseAtCreature() failed, creatureInfo is missing!");
         return false;
     }
 
@@ -955,7 +955,7 @@ bool Pet::CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner)
 
 bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask)
 {
-    TC_LOG_DEBUG("entities.pet", "Pet::CreateBaseForTamed");
+    FMT_LOG_DEBUG("entities.pet", "Pet::CreateBaseForTamed");
     ObjectGuid::LowType guid = map->GenerateLowGuid<HighGuid::Pet>();
     uint32 petId = sObjectMgr->GeneratePetNumber();
     if (!Create(guid, map, phaseMask, cinfo->Entry, petId))
@@ -1004,7 +1004,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         }
         else
         {
-            TC_LOG_ERROR("entities.pet", "Unknown type pet %u is summoned by player class %u",
+            FMT_LOG_ERROR("entities.pet", "Unknown type pet {} is summoned by player class {}",
                            GetEntry(), GetOwner()->GetClass());
         }
     }
@@ -1383,7 +1383,7 @@ void Pet::_SaveSpells(CharacterDatabaseTransaction trans)
 
 void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
 {
-    TC_LOG_DEBUG("entities.pet", "Loading auras for pet %s", GetGUID().ToString().c_str());
+    FMT_LOG_DEBUG("entities.pet", "Loading auras for pet {}", GetGUID().ToString());
 
     if (result)
     {
@@ -1415,7 +1415,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
             if (!spellInfo)
             {
-                TC_LOG_ERROR("entities.pet", "Unknown aura (spellid %u), ignore.", spellid);
+                FMT_LOG_ERROR("entities.pet", "Unknown aura (spellid {}), ignore.", spellid);
                 continue;
             }
 
@@ -1451,7 +1451,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 }
                 aura->SetLoadedState(maxduration, remaintime, remaincharges, stackcount, recalculatemask, critChance, applyResilience, &damage[0]);
                 aura->ApplyForTargets();
-                TC_LOG_DEBUG("entities.pet", "Added aura spellid %u, effectmask %u", spellInfo->Id, effmask);
+                FMT_LOG_DEBUG("entities.pet", "Added aura spellid {}, effectmask {}", spellInfo->Id, effmask);
             }
         }
         while (result->NextRow());
@@ -1529,7 +1529,7 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
         // do pet spell book cleanup
         if (state == PETSPELL_UNCHANGED)                    // spell load case
         {
-            TC_LOG_ERROR("entities.pet", "Pet::addSpell: Non-existed in SpellStore spell #%u request, deleting for all pets in `pet_spell`.", spellId);
+            FMT_LOG_ERROR("entities.pet", "Pet::addSpell: Non-existed in SpellStore spell #{} request, deleting for all pets in `pet_spell`.", spellId);
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_PET_SPELL);
 
@@ -1538,7 +1538,7 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
             CharacterDatabase.Execute(stmt);
         }
         else
-            TC_LOG_ERROR("entities.pet", "Pet::addSpell: Non-existed in SpellStore spell #%u request.", spellId);
+            FMT_LOG_ERROR("entities.pet", "Pet::addSpell: Non-existed in SpellStore spell #{} request.", spellId);
 
         return false;
     }

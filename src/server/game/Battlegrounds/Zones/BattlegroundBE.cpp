@@ -107,7 +107,7 @@ bool BattlegroundBE::SetupBattleground()
         BattlegroundGOSpawnPoint const& object = BG_BE_GameObjects[i];
         if (!AddObject(i, object.Entry, object.Pos, object.Rot, object.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "BattleGroundBE: Failed to spawn some object (Entry %u). Battleground not created!", object.Entry);
+            FMT_LOG_ERROR("bg.battleground", "BattleGroundBE: Failed to spawn some object (Entry {}). Battleground not created!", object.Entry);
             return false;
         }
     }

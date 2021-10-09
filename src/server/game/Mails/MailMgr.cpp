@@ -527,7 +527,7 @@ bool MailMgr::PrepareMessageAttributeBy(Object* sender, ObjectGuid::LowType rece
         default:
             m_messageType = MAIL_NORMAL;
             m_senderId = 0;                                 // will show mail from non-existing player
-            TC_LOG_ERROR("misc", "MailMgr::SendMailTo - Mail message contains unexpected sender typeid (%u).", sender->GetTypeId());
+            FMT_LOG_ERROR("misc", "MailMgr::SendMailTo - Mail message contains unexpected sender typeid ({}).", sender->GetTypeId());
             typeIsOk = false;
             break;
     }
@@ -723,7 +723,7 @@ void MailMgr::AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowTy
 
     if (itemexist)
     {
-        TC_LOG_ERROR("mailMgr", "New Mail (%u) :: AddNewMailItem (GUID: %u), but item with this item_guid already exist, skip", mailID, itemGuidLow);
+        FMT_LOG_ERROR("mailMgr", "New Mail ({}) :: AddNewMailItem (GUID: {}), but item with this item_guid already exist, skip", mailID, itemGuidLow);
         return;
     }
 
@@ -987,9 +987,9 @@ MailResponseResult MailMgr::HandleMailTakeItem(Player* player, uint32 mailID, Ob
         if (!it || !itemexist)
         {
             if (!it && itemexist)
-                TC_LOG_ERROR("mailMgr", "Mail (%u) has item (GUID: %u), but doesn not exist in ItemMap of pointers", mailID, item_guid);
+                FMT_LOG_ERROR("mailMgr", "Mail ({}) has item (GUID: {}), but doesn not exist in ItemMap of pointers", mailID, item_guid);
             if (it && !itemexist)
-                TC_LOG_ERROR("mailMgr", "Mail (%u) has item (GUID: %u), but doesn not exist in MailItemMap", mailID, item_guid);
+                FMT_LOG_ERROR("mailMgr", "Mail ({}) has item (GUID: {}), but doesn not exist in MailItemMap", mailID, item_guid);
             return MAIL_ERR_MAIL_ATTACHMENT_INVALID;
         }
 
@@ -1026,8 +1026,8 @@ MailResponseResult MailMgr::HandleMailTakeItem(Player* player, uint32 mailID, Ob
                         if (!sCharacterCache->GetCharacterNameByGuid(sender_guid, sender_name))
                             sender_name = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
                     }
-                    sLog->outCommand(player->GetSession()->GetAccountId(), "GM %s (Account: %u) receiver mail item: %s (Entry: %u Count: %u) and send COD money: %u to player: %s (Account: %u)",
-                        player->GetName().c_str(), player->GetSession()->GetAccountId(), it->GetTemplate()->Name1.c_str(), it->GetEntry(), it->GetCount(), itr->second.COD, sender_name.c_str(), sender_accId);
+                    sLog->outCommand(player->GetSession()->GetAccountId(), "GM {} (Account: {}) receiver mail item: {} (Entry: {} Count: {}) and send COD money: {} to player: {} (Account: {})",
+                        player->GetName(), player->GetSession()->GetAccountId(), it->GetTemplate()->Name1, it->GetEntry(), it->GetCount(), itr->second.COD, sender_name, sender_accId);
                 }
                 else if (!receiver)
                     sender_accId = sCharacterCache->GetCharacterAccountIdByGuid(sender_guid);
@@ -1263,7 +1263,7 @@ MailResponseResult MailMgr::HandleMailCreateTextItem(Player* player, uint32 mail
 
         bodyItem->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_MAIL_TEXT_MASK);
 
-        TC_LOG_DEBUG("network", "HandleMailCreateTextItem mailid=%u", mailID);
+        FMT_LOG_DEBUG("network", "HandleMailCreateTextItem mailid={}", mailID);
 
         ItemPosCountVec dest;
         msg_result = player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, bodyItem, false);
@@ -1370,7 +1370,7 @@ void MailMgr::_LoadMails()
     QueryResult result = CharacterDatabase.Query("SELECT id, messageType, stationery, mailTemplateId, sender, receiver, subject, body, has_items, expire_time, deliver_time, money, cod, checked, state FROM mail");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 Mails. DB table `mail` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 Mails. DB table `mail` is empty.");
         return;
     }
 
@@ -1401,7 +1401,7 @@ void MailMgr::_LoadMails()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u mails in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} mails in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void MailMgr::_LoadMailItems()
@@ -1413,7 +1413,7 @@ void MailMgr::_LoadMailItems()
     QueryResult result = CharacterDatabase.Query("SELECT id, mail_id, item_guid, receiver FROM mail_items");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 Mail items. DB table `mail_items` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 Mail items. DB table `mail_items` is empty.");
         return;
     }
 
@@ -1432,7 +1432,7 @@ void MailMgr::_LoadMailItems()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u mail items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} mail items in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load mailed item which should receive current player
@@ -1456,7 +1456,7 @@ void MailMgr::_LoadMailedItemPointers()
 
         if (!proto)
         {
-            TC_LOG_ERROR("mailMgr", "Mail has unknown item_template in mailed items (GUID: %u, Entry: %u), deleted.", itemGuid, itemTemplate);
+            FMT_LOG_ERROR("mailMgr", "Mail has unknown item_template in mailed items (GUID: {}, Entry: {}), deleted.", itemGuid, itemTemplate);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
             stmt->setUInt32(0, itemGuid);
@@ -1472,7 +1472,7 @@ void MailMgr::_LoadMailedItemPointers()
 
         if (!item->LoadFromDB(itemGuid, ObjectGuid(HighGuid::Player, fields[13].GetUInt32()), fields, itemTemplate))
         {
-            TC_LOG_ERROR("entities.player", "Player::_LoadMailedItems: Item (GUID: %u) in mail doesn't exist, deleted from mail.", itemGuid);
+            FMT_LOG_ERROR("entities.player", "Player::_LoadMailedItems: Item (GUID: {}) in mail doesn't exist, deleted from mail.", itemGuid);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
             stmt->setUInt32(0, itemGuid);

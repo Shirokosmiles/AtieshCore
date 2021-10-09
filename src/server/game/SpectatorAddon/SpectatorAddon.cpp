@@ -96,7 +96,7 @@ std::string SpectatorAddonMsg::GetMsgData()
 
     if (!isFilledIn(SPECTATOR_PREFIX_PLAYER))
     {
-        TC_LOG_INFO("Arena_spectate", "SPECTATOR ADDON: player is not filled in.");
+        FMT_LOG_INFO("Arena_spectate", "SPECTATOR ADDON: player is not filled in.");
         return addonData;
     }
 

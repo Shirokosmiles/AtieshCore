@@ -76,7 +76,7 @@ public:
             {
                 InstanceSave const* save = bind.save;
                 std::string timeleft = secsToTimeString(save->GetResetTime() - GameTime::GetGameTime(), TimeFormat::ShortText);
-                handler->PSendSysMessage(LANG_COMMAND_LIST_BIND_INFO, mapId, save->GetInstanceId(), bind.perm ? "yes" : "no", bind.extendState == EXTEND_STATE_EXPIRED ? "expired" : bind.extendState == EXTEND_STATE_EXTENDED ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str());
+                handler->PSendSysMessage(LANG_COMMAND_LIST_BIND_INFO, mapId, save->GetInstanceId(), bind.perm ? "yes" : "no", bind.extendState == EXTEND_STATE_EXPIRED ? "expired" : bind.extendState == EXTEND_STATE_EXTENDED ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft);
                 counter++;
             }
         }
@@ -91,7 +91,7 @@ public:
                 {
                     InstanceSave* save = bind.save;
                     std::string timeleft = secsToTimeString(save->GetResetTime() - GameTime::GetGameTime(), TimeFormat::ShortText);
-                    handler->PSendSysMessage(LANG_COMMAND_LIST_BIND_INFO, mapId, save->GetInstanceId(), bind.perm ? "yes" : "no", "-", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str());
+                    handler->PSendSysMessage(LANG_COMMAND_LIST_BIND_INFO, mapId, save->GetInstanceId(), bind.perm ? "yes" : "no", "-", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft);
                     counter++;
                 }
             }
@@ -126,7 +126,7 @@ public:
                 if (itr->first != player->GetMapId() && (!mapId || mapId == itr->first) && (!difficultyArg || difficultyArg == save->GetDifficulty()))
                 {
                     std::string timeleft = secsToTimeString(save->GetResetTime() - GameTime::GetGameTime(), TimeFormat::ShortText);
-                    handler->PSendSysMessage(LANG_COMMAND_INST_UNBIND_UNBINDING, itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str());
+                    handler->PSendSysMessage(LANG_COMMAND_INST_UNBIND_UNBINDING, itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft);
                     player->UnbindInstance(itr, Difficulty(i));
                     counter++;
                 }

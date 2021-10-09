@@ -542,7 +542,7 @@ public:
                 {
                     // Ignore, will be erased on next save.
                     // Additionally this can happen if an item was deleted from DB but still exists for the player
-                    // TC_LOG_ERROR("custom.transmog", "Item entry (Entry: %u, itemGUID: %u, playerGUID: %u) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), player->GetGUID().ToString().c_str());
+                    // FMT_LOG_ERROR("custom.transmog", "Item entry (Entry: {}, itemGUID: {}, playerGUID: {}) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), player->GetGUID().ToString());
                     // CharacterDatabase.PExecute("DELETE FROM custom_transmogrification WHERE FakeEntry = %u", fakeEntry);
                 }
             } while (result->NextRow());
@@ -580,7 +580,7 @@ public:
 
     void OnStartup() override
     {
-        TC_LOG_INFO("custom.transmog", "Deleting non-existing transmogrification entries...");
+        FMT_LOG_INFO("custom.transmog", "Deleting non-existing transmogrification entries...");
         CharacterDatabase.DirectExecute("DELETE FROM custom_transmogrification WHERE NOT EXISTS (SELECT 1 FROM item_instance WHERE item_instance.guid = custom_transmogrification.GUID)");
 
 #ifdef PRESETS

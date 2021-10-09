@@ -72,10 +72,10 @@ void LoadRandomEnchantmentsTable()
             ++count;
         } while (result->NextRow());
 
-        TC_LOG_INFO("server.loading", ">> Loaded %u Item Enchantment definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        FMT_LOG_INFO("server.loading", ">> Loaded {} Item Enchantment definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     }
     else
-        TC_LOG_INFO("server.loading", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
 }
 
 uint32 GetItemEnchantMod(int32 entry)
@@ -89,7 +89,7 @@ uint32 GetItemEnchantMod(int32 entry)
     EnchantmentStore::const_iterator tab = RandomItemEnch.find(entry);
     if (tab == RandomItemEnch.end())
     {
-        TC_LOG_ERROR("sql.sql", "Item RandomProperty / RandomSuffix id #%u used in `item_template` but it does not have records in `item_enchantment_template` table.", entry);
+        FMT_LOG_ERROR("sql.sql", "Item RandomProperty / RandomSuffix id #{} used in `item_template` but it does not have records in `item_enchantment_template` table.", entry);
         return 0;
     }
 
@@ -133,7 +133,7 @@ int32 GenerateItemRandomPropertyId(uint32 item_id)
     // item can have not null only one from field values
     if ((itemProto->RandomProperty) && (itemProto->RandomSuffix))
     {
-        TC_LOG_ERROR("sql.sql", "Item template %u have RandomProperty == %u and RandomSuffix == %u, but must have one from field =0", itemProto->ItemId, itemProto->RandomProperty, itemProto->RandomSuffix);
+        FMT_LOG_ERROR("sql.sql", "Item template {} have RandomProperty == {} and RandomSuffix == {}, but must have one from field =0", itemProto->ItemId, itemProto->RandomProperty, itemProto->RandomSuffix);
         return 0;
     }
 
@@ -144,7 +144,7 @@ int32 GenerateItemRandomPropertyId(uint32 item_id)
         ItemRandomPropertiesDBC const* random_id = sDBCStoresMgr->GetItemRandomPropertiesDBC(randomPropId);
         if (!random_id)
         {
-            TC_LOG_ERROR("sql.sql", "Enchantment id #%u used but it doesn't have records in 'ItemRandomProperties.dbc'", randomPropId);
+            FMT_LOG_ERROR("sql.sql", "Enchantment id #{} used but it doesn't have records in 'ItemRandomProperties.dbc'", randomPropId);
             return 0;
         }
 
@@ -157,7 +157,7 @@ int32 GenerateItemRandomPropertyId(uint32 item_id)
         ItemRandomSuffixDBC const* random_id = sDBCStoresMgr->GetItemRandomSuffixDBC(randomPropId);
         if (!random_id)
         {
-            TC_LOG_ERROR("sql.sql", "Enchantment id #%u used but it doesn't have records in sItemRandomSuffixStore.", randomPropId);
+            FMT_LOG_ERROR("sql.sql", "Enchantment id #{} used but it doesn't have records in sItemRandomSuffixStore.", randomPropId);
             return 0;
         }
 

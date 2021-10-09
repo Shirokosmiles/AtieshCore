@@ -71,7 +71,7 @@ void Player::CalculateAuctionLotsCounter()
     if (AuctionHouseObject * AllianceauctionHouse = sAuctionMgr->GetAuctionsMapByHouseId(AUCTIONHOUSE_NEUTRAL))
         AllianceauctionHouse->BuildListAllLots(this, count);
 
-    TC_LOG_DEBUG("chatmessage", "Player: CalculateAuctionLotsCounter - Player (%s) has %u lots in all auctions", GetName().c_str(), count);
+    FMT_LOG_DEBUG("chatmessage", "Player: CalculateAuctionLotsCounter - Player ({}) has {} lots in all auctions", GetName(), count);
     m_auctionlots = count;
 }
 
@@ -89,16 +89,16 @@ void Player::InstallItemPresentBySlot(uint32 entry)
 
 void Player::InstallItemPresent(uint32 entry, uint32 itemId, uint32 count)
 {
-    TC_LOG_DEBUG("entities.player", "Player (Guid: %s) %s: installing itempresent (Entry: %u) for item %u",
-        GetGUID().ToString().c_str(), GetName().c_str(), entry, itemId);
+    FMT_LOG_DEBUG("entities.player", "Player (Guid: {}) {}: installing itempresent (Entry: {}) for item {}",
+        GetGUID().ToString(), GetName(), entry, itemId);
 
     ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
     if (!itemTemplate)
         return;
 
     if (!AddItem(itemId, count))
-        TC_LOG_DEBUG("entities.player", "Player (Guid: %s) %s: did not received itempresent (Entry: %u) for item %u",
-            GetGUID().ToString().c_str(), GetName().c_str(), entry, itemId);
+        FMT_LOG_DEBUG("entities.player", "Player (Guid: {}) {}: did not received itempresent (Entry: {}) for item {}",
+            GetGUID().ToString(), GetName(), entry, itemId);
 }
 
 // VIP system
@@ -214,10 +214,10 @@ uint32 Player::GetGearScore() const
 
             itemGS = 1.8618 * W * Q * (itemlevel - A) / B;
             fullGS += itemGS;
-            //TC_LOG_ERROR("server", "GetGearScore :  slot = %i, itemGS = %u", i, itemGS);
+            //FMT_LOG_ERROR("server", "GetGearScore :  slot = {}, itemGS = {}", i, itemGS);
         }
     }
-    //TC_LOG_ERROR("server", "GetGearScore = %u", fullGS);
+    //FMT_LOG_ERROR("server", "GetGearScore = {}", fullGS);
     return fullGS;
 }
 
@@ -246,7 +246,7 @@ uint8 Player::GetMostPointsTalentTree() const
             }
         }
     }
-    //TC_LOG_ERROR("server", "talents :  1tab = %u, 2tab = %u, 3tab = %u", specPoints[0], specPoints[1], specPoints[2]);
+    //FMT_LOG_ERROR("server", "talents :  1tab = {}, 2tab = {}, 3tab = {}", specPoints[0], specPoints[1], specPoints[2]);
     uint8 maxIndex = 0;
     uint8 maxCount = specPoints[0];
     for (uint8 i = 1; i < 3; ++i)
@@ -296,7 +296,7 @@ void Player::SetPVPCapPoints(uint32 cap, bool weeklyupdate)
             m_pvpcapReceived = true;
 
         if (GetSession())
-            ChatHandler(GetSession()).PSendSysMessage("Your Weekly Arena Cap was updated : ( %u / %u )", m_pvpcap, maxcap);
+            ChatHandler(GetSession()).PSendSysMessage("Your Weekly Arena Cap was updated : ( {} / {} )", m_pvpcap, maxcap);
     }
 }
 
@@ -318,7 +318,7 @@ void Player::RewardPVPCapPoints(uint32 reward)
     }
 
     if (GetSession())
-        ChatHandler(GetSession()).PSendSysMessage("Your Weekly Arena Cap was updated : ( %u / %u )", m_pvpcap, maxcap);
+        ChatHandler(GetSession()).PSendSysMessage("Your Weekly Arena Cap was updated : ( {} / {} )", m_pvpcap, maxcap);
 }
 
 void Player::RewardPVPCap()

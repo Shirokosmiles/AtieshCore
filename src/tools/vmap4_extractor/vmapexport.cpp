@@ -406,7 +406,7 @@ bool processArgv(int argc, char ** argv, const char *versionString)
 
 int main(int argc, char ** argv)
 {
-    Trinity::Banner::Show("VMAP data extractor", [](char const* text) { printf("%s\n", text); }, nullptr);
+    Trinity::Banner::Show("VMAP data extractor", [](std::string_view text) { fmt::print("{}\n", text); }, nullptr);
 
     bool success = true;
     const char *versionString = "V4.00 2012_02";

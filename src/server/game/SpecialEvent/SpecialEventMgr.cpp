@@ -55,7 +55,7 @@ void SpecialEventMgr::InitSpecialEvents()
     QueryResult result = WorldDatabase.Query("SELECT TypeId, ScriptName, isEnabled, isActiveStatus, isRepeatable, cooldownTimer, durationTimer, comment FROM special_events");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 Special Events definitions. DB table `special_events` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 Special Events definitions. DB table `special_events` is empty.");
         return;
     }
 
@@ -78,7 +78,7 @@ void SpecialEventMgr::InitSpecialEvents()
 
         if (typeId >= SPECIALEVENT_EVENTID_MAX)
         {
-            TC_LOG_ERROR("sql.sql", "Invalid Special Event TypeId value %u in special_events; skipped.", typeId);
+            FMT_LOG_ERROR("sql.sql", "Invalid Special Event TypeId value {} in special_events; skipped.", typeId);
             continue;
         }
 
@@ -105,14 +105,14 @@ void SpecialEventMgr::InitSpecialEvents()
     {
         if (!m_SpecialEventDatas[i])
         {
-            TC_LOG_ERROR("sql.sql", "Could not initialize Special Event for type ID %u; no entry in database.", i);
+            FMT_LOG_ERROR("sql.sql", "Could not initialize Special Event for type ID {}; no entry in database.", i);
             continue;
         }
 
         se = sScriptMgr->CreateSpecialEvent(m_SpecialEventDatas[i]);
         if (!se)
         {
-            TC_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID %u; got NULL pointer from script.", i);
+            FMT_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID {}; got NULL pointer from script.", i);
             continue;
         }
 
@@ -131,16 +131,16 @@ void SpecialEventMgr::InitSpecialEvents()
 
         if (!se->SetupSpecialEvent(isEnabled, isActiveStatus, isRepeatable, i, cooldownTimer, durationTimer, comment))
         {
-            TC_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID %u; SetupSpecialEvent failed.", i);
+            FMT_LOG_ERROR("specialevent", "Could not initialize Special Event for type ID {}; SetupSpecialEvent failed.", i);
             delete se;
             continue;
         }
 
-        TC_LOG_INFO("server.loading", ">> Special Event (id: %u) - %s successfully initialized", i, comment.c_str());
+        FMT_LOG_INFO("server.loading", ">> Special Event (id: {}) - {} successfully initialized", i, comment);
         m_SpecialEventSet.push_back(se);
     }
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u Special Event definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} Special Event definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void SpecialEventMgr::Update(uint32 diff)

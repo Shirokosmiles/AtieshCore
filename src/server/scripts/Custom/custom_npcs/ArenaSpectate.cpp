@@ -324,8 +324,8 @@ class arena_spectator_commands : public CommandScript
                         {
                             handler->PSendSysMessage("You're entered to rated arena.");
                             handler->PSendSysMessage("Teams:");
-                            handler->PSendSysMessage("Team GOLD : %s vs Team GREEN : %s", firstTeam->GetName().c_str(), secondTeam->GetName().c_str());
-                            handler->PSendSysMessage("Rating %u (MMR %u) - Rating %u (MMR %u)", firstTeam->GetRating(), firstTeam->GetAverageMMR(firstTeamMember->GetGroup()),
+                            handler->PSendSysMessage("Team GOLD : {} vs Team GREEN : {}", firstTeam->GetName(), secondTeam->GetName());
+                            handler->PSendSysMessage("Rating {} (MMR {}) - Rating {} (MMR {})", firstTeam->GetRating(), firstTeam->GetAverageMMR(firstTeamMember->GetGroup()),
                             secondTeam->GetRating(), secondTeam->GetAverageMMR(secondTeamMember->GetGroup()));
                         }
                     }

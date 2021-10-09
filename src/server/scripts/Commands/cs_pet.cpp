@@ -144,7 +144,7 @@ public:
         // Check if pet already has it
         if (pet->HasSpell(spellId))
         {
-            handler->PSendSysMessage("Pet already has spell: %u", spellId);
+            handler->PSendSysMessage("Pet already has spell: {}", spellId);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -160,7 +160,7 @@ public:
 
         pet->learnSpell(spellId);
 
-        handler->PSendSysMessage("Pet has learned spell %u", spellId);
+        handler->PSendSysMessage("Pet has learned spell {}", spellId);
         return true;
     }
 

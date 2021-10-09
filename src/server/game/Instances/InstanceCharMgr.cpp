@@ -44,7 +44,7 @@ void InstanceCharMgr::Initialize()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 Character Instance History. DB table `character_instance_completed` is empty!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 Character Instance History. DB table `character_instance_completed` is empty!");
         return;
     }
 
@@ -67,7 +67,7 @@ void InstanceCharMgr::Initialize()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u InstanceCharDatas in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} InstanceCharDatas in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 /*

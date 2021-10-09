@@ -114,30 +114,30 @@ int main(int argc, char** argv)
     sLog->Initialize(nullptr);
 
     Trinity::Banner::Show("authserver",
-        [](char const* text)
+        [](std::string_view text)
         {
-            TC_LOG_INFO("server.authserver", "%s", text);
+            FMT_LOG_INFO("server.authserver", "{}", text);
         },
         []()
         {
-            TC_LOG_INFO("server.authserver", "Using configuration file %s.", sConfigMgr->GetFilename().c_str());
-            TC_LOG_INFO("server.authserver", "Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            TC_LOG_INFO("server.authserver", "Using Boost version: %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+            FMT_LOG_INFO("server.authserver", "Using configuration file {}.", sConfigMgr->GetFilename());
+            FMT_LOG_INFO("server.authserver", "Using SSL version: {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            FMT_LOG_INFO("server.authserver", "Using Boost version: {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         }
     );
 
     for (std::string const& key : overriddenKeys)
-        TC_LOG_INFO("server.authserver", "Configuration field '%s' was overridden with environment variable.", key.c_str());
+        FMT_LOG_INFO("server.authserver", "Configuration field '{}' was overridden with environment variable.", key);
 
     // authserver PID file creation
     std::string pidFile = sConfigMgr->GetStringDefault("PidFile", "");
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            TC_LOG_INFO("server.authserver", "Daemon PID: %u\n", pid);
+            FMT_LOG_INFO("server.authserver", "Daemon PID: {}\n", pid);
         else
         {
-            TC_LOG_ERROR("server.authserver", "Cannot create PID file %s.\n", pidFile.c_str());
+            FMT_LOG_ERROR("server.authserver", "Cannot create PID file {}.\n", pidFile);
             return 1;
         }
     }
@@ -162,7 +162,7 @@ int main(int argc, char** argv)
 
     if (sRealmList->GetRealms().empty())
     {
-        TC_LOG_ERROR("server.authserver", "No valid realms specified.");
+        FMT_LOG_ERROR("server.authserver", "No valid realms specified.");
         return 1;
     }
 
@@ -170,7 +170,7 @@ int main(int argc, char** argv)
     int32 port = sConfigMgr->GetIntDefault("RealmServerPort", 3724);
     if (port < 0 || port > 0xFFFF)
     {
-        TC_LOG_ERROR("server.authserver", "Specified port out of allowed range (1-65535)");
+        FMT_LOG_ERROR("server.authserver", "Specified port out of allowed range (1-65535)");
         return 1;
     }
 
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
 
     if (!sAuthSocketMgr.StartNetwork(*ioContext, bindIp, port))
     {
-        TC_LOG_ERROR("server.authserver", "Failed to initialize network");
+        FMT_LOG_ERROR("server.authserver", "Failed to initialize network");
         return 1;
     }
 
@@ -224,7 +224,7 @@ int main(int argc, char** argv)
     banExpiryCheckTimer->cancel();
     dbPingTimer->cancel();
 
-    TC_LOG_INFO("server.authserver", "Halting process...");
+    FMT_LOG_INFO("server.authserver", "Halting process...");
 
     signals.cancel();
 
@@ -246,7 +246,7 @@ bool StartDB()
     if (!loader.Load())
         return false;
 
-    TC_LOG_INFO("server.authserver", "Started auth database connection pool.");
+    FMT_LOG_INFO("server.authserver", "Started auth database connection pool.");
     sLog->SetRealmId(0); // Enables DB appenders when realm is set.
     return true;
 }
@@ -271,7 +271,7 @@ void KeepDatabaseAliveHandler(std::weak_ptr<Trinity::Asio::DeadlineTimer> dbPing
     {
         if (std::shared_ptr<Trinity::Asio::DeadlineTimer> dbPingTimer = dbPingTimerRef.lock())
         {
-            TC_LOG_INFO("server.authserver", "Ping MySQL to keep connection alive");
+            FMT_LOG_INFO("server.authserver", "Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
 
             dbPingTimer->expires_from_now(boost::posix_time::minutes(dbPingInterval));

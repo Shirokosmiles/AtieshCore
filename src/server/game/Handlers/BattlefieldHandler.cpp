@@ -138,7 +138,7 @@ void WorldSession::HandleBattlefieldEntryInviteResponse(WorldPackets::Battlefiel
 {
     uint32 battleId = entryInviteResponse.BattleID;
     bool accepted = entryInviteResponse.AcceptedInvite;
-    TC_LOG_DEBUG("network", "WorldSession::HandleBattlefieldEntryInviteResponse: battleId: %u, accepted: %u", battleId, accepted);
+    FMT_LOG_DEBUG("network", "WorldSession::HandleBattlefieldEntryInviteResponse: battleId: {}, accepted: {}", battleId, accepted);
 
     if (accepted)
         sWintergraspMgr->PlayerAcceptInviteToWar(_player);
@@ -155,7 +155,7 @@ void WorldSession::HandleBattlefieldQueueInviteResponse(WorldPackets::Battlefiel
 {
     uint32 battleId = queueInviteResponse.BattleID;
     bool accepted = queueInviteResponse.AcceptedInvite;
-    TC_LOG_DEBUG("network", "WorldSession::HandleBattlefieldQueueInviteResponse: battleId: %u, accepted: %u", battleId, accepted);
+    FMT_LOG_DEBUG("network", "WorldSession::HandleBattlefieldQueueInviteResponse: battleId: {}, accepted: {}", battleId, accepted);
 
     if (accepted)
         sWintergraspMgr->PlayerAcceptInviteToQueue(_player);
@@ -171,7 +171,7 @@ void WorldSession::HandleBattlefieldQueueInviteResponse(WorldPackets::Battlefiel
 void WorldSession::HandleBattlefieldExitRequest(WorldPackets::Battlefield::BattlefieldMgrExitRequest& exitRequest)
 {
     uint32 battleId = exitRequest.BattleID;
-    TC_LOG_DEBUG("network", "WorldSession::HandleBattlefieldExitRequest: battleId: %u ", battleId);
+    FMT_LOG_DEBUG("network", "WorldSession::HandleBattlefieldExitRequest: battleId: {} ", battleId);
 
     sWintergraspMgr->AskToLeaveQueue(_player);
 }

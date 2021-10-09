@@ -258,7 +258,7 @@ void WintergraspMgr::OnCreatureCreate(Creature* creature)
             }
 
             if (!registered)
-                TC_LOG_ERROR("system", "NPC_WINTERGRASP_TOWER_CANNON not registered for GUID : %u", creature->GetSpawnId());
+                FMT_LOG_ERROR("system", "NPC_WINTERGRASP_TOWER_CANNON not registered for GUID : {}", creature->GetSpawnId());
             break;
         }
         case NPC_WORKSHOP_MECHANIC_ALLIANCE:
@@ -307,7 +307,7 @@ void WintergraspMgr::OnCreatureCreate(Creature* creature)
             }
 
             if (!registered)
-                TC_LOG_ERROR("system", "NPC_WINTERGRASP_TOWER_CANNON not registered for GUID : %u", creature->GetSpawnId());
+                FMT_LOG_ERROR("system", "NPC_WINTERGRASP_TOWER_CANNON not registered for GUID : {}", creature->GetSpawnId());
             break;
         }
         case NPC_WINTERGRASP_TOWER_CANNON:
@@ -381,7 +381,7 @@ void WintergraspMgr::OnCreatureCreate(Creature* creature)
 
             creature->SetReactState(REACT_PASSIVE);
             if (!registered)
-                TC_LOG_ERROR("system", "NPC_WINTERGRASP_TOWER_CANNON not registered for GUID : %u", creature->GetSpawnId());
+                FMT_LOG_ERROR("system", "NPC_WINTERGRASP_TOWER_CANNON not registered for GUID : {}", creature->GetSpawnId());
 
             break;
         }
@@ -582,7 +582,7 @@ void WintergraspMgr::OnCreatureCreate(Creature* creature)
             }
 
             if (!registered)
-                TC_LOG_ERROR("system", "BATTLEFIELD_WG_NPC_GUARD_A not registered for GUID : %u", creature->GetSpawnId());
+                FMT_LOG_ERROR("system", "BATTLEFIELD_WG_NPC_GUARD_A not registered for GUID : {}", creature->GetSpawnId());
             break;
         }
         case BATTLEFIELD_WG_NPC_GUARD_H:
@@ -780,7 +780,7 @@ void WintergraspMgr::OnCreatureCreate(Creature* creature)
             }
 
             if (!registered)
-                TC_LOG_ERROR("system", "BATTLEFIELD_WG_NPC_GUARD_H not registered for GUID : %u", creature->GetSpawnId());
+                FMT_LOG_ERROR("system", "BATTLEFIELD_WG_NPC_GUARD_H not registered for GUID : {}", creature->GetSpawnId());
             break;
         }
         // Alliance keep not guard NPC

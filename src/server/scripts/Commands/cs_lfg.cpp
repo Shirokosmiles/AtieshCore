@@ -38,9 +38,9 @@ void PrintPlayerInfo(ChatHandler* handler, Player const* player)
     lfg::LfgDungeonSet dungeons = sLFGMgr->GetSelectedDungeons(guid);
 
     std::string const& state = lfg::GetStateString(sLFGMgr->GetState(guid));
-    handler->PSendSysMessage(LANG_LFG_PLAYER_INFO, player->GetName().c_str(),
-        state.c_str(), uint8(dungeons.size()), lfg::ConcatenateDungeons(dungeons).c_str(),
-        lfg::GetRolesString(sLFGMgr->GetRoles(guid)).c_str(), sLFGMgr->GetComment(guid).c_str());
+    handler->PSendSysMessage(LANG_LFG_PLAYER_INFO, player->GetName(),
+        state, uint8(dungeons.size()), lfg::ConcatenateDungeons(dungeons),
+        lfg::GetRolesString(sLFGMgr->GetRoles(guid)), sLFGMgr->GetComment(guid));
 }
 
 class lfg_commandscript : public CommandScript
@@ -104,7 +104,7 @@ public:
 
         if (!groupTarget)
         {
-            handler->PSendSysMessage(LANG_LFG_NOT_IN_GROUP, player->GetName().c_str());
+            handler->PSendSysMessage(LANG_LFG_NOT_IN_GROUP, player->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -112,7 +112,7 @@ public:
         ObjectGuid guid = groupTarget->GetGUID();
         std::string const& state = lfg::GetStateString(sLFGMgr->GetState(guid));
         handler->PSendSysMessage(LANG_LFG_GROUP_INFO, groupTarget->isLFGGroup(),
-            state.c_str(), sLFGMgr->GetDungeon(guid));
+            state, sLFGMgr->GetDungeon(guid));
 
         for (Group::MemberSlot const& slot : groupTarget->GetMemberSlots())
         {
@@ -120,7 +120,7 @@ public:
             if (p)
                 PrintPlayerInfo(handler, p);
             else
-                handler->PSendSysMessage("%s is offline.", slot.name.c_str());
+                handler->PSendSysMessage("{} is offline.", slot.name);
         }
 
         return true;
@@ -139,7 +139,7 @@ public:
 
     static bool HandleLfgQueueInfoCommand(ChatHandler* handler, Tail full)
     {
-        handler->SendSysMessage(sLFGMgr->DumpQueueInfo(!full.empty()).c_str(), true);
+        handler->SendSysMessage(sLFGMgr->DumpQueueInfo(!full.empty()), true);
         return true;
     }
 

@@ -57,7 +57,7 @@ void PromotionCodeMgr::_LoadPromoCodes()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 Promo Codes. DB table `promotion_codes` is empty!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 Promo Codes. DB table `promotion_codes` is empty!");
         return;
     }
 
@@ -94,7 +94,7 @@ void PromotionCodeMgr::_LoadPromoCodes()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u Promotion Codes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} Promotion Codes in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void PromotionCodeMgr::_LoadPromoCodesHistory()
@@ -108,7 +108,7 @@ void PromotionCodeMgr::_LoadPromoCodesHistory()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 Promo Codes History count. DB table `promotion_codes_history` is empty!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 Promo Codes History count. DB table `promotion_codes_history` is empty!");
         return;
     }
 
@@ -131,7 +131,7 @@ void PromotionCodeMgr::_LoadPromoCodesHistory()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u Promotion Codes history count in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} Promotion Codes history count in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 PromotionCodes const* PromotionCodeMgr::GetPromoCode(const std::string& name, uint32& id) const

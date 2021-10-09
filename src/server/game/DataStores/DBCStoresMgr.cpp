@@ -329,7 +329,7 @@ void DBCStoresMgr::Initialize()
 
 void DBCStoresMgr::Initialize_WorldDBC_Corrections()
 {
-    TC_LOG_INFO("server.loading", "Initialize DBC corrections (server-side data stores)");
+    FMT_LOG_INFO("server.loading", "Initialize DBC corrections (server-side data stores)");
     // here we adding data in exist DBC containers from world tables:
     // achievement_dbc
     _Handle_World_Achievement();
@@ -341,7 +341,7 @@ void DBCStoresMgr::Initialize_WorldDBC_Corrections()
 
 void DBCStoresMgr::Initialize_Additional_Data()
 {
-    TC_LOG_INFO("server.loading", "Initialize Additional Data from DBC");
+    FMT_LOG_INFO("server.loading", "Initialize Additional Data from DBC");
     // Handle additional data-containers from DBC
     _Handle_NamesProfanityRegex();
     _Handle_NamesReservedRegex();
@@ -373,7 +373,7 @@ void DBCStoresMgr::_Load_Achievement()
     QueryResult result = DBCDatabase.Query("SELECT ID, Faction, Instance_Id, Title_Lang_enUS, Title_Lang_koKR, Title_Lang_frFR, Title_Lang_deDE, Title_Lang_zhCN, Title_Lang_zhTW, Title_Lang_esES, Title_Lang_esMX, Title_Lang_ruRU, Category, Points, Flags, Minimum_Criteria, Shares_Criteria FROM dbc_achievement");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievements. DB table `dbc_achievement` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievements. DB table `dbc_achievement` is empty.");
         return;
     }
 
@@ -409,7 +409,7 @@ void DBCStoresMgr::_Load_Achievement()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_achievements                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_achievements                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Achievement_Criteria.dbc
@@ -422,7 +422,7 @@ void DBCStoresMgr::_Load_AchievementCriteria()
     QueryResult result = DBCDatabase.Query("SELECT ID, Achievement_Id, Type, Asset_Id, Quantity, Start_Event, Start_Asset, Fail_Event, Fail_Asset, Description_Lang_enUS, Description_Lang_koKR, Description_Lang_frFR, Description_Lang_deDE, Description_Lang_zhCN, Description_Lang_zhTW, Description_Lang_esES, Description_Lang_esMX, Description_Lang_ruRU, Flags, Timer_Start_Event, Timer_Asset_Id, Timer_Time FROM dbc_achievement_criteria");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievement_criteria. DB table `dbc_achievement_criteria` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievement_criteria. DB table `dbc_achievement_criteria` is empty.");
         return;
     }
 
@@ -465,7 +465,7 @@ void DBCStoresMgr::_Load_AchievementCriteria()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_achievement_criteria          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_achievement_criteria          {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load AreaTable.dbc
@@ -478,7 +478,7 @@ void DBCStoresMgr::_Load_AreaTable()
     QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, ParentAreaID, AreaBit, Flags, ExplorationLevel, AreaName_Lang_enUS, AreaName_Lang_koKR, AreaName_Lang_frFR, AreaName_Lang_deDE, AreaName_Lang_zhCN, AreaName_Lang_zhTW, AreaName_Lang_esES, AreaName_Lang_esMX, AreaName_Lang_ruRU, FactionGroupMask, LiquidTypeID_1, LiquidTypeID_2, LiquidTypeID_3, LiquidTypeID_4 FROM dbc_areatable");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areatable. DB table `dbc_areatable` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_areatable. DB table `dbc_areatable` is empty.");
         return;
     }
 
@@ -511,7 +511,7 @@ void DBCStoresMgr::_Load_AreaTable()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_areatable                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_areatable                     {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load AreaGroup.dbc
@@ -524,7 +524,7 @@ void DBCStoresMgr::_Load_AreaGroup()
     QueryResult result = DBCDatabase.Query("SELECT ID, AreaID_1, AreaID_2, AreaID_3, AreaID_4, AreaID_5, AreaID_6, NextAreaID FROM dbc_areagroup");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areagroup. DB table `dbc_areagroup` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_areagroup. DB table `dbc_areagroup` is empty.");
         return;
     }
 
@@ -547,7 +547,7 @@ void DBCStoresMgr::_Load_AreaGroup()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_areagroup                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_areagroup                     {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load AreaPOI.dbc  (NOT USED)
@@ -560,7 +560,7 @@ void DBCStoresMgr::_Load_AreaPOI()
     QueryResult result = DBCDatabase.Query("SELECT ID, Importance, Icon_1, Icon_2, Icon_3, Icon_4, Icon_5, Icon_6, Icon_7, Icon_8, Icon_9, FactionID, X, Y, Z, ContinentID, AreaID, WorldStateID FROM dbc_areapoi");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areapoi. DB table `dbc_areapoi` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_areapoi. DB table `dbc_areapoi` is empty.");
         return;
     }
 
@@ -591,7 +591,7 @@ void DBCStoresMgr::_Load_AreaPOI()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_areapoi                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_areapoi                       {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load AreaTrigger.dbc
@@ -604,7 +604,7 @@ void DBCStoresMgr::_Load_AreaTrigger()
     QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, X, Y, Z, Radius, Box_Length, Box_Width, Box_Height, Box_Yaw FROM dbc_areatrigger");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_areatrigger. DB table `dbc_areatrigger` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_areatrigger. DB table `dbc_areatrigger` is empty.");
         return;
     }
 
@@ -632,7 +632,7 @@ void DBCStoresMgr::_Load_AreaTrigger()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_areatrigger                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_areatrigger                   {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load AuctionHouse.dbc
@@ -645,7 +645,7 @@ void DBCStoresMgr::_Load_AuctionHouse()
     QueryResult result = DBCDatabase.Query("SELECT ID, FactionID, DepositRate, ConsignmentRate FROM dbc_auctionhouse");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_auctionhouse. DB table `dbc_auctionhouse` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_auctionhouse. DB table `dbc_auctionhouse` is empty.");
         return;
     }
 
@@ -667,7 +667,7 @@ void DBCStoresMgr::_Load_AuctionHouse()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_auctionhouse                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_auctionhouse                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load BankBagSlotPrices.dbc
@@ -680,7 +680,7 @@ void DBCStoresMgr::_Load_BankBagSlotPrices()
     QueryResult result = DBCDatabase.Query("SELECT ID, Cost FROM dbc_bankbagslotprices");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_bankbagslotprices. DB table `dbc_bankbagslotprices` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_bankbagslotprices. DB table `dbc_bankbagslotprices` is empty.");
         return;
     }
 
@@ -700,7 +700,7 @@ void DBCStoresMgr::_Load_BankBagSlotPrices()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_bankbagslotprices             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_bankbagslotprices             {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load BannedAddOns.dbc
@@ -713,7 +713,7 @@ void DBCStoresMgr::_Load_BannedAddOns()
     QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_bannedaddons");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_bannedaddons. DB table `dbc_bannedaddons` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_bannedaddons. DB table `dbc_bannedaddons` is empty.");
         return;
     }
 
@@ -741,7 +741,7 @@ void DBCStoresMgr::_Load_BannedAddOns()
 
     _bannedAddonsNumRow++; // this _bannedAddonsNumRow should be more then the last by 1 point
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_bannedaddons                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_bannedaddons                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load BarberShopStyle.dbc
@@ -754,7 +754,7 @@ void DBCStoresMgr::_Load_BarberShopStyle()
     QueryResult result = DBCDatabase.Query("SELECT ID, Type, Race, Sex, Data FROM dbc_barbershopstyle");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_barbershopstyle. DB table `dbc_barbershopstyle` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_barbershopstyle. DB table `dbc_barbershopstyle` is empty.");
         return;
     }
 
@@ -777,7 +777,7 @@ void DBCStoresMgr::_Load_BarberShopStyle()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_barbershopstyle               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_barbershopstyle               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load BattlemasterList.dbc
@@ -790,7 +790,7 @@ void DBCStoresMgr::_Load_BattlemasterList()
     QueryResult result = DBCDatabase.Query("SELECT ID, MapID_1, MapID_2, MapID_3, MapID_4, MapID_5, MapID_6, MapID_7, MapID_8, InstanceType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MaxGroupSize, HolidayWorldState FROM dbc_battlemasterlist");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_battlemasterlist. DB table `dbc_battlemasterlist` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_battlemasterlist. DB table `dbc_battlemasterlist` is empty.");
         return;
     }
 
@@ -820,7 +820,7 @@ void DBCStoresMgr::_Load_BattlemasterList()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_battlemasterlist              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_battlemasterlist              {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CharacterFacialHairStyles.dbc
@@ -833,7 +833,7 @@ void DBCStoresMgr::_Load_CharacterFacialHairStyles()
     QueryResult result = DBCDatabase.Query("SELECT ID, RaceID, SexID, VariationID FROM dbc_characterfacialhairstyles");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_characterfacialhairstyles. DB table `dbc_characterfacialhairstyles` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_characterfacialhairstyles. DB table `dbc_characterfacialhairstyles` is empty.");
         return;
     }
 
@@ -855,7 +855,7 @@ void DBCStoresMgr::_Load_CharacterFacialHairStyles()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_characterfacialhairstyles     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_characterfacialhairstyles     {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CharSections.dbc
@@ -868,7 +868,7 @@ void DBCStoresMgr::_Load_CharSections()
     QueryResult result = DBCDatabase.Query("SELECT ID, RaceID, SexID, BaseSection, Flags, VariationIndex, ColorIndex FROM dbc_charsections");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_charsections. DB table `dbc_charsections` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_charsections. DB table `dbc_charsections` is empty.");
         return;
     }
 
@@ -893,7 +893,7 @@ void DBCStoresMgr::_Load_CharSections()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_charsections                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_charsections                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CharStartOutfit.dbc
@@ -906,7 +906,7 @@ void DBCStoresMgr::_Load_CharStartOutfit()
     QueryResult result = DBCDatabase.Query("SELECT ID, RaceID, ClassID, SexID, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, ItemID_11, ItemID_12, ItemID_13, ItemID_14, ItemID_15, ItemID_16, ItemID_17, ItemID_18, ItemID_19, ItemID_20, ItemID_21, ItemID_22, ItemID_23, ItemID_24 FROM dbc_charstartoutfit");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_charstartoutfit. DB table `dbc_charstartoutfit` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_charstartoutfit. DB table `dbc_charstartoutfit` is empty.");
         return;
     }
 
@@ -931,7 +931,7 @@ void DBCStoresMgr::_Load_CharStartOutfit()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_charstartoutfit               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_charstartoutfit               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CharTitles.dbc
@@ -944,7 +944,7 @@ void DBCStoresMgr::_Load_CharTitles()
     QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name1_Lang_enUS, Name1_Lang_koKR, Name1_Lang_frFR, Name1_Lang_deDE, Name1_Lang_zhCN, Name1_Lang_zhTW, Name1_Lang_esES, Name1_Lang_esMX, Name1_Lang_ruRU, Mask_ID FROM dbc_chartitles");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chartitles. DB table `dbc_chartitles` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_chartitles. DB table `dbc_chartitles` is empty.");
         return;
     }
 
@@ -971,7 +971,7 @@ void DBCStoresMgr::_Load_CharTitles()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_chartitles                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_chartitles                    {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ChatChannels.dbc
@@ -984,7 +984,7 @@ void DBCStoresMgr::_Load_ChatChannels()
     QueryResult result = DBCDatabase.Query("SELECT ID, Flags, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_chatchannels");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chatchannels. DB table `dbc_chatchannels` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_chatchannels. DB table `dbc_chatchannels` is empty.");
         return;
     }
 
@@ -1007,7 +1007,7 @@ void DBCStoresMgr::_Load_ChatChannels()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_chatchannels                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_chatchannels                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ChrClasses.dbc
@@ -1020,7 +1020,7 @@ void DBCStoresMgr::_Load_ChrClasses()
     QueryResult result = DBCDatabase.Query("SELECT ID, DisplayPower, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, SpellClassSet, CinematicSequenceID, Required_Expansion FROM dbc_chrclasses");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrclasses. DB table `dbc_chrclasses` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrclasses. DB table `dbc_chrclasses` is empty.");
         return;
     }
 
@@ -1047,7 +1047,7 @@ void DBCStoresMgr::_Load_ChrClasses()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_chrclasses                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_chrclasses                    {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ChrRaces.dbc
@@ -1060,7 +1060,7 @@ void DBCStoresMgr::_Load_ChrRaces()
     QueryResult result = DBCDatabase.Query("SELECT ID, Flags, FactionID, MaleDisplayId, FemaleDisplayId, BaseLanguage, CreatureType, ResSicknessSpellID, CinematicSequenceID, Alliance, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Required_Expansion FROM dbc_chrraces");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrraces. DB table `dbc_chrraces` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrraces. DB table `dbc_chrraces` is empty.");
         return;
     }
 
@@ -1093,7 +1093,7 @@ void DBCStoresMgr::_Load_ChrRaces()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_chrraces                      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_chrraces                      {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CinematicCamera.dbc
@@ -1106,7 +1106,7 @@ void DBCStoresMgr::_Load_CinematicCamera()
     QueryResult result = DBCDatabase.Query("SELECT ID, Model, SoundID, OriginX, OriginY, OriginZ, OriginFacing FROM dbc_cinematiccamera");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_cinematiccamera. DB table `dbc_cinematiccamera` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_cinematiccamera. DB table `dbc_cinematiccamera` is empty.");
         return;
     }
 
@@ -1131,7 +1131,7 @@ void DBCStoresMgr::_Load_CinematicCamera()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_cinematiccamera               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_cinematiccamera               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CinematicSequences.dbc
@@ -1144,7 +1144,7 @@ void DBCStoresMgr::_Load_CinematicSequences()
     QueryResult result = DBCDatabase.Query("SELECT ID, Camera_1, Camera_2, Camera_3, Camera_4, Camera_5, Camera_6, Camera_7, Camera_8 FROM dbc_cinematicsequences");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_cinematicsequences. DB table `dbc_cinematicsequences` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_cinematicsequences. DB table `dbc_cinematicsequences` is empty.");
         return;
     }
 
@@ -1166,7 +1166,7 @@ void DBCStoresMgr::_Load_CinematicSequences()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_cinematicsequences            %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_cinematicsequences            {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CreatureDisplayInfo.dbc
@@ -1179,7 +1179,7 @@ void DBCStoresMgr::_Load_CreatureDisplayInfo()
     QueryResult result = DBCDatabase.Query("SELECT ID, ModelID, ExtendedDisplayInfoID, CreatureModelScale FROM dbc_creaturedisplayinfo");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturedisplayinfo. DB table `dbc_creaturedisplayinfo` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturedisplayinfo. DB table `dbc_creaturedisplayinfo` is empty.");
         return;
     }
 
@@ -1201,7 +1201,7 @@ void DBCStoresMgr::_Load_CreatureDisplayInfo()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturedisplayinfo           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_creaturedisplayinfo           {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CreatureDisplayInfoExtra.dbc
@@ -1214,7 +1214,7 @@ void DBCStoresMgr::_Load_CreatureDisplayInfoExtra()
     QueryResult result = DBCDatabase.Query("SELECT ID, DisplayRaceID, DisplaySexID FROM dbc_creaturedisplayinfoextra");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturedisplayinfoextra. DB table `dbc_creaturedisplayinfoextra` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturedisplayinfoextra. DB table `dbc_creaturedisplayinfoextra` is empty.");
         return;
     }
 
@@ -1235,7 +1235,7 @@ void DBCStoresMgr::_Load_CreatureDisplayInfoExtra()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturedisplayinfoextra      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_creaturedisplayinfoextra      {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CreatureFamily.dbc
@@ -1248,7 +1248,7 @@ void DBCStoresMgr::_Load_CreatureFamily()
     QueryResult result = DBCDatabase.Query("SELECT ID, MinScale, MinScaleLevel, MaxScale, MaxScaleLevel, SkillLine_1, SkillLine_2, PetFoodMask, PetTalentType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_creaturefamily");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturefamily. DB table `dbc_creaturefamily` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturefamily. DB table `dbc_creaturefamily` is empty.");
         return;
     }
 
@@ -1277,7 +1277,7 @@ void DBCStoresMgr::_Load_CreatureFamily()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturefamily                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_creaturefamily                {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CreatureModelData.dbc
@@ -1290,7 +1290,7 @@ void DBCStoresMgr::_Load_CreatureModelData()
     QueryResult result = DBCDatabase.Query("SELECT ID, Flags, ModelName, ModelScale, CollisionHeight, MountHeight FROM dbc_creaturemodeldata");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturemodeldata. DB table `dbc_creaturemodeldata` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturemodeldata. DB table `dbc_creaturemodeldata` is empty.");
         return;
     }
 
@@ -1314,7 +1314,7 @@ void DBCStoresMgr::_Load_CreatureModelData()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturemodeldata             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_creaturemodeldata             {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CreatureSpellData.dbc
@@ -1327,7 +1327,7 @@ void DBCStoresMgr::_Load_CreatureSpellData()
     QueryResult result = DBCDatabase.Query("SELECT ID, Spells_1, Spells_1, Spells_1, Spells_1 FROM dbc_creaturespelldata");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturespelldata. DB table `dbc_creaturespelldata` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturespelldata. DB table `dbc_creaturespelldata` is empty.");
         return;
     }
 
@@ -1348,7 +1348,7 @@ void DBCStoresMgr::_Load_CreatureSpellData()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturespelldata             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_creaturespelldata             {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CreatureSpellData.dbc
@@ -1361,7 +1361,7 @@ void DBCStoresMgr::_Load_CreatureType()
     QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_creaturetype");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturetype. DB table `dbc_creaturetype` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturetype. DB table `dbc_creaturetype` is empty.");
         return;
     }
 
@@ -1380,7 +1380,7 @@ void DBCStoresMgr::_Load_CreatureType()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_creaturetype                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_creaturetype                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CurrencyCategory.dbc (NOT USED)
@@ -1393,7 +1393,7 @@ void DBCStoresMgr::_Load_CurrencyCategory()
     QueryResult result = DBCDatabase.Query("SELECT ID, Flags,  Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_currencycategory");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_currencycategory. DB table `dbc_currencycategory` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_currencycategory. DB table `dbc_currencycategory` is empty.");
         return;
     }
 
@@ -1415,7 +1415,7 @@ void DBCStoresMgr::_Load_CurrencyCategory()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_currencycategory              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_currencycategory              {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load CurrencyTypes.dbc
@@ -1428,7 +1428,7 @@ void DBCStoresMgr::_Load_CurrencyTypes()
     QueryResult result = DBCDatabase.Query("SELECT ID, ItemID, BitIndex FROM dbc_currencytypes");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_currencytypes. DB table `dbc_currencytypes` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_currencytypes. DB table `dbc_currencytypes` is empty.");
         return;
     }
 
@@ -1449,7 +1449,7 @@ void DBCStoresMgr::_Load_CurrencyTypes()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_currencytypes                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_currencytypes                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load DestructibleModelData.dbc
@@ -1462,7 +1462,7 @@ void DBCStoresMgr::_Load_DestructibleModelData()
     QueryResult result = DBCDatabase.Query("SELECT ID, State1Wmo, State2Wmo, State3Wmo, RepairGroundFx FROM dbc_destructiblemodeldata");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_destructiblemodeldata. DB table `dbc_destructiblemodeldata` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_destructiblemodeldata. DB table `dbc_destructiblemodeldata` is empty.");
         return;
     }
 
@@ -1485,7 +1485,7 @@ void DBCStoresMgr::_Load_DestructibleModelData()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_destructiblemodeldata         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_destructiblemodeldata         {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load DungeonEncounter.dbc
@@ -1498,7 +1498,7 @@ void DBCStoresMgr::_Load_DungeonEncounter()
     QueryResult result = DBCDatabase.Query("SELECT ID, MapID, Difficulty, Bit, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_dungeonencounter");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_dungeonencounter. DB table `dbc_dungeonencounter` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_dungeonencounter. DB table `dbc_dungeonencounter` is empty.");
         return;
     }
 
@@ -1522,7 +1522,7 @@ void DBCStoresMgr::_Load_DungeonEncounter()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_dungeonencounter              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_dungeonencounter              {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load DurabilityCosts.dbc
@@ -1535,7 +1535,7 @@ void DBCStoresMgr::_Load_DurabilityCosts()
     QueryResult result = DBCDatabase.Query("SELECT ID, WeaponSubClassCost_1, WeaponSubClassCost_2, WeaponSubClassCost_3, WeaponSubClassCost_4, WeaponSubClassCost_5, WeaponSubClassCost_6, WeaponSubClassCost_7, WeaponSubClassCost_8, WeaponSubClassCost_9, WeaponSubClassCost_10, WeaponSubClassCost_11, WeaponSubClassCost_12, WeaponSubClassCost_13, WeaponSubClassCost_14, WeaponSubClassCost_15, WeaponSubClassCost_16, WeaponSubClassCost_17, WeaponSubClassCost_18, WeaponSubClassCost_19, WeaponSubClassCost_20, WeaponSubClassCost_21, ArmorSubClassCost_1, ArmorSubClassCost_2, ArmorSubClassCost_3, ArmorSubClassCost_4, ArmorSubClassCost_5, ArmorSubClassCost_6, ArmorSubClassCost_7, ArmorSubClassCost_8 FROM dbc_durabilitycosts");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_durabilitycosts. DB table `dbc_durabilitycosts` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_durabilitycosts. DB table `dbc_durabilitycosts` is empty.");
         return;
     }
 
@@ -1559,7 +1559,7 @@ void DBCStoresMgr::_Load_DurabilityCosts()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_durabilitycosts               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_durabilitycosts               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load DurabilityQuality.dbc
@@ -1572,7 +1572,7 @@ void DBCStoresMgr::_Load_DurabilityQuality()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_durabilityquality");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_durabilityquality. DB table `dbc_durabilityquality` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_durabilityquality. DB table `dbc_durabilityquality` is empty.");
         return;
     }
 
@@ -1592,7 +1592,7 @@ void DBCStoresMgr::_Load_DurabilityQuality()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_durabilityquality             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_durabilityquality             {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Emotes.dbc
@@ -1605,7 +1605,7 @@ void DBCStoresMgr::_Load_Emotes()
     QueryResult result = DBCDatabase.Query("SELECT ID, EmoteFlags, EmoteSpecProc, EmoteSpecProcParam FROM dbc_emotes");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotes. DB table `dbc_emotes` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotes. DB table `dbc_emotes` is empty.");
         return;
     }
 
@@ -1627,7 +1627,7 @@ void DBCStoresMgr::_Load_Emotes()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_emotes                        %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_emotes                        {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load EmotesText.dbc
@@ -1640,7 +1640,7 @@ void DBCStoresMgr::_Load_EmotesText()
     QueryResult result = DBCDatabase.Query("SELECT ID, EmoteID FROM dbc_emotestext");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotestext. DB table `dbc_emotestext` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotestext. DB table `dbc_emotestext` is empty.");
         return;
     }
 
@@ -1660,7 +1660,7 @@ void DBCStoresMgr::_Load_EmotesText()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_emotestext                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_emotestext                    {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load EmotesTextSound.dbc
@@ -1673,7 +1673,7 @@ void DBCStoresMgr::_Load_EmotesTextSound()
     QueryResult result = DBCDatabase.Query("SELECT ID, EmotesTextID, RaceID, SexID, SoundID FROM dbc_emotestextsound");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotestextsound. DB table `dbc_emotestextsound` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_emotestextsound. DB table `dbc_emotestextsound` is empty.");
         return;
     }
 
@@ -1696,7 +1696,7 @@ void DBCStoresMgr::_Load_EmotesTextSound()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_emotestextsound               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_emotestextsound               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Faction.dbc
@@ -1709,7 +1709,7 @@ void DBCStoresMgr::_Load_Faction()
     QueryResult result = DBCDatabase.Query("SELECT ID, ReputationIndex, ReputationRaceMask_1, ReputationRaceMask_2, ReputationRaceMask_3, ReputationRaceMask_4, ReputationClassMask_1, ReputationClassMask_2, ReputationClassMask_3, ReputationClassMask_4, ReputationBase_1, ReputationBase_2, ReputationBase_3, ReputationBase_4, ReputationFlags_1, ReputationFlags_2, ReputationFlags_3, ReputationFlags_4, ParentFactionID, ParentFactionMod_1, ParentFactionMod_2, ParentFactionCap_1, ParentFactionCap_2, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_faction");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_faction. DB table `dbc_faction` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_faction. DB table `dbc_faction` is empty.");
         return;
     }
 
@@ -1748,7 +1748,7 @@ void DBCStoresMgr::_Load_Faction()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_faction                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_faction                       {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load FactionTemplate.dbc
@@ -1761,7 +1761,7 @@ void DBCStoresMgr::_Load_FactionTemplate()
     QueryResult result = DBCDatabase.Query("SELECT ID, Faction, Flags, FactionGroup, FriendGroup, EnemyGroup, Enemies_1, Enemies_2, Enemies_3, Enemies_4, Friend_1, Friend_2, Friend_3, Friend_4  FROM dbc_factiontemplate");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_factiontemplate. DB table `dbc_factiontemplate` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_factiontemplate. DB table `dbc_factiontemplate` is empty.");
         return;
     }
 
@@ -1789,7 +1789,7 @@ void DBCStoresMgr::_Load_FactionTemplate()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_factiontemplate               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_factiontemplate               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load GameObjectArtKit.dbc
@@ -1802,7 +1802,7 @@ void DBCStoresMgr::_Load_GameObjectArtKit()
     QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_gameobjectartkit");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gameobjectartkit. DB table `dbc_gameobjectartkit` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gameobjectartkit. DB table `dbc_gameobjectartkit` is empty.");
         return;
     }
 
@@ -1821,7 +1821,7 @@ void DBCStoresMgr::_Load_GameObjectArtKit()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gameobjectartkit              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gameobjectartkit              {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load GameObjectDisplayInfo.dbc
@@ -1834,7 +1834,7 @@ void DBCStoresMgr::_Load_GameObjectDisplayInfo()
     QueryResult result = DBCDatabase.Query("SELECT ID, ModelName, GeoBoxMinX, GeoBoxMinY, GeoBoxMinZ, GeoBoxMaxX, GeoBoxMaxY, GeoBoxMaxZ FROM dbc_gameobjectdisplayinfo");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gameobjectdisplayinfo. DB table `dbc_gameobjectdisplayinfo` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gameobjectdisplayinfo. DB table `dbc_gameobjectdisplayinfo` is empty.");
         return;
     }
 
@@ -1860,7 +1860,7 @@ void DBCStoresMgr::_Load_GameObjectDisplayInfo()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gameobjectdisplayinfo         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gameobjectdisplayinfo         {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load GemProperties.dbc
@@ -1873,7 +1873,7 @@ void DBCStoresMgr::_Load_GemProperties()
     QueryResult result = DBCDatabase.Query("SELECT ID, Enchant_Id, Type FROM dbc_gemproperties");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gemproperties. DB table `dbc_gemproperties` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gemproperties. DB table `dbc_gemproperties` is empty.");
         return;
     }
 
@@ -1894,7 +1894,7 @@ void DBCStoresMgr::_Load_GemProperties()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gemproperties                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gemproperties                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load GlyphProperties.dbc
@@ -1907,7 +1907,7 @@ void DBCStoresMgr::_Load_GlyphProperties()
     QueryResult result = DBCDatabase.Query("SELECT ID, SpellID, GlyphSlotFlags, SpellIconID FROM dbc_glyphproperties");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_glyphproperties. DB table `dbc_glyphproperties` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_glyphproperties. DB table `dbc_glyphproperties` is empty.");
         return;
     }
 
@@ -1929,7 +1929,7 @@ void DBCStoresMgr::_Load_GlyphProperties()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_glyphproperties               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_glyphproperties               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load GlyphSlot.dbc
@@ -1942,7 +1942,7 @@ void DBCStoresMgr::_Load_GlyphSlot()
     QueryResult result = DBCDatabase.Query("SELECT ID, Type, Tooltip FROM dbc_glyphslot");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_glyphslot. DB table `dbc_glyphslot` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_glyphslot. DB table `dbc_glyphslot` is empty.");
         return;
     }
 
@@ -1963,7 +1963,7 @@ void DBCStoresMgr::_Load_GlyphSlot()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_glyphslot                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_glyphslot                     {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtBarberShopCostBase.dbc
@@ -1976,7 +1976,7 @@ void DBCStoresMgr::_Load_gtBarberShopCostBase()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtbarbershopcostbase");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtbarbershopcostbase. DB table `dbc_gtbarbershopcostbase` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtbarbershopcostbase. DB table `dbc_gtbarbershopcostbase` is empty.");
         return;
     }
 
@@ -1996,7 +1996,7 @@ void DBCStoresMgr::_Load_gtBarberShopCostBase()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtbarbershopcostbase          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtbarbershopcostbase          {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtCombatRatings.dbc
@@ -2009,7 +2009,7 @@ void DBCStoresMgr::_Load_gtCombatRatings()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtcombatratings");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtcombatratings. DB table `dbc_gtcombatratings` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtcombatratings. DB table `dbc_gtcombatratings` is empty.");
         return;
     }
 
@@ -2029,7 +2029,7 @@ void DBCStoresMgr::_Load_gtCombatRatings()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtcombatratings               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtcombatratings               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtChanceToMeleeCritBase.dbc
@@ -2042,7 +2042,7 @@ void DBCStoresMgr::_Load_gtChanceToMeleeCritBase()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtchancetomeleecritbase");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetomeleecritbase. DB table `dbc_gtchancetomeleecritbase` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetomeleecritbase. DB table `dbc_gtchancetomeleecritbase` is empty.");
         return;
     }
 
@@ -2062,7 +2062,7 @@ void DBCStoresMgr::_Load_gtChanceToMeleeCritBase()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetomeleecritbase       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetomeleecritbase       {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtChanceToMeleeCrit.dbc
@@ -2075,7 +2075,7 @@ void DBCStoresMgr::_Load_gtChanceToMeleeCrit()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtchancetomeleecrit");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetomeleecrit. DB table `dbc_gtchancetomeleecrit` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetomeleecrit. DB table `dbc_gtchancetomeleecrit` is empty.");
         return;
     }
 
@@ -2095,7 +2095,7 @@ void DBCStoresMgr::_Load_gtChanceToMeleeCrit()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetomeleecrit           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetomeleecrit           {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtChanceToSpellCritBase.dbc
@@ -2108,7 +2108,7 @@ void DBCStoresMgr::_Load_gtChanceToSpellCritBase()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtchancetospellcritbase");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetospellcritbase. DB table `dbc_gtchancetospellcritbase` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetospellcritbase. DB table `dbc_gtchancetospellcritbase` is empty.");
         return;
     }
 
@@ -2128,7 +2128,7 @@ void DBCStoresMgr::_Load_gtChanceToSpellCritBase()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetospellcritbase       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetospellcritbase       {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtChanceToSpellCrit.dbc
@@ -2141,7 +2141,7 @@ void DBCStoresMgr::_Load_gtChanceToSpellCrit()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtchancetospellcrit");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetospellcrit. DB table `dbc_gtchancetospellcrit` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtchancetospellcrit. DB table `dbc_gtchancetospellcrit` is empty.");
         return;
     }
 
@@ -2161,7 +2161,7 @@ void DBCStoresMgr::_Load_gtChanceToSpellCrit()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetospellcrit           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtchancetospellcrit           {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtNPCManaCostScaler.dbc
@@ -2174,7 +2174,7 @@ void DBCStoresMgr::_Load_gtNPCManaCostScaler()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtnpcmanacostscaler");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtnpcmanacostscaler. DB table `dbc_gtnpcmanacostscaler` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtnpcmanacostscaler. DB table `dbc_gtnpcmanacostscaler` is empty.");
         return;
     }
 
@@ -2194,7 +2194,7 @@ void DBCStoresMgr::_Load_gtNPCManaCostScaler()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtnpcmanacostscaler           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtnpcmanacostscaler           {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtOCTClassCombatRatingScalar.dbc
@@ -2207,7 +2207,7 @@ void DBCStoresMgr::_Load_gtOCTClassCombatRatingScalar()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtoctclasscombatratingscalar");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctclasscombatratingscalar. DB table `dbc_gtoctclasscombatratingscalar` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctclasscombatratingscalar. DB table `dbc_gtoctclasscombatratingscalar` is empty.");
         return;
     }
 
@@ -2227,7 +2227,7 @@ void DBCStoresMgr::_Load_gtOCTClassCombatRatingScalar()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtoctclasscombatratingscalar  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtoctclasscombatratingscalar  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtOCTRegenHP.dbc
@@ -2240,7 +2240,7 @@ void DBCStoresMgr::_Load_gtOCTRegenHP()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtoctregenhp");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctregenhp. DB table `dbc_gtoctregenhp` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctregenhp. DB table `dbc_gtoctregenhp` is empty.");
         return;
     }
 
@@ -2260,7 +2260,7 @@ void DBCStoresMgr::_Load_gtOCTRegenHP()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtoctregenhp                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtoctregenhp                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtOCTRegenMP.dbc
@@ -2273,7 +2273,7 @@ void DBCStoresMgr::_Load_gtOCTRegenMP()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtoctregenmp");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctregenmp. DB table `dbc_gtoctregenmp` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtoctregenmp. DB table `dbc_gtoctregenmp` is empty.");
         return;
     }
 
@@ -2293,7 +2293,7 @@ void DBCStoresMgr::_Load_gtOCTRegenMP()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtoctregenmp                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtoctregenmp                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtRegenHPPerSpt.dbc
@@ -2306,7 +2306,7 @@ void DBCStoresMgr::_Load_gtRegenHPPerSpt()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtregenhpperspt");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtregenhpperspt. DB table `dbc_gtregenhpperspt` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtregenhpperspt. DB table `dbc_gtregenhpperspt` is empty.");
         return;
     }
 
@@ -2326,7 +2326,7 @@ void DBCStoresMgr::_Load_gtRegenHPPerSpt()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtregenhpperspt               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtregenhpperspt               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load gtRegenMPPerSpt.dbc
@@ -2339,7 +2339,7 @@ void DBCStoresMgr::_Load_gtRegenMPPerSpt()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_gtregenmpperspt");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtregenmpperspt. DB table `dbc_gtregenmpperspt` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_gtregenmpperspt. DB table `dbc_gtregenmpperspt` is empty.");
         return;
     }
 
@@ -2359,7 +2359,7 @@ void DBCStoresMgr::_Load_gtRegenMPPerSpt()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_gtregenmpperspt               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_gtregenmpperspt               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Holidays.dbc
@@ -2372,7 +2372,7 @@ void DBCStoresMgr::_Load_Holidays()
     QueryResult result = DBCDatabase.Query("SELECT ID, Duration_1, Duration_2, Duration_3, Duration_4, Duration_5, Duration_6, Duration_7, Duration_8, Duration_9, Duration_10, Date_1, Date_2, Date_3, Date_4, Date_5, Date_6, Date_7, Date_8, Date_9, Date_10, Date_11, Date_12, Date_13, Date_14, Date_15, Date_16, Date_17, Date_18, Date_19, Date_20, Date_21, Date_22, Date_23, Date_24, Date_25, Date_26, Region, Looping, CalendarFlags_1, CalendarFlags_2, CalendarFlags_3, CalendarFlags_4, CalendarFlags_5, CalendarFlags_6, CalendarFlags_7, CalendarFlags_8, CalendarFlags_9, CalendarFlags_10, TextureFilename, Priority, CalendarFilterType FROM dbc_holidays");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_holidays. DB table `dbc_holidays` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_holidays. DB table `dbc_holidays` is empty.");
         return;
     }
 
@@ -2402,7 +2402,7 @@ void DBCStoresMgr::_Load_Holidays()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_holidays                      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_holidays                      {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Item.dbc
@@ -2415,7 +2415,7 @@ void DBCStoresMgr::_Load_Item()
     QueryResult result = DBCDatabase.Query("SELECT ID, ClassID, SubclassID, Sound_Override_Subclassid, Material, DisplayInfoID, InventoryType, SheatheType FROM dbc_item");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_item. DB table `dbc_item` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_item. DB table `dbc_item` is empty.");
         return;
     }
 
@@ -2441,7 +2441,7 @@ void DBCStoresMgr::_Load_Item()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_item                          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_item                          {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemBagFamily.dbc
@@ -2454,7 +2454,7 @@ void DBCStoresMgr::_Load_ItemBagFamily()
     QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_itembagfamily");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itembagfamily. DB table `dbc_itembagfamily` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_itembagfamily. DB table `dbc_itembagfamily` is empty.");
         return;
     }
 
@@ -2473,7 +2473,7 @@ void DBCStoresMgr::_Load_ItemBagFamily()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_itembagfamily                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_itembagfamily                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemDisplayInfo.dbc
@@ -2486,7 +2486,7 @@ void DBCStoresMgr::_Load_ItemDisplayInfo()
     QueryResult result = DBCDatabase.Query("SELECT ID, ModelName_1, ModelName_2, ModelTexture_1, ModelTexture_2, InventoryIcon_1, InventoryIcon_2, GeosetGroup_1, GeosetGroup_2, GeosetGroup_3, Flags, SpellVisualID, GroupSoundIndex, HelmetGeosetVis_1, HelmetGeosetVis_2, Texture_1, Texture_2, Texture_3, Texture_4, Texture_5, Texture_6, Texture_7, Texture_8, ItemVisual, ParticleColorID FROM dbc_itemdisplayinfo");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemdisplayinfo. DB table `dbc_itemdisplayinfo` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemdisplayinfo. DB table `dbc_itemdisplayinfo` is empty.");
         return;
     }
 
@@ -2525,7 +2525,7 @@ void DBCStoresMgr::_Load_ItemDisplayInfo()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemdisplayinfo               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_itemdisplayinfo               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemExtendedCost.dbc
@@ -2538,7 +2538,7 @@ void DBCStoresMgr::_Load_ItemExtendedCost()
     QueryResult result = DBCDatabase.Query("SELECT ID, HonorPoints, ArenaPoints, ArenaBracket, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemCount_1, ItemCount_2, ItemCount_3, ItemCount_4, ItemCount_5, RequiredArenaRating FROM dbc_itemextendedcost");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemextendedcost. DB table `dbc_itemextendedcost` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemextendedcost. DB table `dbc_itemextendedcost` is empty.");
         return;
     }
 
@@ -2565,7 +2565,7 @@ void DBCStoresMgr::_Load_ItemExtendedCost()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemextendedcost              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_itemextendedcost              {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemLimitCategory.dbc
@@ -2578,7 +2578,7 @@ void DBCStoresMgr::_Load_ItemLimitCategory()
     QueryResult result = DBCDatabase.Query("SELECT ID, Quantity, Flags FROM dbc_itemlimitcategory");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemlimitcategory. DB table `dbc_itemlimitcategory` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemlimitcategory. DB table `dbc_itemlimitcategory` is empty.");
         return;
     }
 
@@ -2599,7 +2599,7 @@ void DBCStoresMgr::_Load_ItemLimitCategory()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemlimitcategory             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_itemlimitcategory             {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemRandomProperties.dbc
@@ -2612,7 +2612,7 @@ void DBCStoresMgr::_Load_ItemRandomProperties()
     QueryResult result = DBCDatabase.Query("SELECT ID, Enchantment_1, Enchantment_2, Enchantment_3, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_itemrandomproperties");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemrandomproperties. DB table `dbc_itemrandomproperties` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemrandomproperties. DB table `dbc_itemrandomproperties` is empty.");
         return;
     }
 
@@ -2636,7 +2636,7 @@ void DBCStoresMgr::_Load_ItemRandomProperties()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemrandomproperties          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_itemrandomproperties          {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemRandomSuffix.dbc
@@ -2649,7 +2649,7 @@ void DBCStoresMgr::_Load_ItemRandomSuffix()
     QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Enchantment_1, Enchantment_2, Enchantment_3, AllocationPct_1, AllocationPct_2, AllocationPct_3 FROM dbc_itemrandomsuffix");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemrandomsuffix. DB table `dbc_itemrandomsuffix` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemrandomsuffix. DB table `dbc_itemrandomsuffix` is empty.");
         return;
     }
 
@@ -2686,7 +2686,7 @@ void DBCStoresMgr::_Load_ItemRandomSuffix()
     _itemRandomSuffixNumRow++; // this _itemRandomSuffixTheLastIndex should be more then the last by 1 point
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemrandomsuffix              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_itemrandomsuffix              {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ItemSet.dbc
@@ -2699,7 +2699,7 @@ void DBCStoresMgr::_Load_ItemSet()
     QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, SetSpellID_1, SetSpellID_2, SetSpellID_3, SetSpellID_4, SetSpellID_5, SetSpellID_6, SetSpellID_7, SetSpellID_8, SetThreshold_1, SetThreshold_2, SetThreshold_3, SetThreshold_4, SetThreshold_5, SetThreshold_6, SetThreshold_7, SetThreshold_8, RequiredSkill, RequiredSkillRank FROM dbc_itemset");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemset. DB table `dbc_itemset` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemset. DB table `dbc_itemset` is empty.");
         return;
     }
 
@@ -2732,7 +2732,7 @@ void DBCStoresMgr::_Load_ItemSet()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_itemset                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_itemset                       {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load LFGDungeons.dbc
@@ -2745,7 +2745,7 @@ void DBCStoresMgr::_Load_LFGDungeons()
     QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MinLevel, MaxLevel, Target_Level, Target_Level_Min, Target_Level_Max, MapID, Difficulty, Flags, TypeID, ExpansionLevel, Group_Id FROM dbc_lfgdungeons");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_lfgdungeons. DB table `dbc_lfgdungeons` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_lfgdungeons. DB table `dbc_lfgdungeons` is empty.");
         return;
     }
 
@@ -2778,7 +2778,7 @@ void DBCStoresMgr::_Load_LFGDungeons()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_lfgdungeons                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_lfgdungeons                   {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Light.dbc
@@ -2791,7 +2791,7 @@ void DBCStoresMgr::_Load_Light()
     QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, X, Y, Z FROM dbc_light");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_light. DB table `dbc_light` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_light. DB table `dbc_light` is empty.");
         return;
     }
 
@@ -2814,7 +2814,7 @@ void DBCStoresMgr::_Load_Light()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_light                         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_light                         {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load LiquidType.dbc
@@ -2827,7 +2827,7 @@ void DBCStoresMgr::_Load_LiquidType()
     QueryResult result = DBCDatabase.Query("SELECT ID, Type, SpellID FROM dbc_liquidtype");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_liquidtype. DB table `dbc_liquidtype` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_liquidtype. DB table `dbc_liquidtype` is empty.");
         return;
     }
 
@@ -2848,7 +2848,7 @@ void DBCStoresMgr::_Load_LiquidType()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_liquidtype                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_liquidtype                    {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Lock.dbc
@@ -2861,7 +2861,7 @@ void DBCStoresMgr::_Load_Lock()
     QueryResult result = DBCDatabase.Query("SELECT ID, Type_1, Type_2, Type_3, Type_4, Type_5, Type_6, Type_7, Type_8, Index_1, Index_2, Index_3, Index_4, Index_5, Index_6, Index_7, Index_8, Skill_1, Skill_2, Skill_3, Skill_4, Skill_5, Skill_6, Skill_7, Skill_8 FROM dbc_lock");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_lock. DB table `dbc_lock` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_lock. DB table `dbc_lock` is empty.");
         return;
     }
 
@@ -2888,7 +2888,7 @@ void DBCStoresMgr::_Load_Lock()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_lock                          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_lock                          {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load MailTemplate.dbc
@@ -2901,7 +2901,7 @@ void DBCStoresMgr::_Load_MailTemplate()
     QueryResult result = DBCDatabase.Query("SELECT ID, Body_Lang_enUS, Body_Lang_koKR, Body_Lang_frFR, Body_Lang_deDE, Body_Lang_zhCN, Body_Lang_zhTW, Body_Lang_esES, Body_Lang_esMX, Body_Lang_ruRU FROM dbc_mailtemplate");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_mailtemplate. DB table `dbc_mailtemplate` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_mailtemplate. DB table `dbc_mailtemplate` is empty.");
         return;
     }
 
@@ -2922,7 +2922,7 @@ void DBCStoresMgr::_Load_MailTemplate()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_mailtemplate                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_mailtemplate                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Map.dbc
@@ -2935,7 +2935,7 @@ void DBCStoresMgr::_Load_Map()
     QueryResult result = DBCDatabase.Query("SELECT ID, InstanceType, Flags, MapName_Lang_enUS, MapName_Lang_koKR, MapName_Lang_frFR, MapName_Lang_deDE, MapName_Lang_zhCN, MapName_Lang_zhTW, MapName_Lang_esES, MapName_Lang_esMX, MapName_Lang_ruRU, AreaTableID, LoadingScreenID, CorpseMapID, CorpseX, CorpseY, ExpansionID, RaidOffset, MaxPlayers FROM dbc_map");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_map. DB table `dbc_map` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_map. DB table `dbc_map` is empty.");
         return;
     }
 
@@ -2967,7 +2967,7 @@ void DBCStoresMgr::_Load_Map()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_map                           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_map                           {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load MapDifficulty.dbc
@@ -2980,7 +2980,7 @@ void DBCStoresMgr::_Load_MapDifficulty()
     QueryResult result = DBCDatabase.Query("SELECT ID, MapID, Difficulty,  Message_Lang_enUS, Message_Lang_koKR, Message_Lang_frFR, Message_Lang_deDE, Message_Lang_zhCN, Message_Lang_zhTW, Message_Lang_esES, Message_Lang_esMX, Message_Lang_ruRU, RaidDuration, MaxPlayers FROM dbc_mapdifficulty");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_mapdifficulty. DB table `dbc_mapdifficulty` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_mapdifficulty. DB table `dbc_mapdifficulty` is empty.");
         return;
     }
 
@@ -3006,7 +3006,7 @@ void DBCStoresMgr::_Load_MapDifficulty()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_mapdifficulty                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_mapdifficulty                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Movie.dbc
@@ -3019,7 +3019,7 @@ void DBCStoresMgr::_Load_Movie()
     QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_movie");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_movie. DB table `dbc_movie` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_movie. DB table `dbc_movie` is empty.");
         return;
     }
 
@@ -3038,7 +3038,7 @@ void DBCStoresMgr::_Load_Movie()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_movie                         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_movie                         {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load NamesProfanity.dbc
@@ -3051,7 +3051,7 @@ void DBCStoresMgr::_Load_NamesProfanity()
     QueryResult result = DBCDatabase.Query("SELECT ID, Name, Language FROM dbc_namesprofanity");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_namesprofanity. DB table `dbc_namesprofanity` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_namesprofanity. DB table `dbc_namesprofanity` is empty.");
         return;
     }
 
@@ -3072,7 +3072,7 @@ void DBCStoresMgr::_Load_NamesProfanity()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_namesprofanity                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_namesprofanity                {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load NamesReserved.dbc
@@ -3085,7 +3085,7 @@ void DBCStoresMgr::_Load_NamesReserved()
     QueryResult result = DBCDatabase.Query("SELECT ID, Name, Language FROM dbc_namesreserved");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_namesreserved. DB table `dbc_namesreserved` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_namesreserved. DB table `dbc_namesreserved` is empty.");
         return;
     }
 
@@ -3106,7 +3106,7 @@ void DBCStoresMgr::_Load_NamesReserved()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_namesreserved                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_namesreserved                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load OverrideSpellData.dbc
@@ -3119,7 +3119,7 @@ void DBCStoresMgr::_Load_OverrideSpellData()
     QueryResult result = DBCDatabase.Query("SELECT ID, Spells_1, Spells_2, Spells_3, Spells_4, Spells_5, Spells_6, Spells_7, Spells_8, Spells_9, Spells_10 FROM dbc_overridespelldata");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_overridespelldata. DB table `dbc_overridespelldata` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_overridespelldata. DB table `dbc_overridespelldata` is empty.");
         return;
     }
 
@@ -3140,7 +3140,7 @@ void DBCStoresMgr::_Load_OverrideSpellData()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_overridespelldata             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_overridespelldata             {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load PowerDisplay.dbc
@@ -3153,7 +3153,7 @@ void DBCStoresMgr::_Load_PowerDisplay()
     QueryResult result = DBCDatabase.Query("SELECT ID, ActualType FROM dbc_powerdisplay");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_powerdisplay. DB table `dbc_powerdisplay` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_powerdisplay. DB table `dbc_powerdisplay` is empty.");
         return;
     }
 
@@ -3173,7 +3173,7 @@ void DBCStoresMgr::_Load_PowerDisplay()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_powerdisplay                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_powerdisplay                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load PvpDifficulty.dbc
@@ -3186,7 +3186,7 @@ void DBCStoresMgr::_Load_PvpDifficulty()
     QueryResult result = DBCDatabase.Query("SELECT ID, MapID, RangeIndex, MinLevel, MaxLevel, Difficulty FROM dbc_pvpdifficulty");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_pvpdifficulty. DB table `dbc_pvpdifficulty` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_pvpdifficulty. DB table `dbc_pvpdifficulty` is empty.");
         return;
     }
 
@@ -3212,7 +3212,7 @@ void DBCStoresMgr::_Load_PvpDifficulty()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_pvpdifficulty                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_pvpdifficulty                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load QuestSort.dbc
@@ -3225,7 +3225,7 @@ void DBCStoresMgr::_Load_QuestSort()
     QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_questsort");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_questsort. DB table `dbc_questsort` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_questsort. DB table `dbc_questsort` is empty.");
         return;
     }
 
@@ -3244,7 +3244,7 @@ void DBCStoresMgr::_Load_QuestSort()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_questsort                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_questsort                     {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load QuestXP.dbc
@@ -3257,7 +3257,7 @@ void DBCStoresMgr::_Load_QuestXP()
     QueryResult result = DBCDatabase.Query("SELECT ID, Difficulty_1, Difficulty_2, Difficulty_3, Difficulty_4, Difficulty_5, Difficulty_6, Difficulty_7, Difficulty_8, Difficulty_9, Difficulty_10 FROM dbc_questxp");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_questxp. DB table `dbc_questxp` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_questxp. DB table `dbc_questxp` is empty.");
         return;
     }
 
@@ -3278,7 +3278,7 @@ void DBCStoresMgr::_Load_QuestXP()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_questxp                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_questxp                       {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load QuestFactionReward.dbc
@@ -3291,7 +3291,7 @@ void DBCStoresMgr::_Load_QuestFactionReward()
     QueryResult result = DBCDatabase.Query("SELECT ID, Difficulty_1, Difficulty_2, Difficulty_3, Difficulty_4, Difficulty_5, Difficulty_6, Difficulty_7, Difficulty_8, Difficulty_9, Difficulty_10 FROM dbc_questfactionreward");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_questfactionreward. DB table `dbc_questfactionreward` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_questfactionreward. DB table `dbc_questfactionreward` is empty.");
         return;
     }
 
@@ -3312,7 +3312,7 @@ void DBCStoresMgr::_Load_QuestFactionReward()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_questfactionreward            %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_questfactionreward            {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load RandPropPoints.dbc
@@ -3325,7 +3325,7 @@ void DBCStoresMgr::_Load_RandPropPoints()
     QueryResult result = DBCDatabase.Query("SELECT ID, Epic_1, Epic_2, Epic_3, Epic_4, Epic_5, Superior_1, Superior_2, Superior_3, Superior_4, Superior_5, Good_1, Good_2, Good_3, Good_4, Good_5 FROM dbc_randproppoints");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_randproppoints. DB table `dbc_randproppoints` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_randproppoints. DB table `dbc_randproppoints` is empty.");
         return;
     }
 
@@ -3352,7 +3352,7 @@ void DBCStoresMgr::_Load_RandPropPoints()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_randproppoints                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_randproppoints                {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ScalingStatDistribution.dbc
@@ -3365,7 +3365,7 @@ void DBCStoresMgr::_Load_ScalingStatDistribution()
     QueryResult result = DBCDatabase.Query("SELECT ID, StatID_1, StatID_2, StatID_3, StatID_4, StatID_5, StatID_6, StatID_7, StatID_8, StatID_9, StatID_10, Bonus_1, Bonus_2, Bonus_3, Bonus_4, Bonus_5, Bonus_6, Bonus_7, Bonus_8, Bonus_9, Bonus_10, Maxlevel FROM dbc_scalingstatdistribution");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_scalingstatdistribution. DB table `dbc_scalingstatdistribution` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_scalingstatdistribution. DB table `dbc_scalingstatdistribution` is empty.");
         return;
     }
 
@@ -3391,7 +3391,7 @@ void DBCStoresMgr::_Load_ScalingStatDistribution()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_scalingstatdistribution       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_scalingstatdistribution       {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load ScalingStatValues.dbc
@@ -3404,7 +3404,7 @@ void DBCStoresMgr::_Load_ScalingStatValues()
     QueryResult result = DBCDatabase.Query("SELECT ID, Charlevel, ShoulderBudget, TrinketBudget, WeaponBudget1H, RangedBudget, ClothShoulderArmor, LeatherShoulderArmor, MailShoulderArmor, PlateShoulderArmor, WeaponDPS1H, WeaponDPS2H, SpellcasterDPS1H, SpellcasterDPS2H, RangedDPS, WandDPS, SpellPower, PrimaryBudget, TertiaryBudget, ClothCloakArmor, ClothChestArmor, LeatherChestArmor, MailChestArmor, PlateChestArmor FROM dbc_scalingstatvalues");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_scalingstatvalues. DB table `dbc_scalingstatvalues` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_scalingstatvalues. DB table `dbc_scalingstatvalues` is empty.");
         return;
     }
 
@@ -3447,7 +3447,7 @@ void DBCStoresMgr::_Load_ScalingStatValues()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_scalingstatvalues             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_scalingstatvalues             {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SkillLine.dbc
@@ -3460,7 +3460,7 @@ void DBCStoresMgr::_Load_SkillLine()
     QueryResult result = DBCDatabase.Query("SELECT ID, CategoryID, DisplayName_Lang_enUS, DisplayName_Lang_koKR, DisplayName_Lang_frFR, DisplayName_Lang_deDE, DisplayName_Lang_zhCN, DisplayName_Lang_zhTW, DisplayName_Lang_esES, DisplayName_Lang_esMX, DisplayName_Lang_ruRU, SpellIconID, CanLink FROM dbc_skillline");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skillline. DB table `dbc_skillline` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_skillline. DB table `dbc_skillline` is empty.");
         return;
     }
 
@@ -3484,7 +3484,7 @@ void DBCStoresMgr::_Load_SkillLine()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_skillline                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_skillline                     {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SkillLineAbility.dbc
@@ -3497,7 +3497,7 @@ void DBCStoresMgr::_Load_SkillLineAbility()
     QueryResult result = DBCDatabase.Query("SELECT ID, SkillLine, Spell, RaceMask, ClassMask, MinSkillLineRank, SupercededBySpell, AcquireMethod, TrivialSkillLineRankHigh, TrivialSkillLineRankLow FROM dbc_skilllineability");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skilllineability. DB table `dbc_skilllineability` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_skilllineability. DB table `dbc_skilllineability` is empty.");
         return;
     }
 
@@ -3525,7 +3525,7 @@ void DBCStoresMgr::_Load_SkillLineAbility()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_skilllineability              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_skilllineability              {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SkillRaceClassInfo.dbc
@@ -3538,7 +3538,7 @@ void DBCStoresMgr::_Load_SkillRaceClassInfo()
     QueryResult result = DBCDatabase.Query("SELECT ID, SkillID, RaceMask, ClassMask, Flags, SkillTierID FROM dbc_skillraceclassinfo");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skillraceclassinfo. DB table `dbc_skillraceclassinfo` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_skillraceclassinfo. DB table `dbc_skillraceclassinfo` is empty.");
         return;
     }
 
@@ -3562,7 +3562,7 @@ void DBCStoresMgr::_Load_SkillRaceClassInfo()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_skillraceclassinfo            %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_skillraceclassinfo            {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SkillTiers.dbc
@@ -3575,7 +3575,7 @@ void DBCStoresMgr::_Load_SkillTiers()
     QueryResult result = DBCDatabase.Query("SELECT ID, Value_1, Value_2, Value_3, Value_4, Value_5, Value_6, Value_7, Value_8, Value_9, Value_10, Value_11, Value_12, Value_13, Value_14, Value_15, Value_16 FROM dbc_skilltiers");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_skilltiers. DB table `dbc_skilltiers` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_skilltiers. DB table `dbc_skilltiers` is empty.");
         return;
     }
 
@@ -3596,7 +3596,7 @@ void DBCStoresMgr::_Load_SkillTiers()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_skilltiers                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_skilltiers                    {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SkillTiers.dbc
@@ -3609,7 +3609,7 @@ void DBCStoresMgr::_Load_SoundEntries()
     QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_soundentries");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_soundentries. DB table `dbc_soundentries` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_soundentries. DB table `dbc_soundentries` is empty.");
         return;
     }
 
@@ -3628,7 +3628,7 @@ void DBCStoresMgr::_Load_SoundEntries()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_soundentries                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_soundentries                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Spell.dbc
@@ -3876,7 +3876,7 @@ void DBCStoresMgr::_Load_Spell()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_soundentries. DB table `dbc_soundentries` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_soundentries. DB table `dbc_soundentries` is empty.");
         return;
     }
 
@@ -4068,7 +4068,7 @@ void DBCStoresMgr::_Load_Spell()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spell                         %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spell                         {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellCastTimes.dbc
@@ -4081,7 +4081,7 @@ void DBCStoresMgr::_Load_SpellCastTimes()
     QueryResult result = DBCDatabase.Query("SELECT ID, Base FROM dbc_spellcasttimes");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellcasttimes. DB table `dbc_spellcasttimes` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellcasttimes. DB table `dbc_spellcasttimes` is empty.");
         return;
     }
 
@@ -4101,7 +4101,7 @@ void DBCStoresMgr::_Load_SpellCastTimes()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellcasttimes                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellcasttimes                {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellCategory.dbc
@@ -4114,7 +4114,7 @@ void DBCStoresMgr::_Load_SpellCategory()
     QueryResult result = DBCDatabase.Query("SELECT ID, Flags FROM dbc_spellcategory");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellcategory. DB table `dbc_spellcategory` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellcategory. DB table `dbc_spellcategory` is empty.");
         return;
     }
 
@@ -4134,7 +4134,7 @@ void DBCStoresMgr::_Load_SpellCategory()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellcategory                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellcategory                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellItemEnchantment.dbc
@@ -4147,7 +4147,7 @@ void DBCStoresMgr::_Load_SpellItemEnchantment()
     QueryResult result = DBCDatabase.Query("SELECT ID, Effect_1, Effect_2, Effect_3, EffectPointsMin_1, EffectPointsMin_2, EffectPointsMin_3, EffectArg_1, EffectArg_2, EffectArg_3, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, ItemVisual, Flags, Src_ItemID, Condition_Id, RequiredSkillID, RequiredSkillRank, MinLevel FROM dbc_spellitemenchantment");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellitemenchantment. DB table `dbc_spellitemenchantment` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellitemenchantment. DB table `dbc_spellitemenchantment` is empty.");
         return;
     }
 
@@ -4191,7 +4191,7 @@ void DBCStoresMgr::_Load_SpellItemEnchantment()
 
     _spellItemEnchantmentNumRow++; // this _spellItemEnchantmentNumRow should be more then the last by 1 point
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellitemenchantment          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellitemenchantment          {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellDifficulty.dbc
@@ -4204,7 +4204,7 @@ void DBCStoresMgr::_Load_SpellDifficulty()
     QueryResult result = DBCDatabase.Query("SELECT ID, DifficultySpellID_1, DifficultySpellID_2, DifficultySpellID_3, DifficultySpellID_4 FROM dbc_spelldifficulty");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spelldifficulty. DB table `dbc_spelldifficulty` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spelldifficulty. DB table `dbc_spelldifficulty` is empty.");
         return;
     }
 
@@ -4225,7 +4225,7 @@ void DBCStoresMgr::_Load_SpellDifficulty()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spelldifficulty               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spelldifficulty               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellDuration.dbc
@@ -4238,7 +4238,7 @@ void DBCStoresMgr::_Load_SpellDuration()
     QueryResult result = DBCDatabase.Query("SELECT ID, Duration, DurationPerLevel, MaxDuration FROM dbc_spellduration");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellduration. DB table `dbc_spellduration` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellduration. DB table `dbc_spellduration` is empty.");
         return;
     }
 
@@ -4260,7 +4260,7 @@ void DBCStoresMgr::_Load_SpellDuration()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellduration                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellduration                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellFocusObject.dbc
@@ -4273,7 +4273,7 @@ void DBCStoresMgr::_Load_SpellFocusObject()
     QueryResult result = DBCDatabase.Query("SELECT ID FROM dbc_spellfocusobject");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellfocusobject. DB table `dbc_spellfocusobject` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellfocusobject. DB table `dbc_spellfocusobject` is empty.");
         return;
     }
 
@@ -4292,7 +4292,7 @@ void DBCStoresMgr::_Load_SpellFocusObject()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellfocusobject              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellfocusobject              {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellItemEnchantmentCondition.dbc
@@ -4312,7 +4312,7 @@ void DBCStoresMgr::_Load_SpellItemEnchantmentCondition()
         "FROM dbc_spellitemenchantmentcondition");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellitemenchantmentcondition. DB table `dbc_spellitemenchantmentcondition` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellitemenchantmentcondition. DB table `dbc_spellitemenchantmentcondition` is empty.");
         return;
     }
 
@@ -4339,7 +4339,7 @@ void DBCStoresMgr::_Load_SpellItemEnchantmentCondition()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellitemenchantmentcondition %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellitemenchantmentcondition {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellRadius.dbc
@@ -4352,7 +4352,7 @@ void DBCStoresMgr::_Load_SpellRadius()
     QueryResult result = DBCDatabase.Query("SELECT ID, Radius, RadiusPerLevel, RadiusMax FROM dbc_spellradius");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellradius. DB table `dbc_spellradius` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellradius. DB table `dbc_spellradius` is empty.");
         return;
     }
 
@@ -4374,7 +4374,7 @@ void DBCStoresMgr::_Load_SpellRadius()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellradius                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellradius                   {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellRange.dbc
@@ -4387,7 +4387,7 @@ void DBCStoresMgr::_Load_SpellRange()
     QueryResult result = DBCDatabase.Query("SELECT ID, RangeMin_1, RangeMin_2, RangeMax_1, RangeMax_2, Flags FROM dbc_spellrange");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellrange. DB table `dbc_spellrange` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellrange. DB table `dbc_spellrange` is empty.");
         return;
     }
 
@@ -4411,7 +4411,7 @@ void DBCStoresMgr::_Load_SpellRange()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellrange                    %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellrange                    {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellRuneCost.dbc
@@ -4424,7 +4424,7 @@ void DBCStoresMgr::_Load_SpellRuneCost()
     QueryResult result = DBCDatabase.Query("SELECT ID, Blood, Unholy, Frost, RunicPower FROM dbc_spellrunecost");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellrunecost. DB table `dbc_spellrunecost` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellrunecost. DB table `dbc_spellrunecost` is empty.");
         return;
     }
 
@@ -4446,7 +4446,7 @@ void DBCStoresMgr::_Load_SpellRuneCost()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellrunecost                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellrunecost                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellShapeshiftForm.dbc
@@ -4464,7 +4464,7 @@ void DBCStoresMgr::_Load_SpellShapeshiftForm()
         "FROM dbc_spellshapeshiftform");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellshapeshiftform. DB table `dbc_spellshapeshiftform` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellshapeshiftform. DB table `dbc_spellshapeshiftform` is empty.");
         return;
     }
 
@@ -4490,7 +4490,7 @@ void DBCStoresMgr::_Load_SpellShapeshiftForm()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellshapeshiftform           %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellshapeshiftform           {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SpellVisual.dbc
@@ -4503,7 +4503,7 @@ void DBCStoresMgr::_Load_SpellVisual()
     QueryResult result = DBCDatabase.Query("SELECT ID, HasMissile, MissileModel FROM dbc_spellvisual");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellvisual. DB table `dbc_spellvisual` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellvisual. DB table `dbc_spellvisual` is empty.");
         return;
     }
 
@@ -4524,7 +4524,7 @@ void DBCStoresMgr::_Load_SpellVisual()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_spellvisual                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_spellvisual                   {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load StableSlotPrices.dbc
@@ -4537,7 +4537,7 @@ void DBCStoresMgr::_Load_StableSlotPrices()
     QueryResult result = DBCDatabase.Query("SELECT ID, Cost FROM dbc_stableslotprices");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_stableslotprices. DB table `dbc_stableslotprices` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_stableslotprices. DB table `dbc_stableslotprices` is empty.");
         return;
     }
 
@@ -4557,7 +4557,7 @@ void DBCStoresMgr::_Load_StableSlotPrices()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_stableslotprices              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_stableslotprices              {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load SummonProperties.dbc
@@ -4570,7 +4570,7 @@ void DBCStoresMgr::_Load_SummonProperties()
     QueryResult result = DBCDatabase.Query("SELECT ID, Control, Faction, Title, Slot, Flags FROM dbc_summonproperties");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_summonproperties. DB table `dbc_summonproperties` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_summonproperties. DB table `dbc_summonproperties` is empty.");
         return;
     }
 
@@ -4594,7 +4594,7 @@ void DBCStoresMgr::_Load_SummonProperties()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_summonproperties              %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_summonproperties              {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Talent.dbc
@@ -4609,7 +4609,7 @@ void DBCStoresMgr::_Load_Talent()
         "PrereqTalent_1, PrereqRank_1 FROM dbc_talent");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_talent. DB table `dbc_talent` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_talent. DB table `dbc_talent` is empty.");
         return;
     }
 
@@ -4635,7 +4635,7 @@ void DBCStoresMgr::_Load_Talent()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_talent                        %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_talent                        {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Talent.dbc
@@ -4648,7 +4648,7 @@ void DBCStoresMgr::_Load_TalentTab()
     QueryResult result = DBCDatabase.Query("SELECT ID, ClassMask, PetTalentMask, OrderIndex FROM dbc_talenttab");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_talenttab. DB table `dbc_talenttab` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_talenttab. DB table `dbc_talenttab` is empty.");
         return;
     }
 
@@ -4670,7 +4670,7 @@ void DBCStoresMgr::_Load_TalentTab()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_talenttab                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_talenttab                     {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load TaxiNodes.dbc
@@ -4687,7 +4687,7 @@ void DBCStoresMgr::_Load_TaxiNodes()
         "MountCreatureID_1, MountCreatureID_2 FROM dbc_taxinodes");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxinodes. DB table `dbc_taxinodes` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxinodes. DB table `dbc_taxinodes` is empty.");
         return;
     }
 
@@ -4714,7 +4714,7 @@ void DBCStoresMgr::_Load_TaxiNodes()
     } while (result->NextRow());
 
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_taxinodes                     %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_taxinodes                     {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load TaxiNodes.dbc
@@ -4727,7 +4727,7 @@ void DBCStoresMgr::_Load_TaxiPath()
     QueryResult result = DBCDatabase.Query("SELECT ID, FromTaxiNode, ToTaxiNode, Cost FROM dbc_taxipath");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxipath. DB table `dbc_taxipath` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxipath. DB table `dbc_taxipath` is empty.");
         return;
     }
 
@@ -4758,7 +4758,7 @@ void DBCStoresMgr::_Load_TaxiPath()
 
     _taxiPathNumRow++; // this _taxiPathNumRow should be more then the last by 1 point
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_taxipath                      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_taxipath                      {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load TaxiPathNode.dbc
@@ -4771,7 +4771,7 @@ void DBCStoresMgr::_Load_TaxiPathNode()
     QueryResult result = DBCDatabase.Query("SELECT ID, PathID, NodeIndex, ContinentID, LocX, LocY, LocZ, Flags, Delay, ArrivalEventID, DepartureEventID FROM dbc_taxipathnode");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxipathnode. DB table `dbc_taxipathnode` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_taxipathnode. DB table `dbc_taxipathnode` is empty.");
         return;
     }
 
@@ -4799,7 +4799,7 @@ void DBCStoresMgr::_Load_TaxiPathNode()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_taxipathnode                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_taxipathnode                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load TeamContributionPoints.dbc
@@ -4812,7 +4812,7 @@ void DBCStoresMgr::_Load_TeamContributionPoints()
     QueryResult result = DBCDatabase.Query("SELECT ID, Data FROM dbc_teamcontributionpoints");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_teamcontributionpoints. DB table `dbc_teamcontributionpoints` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_teamcontributionpoints. DB table `dbc_teamcontributionpoints` is empty.");
         return;
     }
 
@@ -4831,7 +4831,7 @@ void DBCStoresMgr::_Load_TeamContributionPoints()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_teamcontributionpoints        %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_teamcontributionpoints        {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load TotemCategory.dbc
@@ -4844,7 +4844,7 @@ void DBCStoresMgr::_Load_TotemCategory()
     QueryResult result = DBCDatabase.Query("SELECT ID, TotemCategoryType, TotemCategoryMask FROM dbc_totemcategory");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_totemcategory. DB table `dbc_totemcategory` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_totemcategory. DB table `dbc_totemcategory` is empty.");
         return;
     }
 
@@ -4864,7 +4864,7 @@ void DBCStoresMgr::_Load_TotemCategory()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_totemcategory                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_totemcategory                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load TransportAnimation.dbc
@@ -4877,7 +4877,7 @@ void DBCStoresMgr::_Load_TransportAnimation()
     QueryResult result = DBCDatabase.Query("SELECT ID, TransportID, TimeIndex, PosX, PosY, PosZ FROM dbc_transportanimation");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_transportanimation. DB table `dbc_transportanimation` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_transportanimation. DB table `dbc_transportanimation` is empty.");
         return;
     }
 
@@ -4900,7 +4900,7 @@ void DBCStoresMgr::_Load_TransportAnimation()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_transportanimation            %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_transportanimation            {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load TransportRotation.dbc
@@ -4913,7 +4913,7 @@ void DBCStoresMgr::_Load_TransportRotation()
     QueryResult result = DBCDatabase.Query("SELECT ID, GameObjectsID, TimeIndex, RotX, RotY, RotZ, RotW FROM dbc_transportrotation");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_transportrotation. DB table `dbc_transportrotation` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_transportrotation. DB table `dbc_transportrotation` is empty.");
         return;
     }
 
@@ -4937,7 +4937,7 @@ void DBCStoresMgr::_Load_TransportRotation()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_transportrotation             %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_transportrotation             {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load Vehicle.dbc
@@ -4956,7 +4956,7 @@ void DBCStoresMgr::_Load_Vehicle()
         "MsslTrgtArcTexture, MsslTrgtImpactTexture, MsslTrgtImpactModel_1, MsslTrgtImpactModel_2, CameraYawOffset, UilocomotionType, MsslTrgtImpactTexRadius, VehicleUIIndicatorID, PowerDisplayID_1 FROM dbc_vehicle");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_vehicle. DB table `dbc_vehicle` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_vehicle. DB table `dbc_vehicle` is empty.");
         return;
     }
 
@@ -5008,7 +5008,7 @@ void DBCStoresMgr::_Load_Vehicle()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_vehicle                       %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_vehicle                       {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load VehicleSeat.dbc
@@ -5029,7 +5029,7 @@ void DBCStoresMgr::_Load_VehicleSeat()
         "EnterUISoundID, ExitUISoundID, UiSkin, FlagsB FROM dbc_vehicleseat");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_vehicleseat. DB table `dbc_vehicleseat` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_vehicleseat. DB table `dbc_vehicleseat` is empty.");
         return;
     }
 
@@ -5092,7 +5092,7 @@ void DBCStoresMgr::_Load_VehicleSeat()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_vehicleseat                   %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_vehicleseat                   {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load WMOAreaTable.dbc
@@ -5105,7 +5105,7 @@ void DBCStoresMgr::_Load_WMOAreaTable()
     QueryResult result = DBCDatabase.Query("SELECT ID, WMOID, NameSetID, WMOGroupID, Flags, AreaTableID FROM dbc_wmoareatable");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_wmoareatable. DB table `dbc_wmoareatable` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_wmoareatable. DB table `dbc_wmoareatable` is empty.");
         return;
     }
 
@@ -5128,7 +5128,7 @@ void DBCStoresMgr::_Load_WMOAreaTable()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_wmoareatable                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_wmoareatable                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load WMOAreaTable.dbc
@@ -5141,7 +5141,7 @@ void DBCStoresMgr::_Load_WorldMapArea()
     QueryResult result = DBCDatabase.Query("SELECT ID, MapID, AreaID, LocLeft, LocRight, LocTop, LocBottom, DisplayMapID FROM dbc_worldmaparea");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldmaparea. DB table `dbc_worldmaparea` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldmaparea. DB table `dbc_worldmaparea` is empty.");
         return;
     }
 
@@ -5167,7 +5167,7 @@ void DBCStoresMgr::_Load_WorldMapArea()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_worldmaparea                  %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_worldmaparea                  {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load WorldMapOverlay.dbc
@@ -5180,7 +5180,7 @@ void DBCStoresMgr::_Load_WorldMapOverlay()
     QueryResult result = DBCDatabase.Query("SELECT ID, AreaID_1, AreaID_2, AreaID_3, AreaID_4 FROM dbc_worldmapoverlay");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldmapoverlay. DB table `dbc_worldmapoverlay` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldmapoverlay. DB table `dbc_worldmapoverlay` is empty.");
         return;
     }
 
@@ -5200,7 +5200,7 @@ void DBCStoresMgr::_Load_WorldMapOverlay()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_worldmapoverlay               %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_worldmapoverlay               {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // load WorldSafeLocs.dbc
@@ -5213,7 +5213,7 @@ void DBCStoresMgr::_Load_WorldSafeLocs()
     QueryResult result = DBCDatabase.Query("SELECT ID, Continent, LocX, LocY, LocZ FROM dbc_worldsafelocs");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldsafelocs. DB table `dbc_worldsafelocs` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_worldsafelocs. DB table `dbc_worldsafelocs` is empty.");
         return;
     }
 
@@ -5235,7 +5235,7 @@ void DBCStoresMgr::_Load_WorldSafeLocs()
         ++count;
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded DBC_worldsafelocs                 %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded DBC_worldsafelocs                 {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle Additional dbc from World db
@@ -5247,7 +5247,7 @@ void DBCStoresMgr::_Handle_World_Achievement()
     QueryResult result = WorldDatabase.Query("SELECT ID, requiredFaction, mapID, points, flags, count, refAchievement FROM achievement_dbc");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 WorldDB::achievement_dbc. DB table `achievement_dbc` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 WorldDB::achievement_dbc. DB table `achievement_dbc` is empty.");
         return;
     }
 
@@ -5284,11 +5284,11 @@ void DBCStoresMgr::_Handle_World_Achievement()
             ++count;
         }
         else
-            TC_LOG_INFO("server.loading", ">> WorldDB::achievement_dbc          %u already exist, need to override?", id);
+            FMT_LOG_INFO("server.loading", ">> WorldDB::achievement_dbc          {} already exist, need to override?", id);
 
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded WorldDB::achievement_dbc          %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded WorldDB::achievement_dbc          {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void DBCStoresMgr::_Handle_World_Spell()
@@ -5396,7 +5396,7 @@ void DBCStoresMgr::_Handle_World_Spell()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 WorldDB::spell_dbc. DB table `spell_dbc` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 WorldDB::spell_dbc. DB table `spell_dbc` is empty.");
         return;
     }
 
@@ -5623,11 +5623,11 @@ void DBCStoresMgr::_Handle_World_Spell()
             ++count;
         }
         else
-            TC_LOG_INFO("server.loading", ">> WorldDB::spell_dbc          %u already exist, need to override?", id);
+            FMT_LOG_INFO("server.loading", ">> WorldDB::spell_dbc          {} already exist, need to override?", id);
 
     } while (result->NextRow());    
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded WorldDB::spell_dbc                %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded WorldDB::spell_dbc                {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void DBCStoresMgr::_Handle_World_SpellDifficulty()
@@ -5638,7 +5638,7 @@ void DBCStoresMgr::_Handle_World_SpellDifficulty()
     QueryResult result = WorldDatabase.Query("SELECT ID, spellid0, spellid1, spellid2, spellid3 FROM spelldifficulty_dbc");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 WorldDB::spelldifficulty_dbc. DB table `spelldifficulty_dbc` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 WorldDB::spelldifficulty_dbc. DB table `spelldifficulty_dbc` is empty.");
         return;
     }
 
@@ -5660,11 +5660,11 @@ void DBCStoresMgr::_Handle_World_SpellDifficulty()
             ++count;
         }
         else
-            TC_LOG_INFO("server.loading", ">> WorldDB::spelldifficulty_dbc          %u already exist, need to override?", id);
+            FMT_LOG_INFO("server.loading", ">> WorldDB::spelldifficulty_dbc          {} already exist, need to override?", id);
 
     } while (result->NextRow());
     //                                       1111111111111111111111111111111111
-    TC_LOG_INFO("server.loading", ">> Loaded WorldDB::spelldifficulty_dbc      %u in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded WorldDB::spelldifficulty_dbc      {} in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Handle others containers
@@ -5753,7 +5753,7 @@ void DBCStoresMgr::Handle_SpellDifficultyInSpellMgr()
                 if (spellDiff->DifficultySpellID[x] <= 0 || !GetSpellDBC(spellDiff->DifficultySpellID[x]))
                 {
                     if (spellDiff->DifficultySpellID[x] > 0)//don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
-                        TC_LOG_ERROR("sql.sql", "spelldifficulty_dbc: spell %i at field id:%u at spellid%i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->DifficultySpellID[x], spellDiff->ID, x);
+                        FMT_LOG_ERROR("sql.sql", "spelldifficulty_dbc: spell {} at field id:{} at spellid{} does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->DifficultySpellID[x], spellDiff->ID, x);
                     newEntry.DifficultySpellID[x] = 0;//spell was <= 0 or invalid, set to 0
                 }
                 else

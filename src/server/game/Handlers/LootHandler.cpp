@@ -33,7 +33,7 @@
 
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
+    FMT_LOG_DEBUG("network", "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
     Player* player = GetPlayer();
     ObjectGuid lguid = player->GetLootGUID();
     Loot* loot = nullptr;
@@ -100,7 +100,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 {
-    TC_LOG_DEBUG("network", "WORLD: CMSG_LOOT_MONEY");
+    FMT_LOG_DEBUG("network", "WORLD: CMSG_LOOT_MONEY");
 
     Player* player = GetPlayer();
     ObjectGuid guid = player->GetLootGUID();
@@ -218,7 +218,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleLootOpcode(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: CMSG_LOOT");
+    FMT_LOG_DEBUG("network", "WORLD: CMSG_LOOT");
 
     ObjectGuid guid;
     recvData >> guid;
@@ -236,7 +236,7 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: CMSG_LOOT_RELEASE");
+    FMT_LOG_DEBUG("network", "WORLD: CMSG_LOOT_RELEASE");
 
     // cheaters can modify lguid to prevent correct apply loot release code and re-loot
     // use internal stored guid
@@ -404,7 +404,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    TC_LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [%s].", target->GetName().c_str());
+    FMT_LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [{}].", target->GetName());
 
     if (_player->GetLootGUID() != lootguid)
     {
@@ -415,7 +415,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (!_player->IsInRaidWith(target) || !_player->IsInMap(target))
     {
         _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
-        TC_LOG_INFO("entities.player.cheat", "MasterLootItem: Player %s tried to give an item to ineligible player %s !", GetPlayer()->GetName().c_str(), target->GetName().c_str());
+        FMT_LOG_INFO("entities.player.cheat", "MasterLootItem: Player {} tried to give an item to ineligible player {} !", GetPlayer()->GetName(), target->GetName());
         return;
     }
 
@@ -443,8 +443,8 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {
-        TC_LOG_DEBUG("loot", "MasterLootItem: Player %s might be using a hack! (slot %d, size %lu)",
-            GetPlayer()->GetName().c_str(), slotid, (unsigned long)loot->items.size());
+        FMT_LOG_DEBUG("loot", "MasterLootItem: Player {} might be using a hack! (slot {}, size {})",
+            GetPlayer()->GetName(), slotid, (unsigned long)loot->items.size());
         return;
     }
 

@@ -135,18 +135,18 @@ public:
                 {
                     p->SetPremiumStatus(true);
                     p->SetPremiumUnsetdate(unsetdate);
-                    handler->PSendSysMessage("VIP privileges has been set for Account: %u Character:[%s] (online) (GUID: %u), for %u days", accountID, p->GetName().c_str(), p->GetGUID().GetCounter(), days_bonus);
+                    handler->PSendSysMessage("VIP privileges has been set for Account: {} Character:[{}] (online) (GUID: {}), for {} days", accountID, p->GetName(), p->GetGUID().GetCounter(), days_bonus);
                 }
             }
             else
-                handler->PSendSysMessage("VIP privileges has been set for Account: %u, for %u days, no characters online", accountID, days_bonus);
+                handler->PSendSysMessage("VIP privileges has been set for Account: {}, for {} days, no characters online", accountID, days_bonus);
         }
         else
         {
-            handler->PSendSysMessage("VIP privileges has been set for Account: %u (IP: %s) Character:[%s] (GUID: %u), for %u days",
+            handler->PSendSysMessage("VIP privileges has been set for Account: {} (IP: {}) Character:[{}] (GUID: {}), for {} days",
                 accountID,
-                target->GetSession()->GetRemoteAddress().c_str(),
-                target->GetName().c_str(),
+                target->GetSession()->GetRemoteAddress(),
+                target->GetName(),
                 target->GetGUID().GetCounter(),
                 days_bonus);
 
@@ -199,18 +199,18 @@ public:
                 {
                     p->SetPremiumStatus(false);
                     p->SetPremiumUnsetdate(0);
-                    handler->PSendSysMessage("VIP privileges were removed for Account: %u Character:[%s] (online) (GUID: %u)", accountID, p->GetName().c_str(), p->GetGUID().GetCounter());
+                    handler->PSendSysMessage("VIP privileges were removed for Account: {} Character:[{}] (online) (GUID: {})", accountID, p->GetName(), p->GetGUID().GetCounter());
                 }
             }
             else
-                handler->PSendSysMessage("VIP privileges were removed for Account: %u, no characters online", accountID);
+                handler->PSendSysMessage("VIP privileges were removed for Account: {}, no characters online", accountID);
         }
         else
         {
-            handler->PSendSysMessage("VIP privileges were removed for Account: %u (IP: %s) Character:[%s] (GUID: %u)",
+            handler->PSendSysMessage("VIP privileges were removed for Account: {} (IP: {}) Character:[{}] (GUID: {})",
                 accountID,
-                target->GetSession()->GetRemoteAddress().c_str(),
-                target->GetName().c_str(),
+                target->GetSession()->GetRemoteAddress(),
+                target->GetName(),
                 target->GetGUID().GetCounter());
 
             target->SetPremiumStatus(false);
@@ -232,7 +232,7 @@ public:
         }
 
         if (player->IsPremium())
-            handler->PSendSysMessage(LANG_PLAYER_VIP_TIME_EXIST, (secsToTimeString(player->GetPremiumUnsetdate() - GameTime::GetGameTime(), TimeFormat::ShortText)).c_str());
+            handler->PSendSysMessage(LANG_PLAYER_VIP_TIME_EXIST, (secsToTimeString(player->GetPremiumUnsetdate() - GameTime::GetGameTime(), TimeFormat::ShortText)));
 
         handler->PSendSysMessage("The next VIP commands are available for you:");
         if (sWorld->getBoolConfig(CONFIG_VIP_DEBUFF))
@@ -492,7 +492,7 @@ public:
         }
 
         player->DurabilityRepairAll(false, 0, false);
-        handler->PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink(player).c_str());
+        handler->PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink(player));
         return true;
     }
 
@@ -551,7 +551,7 @@ public:
 
         player->ResetTalents(true);
         player->SendTalentsInfoData(false);
-        handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(player).c_str());
+        handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(player));
         return true;
     }
 
@@ -609,9 +609,9 @@ public:
         }
 
         player->SetTaxiCheater(true);
-        handler->PSendSysMessage(LANG_YOU_GIVE_TAXIS, handler->GetNameLink(player).c_str());
+        handler->PSendSysMessage(LANG_YOU_GIVE_TAXIS, handler->GetNameLink(player));
         if (handler->needReportToTarget(player))
-            ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_ADDED, handler->GetNameLink().c_str());
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_ADDED, handler->GetNameLink());
         return true;
     }
 
@@ -997,7 +997,7 @@ public:
             else
                 player->SetDungeonDifficulty(target->GetDungeonDifficulty());
 
-            handler->PSendSysMessage(LANG_APPEARING_AT, chrNameLink.c_str());
+            handler->PSendSysMessage(LANG_APPEARING_AT, chrNameLink);
 
             // stop flight if need
             if (player->IsInFlight())
@@ -1038,12 +1038,12 @@ public:
         {
             // GM should can to see the coins of target-player by .coin too
             coins = target->GetCoins();
-            handler->PSendSysMessage("The AccountID %u [player : %s ] have %u coins", target->GetSession()->GetAccountId(), target->GetName().c_str(), coins);
+            handler->PSendSysMessage("The AccountID {} [player : {} ] have {} coins", target->GetSession()->GetAccountId(), target->GetName(), coins);
         }
         else
         {
             coins = _player->GetCoins();
-            handler->PSendSysMessage("You have the %u coins", coins);
+            handler->PSendSysMessage("You have the {} coins", coins);
         }
 
         return true;
@@ -1104,7 +1104,7 @@ public:
         }
 
         AccountMgr::SetCoins(accountID, coinCount);
-        handler->PSendSysMessage("The AccountID %u has received %i coins, and now have a %u coins", accountID, coinAdded, coinCount);
+        handler->PSendSysMessage("The AccountID {} has received {} coins, and now have a {} coins", accountID, coinAdded, coinCount);
         return true;
     }
 
@@ -1168,7 +1168,7 @@ public:
         }
 
         AccountMgr::SetCoins(accountID, coinCount);
-        handler->PSendSysMessage("The AccountID %u has removed %i coins, and now have a %u coins", accountID, coinRemoved, coinCount);
+        handler->PSendSysMessage("The AccountID {} has removed {} coins, and now have a {} coins", accountID, coinRemoved, coinCount);
         return true;
     }
 };

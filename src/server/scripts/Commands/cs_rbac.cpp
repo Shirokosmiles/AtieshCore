@@ -221,7 +221,7 @@ public:
         handler->PSendSysMessage(LANG_RBAC_LIST_HEADER_GRANTED, data.rbac->GetId(), data.rbac->GetName());
         rbac::RBACPermissionContainer const& granted = data.rbac->GetGrantedPermissions();
         if (granted.empty())
-            handler->PSendSysMessage("%s", handler->GetTrinityString(LANG_RBAC_LIST_EMPTY));
+            handler->PSendSysMessage("{}", handler->GetTrinityString(LANG_RBAC_LIST_EMPTY));
         else
         {
             for (uint32 grantedId : granted)
@@ -234,7 +234,7 @@ public:
         handler->PSendSysMessage(LANG_RBAC_LIST_HEADER_DENIED, data.rbac->GetId(), data.rbac->GetName());
         rbac::RBACPermissionContainer const& denied = data.rbac->GetDeniedPermissions();
         if (denied.empty())
-            handler->PSendSysMessage("%s", handler->GetTrinityString(LANG_RBAC_LIST_EMPTY));
+            handler->PSendSysMessage("{}", handler->GetTrinityString(LANG_RBAC_LIST_EMPTY));
         else
         {
             for (uint32 deniedId : denied)
@@ -246,7 +246,7 @@ public:
         handler->PSendSysMessage(LANG_RBAC_LIST_HEADER_BY_SEC_LEVEL, data.rbac->GetId(), data.rbac->GetName(), data.rbac->GetSecurityLevel());
         rbac::RBACPermissionContainer const& defaultPermissions = sAccountMgr->GetRBACDefaultPermissions(data.rbac->GetSecurityLevel());
         if (defaultPermissions.empty())
-            handler->PSendSysMessage("%s", handler->GetTrinityString(LANG_RBAC_LIST_EMPTY));
+            handler->PSendSysMessage("{}", handler->GetTrinityString(LANG_RBAC_LIST_EMPTY));
         else
         {
             for (uint32 defaultPermission : defaultPermissions)
@@ -264,7 +264,7 @@ public:
         if (!permId)
         {
             rbac::RBACPermissionsContainer const& permissions = sAccountMgr->GetRBACPermissionList();
-            handler->PSendSysMessage("%s", handler->GetTrinityString(LANG_RBAC_LIST_PERMISSIONS_HEADER));
+            handler->PSendSysMessage("{}", handler->GetTrinityString(LANG_RBAC_LIST_PERMISSIONS_HEADER));
             for (auto const& [_, permission] : permissions)
             {
                 handler->PSendSysMessage(LANG_RBAC_LIST_ELEMENT, permission->GetId(), permission->GetName());
@@ -280,9 +280,9 @@ public:
                 return false;
             }
 
-            handler->PSendSysMessage("%s", handler->GetTrinityString(LANG_RBAC_LIST_PERMISSIONS_HEADER));
+            handler->PSendSysMessage("{}", handler->GetTrinityString(LANG_RBAC_LIST_PERMISSIONS_HEADER));
             handler->PSendSysMessage(LANG_RBAC_LIST_ELEMENT, permission->GetId(), permission->GetName());
-            handler->PSendSysMessage("%s", handler->GetTrinityString(LANG_RBAC_LIST_PERMS_LINKED_HEADER));
+            handler->PSendSysMessage("{}", handler->GetTrinityString(LANG_RBAC_LIST_PERMS_LINKED_HEADER));
             for (uint32 linkedPerm : permission->GetLinkedPermissions())
                 if (rbac::RBACPermission const* rbacPermission = sAccountMgr->GetRBACPermission(linkedPerm))
                     handler->PSendSysMessage(LANG_RBAC_LIST_ELEMENT, rbacPermission->GetId(), rbacPermission->GetName());

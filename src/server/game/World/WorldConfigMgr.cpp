@@ -64,7 +64,7 @@ void WorldConfig::Load()
     QueryResult result = WorldDatabase.PQuery("SELECT `OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue` FROM world_config");
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 game config options. DB table `game_config` is empty.");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 game config options. DB table `game_config` is empty.");
         return;
     }
 
@@ -98,7 +98,7 @@ void WorldConfig::Load()
 
         if (_type == WorldConfigType::GAME_CONFIG_TYPE_UNKNOWN)
         {
-            TC_LOG_ERROR("config", "> Don't support type (%s) for option (%s)", optionType.c_str(), optionName.c_str());
+            FMT_LOG_ERROR("config", "> Don't support type ({}) for option ({})", optionType, optionName);
             continue;
         }
 
@@ -108,7 +108,7 @@ void WorldConfig::Load()
 
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u game config option in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} game config option in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void WorldConfig::RecheckAndFixDependancy()
@@ -125,7 +125,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Respawn.DynamicRateCreature (%f) must be positive. Set to 10.", value);
+                    FMT_LOG_ERROR("config", "Respawn.DynamicRateCreature ({}) must be positive. Set to 10.", value);
                     sWorld->setFloatConfig(WorldFloatConfigs(i), 10.0f);
                 }
                 break;
@@ -134,7 +134,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Respawn.DynamicRateGameObject (%f) must be positive. Set to 10.", value);
+                    FMT_LOG_ERROR("config", "Respawn.DynamicRateGameObject ({}) must be positive. Set to 10.", value);
                     sWorld->setFloatConfig(WorldFloatConfigs(i), 10.0f);
                 }
                 break;
@@ -143,12 +143,12 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
                 {
-                    TC_LOG_ERROR("config", "Visibility.Distance.Continents can't be less max aggro radius %f", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
+                    FMT_LOG_ERROR("config", "Visibility.Distance.Continents can't be less max aggro radius {}", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
                     sWorld->setFloatConfig(WorldFloatConfigs(i), 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
                 }
                 else if (value > MAX_VISIBILITY_DISTANCE)
                 {
-                    TC_LOG_ERROR("server.loading", "Visibility.Distance.Continents can't be greater %f", MAX_VISIBILITY_DISTANCE);
+                    FMT_LOG_ERROR("server.loading", "Visibility.Distance.Continents can't be greater {}", MAX_VISIBILITY_DISTANCE);
                     sWorld->setFloatConfig(WorldFloatConfigs(i), MAX_VISIBILITY_DISTANCE);
                 }
                 break;
@@ -157,12 +157,12 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
                 {
-                    TC_LOG_ERROR("server.loading", "Visibility.Distance.Instances can't be less max aggro radius %f", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
+                    FMT_LOG_ERROR("server.loading", "Visibility.Distance.Instances can't be less max aggro radius {}", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
                     sWorld->setFloatConfig(WorldFloatConfigs(i), 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
                 }
                 else if (value > MAX_VISIBILITY_DISTANCE)
                 {
-                    TC_LOG_ERROR("server.loading", "Visibility.Distance.Instances can't be greater %f", MAX_VISIBILITY_DISTANCE);
+                    FMT_LOG_ERROR("server.loading", "Visibility.Distance.Instances can't be greater {}", MAX_VISIBILITY_DISTANCE);
                     sWorld->setFloatConfig(WorldFloatConfigs(i), MAX_VISIBILITY_DISTANCE);
                 }
                 break;
@@ -172,12 +172,12 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
                 {
-                    TC_LOG_ERROR("server.loading", "Visibility.Distance.BGArenas can't be less max aggro radius %f", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
+                    FMT_LOG_ERROR("server.loading", "Visibility.Distance.BGArenas can't be less max aggro radius {}", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
                     sWorld->setFloatConfig(WorldFloatConfigs(i), 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
                 }
                 else if (value > MAX_VISIBILITY_DISTANCE)
                 {
-                    TC_LOG_ERROR("server.loading", "Visibility.Distance.BGArenas can't be greater %f", MAX_VISIBILITY_DISTANCE);
+                    FMT_LOG_ERROR("server.loading", "Visibility.Distance.BGArenas can't be greater {}", MAX_VISIBILITY_DISTANCE);
                     sWorld->setFloatConfig(WorldFloatConfigs(i), MAX_VISIBILITY_DISTANCE);
                 }
                 break;
@@ -197,7 +197,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Rate.Health (%f) must be > 0. Using 1 instead.", value);
+                    FMT_LOG_ERROR("config", "Rate.Health ({}) must be > 0. Using 1 instead.", value);
                     sWorld->setRate(Rates(i), 1.0f);
                 }
                 break;
@@ -206,7 +206,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Rate.Mana (%f) must be > 0. Using 1 instead.", value);
+                    FMT_LOG_ERROR("config", "Rate.Mana ({}) must be > 0. Using 1 instead.", value);
                     sWorld->setRate(Rates(i), 1.0f);
                 }
                 break;
@@ -215,7 +215,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Rate.Rage.Loss (%f) must be > 0. Using 1 instead.", value);
+                    FMT_LOG_ERROR("config", "Rate.Rage.Loss ({}) must be > 0. Using 1 instead.", value);
                     sWorld->setRate(Rates(i), 1.0f);
                 }
                 break;
@@ -224,7 +224,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Rate.RunicPower.Loss (%f) must be > 0. Using 1 instead.", value);
+                    FMT_LOG_ERROR("config", "Rate.RunicPower.Loss ({}) must be > 0. Using 1 instead.", value);
                     sWorld->setRate(Rates(i), 1.0f);
                 }
                 break;
@@ -233,7 +233,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Rate.RepairCost (%f) must be >=0. Using 0.0 instead.", value);
+                    FMT_LOG_ERROR("config", "Rate.RepairCost ({}) must be >=0. Using 0.0 instead.", value);
                     sWorld->setRate(Rates(i), 0.0f);
                 }
                 break;
@@ -242,7 +242,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Rate.Talent (%f) must be > 0. Using 1 instead.", value);
+                    FMT_LOG_ERROR("config", "Rate.Talent ({}) must be > 0. Using 1 instead.", value);
                     sWorld->setRate(Rates(i), 1.0f);
                 }
                 break;
@@ -251,12 +251,12 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "DurabilityLoss.OnDeath (%f) must be >=0. Using 0.0 instead.", value);
+                    FMT_LOG_ERROR("config", "DurabilityLoss.OnDeath ({}) must be >=0. Using 0.0 instead.", value);
                     value = 0.0f;
                 }
                 else if (value > 100.0f)
                 {
-                    TC_LOG_ERROR("config", "DurabilityLoss.OnDeath (%f) must be <= 100. Using 100.0 instead.", value);
+                    FMT_LOG_ERROR("config", "DurabilityLoss.OnDeath ({}) must be <= 100. Using 100.0 instead.", value);
                     value = 100.0f;
                 }
                 value /= 100.0f;
@@ -266,7 +266,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "DurabilityLossChance.Damage (%f) must be >=0. Using 0.0 instead.", value);
+                    FMT_LOG_ERROR("config", "DurabilityLossChance.Damage ({}) must be >=0. Using 0.0 instead.", value);
                     sWorld->setRate(Rates(i), 0.0f);
                 }
                 break;
@@ -275,7 +275,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "DurabilityLossChance.Parry (%f) must be >=0. Using 0.0 instead.", value);
+                    FMT_LOG_ERROR("config", "DurabilityLossChance.Parry ({}) must be >=0. Using 0.0 instead.", value);
                     sWorld->setRate(Rates(i), 0.0f);
                 }
                 break;
@@ -284,7 +284,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "DurabilityLossChance.Absorb (%f) must be >=0. Using 0.0 instead.", value);
+                    FMT_LOG_ERROR("config", "DurabilityLossChance.Absorb ({}) must be >=0. Using 0.0 instead.", value);
                     sWorld->setRate(Rates(i), 0.0f);
                 }
                 break;
@@ -293,7 +293,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "DurabilityLossChance.Block (%f) must be >=0. Using 0.0 instead.", value);
+                    FMT_LOG_ERROR("config", "DurabilityLossChance.Block ({}) must be >=0. Using 0.0 instead.", value);
                     sWorld->setRate(Rates(i), 0.0f);
                 }
                 break;
@@ -302,7 +302,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Rate.MoveSpeed (%f) must be > 0. Using 1 instead.", value);
+                    FMT_LOG_ERROR("config", "Rate.MoveSpeed ({}) must be > 0. Using 1 instead.", value);
                     sWorld->setRate(Rates(i), 1.0f);
                 }
                 break;
@@ -311,7 +311,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Rate.Quest.Money.Reward (%f) must be >=0. Using 0 instead.", value);
+                    FMT_LOG_ERROR("config", "Rate.Quest.Money.Reward ({}) must be >=0. Using 0 instead.", value);
                     sWorld->setRate(Rates(i), 0.0f);
                 }
                 break;
@@ -320,7 +320,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 0.0f)
                 {
-                    TC_LOG_ERROR("config", "Rate.Quest.Money.Max.Level.Reward (%f) must be >=0. Using 0 instead.", value);
+                    FMT_LOG_ERROR("config", "Rate.Quest.Money.Max.Level.Reward ({}) must be >=0. Using 0 instead.", value);
                     sWorld->setRate(Rates(i), 0.0f);
                 }
                 break;
@@ -340,7 +340,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 1 || value > 9)
                 {
-                    TC_LOG_ERROR("config", "Compression level (%i) must be in range 1..9. Using default compression level (1).", value);
+                    FMT_LOG_ERROR("config", "Compression level ({}) must be in range 1..9. Using default compression level (1).", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 1);
                 }
                 break;
@@ -349,7 +349,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < MIN_GRID_DELAY)
                 {
-                    TC_LOG_ERROR("config", "GridCleanUpDelay (%i) must be greater %u. Use this minimal value.", value, MIN_GRID_DELAY);
+                    FMT_LOG_ERROR("config", "GridCleanUpDelay ({}) must be greater {}. Use this minimal value.", value, MIN_GRID_DELAY);
                     sWorld->setIntConfig(WorldIntConfigs(i), MIN_GRID_DELAY);
                 }
                 break;
@@ -358,7 +358,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < MIN_MAP_UPDATE_DELAY)
                 {
-                    TC_LOG_ERROR("config", "MapUpdateInterval (%i) must be greater %u. Use this minimal value.", value, MIN_MAP_UPDATE_DELAY);
+                    FMT_LOG_ERROR("config", "MapUpdateInterval ({}) must be greater {}. Use this minimal value.", value, MIN_MAP_UPDATE_DELAY);
                     sWorld->setIntConfig(WorldIntConfigs(i), MIN_MAP_UPDATE_DELAY);
                 }
                 break;
@@ -367,7 +367,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 1 || value > MAX_PLAYER_NAME)
                 {
-                    TC_LOG_ERROR("config", "MinPlayerName (%i) must be in range 1..%u. Set to 2.", value, MAX_PLAYER_NAME);
+                    FMT_LOG_ERROR("config", "MinPlayerName ({}) must be in range 1..{}. Set to 2.", value, MAX_PLAYER_NAME);
                     sWorld->setIntConfig(WorldIntConfigs(i), 2);
                 }
                 break;
@@ -376,7 +376,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 1 || value > MAX_CHARTER_NAME)
                 {
-                    TC_LOG_ERROR("config", "MinCharterName (%i) must be in range 1..%u. Set to 2.", value, MAX_CHARTER_NAME);
+                    FMT_LOG_ERROR("config", "MinCharterName ({}) must be in range 1..{}. Set to 2.", value, MAX_CHARTER_NAME);
                     sWorld->setIntConfig(WorldIntConfigs(i), 2);
                 }
                 break;
@@ -385,7 +385,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 1 || value > MAX_PET_NAME)
                 {
-                    TC_LOG_ERROR("config", "MinPetName (%i) must be in range 1..%u. Set to 2.", value, MAX_PET_NAME);
+                    FMT_LOG_ERROR("config", "MinPetName ({}) must be in range 1..{}. Set to 2.", value, MAX_PET_NAME);
                     sWorld->setIntConfig(WorldIntConfigs(i), 2);
                 }
                 break;
@@ -394,7 +394,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 1 || value > 10)
                 {
-                    TC_LOG_ERROR("config", "CharactersPerRealm (%i) must be in range 1..10. Set to 10.", value);
+                    FMT_LOG_ERROR("config", "CharactersPerRealm ({}) must be in range 1..10. Set to 10.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 10);
                 }
                 break;
@@ -404,7 +404,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 uint32 accPerAcc = sWorld->getIntConfig(CONFIG_CHARACTERS_PER_REALM);
                 if (value < accPerAcc)
                 {
-                    TC_LOG_ERROR("config", "CharactersPerAccount (%i) can't be less than CharactersPerRealm (%i).", value, accPerAcc);
+                    FMT_LOG_ERROR("config", "CharactersPerAccount ({}) can't be less than CharactersPerRealm ({}).", value, accPerAcc);
                     sWorld->setIntConfig(WorldIntConfigs(i), accPerAcc);
                 }
                 break;
@@ -413,7 +413,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 10)
                 {
-                    TC_LOG_ERROR("config", "DeathKnightsPerRealm (%i) must be in range 0..10. Set to 1.", value);
+                    FMT_LOG_ERROR("config", "DeathKnightsPerRealm ({}) must be in range 0..10. Set to 1.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 1);
                 }
                 break;
@@ -422,7 +422,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 2)
                 {
-                    TC_LOG_ERROR("config", "SkipCinematics (%i) must be in range 0..2. Set to 0.", value);
+                    FMT_LOG_ERROR("config", "SkipCinematics ({}) must be in range 0..2. Set to 0.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 0);
                 }
                 break;
@@ -431,7 +431,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 1 || value > STRONG_MAX_LEVEL)
                 {
-                    TC_LOG_ERROR("config", "MaxPlayerLevel (%i) must be in range 1..255. Set to 1.", value);
+                    FMT_LOG_ERROR("config", "MaxPlayerLevel ({}) must be in range 1..255. Set to 1.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 1);
                 }
                 break;
@@ -441,7 +441,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 uint32 maxStartLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
                 if (value < 1 || value > maxStartLevel)
                 {
-                    TC_LOG_ERROR("config", "StartPlayerLevel (%i) must be in range 0..(%i). Set to max.", value, maxStartLevel);
+                    FMT_LOG_ERROR("config", "StartPlayerLevel ({}) must be in range 0..({}). Set to max.", value, maxStartLevel);
                     sWorld->setIntConfig(WorldIntConfigs(i), maxStartLevel);
                 }
                 break;
@@ -452,12 +452,12 @@ void WorldConfig::RecheckAndFixDependancy()
                 uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
                 if (value < minDKStartLevel)
                 {
-                    TC_LOG_ERROR("config", "StartDeathKnightPlayerLevel (%i) must be in range (%i)..(%i). Set to min.", value, minDKStartLevel, maxLevel);
+                    FMT_LOG_ERROR("config", "StartDeathKnightPlayerLevel ({}) must be in range ({})..({}). Set to min.", value, minDKStartLevel, maxLevel);
                     sWorld->setIntConfig(WorldIntConfigs(i), minDKStartLevel);
                 }
                 else if (value > maxLevel)
                 {
-                    TC_LOG_ERROR("config", "StartDeathKnightPlayerLevel (%i) must be in range (%i)..(%i). Set to max.", value, minDKStartLevel, maxLevel);
+                    FMT_LOG_ERROR("config", "StartDeathKnightPlayerLevel ({}) must be in range ({})..({}). Set to max.", value, minDKStartLevel, maxLevel);
                     sWorld->setIntConfig(WorldIntConfigs(i), maxLevel);
                 }
                 break;
@@ -466,7 +466,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > MAX_MONEY_AMOUNT)
                 {
-                    TC_LOG_ERROR("config", "StartPlayerMoney (%i) must be in range 0..%u. Set to max.", value, MAX_MONEY_AMOUNT);
+                    FMT_LOG_ERROR("config", "StartPlayerMoney ({}) must be in range 0..{}. Set to max.", value, MAX_MONEY_AMOUNT);
                     sWorld->setIntConfig(WorldIntConfigs(i), MAX_MONEY_AMOUNT);
                 }
                 break;
@@ -476,7 +476,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 uint32 maxHonor = sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS);
                 if (value > maxHonor)
                 {
-                    TC_LOG_ERROR("config", "StartHonorPoints (%i) must be in range 0..MaxHonorPoints(%u). Set to %u.", value, maxHonor, maxHonor);
+                    FMT_LOG_ERROR("config", "StartHonorPoints ({}) must be in range 0..MaxHonorPoints({}). Set to {}.", value, maxHonor, maxHonor);
                     sWorld->setIntConfig(WorldIntConfigs(i), maxHonor);
                 }
                 break;
@@ -486,7 +486,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 uint32 maxAP = sWorld->getIntConfig(CONFIG_MAX_ARENA_POINTS);
                 if (value > maxAP)
                 {
-                    TC_LOG_ERROR("config", "StartArenaPoints (%i) must be in range 0..MaxArenaPoints(%u). Set to %u.", value, maxAP, maxAP);
+                    FMT_LOG_ERROR("config", "StartArenaPoints ({}) must be in range 0..MaxArenaPoints({}). Set to {}.", value, maxAP, maxAP);
                     sWorld->setIntConfig(WorldIntConfigs(i), maxAP);
                 }
                 break;
@@ -496,7 +496,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 uint32 maxLVL = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
                 if (value > maxLVL)
                 {
-                    TC_LOG_ERROR("config", "RecruitAFriend.MaxLevel (%i) must be in range 0..MaxPlayerLevel(%u). Set to %u.", value, maxLVL, maxLVL);
+                    FMT_LOG_ERROR("config", "RecruitAFriend.MaxLevel ({}) must be in range 0..MaxPlayerLevel({}). Set to {}.", value, maxLVL, maxLVL);
                     sWorld->setIntConfig(WorldIntConfigs(i), maxLVL);
                 }
                 break;
@@ -505,7 +505,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 23)
                 {
-                    TC_LOG_ERROR("config", "Quests.DailyResetTime (%i) must be in range 0..23. Set to 3.", value);
+                    FMT_LOG_ERROR("config", "Quests.DailyResetTime ({}) must be in range 0..23. Set to 3.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 3);
                 }
                 break;
@@ -514,7 +514,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 6)
                 {
-                    TC_LOG_ERROR("config", "Quests.WeeklyResetDay (%i) must be in range 0..6. Set to 3 (Wednesday).", value);
+                    FMT_LOG_ERROR("config", "Quests.WeeklyResetDay ({}) must be in range 0..6. Set to 3 (Wednesday).", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 6);
                 }
                 break;
@@ -523,7 +523,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 9)
                 {
-                    TC_LOG_ERROR("config", "MinPetitionSigns (%i) must be in range 0..9. Set to 9.", value);
+                    FMT_LOG_ERROR("config", "MinPetitionSigns ({}) must be in range 0..9. Set to 9.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 9);
                 }
                 break;
@@ -532,7 +532,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value != 0 && value < 2)
                 {
-                    TC_LOG_ERROR("config", "MaxOverspeedPings (%i) must be in range 2..infinity (or 0 to disable check). Set to 2.", value);
+                    FMT_LOG_ERROR("config", "MaxOverspeedPings ({}) must be in range 2..infinity (or 0 to disable check). Set to 2.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 2);
                 }
                 break;
@@ -541,12 +541,12 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value < 1)
                 {
-                    TC_LOG_ERROR("config", "Battleground.ReportAFK (%i) must be > 0, set to min 1.", value);
+                    FMT_LOG_ERROR("config", "Battleground.ReportAFK ({}) must be > 0, set to min 1.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 1);
                 }
                 else if (value > 9)
                 {
-                    TC_LOG_ERROR("config", "Battleground.ReportAFK (%i) must be < 10. Set max (10).", value);
+                    FMT_LOG_ERROR("config", "Battleground.ReportAFK ({}) must be < 10. Set max (10).", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 10);
                 }
                 break;
@@ -555,7 +555,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > GUILD_EVENTLOG_MAX_RECORDS)
                 {
-                    TC_LOG_ERROR("config", "Guild.EventLogRecordsCount (%i) must be < 100, set to default 100.", value);
+                    FMT_LOG_ERROR("config", "Guild.EventLogRecordsCount ({}) must be < 100, set to default 100.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 100);
                 }
                 break;
@@ -564,7 +564,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > GUILD_BANKLOG_MAX_RECORDS)
                 {
-                    TC_LOG_ERROR("config", "Guild.BankEventLogRecordsCount (%i) must be < 25, set to default 25.", value);
+                    FMT_LOG_ERROR("config", "Guild.BankEventLogRecordsCount ({}) must be < 25, set to default 25.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 25);
                 }
                 break;
@@ -574,7 +574,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 uint32 maxStartLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
                 if (value > maxStartLevel)
                 {
-                    TC_LOG_ERROR("config", "PlayerSave.Stats.MinLevel (%i) must be in range 0..(%i). Using default, do not save character stats (0).", value, maxStartLevel);
+                    FMT_LOG_ERROR("config", "PlayerSave.Stats.MinLevel ({}) must be in range 0..({}). Using default, do not save character stats (0).", value, maxStartLevel);
                     sWorld->setIntConfig(WorldIntConfigs(i), 0);
                 }
                 break;
@@ -583,7 +583,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 23)
                 {
-                    TC_LOG_ERROR("config", "Battleground.Random.ResetHour (%i) can't be load. Set to 6.", value);
+                    FMT_LOG_ERROR("config", "Battleground.Random.ResetHour ({}) can't be load. Set to 6.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 6);
                 }
                 break;
@@ -592,7 +592,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 23)
                 {
-                    TC_LOG_ERROR("config", "Calendar.DeleteOldEventsHour (%i) can't be load. Set to 6.", value);
+                    FMT_LOG_ERROR("config", "Calendar.DeleteOldEventsHour ({}) can't be load. Set to 6.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 6);
                 }
                 break;
@@ -601,7 +601,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 23)
                 {
-                    TC_LOG_ERROR("config", "Guild.ResetHour (%i) can't be load. Set to 6.", value);
+                    FMT_LOG_ERROR("config", "Guild.ResetHour ({}) can't be load. Set to 6.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 6);
                 }
                 break;
@@ -611,7 +611,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 uint32 delay = sWorld->getIntConfig(CONFIG_AUCTION_GETALL_DELAY);
                 if (value < 100 || value > delay)
                 {
-                    TC_LOG_ERROR("config", "Auction.SearchDelay (%i) must be between 100 and 10000. Using default of 300ms", value);
+                    FMT_LOG_ERROR("config", "Auction.SearchDelay ({}) must be between 100 and 10000. Using default of 300ms", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 300);
                 }
                 break;
@@ -620,7 +620,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 1)
                 {
-                    TC_LOG_ERROR("config", "Invalid value for Respawn.DynamicMode (%u). Set to 0.", value);
+                    FMT_LOG_ERROR("config", "Invalid value for Respawn.DynamicMode ({}). Set to 0.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 0);
                 }
                 break;
@@ -629,7 +629,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 16777215)
                 {
-                    TC_LOG_ERROR("config", "Respawn.GuidWarnLevel (%u) cannot be greater than maximum GUID (16777215). Set to 12000000.", value);
+                    FMT_LOG_ERROR("config", "Respawn.GuidWarnLevel ({}) cannot be greater than maximum GUID (16777215). Set to 12000000.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 12000000);
                 }
                 break;
@@ -638,7 +638,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 16777215)
                 {
-                    TC_LOG_ERROR("config", "Respawn.GuidWarnLevel (%u) cannot be greater than maximum GUID (16777215). Set to 16000000.", value);
+                    FMT_LOG_ERROR("config", "Respawn.GuidWarnLevel ({}) cannot be greater than maximum GUID (16777215). Set to 16000000.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 16000000);
                 }
                 break;
@@ -647,7 +647,7 @@ void WorldConfig::RecheckAndFixDependancy()
             {
                 if (value > 23)
                 {
-                    TC_LOG_ERROR("config", "Respawn.RestartQuietTime (%u) must be an hour, between 0 and 23. Set to 3.", value);
+                    FMT_LOG_ERROR("config", "Respawn.RestartQuietTime ({}) must be an hour, between 0 and 23. Set to 3.", value);
                     sWorld->setIntConfig(WorldIntConfigs(i), 3);
                 }
                 break;
@@ -668,7 +668,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 bool unloadgrid = sWorld->getBoolConfig(CONFIG_GRID_UNLOAD);
                 if (value && unloadgrid)
                 {
-                    TC_LOG_ERROR("config", "BaseMapLoadAllGrids enabled, but GridUnload also enabled. GridUnload must be disabled to enable base map pre-loading. Base map pre-loading disabled");
+                    FMT_LOG_ERROR("config", "BaseMapLoadAllGrids enabled, but GridUnload also enabled. GridUnload must be disabled to enable base map pre-loading. Base map pre-loading disabled");
                     sWorld->setBoolConfig(WorldBoolConfigs(i), 0);
                 }
                 break;
@@ -678,7 +678,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 bool unloadgrid = sWorld->getBoolConfig(CONFIG_GRID_UNLOAD);
                 if (value && unloadgrid)
                 {
-                    TC_LOG_ERROR("config", "InstanceMapLoadAllGrids enabled, but GridUnload also enabled. GridUnload must be disabled to enable instance map pre-loading. Instance map pre-loading disabled");
+                    FMT_LOG_ERROR("config", "InstanceMapLoadAllGrids enabled, but GridUnload also enabled. GridUnload must be disabled to enable instance map pre-loading. Instance map pre-loading disabled");
                     sWorld->setBoolConfig(WorldBoolConfigs(i), 0);
                 }
                 break;
@@ -688,7 +688,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 bool vmap = sWorld->getBoolConfig(CONFIG_DETECT_POS_COLLISION);
                 if (value && !vmap)
                 {
-                    TC_LOG_ERROR("config", "CheckGameObjectLoS enabled, but DetectPosCollision disabled. CheckGameObjectLoS disabled");
+                    FMT_LOG_ERROR("config", "CheckGameObjectLoS enabled, but DetectPosCollision disabled. CheckGameObjectLoS disabled");
                     sWorld->setBoolConfig(WorldBoolConfigs(i), 0);
                 }
                 break;
@@ -698,7 +698,7 @@ void WorldConfig::RecheckAndFixDependancy()
                 bool vmap = sWorld->getBoolConfig(CONFIG_DETECT_POS_COLLISION);
                 if (value && !vmap)
                 {
-                    TC_LOG_ERROR("config", "CheckM2ObjectLoS enabled, but DetectPosCollision disabled. CheckGameObjectLoS disabled");
+                    FMT_LOG_ERROR("config", "CheckM2ObjectLoS enabled, but DetectPosCollision disabled. CheckGameObjectLoS disabled");
                     sWorld->setBoolConfig(WorldBoolConfigs(i), 0);
                 }
                 break;
@@ -708,14 +708,14 @@ void WorldConfig::RecheckAndFixDependancy()
         }
     }
 
-    TC_LOG_INFO("server.loading", ">> RecheckAndFixDependancy handled in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> RecheckAndFixDependancy handled in {} ms", GetMSTimeDiffToNow(oldMSTime));
 }
 
 void WorldConfig::AddBoolOption(uint32 IDinTypeGroup, bool const& value)
 {
     if (!sWorld->setBoolConfig(WorldBoolConfigs(IDinTypeGroup), value))
     {
-        TC_LOG_ERROR("config", "> Bool option (%u) did not registered in core!", IDinTypeGroup);
+        FMT_LOG_ERROR("config", "> Bool option ({}) did not registered in core!", IDinTypeGroup);
         return;
     }
 }
@@ -724,7 +724,7 @@ void WorldConfig::AddIntOption(uint32 IDinTypeGroup, uint32 const& value)
 {
     if (!sWorld->setIntConfig(WorldIntConfigs(IDinTypeGroup), value))
     {
-        TC_LOG_ERROR("config", "> Int option (%u) did not registered in core!", IDinTypeGroup);
+        FMT_LOG_ERROR("config", "> Int option ({}) did not registered in core!", IDinTypeGroup);
         return;
     }
 }
@@ -733,7 +733,7 @@ void WorldConfig::AddFloatOption(uint32 IDinTypeGroup, float const& value)
 {
     if (!sWorld->setFloatConfig(WorldFloatConfigs(IDinTypeGroup), value))
     {
-        TC_LOG_ERROR("config", "> Float option (%u) did not registered in core!", IDinTypeGroup);
+        FMT_LOG_ERROR("config", "> Float option ({}) did not registered in core!", IDinTypeGroup);
         return;
     }
 }
@@ -742,7 +742,7 @@ void WorldConfig::AddRateOption(uint32 IDinTypeGroup, float const& value)
 {
     if (!sWorld->setRate(Rates(IDinTypeGroup), value))
     {
-        TC_LOG_ERROR("config", "> Rate option (%u) did not registered in core!", IDinTypeGroup);
+        FMT_LOG_ERROR("config", "> Rate option ({}) did not registered in core!", IDinTypeGroup);
         return;
     }
 }

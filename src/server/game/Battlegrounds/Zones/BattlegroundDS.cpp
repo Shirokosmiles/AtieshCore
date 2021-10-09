@@ -177,7 +177,7 @@ bool BattlegroundDS::SetupBattleground()
         BattlegroundSpawnPoint const& creature = BG_DS_Creatures[i];
         if (!AddCreature(creature.Entry, i, creature.Pos, creature.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "BattleGroundDS: Failed to spawn Creature! (Entry: %u). Battleground not created!", creature.Entry);
+            FMT_LOG_ERROR("bg.battleground", "BattleGroundDS: Failed to spawn Creature! (Entry: {}). Battleground not created!", creature.Entry);
             return false;
         }
     }
@@ -187,7 +187,7 @@ bool BattlegroundDS::SetupBattleground()
         BattlegroundGOSpawnPoint const& object = BG_DS_GameObjects[i];
         if (!AddObject(i, object.Entry, object.Pos, object.Rot, object.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "BattleGroundDS: Failed to spawn GameObject! (Entry: %u). Battleground not created!", object.Entry);
+            FMT_LOG_ERROR("bg.battleground", "BattleGroundDS: Failed to spawn GameObject! (Entry: {}). Battleground not created!", object.Entry);
             return false;
         }
     }

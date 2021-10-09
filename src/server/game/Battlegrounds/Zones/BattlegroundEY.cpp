@@ -296,7 +296,7 @@ void BattlegroundEY::CheckSomeoneJoinedPoint()
                 Player* player = ObjectAccessor::FindPlayer(m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS][j]);
                 if (!player)
                 {
-                    TC_LOG_ERROR("bg.battleground", "BattlegroundEY:CheckSomeoneJoinedPoint: Player (%s) could not be found!", m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS][j].ToString().c_str());
+                    FMT_LOG_ERROR("bg.battleground", "BattlegroundEY:CheckSomeoneJoinedPoint: Player ({}) could not be found!", m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS][j].ToString());
                     ++j;
                     continue;
                 }
@@ -336,7 +336,7 @@ void BattlegroundEY::CheckSomeoneLeftPoint()
                 if (!player)
                 {
                     //move non-existing players to "free space" - this will cause many errors showing in log, but it is a very important bug
-                    TC_LOG_ERROR("bg.battleground", "BattlegroundEY:CheckSomeoneLeftPoint Player (%s) could not be found!", m_PlayersNearPoint[i][j].ToString().c_str());
+                    FMT_LOG_ERROR("bg.battleground", "BattlegroundEY:CheckSomeoneLeftPoint Player ({}) could not be found!", m_PlayersNearPoint[i][j].ToString());
                     m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS].push_back(m_PlayersNearPoint[i][j]);
                     m_PlayersNearPoint[i].erase(m_PlayersNearPoint[i].begin() + j);
                     continue;
@@ -577,7 +577,7 @@ bool BattlegroundEY::SetupBattleground()
         BattlegroundGOSpawnPoint const& object = BG_EY_GameObjects[i];
         if (!AddObject(i, object.Entry, object.Pos, object.Rot, object.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "BattleGroundEY: Failed to spawn GameObject! (Entry: %u). Battleground not created!", object.Entry);
+            FMT_LOG_ERROR("bg.battleground", "BattleGroundEY: Failed to spawn GameObject! (Entry: {}). Battleground not created!", object.Entry);
             return false;
         }
     }
@@ -585,14 +585,14 @@ bool BattlegroundEY::SetupBattleground()
     WorldSafeLocsDBC const* sg = sDBCStoresMgr->GetWorldSafeLocsDBC(EY_GRAVEYARD_MAIN_ALLIANCE);
     if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_ALLIANCE, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, 3.124139f), TEAM_ALLIANCE))
     {
-        TC_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. The battleground was not created.");
+        FMT_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. The battleground was not created.");
         return false;
     }
 
     sg = sDBCStoresMgr->GetWorldSafeLocsDBC(EY_GRAVEYARD_MAIN_HORDE);
     if (!sg || !AddSpiritGuide(EY_SPIRIT_MAIN_HORDE, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, 3.193953f), TEAM_HORDE))
     {
-        TC_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. The battleground was not created.");
+        FMT_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. The battleground was not created.");
         return false;
     }
 
@@ -658,7 +658,7 @@ void BattlegroundEY::RespawnFlagAfterDrop()
     if (obj)
         obj->Delete();
     else
-        TC_LOG_ERROR("bg.battleground", "BattlegroundEY: Unknown dropped flag (%s).", GetDroppedFlagGUID().ToString().c_str());
+        FMT_LOG_ERROR("bg.battleground", "BattlegroundEY: Unknown dropped flag ({}).", GetDroppedFlagGUID().ToString());
 
     SetDroppedFlagGUID(ObjectGuid::Empty);
 }
@@ -826,7 +826,7 @@ void BattlegroundEY::EventTeamCapturedPoint(Player* player, EYBattlegroundPoints
     WorldSafeLocsDBC const* sg = nullptr;
     sg = sDBCStoresMgr->GetWorldSafeLocsDBC(m_CapturingPointTypes[Point].GraveYardId);
     if (!sg || !AddSpiritGuide(Point, Position(sg->Loc.X, sg->Loc.Y, sg->Loc.Z, 3.124139f), GetTeamIndexByTeamId(Team)))
-        TC_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. point: %u, team: %u, graveyard_id: %u",
+        FMT_LOG_ERROR("bg.battleground", "BatteGroundEY: Failed to spawn spirit guide. point: {}, team: {}, graveyard_id: {}",
             Point, Team, m_CapturingPointTypes[Point].GraveYardId);
 
     // SpawnBGCreature(Point, RESPAWN_IMMEDIATELY);
@@ -957,7 +957,7 @@ WorldSafeLocsDBC const* BattlegroundEY::GetClosestGraveyard(Player* player)
 
     if (!entry)
     {
-        TC_LOG_ERROR("bg.battleground", "BattlegroundEY: The main team graveyard could not be found. The graveyard system will not be operational!");
+        FMT_LOG_ERROR("bg.battleground", "BattlegroundEY: The main team graveyard could not be found. The graveyard system will not be operational!");
         return nullptr;
     }
 
@@ -974,7 +974,7 @@ WorldSafeLocsDBC const* BattlegroundEY::GetClosestGraveyard(Player* player)
         {
             entry = sDBCStoresMgr->GetWorldSafeLocsDBC(m_CapturingPointTypes[i].GraveYardId);
             if (!entry)
-                TC_LOG_ERROR("bg.battleground", "BattlegroundEY: Graveyard %u could not be found.", m_CapturingPointTypes[i].GraveYardId);
+                FMT_LOG_ERROR("bg.battleground", "BattlegroundEY: Graveyard {} could not be found.", m_CapturingPointTypes[i].GraveYardId);
             else
             {
                 distance = (entry->Loc.X - plr_x)*(entry->Loc.X - plr_x) + (entry->Loc.Y - plr_y)*(entry->Loc.Y - plr_y) + (entry->Loc.Z - plr_z)*(entry->Loc.Z - plr_z);

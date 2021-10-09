@@ -139,13 +139,13 @@ public:
                 dbPortOutput = Trinity::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
         }
 
-        handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
-        handler->PSendSysMessage("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-        handler->PSendSysMessage("Using Boost version: %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
-        handler->PSendSysMessage("Using MySQL version: %u", MySQL::GetLibraryVersion());
-        handler->PSendSysMessage("Using CMake version: %s", GitRevision::GetCMakeVersion());
+        handler->PSendSysMessage("{}", GitRevision::GetFullVersion());
+        handler->PSendSysMessage("Using SSL version: {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+        handler->PSendSysMessage("Using Boost version: {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+        handler->PSendSysMessage("Using MySQL version: {}", MySQL::GetLibraryVersion());
+        handler->PSendSysMessage("Using CMake version: {}", GitRevision::GetCMakeVersion());
 
-        handler->PSendSysMessage("Compiled on: %s", GitRevision::GetHostOSVersion());
+        handler->PSendSysMessage("Compiled on: {}", GitRevision::GetHostOSVersion());
 
         uint32 updateFlags = sConfigMgr->GetIntDefault("Updates.EnableDatabases", DatabaseLoader::DATABASE_NONE);
         if (!updateFlags)
@@ -170,11 +170,11 @@ public:
                     availableUpdateDatabases += ", ";
             }
 
-            handler->PSendSysMessage("Automatic database updates are enabled for the following databases: %s", availableUpdateDatabases.c_str());
+            handler->PSendSysMessage("Automatic database updates are enabled for the following databases: {}", availableUpdateDatabases);
         }
 
         handler->PSendSysMessage("Worldserver listening connections on port %" PRIu16, worldPort);
-        handler->PSendSysMessage("%s", dbPortOutput.c_str());
+        handler->PSendSysMessage("{}", dbPortOutput);
 
         bool vmapIndoorCheck = sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);
         bool vmapLOSCheck = VMAP::VMapFactory::createOrGetVMapManager()->isLineOfSightCalcEnabled();
@@ -187,7 +187,7 @@ public:
         subDirs.emplace_back("maps");
         if (vmapIndoorCheck || vmapLOSCheck || vmapHeightCheck)
         {
-            handler->PSendSysMessage("VMAPs status: Enabled. LineOfSight: %i, getHeight: %i, indoorCheck: %i", vmapLOSCheck, vmapHeightCheck, vmapIndoorCheck);
+            handler->PSendSysMessage("VMAPs status: Enabled. LineOfSight: {}, getHeight: {}, indoorCheck: {}", vmapLOSCheck, vmapHeightCheck, vmapIndoorCheck);
             subDirs.emplace_back("vmaps");
         }
         else
@@ -208,7 +208,7 @@ public:
 
             if (!boost::filesystem::exists(mapPath))
             {
-                handler->PSendSysMessage("%s directory doesn't exist!. Using path: %s", subDir.c_str(), mapPath.generic_string().c_str());
+                handler->PSendSysMessage("{} directory doesn't exist!. Using path: {}", subDir, mapPath.generic_string());
                 continue;
             }
 
@@ -221,7 +221,7 @@ public:
                 return val;
             });
 
-            handler->PSendSysMessage("%s directory located in %s. Total size: " SZFMTD " bytes", subDir.c_str(), mapPath.generic_string().c_str(), folderSize);
+            handler->PSendSysMessage("{} directory located in {}. Total size: {} bytes", subDir, mapPath.generic_string(), folderSize);
         }
 
         LocaleConstant defaultLocale = sWorld->GetDefaultDbcLocale();
@@ -248,9 +248,9 @@ public:
                 availableLocales += " ";
         }
 
-        handler->PSendSysMessage("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[defaultLocale], availableLocales.c_str());
+        handler->PSendSysMessage("Using {} DBC Locale as default. All available DBC locales: {}", localeNames[defaultLocale], availableLocales);
 
-        handler->PSendSysMessage("Using World DB: %s", sWorld->GetDBVersion());
+        handler->PSendSysMessage("Using World DB: {}", sWorld->GetDBVersion());
 
         handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
@@ -269,14 +269,14 @@ public:
         std::string uptime          = secsToTimeString(GameTime::GetUptime());
         uint32 updateTime           = sWorldUpdateTime.GetLastUpdateTime();
 
-        handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
+        handler->PSendSysMessage("{}", GitRevision::GetFullVersion());
         handler->PSendSysMessage(LANG_CONNECTED_PLAYERS, playersNum, maxPlayersNum);
         handler->PSendSysMessage(LANG_CONNECTED_USERS, activeClientsNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
-        handler->PSendSysMessage(LANG_UPTIME, uptime.c_str());
+        handler->PSendSysMessage(LANG_UPTIME, uptime);
         handler->PSendSysMessage(LANG_UPDATE_DIFF, updateTime);
         // Can't use sWorld->ShutdownMsg here in case of console command
         if (sWorld->IsShuttingDown())
-            handler->PSendSysMessage(LANG_SHUTDOWN_TIMELEFT, secsToTimeString(sWorld->GetShutDownTimeLeft()).c_str());
+            handler->PSendSysMessage(LANG_SHUTDOWN_TIMELEFT, secsToTimeString(sWorld->GetShutDownTimeLeft()));
 
         return true;
     }
@@ -341,7 +341,7 @@ public:
                 secName = "<unknown>";
                 break;
         }
-        handler->PSendSysMessage("Player limits: amount %u, min. security level %s.", playerAmountLimit, secName);
+        handler->PSendSysMessage("Player limits: amount {}, min. security level {}.", playerAmountLimit, secName);
 
         return true;
     }

@@ -174,7 +174,7 @@ bool WGCapturePoint::SetCapturePointData(GameObject* capturePoint)
 {
     ASSERT(capturePoint);
 
-    TC_LOG_DEBUG("bg.battlefield", "Creating capture point %u", capturePoint->GetEntry());
+    FMT_LOG_DEBUG("bg.battlefield", "Creating capture point {}", capturePoint->GetEntry());
 
     m_capturePointGUID = ObjectGuid(HighGuid::GameObject, capturePoint->GetEntry(), capturePoint->GetGUID().GetCounter());
 
@@ -182,7 +182,7 @@ bool WGCapturePoint::SetCapturePointData(GameObject* capturePoint)
     GameObjectTemplate const* goinfo = capturePoint->GetGOInfo();
     if (goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
     {
-        TC_LOG_ERROR("bg.battlefield", "SetCapturePointData: GO %u is not a capture point!", capturePoint->GetEntry());
+        FMT_LOG_ERROR("bg.battlefield", "SetCapturePointData: GO {} is not a capture point!", capturePoint->GetEntry());
         return false;
     }
 
@@ -328,7 +328,7 @@ bool WGCapturePoint::Update(uint32 diff)
 
     if (m_OldState != m_State)
     {
-        //TC_LOG_ERROR("bg.battlefield", "%u->%u", m_OldState, m_State);
+        //FMT_LOG_ERROR("bg.battlefield", "{}->{}", m_OldState, m_State);
         ChangeState();
         ChangeTeam(m_team);
         return true;

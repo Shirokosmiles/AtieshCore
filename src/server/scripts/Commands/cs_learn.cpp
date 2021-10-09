@@ -98,7 +98,7 @@ public:
             if (targetPlayer == handler->GetPlayer())
                 handler->SendSysMessage(LANG_YOU_KNOWN_SPELL);
             else
-                handler->PSendSysMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer).c_str());
+                handler->PSendSysMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -342,7 +342,7 @@ public:
         target->LearnCustomSpells();
         target->LearnQuestRewardedSpells();
 
-        handler->PSendSysMessage(LANG_COMMAND_LEARN_ALL_DEFAULT_AND_QUEST, handler->GetNameLink(target).c_str());
+        handler->PSendSysMessage(LANG_COMMAND_LEARN_ALL_DEFAULT_AND_QUEST, handler->GetNameLink(target));
         return true;
     }
 

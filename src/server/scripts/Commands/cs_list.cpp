@@ -133,9 +133,9 @@ public:
                         for (std::unordered_multimap<uint32, Creature*>::const_iterator itr = creBounds.first; itr != creBounds.second;)
                         {
                             if (handler->GetSession())
-                                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
+                                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name, x, y, z, mapId, itr->second->GetGUID().ToString(), itr->second->IsAlive() ? "*" : " ");
                             else
-                                handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->IsAlive() ? "*" : " ");
+                                handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name, x, y, z, mapId, itr->second->GetGUID().ToString(), itr->second->IsAlive() ? "*" : " ");
                             ++itr;
                         }
                         liveFound = true;
@@ -145,9 +145,9 @@ public:
                 if (!liveFound)
                 {
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name.c_str(), x, y, z, mapId, "", "");
+                        handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name, x, y, z, mapId, "", "");
                     else
-                        handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name.c_str(), x, y, z, mapId, "", "");
+                        handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name, x, y, z, mapId, "", "");
                 }
             }
             while (result->NextRow());
@@ -205,7 +205,7 @@ public:
                 else
                     itemPos = "";
 
-                handler->PSendSysMessage(LANG_ITEMLIST_SLOT, itemGuid, ownerName.c_str(), ownerGuid, ownerAccountId, itemPos);
+                handler->PSendSysMessage(LANG_ITEMLIST_SLOT, itemGuid, ownerName, ownerGuid, ownerAccountId, itemPos);
             }
             while (result->NextRow());
 
@@ -252,7 +252,7 @@ public:
 
                 char const* itemPos = "[in mail]";
 
-                handler->PSendSysMessage(LANG_ITEMLIST_MAIL, itemGuid, itemSenderName.c_str(), itemSender, itemSenderAccountId, itemReceiverName.c_str(), itemReceiver, itemReceiverAccount, itemPos);
+                handler->PSendSysMessage(LANG_ITEMLIST_MAIL, itemGuid, itemSenderName, itemSender, itemSenderAccountId, itemReceiverName, itemReceiver, itemReceiverAccount, itemPos);
             }
             while (result->NextRow());
 
@@ -296,7 +296,7 @@ public:
 
                 char const* itemPos = "[in auction]";
 
-                handler->PSendSysMessage(LANG_ITEMLIST_AUCTION, itemGuid, ownerName.c_str(), owner, ownerAccountId, itemPos);
+                handler->PSendSysMessage(LANG_ITEMLIST_AUCTION, itemGuid, ownerName, owner, ownerAccountId, itemPos);
             }
             while (result->NextRow());
         }
@@ -327,7 +327,7 @@ public:
 
                 char const* itemPos = "[in guild bank]";
 
-                handler->PSendSysMessage(LANG_ITEMLIST_GUILD, itemGuid, guildName.c_str(), guildGuid, itemPos);
+                handler->PSendSysMessage(LANG_ITEMLIST_GUILD, itemGuid, guildName, guildGuid, itemPos);
             }
             while (result->NextRow());
 
@@ -412,9 +412,9 @@ public:
                         for (std::unordered_multimap<uint32, GameObject*>::const_iterator itr = goBounds.first; itr != goBounds.second;)
                         {
                             if (handler->GetSession())
-                                handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gInfo->name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->isSpawned() ? "*" : " ");
+                                handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gInfo->name, x, y, z, mapId, itr->second->GetGUID().ToString(), itr->second->isSpawned() ? "*" : " ");
                             else
-                                handler->PSendSysMessage(LANG_GO_LIST_CONSOLE, guid, gInfo->name.c_str(), x, y, z, mapId, itr->second->GetGUID().ToString().c_str(), itr->second->isSpawned() ? "*" : " ");
+                                handler->PSendSysMessage(LANG_GO_LIST_CONSOLE, guid, gInfo->name, x, y, z, mapId, itr->second->GetGUID().ToString(), itr->second->isSpawned() ? "*" : " ");
                             ++itr;
                         }
                         liveFound = true;
@@ -424,9 +424,9 @@ public:
                 if (!liveFound)
                 {
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gInfo->name.c_str(), x, y, z, mapId, "", "");
+                        handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gInfo->name, x, y, z, mapId, "", "");
                     else
-                        handler->PSendSysMessage(LANG_GO_LIST_CONSOLE, guid, gInfo->name.c_str(), x, y, z, mapId, "", "");
+                        handler->PSendSysMessage(LANG_GO_LIST_CONSOLE, guid, gInfo->name, x, y, z, mapId, "", "");
                 }
             }
             while (result->NextRow());
@@ -482,7 +482,7 @@ public:
             std::ostringstream ss_name;
             ss_name << "|cffffffff|Hspell:" << aura->GetId() << "|h[" << name << "]|h|r";
 
-            handler->PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, aura->GetId(), (handler->GetSession() ? ss_name.str().c_str() : name),
+            handler->PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, aura->GetId(), (handler->GetSession() ? ss_name.str() : name),
                 aurApp->GetEffectMask(), aura->GetCharges(), aura->GetStackAmount(), aurApp->GetSlot(),
                 aura->GetDuration(), aura->GetMaxDuration(), (aura->IsPassive() ? passiveStr : ""),
                 (talent ? talentStr : ""), aura->GetCasterGUID().IsPlayer() ? "player" : "creature",
@@ -546,7 +546,7 @@ public:
             uint32 countMail    = fields[0].GetUInt64();
 
             std::string nameLink = handler->playerLink(player->GetName());
-            handler->PSendSysMessage(LANG_LIST_MAIL_HEADER, countMail, nameLink.c_str(), player->GetGUID().GetCounter());
+            handler->PSendSysMessage(LANG_LIST_MAIL_HEADER, countMail, nameLink, player->GetGUID().GetCounter());
             handler->PSendSysMessage(LANG_ACCOUNT_LIST_BAR);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL_LIST_INFO);
@@ -573,9 +573,9 @@ public:
                     uint32 copp = (money % GOLD) % SILVER;
                     std::string receiverStr = handler->playerLink(receiver);
                     std::string senderStr = handler->playerLink(sender);
-                    handler->PSendSysMessage(LANG_LIST_MAIL_INFO_1, messageId, subject.c_str(), gold, silv, copp);
-                    handler->PSendSysMessage(LANG_LIST_MAIL_INFO_2, senderStr.c_str(), senderId, receiverStr.c_str(), receiverId);
-                    handler->PSendSysMessage(LANG_LIST_MAIL_INFO_3, TimeToTimestampStr(deliverTime).c_str(), TimeToTimestampStr(expireTime).c_str());
+                    handler->PSendSysMessage(LANG_LIST_MAIL_INFO_1, messageId, subject, gold, silv, copp);
+                    handler->PSendSysMessage(LANG_LIST_MAIL_INFO_2, senderStr, senderId, receiverStr, receiverId);
+                    handler->PSendSysMessage(LANG_LIST_MAIL_INFO_3, TimeToTimestampStr(deliverTime), TimeToTimestampStr(expireTime));
 
                     if (hasItem == 1)
                     {
@@ -606,10 +606,10 @@ public:
                                             uint32 color = ItemQualityColors[item_quality];
                                             std::ostringstream itemStr;
                                             itemStr << "|c" << std::hex << color << "|Hitem:" << item_entry << ":0:0:0:0:0:0:0:0:0|h[" << item_name << "]|h|r";
-                                            handler->PSendSysMessage(LANG_LIST_MAIL_INFO_ITEM, itemStr.str().c_str(), item_entry, item_guid, item_count);
+                                            handler->PSendSysMessage(LANG_LIST_MAIL_INFO_ITEM, itemStr.str(), item_entry, item_guid, item_count);
                                         }
                                         else
-                                            handler->PSendSysMessage(LANG_LIST_MAIL_INFO_ITEM, item_name.c_str(), item_entry, item_guid, item_count);
+                                            handler->PSendSysMessage(LANG_LIST_MAIL_INFO_ITEM, item_name, item_entry, item_guid, item_count);
                                     }
                                     while (result3->NextRow());
                                 }
@@ -636,7 +636,7 @@ public:
         Map const* map = player->GetMap();
         uint32 const mapId = map->GetId();
         bool const showAll = map->IsBattlegroundOrArena() || map->IsDungeon();
-        handler->PSendSysMessage("Listing all spawn points in map %u (%s)%s:", mapId, map->GetMapName(), showAll ? "" : " within 5000yd");
+        handler->PSendSysMessage("Listing all spawn points in map {} ({}){}:", mapId, map->GetMapName(), showAll ? "" : " within 5000yd");
         for (auto const& pair : sObjectMgr->GetAllCreatureData())
         {
             SpawnData const& data = pair.second;
@@ -646,7 +646,7 @@ public:
             if (!cTemp)
                 continue;
             if (showAll || data.spawnPoint.IsInDist2d(player, 5000.0))
-                handler->PSendSysMessage("Type: %u | SpawnId: %u | Entry: %u (%s) | X: %.3f | Y: %.3f | Z: %.3f", uint32(data.type), data.spawnId, data.id, cTemp->Name.c_str(), data.spawnPoint.GetPositionX(), data.spawnPoint.GetPositionY(), data.spawnPoint.GetPositionZ());
+                handler->PSendSysMessage("Type: {} | SpawnId: {} | Entry: {} ({}) | X: {0:.3f} | Y: {0:.3f} | Z: {0:.3f}", uint32(data.type), data.spawnId, data.id, cTemp->Name, data.spawnPoint.GetPositionX(), data.spawnPoint.GetPositionY(), data.spawnPoint.GetPositionZ());
         }
         for (auto const& pair : sObjectMgr->GetAllGameObjectData())
         {
@@ -657,7 +657,7 @@ public:
             if (!goTemp)
                 continue;
             if (showAll || data.spawnPoint.IsInDist2d(player, 5000.0))
-                handler->PSendSysMessage("Type: %u | SpawnId: %u | Entry: %u (%s) | X: %.3f | Y: %.3f | Z: %.3f", uint32(data.type), data.spawnId, data.id, goTemp->name.c_str(), data.spawnPoint.GetPositionX(), data.spawnPoint.GetPositionY(), data.spawnPoint.GetPositionZ());
+                handler->PSendSysMessage("Type: {} | SpawnId: {} | Entry: {} ({}) | X: {0:.3f} | Y: {0:.3f} | Z: {0:.3f}", uint32(data.type), data.spawnId, data.id, goTemp->name, data.spawnPoint.GetPositionX(), data.spawnPoint.GetPositionY(), data.spawnPoint.GetPositionZ());
         }
         return true;
     }
@@ -712,7 +712,7 @@ public:
                 uint32 gridY = ri->gridId / MAX_NUMBER_OF_GRIDS;
                 uint32 gridX = ri->gridId % MAX_NUMBER_OF_GRIDS;
                 std::string respawnTime = ri->respawnTime > GameTime::GetGameTime() ? secsToTimeString(uint64(ri->respawnTime - GameTime::GetGameTime()), TimeFormat::ShortText) : stringOverdue;
-                handler->PSendSysMessage("%u | %u | [%02u,%02u] | %s (%u) | %s%s", ri->spawnId, ri->entry, gridX, gridY, GetZoneName(respawnZoneId, locale), respawnZoneId, respawnTime.c_str(), map->IsSpawnGroupActive(data->spawnGroupData->groupId) ? "" : " (inactive)");
+                handler->PSendSysMessage("{} | {} | [{:02},{:02}] | {} ({}) | {}{}", ri->spawnId, ri->entry, gridX, gridY, GetZoneName(respawnZoneId, locale), respawnZoneId, respawnTime, map->IsSpawnGroupActive(data->spawnGroupData->groupId) ? "" : " (inactive)");
             }
         }
         return true;

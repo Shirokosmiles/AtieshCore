@@ -40,7 +40,7 @@ bool WorldSession::CanOpenMailBox(ObjectGuid guid)
     {
         if (!HasPermission(rbac::RBAC_PERM_COMMAND_MAILBOX))
         {
-            TC_LOG_WARN("cheat", "%s attempted to open mailbox by using a cheat.", _player->GetName().c_str());
+            FMT_LOG_WARN("cheat", "{} attempted to open mailbox by using a cheat.", _player->GetName());
             return false;
         }
     }
@@ -82,9 +82,9 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMailClient& sendMail)
 
     if (!receiverGuid)
     {
-        TC_LOG_INFO("network", "Player %s is sending mail to %s (GUID: non-existing!) with subject %s "
-            "and body %s includes " SZFMTD " items, %u copper and %u COD copper with StationeryID = %d, PackageID = %d",
-            GetPlayerInfo().c_str(), sendMail.Target.c_str(), sendMail.Subject.c_str(), sendMail.Body.c_str(),
+        FMT_LOG_INFO("network", "Player {} is sending mail to {} (GUID: non-existing!) with subject {} "
+            "and body {} includes {} items, {} copper and {} COD copper with StationeryID = {}, PackageID = {}",
+            GetPlayerInfo(), sendMail.Target, sendMail.Subject, sendMail.Body,
             sendMail.Attachments.size(), sendMail.SendMoney, sendMail.Cod, sendMail.StationeryID, sendMail.PackageID);
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
         return;
@@ -93,23 +93,23 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMailClient& sendMail)
     if (sendMail.SendMoney < 0)
     {
         GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
-        TC_LOG_WARN("cheat", "Player %s attempted to send mail to %s (%s) with negative money value (SendMoney: %d)",
-            GetPlayerInfo().c_str(), sendMail.Target.c_str(), receiverGuid.ToString().c_str(), sendMail.SendMoney);
+        FMT_LOG_WARN("cheat", "Player {} attempted to send mail to {} ({}) with negative money value (SendMoney: {})",
+            GetPlayerInfo(), sendMail.Target, receiverGuid.ToString(), sendMail.SendMoney);
         return;
     }
 
     if (sendMail.Cod < 0)
     {
         GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
-        TC_LOG_WARN("cheat", "Player %s attempted to send mail to %s (%s) with negative COD value (Cod: %d)",
-            GetPlayerInfo().c_str(), sendMail.Target.c_str(), receiverGuid.ToString().c_str(), sendMail.Cod);
+        FMT_LOG_WARN("cheat", "Player {} attempted to send mail to {} ({}) with negative COD value (Cod: {})",
+            GetPlayerInfo(), sendMail.Target, receiverGuid.ToString(), sendMail.Cod);
         return;
     }
 
-    TC_LOG_INFO("network", "Player %s is sending mail to %s (%s) with subject %s and body %s "
-        "including " SZFMTD " items, %u copper and %u COD copper with StationeryID = %d, PackageID = %d",
-        GetPlayerInfo().c_str(), sendMail.Target.c_str(), receiverGuid.ToString().c_str(), sendMail.Subject.c_str(),
-        sendMail.Body.c_str(), sendMail.Attachments.size(), sendMail.SendMoney, sendMail.Cod, sendMail.StationeryID, sendMail.PackageID);
+    FMT_LOG_INFO("network", "Player {} is sending mail to {} ({}) with subject {} and body {} "
+        "including {} items, {} copper and {} COD copper with StationeryID = {}, PackageID = {}",
+        GetPlayerInfo(), sendMail.Target, receiverGuid.ToString(), sendMail.Subject,
+        sendMail.Body, sendMail.Attachments.size(), sendMail.SendMoney, sendMail.Cod, sendMail.StationeryID, sendMail.PackageID);
 
     if (player->GetGUID() == receiverGuid)
     {
@@ -259,10 +259,10 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMailClient& sendMail)
             {
                 if (log)
                 {
-                    sLog->outCommand(GetAccountId(), "GM %s (GUID: %u) (Account: %u) mail item: %s (Entry: %u Count: %u) "
-                        "to: %s (%s) (Account: %u)", GetPlayerName().c_str(), GetGUIDLow(), GetAccountId(),
-                        item->GetTemplate()->Name1.c_str(), item->GetEntry(), item->GetCount(),
-                        sendMail.Target.c_str(), receiverGuid.ToString().c_str(), receiverAccountId);
+                    sLog->outCommand(GetAccountId(), "GM {} (GUID: {}) (Account: {}) mail item: {} (Entry: {} Count: {}) "
+                        "to: {} ({}) (Account: {})", GetPlayerName(), GetGUIDLow(), GetAccountId(),
+                        item->GetTemplate()->Name1, item->GetEntry(), item->GetCount(),
+                        sendMail.Target, receiverGuid.ToString(), receiverAccountId);
                 }
 
                 item->SetNotRefundable(GetPlayer()); // makes the item no longer refundable
@@ -282,8 +282,8 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMailClient& sendMail)
 
         if (log && sendMail.SendMoney > 0)
         {
-            sLog->outCommand(GetAccountId(), "GM %s (GUID: %u) (Account: %u) mail money: %u to: %s (%s) (Account: %u)",
-                GetPlayerName().c_str(), GetGUIDLow(), GetAccountId(), sendMail.SendMoney, sendMail.Target.c_str(), receiverGuid.ToString().c_str(), receiverAccountId);
+            sLog->outCommand(GetAccountId(), "GM {} (GUID: {}) (Account: {}) mail money: {} to: {} ({}) (Account: {})",
+                GetPlayerName(), GetGUIDLow(), GetAccountId(), sendMail.SendMoney, sendMail.Target, receiverGuid.ToString(), receiverAccountId);
         }
     }
 

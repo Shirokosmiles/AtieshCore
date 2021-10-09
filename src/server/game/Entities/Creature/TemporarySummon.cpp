@@ -170,7 +170,7 @@ void TempSummon::Update(uint32 diff)
         }
         default:
             UnSummon();
-            TC_LOG_ERROR("entities.unit", "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
+            FMT_LOG_ERROR("entities.unit", "Temporary summoned creature (entry: {}) have unknown type {} of ", GetEntry(), m_type);
             break;
     }
 }
@@ -298,10 +298,10 @@ void TempSummon::RemoveFromWorld()
         if (GameObject* GO = GetSummonerGameObject())
         {
             GO->RemoveFromTempSummonsList(this);
-            //TC_LOG_ERROR("server", "Unit TempSummon, summoned by GO %s, removed from world", GO->GetName().c_str());
+            //FMT_LOG_ERROR("server", "Unit TempSummon, summoned by GO {}, removed from world", GO->GetName());
         }
     //if (GetOwnerGUID())
-    //    TC_LOG_ERROR("entities.unit", "Unit %u has owner guid when removed from world", GetEntry());
+    //    FMT_LOG_ERROR("entities.unit", "Unit {} has owner guid when removed from world", GetEntry());
 
     Creature::RemoveFromWorld();
 }
@@ -322,7 +322,7 @@ void TempSummon::Killed()
         if (GameObject* GO = GetSummonerGameObject())
         {
             GO->RemoveFromTempSummonsList(this);
-            //TC_LOG_ERROR("server", "Unit TempSummon, summoned by GO %s, removed from world", GO->GetName().c_str());
+            //FMT_LOG_ERROR("server", "Unit TempSummon, summoned by GO {}, removed from world", GO->GetName());
         }
 
     m_summonerGOGUID = ObjectGuid::Empty;

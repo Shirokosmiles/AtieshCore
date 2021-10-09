@@ -1120,7 +1120,7 @@ inline void CloseMPQFiles()
 
 int main(int argc, char * arg[])
 {
-    Trinity::Banner::Show("Map & DBC Extractor", [](char const* text) { printf("%s\n", text); }, nullptr);
+    Trinity::Banner::Show("Map & DBC Extractor", [](std::string_view text) { fmt::format("{}\n", text); }, nullptr);
 
     HandleArgs(argc, arg);
 

@@ -353,7 +353,7 @@ void WGGameObjectBuilding::Destroyed()
             if (_wg->GetRelic())
                 _wg->GetRelic()->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
             else
-                TC_LOG_ERROR("bg.battlefield.wg", "Titan Relic not found.");
+                FMT_LOG_ERROR("bg.battlefield.wg", "Titan Relic not found.");
             break;
         default:
             break;

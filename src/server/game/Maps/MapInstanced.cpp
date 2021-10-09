@@ -210,20 +210,20 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
     MapDBC const* entry = sDBCStoresMgr->GetMapDBC(GetId());
     if (!entry)
     {
-        TC_LOG_ERROR("maps", "CreateInstance: no entry for map %d", GetId());
+        FMT_LOG_ERROR("maps", "CreateInstance: no entry for map {}", GetId());
         ABORT();
     }
     InstanceTemplate const* iTemplate = sObjectMgr->GetInstanceTemplate(GetId());
     if (!iTemplate)
     {
-        TC_LOG_ERROR("maps", "CreateInstance: no instance template for map %d", GetId());
+        FMT_LOG_ERROR("maps", "CreateInstance: no instance template for map {}", GetId());
         ABORT();
     }
 
     // some instances only have one difficulty
     sDBCStoresMgr->GetDownscaledMapDifficultyData(GetId(), difficulty);
 
-    TC_LOG_DEBUG("maps", "MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %u", save ? "" : "new ", InstanceId, GetId(), static_cast<uint32>(difficulty));
+    FMT_LOG_DEBUG("maps", "MapInstanced::CreateInstance: {} map instance {} for {} created with difficulty {}", save ? "" : "new ", InstanceId, GetId(), static_cast<uint32>(difficulty));
 
     InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, this, InstanceTeam);
     ASSERT(map->IsDungeon());
@@ -246,7 +246,7 @@ BattlegroundMap* MapInstanced::CreateBattleground(uint32 InstanceId, Battlegroun
     // load/create a map
     std::lock_guard<std::mutex> lock(_mapLock);
 
-    TC_LOG_DEBUG("maps", "MapInstanced::CreateBattleground: map bg %d for %d created.", InstanceId, GetId());
+    FMT_LOG_DEBUG("maps", "MapInstanced::CreateBattleground: map bg {} for {} created.", InstanceId, GetId());
 
     PvPDifficultyDBC const* bracketEntry = sDBCStoresMgr->GetBattlegroundBracketByLevel(bg->GetMapId(), bg->GetMinLevel());
 

@@ -35,7 +35,7 @@ void WardenCheckMgr::LoadWardenChecks()
     // Check if Warden is enabled by config before loading anything
     if (!sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED))
     {
-        TC_LOG_INFO("warden", ">> Warden disabled, loading checks skipped.");
+        FMT_LOG_INFO("warden", ">> Warden disabled, loading checks skipped.");
         return;
     }
 
@@ -43,7 +43,7 @@ void WardenCheckMgr::LoadWardenChecks()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 Warden checks. DB table `warden_checks` is empty!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 Warden checks. DB table `warden_checks` is empty!");
         return;
     }
 
@@ -67,13 +67,13 @@ void WardenCheckMgr::LoadWardenChecks()
 
         if (category == NUM_CHECK_CATEGORIES)
         {
-            TC_LOG_ERROR("sql.sql", "Warden check with id %u lists check type %u in `warden_checks`, which is not supported. Skipped.", id, type);
+            FMT_LOG_ERROR("sql.sql", "Warden check with id {} lists check type {} in `warden_checks`, which is not supported. Skipped.", id, type);
             continue;
         }
 
         if ((type == LUA_EVAL_CHECK) && (id > 9999))
         {
-            TC_LOG_ERROR("sql.sql", "Warden Lua check with id %u found in `warden_checks`. Lua checks may have four-digit IDs at most. Skipped.", id);
+            FMT_LOG_ERROR("sql.sql", "Warden Lua check with id {} found in `warden_checks`. Lua checks may have four-digit IDs at most. Skipped.", id);
             continue;
         }
 
@@ -105,7 +105,7 @@ void WardenCheckMgr::LoadWardenChecks()
         {
             if (wardenCheck.Str.size() > WARDEN_MAX_LUA_CHECK_LENGTH)
             {
-                TC_LOG_ERROR("sql.sql", "Found over-long Lua check for Warden check with id %u in `warden_checks`. Max length is %u. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
+                FMT_LOG_ERROR("sql.sql", "Found over-long Lua check for Warden check with id {} in `warden_checks`. Max length is {}. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
                 continue;
             }
 
@@ -122,7 +122,7 @@ void WardenCheckMgr::LoadWardenChecks()
     }
     while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u warden checks in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} warden checks in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void WardenCheckMgr::LoadWardenOverrides()
@@ -132,7 +132,7 @@ void WardenCheckMgr::LoadWardenOverrides()
     // Check if Warden is enabled by config before loading anything
     if (!sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED))
     {
-        TC_LOG_INFO("warden", ">> Warden disabled, loading check overrides skipped.");
+        FMT_LOG_INFO("warden", ">> Warden disabled, loading check overrides skipped.");
         return;
     }
 
@@ -141,7 +141,7 @@ void WardenCheckMgr::LoadWardenOverrides()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 Warden action overrides. DB table `warden_action` is empty!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 Warden action overrides. DB table `warden_action` is empty!");
         return;
     }
 
@@ -156,10 +156,10 @@ void WardenCheckMgr::LoadWardenOverrides()
 
         // Check if action value is in range (0-2, see WardenActions enum)
         if (action > WARDEN_ACTION_BAN)
-            TC_LOG_ERROR("warden", "Warden check override action out of range (ID: %u, action: %u)", checkId, action);
+            FMT_LOG_ERROR("warden", "Warden check override action out of range (ID: {}, action: {})", checkId, action);
         // Check if check actually exists before accessing the _checks vector
         else if (checkId >= _checks.size())
-            TC_LOG_ERROR("warden", "Warden check action override for non-existing check (ID: %u, action: %u), skipped", checkId, action);
+            FMT_LOG_ERROR("warden", "Warden check action override for non-existing check (ID: {}, action: {}), skipped", checkId, action);
         else
         {
             _checks[checkId].Action = WardenActions(action);
@@ -168,7 +168,7 @@ void WardenCheckMgr::LoadWardenOverrides()
     }
     while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u warden action overrides in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} warden action overrides in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 WardenCheckMgr* WardenCheckMgr::instance()

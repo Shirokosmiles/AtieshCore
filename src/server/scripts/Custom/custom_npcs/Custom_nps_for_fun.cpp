@@ -2427,7 +2427,7 @@ public:
 
             if (!SkillInfo)
             {
-                TC_LOG_ERROR("server", "Profession NPC: received non-valid SkillType (LearnAllRecipesInProfession)");
+                FMT_LOG_ERROR("server", "Profession NPC: received non-valid SkillType (LearnAllRecipesInProfession)");
                 return false;
             }
 

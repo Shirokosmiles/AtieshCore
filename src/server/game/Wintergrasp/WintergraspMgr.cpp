@@ -206,7 +206,7 @@ void WintergraspMgr::SetupWG(TeamId defender, bool StartWar)
             m_TitansRelicGUID = relic->GetGUID();
         }
         else
-            TC_LOG_ERROR("bg.battlefield", "WG: Failed to spawn titan relic.");
+            FMT_LOG_ERROR("bg.battlefield", "WG: Failed to spawn titan relic.");
     }
     // Rebuild all wall
     for (auto pointer : m_buildingsInZone)
@@ -346,7 +346,7 @@ void WintergraspMgr::InitializeWG()
 
     InitAllGOforKeep();
     UpdateCounterVehicle(true);
-    TC_LOG_INFO("server.loading", "Wintergrasp PVP system loaded in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", "Wintergrasp PVP system loaded in {} ms", GetMSTimeDiffToNow(oldMSTime));
 }
 
 void WintergraspMgr::Update(uint32 diff)
@@ -649,7 +649,7 @@ WGGraveyardId WintergraspMgr::GetSpiritGraveyardIdForCreature(Creature* creature
     if (creature->IsInDist2d(Grave_Alliance->Loc.X, Grave_Alliance->Loc.Y, 20.f))
         return BATTLEFIELD_WG_GY_ALLIANCE;
 
-    TC_LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardIdForCreature: Unexpected SpiritCreature Id %u", creature->GetSpawnId());
+    FMT_LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardIdForCreature: Unexpected SpiritCreature Id {}", creature->GetSpawnId());
     return BATTLEFIELD_WG_GY_WORKSHOP_SE;
 }
 

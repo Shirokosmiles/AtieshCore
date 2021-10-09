@@ -106,7 +106,7 @@ bool BattlegroundNA::SetupBattleground()
         BattlegroundGOSpawnPoint const& object = BG_NA_GameObjects[i];
         if (!AddObject(i, object.Entry, object.Pos, object.Rot, object.SpawnTime))
         {
-            TC_LOG_ERROR("bg.battleground", "BattleGroundNA: Failed to spawn GameObject! (Entry: %u). Battleground not created!", object.Entry);
+            FMT_LOG_ERROR("bg.battleground", "BattleGroundNA: Failed to spawn GameObject! (Entry: {}). Battleground not created!", object.Entry);
             return false;
         }
     }

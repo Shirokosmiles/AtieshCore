@@ -99,7 +99,7 @@ public:
         ChrClassesDBC const* classEntry = sDBCStoresMgr->GetChrClassesDBC(player->GetClass());
         if (!classEntry)
         {
-            TC_LOG_ERROR("misc", "Class %u not found in DBC (Wrong DBC files?)", player->GetClass());
+            FMT_LOG_ERROR("misc", "Class {} not found in DBC (Wrong DBC files?)", player->GetClass());
             return false;
         }
 
@@ -176,7 +176,7 @@ public:
 
             ChatHandler(target->GetSession()).SendSysMessage(LANG_RESET_SPELLS);
             if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)
-                handler->PSendSysMessage(LANG_RESET_SPELLS_ONLINE, handler->GetNameLink(target).c_str());
+                handler->PSendSysMessage(LANG_RESET_SPELLS_ONLINE, handler->GetNameLink(target));
         }
         else
         {
@@ -185,7 +185,7 @@ public:
             stmt->setUInt32(1, targetGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
 
-            handler->PSendSysMessage(LANG_RESET_SPELLS_OFFLINE, targetName.c_str());
+            handler->PSendSysMessage(LANG_RESET_SPELLS_OFFLINE, targetName);
         }
 
         return true;
@@ -228,7 +228,7 @@ public:
 
                     ChatHandler(owner->ToPlayer()->GetSession()).SendSysMessage(LANG_RESET_PET_TALENTS);
                     if (!handler->GetSession() || handler->GetSession()->GetPlayer() != owner->ToPlayer())
-                        handler->PSendSysMessage(LANG_RESET_PET_TALENTS_ONLINE, handler->GetNameLink(owner->ToPlayer()).c_str());
+                        handler->PSendSysMessage(LANG_RESET_PET_TALENTS_ONLINE, handler->GetNameLink(owner->ToPlayer()));
                 }
                 return true;
             }
@@ -244,7 +244,7 @@ public:
             target->SendTalentsInfoData(false);
             ChatHandler(target->GetSession()).SendSysMessage(LANG_RESET_TALENTS);
             if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)
-                handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(target).c_str());
+                handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(target));
 
             Pet* pet = target->GetPet();
             Pet::resetTalentsForAllPetsOf(target, pet);
@@ -260,7 +260,7 @@ public:
             CharacterDatabase.Execute(stmt);
 
             std::string nameLink = handler->playerLink(targetName);
-            handler->PSendSysMessage(LANG_RESET_TALENTS_OFFLINE, nameLink.c_str());
+            handler->PSendSysMessage(LANG_RESET_TALENTS_OFFLINE, nameLink);
             return true;
         }
 

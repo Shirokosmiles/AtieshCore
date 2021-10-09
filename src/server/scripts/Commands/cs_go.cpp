@@ -508,7 +508,7 @@ public:
             handler->SendSysMessage(LANG_COMMAND_MULTIPLE_BOSSES_MATCH);
             --it;
             do
-                handler->PSendSysMessage(LANG_COMMAND_MULTIPLE_BOSSES_ENTRY, it->second->Entry, it->second->Name.c_str(), sObjectMgr->GetScriptName(it->second->ScriptID).c_str());
+                handler->PSendSysMessage(LANG_COMMAND_MULTIPLE_BOSSES_ENTRY, it->second->Entry, it->second->Name, sObjectMgr->GetScriptName(it->second->ScriptID));
             while (((++it) != end) && (it->first == maxCount));
             handler->SetSentErrorMessage(true);
             return false;
@@ -520,12 +520,12 @@ public:
 
         if (spawns.size() > 1)
         {
-            handler->PSendSysMessage(LANG_COMMAND_BOSS_MULTIPLE_SPAWNS, boss->Name.c_str(), boss->Entry);
+            handler->PSendSysMessage(LANG_COMMAND_BOSS_MULTIPLE_SPAWNS, boss->Name, boss->Entry);
             for (CreatureData const* spawn : spawns)
             {
                 uint32 const mapId = spawn->mapId;
                 MapDBC const* const map = ASSERT_NOTNULL(sDBCStoresMgr->GetMapDBC(mapId));
-                handler->PSendSysMessage(LANG_COMMAND_BOSS_MULTIPLE_SPAWN_ETY, spawn->spawnId, mapId, map->MapName[handler->GetSessionDbcLocale()], spawn->spawnPoint.ToString().c_str());
+                handler->PSendSysMessage(LANG_COMMAND_BOSS_MULTIPLE_SPAWN_ETY, spawn->spawnId, mapId, map->MapName[handler->GetSessionDbcLocale()], spawn->spawnPoint.ToString());
             }
             handler->SetSentErrorMessage(true);
             return false;
@@ -542,12 +542,12 @@ public:
         if (!player->TeleportTo({ mapId, spawn->spawnPoint }))
         {
             char const* const mapName = ASSERT_NOTNULL(sDBCStoresMgr->GetMapDBC(mapId))->MapName[handler->GetSessionDbcLocale()].c_str();
-            handler->PSendSysMessage(LANG_COMMAND_GO_BOSS_FAILED, spawn->spawnId, boss->Name.c_str(), boss->Entry, mapName);
+            handler->PSendSysMessage(LANG_COMMAND_GO_BOSS_FAILED, spawn->spawnId, boss->Name, boss->Entry, mapName);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_WENT_TO_BOSS, boss->Name.c_str(), boss->Entry, spawn->spawnId);
+        handler->PSendSysMessage(LANG_COMMAND_WENT_TO_BOSS, boss->Name, boss->Entry, spawn->spawnId);
         return true;
     }
 };

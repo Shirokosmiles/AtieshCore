@@ -264,7 +264,7 @@ public:
         }
 
         // Display Guild Information
-        handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
+        handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName(), guild->GetId()); // Guild Id + Name
         handler->PSendSysMessage(LANG_GSYSTEM_ANNOUNCE_INFO, guild->GetGuildLevel(), guild->GetGuildExperience(), guild->GetGuildRating());
         return true;
     }
@@ -294,7 +294,7 @@ public:
             return false;
 
         targetGuild->AddGuildLevel(uint32(addedlvl), nullptr);
-        handler->PSendSysMessage(LANG_GSYSTEM_GM_RECEIVED_LEVEL, targetGuild->GetName().c_str(), uint32(addedlvl), targetGuild->GetGuildLevel());
+        handler->PSendSysMessage(LANG_GSYSTEM_GM_RECEIVED_LEVEL, targetGuild->GetName(), uint32(addedlvl), targetGuild->GetGuildLevel());
         return true;
     }
 
@@ -320,7 +320,7 @@ public:
             removedlvl = atoi(value);
 
         targetGuild->RemoveGuildLevel(removedlvl, target);
-        handler->PSendSysMessage(LANG_GSYSTEM_GM_LOOSED_LEVEL, targetGuild->GetName().c_str(), removedlvl, targetGuild->GetGuildLevel());
+        handler->PSendSysMessage(LANG_GSYSTEM_GM_LOOSED_LEVEL, targetGuild->GetName(), removedlvl, targetGuild->GetGuildLevel());
         return true;
     }
 
@@ -349,7 +349,7 @@ public:
             return false;
 
         targetGuild->AddGuildExp(uint32(addedExp), nullptr);
-        handler->PSendSysMessage(LANG_GSYSTEM_GM_RECEIVED_EXP, targetGuild->GetName().c_str(), uint32(addedExp), targetGuild->GetGuildExperience());
+        handler->PSendSysMessage(LANG_GSYSTEM_GM_RECEIVED_EXP, targetGuild->GetName(), uint32(addedExp), targetGuild->GetGuildExperience());
         return true;
     }
 
@@ -378,7 +378,7 @@ public:
         }
 
         player->DurabilityRepairAll(false, 0, false);
-        handler->PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink(player).c_str());
+        handler->PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink(player));
         return true;
     }
 
@@ -515,26 +515,26 @@ public:
 
         if (sGuildMgr->IsGuildsInWar(ownGuild->GetId(), targetGuild->GetId()))
         {
-            handler->PSendSysMessage(LANG_GSYSTEM_GW_ALREADY_ENEMY, guildName.c_str());
+            handler->PSendSysMessage(LANG_GSYSTEM_GW_ALREADY_ENEMY, guildName);
             return true;
         }
 
         std::string msg;
         if (!ownGuild->CanStartGuildWarByCount(player->GetSession(), msg, false))
         {
-            handler->PSendSysMessage("%s", msg.c_str());
+            handler->PSendSysMessage("{}", msg);
             return true;
         }
 
         if (!ownGuild->CanStartGuildWarByTimer(player->GetSession(), msg))
         {
-            handler->PSendSysMessage("%s", msg.c_str());
+            handler->PSendSysMessage("{}", msg);
             return true;
         }
 
         if (!targetGuild->CanStartGuildWarByCount(player->GetSession(), msg, true))
         {
-            handler->PSendSysMessage("%s", msg.c_str());
+            handler->PSendSysMessage("{}", msg);
             return true;
         }
 
@@ -542,7 +542,7 @@ public:
         data.attackerGuildId = ownGuild->GetId();
         data.defenderGuildId = targetGuild->GetId();
         if (sGuildMgr->StartNewWar(data))
-            handler->PSendSysMessage(LANG_GSYSTEM_GW_START, guildName.c_str());
+            handler->PSendSysMessage(LANG_GSYSTEM_GW_START, guildName);
 
         return true;
     }
@@ -578,12 +578,12 @@ public:
 
         if (!sGuildMgr->IsGuildsInWar(ownGuild->GetId(), targetGuild->GetId()))
         {
-            handler->PSendSysMessage(LANG_GSYSTEM_GW_NOT_ENEMY, guildName.c_str());
+            handler->PSendSysMessage(LANG_GSYSTEM_GW_NOT_ENEMY, guildName);
             return true;
         }
 
         sGuildMgr->StopWarBetween(ownGuild->GetId(), targetGuild->GetId(), targetGuild->GetId());
-        handler->PSendSysMessage(LANG_GSYSTEM_GW_STOP, guildName.c_str());
+        handler->PSendSysMessage(LANG_GSYSTEM_GW_STOP, guildName);
 
         return true;
     }

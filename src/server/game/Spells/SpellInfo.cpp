@@ -1487,7 +1487,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         shapeInfo = sDBCStoresMgr->GetSpellShapeshiftFormDBC(form);
         if (!shapeInfo)
         {
-            TC_LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
+            FMT_LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift {}", form);
             return SPELL_CAST_OK;
         }
         actAsShifted = !(shapeInfo->Flags & 1);            // shapeshift acts as normal form for spells
@@ -3216,7 +3216,7 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
         // Else drain all power
         if (PowerType < MAX_POWERS)
             return unitCaster->GetPower(PowerType);
-        TC_LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
+        FMT_LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '{}' in spell {}", PowerType, Id);
         return 0;
     }
 
@@ -3242,10 +3242,10 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
                 break;
             case POWER_RUNE:
             case POWER_RUNIC_POWER:
-                TC_LOG_DEBUG("spells", "CalculateManaCost: Not implemented yet!");
+                FMT_LOG_DEBUG("spells", "CalculateManaCost: Not implemented yet!");
                 break;
             default:
-                TC_LOG_ERROR("spells", "CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
+                FMT_LOG_ERROR("spells", "CalculateManaCost: Unknown power type '{}' in spell {}", PowerType, Id);
                 return 0;
         }
     }
