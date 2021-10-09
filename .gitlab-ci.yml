@@ -5,14 +5,14 @@ variables:
   MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
 before_script:
-  - sudo apt-get -yqq update
-  - sudo apt-get -yqq install git clang cmake make gcc g++ libmariadbclient-dev-compat libssl-dev libbz2-dev libreadline-dev libncurses-dev libboost-all-dev mariadb-server p7zip
+  - apt-get -yqq update
+  - apt-get -yqq install git clang cmake make gcc g++ libmariadbclient-dev-compat libssl-dev libbz2-dev libreadline-dev libncurses-dev libboost-all-dev mariadb-server p7zip
 
 
 install:
   script:
     - mkdir bin
     - cd bin
-    - sudo cmake ../ -DWITH_WARNINGS=1 -DTOOLS=1 -DCMAKE_BUILD_TYPE=Release
-    - sudo make -j 5
-    - sudo make install
+    - cmake ../ -DWITH_WARNINGS=1 -DTOOLS=1 -DCMAKE_BUILD_TYPE=Release
+    - make -j 5
+    - make install
