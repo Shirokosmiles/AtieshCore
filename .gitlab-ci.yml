@@ -1,18 +1,15 @@
-services:
-  - mysql:latest
-
-variables:
-  MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-
-before_script:
-  - apt-get -yqq update
-  - apt-get -yqq install git clang cmake make gcc g++ libmariadbclient-dev-compat libssl-dev libbz2-dev libreadline-dev libncurses-dev libboost-all-dev mariadb-server p7zip
-
-
 install:
   script:
+    - mysql -uroot -e 'drop database test_mysql;'
+    - mysql -uroot -e 'create database test_mysql;'
     - mkdir bin
     - cd bin
     - cmake ../ -DWITH_WARNINGS=1 -DTOOLS=1 -DCMAKE_BUILD_TYPE=Release
-    - make -j 5
-    - make install
+    - cd ..
+    - chmod +x contrib/check_updates.sh
+    - mysql -uroot auth < sql/base/auth_database.sql
+    - mysql -uroot  characters < sql/base/characters_database.sql
+    - mysql -uroot world < sql/base/dev/world_database.sql
+ 
+    - cd bin
+    - make -j 10 -k
