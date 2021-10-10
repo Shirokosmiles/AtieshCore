@@ -65,16 +65,16 @@ def checkSoloLine(line):
     if isTClog(line):
         line = line.replace("TC_LOG_", "FMT_LOG_");
         return handleCleanup(line), False
-    elif isTCStringFormat(line):
-        return handleCleanup(line), False
-    elif isASSERT(line):
-        return handleCleanup(line), False
-    elif isABORTMSG(line):
-        return handleCleanup(line), False
-    elif isSendSysMessage(line):
-        return handleCleanup(line), False
-    elif isoutCommand(line):
-        return handleCleanup(line), False
+    #elif isTCStringFormat(line):
+    #    return handleCleanup(line), False
+    #elif isASSERT(line):
+    #    return handleCleanup(line), False
+    #elif isABORTMSG(line):
+    #    return handleCleanup(line), False
+    #elif isSendSysMessage(line):
+    #    return handleCleanup(line), False
+    #elif isoutCommand(line):
+    #    return handleCleanup(line), False
     else:
         return line, False
 
@@ -83,21 +83,21 @@ def startMultiLine(line):
         line = line.replace("TC_LOG_", "FMT_LOG_");
         print('Старт мультилайна: \n' + line)
         return handleCleanup(line), True
-    elif isTCStringFormat(line):
-        print('Старт мультилайна: \n' + line)
-        return handleCleanup(line), True
-    elif isASSERT(line):
-        print('Старт мультилайна: \n' + line)
-        return handleCleanup(line), True
-    elif isABORTMSG(line):
-        print('Старт мультилайна: \n' + line)
-        return handleCleanup(line), True
-    elif isSendSysMessage(line):
-        print('Старт мультилайна: \n' + line)
-        return handleCleanup(line), True
-    elif isoutCommand(line):
-        print('Старт мультилайна: \n' + line)
-        return handleCleanup(line), True
+    #elif isTCStringFormat(line):
+    #    print('Старт мультилайна: \n' + line)
+    #    return handleCleanup(line), True
+    #elif isASSERT(line):
+    #    print('Старт мультилайна: \n' + line)
+    #    return handleCleanup(line), True
+    #elif isABORTMSG(line):
+    #    print('Старт мультилайна: \n' + line)
+    #    return handleCleanup(line), True
+    #elif isSendSysMessage(line):
+    #    print('Старт мультилайна: \n' + line)
+    #    return handleCleanup(line), True
+    #elif isoutCommand(line):
+    #    print('Старт мультилайна: \n' + line)
+    #    return handleCleanup(line), True
     else :
         return line, False
         
