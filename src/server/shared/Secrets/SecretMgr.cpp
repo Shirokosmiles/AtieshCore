@@ -188,11 +188,11 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
                 if (hadOldSecret)
                 {
                     if (!oldSecret)
-                        return Trinity::StringFormat("Cannot decrypt old TOTP tokens - add config key '%s' to authserver.conf!", secret_info[i].oldKey);
+                        return Trinity::StringFormat("Cannot decrypt old TOTP tokens - add config key '{}' to authserver.conf!", secret_info[i].oldKey);
 
                     bool success = Trinity::Crypto::AEDecrypt<Trinity::Crypto::AES>(totpSecret, oldSecret->ToByteArray<Trinity::Crypto::AES::KEY_SIZE_BYTES>());
                     if (!success)
-                        return Trinity::StringFormat("Cannot decrypt old TOTP tokens - value of '%s' is incorrect for some users!", secret_info[i].oldKey);
+                        return Trinity::StringFormat("Cannot decrypt old TOTP tokens - value of '{}' is incorrect for some users!", secret_info[i].oldKey);
                 }
 
                 if (newSecret)

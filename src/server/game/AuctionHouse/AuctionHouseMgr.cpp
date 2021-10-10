@@ -960,7 +960,7 @@ bool AuctionEntry::LoadFromDB(Field* fields)
 }
 std::string AuctionEntry::BuildAuctionMailSubject(MailAuctionAnswers response) const
 {
-    return Trinity::StringFormat("%u:0:%u:%u:%u", itemEntry, static_cast<uint8>(response), Id, itemCount);
+    return Trinity::StringFormat("{}:0:{}:{}:{}", itemEntry, static_cast<uint8>(response), Id, itemCount);
 }
 
 std::string AuctionEntry::BuildAuctionMailBody(ObjectGuid::LowType lowGuid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut)

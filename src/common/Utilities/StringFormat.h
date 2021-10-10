@@ -39,7 +39,7 @@ namespace Trinity
 
     /// OLD TC string format function.
     template<typename Format, typename... Args>
-    inline std::string SQLStringFormat(Format&& fmt, Args&&... args)
+    inline std::string StringSPRINTF(Format&& fmt, Args&&... args)
     {
         try
         {

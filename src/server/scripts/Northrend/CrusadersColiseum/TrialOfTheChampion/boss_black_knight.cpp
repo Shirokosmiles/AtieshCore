@@ -176,7 +176,7 @@ public:
                 Talk(urand(0, 2));
         }
 
-        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        void DamageTaken(Unit* /*doneBy*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
         {
             if (HealthBelowPct(31) && !doExplode)
             {

@@ -418,13 +418,13 @@ namespace Trinity::Impl::ChatCommands
                 {
                     if (prefix.empty())
                     {
-                        return Trinity::StringFormat(STRING_VIEW_FMT "%c" STRING_VIEW_FMT,
-                            STRING_VIEW_FMT_ARG(match), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(suffix));
+                        return Trinity::StringFormat("{} {} ",
+                            (match), (suffix));
                     }
                     else
                     {
-                        return Trinity::StringFormat(STRING_VIEW_FMT "%c" STRING_VIEW_FMT "%c" STRING_VIEW_FMT,
-                            STRING_VIEW_FMT_ARG(prefix), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(match), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(suffix));
+                        return Trinity::StringFormat("{} {} {} ",
+                            (prefix), (match), (suffix));
                     }
                 });
 
@@ -442,8 +442,8 @@ namespace Trinity::Impl::ChatCommands
             path.assign(it1->first);
         else
         {
-            path = Trinity::StringFormat(STRING_VIEW_FMT "%c" STRING_VIEW_FMT,
-                STRING_VIEW_FMT_ARG(path), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(it1->first));
+            path = Trinity::StringFormat("{} {} ",
+                (path), (it1->first));
         }
         cmd = &it1->second;
         map = &cmd->_subCommands;
@@ -456,8 +456,8 @@ namespace Trinity::Impl::ChatCommands
         if (cmd)
         { /* if we matched a command at some point, auto-complete it */
             return {
-                Trinity::StringFormat(STRING_VIEW_FMT "%c" STRING_VIEW_FMT,
-                    STRING_VIEW_FMT_ARG(path), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(oldTail))
+                Trinity::StringFormat("{} {} ",
+                    (path), (oldTail))
             };
         }
         else
@@ -471,8 +471,8 @@ namespace Trinity::Impl::ChatCommands
                 return std::string(match);
             else
             {
-                return Trinity::StringFormat(STRING_VIEW_FMT "%c" STRING_VIEW_FMT,
-                    STRING_VIEW_FMT_ARG(prefix), COMMAND_DELIMITER, STRING_VIEW_FMT_ARG(match));
+                return Trinity::StringFormat("{} {} ",
+                    (prefix), (match));
             }
         });
 

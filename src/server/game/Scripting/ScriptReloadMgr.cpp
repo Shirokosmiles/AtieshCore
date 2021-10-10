@@ -312,7 +312,7 @@ static bool HasValidScriptModuleName(std::string const& name)
 {
     // Detects scripts_NAME.dll's / .so's
     static Trinity::regex const regex(
-        Trinity::StringFormat("^%s[sS]cripts_[a-zA-Z0-9_]+\\.%s$",
+        Trinity::StringFormat("^{}[sS]cripts_[a-zA-Z0-9_]+\\.{}$",
             GetSharedLibraryPrefix(),
             GetSharedLibraryExtension()));
 
@@ -756,9 +756,9 @@ private:
     static fs::path CalculateTemporaryCachePath()
     {
         auto path = fs::temp_directory_path();
-        path /= Trinity::StringFormat("tc_script_cache_%s_%s",
+        path /= Trinity::StringFormat("tc_script_cache_{}_{}",
             GitRevision::GetBranch(),
-            ByteArrayToHexStr(Trinity::Crypto::SHA1::GetDigestOf(sConfigMgr->GetFilename())).c_str());
+            ByteArrayToHexStr(Trinity::Crypto::SHA1::GetDigestOf(sConfigMgr->GetFilename())));
 
         return path;
     }
@@ -770,10 +770,10 @@ private:
 
         // Create the cache path and increment the library counter to use an unique name for each library
         auto cache_path = temporary_cache_path_;
-        cache_path /= Trinity::StringFormat("%s.%u%s",
-            path.stem().generic_string().c_str(),
+        cache_path /= Trinity::StringFormat("{}.{}{}",
+            path.stem().generic_string(),
             _unique_library_name_counter++,
-            path.extension().generic_string().c_str());
+            path.extension().generic_string());
 
         return cache_path;
     }

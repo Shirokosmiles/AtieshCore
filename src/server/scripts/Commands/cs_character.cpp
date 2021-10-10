@@ -270,7 +270,7 @@ public:
                     if (target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->MaskID)
                         activeStr = handler->GetTrinityString(LANG_ACTIVE);
 
-                    std::string titleName = Trinity::StringFormat(name, player->GetName().c_str());
+                    std::string titleName = Trinity::StringFormat(name, player->GetName());
 
                     // send title in "id (idx:idx) - [namedlink locale]" format
                     if (handler->GetSession())
@@ -510,7 +510,7 @@ public:
 
         handler->PSendSysMessage(LANG_CHANGEACCOUNT_SUCCESS, player->GetName(), newAccount.GetName());
 
-        std::string logString = Trinity::StringFormat("changed ownership of player %s (%s) from account %u to account %u", player->GetName().c_str(), player->GetGUID().ToString().c_str(), oldAccountId, newAccount.GetID());
+        std::string logString = Trinity::StringFormat("changed ownership of player {} ({}) from account {} to account {}", player->GetName(), player->GetGUID().ToString(), oldAccountId, newAccount.GetID());
         if (WorldSession* session = handler->GetSession())
         {
             if (Player* player = session->GetPlayer())

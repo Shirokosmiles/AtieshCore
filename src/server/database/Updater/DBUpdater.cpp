@@ -263,7 +263,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    std::string const info = Trinity::StringFormat("Containing " SZFMTD " new and " SZFMTD " archived updates.",
+    std::string const info = Trinity::StringFormat("Containing {} new and {} archived updates.",
         result.recent, result.archived);
 
     if (!result.updated)
