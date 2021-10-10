@@ -110,89 +110,41 @@ std::string secsToTimeString(uint64 timeInSecs, TimeFormat timeFormat, bool hour
         else if (minutes)
             return Trinity::StringFormat("{}:{:02}", minutes, secs);
         else
-            return Trinity::StringFormat("0:{:02}", secs);
+            return Trinity::StringFormat("{}", secs);
     }
-
-    std::ostringstream ss;
-    if (days)
+    else
     {
-        ss << days;
-        switch (timeFormat)
-        {
-            case TimeFormat::ShortText:
-                ss << "d";
-                break;
-            case TimeFormat::FullText:
-                if (days == 1)
-                    ss << " Day ";
-                else
-                    ss << " Days ";
-                break;
-            default:
-                return "<Unknown time format>";
-        }
-    }
+        std::string sdays;
+        std::string shours;
+        std::string sminutes;
+        std::string sseconds;
 
-    if (hours || hoursOnly)
-    {
-        ss << hours;
-        switch (timeFormat)
+        if (timeFormat == TimeFormat::FullText)
         {
-            case TimeFormat::ShortText:
-                ss << "h";
-                break;
-            case TimeFormat::FullText:
-                if (hours <= 1)
-                    ss << " Hour ";
-                else
-                    ss << " Hours ";
-                break;
-            default:
-                return "<Unknown time format>";
+            sdays = days && days != 1 ? "Days" : "Day";
+            shours = hours && hours != 1 ? "Hours" : "Hour";
+            sminutes = minutes && minutes != 1 ? "Minutes" : "Minute";
+            sseconds = secs && secs != 1 ? "Seconds" : "Second";
         }
-    }
-    if (!hoursOnly)
-    {
-        if (minutes)
+        else
         {
-            ss << minutes;
-            switch (timeFormat)
-            {
-                case TimeFormat::ShortText:
-                    ss << "m";
-                    break;
-                case TimeFormat::FullText:
-                    if (minutes == 1)
-                        ss << " Minute ";
-                    else
-                        ss << " Minutes ";
-                    break;
-                default:
-                    return "<Unknown time format>";
-            }
+            sdays = "d";
+            shours = "h";
+            sminutes = "m";
+            sseconds = "s";
         }
 
-        if (secs || (!days && !hours && !minutes))
-        {
-            ss << secs;
-            switch (timeFormat)
-            {
-                case TimeFormat::ShortText:
-                    ss << "s";
-                    break;
-                case TimeFormat::FullText:
-                    if (secs <= 1)
-                        ss << " Second.";
-                    else
-                        ss << " Seconds.";
-                    break;
-                default:
-                    return "<Unknown time format>";
-            }
-        }
+        if (days && !hoursOnly)
+            return Trinity::StringFormat("{} {} {:02} {} {:02} {} {:02} {}", days, sdays, hours, shours, minutes, sminutes, secs, sseconds);
+        else if (hours)
+            return Trinity::StringFormat("{} {} {:02} {} {:02} {}", hours, shours, minutes, sminutes, secs, sseconds);
+        else if (minutes)
+            return Trinity::StringFormat("{} {} {:02} {}", minutes, sminutes, secs, sseconds);
+        else
+            return Trinity::StringFormat("{} {}", secs, sseconds);
     }
 
-    return ss.str();
+    return "<Unknown time format>";
 }
 
 Optional<int32> MoneyStringToMoney(std::string const& moneyString)
