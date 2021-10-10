@@ -12,4 +12,4 @@ install:
     - mysql -uroot world < sql/base/dev/world_database.sql
  
     - cd bin
-    - make -j 10 -k
+    - make -j 15 -k
