@@ -1040,7 +1040,7 @@ public:
     }
 
     //TODO : WTF !?
-    static bool HandleDebugSendLargePacketCommand(ChatHandler* handler)
+    static bool HandleDebugSendLargePacketCommand(ChatHandler* /*handler*/)
     {
         /*std::ostringstream ss;
         while (ss.str().size() < 128000)
