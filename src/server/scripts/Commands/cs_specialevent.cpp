@@ -57,22 +57,16 @@ public:
 
     static std::string NextTimeEvent(time_t possible)
     {
-        std::ostringstream str;
-        str << " ( " << TimeToHumanReadable(possible) << " )";
-
-        return str.str();
+        return fmt::format("({})", TimeToHumanReadable(possible));
     }
 
     static std::string PrepareText(bool enabled, bool active, bool repeat, uint32 cooldown, uint32 duration, std::string nexttime)
     {
-        std::ostringstream str;
         std::string enableStatus = enabled ? "Enabled" : "Disabled";
         std::string activeStatus = active ? "is Active" : "Not Activated";
         std::string repeatStatus = repeat ? "is Repeatable" : "is not Repeatable";
         std::string nexttexttime = repeat ? nexttime : "None";
-        str << enableStatus << ", " << activeStatus << ", " << repeatStatus << ", cooldown time = " << cooldown << ", duration time = " << duration << ", The next available time: " << nexttexttime;
-
-        return str.str();
+        return fmt::format("{}, {}, {}, cooldown time = {}, duration time = {}, The next available time: {}", enableStatus, activeStatus, repeatStatus, cooldown, duration, nexttexttime);
     }
 
     static bool HandleEventInfoCommand(ChatHandler* handler, char const* args)

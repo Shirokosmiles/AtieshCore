@@ -479,10 +479,9 @@ public:
             if (!ShouldListAura(aura->GetSpellInfo(), spellId, namePart, handler->GetSessionDbcLocale()))
                 continue;
 
-            std::ostringstream ss_name;
-            ss_name << "|cffffffff|Hspell:" << aura->GetId() << "|h[" << name << "]|h|r";
+            std::string ss_name = fmt::format("|cffffffff|Hspell:{}|h[{}]|h|r", aura->GetId(), name);
 
-            handler->PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, aura->GetId(), (handler->GetSession() ? ss_name.str() : name),
+            handler->PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, aura->GetId(), (handler->GetSession() ? ss_name : name),
                 aurApp->GetEffectMask(), aura->GetCharges(), aura->GetStackAmount(), aurApp->GetSlot(),
                 aura->GetDuration(), aura->GetMaxDuration(), (aura->IsPassive() ? passiveStr : ""),
                 (talent ? talentStr : ""), aura->GetCasterGUID().IsPlayer() ? "player" : "creature",
@@ -604,9 +603,8 @@ public:
                                         if (handler->GetSession())
                                         {
                                             uint32 color = ItemQualityColors[item_quality];
-                                            std::ostringstream itemStr;
-                                            itemStr << "|c" << std::hex << color << "|Hitem:" << item_entry << ":0:0:0:0:0:0:0:0:0|h[" << item_name << "]|h|r";
-                                            handler->PSendSysMessage(LANG_LIST_MAIL_INFO_ITEM, itemStr.str(), item_entry, item_guid, item_count);
+                                            std::string itemStr = fmt::format("|c{:x}|Hitem:{}:0:0:0:0:0:0:0:0:0|h[{}]|h|r", color, item_entry, item_name);
+                                            handler->PSendSysMessage(LANG_LIST_MAIL_INFO_ITEM, itemStr, item_entry, item_guid, item_count);
                                         }
                                         else
                                             handler->PSendSysMessage(LANG_LIST_MAIL_INFO_ITEM, item_name, item_entry, item_guid, item_count);

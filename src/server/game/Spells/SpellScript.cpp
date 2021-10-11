@@ -251,9 +251,7 @@ SpellScript::TargetHook::TargetHook(uint8 _effectIndex, uint16 _targetType, bool
 
 std::string SpellScript::TargetHook::ToString()
 {
-    std::ostringstream oss;
-    oss << "Index: " << EffIndexToString() << " Target: " << targetType;
-    return oss.str();
+    return fmt::format("Index: {} Target: {}", EffIndexToString(), targetType);
 }
 
 bool SpellScript::TargetHook::CheckEffect(SpellInfo const* spellEntry, uint8 effIndexToCheck)

@@ -148,9 +148,7 @@ bool Position::HasInLine(Position const* pos, float objSize, float width) const
 
 std::string Position::ToString() const
 {
-    std::stringstream sstr;
-    sstr << "X: " << m_positionX << " Y: " << m_positionY << " Z: " << m_positionZ << " O: " << m_orientation;
-    return sstr.str();
+    return fmt::format("X: {} Y: {} Z: {} O: {}", m_positionX, m_positionY, m_positionZ, m_orientation);
 }
 
 float Position::NormalizeOrientation(float o)

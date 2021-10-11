@@ -142,13 +142,13 @@ public:
                     }
 
                     // send area in "id - [name]" format
-                    std::ostringstream ss;
+                    std::string ss;
                     if (handler->GetSession())
-                        ss << areaEntry->ID << " - |cffffffff|Harea:" << areaEntry->ID << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
+                        ss = fmt::format("{} - |cffffffff|Harea:{}|h[{} {}]|h|r", areaEntry->ID, areaEntry->ID, name, localeNames[locale]);
                     else
-                        ss << areaEntry->ID << " - " << name << ' ' << localeNames[locale];
+                        ss = fmt::format("{} - {} {}", areaEntry->ID, name, localeNames[locale]);
 
-                    handler->SendSysMessage(ss.str());
+                    handler->SendSysMessage(ss);
 
                     if (!found)
                         found = true;

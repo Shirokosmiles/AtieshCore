@@ -1039,12 +1039,14 @@ public:
         return true;
     }
 
+    //TODO : WTF !?
     static bool HandleDebugSendLargePacketCommand(ChatHandler* handler)
     {
-        std::ostringstream ss;
+        /*std::ostringstream ss;
         while (ss.str().size() < 128000)
             ss << "This is a dummy string to push the packet's size beyond 128000 bytes. ";
         handler->SendSysMessage(ss.str());
+        */
         return true;
     }
 

@@ -125,9 +125,7 @@ class StringTransaction
 
         void Append(char const* sql)
         {
-            std::ostringstream oss;
-            oss << sql << '\n';
-            _buf += oss.str();
+            _buf += fmt::format("{}\n", sql);
         }
 
         char const* GetBuffer() const
@@ -544,9 +542,7 @@ inline void AppendTableDump(StringTransaction& trans, TableStruct const& tableSt
 
 inline std::string GenerateWhereStr(std::string const& field, ObjectGuid::LowType guid)
 {
-    std::ostringstream whereStr;
-    whereStr << field << " = '" << guid << '\'';
-    return whereStr.str();
+    return fmt::format("{} = '{}'\''", field, guid);
 }
 
 template <typename T, template<class, class...> class SetType, class... Rest>

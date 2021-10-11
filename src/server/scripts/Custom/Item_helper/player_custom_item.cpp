@@ -52,17 +52,12 @@ uint32 aurass[aurassSize] = { 15366, 16609, 48162, 48074, 48170, 43223, 36880, 6
 
 std::string getString(std::string string, uint32 number)
 {
-    std::ostringstream oss;
-    oss << string << number;
-    return oss.str();
+    return fmt::format("{}{}", string, number);
 }
 
 std::string NextTimeDalaranEvent(time_t possible)
 {
-    std::ostringstream str;
-    str << " ( " << TimeToHumanReadable(possible) << " )";
-
-    return str.str();
+    return fmt::format("({})", TimeToHumanReadable(possible));
 }
 
 class custom_item : public ItemScript
@@ -1286,14 +1281,12 @@ public:
                     }
                     case 26: // (FAMILY) cloth armor
                     {
-                        std::ostringstream text;
                         for (ItemShopContainer::const_iterator itr = itemshopMap.begin(); itr != itemshopMap.end(); ++itr)
                         {
                             if (itr->second.groupName == "family_cloth_armor")
                             {
-                                text.str("");
-                                text << itr->second.itemName << " (" << itr->second.coinCost << " coins)";
-                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text.str().c_str(), GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
+                                std::string text = fmt::format("{} ({} coins)", itr->second.itemName, itr->second.coinCost);
+                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text, GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
                             }
                         }
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface/ICONS/Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 25);
@@ -1302,14 +1295,12 @@ public:
                     }
                     case 27: // (FAMILY) leather armor
                     {
-                        std::ostringstream text;
                         for (ItemShopContainer::const_iterator itr = itemshopMap.begin(); itr != itemshopMap.end(); ++itr)
                         {
                             if (itr->second.groupName == "family_leather_armor")
                             {
-                                text.str("");
-                                text << itr->second.itemName << " (" << itr->second.coinCost << " coins)";
-                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text.str().c_str(), GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
+                                std::string text = fmt::format("{} ({} coins)", itr->second.itemName, itr->second.coinCost);
+                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text, GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
                             }
                         }
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface/ICONS/Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 25);
@@ -1318,14 +1309,12 @@ public:
                     }
                     case 28: // (FAMILY) mail armor
                     {
-                        std::ostringstream text;
                         for (ItemShopContainer::const_iterator itr = itemshopMap.begin(); itr != itemshopMap.end(); ++itr)
                         {
                             if (itr->second.groupName == "family_mail_armor")
                             {
-                                text.str("");
-                                text << itr->second.itemName << " (" << itr->second.coinCost << " coins)";
-                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text.str().c_str(), GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
+                                std::string text = fmt::format("{} ({} coins)", itr->second.itemName, itr->second.coinCost);
+                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text, GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
                             }
                         }
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface/ICONS/Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 25);
@@ -1334,14 +1323,12 @@ public:
                     }
                     case 29: // (FAMILY) plate armor
                     {
-                        std::ostringstream text;
                         for (ItemShopContainer::const_iterator itr = itemshopMap.begin(); itr != itemshopMap.end(); ++itr)
                         {
                             if (itr->second.groupName == "family_plate_armor")
                             {
-                                text.str("");
-                                text << itr->second.itemName << " (" << itr->second.coinCost << " coins)";
-                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text.str().c_str(), GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
+                                std::string text = fmt::format("{} ({} coins)", itr->second.itemName, itr->second.coinCost);
+                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text, GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
                             }
                         }
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface/ICONS/Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 25);
@@ -1350,14 +1337,12 @@ public:
                     }
                     case 30: // (FAMILY) weapon
                     {
-                        std::ostringstream text;
                         for (ItemShopContainer::const_iterator itr = itemshopMap.begin(); itr != itemshopMap.end(); ++itr)
                         {
                             if (itr->second.groupName == "family_weapon")
                             {
-                                text.str("");
-                                text << itr->second.itemName << " (" << itr->second.coinCost << " coins)";
-                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text.str().c_str(), GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
+                                std::string text = fmt::format("{} ({} coins)", itr->second.itemName, itr->second.coinCost);
+                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text, GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
                             }
                         }
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface/ICONS/Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 25);
@@ -1366,14 +1351,12 @@ public:
                     }
                     case 31: // (FAMILY) trinket and rings
                     {
-                        std::ostringstream text;
                         for (ItemShopContainer::const_iterator itr = itemshopMap.begin(); itr != itemshopMap.end(); ++itr)
                         {
                             if (itr->second.groupName == "family_trinket_and_ring")
                             {
-                                text.str("");
-                                text << itr->second.itemName << " (" << itr->second.coinCost << " coins)";
-                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text.str().c_str(), GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
+                                std::string text = fmt::format("{} ({} coins)", itr->second.itemName, itr->second.coinCost);
+                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text, GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
                             }
                         }
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, std::string("|TInterface/ICONS/Spell_chargenegative:25:25:-15:0|t ") + "Back", GOSSIP_SENDER_MAIN, 25);
@@ -1382,14 +1365,12 @@ public:
                     }
                     case 32:
                     {
-                        std::ostringstream text;
                         for (ItemShopContainer::const_iterator itr = itemshopMap.begin(); itr != itemshopMap.end(); ++itr)
                         {
                             if (itr->second.groupName == "mounts")
                             {
-                                text.str("");
-                                text << itr->second.itemName << " (" << itr->second.coinCost << " coins)";
-                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text.str().c_str(), GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
+                                std::string text = fmt::format("{} ({} coins)", itr->second.itemName, itr->second.coinCost);
+                                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, text, GOSSIP_SENDER_MAIN, itr->second.gossipAction, "Are you sure you want to buy it?", 0, false);
                             }
                         }
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GTS(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 3);

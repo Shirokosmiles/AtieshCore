@@ -1308,10 +1308,7 @@ private:
                 return;
             }
 
-            std::ostringstream ss;
-            ss << in.rdbuf();
-            cmake_cache_content = ss.str();
-
+            cmake_cache_content = fmt::format("{}", in.rdbuf());
             in.close();
         }
 

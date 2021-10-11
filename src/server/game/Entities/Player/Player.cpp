@@ -26809,16 +26809,12 @@ std::string Player::GetMapAreaAndZoneString() const
             zoneName = zone->AreaName[locale];
     }
 
-    std::ostringstream str;
-    str << "Map: " << GetMapId() << " (" << (FindMap() ? FindMap()->GetMapName() : "Unknown") << ") Area: " << areaId << " (" << areaName.c_str() << ") Zone: " << zoneName.c_str();
-    return str.str();
+    return fmt::format("Map: {} ({}) Area: {} ({}) Zone: {}", GetMapId(), (FindMap() ? FindMap()->GetMapName() : "Unknown"), areaId, areaName, zoneName);
 }
 
 std::string Player::GetCoordsMapAreaAndZoneString() const
 {
-    std::ostringstream str;
-    str << Position::ToString() << " " << GetMapAreaAndZoneString();
-    return str.str();
+    return fmt::format("{} {}", Position::ToString(), GetMapAreaAndZoneString());
 }
 
 void Player::SetInGuild(uint32 guildId)
