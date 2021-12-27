@@ -1,4 +1,4 @@
--- UPDATE `trinity_string` SET content_default = REPLACE(content_default, '%.*s', '{}');
+UPDATE `trinity_string` SET content_default = REPLACE(content_default, '%.*s', '{}');
 UPDATE `trinity_string` SET content_default = REPLACE(content_default, '%s', '{}');
 UPDATE `trinity_string` SET content_default = REPLACE(content_default, '%10s', '{:>10}');
 UPDATE `trinity_string` SET content_default = REPLACE(content_default, '%11s', '{:>11}');
