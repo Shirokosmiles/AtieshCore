@@ -218,8 +218,14 @@ enum TrinityStrings
     LANG_INVALID_GAMEOBJECT_TYPE          = 176,
     LANG_GAMEOBJECT_DAMAGED               = 177,
     LANG_GRID_POSITION                    = 178,
-    LANG_TRANSOFFSET_POSITION             = 179,
-    // 180-185 used in master branch
+
+    LANG_PHASESHIFT_STATUS                = 179, // master branch ONLY
+    LANG_PHASESHIFT_PHASES                = 180, // master branch ONLY
+    LANG_PHASESHIFT_VISIBLE_MAP_IDS       = 181, // master branch ONLY
+    LANG_PHASESHIFT_UI_WORLD_MAP_AREA_SWAPS = 182,//master branch ONLY
+    LANG_PHASE_FLAG_COSMETIC              = 183, // master branch ONLY
+    LANG_PHASE_FLAG_PERSONAL              = 184, // master branch ONLY
+    //                                      185 not used
     LANG_TRANSPORT_POSITION               = 186,
     LANG_PARTIAL_GROUP_SUMMON             = 187,
     LANG_2FA_SECRET_TOO_LONG              = 188,
@@ -739,7 +745,7 @@ enum TrinityStrings
     LANG_ARENA_TESTING                    = 785,
     LANG_AUTO_ANN                         = 786,
     LANG_ANNOUNCE_COLOR                   = 787,
-    // 791-799 - free
+    // 788-799 - free
 
     // in game strings
     LANG_PET_INVALID_NAME                 = 800,
@@ -789,8 +795,6 @@ enum TrinityStrings
     LANG_PINFO_CHR_MAILS                  = 854,
     LANG_PINFO_CHR_LEVEL_HIGH             = 871,
     LANG_PINFO_CHR_MAP_WITH_AREA          = 882,
-    LANG_PINFO_CHR_VIP_MODE               = 884,
-    LANG_PINFO_CHR_ANTICHEAT_FLY_MODE     = 885,
 
     LANG_CHARACTER_GENDER_MALE            = 855,
     LANG_CHARACTER_GENDER_FEMALE          = 856,
@@ -822,7 +826,7 @@ enum TrinityStrings
     LANG_RBAC_EMAIL_REQUIRED              = 881,
     //                                    = 882, LANG_PINFO_CHR_MAP_WITH_AREA
     LANG_ACCOUNT                          = 883,
-    // Room for in-game strings             886-999 not used
+    // Room for in-game strings             884-999 not used
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                     = 1000,
@@ -979,7 +983,14 @@ enum TrinityStrings
     LANG_COMMAND_BOSS_MULTIPLE_SPAWN_ETY  = 1209,
     LANG_COMMAND_GO_BOSS_FAILED           = 1210,
     LANG_COMMAND_WENT_TO_BOSS             = 1211,
-    // 1212-1499 - free
+    LANG_GUILD_INFO_LEVEL                 = 1212, // master branch ONLY
+    LANG_ACCOUNT_BNET_LINKED              = 1213, // master branch ONLY
+    LANG_ACCOUNT_OR_BNET_DOES_NOT_EXIST   = 1214, // master branch ONLY
+    LANG_ACCOUNT_ALREADY_LINKED           = 1215, // master branch ONLY
+    LANG_ACCOUNT_BNET_UNLINKED            = 1216, // master branch ONLY
+    LANG_ACCOUNT_BNET_NOT_LINKED          = 1217, // master branch ONLY
+    LANG_DISALLOW_TICKETS_CONFIG          = 1218, // master branch ONLY
+    // 1219-1499 - free
 
     // Command argument parsers
     LANG_CMDPARSER_EITHER                 = 1500,
@@ -999,8 +1010,8 @@ enum TrinityStrings
     LANG_CMDPARSER_SPELL_NO_EXIST         = 1514,
     LANG_CMDPARSER_EXACT_SEQ_MISMATCH     = 1515,
 
-    // 1212-1998 - free
-    LANG_DO_NOT_USE_6X_DEBUG_AREATRIGGER_LEFT = 1999,
+    // 1516-1998 - free
+    LANG_DEBUG_AREATRIGGER_LEFT           = 1999, // master branch ONLY
     // Ticket Strings 2000-2030
     LANG_COMMAND_TICKETNEW                = 2000,
     LANG_COMMAND_TICKETUPDATED            = 2001,
@@ -1042,7 +1053,7 @@ enum TrinityStrings
     LANG_COMMAND_NO_FROZEN_PLAYERS        = 5004,
     LANG_COMMAND_LIST_FREEZE              = 5005,
     LANG_COMMAND_PERMA_FROZEN_PLAYER      = 5006,
-    //                                    = 5007, unused
+    LANG_PHASE_NOTFOUND                   = 5007, // master branch ONLY
     LANG_INSTANCE_CLOSED                  = 5008,
     LANG_COMMAND_PLAYED_TO_ALL            = 5009,
     LANG_NPCINFO_LINKGUID                 = 5010,
@@ -1104,14 +1115,14 @@ enum TrinityStrings
     LANG_COMMAND_MUTEHISTORY_OUTPUT       = 5061,
 
     // Scene debugs commands [Master only, not used in 3.3.5]
-    /* LANG_COMMAND_SCENE_DEBUG_ON        = 5062,
-    LANG_COMMAND_SCENE_DEBUG_OFF          = 5063,
-    LANG_COMMAND_SCENE_DEBUG_PLAY         = 5064,
-    LANG_COMMAND_SCENE_DEBUG_TRIGGER      = 5065,
-    LANG_COMMAND_SCENE_DEBUG_CANCEL       = 5066,
-    LANG_COMMAND_SCENE_DEBUG_COMPLETE     = 5067,
-    LANG_DEBUG_SCENE_OBJECT_LIST          = 5068,
-    LANG_DEBUG_SCENE_OBJECT_DETAIL        = 5069, */
+    LANG_COMMAND_SCENE_DEBUG_ON           = 5062, // master branch ONLY
+    LANG_COMMAND_SCENE_DEBUG_OFF          = 5063, // master branch ONLY
+    LANG_COMMAND_SCENE_DEBUG_PLAY         = 5064, // master branch ONLY
+    LANG_COMMAND_SCENE_DEBUG_TRIGGER      = 5065, // master branch ONLY
+    LANG_COMMAND_SCENE_DEBUG_CANCEL       = 5066, // master branch ONLY
+    LANG_COMMAND_SCENE_DEBUG_COMPLETE     = 5067, // master branch ONLY
+    LANG_DEBUG_SCENE_OBJECT_LIST          = 5068, // master branch ONLY
+    LANG_DEBUG_SCENE_OBJECT_DETAIL        = 5069, // master branch ONLY
 
     // Strings added for dynamic_spawning
     LANG_SPAWNINFO_GROUP_ID               = 5070,
@@ -1131,20 +1142,10 @@ enum TrinityStrings
     LANG_NPCINFO_UNIT_FIELD_FLAGS_2       = 5084, // master branch ONLY
     LANG_NPCINFO_UNIT_FIELD_FLAGS_3       = 5085, // master branch ONLY
     LANG_NPCINFO_NPC_FLAGS                = 5086, // master branch ONLY
+    LANG_NPCINFO_PHASE_IDS                = 5087, // master branch ONLY
+    LANG_SCENARIO                         = 5088, // master branch ONLY
 
-    // Battlefield
-    LANG_COMMAND_BF_START               = 5083,
-    LANG_COMMAND_BF_ACTIVE              = 5084,
-    LANG_COMMAND_BF_STOP                = 5085,
-    LANG_COMMAND_BF_ALREADY_STOPPED     = 5086,
-    LANG_COMMAND_BF_DISABLE             = 5087,
-    LANG_COMMAND_BF_ENABLE              = 5088,
-    LANG_COMMAND_BF_SWITCH              = 5089,
-    LANG_COMMAND_BF_TIMER               = 5090,
-    LANG_COMMAND_BF_INCORRECT_ID        = 5091,
-    LANG_COMMAND_BF_DISABLED            = 5092,
-
-    // Room for more Trinity strings        5094-6603
+    // Room for more Trinity strings        5089-6603
 
     // Level requirement notifications
     LANG_SAY_REQ                          = 6604,
@@ -1163,7 +1164,6 @@ enum TrinityStrings
     LANG_GM_ANNOUNCE_COLOR                = 6615,
 
     LANG_GM_SILENCE                       = 6616,  // "Silence is ON for %s" - Spell 1852
-    // 6617-6625 for Anticheat reserved
 
     LANG_WORLD_CLOSED                     = 7523,
     LANG_WORLD_OPENED                     = 7524,
@@ -1214,7 +1214,7 @@ enum TrinityStrings
     LANG_COMMAND_MUTEMESSAGE_WORLD        = 11003,
 
     // Show Ban in world
-    LANG_BAN_CHARACTER_YOUBANNEDMESSAGE_WORLD = 11004,
+    LANG_BAN_CHARACTER_YOUBANNEDMESSAGE_WORLD     = 11004,
     LANG_BAN_CHARACTER_YOUPERMBANNEDMESSAGE_WORLD = 11005,
     LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD       = 11006,
     LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD   = 11007,
@@ -1231,258 +1231,277 @@ enum TrinityStrings
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
     LANG_SHUTDOWN_DELAYED                         = 11017,
     LANG_SHUTDOWN_CANCELLED                       = 11018,
+    LANG_YOU_CHANGE_POWER                         = 11019, // master branch ONLY
+    LANG_YOUR_POWER_CHANGED                       = 11020, // master branch ONLY
+    LANG_INVALID_POWER_NAME                       = 11021, // master branch ONLY
 
-    // RE features
+    /**
+    *   AT features
+    **/
+    LANG_TRANSOFFSET_POSITION                     = 12000,
+    LANG_PINFO_CHR_VIP_MODE                       = 12001,
+    LANG_PINFO_CHR_ANTICHEAT_FLY_MODE             = 12002,
+
+    // Mail antispam
+    LANG_ANTISPAM_ERROR                   = 12003,
+
+    // Special event
+    LANG_SPECIALEVENT_INFO                = 12004,
+    LANG_SPECIALEVENT_START               = 12005,
+    LANG_SPECIALEVENT_STOP                = 12006,
+
+    // Dalaran Crater Event
+    LANG_DALARAN_CRATER_START_ANNOUNCE_30_SEC     = 12010, // "Dalaran Crater PVP (Battle Royale) Event will start in 1 minute. %u players will fight !"
+    LANG_DALARAN_CRATER_START_ANNOUNCE            = 12011, // "Dalaran Crater PVP (Battle Royale) Event has been Started!"
+    LANG_DALARAN_CRATER_PREPARE_TO_STOP_ANNOUNCE  = 12012, // "Dalaran Crater PVP (Battle Royale) Event will ended in 1 minute! In this match will fight %u players"
+    LANG_DALARAN_CRATER_DURATION_STOP_ANNOUNCE    = 12013, // "Dalaran Crater PVP (Battle Royale) Event has been Stoped for time out duration!"
+    LANG_DALARAN_CRATER_SUCCESS_STOP_ANNOUNCE     = 12014, // "Dalaran Crater PVP (Battle Royale) Event has been Stoped! Winner of this match %s"
+    LANG_DALARAN_CRATER_PREPARE_TO_RETURN_PLAYERS = 12015, // "All members of Dalaran Event will be revived and teleported in previous location in 45 seconds"
+    LANG_DALARAN_CRATER_LEAVE_PLAYER_AND_COUNT    = 12016, // "Player %s has leave the Battle. Alive players : %u"
+    LANG_DALARAN_CRATER_LEAVE_PLAYER_NOT_ALIVE    = 12017, // "You can not take a participation in Dalaran Event (you are died). Try to enjoy in next time"
+    LANG_DALARAN_CRATER_NOT_ENOGH_MIN_PLAYERS     = 12018, // "Dalaran Crater PVP (Battle Royale) Event can not be starte. Not enough players. Try to enjoy in next time"
+    LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_60  = 12019, // "Dalaran Crater PVP (Battle Royale) Event will be started in 1 minute"
+    LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_30  = 12020, // "Dalaran Crater PVP (Battle Royale) Event will be started in 30 seconds"
+    LANG_DALARAN_CRATER_REGISTRATION_QUEUE        = 12021, // "You have successfully registered in Dalaran Crater PVP (Battle Royale) Event"
+    LANG_DALARAN_CRATER_REGISTRATION_QUEUE_ABORT  = 12022, // "You have successfully canceled registration in Dalaran Crater PVP (Battle Royale) Event"
+    LANG_DALARAN_MENU_REGISTER                    = 12023, // "Register in Dalaran Crater Event PVP(Battle Royale) Queue"
+    LANG_DALARAN_MENU_LEAVE                       = 12024, // "Leave Dalaran Crater Event PVP (Battle Royale) - Queue"
+    LANG_DALARAN_MENU_AVALIABLE                   = 12025, // "Dalaran Crater Event PVP (Battle Royale) - will Available"
+
+    // GSystem
+    LANG_GSYSTEM_MIN_PLAYERS              = 12030, //"Not enough guild members for start Guild War"
+    LANG_GSYSTEM_MIN_PLAYERS_DEF          = 12031, //"Not enough guild members in target guild for starting Guild War"
+    LANG_GSYSTEM_MIN_TIMER                = 12032, //"You can start new Guild War only"
+    LANG_GSYSTEM_ANNOUNCE_LVL_UP_BY       = 12033, //"Congratulations! The guild has reached a " << level << " level. The last experience has gained by "
+    LANG_GSYSTEM_ANNOUNCE_LVL_UP          = 12034, //"Congratulations! The guild has reached a " << level"
+    LANG_GSYSTEM_ANNOUNCE_EXP_UP_BY       = 12035, //"The guild has received a " << value << " experience. Points has gained by "
+    LANG_GSYSTEM_ANNOUNCE_EXP_UP          = 12036, //"The guild has received a " << value << " experience."
+    LANG_GSYSTEM_ANNOUNCE_START_WAR       = 12037, //"The guild has entered in Guild War with "
+    LANG_GSYSTEM_ANNOUNCE_END_WAR         = 12038, //"The guild has ended Guild War with " << guildName << ". Winner of this Guild War : "
+    LANG_GSYSTEM_ANNOUNCE_INFO            = 12039, //"Guild has %u level, and %u / 1500 experience for next level"
+    LANG_GSYSTEM_ANNOUNCE_SANCTION_LVL    = 12040, //"Guild has %u level, and %u / 1500 experience for next level"
+    LANG_GSYSTEM_NAME_WITH_LEVEL          = 12041,
+    LANG_GSYSTEM_GM_RECEIVED_LEVEL        = 12042, //"Guild %s has received %u additional levels, and now has %u level"
+    LANG_GSYSTEM_GM_RECEIVED_EXP          = 12043, //"Guild %s has received %u additional experience, and now has %u Exp"
+    LANG_GSYSTEM_GM_LOOSED_LEVEL          = 12044, //"Guild %s has lost %u additional levels, and now has %u level"
+    LANG_GSYSTEM_GW_NO_ENEMY              = 12045, //"Guild has not enemies "
+    LANG_GSYSTEM_GW_HAS_ENEMY             = 12046, //"Guild has next emeies: /n %s "
+    LANG_GSYSTEM_GW_NOT_ENEMY             = 12047, //"Guild %s is not enemy of your guild"
+    LANG_GSYSTEM_GW_ALREADY_ENEMY         = 12048, //"Guild %s already is enemy of your guild"
+    LANG_GSYSTEM_GW_START                 = 12049, //"You declared a Guild War against %s"
+    LANG_GSYSTEM_GW_STOP                  = 12050, //"You admitted defeat in this war against the guild %s"
+    LANG_GSYSTEM_GW_REQ_LEVEL             = 12051,
+    LANG_GSYSTEM_GW_REQ_GUILDRIGHTS       = 12052, // "You have not rights to declare Guild War.\nYou should to have guild rank with rights to modify guild information"
+    LANG_GSYSTEM_GW_REQ_ONEFACTION        = 12053, // "You can declare War only inside one faction (Alliance or Horde)"
+    LANG_GSYSTEM_GUILD_MENU               = 12054, // "|TInterface\\icons\\spell_shadow_darksummoning:25:25:-15:0|t Guild Menu|r"
+    LANG_GSYSTEM_GUILD_INFO               = 12055, // "|TInterface\\icons\\spell_shadow_shadesofdarkness:25:25:-15:0|t Guild Info|r"
+    LANG_GSYSTEM_GUILD_WAR_INFO           = 12056, // "|TInterface\\icons\\spell_shadow_deathpact:25:25:-15:0|t Guild War Info|r"
+    LANG_GSYSTEM_GUILD_WAR_DECLARE        = 12057, // "|TInterface\\icons\\Achievement_Arena_3v3_4:25:25:-15:0|t Declare The War with guild:|r"
+    LANG_GSYSTEM_GUILD_WAR_ADMIT          = 12058, // "|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Admit defeat with guild:|r"
+    LANG_GSYSTEM_GUILD_WAR_DECLARE_SURE   = 12059, // "Are you sure you want to Declare The War?"
+    LANG_GSYSTEM_GUILD_WAR_ADMIT_SURE     = 12060, // "Are you sure you want to Admit defeat?"
+    //LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY    = 12061, // "The guild has received a " << value << " rating points. Points has gained by "
+    //LANG_GSYSTEM_ANNOUNCE_RATING_UP       = 12062, // "The guild has received a " << value << " rating points."
+    LANG_GSYSTEM_GUILD_DISABLED           = 12063, // "Guild Level System disabled"
+    LANG_GSYSTEM_GUILD_WARS_DISABLED      = 12064, // "Guild Wars disabled"
+
     // Guild loot
-    LANG_GUILD_LOOT_ANNOUNCE_1                    = 11019,
-    LANG_GUILD_LOOT_ANNOUNCE_2                    = 11020,
+    LANG_GUILD_LOOT_ANNOUNCE_1                    = 12100,
+    LANG_GUILD_LOOT_ANNOUNCE_2                    = 12101,
+
     // FLAB
-    LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE     = 11021,
-    // Anticheat
-    LANG_GM_ANNOUNCE_ASH                  = 6617,  // AntiSpeedHack
-    LANG_GM_ANNOUNCE_AFH_CANFLYWRONG      = 6618,  // AntiFlyHack - flying without canfly
-    LANG_GM_ANNOUNCE_AFK_SWIMMING         = 6619,  // AntiFlyHack - flying swimming not in water
-    LANG_GM_ANNOUNCE_AFH                  = 6620,  // AntiFlyHack
-    LANG_GM_ANNOUNCE_DOUBLE_JUMP          = 6621,  // Double jump (client can't sent second packet of jump (only hack))
-    LANG_GM_ANNOUNCE_JUMPER_FAKE          = 6622,  // Gagarin and others can set falling flag and move up as jump
-    LANG_GM_ANNOUNCE_JUMPER_FLYING        = 6623,  // Hitchhiker's Hack and others can set fly unrestricted flag
-    LANG_GM_ANNOUNCE_WALLCLIMB            = 6624,  // Wallclimb
-    LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL   = 6625,  // Movement under Controll (not restricted)
-    LANG_GM_ANNOUNCE_NOFALLINGDMG         = 6626,  // Falling without opcode of land/swim (not restricted)
+    LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE     = 12102,
 
     // Raid info
-    LANG_GROUP_TEXT_ANNOUNCE_1            = 788,
-    LANG_GROUP_TEXT_ANNOUNCE_2            = 789,
-    LANG_GROUP_TEXT_ANNOUNCE_3            = 790,
-    LANG_GROUP_TEXT_ANNOUNCE_4            = 791,
+    LANG_GROUP_TEXT_ANNOUNCE_1            = 12103,
+    LANG_GROUP_TEXT_ANNOUNCE_2            = 12104,
+    LANG_GROUP_TEXT_ANNOUNCE_3            = 12105,
+    LANG_GROUP_TEXT_ANNOUNCE_4            = 12106,
 
-    // BG
-    // AB
-    LANG_BG_AB_NODE_STABLES             = 652,
-    LANG_BG_AB_NODE_BLACKSMITH          = 653,
-    LANG_BG_AB_NODE_FARM                = 654,
-    LANG_BG_AB_NODE_LUMBER_MILL         = 655,
-    LANG_BG_AB_NODE_GOLD_MINE           = 656,
-    // EYE
-    LANG_BG_EY_HAS_TAKEN_A_M_TOWER      = 667,
-    LANG_BG_EY_HAS_TAKEN_H_M_TOWER      = 668,
-    LANG_BG_EY_HAS_TAKEN_A_D_RUINS      = 669,
-    LANG_BG_EY_HAS_TAKEN_H_D_RUINS      = 670,
-    LANG_BG_EY_HAS_TAKEN_A_B_TOWER      = 671,
-    LANG_BG_EY_HAS_TAKEN_H_B_TOWER      = 672,
-    LANG_BG_EY_HAS_TAKEN_A_F_RUINS      = 673,
-    LANG_BG_EY_HAS_TAKEN_H_F_RUINS      = 674,
-    LANG_BG_EY_HAS_LOST_A_M_TOWER       = 675,
-    LANG_BG_EY_HAS_LOST_H_M_TOWER       = 676,
-    LANG_BG_EY_HAS_LOST_A_D_RUINS       = 677,
-    LANG_BG_EY_HAS_LOST_H_D_RUINS       = 678,
-    LANG_BG_EY_HAS_LOST_A_B_TOWER       = 679,
-    LANG_BG_EY_HAS_LOST_H_B_TOWER       = 680,
-    LANG_BG_EY_HAS_LOST_A_F_RUINS       = 681,
-    LANG_BG_EY_HAS_LOST_H_F_RUINS       = 682,
-    // Isle of Conquest
+    // Battlefield
+    /*LANG_COMMAND_BF_START = 12110,
+    LANG_COMMAND_BF_ACTIVE              = 12111,
+    LANG_COMMAND_BF_STOP                = 12112,
+    LANG_COMMAND_BF_ALREADY_STOPPED     = 12113,
+    LANG_COMMAND_BF_DISABLE             = 12114,
+    LANG_COMMAND_BF_ENABLE              = 12115,
+    LANG_COMMAND_BF_SWITCH              = 12116,
+    LANG_COMMAND_BF_TIMER               = 12117,
+    LANG_COMMAND_BF_INCORRECT_ID        = 12118,
+    LANG_COMMAND_BF_DISABLED            = 12119,*/
+
+    // Anticheat
+    LANG_GM_ANNOUNCE_ASH                  = 12120,  // AntiSpeedHack
+    LANG_GM_ANNOUNCE_AFH_CANFLYWRONG      = 12121,  // AntiFlyHack - flying without canfly
+    LANG_GM_ANNOUNCE_AFK_SWIMMING         = 12122,  // AntiFlyHack - flying swimming not in water
+    LANG_GM_ANNOUNCE_AFH                  = 12123,  // AntiFlyHack
+    LANG_GM_ANNOUNCE_DOUBLE_JUMP          = 12124,  // Double jump (client can't sent second packet of jump (only hack))
+    LANG_GM_ANNOUNCE_JUMPER_FAKE          = 12125,  // Gagarin and others can set falling flag and move up as jump
+    LANG_GM_ANNOUNCE_JUMPER_FLYING        = 12126,  // Hitchhiker's Hack and others can set fly unrestricted flag
+    LANG_GM_ANNOUNCE_WALLCLIMB            = 12127,  // Wallclimb
+    LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL   = 12128,  // Movement under Controll (not restricted)
+    LANG_GM_ANNOUNCE_NOFALLINGDMG         = 12129,  // Falling without opcode of land/swim (not restricted)
+
+    // ArenaSpectator
+    LANG_SPECTATE_MENU_2VS2               = 12150,
+    LANG_SPECTATE_MENU_3VS3               = 12151,
+    LANG_SPECTATE_MENU_5VS5               = 12152,
+    LANG_SPECTATE_WRONG_NAME              = 12153,
+    LANG_YOU_ARE_FROZEN                   = 12154,
+    LANG_SPECTATE_WAIT_START              = 12155,
+    LANG_SPECTATE_NON_PLAYER              = 12156,
+    LANG_SPECTATE_YOUSELF                 = 12157,
+    LANG_SPECTATE_DISMIS_PET              = 12158,
+    LANG_SPECTATE_PLAYER_NOT_ARENA        = 12159,
+    LANG_SPECTATE_CANT_SPECTATORS         = 12160,
+    LANG_SPECTATE_MOUNT                   = 12161,
+    LANG_SPECTATE_QUEUE                   = 12162,
+    LANG_SPECTATE_MENU_UPDATE             = 12163,
+    LANG_SPECTATE_MAIN_MENU               = 12164,
+    LANG_SPECTATE_NOT_SPECTATOR           = 12165,
+    LANG_SPECTATE_YOU_TARGET_SPECTATOR    = 12166,
+    LANG_SPECTATE_DIFERENT_ARENAS         = 12167,
+    LANG_SPECTATE_TARGET_INVISEBLE        = 12168,
+    LANG_SPECTATE_CANT_FIND_PLAYER        = 12169,
+
+    // Vip Commands
+    LANG_PLAYER_NOT_VIP                   = 12170,
+    LANG_VIP_COMMAND_DISABLED             = 12171,
+    LANG_VIP_ERROR                        = 12172,
+    LANG_VIP_BG                           = 12173,
+    LANG_VIP_STEALTH                      = 12174,
+    LANG_VIP_DEAD                         = 12175,
+    LANG_VIP_CHANGE_RACE                  = 12176,
+    LANG_VIP_CHANGE_CUSTOMIZE             = 12177,
+    LANG_VIP_GROUP                        = 12178,
+    LANG_PLAYER_TARGET_NOT_VIP            = 12179,
+    LANG_PLAYER_VIP_TIME_EXIST            = 12180,
+    LANG_PLAYER_VIP_TIME_NEAR_END         = 12181,
+    LANG_PLAYER_VIP_TIME_EXPIRED          = 12182,
+    LANG_TARGETPLAYER_VIP_TIME_EXIST      = 12183,    
+
+    // Custom Item
+    LANG_ITEM_MSG_ALREADY_ITEM            = 12200,
+    LANG_ITEM_MSG_RENAME_COMPLETE         = 12201,
+    LANG_ITEM_MSG_CUSTOMIZE_COMPLETE      = 12202,
+    LANG_ITEM_MSG_CHANGE_FACTION_COMPLETE = 12203,
+    LANG_ITEM_MSG_CHANGE_RACE_COMPLETE    = 12204,
+    LANG_ITEM_MSG_NO_ARENA_POINTS         = 12205,
+    LANG_ITEM_MSG_RESET_COOLDOWN          = 12206,
+    LANG_ITEM_MSG_COOLDOWN                = 12207,
+    LANG_ITEM_MSG_RESET_QUEST_STATUS_COMPLETE            = 12208,
+    LANG_ITEM_MSG_RESET_RAID_INSTANCES_COOLDOWN_COMPLETE = 12209,
+    LANG_ITEM_CURRENT_COINS               = 12210,
+    LANG_ITEM_STORMWIND                   = 12211,
+    LANG_ITEM_ORGRIMMAR                   = 12212,
+    LANG_ITEM_STORMWIND_SURE              = 12213,
+    LANG_ITEM_ORGRIMMAR_SURE              = 12214,
+    LANG_ITEM_VIP_MENU                    = 12215,
+    LANG_ITEM_SERVER_MENU                 = 12216,
+    LANG_ITEM_VIP_BUY                     = 12217,
+    LANG_ITEM_VIP_INCREASE                = 12218,
+    LANG_ITEM_CLOSE                       = 12219,
+    LANG_ITEM_LEVELUP                     = 12220,
+    LANG_ITEM_COMMAND_LIST                = 12221,
+    LANG_ITEM_CHARACTER_MANAGEMENT        = 12222,
+    LANG_ITEM_CHARACTER_CHANGEING         = 12223,
+    LANG_ITEM_CLASS_SKILLS                = 12224,
+    LANG_ITEM_REPAIR_EQUIP                = 12225,
+    LANG_ITEM_REMOVE_DESERTER             = 12226,
+    LANG_ITEM_REMOVE_WEAKNESS             = 12227,
+    LANG_ITEM_GIVE_BUFFS                  = 12228,
+    LANG_ITEM_REMOVE_COOLDOWN             = 12229,
+    LANG_ITEM_DUAL_SPEC                   = 12230,
+    LANG_ITEM_RESET_TALENT                = 12231,
+    LANG_ITEM_RESET_TALENT_SURE           = 12232,
+    LANG_ITEM_SKILLS_WEAPON               = 12233,
+    LANG_ITEM_MAXSKILL                    = 12234,
+    LANG_ITEM_TALENT_RESET_CONFIRM        = 12235,
+    LANG_ITEM_SKILLS_WEAPON_CONFIRM       = 12236,
+    LANG_ITEM_MAXSKILL_CONFIRM            = 12237,
+    LANG_ITEM_REPAIR_CONFIRM              = 12238,
+    LANG_ITEM_DESERTER_NOT_FOUND          = 12239,
+    LANG_ITEM_DESERTER_REMOVED            = 12240,
+
+    LANG_ITEM_CHANGE_NAME                 = 12241,
+    LANG_ITEM_CHANGE_OF_APPEARANCE        = 12242,
+    LANG_ITEM_CHANGE_FACTION              = 12243,
+    LANG_ITEM_CHANGE_RACE                 = 12244,
+
+    LANG_ITEM_RATES                       = 12245,
+    LANG_ITEM_RATES_XP_KILL               = 12246,
+    LANG_ITEM_RATES_XP_QUEST              = 12247,
+    LANG_ITEM_RATES_REP                   = 12248,
+    LANG_ITEM_RATES_GOLD                  = 12249,
+    LANG_ITEM_RATES_HONOR                 = 12250,
+
+    LANG_ITEM_BUY_7                       = 12251,
+    LANG_ITEM_BUY_14                      = 12252,
+    LANG_ITEM_BUY_31                      = 12253,
+    LANG_ITEM_BUY_7_SURE                  = 12254,
+    LANG_ITEM_BUY_14_SURE                 = 12255,
+    LANG_ITEM_BUY_31_SURE                 = 12256,
+
+    LANG_ITEM_INC_7                       = 12257,
+    LANG_ITEM_INC_14                      = 12258,
+    LANG_ITEM_INC_31                      = 12259,
+    LANG_ITEM_INC_7_SURE                  = 12260,
+    LANG_ITEM_INC_14_SURE                 = 12261,
+    LANG_ITEM_INC_31_SURE                 = 12262,
+
+    LANG_ITEM_NOT_ENOUGH_COINS            = 12263,
+    LANG_ITEM_YOU_HAVE_COINS              = 12264,
+    LANG_ITEM_YOU_NEED_COINS              = 12265,
+    LANG_NOT_USED_BG                      = 12266,
+    LANG_ITEM_NOT_USED_STEALTH            = 12267,
+    LANG_ITEM_NOT_USED_DEAD               = 12268,
+    LANG_ITEM_SUCCESS_BOUGHT              = 12269,
+    LANG_ITEM_VIP_TIME                    = 12270,
+
+    LANG_ITEM_MENU_TRADE                  = 12271,
+    LANG_ITEM_PVP_CAP_ALIANCE             = 12272,
+    LANG_ITEM_PVP_CAP_HORDE               = 12273,
+    LANG_ITEM_VIP_BANK                    = 12274,
+
+    LANG_GOINFO_PHASEMASK                 = 12275,
+    LANG_ITEM_START_PACK_ITEM             = 12276,
+
+    LANG_ENTER_PROMO_CODE                         = 12300, // "Enter Promo - Code"
+    LANG_ENTERED_PROMO_CODE_CORRECT               = 12301, // "Are you sure that the entered code is correct?"
+    LANG_MENU_CLASS_SKILLS_GM                     = 12302, // "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r"
+    LANG_MENU_DELIVERY_OF_BAGS                    = 12303, // "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Delivery of bags"
+    LANG_MENU_LVL_UP                              = 12304, // "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|t Level up at 80"
+    LANG_PROMO_CODE_ERROR                         = 12305, // "Error promo - code"
+    LANG_PROMO_CODE_ACEPT                         = 12306, // "You have successfully received rewards for the promotional code"
+
+    LANG_BG_EY_HAS_TAKEN_A_M_TOWER    = 667,
+    LANG_BG_EY_HAS_TAKEN_H_M_TOWER    = 668,
+    LANG_BG_EY_HAS_TAKEN_A_D_RUINS    = 669,
+    LANG_BG_EY_HAS_TAKEN_H_D_RUINS    = 670,
+    LANG_BG_EY_HAS_TAKEN_A_B_TOWER    = 671,
+    LANG_BG_EY_HAS_TAKEN_H_B_TOWER    = 672,
+    LANG_BG_EY_HAS_TAKEN_A_F_RUINS    = 673,
+    LANG_BG_EY_HAS_TAKEN_H_F_RUINS    = 674,
+    LANG_BG_EY_HAS_LOST_A_M_TOWER     = 675,
+    LANG_BG_EY_HAS_LOST_H_M_TOWER     = 676,
+    LANG_BG_EY_HAS_LOST_A_D_RUINS     = 677,
+    LANG_BG_EY_HAS_LOST_H_D_RUINS     = 678,
+    LANG_BG_EY_HAS_LOST_A_B_TOWER     = 679,
+    LANG_BG_EY_HAS_LOST_H_B_TOWER     = 680,
+    LANG_BG_EY_HAS_LOST_A_F_RUINS     = 681,
+    LANG_BG_EY_HAS_LOST_H_F_RUINS     = 682,
+    LANG_BG_EY_HAS_TAKEN_FLAG         = 683,
+    LANG_BG_EY_CAPTURED_FLAG_A        = 684,
+    LANG_BG_EY_CAPTURED_FLAG_H        = 685,
+    LANG_BG_EY_DROPPED_FLAG           = 686,
+    LANG_BG_EY_RESETED_FLAG           = 687,
+
     LANG_BG_IC_ALLIANCE_KEEP            = 1209,
     LANG_BG_IC_HORDE_KEEP               = 1210,
-
     LANG_BG_IC_WORKSHOP                 = 1220,
     LANG_BG_IC_DOCKS                    = 1221,
     LANG_BG_IC_REFINERY                 = 1222,
     LANG_BG_IC_QUARRY                   = 1223,
     LANG_BG_IC_HANGAR                   = 1224,
-    // 11022 - 11109 free
-    // Vip Commands
-    LANG_PLAYER_NOT_VIP                   = 11110,
-    LANG_VIP_COMMAND_DISABLED             = 11111,
-    LANG_VIP_ERROR                        = 11112,
-    LANG_VIP_BG                           = 11113,
-    LANG_VIP_STEALTH                      = 11114,
-    LANG_VIP_DEAD                         = 11115,
-    LANG_VIP_CHANGE_RACE                  = 11116,
-    LANG_VIP_CHANGE_CUSTOMIZE             = 11117,
-    LANG_VIP_GROUP                        = 11118,
-    LANG_PLAYER_TARGET_NOT_VIP            = 11119,
-    LANG_PLAYER_VIP_TIME_EXIST            = 11120,
-    LANG_PLAYER_VIP_TIME_NEAR_END         = 11121,
-    LANG_PLAYER_VIP_TIME_EXPIRED          = 11122,
-    LANG_TARGETPLAYER_VIP_TIME_EXIST      = 11123,
-    // Mail antispam
-    LANG_ANTISPAM_ERROR                   = 11124,
-    // Special event
-    LANG_SPECIALEVENT_INFO                = 11125,
-    LANG_SPECIALEVENT_START               = 11126,
-    LANG_SPECIALEVENT_STOP                = 11127,
-
-    // Custom Item
-    LANG_ITEM_MSG_ALREADY_ITEM            = 11500,
-    LANG_ITEM_MSG_RENAME_COMPLETE         = 11501,
-    LANG_ITEM_MSG_CUSTOMIZE_COMPLETE      = 11502,
-    LANG_ITEM_MSG_CHANGE_FACTION_COMPLETE = 11503,
-    LANG_ITEM_MSG_CHANGE_RACE_COMPLETE    = 11504,
-    LANG_ITEM_MSG_NO_ARENA_POINTS         = 11505,
-    LANG_ITEM_MSG_RESET_COOLDOWN          = 11506,
-    LANG_ITEM_MSG_COOLDOWN                = 11507,
-    LANG_ITEM_MSG_RESET_QUEST_STATUS_COMPLETE            = 11508,
-    LANG_ITEM_MSG_RESET_RAID_INSTANCES_COOLDOWN_COMPLETE = 11509,
-    LANG_ITEM_CURRENT_COINS               = 11510,
-    LANG_ITEM_STORMWIND                   = 11511,
-    LANG_ITEM_ORGRIMMAR                   = 11512,
-    LANG_ITEM_STORMWIND_SURE              = 11513,
-    LANG_ITEM_ORGRIMMAR_SURE              = 11514,
-    LANG_ITEM_VIP_MENU                    = 11515,
-    LANG_ITEM_SERVER_MENU                 = 11516,
-    LANG_ITEM_VIP_BUY                     = 11517,
-    LANG_ITEM_VIP_INCREASE                = 11518,
-    LANG_ITEM_CLOSE                       = 11519,
-    LANG_ITEM_LEVELUP                     = 11520,
-    LANG_ITEM_COMMAND_LIST                = 11521,
-    LANG_ITEM_CHARACTER_MANAGEMENT        = 11522,
-    LANG_ITEM_CHARACTER_CHANGEING         = 11523,
-    LANG_ITEM_CLASS_SKILLS                = 11524,
-    LANG_ITEM_REPAIR_EQUIP                = 11525,
-    LANG_ITEM_REMOVE_DESERTER             = 11526,
-    LANG_ITEM_REMOVE_WEAKNESS             = 11527,
-    LANG_ITEM_GIVE_BUFFS                  = 11528,
-    LANG_ITEM_REMOVE_COOLDOWN             = 11529,
-    LANG_ITEM_DUAL_SPEC                   = 11530,
-    LANG_ITEM_RESET_TALENT                = 11531,
-    LANG_ITEM_RESET_TALENT_SURE           = 11532,
-    LANG_ITEM_SKILLS_WEAPON               = 11533,
-    LANG_ITEM_MAXSKILL                    = 11534,
-    LANG_ITEM_TALENT_RESET_CONFIRM        = 11535,
-    LANG_ITEM_SKILLS_WEAPON_CONFIRM       = 11536,
-    LANG_ITEM_MAXSKILL_CONFIRM            = 11537,
-    LANG_ITEM_REPAIR_CONFIRM              = 11538,
-    LANG_ITEM_DESERTER_NOT_FOUND          = 11539,
-    LANG_ITEM_DESERTER_REMOVED            = 11540,
-
-    LANG_ITEM_CHANGE_NAME                 = 11541,
-    LANG_ITEM_CHANGE_OF_APPEARANCE        = 11542,
-    LANG_ITEM_CHANGE_FACTION              = 11543,
-    LANG_ITEM_CHANGE_RACE                 = 11544,
-
-    LANG_ITEM_RATES                       = 11545,
-    LANG_ITEM_RATES_XP_KILL               = 11546,
-    LANG_ITEM_RATES_XP_QUEST              = 11547,
-    LANG_ITEM_RATES_REP                   = 11548,
-    LANG_ITEM_RATES_GOLD                  = 11549,
-    LANG_ITEM_RATES_HONOR                 = 11550,
-
-    LANG_ITEM_BUY_7                       = 11551,
-    LANG_ITEM_BUY_14                      = 11552,
-    LANG_ITEM_BUY_31                      = 11553,
-    LANG_ITEM_BUY_7_SURE                  = 11554,
-    LANG_ITEM_BUY_14_SURE                 = 11555,
-    LANG_ITEM_BUY_31_SURE                 = 11556,
-
-    LANG_ITEM_INC_7                       = 11557,
-    LANG_ITEM_INC_14                      = 11558,
-    LANG_ITEM_INC_31                      = 11559,
-    LANG_ITEM_INC_7_SURE                  = 11560,
-    LANG_ITEM_INC_14_SURE                 = 11561,
-    LANG_ITEM_INC_31_SURE                 = 11562,
-
-    LANG_ITEM_NOT_ENOUGH_COINS            = 11563,
-    LANG_ITEM_YOU_HAVE_COINS              = 11564,
-    LANG_ITEM_YOU_NEED_COINS              = 11565,
-    LANG_NOT_USED_BG                      = 11566,
-    LANG_ITEM_NOT_USED_STEALTH            = 11567,
-    LANG_ITEM_NOT_USED_DEAD               = 11568,
-    LANG_ITEM_SUCCESS_BOUGHT              = 11569,
-    LANG_ITEM_VIP_TIME                    = 11570,
-
-    LANG_ITEM_MENU_TRADE                  = 11571,
-    LANG_ITEM_PVP_CAP_ALIANCE             = 11572,
-    LANG_ITEM_PVP_CAP_HORDE               = 11573,
-    LANG_ITEM_VIP_BANK                    = 11574,
-
-    LANG_GOINFO_PHASEMASK                 = 11575,
-
-    LANG_ITEM_START_PACK_ITEM             = 11576,
-
-    // ArenaSpectator
-    LANG_SPECTATE_MENU_2VS2               = 11577,
-    LANG_SPECTATE_MENU_3VS3               = 11578,
-    LANG_SPECTATE_MENU_5VS5               = 11579,
-    LANG_SPECTATE_WRONG_NAME              = 11580,
-    LANG_YOU_ARE_FROZEN                   = 11581,
-    LANG_SPECTATE_WAIT_START              = 11582,
-    LANG_SPECTATE_NON_PLAYER              = 11583,
-    LANG_SPECTATE_YOUSELF                 = 11584,
-    LANG_SPECTATE_DISMIS_PET              = 11585,
-    LANG_SPECTATE_PLAYER_NOT_ARENA        = 11586,
-    LANG_SPECTATE_CANT_SPECTATORS         = 11587,
-    LANG_SPECTATE_MOUNT                   = 11588,
-    LANG_SPECTATE_QUEUE                   = 11589,
-    LANG_SPECTATE_MENU_UPDATE             = 11590,
-    LANG_SPECTATE_MAIN_MENU               = 11591,
-    LANG_SPECTATE_NOT_SPECTATOR           = 11592,
-    LANG_SPECTATE_YOU_TARGET_SPECTATOR    = 11593,
-    LANG_SPECTATE_DIFERENT_ARENAS         = 11594,
-    LANG_SPECTATE_TARGET_INVISEBLE        = 11595,
-    LANG_SPECTATE_CANT_FIND_PLAYER        = 11596,
-
-    // GSystem
-    LANG_GSYSTEM_MIN_PLAYERS              = 12000, //"Not enough guild members for start Guild War"
-    LANG_GSYSTEM_MIN_PLAYERS_DEF          = 12001, //"Not enough guild members in target guild for starting Guild War"
-    LANG_GSYSTEM_MIN_TIMER                = 12002, //"You can start new Guild War only"
-    LANG_GSYSTEM_ANNOUNCE_LVL_UP_BY       = 12003, //"Congratulations! The guild has reached a " << level << " level. The last experience has gained by "
-    LANG_GSYSTEM_ANNOUNCE_LVL_UP          = 12004, //"Congratulations! The guild has reached a " << level"
-    LANG_GSYSTEM_ANNOUNCE_EXP_UP_BY       = 12005, //"The guild has received a " << value << " experience. Points has gained by "
-    LANG_GSYSTEM_ANNOUNCE_EXP_UP          = 12006, //"The guild has received a " << value << " experience."
-    LANG_GSYSTEM_ANNOUNCE_START_WAR       = 12007, //"The guild has entered in Guild War with "
-    LANG_GSYSTEM_ANNOUNCE_END_WAR         = 12008, //"The guild has ended Guild War with " << guildName << ". Winner of this Guild War : "
-    LANG_GSYSTEM_ANNOUNCE_INFO            = 12009, //"Guild has %u level, and %u / 1500 experience for next level"
-    LANG_GSYSTEM_ANNOUNCE_SANCTION_LVL    = 12010, //"Guild has %u level, and %u / 1500 experience for next level"
-    LANG_GSYSTEM_NAME_WITH_LEVEL          = 12011,
-    LANG_GSYSTEM_GM_RECEIVED_LEVEL        = 12012, //"Guild %s has received %u additional levels, and now has %u level"
-    LANG_GSYSTEM_GM_RECEIVED_EXP          = 12013, //"Guild %s has received %u additional experience, and now has %u Exp"
-    LANG_GSYSTEM_GM_LOOSED_LEVEL          = 12014, //"Guild %s has lost %u additional levels, and now has %u level"
-    LANG_GSYSTEM_GW_NO_ENEMY              = 12015, //"Guild has not enemies "
-    LANG_GSYSTEM_GW_HAS_ENEMY             = 12016, //"Guild has next emeies: /n %s "
-    LANG_GSYSTEM_GW_NOT_ENEMY             = 12017, //"Guild %s is not enemy of your guild"
-    LANG_GSYSTEM_GW_ALREADY_ENEMY         = 12018, //"Guild %s already is enemy of your guild"
-    LANG_GSYSTEM_GW_START                 = 12019, //"You declared a Guild War against %s"
-    LANG_GSYSTEM_GW_STOP                  = 12020, //"You admitted defeat in this war against the guild %s"
-    LANG_GSYSTEM_GW_REQ_LEVEL             = 12021,
-    LANG_GSYSTEM_GW_REQ_GUILDRIGHTS       = 12022, // "You have not rights to declare Guild War.\nYou should to have guild rank with rights to modify guild information"
-    LANG_GSYSTEM_GW_REQ_ONEFACTION        = 12023, // "You can declare War only inside one faction (Alliance or Horde)"
-    LANG_GSYSTEM_GUILD_MENU               = 12024, // "|TInterface\\icons\\spell_shadow_darksummoning:25:25:-15:0|t Guild Menu|r"
-    LANG_GSYSTEM_GUILD_INFO               = 12025, // "|TInterface\\icons\\spell_shadow_shadesofdarkness:25:25:-15:0|t Guild Info|r"
-    LANG_GSYSTEM_GUILD_WAR_INFO           = 12026, // "|TInterface\\icons\\spell_shadow_deathpact:25:25:-15:0|t Guild War Info|r"
-    LANG_GSYSTEM_GUILD_WAR_DECLARE        = 12027, // "|TInterface\\icons\\Achievement_Arena_3v3_4:25:25:-15:0|t Declare The War with guild:|r"
-    LANG_GSYSTEM_GUILD_WAR_ADMIT          = 12028, // "|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Admit defeat with guild:|r"
-    LANG_GSYSTEM_GUILD_WAR_DECLARE_SURE   = 12029, // "Are you sure you want to Declare The War?"
-    LANG_GSYSTEM_GUILD_WAR_ADMIT_SURE     = 12030, // "Are you sure you want to Admit defeat?"
-    //LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY    = 12031, // "The guild has received a " << value << " rating points. Points has gained by "
-    //LANG_GSYSTEM_ANNOUNCE_RATING_UP       = 12032, // "The guild has received a " << value << " rating points."
-    LANG_GSYSTEM_GUILD_DISABLED           = 12033, // "Guild Level System disabled"
-    LANG_GSYSTEM_GUILD_WARS_DISABLED      = 12034, // "Guild Wars disabled"
-
-    // Dalaran Crater Event
-    LANG_DALARAN_CRATER_START_ANNOUNCE_30_SEC     = 12500, // "Dalaran Crater PVP (Battle Royale) Event will start in 1 minute. %u players will fight !"
-    LANG_DALARAN_CRATER_START_ANNOUNCE            = 12501, // "Dalaran Crater PVP (Battle Royale) Event has been Started!"
-    LANG_DALARAN_CRATER_PREPARE_TO_STOP_ANNOUNCE  = 12502, // "Dalaran Crater PVP (Battle Royale) Event will ended in 1 minute! In this match will fight %u players"
-    LANG_DALARAN_CRATER_DURATION_STOP_ANNOUNCE    = 12503, // "Dalaran Crater PVP (Battle Royale) Event has been Stoped for time out duration!"
-    LANG_DALARAN_CRATER_SUCCESS_STOP_ANNOUNCE     = 12504, // "Dalaran Crater PVP (Battle Royale) Event has been Stoped! Winner of this match %s"
-    LANG_DALARAN_CRATER_PREPARE_TO_RETURN_PLAYERS = 12505, // "All members of Dalaran Event will be revived and teleported in previous location in 45 seconds"
-    LANG_DALARAN_CRATER_LEAVE_PLAYER_AND_COUNT    = 12506, // "Player %s has leave the Battle. Alive players : %u"
-    LANG_DALARAN_CRATER_LEAVE_PLAYER_NOT_ALIVE    = 12507, // "You can not take a participation in Dalaran Event (you are died). Try to enjoy in next time"
-    LANG_DALARAN_CRATER_NOT_ENOGH_MIN_PLAYERS     = 12508, // "Dalaran Crater PVP (Battle Royale) Event can not be starte. Not enough players. Try to enjoy in next time"
-    LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_60  = 12509, // "Dalaran Crater PVP (Battle Royale) Event will be started in 1 minute"
-    LANG_DALARAN_CRATER_ANNOUNCE_BEFORE_START_30  = 12510, // "Dalaran Crater PVP (Battle Royale) Event will be started in 30 seconds"
-    LANG_DALARAN_CRATER_REGISTRATION_QUEUE        = 12511, // "You have successfully registered in Dalaran Crater PVP (Battle Royale) Event"
-    LANG_DALARAN_CRATER_REGISTRATION_QUEUE_ABORT  = 12512, // "You have successfully canceled registration in Dalaran Crater PVP (Battle Royale) Event"
-    LANG_DALARAN_MENU_REGISTER                    = 12513, // "Register in Dalaran Crater Event PVP(Battle Royale) Queue"
-    LANG_DALARAN_MENU_LEAVE                       = 12514, // "Leave Dalaran Crater Event PVP (Battle Royale) - Queue"
-    LANG_DALARAN_MENU_AVALIABLE                   = 12515, // "Dalaran Crater Event PVP (Battle Royale) - will Available"
-
-    // Custom item
-    LANG_ENTER_PROMO_CODE                         = 12535, // "Enter Promo - Code"
-    LANG_ENTERED_PROMO_CODE_CORRECT               = 12536, // "Are you sure that the entered code is correct?"
-    LANG_MENU_CLASS_SKILLS_GM                     = 12537, // "|TInterface\\icons\\achievement_level_80:25:25:-15:0|t Class skills - GM|r"
-    LANG_MENU_DELIVERY_OF_BAGS                    = 12538, // "|TInterface/ICONS/inv_crate_04:25:25:-15:0|t Delivery of bags"
-    LANG_MENU_LVL_UP                              = 12539, // "|TInterface\\icons\\Inv_misc_coin_01:25:25:-15:0|t Level up at 80"
-    LANG_PROMO_CODE_ERROR                         = 12540, // "Error promo - code"
-    LANG_PROMO_CODE_ACEPT                         = 12541, // "You have successfully received rewards for the promotional code"
 };
 #endif

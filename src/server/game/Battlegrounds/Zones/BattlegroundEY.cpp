@@ -491,8 +491,10 @@ void BattlegroundEY::UpdatePointsIcons(uint32 Team, EYBattlegroundPoints Point)
 
 void BattlegroundEY::AddPlayer(Player* player)
 {
+    bool const isInBattleground = IsPlayerInBattleground(player->GetGUID());
     Battleground::AddPlayer(player);
-    PlayerScores[player->GetGUID().GetCounter()] = new BattlegroundEYScore(player->GetGUID());
+    if (!isInBattleground)
+        PlayerScores[player->GetGUID().GetCounter()] = new BattlegroundEYScore(player->GetGUID());
 
     m_PlayersNearPoint[EY_PLAYERS_OUT_OF_POINTS].push_back(player->GetGUID());
 }

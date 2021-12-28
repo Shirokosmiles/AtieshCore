@@ -31,11 +31,13 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "QuestDef.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "Spell.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "TemporarySummon.h"
@@ -436,96 +438,81 @@ private:
     SummonList _summons;
 };
 
-enum MindlessAbomination
+/*######
+## Quest 11310: Warning: Some Assembly Required
+######*/
+
+enum SomeAssemblyRequired
 {
-    EVENT_CHECK_CHARMED                = 1
+    SPELL_PING_MASTER                          = 43393, // casted on owner after spawn, presumably has a spell script to force owner cast SPELL_MINDLESS_ABOMINATION_CONTROL (currently handled by linked spells)
+    SPELL_MINDLESS_ABOMINATION_CONTROL         = 42168,
+
+    SPELL_RANDOM_CIRCUMFERENCE_POINT_POISON    = 42266,
+    SPELL_RANDOM_CIRCUMFERENCE_POINT_BONE      = 42267,
+    SPELL_RANDOM_CIRCUMFERENCE_POINT_BONE_2    = 42274
 };
 
-class npc_mindless_abomination : public CreatureScript
+struct npc_mindless_abomination : public ScriptedAI
 {
-public:
-    npc_mindless_abomination() : CreatureScript("npc_mindless_abomination") { }
+    npc_mindless_abomination(Creature* creature) : ScriptedAI(creature) { }
 
-    struct npc_mindless_abominationAI : public ScriptedAI
+    void JustAppeared() override
     {
-        npc_mindless_abominationAI(Creature* creature) : ScriptedAI(creature) { }
+        me->SetCorpseDelay(0, true);
 
-        void Reset() override
+        _scheduler.Schedule(1s, [this](TaskContext task)
         {
-            events.ScheduleEvent(EVENT_CHECK_CHARMED, 1s);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            events.Update(diff);
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_CHECK_CHARMED:
-                        if (!me->IsCharmedOwnedByPlayerOrPlayer())
-                            me->DespawnOrUnsummon();
-                        else
-                            events.ScheduleEvent(EVENT_CHECK_CHARMED, 1s);
-                        break;
-                }
-            }
-        }
-
-    private:
-        EventMap events;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_mindless_abominationAI(creature);
+            if (!me->IsCharmedOwnedByPlayerOrPlayer())
+                me->DespawnOrUnsummon();
+            else
+                task.Repeat();
+        });
     }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 // 42268 - Quest - Mindless Abomination Explosion FX Master
-class spell_mindless_abomination_explosion_fx_master : public SpellScriptLoader
+class spell_mindless_abomination_explosion_fx_master : public SpellScript
 {
-    enum Spells
+    PrepareSpellScript(spell_mindless_abomination_explosion_fx_master);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        SPELL_RANDOM_CIRCUMFERENCE_POINT_POISON = 42266,
-        SPELL_COSMETIC_BLOOD_EXPLOSION_GREEN_LARGE = 43401
-    };
-
-    public:
-        spell_mindless_abomination_explosion_fx_master() : SpellScriptLoader("spell_mindless_abomination_explosion_fx_master") { }
-
-        class spell_mindless_abomination_explosion_fx_master_SpellScript : public SpellScript
+        return ValidateSpellInfo(
         {
-            PrepareSpellScript(spell_mindless_abomination_explosion_fx_master_SpellScript);
+            SPELL_RANDOM_CIRCUMFERENCE_POINT_POISON,
+            SPELL_RANDOM_CIRCUMFERENCE_POINT_BONE,
+            SPELL_RANDOM_CIRCUMFERENCE_POINT_BONE_2
+        });
+    }
 
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                return ValidateSpellInfo({ SPELL_RANDOM_CIRCUMFERENCE_POINT_POISON, SPELL_COSMETIC_BLOOD_EXPLOSION_GREEN_LARGE });
-            }
+    void HandleScript(SpellEffIndex /*eff*/)
+    {
+        Creature* caster = GetCaster()->ToCreature();
+        if (!caster)
+            return;
 
-            void HandleScript(SpellEffIndex /*eff*/)
-            {
-                Creature* caster = GetCaster()->ToCreature();
-                if (!caster)
-                    return;
+        for (uint8 i = 0; i < 11; ++i)
+            caster->CastSpell(caster, SPELL_RANDOM_CIRCUMFERENCE_POINT_POISON);
 
-                caster->CastSpell(caster, SPELL_COSMETIC_BLOOD_EXPLOSION_GREEN_LARGE);
+        for (uint8 i = 0; i < 6; ++i)
+            caster->CastSpell(caster, SPELL_RANDOM_CIRCUMFERENCE_POINT_BONE);
 
-                for (uint8 i = 0; i < 10; ++i)
-                    caster->CastSpell(caster, SPELL_RANDOM_CIRCUMFERENCE_POINT_POISON);
-            }
+        for (uint8 i = 0; i < 4; ++i)
+            caster->CastSpell(caster, SPELL_RANDOM_CIRCUMFERENCE_POINT_BONE_2);
+    }
 
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_mindless_abomination_explosion_fx_master_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_mindless_abomination_explosion_fx_master_SpellScript();
-        }
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_mindless_abomination_explosion_fx_master::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
 };
 
 /*######
@@ -548,7 +535,7 @@ enum RivenwoodCaptives
     SPELL_SUMMON_FREED_MIST_WHISPER_SCOUT = 43289
 };
 
-uint32 const CocoonSummonSpells[11] =
+std::array<uint32, 11> const CocoonSummonSpells =
 {
     SPELL_SUMMON_BABY_RIVEN_WIDOWS,
     SPELL_SUMMON_DARKCLAW_BAT,
@@ -743,14 +730,147 @@ public:
     }
 };
 
+/*######
+## Quest 11317, 11322: The Cleansing
+######*/
+
+enum TheCleansing
+{
+    SPELL_CLEANSING_SOUL            = 43351,
+    SPELL_SUMMON_INNER_TURMOIL      = 50167,
+    SPELL_RECENT_MEDITATION         = 61720,
+    SPELL_MIRROR_IMAGE_AURA         = 50218,
+
+    QUEST_THE_CLEANSING_H           = 11317,
+    QUEST_THE_CLEANSING_A           = 11322
+};
+
+// 43365 - The Cleansing: Shrine Cast
+class spell_the_cleansing_shrine_cast : public SpellScript
+{
+    PrepareSpellScript(spell_the_cleansing_shrine_cast);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_RECENT_MEDITATION, SPELL_CLEANSING_SOUL }) &&
+            sObjectMgr->GetQuestTemplate(QUEST_THE_CLEANSING_H) &&
+            sObjectMgr->GetQuestTemplate(QUEST_THE_CLEANSING_A);
+    }
+
+    SpellCastResult CheckCast()
+    {
+        // Error is correct for quest check but may be not correct for aura and this may be a wrong place to send error
+        if (Player* target = GetExplTargetUnit()->ToPlayer())
+        {
+            if (target->HasAura(SPELL_RECENT_MEDITATION) || (!(target->GetQuestStatus(QUEST_THE_CLEANSING_H) == QUEST_STATUS_INCOMPLETE ||
+                target->GetQuestStatus(QUEST_THE_CLEANSING_A) == QUEST_STATUS_INCOMPLETE)))
+            {
+                Spell::SendCastResult(target, GetSpellInfo(), 0, SPELL_FAILED_FIZZLE);
+                return SPELL_FAILED_FIZZLE;
+            }
+        }
+        return SPELL_CAST_OK;
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_CLEANSING_SOUL, true);
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_the_cleansing_shrine_cast::CheckCast);
+        OnEffectHitTarget += SpellEffectFn(spell_the_cleansing_shrine_cast::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 43351 - Cleansing Soul
+class spell_the_cleansing_cleansing_soul : public AuraScript
+{
+    PrepareAuraScript(spell_the_cleansing_cleansing_soul);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_INNER_TURMOIL, SPELL_RECENT_MEDITATION });
+    }
+
+    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->SetStandState(UNIT_STAND_STATE_SIT);
+    }
+
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        target->SetStandState(UNIT_STAND_STATE_STAND);
+        target->CastSpell(target, SPELL_SUMMON_INNER_TURMOIL, true);
+        target->CastSpell(target, SPELL_RECENT_MEDITATION, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_the_cleansing_cleansing_soul::AfterApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_cleansing_cleansing_soul::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 50217 - The Cleansing: Script Effect Player Cast Mirror Image
+class spell_the_cleansing_mirror_image_script_effect : public SpellScript
+{
+    PrepareSpellScript(spell_the_cleansing_mirror_image_script_effect);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MIRROR_IMAGE_AURA });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_MIRROR_IMAGE_AURA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_the_cleansing_mirror_image_script_effect::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 50238 - The Cleansing: Your Inner Turmoil's On Death Cast on Master
+class spell_the_cleansing_on_death_cast_on_master : public SpellScript
+{
+    PrepareSpellScript(spell_the_cleansing_on_death_cast_on_master);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->GetEffect(EFFECT_0).CalcValue()) });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (TempSummon* casterSummon = caster->ToTempSummon())
+                if (Unit* summoner = casterSummon->GetSummonerUnit())
+                    summoner->CastSpell(summoner, GetEffectInfo().CalcValue(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_the_cleansing_on_death_cast_on_master::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_howling_fjord()
 {
     new npc_apothecary_hanes();
     RegisterCreatureAI(npc_daegarn);
-    new npc_mindless_abomination();
-    new spell_mindless_abomination_explosion_fx_master();
+    RegisterCreatureAI(npc_mindless_abomination);
+    RegisterSpellScript(spell_mindless_abomination_explosion_fx_master);
     RegisterSpellScript(spell_rivenwood_captives_not_on_quest);
     RegisterSpellScript(spell_rivenwood_captives_on_quest);
     new go_ceremonial_dragonflare_harpoon();
     new npc_impaled_vardarde_scout();
- }
+    RegisterSpellScript(spell_the_cleansing_shrine_cast);
+    RegisterSpellScript(spell_the_cleansing_cleansing_soul);
+    RegisterSpellScript(spell_the_cleansing_mirror_image_script_effect);
+    RegisterSpellScript(spell_the_cleansing_on_death_cast_on_master);
+}

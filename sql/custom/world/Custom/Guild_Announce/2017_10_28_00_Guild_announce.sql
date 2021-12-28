@@ -1,3 +1,0 @@
-﻿DELETE FROM `trinity_string` WHERE `entry` IN (11019,11020);
-INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES ('11019', 'has received', '받은', 'reçu', 'erhalten', '有一個', 'มี', 'recibido', 'recibido', 'Получил');
-INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES ('11020', 'has received', '받은', 'reçu', 'erhalten', '我收到', 'ผมได้รับ', 'recibido', 'recibido', 'Получила');

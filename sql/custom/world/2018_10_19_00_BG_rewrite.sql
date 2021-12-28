@@ -329,13 +329,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 -- ISLE OF CONQUEST
 UPDATE `gameobject_template_addon` SET `faction`=84, `flags`=32 WHERE `entry`=195394;
 UPDATE `gameobject_template_addon` SET `flags`=32 WHERE `entry` IN (195393,195396,195313,195314,195315,195316);
--- avoid 'the the' when 'the alliance/horde' has taken 'the the alliance/horde keep'
-UPDATE `trinity_string` SET `content_default`='alliance keep' WHERE `entry`=1209;
-UPDATE `trinity_string` SET `content_default`='horde keep' WHERE `entry`=1210;
-UPDATE `trinity_string` SET `content_default`='The west gate of the %s is destroyed!' WHERE `entry`=1212;
-UPDATE `trinity_string` SET `content_default`='The east gate of the %s is destroyed!' WHERE `entry`=1213;
-UPDATE `trinity_string` SET `content_default`='The south gate of the %s is destroyed!' WHERE `entry`=1214;
-UPDATE `trinity_string` SET `content_default`='The north gate of the %s is destroyed!' WHERE `entry`=1215;
+
 -- Siege Engine, misc flags and missing difficulty entry data
 UPDATE `creature_template` SET `unit_flags`=16640 WHERE `entry` IN (34776,35069,35431,35433);
 UPDATE `creature_template` SET `VehicleId`=435 WHERE `entry`=35431;

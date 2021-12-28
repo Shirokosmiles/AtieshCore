@@ -405,9 +405,6 @@ public:
                 uint8 locale = 0;
                 for (; locale < TOTAL_LOCALES; ++locale)
                 {
-                    if (locale == handler->GetSessionDbcLocale())
-                        continue;
-
                     name = skillInfo->DisplayName[locale].c_str();
                     if (!name || !*name)
                         continue;
