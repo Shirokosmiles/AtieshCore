@@ -4,11 +4,11 @@ INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `conten
 (12002, '│ CanFly ?: {}', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 
 (12003, 'You have sent too many mails than available {} in a short time interval.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
---Special event
+-- Special event
 (12004, '{}: {}', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (12005, '{}: has been started', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (12006, '{}: has been ended', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
---Dalaran Crater Event
+-- Dalaran Crater Event
 (12010, '|cffe6cc80Dalaran Crater PVP |cFFF00000(Battle Royale) |cffe6cc80Event will start in |cff00ff0030|cffe6cc80seconds. |cff00ff00{} |cffe6cc80Players will fight!. Prepare to FIGHT!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|cffe6cc80Кратер Даларана PVP |cFFF00000(Королевская битва) |cffe6cc80Событие будет запущено через |cff00ff0030|cffe6cc80секунд. |cff00ff00{} |cffe6cc80Игроков примут участие в битве! Готовьтесь к БИТВЕ!'),
 (12011, '|cffe6cc80Dalaran Crater PVP |cFFF00000(Battle Royale) |cffe6cc80Event has been Started!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|cffe6cc80Кратер Даларана PVP |cFFF00000(Королевская битва) |cffe6cc80Событие было запущено!'),
 (12012, '|cffe6cc80Dalaran Crater PVP |cFFF00000(Battle Royale) |cffe6cc80Event will ended in 1 minute. |cff00ff00{} |cffe6cc80Players still alive', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|cffe6cc80Кратер Даларана PVP |cFFF00000(Королевская битва) |cffe6cc80Событие завершится через 1 минуту! |cff00ff00{} |cffe6cc80Игроков ещё живы!'),
@@ -25,7 +25,7 @@ INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `conten
 (12023, 'Register in Dalaran Crater Event PVP(Battle Royale) Queue', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Зарегистрироваться на участие в Кратер Даларана PVP'),
 (12024, 'Leave Dalaran Crater Event PVP (Battle Royale) - Queue', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Покинуть Кратер Даларана PVP'),
 (12025, 'Dalaran Crater Event PVP (Battle Royale) - will Available', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Событие Кратер даларана доступно'),
---GSystem
+-- GSystem
 (12030, '|cffe6cc80Not enough guild members for start Guild War', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|cffe6cc80Недостаточно игроков в гильдии для начала Войны Гильдий'),
 (12031, '|cffe6cc80Not enough guild members in target guild for starting Guild War', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|cffe6cc80В противоположной гильдии недостаточно игроков для начала Войны Гильдий'),
 (12032, '|cffe6cc80You can start new Guild War only', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|cffe6cc80Вы сможете начать новую Войну Гильдий лишь'),
@@ -57,21 +57,21 @@ INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `conten
 (12058, '|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Admit defeat with guild:|r', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|TInterface\\icons\\Achievement_BG_3flagcap_nodeaths:25:25:-15:0|t Признать поражение в Войне с гильдией:|r'),
 (12059, 'Are you sure you want to Declare The War?', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Вы уверены, что готовы объявить Войну?'),
 (12060, 'Are you sure you want to Admit defeat?', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Вы уверены, что готовы признать поражение?'),
---missed LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY
---missed LANG_GSYSTEM_ANNOUNCE_RATING_UP
+-- missed LANG_GSYSTEM_ANNOUNCE_RATING_UP_BY
+-- missed LANG_GSYSTEM_ANNOUNCE_RATING_UP
 (12063, 'Guild Level System disabled', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Уровни гильдий отключены'),
 (12064, 'Guild Wars disabled', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Войны гильдий отключены.'),
---Guild loot
+-- Guild loot
 (12100, 'has received', '받은', 'reçu', 'erhalten', '有一個', 'มี', 'recibido', 'recibido', 'Получил'),
 (12101, 'has received', '받은', 'reçu', 'erhalten', '我收到', 'ผมได้รับ', 'recibido', 'recibido', 'Получила'),
---FLAB
+-- FLAB
 (12102, '|cffe6cc80[{}]: We glad to see your first character here, and present you a little bonus :|r {:01}|TInterface\\MoneyFrame\\UI-GoldIcon:0:0:2:0|t {:02}|TInterface\\MoneyFrame\\UI-SilverIcon:0:0:2:0|t {:02}|TInterface\\MoneyFrame\\UI-CopperIcon:0:0:2:0|t', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|cffe6cc80[{}]: Мы рады видеть вас и вашего первого персонажа, и дарим вам небольшой презент :|r {:01}|TInterface\\MoneyFrame\\UI-GoldIcon:0:0:2:0|t {:02}|TInterface\\MoneyFrame\\UI-SilverIcon:0:0:2:0|t {:02}|TInterface\\MoneyFrame\\UI-CopperIcon:0:0:2:0|t'),
---Raid info
+-- Raid info
 (12103, '|cffff0000[RAID INFO]|r |cffe6cc80{} {} {} defeated by the {} with leader:|r |cFFDCDCDC{}|r {}|cffe6cc80. Players ({} / {}) is alive|r', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (12104, '|cffff0000Members:|r |cffe6cc80Tanks -|r |cFF7CFC00{}|r|cffe6cc80, Healers -|r |cFF7CFC00{}|r|cffe6cc80, Damagers -|r |cFF7CFC00{}|r |cffe6cc80 (Avg GS: {})|r', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (12105, '|cffff0000Status:|r |cffe6cc80({} / {}) boss completed|r', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (12106, '|cffff0000Boss|r |cffe6cc80 has been defeated for {}|r', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
---Anticheat
+-- Anticheat
 (12120, 'AntiCheat: SpeedHack Detected for {}, normal distance for this time and speed = {}, distance from packet = {}', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (12121, 'AntiCheat: FlyHack Detected for {} , player can not fly', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (12122, 'AntiCheat: FlyHack Detected for {}, player has Swimming flag, but not in water', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -83,7 +83,7 @@ INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `conten
 (12128, 'AntiCheat: Ignore control Hack Detected for Account : {}, Player : {}', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (12129, 'AntiCheat: NoFallingDamage Hack Detected for Account : {}, Player : {}', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 
---ArenaSpectator
+-- ArenaSpectator
 (12150, '2vs2 (Current games: ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2vs2 (Текущие игры: '),
 (12151, '3vs3 (Current games: ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '3vs3 (Текущие игры: '),
 (12152, '5vs5 (Current games: ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '5vs5 (Текущие игры: '),
@@ -105,7 +105,7 @@ INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `conten
 (12168, 'ERROR: Can`t target invisible players.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ОШИБКА: Не может нацеливаться на невидимых игроков.'),
 (12169, 'ERROR: Can`t find player.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ОШИБКА: Не могу найти игрока.'),
 
---Vip Commands
+-- Vip Commands
 (12170, 'You are not vip.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Доступно только VIP игрокам.'),
 (12171, 'Сommand disable', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Команда отключена.'),
 (12172, 'error', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Произошла ошибка.'),
@@ -121,7 +121,7 @@ INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `conten
 (12182, 'Your VIP time has been expired!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Время VIP привилегий истекло!'),
 (12183, 'The remaining VIP time of this target will expire in: {}', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Оставшееся VIP время указанного игрока истечет через: {}'),
 
---Custom Item
+-- Custom Item
 (12200, '|cff00ffffYou already have this item!|r', NULL, '|cff00ffffVous avez déjà cet objet !|r', NULL, NULL, NULL, NULL, NULL, '|cff00ffffУ вас уже имеется данная вещь!|r'),
 (12201, '|cff00ff00Payment complete. You need to do log-out by character and set a new name for character. Do not forget to clear folder Cache after rename!|r', NULL, '|cff00ff00Payment validé. Vous devez vous déconnecter de votre personnage et le renommer. N\'oubliez pas d\'effacer le dossier Cache après l\'avoir renommé !|r', NULL, NULL, NULL, NULL, NULL, '|cff00ff00Оплата успешно произведена. Сделайте логаут и введите новое имя своего персонажа.Не забудьте после смены имени, выйти из игры и удалить из клиента папку Cache!|r'),
 (12202, '|cff00ff00Payment complete. You need to do log-out by character and set customize for character.Do not forget to clear folder Cache after rename!|r', NULL, '|cff00ff00Payment validé. Vous devez vous déconnecter de votre personnage et le personnaliser. N\'oubliez pas d\'effacer le dossier Cache après l\'avoir personnalisé !|r', NULL, NULL, NULL, NULL, NULL, '|cff00ff00Оплата успешно произведена. Сделайте логаут и измените внешность своего персонажа.Не забудьте после смены внешности, выйти из игры и удалить из клиента папку Cache!|r'),
@@ -198,9 +198,9 @@ INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `conten
 (12273, '|TInterface\\icons\\Achievement_BG_interruptX_flagcapture_attempts_1game:25:25:-15:0|tYour Weekly PVP Bonus Cap : (', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|TInterface\\icons\\Achievement_BG_interruptX_flagcapture_attempts_1game:25:25:-15:0|tYour Weekly PVP Bonus Cap : ('),
 (12274, '|TInterface\\icons\\Spell_chargepositive:25:25:-15:0|tBank', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|TInterface\\icons\\Spell_chargepositive:25:25:-15:0|tБанк'),
 
---LANG_GOINFO_PHASEMASK
+-- LANG_GOINFO_PHASEMASK
 (12275, 'Phase: {}', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
---LANG_ITEM_START_PACK_ITEM
+-- LANG_ITEM_START_PACK_ITEM
 (12276, '|TInterface\\icons\\Ability_Warrior_Intervene:25:25:-15:0|t Receive start-pack items', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|TInterface\\icons\\Ability_Warrior_Intervene:25:25:-15:0|t Получить стартовый пакет'),
 
 (12300, '|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|tEnter Promo - Code', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|TInterface\\icons\\Inv_inscription_pigment_bug07:25:25:-15:0|tВвести промокод'),
@@ -211,7 +211,7 @@ INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `conten
 (12305, 'Promo code already used or entered incorrectly', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Промокод использован или введен неверно'),
 (12306, 'You have successfully received rewards for the promotional code', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Вы успешно получили награды по промокоду'),
 
---transmogrified
+-- transmogrified
 (13000, 'Item transmogrified', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Предмет трансморгрифицирован'),
 (13001, 'Equipment slot is empty', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Слот экипировки пуст'),
 (13002, 'Invalid source item selected', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Некорректный исходный предмет выбран.'),
