@@ -123,31 +123,6 @@ public:
 
 };
 
-// 58418 - Portal to Orgrimmar
-// 58420 - Portal to Stormwind
-class spell_teleport_leaders_blessing : public SpellScript
-{
-    PrepareSpellScript(spell_teleport_leaders_blessing);
-
-    void HandleScriptEffect(SpellEffIndex /* effIndex */)
-    {
-        Player* target = GetHitPlayer();
-        if (!target)
-            return;
-
-        uint32 spellID = GetEffectInfo().CalcValue();
-        uint32 questID = GetEffectInfo(EFFECT_1).CalcValue();
-
-        if (target->GetQuestStatus(questID) == QUEST_STATUS_COMPLETE)
-            target->CastSpell(target, spellID, true);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_teleport_leaders_blessing::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
-};
-
 enum ScorgeSpells
 {
     // ABOMINATION
@@ -502,5 +477,4 @@ void AddSC_the_scarlet_enclave_c5()
     new npc_scorge_ghoul();
     new npc_scorge_warrior_of_frozen_wastes();
     new npc_scorge_behemoth();
-    RegisterSpellScript(spell_teleport_leaders_blessing);
 }
