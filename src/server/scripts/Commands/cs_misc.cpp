@@ -1200,10 +1200,11 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
         Player* playerTarget = handler->getSelectedPlayer();
-        if (!playerTarget && player)
-            playerTarget = player;
-        else
+        if (!player)
             return false;
+
+        if (!playerTarget)
+            playerTarget = player;
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
         if (!itemTemplate)
