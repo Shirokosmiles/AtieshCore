@@ -4,7 +4,7 @@ INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`
 ('Compression', 'int', 0, '1', NULL, 'Compression level for client update packages. (1   - (Speed) -- 9   - (Best compression))'),
 ('PlayerSaveInterval', 'int', 1, '90000', NULL, 'Time (in milliseconds) for player save interval.'),
 ('GridCleanUpDelay', 'int', 2, '300000', NULL, 'Time (in milliseconds) grid clean up delay.'),
-('MapUpdateInterval', 'int', 3, '100', NULL, 'Time (milliseconds) for map update interval.'),
+('MapUpdateInterval', 'int', 3, '10', NULL, 'Time (milliseconds) for map update interval.'),
 ('ChangeWeatherInterval', 'int', 4, '600000', NULL, 'Time (in milliseconds) for weather update interval.'),
 ('DisconnectToleranceInterval', 'int', 5, '0', NULL, 'Tolerance (in seconds) for disconnected players before reentering the queue.'),
 ('WorldServerPort', 'int', 6, '8085', NULL, 'TCP port to reach the world server.'),
