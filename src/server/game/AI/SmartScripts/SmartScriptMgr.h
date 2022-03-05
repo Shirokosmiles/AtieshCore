@@ -182,8 +182,11 @@ enum SMART_EVENT
     SMART_EVENT_SCENE_CANCEL             = 80,      // don't use on 3.3.5a
     SMART_EVENT_SCENE_COMPLETE           = 81,      // don't use on 3.3.5a
     SMART_EVENT_SUMMONED_UNIT_DIES       = 82,      // CreatureId(0 all), CooldownMin, CooldownMax
+    SMART_EVENT_ON_SPELL_CAST            = 83,      // SpellID, CooldownMin, CooldownMax
+    SMART_EVENT_ON_SPELL_FAILED          = 84,      // SpellID, CooldownMin, CooldownMax
+    SMART_EVENT_ON_SPELL_START           = 85,      // SpellID, CooldownMin, CooldownMax
 
-    SMART_EVENT_END                      = 83
+    SMART_EVENT_END                      = 86
 };
 
 struct SmartEvent
@@ -410,6 +413,13 @@ struct SmartEvent
 
         struct
         {
+            uint32 spell;
+            uint32 cooldownMin;
+            uint32 cooldownMax;
+        } spellCast;
+
+        struct
+        {
             uint32 param1;
             uint32 param2;
             uint32 param3;
@@ -512,7 +522,7 @@ enum SMART_ACTION
     SMART_ACTION_CLOSE_GOSSIP                       = 72,     // none
     SMART_ACTION_TRIGGER_TIMED_EVENT                = 73,     // id(>1)
     SMART_ACTION_REMOVE_TIMED_EVENT                 = 74,     // id(>1)
-    SMART_ACTION_ADD_AURA                           = 75,     // spellid,  targets
+    SMART_ACTION_ADD_AURA                           = 75,     // UNUSED, DO NOT REUSE
     SMART_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT        = 76,     // UNUSED, DO NOT REUSE
     SMART_ACTION_RESET_SCRIPT_BASE_OBJECT           = 77,     // UNUSED, DO NOT REUSE
     SMART_ACTION_CALL_SCRIPT_RESET                  = 78,     // none
@@ -541,9 +551,9 @@ enum SMART_ACTION
     SMART_ACTION_SET_HOME_POS                       = 101,    // none
     SMART_ACTION_SET_HEALTH_REGEN                   = 102,    // 0/1
     SMART_ACTION_SET_ROOT                           = 103,    // off/on
-    SMART_ACTION_SET_GO_FLAG                        = 104,    // Flags
-    SMART_ACTION_ADD_GO_FLAG                        = 105,    // Flags
-    SMART_ACTION_REMOVE_GO_FLAG                     = 106,    // Flags
+    SMART_ACTION_SET_GO_FLAG                        = 104,    // UNUSED, DO NOT REUSE
+    SMART_ACTION_ADD_GO_FLAG                        = 105,    // UNUSED, DO NOT REUSE
+    SMART_ACTION_REMOVE_GO_FLAG                     = 106,    // UNUSED, DO NOT REUSE
     SMART_ACTION_SUMMON_CREATURE_GROUP              = 107,    // Group, attackInvoker
     SMART_ACTION_SET_POWER                          = 108,    // PowerType, newPower
     SMART_ACTION_ADD_POWER                          = 109,    // PowerType, newPower
@@ -577,7 +587,7 @@ enum SMART_ACTION
     SMART_ACTION_PLAY_SPELL_VISUAL_KIT              = 137,    // spellVisualKitId (RESERVED, PENDING CHERRYPICK)
     SMART_ACTION_OVERRIDE_LIGHT                     = 138,    // zoneId, overrideLightID, transitionMilliseconds
     SMART_ACTION_OVERRIDE_WEATHER                   = 139,    // zoneId, weatherId, intensity
-    SMART_ACTION_SET_AI_ANIM_KIT                    = 140,    // don't use on 3.3.5a
+    SMART_ACTION_SET_AI_ANIM_KIT                    = 140,    // DEPRECATED, DO REUSE (it was never used in any branch, treat as free action id)
     SMART_ACTION_SET_HOVER                          = 141,    // 0/1
     SMART_ACTION_SET_HEALTH_PCT                     = 142,    // percent
     SMART_ACTION_CREATE_CONVERSATION                = 143,    // don't use on 3.3.5a
@@ -725,11 +735,6 @@ struct SmartAction
             uint32 inc;
             uint32 dec;
         } incEventPhase;
-
-        struct
-        {
-            uint32 spell;
-        } addAura;
 
         struct
         {
@@ -1018,11 +1023,6 @@ struct SmartAction
         {
             SAIBool root;
         } setRoot;
-
-        struct
-        {
-            uint32 flag;
-        } goFlag;
 
         struct
         {
@@ -1508,6 +1508,9 @@ const uint32 SmartAIEventMask[SMART_EVENT_END][2] =
     {SMART_EVENT_SCENE_CANCEL,              0 },
     {SMART_EVENT_SCENE_COMPLETE,            0 },
     {SMART_EVENT_SUMMONED_UNIT_DIES,        SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
+    {SMART_EVENT_ON_SPELL_CAST,             SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_ON_SPELL_FAILED,           SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_ON_SPELL_START,            SMART_SCRIPT_TYPE_MASK_CREATURE },
 };
 
 enum SmartEventFlags
