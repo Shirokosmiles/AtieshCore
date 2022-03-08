@@ -14,7 +14,7 @@ CREATE TABLE `account_gm_log` (
   PRIMARY KEY (`id`),
   KEY `account` (`account`),
   KEY `player` (`player`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for account_gm_log_item
@@ -34,4 +34,4 @@ CREATE TABLE `account_gm_log_item` (
   `realmId` int(9) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `guid` (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;

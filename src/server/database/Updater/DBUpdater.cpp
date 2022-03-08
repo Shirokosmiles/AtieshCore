@@ -411,7 +411,7 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
 
     // Execute sql file
     args.emplace_back("-e");
-    args.emplace_back(Trinity::StringFormat("BEGIN; SOURCE %s; COMMIT;", path.generic_string().c_str()));
+    args.emplace_back(Trinity::StringFormat("BEGIN; SOURCE {}; COMMIT;", path.generic_string()));
 
     // Database
     if (!database.empty())
