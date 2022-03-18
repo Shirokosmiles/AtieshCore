@@ -660,59 +660,6 @@ public:
     }
 };
 
-/*######
-## Quest Dreadsaber Mastery: Stalking the Prey (12550)
-######*/
-
-enum ShangoTracks
-{
-    SPELL_CORRECT_TRACKS   = 52160,
-    SPELL_INCORRECT_TRACKS = 52163,
-    SAY_CORRECT_TRACKS     = 28634,
-    SAY_INCORRECT_TRACKS   = 28635
-};
-
-// 52160 - Correct Tracks
-// 52163 - Incorrect Tracks
-class spell_shango_tracks : public SpellScriptLoader
-{
-public:
-   spell_shango_tracks() : SpellScriptLoader("spell_shango_tracks") { }
-
-    class spell_shango_tracks_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_shango_tracks_SpellScript);
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-            {
-                switch (GetSpellInfo()->Id)
-                {
-                    case SPELL_CORRECT_TRACKS:
-                        target->Say(SAY_CORRECT_TRACKS, target);
-                        break;
-                    case SPELL_INCORRECT_TRACKS:
-                        target->Say(SAY_INCORRECT_TRACKS, target);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_shango_tracks_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_shango_tracks_SpellScript();
-    }
-};
-
 enum ReturnedSevenfold
 {
     SPELL_FREYAS_WARD           = 51845,
@@ -881,7 +828,6 @@ void AddSC_sholazar_basin()
     new spell_q12589_shoot_rjr();
     new npc_haiphoon();
     new npc_mammoth();
-    new spell_shango_tracks();
     RegisterSpellScript(spell_q12611_deathbolt);
     RegisterSpellScript(spell_sholazar_take_sputum_sample);
     RegisterSpellScript(spell_sholazar_sputum_collected);
