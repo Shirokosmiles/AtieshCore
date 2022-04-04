@@ -202,7 +202,7 @@ void WintergraspMgr::SetupWG(TeamId defender, bool StartWar)
             // Update faction of relic, only attacker can click on
             relic->SetFaction(WintergraspFaction[GetAttackerTeam()]);
             // Set in use (not allow to click on before last door is broken)
-            relic->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
+            relic->SetFlag(GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
             m_TitansRelicGUID = relic->GetGUID();
         }
         else

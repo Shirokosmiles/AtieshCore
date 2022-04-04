@@ -316,7 +316,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (!movementInfo.pos.IsPositionValid())
     {
-        recvData.rfinish();                     // prevent warnings spam
         if (plrMover)
         {
             plrMover->SetSkipOnePacketForASH(true);
@@ -324,12 +323,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         }
         return;
     }
-
     if (!mover->movespline->Finalized())
-    {
-        recvData.rfinish();                     // prevent warnings spam
         return;
-    }
 
     // [CMSG_MOVE_CHNG_TRANSPORT 0x038D (909)]
     if (plrMover && opcode == CMSG_MOVE_CHNG_TRANSPORT)

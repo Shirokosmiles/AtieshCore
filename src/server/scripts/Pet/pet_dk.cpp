@@ -180,7 +180,7 @@ public:
                                 mutualPVP = true;
                         me->CombatStop(true, mutualPVP);
                         // Stop Fighting
-                        me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 
                         // Sanctuary
                         me->CastSpell(me, SPELL_DK_SANCTUARY, true);

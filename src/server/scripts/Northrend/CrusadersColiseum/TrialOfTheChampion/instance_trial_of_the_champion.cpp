@@ -210,7 +210,7 @@ class instance_trial_of_the_champion : public InstanceMapScript
 
                                 DoRespawnGameObject(GetObjectGuid(DATA_CHAMPION_S_CACHE), Hours(24));
                                 if (GameObject* cache = GetGameObject(DATA_CHAMPION_S_CACHE))
-                                    cache->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                    cache->RemoveFlag(GO_FLAG_NOT_SELECTABLE);
                             }
                         }
                         break;
@@ -256,7 +256,7 @@ class instance_trial_of_the_champion : public InstanceMapScript
 
                                 DoRespawnGameObject(GetObjectGuid(dataType), Hours(24));
                                 if (GameObject* cache = GetGameObject(dataType))
-                                    cache->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                    cache->RemoveFlag(GO_FLAG_NOT_SELECTABLE);
                             }
                         }
                         break;

@@ -688,10 +688,12 @@ void MotionMaster::MoveCloserAndStop(uint32 id, Unit* target, float distance)
     else
     {
         // We are already close enough. We just need to turn toward the target without changing position.
-        Movement::MoveSplineInit init(_owner);
-        init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ());
-        init.SetFacing(target);
-        Add(new GenericMovementGenerator(std::move(init), EFFECT_MOTION_TYPE, id));
+        std::function<void(Movement::MoveSplineInit&)> initializer = [=, target = target->GetGUID()](Movement::MoveSplineInit& init)
+        {
+            init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ());
+            init.SetFacing(target);
+        };
+        Add(new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, id));
     }
 }
 
@@ -699,24 +701,28 @@ void MotionMaster::MoveLand(uint32 id, Position const& pos, Optional<float> velo
 {
     FMT_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveLand: '{}', landing point Id: {} (X: {}, Y: {}, Z: {})", _owner->GetGUID().ToString(), id, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
 
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(PositionToVector3(pos), false);
-    init.SetAnimation(AnimationTier::Ground);
-    if (velocity)
-        init.SetVelocity(*velocity);
-    Add(new GenericMovementGenerator(std::move(init), EFFECT_MOTION_TYPE, id));
+    std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+    {
+        init.MoveTo(PositionToVector3(pos), false);
+        init.SetAnimation(AnimTier::Ground);
+        if (velocity)
+            init.SetVelocity(*velocity);
+    };
+    Add(new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, id));
 }
 
 void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, Optional<float> velocity /*= {}*/)
 {
     FMT_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveTakeoff: '{}', landing point Id: {} (X: {}, Y: {}, Z: {})", _owner->GetGUID().ToString(), id, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
 
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(PositionToVector3(pos), false);
-    init.SetAnimation(AnimationTier::Hover);
-    if (velocity)
-        init.SetVelocity(*velocity);
-    Add(new GenericMovementGenerator(std::move(init), EFFECT_MOTION_TYPE, id));
+    std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+    {
+        init.MoveTo(PositionToVector3(pos), false);
+        init.SetAnimation(AnimTier::Hover);
+        if (velocity)
+            init.SetVelocity(*velocity);
+    };
+    Add(new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, id));
 }
 
 void MotionMaster::MoveCharge(float x, float y, float z, float speed /*= SPEED_CHARGE*/, uint32 id /*= EVENT_CHARGE*/, bool generatePath /*= false*/)
@@ -847,47 +853,47 @@ void MotionMaster::MoveJump(float x, float y, float z, float o, float speedXY, f
 
 void MotionMaster::MoveCirclePath(float x, float y, float z, float radius, bool clockwise, uint8 stepCount)
 {
-    float step = 2 * float(M_PI) / stepCount * (clockwise ? -1.0f : 1.0f);
-    Position const& pos = { x, y, z, 0.0f };
-    float angle = pos.GetAbsoluteAngle(_owner->GetPositionX(), _owner->GetPositionY());
-
-    Movement::MoveSplineInit init(_owner);
-
-    // add the owner's current position as starting point as it gets removed after entering the cycle
-    init.Path().push_back(G3D::Vector3(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ()));
-
-    for (uint8 i = 0; i < stepCount; angle += step, ++i)
+    std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
     {
-        G3D::Vector3 point;
-        point.x = x + radius * cosf(angle);
-        point.y = y + radius * sinf(angle);
+        float step = 2 * float(M_PI) / stepCount * (clockwise ? -1.0f : 1.0f);
+        Position const& pos = { x, y, z, 0.0f };
+        float angle = pos.GetAbsoluteAngle(_owner->GetPositionX(), _owner->GetPositionY());
+
+        // add the owner's current position as starting point as it gets removed after entering the cycle
+        init.Path().push_back(G3D::Vector3(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ()));
+
+        for (uint8 i = 0; i < stepCount; angle += step, ++i)
+        {
+            G3D::Vector3 point;
+            point.x = x + radius * cosf(angle);
+            point.y = y + radius * sinf(angle);
+
+            if (_owner->IsFlying())
+                point.z = z;
+            else
+                point.z = _owner->GetMapHeight(point.x, point.y, z) + _owner->GetHoverOffset();
+
+            init.Path().push_back(point);
+        }
 
         if (_owner->IsFlying())
-            point.z = z;
+        {
+            init.SetFly();
+            init.SetCyclic();
+            init.SetAnimation(AnimTier::Hover);
+        }
         else
-            point.z = _owner->GetMapHeight(point.x, point.y, z) + _owner->GetHoverOffset();
+        {
+            init.SetWalk(true);
+            init.SetCyclic();
+        }
+    };
 
-        init.Path().push_back(point);
-    }
-
-    if (_owner->IsFlying())
-    {
-        init.SetFly();
-        init.SetCyclic();
-        init.SetAnimation(AnimationTier::Hover);
-    }
-    else
-    {
-        init.SetWalk(true);
-        init.SetCyclic();
-    }
-
-    Add(new GenericMovementGenerator(std::move(init), EFFECT_MOTION_TYPE, 0));
+    Add(new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, 0));
 }
 
 void MotionMaster::MoveSmoothPath(uint32 pointId, Position const* pathPoints, size_t pathSize, bool walk)
 {
-    Movement::MoveSplineInit init(_owner);
     Movement::PointsArray path;
     path.reserve(pathSize);
     std::transform(pathPoints, pathPoints + pathSize, std::back_inserter(path), [](Position const& point)
@@ -895,14 +901,17 @@ void MotionMaster::MoveSmoothPath(uint32 pointId, Position const* pathPoints, si
         return G3D::Vector3(point.GetPositionX(), point.GetPositionY(), point.GetPositionZ());
     });
 
-    init.MovebyPath(path);
-    init.SetSmooth();
-    init.SetWalk(walk);
+    std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+    {
+        init.MovebyPath(path);
+        init.SetSmooth();
+        init.SetWalk(walk);
+    };
 
     // This code is not correct
     // GenericMovementGenerator does not affect UNIT_STATE_ROAMING_MOVE
     // need to call PointMovementGenerator with various pointIds
-    Add(new GenericMovementGenerator(std::move(init), EFFECT_MOTION_TYPE, pointId));
+    Add(new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, pointId));
 }
 
 void MotionMaster::MoveAlongSplineChain(uint32 pointId, uint16 dbChainId, bool walk)
@@ -966,11 +975,13 @@ void MotionMaster::MoveFall(uint32 id/* = 0*/)
         return;
     }
 
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), tz + _owner->GetHoverOffset(), false);
-    init.SetFall();
+    std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+    {
+        init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), tz + _owner->GetHoverOffset(), false);
+        init.SetFall();
+    };
 
-    GenericMovementGenerator* movement = new GenericMovementGenerator(std::move(init), EFFECT_MOTION_TYPE, id);
+    GenericMovementGenerator* movement = new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, id);
     movement->Priority = MOTION_PRIORITY_HIGHEST;
     Add(movement);
 }
@@ -1067,7 +1078,7 @@ void MotionMaster::MoveFormation(Unit* leader, float range, float angle, uint32 
     }
 }
 
-void MotionMaster::LaunchMoveSpline(Movement::MoveSplineInit&& init, uint32 id/*= 0*/, MovementGeneratorPriority priority/* = MOTION_PRIORITY_NORMAL*/, MovementGeneratorType type/*= EFFECT_MOTION_TYPE*/)
+void MotionMaster::LaunchMoveSpline(std::function<void(Movement::MoveSplineInit& init)>&& initializer, uint32 id/*= 0*/, MovementGeneratorPriority priority/* = MOTION_PRIORITY_NORMAL*/, MovementGeneratorType type/*= EFFECT_MOTION_TYPE*/)
 {
     if (IsInvalidMovementGeneratorType(type))
     {
@@ -1077,7 +1088,7 @@ void MotionMaster::LaunchMoveSpline(Movement::MoveSplineInit&& init, uint32 id/*
 
     FMT_LOG_DEBUG("movement.motionmaster", "MotionMaster::LaunchMoveSpline: '{}', initiates spline Id: {} (Type: {}, Priority: {})", _owner->GetGUID().ToString(), id, type, priority);
 
-    GenericMovementGenerator* movement = new GenericMovementGenerator(std::move(init), type, id);
+    GenericMovementGenerator* movement = new GenericMovementGenerator(std::move(initializer), type, id);
     movement->Priority = priority;
     Add(movement);
 }

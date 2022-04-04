@@ -95,7 +95,7 @@ bool Transport::Create(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, 
     if (GameObjectOverride const* goOverride = GetGameObjectOverride())
     {
         SetFaction(goOverride->Faction);
-        SetUInt32Value(GAMEOBJECT_FLAGS, goOverride->Flags);
+        ReplaceAllFlags(GameObjectFlags(goOverride->Flags));
     }
 
     m_goValue.Transport.PathProgress = 0;
@@ -110,7 +110,7 @@ bool Transport::Create(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, 
     SetLocalRotation(0.0f, 0.0f, 0.0f, 1.0f);
     SetParentRotation(QuaternionData());
 
-    m_model = CreateModel();
+    CreateModel();
     return true;
 }
 
@@ -559,7 +559,7 @@ TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSu
         return nullptr;
     }
 
-    summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);
+    summon->SetCreatedBySpell(spellId);
 
     summon->SetTransport(this);
     summon->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);

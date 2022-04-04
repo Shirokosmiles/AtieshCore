@@ -104,10 +104,10 @@ public:
         void UnlockDoor()
         {
             if (GameObject* door = instance->GetGameObject(DATA_THE_FINAL_CHAMBER))
-                if(door->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE))
+                if(door->HasFlag(GO_FLAG_NOT_SELECTABLE))
                 {
                     door->SetGoState(GO_STATE_ACTIVE);
-                    door->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    door->RemoveFlag(GO_FLAG_NOT_SELECTABLE);
                 }
         }
         void LockDoor()
@@ -115,7 +115,7 @@ public:
             if (GameObject* door = instance->GetGameObject(DATA_THE_FINAL_CHAMBER))
             {
                 door->SetGoState(GO_STATE_READY);
-                door->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                door->SetFlag(GO_FLAG_NOT_SELECTABLE);
             }
         }
 

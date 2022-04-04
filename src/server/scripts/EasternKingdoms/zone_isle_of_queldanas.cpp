@@ -192,9 +192,9 @@ Position const defendersRun[] =
         { 11920.5f,  -7070.132f, 30.40836f }
 };
 
-Position const thalorienSummon = { 11795.32f, -7070.476f, 26.27511f, 5.67232f };
+Position const thalorienSummon = { 11795.32f, -7070.476f, 26.27511f, 5.67232f  };
 Position const thalorienFight = { 11788.46f, -7063.375f, 25.79677f, 3.054326f };
-Position const morlenSummon = { 11766.46f, -7050.078f, 26.19846f, 5.637414f };
+Position const morlenSummon = { 11766.46f, -7050.078f, 26.19846f, 5.637414f  };
 
 struct npc_thalorien_dawnseeker : public ScriptedAI
 {
@@ -217,7 +217,7 @@ struct npc_thalorien_dawnseeker : public ScriptedAI
     {
         if (action == ACTION_START_QUEST)
         {
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             if (Creature* thalorien = me->SummonCreature(NPC_THALORIEN_DAWNSEEKER, thalorienSummon, TEMPSUMMON_CORPSE_DESPAWN))
                 _thalorienGUID = thalorien->GetGUID();
@@ -229,7 +229,7 @@ struct npc_thalorien_dawnseeker : public ScriptedAI
 
     void Reset() override
     {
-        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         _summons.DespawnAll();
         _playerGUID.Clear();
         _morlenGUID.Clear();
@@ -257,202 +257,202 @@ struct npc_thalorien_dawnseeker : public ScriptedAI
         {
             switch (eventId)
             {
-            case EVENT_INTRO_0:
-                ThalorienTalk(SAY_THALORIEN_1);
+                case EVENT_INTRO_0:
+                    ThalorienTalk(SAY_THALORIEN_1);
 
-                _events.ScheduleEvent(EVENT_INTRO_1, 5s);
-                break;
-            case EVENT_INTRO_1:
-                ThalorienTalk(SAY_THALORIEN_2);
+                    _events.ScheduleEvent(EVENT_INTRO_1, 5s);
+                    break;
+                case EVENT_INTRO_1:
+                    ThalorienTalk(SAY_THALORIEN_2);
 
-                _events.ScheduleEvent(EVENT_INTRO_2, 6s);
-                break;
-            case EVENT_INTRO_2:
-                ThalorienTalk(SAY_THALORIEN_3);
+                    _events.ScheduleEvent(EVENT_INTRO_2, 6s);
+                    break;
+                case EVENT_INTRO_2:
+                    ThalorienTalk(SAY_THALORIEN_3);
 
-                _events.ScheduleEvent(EVENT_INTRO_3, 7s);
-                break;
+                    _events.ScheduleEvent(EVENT_INTRO_3, 7s);
+                    break;
 
-            case EVENT_INTRO_3:
-                ThalorienTalk(SAY_THALORIEN_4);
+                case EVENT_INTRO_3:
+                    ThalorienTalk(SAY_THALORIEN_4);
 
-                _events.ScheduleEvent(EVENT_SALUTE, 4s);
-                break;
-            case EVENT_SALUTE:
-                for (auto& summon : _summons)
-                    if (Creature* creature = ObjectAccessor::GetCreature(*me, summon))
-                        creature->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                    _events.ScheduleEvent(EVENT_SALUTE, 4s);
+                    break;
+                case EVENT_SALUTE:
+                    for (auto& summon : _summons)
+                        if (Creature* creature = ObjectAccessor::GetCreature(*me, summon))
+                            creature->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
 
-                _events.ScheduleEvent(EVENT_DEFENDERS_RUN, 3s);
-                break;
-            case EVENT_DEFENDERS_RUN:
-            {
-                _events.ScheduleEvent(EVENT_DEFENDERS_RUN_2, 3s);
-                _events.ScheduleEvent(EVENT_THALORIEN_GO, 2s);
-
-                uint8 defendersCount = 0;
-                for (auto& summon : _summons)
+                    _events.ScheduleEvent(EVENT_DEFENDERS_RUN, 3s);
+                    break;
+                case EVENT_DEFENDERS_RUN:
                 {
-                    Creature* creature = ObjectAccessor::GetCreature(*me, summon);
-                    if (!creature)
-                        continue;
+                    _events.ScheduleEvent(EVENT_DEFENDERS_RUN_2, 3s);
+                    _events.ScheduleEvent(EVENT_THALORIEN_GO, 2s);
 
-                    if (creature->GetEntry() != NPC_SUNWELL_DEFENDER)
-                        continue;
+                    uint8 defendersCount = 0;
+                    for (auto& summon : _summons)
+                    {
+                        Creature* creature = ObjectAccessor::GetCreature(*me, summon);
+                        if (!creature)
+                            continue;
 
-                    defendersCount++;
-                    if (defendersCount <= 5)
-                        creature->SetFacingTo(defendersOrientation);
-                    else
-                        if (defendersCount - 1 < defenders)
-                            creature->GetMotionMaster()->MovePoint(0, defendersRun[defendersCount - 1]);
+                        if (creature->GetEntry() != NPC_SUNWELL_DEFENDER)
+                            continue;
+
+                        defendersCount++;
+                        if (defendersCount <= 5)
+                            creature->SetFacingTo(defendersOrientation);
+                        else
+                            if (defendersCount - 1 < defenders)
+                                creature->GetMotionMaster()->MovePoint(0, defendersRun[defendersCount - 1]);
+                    }
+
+                    break;
                 }
-
-                break;
-            }
-            case EVENT_DEFENDERS_RUN_2:
-            {
-                uint8 defendersCount = 0;
-                for (auto& summon : _summons)
+                case EVENT_DEFENDERS_RUN_2:
                 {
-                    Creature* creature = ObjectAccessor::GetCreature(*me, summon);
-                    if (!creature)
-                        continue;
+                    uint8 defendersCount = 0;
+                    for (auto& summon : _summons)
+                    {
+                        Creature* creature = ObjectAccessor::GetCreature(*me, summon);
+                        if (!creature)
+                            continue;
 
-                    if (creature->GetEntry() != NPC_SUNWELL_DEFENDER)
-                        continue;
+                        if (creature->GetEntry() != NPC_SUNWELL_DEFENDER)
+                            continue;
 
-                    ++defendersCount;
-                    if (defendersCount < defenders)
-                        creature->GetMotionMaster()->MovePoint(0, defendersRun[defendersCount]);
+                        ++defendersCount;
+                        if (defendersCount < defenders)
+                            creature->GetMotionMaster()->MovePoint(0, defendersRun[defendersCount]);
+                    }
+
+                    break;
                 }
-
-                break;
-            }
-            case EVENT_THALORIEN_GO:
-                if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
-                {
-                    thalorien->SetWalk(true);
-                    thalorien->GetMotionMaster()->MovePoint(0, thalorienFight);
-                    thalorien->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                    thalorien->SetHomePosition(thalorienFight);
-                }
-
-                _events.ScheduleEvent(EVENT_INTRO_4, 4s);
-                break;
-            case EVENT_INTRO_4:
-                ThalorienTalk(SAY_THALORIEN_5);
-
-                _events.ScheduleEvent(EVENT_SUMMON_MORLEN, 6s);
-                _events.ScheduleEvent(EVENT_INTRO_5, 9s);
-                break;
-            case EVENT_INTRO_5:
-                ThalorienTalk(SAY_THALORIEN_6);
-
-                _events.ScheduleEvent(EVENT_MORLEN_1, 6s);
-                break;
-            case EVENT_SUMMON_MORLEN:
-                if (Creature* morlen = me->SummonCreature(NPC_MORLEN_GOLDGRIP, morlenSummon, TEMPSUMMON_CORPSE_DESPAWN))
-                {
-                    _morlenGUID = morlen->GetGUID();
-                    morlen->AI()->DoCastSelf(SPELL_BLOOD_PRESENCE);
-                }
-
-                break;
-            case EVENT_MORLEN_1:
-                MorlenTalk(SAY_MORLEN_1);
-
-                _events.ScheduleEvent(EVENT_SPAWN_WAVE_1, 7s);
-                break;
-            case EVENT_SPAWN_WAVE_1:
-                MorlenTalk(SAY_MORLEN_2);
-
-                me->SummonCreatureGroup(SUMMON_SCOURGE_ZOMBIE);
-
-                _events.ScheduleEvent(EVENT_WAVE_ATTACK, 3s);
-                break;
-            case EVENT_SPAWN_WAVE_2:
-                MorlenTalk(SAY_MORLEN_3);
-
-                me->SummonCreatureGroup(SUMMON_GHOUL_INVADER);
-
-                _events.ScheduleEvent(EVENT_WAVE_ATTACK, 3s);
-                break;
-            case EVENT_SPAWN_WAVE_3:
-                MorlenTalk(SAY_MORLEN_4);
-
-                me->SummonCreatureGroup(SUMMON_CRYPT_RAIDER);
-
-                _events.ScheduleEvent(EVENT_WAVE_ATTACK, 3s);
-                break;
-            case EVENT_WAVE_ATTACK:
-                for (auto& summon : _summons)
-                {
-                    Creature* creature = ObjectAccessor::GetCreature(*me, summon);
-                    if (!creature)
-                        continue;
-
-                    if (creature->GetEntry() == NPC_THALORIEN_DAWNSEEKER ||
-                        creature->GetEntry() == NPC_MORLEN_GOLDGRIP)
-                        continue;
-
-                    creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                case EVENT_THALORIEN_GO:
                     if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
-                        creature->AI()->AttackStart(thalorien);
-                }
+                    {
+                        thalorien->SetWalk(true);
+                        thalorien->GetMotionMaster()->MovePoint(0, thalorienFight);
+                        thalorien->SetEmoteState(EMOTE_STATE_READY2H);
+                        thalorien->SetHomePosition(thalorienFight);
+                    }
 
-                break;
-            case EVENT_MORLEN_2:
-                MorlenTalk(SAY_MORLEN_5);
+                    _events.ScheduleEvent(EVENT_INTRO_4, 4s);
+                    break;
+                case EVENT_INTRO_4:
+                    ThalorienTalk(SAY_THALORIEN_5);
 
-                _events.ScheduleEvent(EVENT_MORLEN_ATTACK, 1s);
-                break;
-            case EVENT_MORLEN_ATTACK:
-                if (Creature* morlen = ObjectAccessor::GetCreature(*me, _morlenGUID))
-                {
-                    morlen->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    _events.ScheduleEvent(EVENT_SUMMON_MORLEN, 6s);
+                    _events.ScheduleEvent(EVENT_INTRO_5, 9s);
+                    break;
+                case EVENT_INTRO_5:
+                    ThalorienTalk(SAY_THALORIEN_6);
+
+                    _events.ScheduleEvent(EVENT_MORLEN_1, 6s);
+                    break;
+                case EVENT_SUMMON_MORLEN:
+                    if (Creature* morlen = me->SummonCreature(NPC_MORLEN_GOLDGRIP, morlenSummon, TEMPSUMMON_CORPSE_DESPAWN))
+                    {
+                        _morlenGUID = morlen->GetGUID();
+                        morlen->AI()->DoCastSelf(SPELL_BLOOD_PRESENCE);
+                    }
+
+                    break;
+                case EVENT_MORLEN_1:
+                    MorlenTalk(SAY_MORLEN_1);
+
+                    _events.ScheduleEvent(EVENT_SPAWN_WAVE_1, 7s);
+                    break;
+                case EVENT_SPAWN_WAVE_1:
+                    MorlenTalk(SAY_MORLEN_2);
+
+                    me->SummonCreatureGroup(SUMMON_SCOURGE_ZOMBIE);
+
+                    _events.ScheduleEvent(EVENT_WAVE_ATTACK, 3s);
+                    break;
+                case EVENT_SPAWN_WAVE_2:
+                    MorlenTalk(SAY_MORLEN_3);
+
+                    me->SummonCreatureGroup(SUMMON_GHOUL_INVADER);
+
+                    _events.ScheduleEvent(EVENT_WAVE_ATTACK, 3s);
+                    break;
+                case EVENT_SPAWN_WAVE_3:
+                    MorlenTalk(SAY_MORLEN_4);
+
+                    me->SummonCreatureGroup(SUMMON_CRYPT_RAIDER);
+
+                    _events.ScheduleEvent(EVENT_WAVE_ATTACK, 3s);
+                    break;
+                case EVENT_WAVE_ATTACK:
+                    for (auto& summon : _summons)
+                    {
+                        Creature* creature = ObjectAccessor::GetCreature(*me, summon);
+                        if (!creature)
+                            continue;
+
+                        if (creature->GetEntry() == NPC_THALORIEN_DAWNSEEKER ||
+                            creature->GetEntry() == NPC_MORLEN_GOLDGRIP)
+                            continue;
+
+                        creature->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+                            creature->AI()->AttackStart(thalorien);
+                    }
+
+                    break;
+                case EVENT_MORLEN_2:
+                    MorlenTalk(SAY_MORLEN_5);
+
+                    _events.ScheduleEvent(EVENT_MORLEN_ATTACK, 1s);
+                    break;
+                case EVENT_MORLEN_ATTACK:
+                    if (Creature* morlen = ObjectAccessor::GetCreature(*me, _morlenGUID))
+                    {
+                        morlen->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+                            morlen->AI()->AttackStart(thalorien);
+                    }
+
+                    break;
+                case EVENT_OUTRO_1:
                     if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
-                        morlen->AI()->AttackStart(thalorien);
-                }
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                            thalorien->AI()->DoCast(player, SPELL_KILL_CREDIT);
 
-                break;
-            case EVENT_OUTRO_1:
-                if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
-                        thalorien->AI()->DoCast(player, SPELL_KILL_CREDIT);
+                    ThalorienTalk(SAY_THALORIEN_7);
 
-                ThalorienTalk(SAY_THALORIEN_7);
+                    _events.ScheduleEvent(EVENT_OUTRO_2, 5s);
+                    break;
+                case EVENT_OUTRO_2:
+                    ThalorienTalk(SAY_THALORIEN_8);
 
-                _events.ScheduleEvent(EVENT_OUTRO_2, 5s);
-                break;
-            case EVENT_OUTRO_2:
-                ThalorienTalk(SAY_THALORIEN_8);
+                    _events.ScheduleEvent(EVENT_OUTRO_3, 7s);
+                    break;
+                case EVENT_OUTRO_3:
+                    if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+                        thalorien->AI()->DoCastSelf(SPELL_POLYMORPH_VISUAL);
 
-                _events.ScheduleEvent(EVENT_OUTRO_3, 7s);
-                break;
-            case EVENT_OUTRO_3:
-                if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
-                    thalorien->AI()->DoCastSelf(SPELL_POLYMORPH_VISUAL);
+                    ThalorienTalk(SAY_THALORIEN_9);
 
-                ThalorienTalk(SAY_THALORIEN_9);
+                    _events.ScheduleEvent(EVENT_OUTRO_4, 5s);
+                    break;
+                case EVENT_OUTRO_4:
+                    ThalorienTalk(SAY_THALORIEN_10);
 
-                _events.ScheduleEvent(EVENT_OUTRO_4, 5s);
-                break;
-            case EVENT_OUTRO_4:
-                ThalorienTalk(SAY_THALORIEN_10);
+                    _events.ScheduleEvent(EVENT_KNEEL, 6s);
+                    break;
+                case EVENT_KNEEL:
+                    if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
+                    {
+                        thalorien->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        thalorien->DespawnOrUnsummon(5s);
+                    }
 
-                _events.ScheduleEvent(EVENT_KNEEL, 6s);
-                break;
-            case EVENT_KNEEL:
-                if (Creature* thalorien = ObjectAccessor::GetCreature(*me, _thalorienGUID))
-                {
-                    thalorien->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    thalorien->DespawnOrUnsummon(5s);
-                }
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-                break;
+                    break;
             }
         }
     }

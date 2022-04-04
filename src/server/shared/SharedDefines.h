@@ -20,6 +20,7 @@
 
 #include "DBCEnums.h"
 #include "Define.h"
+#include "EnumFlag.h"
 #include "SmartEnum.h"
 #include <map>
 
@@ -1675,6 +1676,8 @@ enum GameObjectFlags
     GO_FLAG_DAMAGED         = 0x00000200,
     GO_FLAG_DESTROYED       = 0x00000400
 };
+
+DEFINE_ENUM_FLAG(GameObjectFlags);
 
 enum GameObjectDynamicLowFlags
 {

@@ -373,10 +373,12 @@ public:
                 case EVENT_GO_FLY:
                 {
                     DoCastSelf(SPELL_GO_FLY_TRIGGER);
-                    Movement::MoveSplineInit init(me);
-                    init.MoveTo(flyAtPortal.GetPositionX(), flyAtPortal.GetPositionY(), flyAtPortal.GetPositionZ(), false);
-                    init.SetFly();
-                    me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_TELEPORT, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                    std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+                    {
+                        init.MoveTo(flyAtPortal.GetPositionX(), flyAtPortal.GetPositionY(), flyAtPortal.GetPositionZ(), false);
+                        init.SetFly();
+                    };
+                    me->GetMotionMaster()->LaunchMoveSpline(std::move(initializer), POINT_TELEPORT, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
                     break;
                 }
                 case EVENT_CAST_TELEPORT:
@@ -390,29 +392,35 @@ public:
                     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
                         me->SetSpeedRate(UnitMoveType(i), (me->GetSpeedRate(UnitMoveType(i)) * 2));
 
-                    Movement::MoveSplineInit init(me);
-                    init.MoveTo(flyAt1point.GetPositionX(), flyAt1point.GetPositionY(), flyAt1point.GetPositionZ(), false);
-                    init.SetFly();
-                    init.SetWalk(false);
-                    me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_PATH_1, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                    std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+                    {
+                        init.MoveTo(flyAt1point.GetPositionX(), flyAt1point.GetPositionY(), flyAt1point.GetPositionZ(), false);
+                        init.SetFly();
+                        init.SetWalk(false);
+                    };
+                    me->GetMotionMaster()->LaunchMoveSpline(std::move(initializer), POINT_PATH_1, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
                     break;
                 }
                 case EVENT_GO_FLY_POINT_2:
                 {
-                    Movement::MoveSplineInit init(me);
-                    init.MoveTo(flyAt2point.GetPositionX(), flyAt2point.GetPositionY(), flyAt2point.GetPositionZ(), false);
-                    init.SetFly();
-                    init.SetWalk(false);
-                    me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_PATH_2, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                    std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+                    {
+                        init.MoveTo(flyAt2point.GetPositionX(), flyAt2point.GetPositionY(), flyAt2point.GetPositionZ(), false);
+                        init.SetFly();
+                        init.SetWalk(false);
+                    };
+                    me->GetMotionMaster()->LaunchMoveSpline(std::move(initializer), POINT_PATH_2, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
                     break;
                 }
                 case EVENT_GO_FLY_POINT_3:
                 {
-                    Movement::MoveSplineInit init(me);
-                    init.MoveTo(flyAt3point.GetPositionX(), flyAt3point.GetPositionY(), flyAt3point.GetPositionZ(), false);
-                    init.SetFly();
-                    init.SetWalk(false);
-                    me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_PATH_3, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                    std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+                    {
+                        init.MoveTo(flyAt3point.GetPositionX(), flyAt3point.GetPositionY(), flyAt3point.GetPositionZ(), false);
+                        init.SetFly();
+                        init.SetWalk(false);
+                    };
+                    me->GetMotionMaster()->LaunchMoveSpline(std::move(initializer), POINT_PATH_3, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
                     break;
                 }
                 case EVENT_DESPAWN_ME:

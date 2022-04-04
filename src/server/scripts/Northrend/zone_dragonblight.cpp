@@ -396,7 +396,7 @@ public:
             if (!tree || !player)
                 return;
 
-            tree->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            tree->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
 
             if (roll == 1) // friendly version
             {
@@ -541,7 +541,7 @@ class npc_wyrmrest_defender : public CreatureScript
                     case SPELL_WYRMREST_DEFENDER_MOUNT:
                         Talk(WHISPER_MOUNTED, me->GetCharmerOrOwner());
                         me->SetImmuneToAll(false);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                        me->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
                         break;
                     // Both below are for checking low hp warning
                     case SPELL_DEFENDER_ON_LOW_HEALTH_EMOTE:
@@ -569,7 +569,7 @@ class npc_wyrmrest_defender : public CreatureScript
 
             void OnCharmed(bool /*apply*/) override
             {
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
         };
 
@@ -879,26 +879,32 @@ public: npc_sky_captain_cryoflight() : CreatureScript("npc_sky_captain_cryofligh
                     }
                     case EVENT_FLY_AT_NPC:
                     {
-                        Movement::MoveSplineInit init(me);
-                        init.MoveTo(SkyCaptainCryOfLight1Point.GetPositionX(), SkyCaptainCryOfLight1Point.GetPositionY(), SkyCaptainCryOfLight1Point.GetPositionZ(), false);
-                        init.SetFly();
-                        me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_1, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                        std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+                        {
+                            init.MoveTo(SkyCaptainCryOfLight1Point.GetPositionX(), SkyCaptainCryOfLight1Point.GetPositionY(), SkyCaptainCryOfLight1Point.GetPositionZ(), false);
+                            init.SetFly();
+                        };
+                        me->GetMotionMaster()->LaunchMoveSpline(std::move(initializer), POINT_1, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
                         break;
                     }
                     case EVENT_FLY_AT_2:
                     {
-                        Movement::MoveSplineInit init(me);
-                        init.MoveTo(SkyCaptainCryOfLight2Point.GetPositionX(), SkyCaptainCryOfLight2Point.GetPositionY(), SkyCaptainCryOfLight2Point.GetPositionZ(), false);
-                        init.SetFly();
-                        me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_2, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                        std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+                        {
+                            init.MoveTo(SkyCaptainCryOfLight2Point.GetPositionX(), SkyCaptainCryOfLight2Point.GetPositionY(), SkyCaptainCryOfLight2Point.GetPositionZ(), false);
+                            init.SetFly();
+                        };
+                        me->GetMotionMaster()->LaunchMoveSpline(std::move(initializer), POINT_2, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
                         break;
                     }
                     case EVENT_FLY_AT_3:
                     {
-                        Movement::MoveSplineInit init(me);
-                        init.MoveTo(SkyCaptainCryOfLight3Point.GetPositionX(), SkyCaptainCryOfLight3Point.GetPositionY(), SkyCaptainCryOfLight3Point.GetPositionZ(), false);
-                        init.SetFly();
-                        me->GetMotionMaster()->LaunchMoveSpline(std::move(init), POINT_3, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                        std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+                        {
+                            init.MoveTo(SkyCaptainCryOfLight3Point.GetPositionX(), SkyCaptainCryOfLight3Point.GetPositionY(), SkyCaptainCryOfLight3Point.GetPositionZ(), false);
+                            init.SetFly();
+                        };
+                        me->GetMotionMaster()->LaunchMoveSpline(std::move(initializer), POINT_3, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
                         break;
                     }
                     case EVENT_RETURN_RESPAWN:

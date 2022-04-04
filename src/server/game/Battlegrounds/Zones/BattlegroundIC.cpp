@@ -435,9 +435,9 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                     {
                         if (siege->IsAlive())
                         {
-                            if (siege->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE|UNIT_FLAG_CANNOT_SWIM|UNIT_FLAG_IMMUNE_TO_PC))
+                            if (siege->HasUnitFlag(UNIT_FLAG_UNINTERACTIBLE | UNIT_FLAG_CANNOT_SWIM | UNIT_FLAG_IMMUNE_TO_PC))
                                 // following sniffs the vehicle always has UNIT_FLAG_CANNOT_SWIM
-                                siege->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE|UNIT_FLAG_IMMUNE_TO_PC);
+                                siege->RemoveUnitFlag(UNIT_FLAG_UNINTERACTIBLE | UNIT_FLAG_IMMUNE_TO_PC);
                             else
                                 siege->SetHealth(siege->GetMaxHealth());
                         }
@@ -533,7 +533,7 @@ void BattlegroundIC::StartingEventOpenDoors()
 
     for (uint8 i = BG_IC_GO_TELEPORTER_1_1; i < BG_IC_GO_TELEPORTER_1_1 + MAX_FORTRESS_TELEPORTERS_SPAWNS; ++i)
         if (GameObject* teleporter = GetBGObject(i, false))
-            teleporter->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            teleporter->RemoveFlag(GO_FLAG_NOT_SELECTABLE);
 
     for (uint8 i = BG_IC_GO_TELEPORTER_EFFECTS_A_1; i < BG_IC_GO_TELEPORTER_EFFECTS_A_1 + MAX_FORTRESS_TELEPORTER_EFFECTS_SPAWNS; ++i)
         if (GameObject* teleporterEffect = GetBGObject(i, false))
@@ -625,7 +625,7 @@ bool BattlegroundIC::SetupBattleground()
             return false;
         }
 
-        teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+        teleporter->SetFlag(GO_FLAG_NOT_SELECTABLE);
     }
 
     for (uint8 i = BG_IC_GO_TELEPORTER_EFFECTS_A_1; i < BG_IC_GO_TELEPORTER_EFFECTS_A_1 + MAX_FORTRESS_TELEPORTER_EFFECTS_SPAWNS; ++i)
@@ -957,7 +957,7 @@ void BattlegroundIC::HandleContestedNodes(ICNodePoint const* node)
         for (Creature* cannon : cannons)
         {
             cannon->GetVehicleKit()->RemoveAllPassengers();
-            cannon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
+            cannon->SetUnitFlag(UNIT_FLAG_UNINTERACTIBLE);
         }
     }
     else if (node->nodeType == NODE_TYPE_WORKSHOP)
@@ -1228,13 +1228,13 @@ void BattlegroundIC::DestroyGate(Player* player, GameObject* go)
     {
         DoorOpen(BG_IC_GO_HORDE_KEEP_PORTCULLIS);
         if (GameObject* hordeBanner = GetBGObject(BG_IC_GO_HORDE_GRAVEYARD_H, false))
-            hordeBanner->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            hordeBanner->RemoveFlag(GO_FLAG_NOT_SELECTABLE);
     }
     else
     {
         DoorOpen(BG_IC_GO_DOODAD_PORTCULLISACTIVE02);
         if (GameObject* allianceBanner = GetBGObject(BG_IC_GO_ALLIANCE_GRAVEYARD_A, false))
-            allianceBanner->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            allianceBanner->RemoveFlag(GO_FLAG_NOT_SELECTABLE);
     }
 
     uint32 textId;
