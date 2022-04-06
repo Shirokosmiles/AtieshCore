@@ -1992,8 +1992,11 @@ void WorldObject::SetZoneScript()
     if (map->IsBattlegroundOrArena())
         return;
 
-    if (InstanceMap* instanceMap = map->ToInstanceMap())
-        m_zoneScript = reinterpret_cast<ZoneScript*>(instanceMap->GetInstanceScript());
+    if (map->IsDungeon())
+    {
+        if (InstanceMap* instanceMap = map->ToInstanceMap())
+            m_zoneScript = reinterpret_cast<ZoneScript*>(instanceMap->GetInstanceScript());        
+    }
     else
     {
         if (SpecialEvent* SE = sSpecialEventMgr->GetSpecialEventByZoneId(GetZoneId()))
