@@ -290,9 +290,9 @@ void Custom_GetMenu(Player* player, Creature* pCreature, uint32 Key)
         if (Tele[i].menu_id == Key && player->GetLevel() >= Tele[i].level && Custom_FactCheck(player->GetTeam(), i))
         {
             if (Tele[i].next_menu_id != 0)
-            AddGossipItemFor(player, Tele[i].icon, Tele[i].name, GOSSIP_SENDER_MAIN, i, "", Tele[i].cost, false);
+            AddGossipItemFor(player, GossipOptionIcon(Tele[i].icon), Tele[i].name, GOSSIP_SENDER_MAIN, i, "", Tele[i].cost, false);
             else
-            AddGossipItemFor(player, Tele[i].icon, Tele[i].name, GOSSIP_SENDER_MAIN, i, ARE_YOU_SURE + Tele[i].name + " |r?", Tele[i].cost, false);
+            AddGossipItemFor(player, GossipOptionIcon(Tele[i].icon), Tele[i].name, GOSSIP_SENDER_MAIN, i, ARE_YOU_SURE + Tele[i].name + " |r?", Tele[i].cost, false);
             ENDMENU = true;
         }
     }
@@ -362,19 +362,19 @@ public:
 
         bool OnGossipHello(Player* player) override
         {
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_elemental_eternal_shadow:25:25:-15:0|tHousehold goods", GOSSIP_SENDER_MAIN, 1);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\trade_alchemy:25:25:-15:0|tReagents for Alchemy", GOSSIP_SENDER_MAIN, 2);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\trade_mining:25:25:-15:0|tBlacksmithing Reagents", GOSSIP_SENDER_MAIN, 3);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_misc_armorkit_17:25:25:-15:0|tLeather Reagents", GOSSIP_SENDER_MAIN, 4);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_hammer_20:25:25:-15:0|tDevices | Fixtures", GOSSIP_SENDER_MAIN, 5);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\trade_engineering:25:25:-15:0|tReagents for Engineering", GOSSIP_SENDER_MAIN, 6);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\trade_engraving:25:25:-15:0|tEnchanting Reagents", GOSSIP_SENDER_MAIN, 7);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_inscription_tradeskill01:25:25:-15:0|tReagents for inscription", GOSSIP_SENDER_MAIN, 8);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\trade_tailoring:25:25:-15:0|tReagents for Tailoring", GOSSIP_SENDER_MAIN, 9);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_misc_herb_icethorn:25:25:-15:0|tCooking Reagents", GOSSIP_SENDER_MAIN, 10);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_misc_gem_01:25:25:-15:0|tReagents for Jeweler", GOSSIP_SENDER_MAIN, 11);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\inv_elemental_eternal_shadow:25:25:-15:0|tMiscellaneous Goods", GOSSIP_SENDER_MAIN, 12);
-            AddGossipItemFor(player, 0, "|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|tClose", GOSSIP_SENDER_MAIN, 100);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\inv_elemental_eternal_shadow:25:25:-15:0|tHousehold goods", GOSSIP_SENDER_MAIN, 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\trade_alchemy:25:25:-15:0|tReagents for Alchemy", GOSSIP_SENDER_MAIN, 2);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\trade_mining:25:25:-15:0|tBlacksmithing Reagents", GOSSIP_SENDER_MAIN, 3);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\inv_misc_armorkit_17:25:25:-15:0|tLeather Reagents", GOSSIP_SENDER_MAIN, 4);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\inv_hammer_20:25:25:-15:0|tDevices | Fixtures", GOSSIP_SENDER_MAIN, 5);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\trade_engineering:25:25:-15:0|tReagents for Engineering", GOSSIP_SENDER_MAIN, 6);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\trade_engraving:25:25:-15:0|tEnchanting Reagents", GOSSIP_SENDER_MAIN, 7);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\inv_inscription_tradeskill01:25:25:-15:0|tReagents for inscription", GOSSIP_SENDER_MAIN, 8);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\trade_tailoring:25:25:-15:0|tReagents for Tailoring", GOSSIP_SENDER_MAIN, 9);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\inv_misc_herb_icethorn:25:25:-15:0|tCooking Reagents", GOSSIP_SENDER_MAIN, 10);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\inv_misc_gem_01:25:25:-15:0|tReagents for Jeweler", GOSSIP_SENDER_MAIN, 11);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\inv_elemental_eternal_shadow:25:25:-15:0|tMiscellaneous Goods", GOSSIP_SENDER_MAIN, 12);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "|TInterface\\icons\\Spell_chargenegative:25:25:-15:0|tClose", GOSSIP_SENDER_MAIN, 100);
             player->PlayerTalkClass->SendGossipMenu(DEFAULT_GOSSIP_MESSAGE, me->GetGUID());
             return true;
         }
@@ -634,9 +634,9 @@ public:
 
         bool OnGossipHello(Player* player) override
         {
-            AddGossipItemFor(player,7, "|TInterface\\icons\\Inv_misc_dust_infinite:20:20:-15:0|t[Enchanting]", GOSSIP_SENDER_MAIN, 1001);
-            AddGossipItemFor(player,7, "|TInterface\\icons\\Inv_jewelcrafting_starofelune_01:20:20:-15:0|t[Sockets]", GOSSIP_SENDER_MAIN, 1002);
-            AddGossipItemFor(player,7, "|TInterface\\icons\\Inv_inscription_armorscroll01:20:20:-15:0|t[Glyphs]", GOSSIP_SENDER_MAIN, 1003);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_misc_dust_infinite:20:20:-15:0|t[Enchanting]", GOSSIP_SENDER_MAIN, 1001);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_jewelcrafting_starofelune_01:20:20:-15:0|t[Sockets]", GOSSIP_SENDER_MAIN, 1002);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_inscription_armorscroll01:20:20:-15:0|t[Glyphs]", GOSSIP_SENDER_MAIN, 1003);
             player->PlayerTalkClass->SendGossipMenu(100007, me->GetGUID());
             return true;
         }
@@ -651,14 +651,14 @@ public:
             {
             case 1002:
                 // ??????
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_shadowspirit_01:20:20:-15:0|t[Meta]", GOSSIP_SENDER_MAIN, 1101);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_gem_38:20:20:-15:0|t[Yellow]", GOSSIP_SENDER_MAIN, 1102);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_gem_37:20:20:-15:0|t[Red]", GOSSIP_SENDER_MAIN, 1103);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_gem_42:20:20:-15:0|t[Blue]", GOSSIP_SENDER_MAIN, 1104);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_gem_40:20:20:-15:0|t[Purple]", GOSSIP_SENDER_MAIN, 1105);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_gem_39:20:20:-15:0|t[Orange]", GOSSIP_SENDER_MAIN, 1106);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_gem_41:20:20:-15:0|t[Green]", GOSSIP_SENDER_MAIN, 1107);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Inv_jewelcrafting_dragonseye02:20:20:-15:0|t[Brilliant]", GOSSIP_SENDER_MAIN, 1108);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_jewelcrafting_shadowspirit_01:20:20:-15:0|t[Meta]", GOSSIP_SENDER_MAIN, 1101);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_jewelcrafting_gem_38:20:20:-15:0|t[Yellow]", GOSSIP_SENDER_MAIN, 1102);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_jewelcrafting_gem_37:20:20:-15:0|t[Red]", GOSSIP_SENDER_MAIN, 1103);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_jewelcrafting_gem_42:20:20:-15:0|t[Blue]", GOSSIP_SENDER_MAIN, 1104);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_jewelcrafting_gem_40:20:20:-15:0|t[Purple]", GOSSIP_SENDER_MAIN, 1105);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_jewelcrafting_gem_39:20:20:-15:0|t[Orange]", GOSSIP_SENDER_MAIN, 1106);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_jewelcrafting_gem_41:20:20:-15:0|t[Green]", GOSSIP_SENDER_MAIN, 1107);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Inv_jewelcrafting_dragonseye02:20:20:-15:0|t[Brilliant]", GOSSIP_SENDER_MAIN, 1108);
                 player->PlayerTalkClass->SendGossipMenu(100007, me->GetGUID());
                 return true;
                 break;
@@ -688,16 +688,16 @@ public:
                 break;
             case 1003:
                 // ???????
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_holy_avenginewrath:20:20:-15:0|t[Paladin]", GOSSIP_SENDER_MAIN, 1121);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_nature_thunderclap:20:20:-15:0|t[Warrior]", GOSSIP_SENDER_MAIN, 1122);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_shadow_painspike:20:20:-15:0|t[Hunter]", GOSSIP_SENDER_MAIN, 1123);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_shadow_nethercloak:20:20:-15:0|t[Rogue]", GOSSIP_SENDER_MAIN, 1124);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_holy_prayerofshadowprotection:20:20:-15:0|t[Priest]", GOSSIP_SENDER_MAIN, 1125);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_deathknight_icetouch:20:20:-15:0|t[Death knight]", GOSSIP_SENDER_MAIN, 1126);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_nature_earthshock:20:20:-15:0|t[Shaman]", GOSSIP_SENDER_MAIN, 1127);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_nature_polymorph:20:20:-15:0|t[Mage]", GOSSIP_SENDER_MAIN, 1128);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_shadow_demoniccircleteleport:20:20:-15:0|t[Warlock]", GOSSIP_SENDER_MAIN, 1129);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_nature_forceofnature:20:20:-15:0|t[Druid]", GOSSIP_SENDER_MAIN, 1130);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_holy_avenginewrath:20:20:-15:0|t[Paladin]", GOSSIP_SENDER_MAIN, 1121);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_nature_thunderclap:20:20:-15:0|t[Warrior]", GOSSIP_SENDER_MAIN, 1122);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_shadow_painspike:20:20:-15:0|t[Hunter]", GOSSIP_SENDER_MAIN, 1123);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_shadow_nethercloak:20:20:-15:0|t[Rogue]", GOSSIP_SENDER_MAIN, 1124);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_holy_prayerofshadowprotection:20:20:-15:0|t[Priest]", GOSSIP_SENDER_MAIN, 1125);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_deathknight_icetouch:20:20:-15:0|t[Death knight]", GOSSIP_SENDER_MAIN, 1126);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_nature_earthshock:20:20:-15:0|t[Shaman]", GOSSIP_SENDER_MAIN, 1127);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_nature_polymorph:20:20:-15:0|t[Mage]", GOSSIP_SENDER_MAIN, 1128);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_shadow_demoniccircleteleport:20:20:-15:0|t[Warlock]", GOSSIP_SENDER_MAIN, 1129);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_nature_forceofnature:20:20:-15:0|t[Druid]", GOSSIP_SENDER_MAIN, 1130);
                 player->PlayerTalkClass->SendGossipMenu(100007, me->GetGUID());
                 return true;
                 break;
@@ -733,26 +733,26 @@ public:
                 break;
 
             case 1001:
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_helmet_164:20:20:-15:0|t[Enchant: helm]", GOSSIP_SENDER_MAIN, 4);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_shoulder_126:20:20:-15:0|t[Enchant: shoulder]", GOSSIP_SENDER_MAIN, 5);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_chest_plate26:20:20:-15:0|t[Enchant: chest]", GOSSIP_SENDER_MAIN, 7);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_pants_plate_37:20:20:-15:0|t[Enchant: legs]", GOSSIP_SENDER_MAIN, 10);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_gauntlets_91:20:20:-15:0|t[Enchant: hands]", GOSSIP_SENDER_MAIN, 9);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_bracer_43:20:20:-15:0|t[Enchant: wrist]", GOSSIP_SENDER_MAIN, 8);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_belt_48c:20:20:-15:0|t[Enchant: waist]", GOSSIP_SENDER_MAIN, 15);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_boots_plate_13:20:20:-15:0|t[Enchant: feet]", GOSSIP_SENDER_MAIN, 11);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_misc_cape_18:20:20:-15:0|t[Enchant: cloak]", GOSSIP_SENDER_MAIN, 6);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_axe_113:20:20:-15:0|t[Enchant: weapon]", GOSSIP_SENDER_MAIN, 1);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_axe_116:20:20:-15:0|t[Enchant: off-hand weapon]", GOSSIP_SENDER_MAIN, 13);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_axe_115:20:20:-15:0|t[Enchant: two-hand weapon]", GOSSIP_SENDER_MAIN, 2);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_shield_75:20:20:-15:0|t[Enchant: shield]", GOSSIP_SENDER_MAIN, 3);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_helmet_164:20:20:-15:0|t[Enchant: helm]", GOSSIP_SENDER_MAIN, 4);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_shoulder_126:20:20:-15:0|t[Enchant: shoulder]", GOSSIP_SENDER_MAIN, 5);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_chest_plate26:20:20:-15:0|t[Enchant: chest]", GOSSIP_SENDER_MAIN, 7);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_pants_plate_37:20:20:-15:0|t[Enchant: legs]", GOSSIP_SENDER_MAIN, 10);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_gauntlets_91:20:20:-15:0|t[Enchant: hands]", GOSSIP_SENDER_MAIN, 9);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_bracer_43:20:20:-15:0|t[Enchant: wrist]", GOSSIP_SENDER_MAIN, 8);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_belt_48c:20:20:-15:0|t[Enchant: waist]", GOSSIP_SENDER_MAIN, 15);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_boots_plate_13:20:20:-15:0|t[Enchant: feet]", GOSSIP_SENDER_MAIN, 11);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_misc_cape_18:20:20:-15:0|t[Enchant: cloak]", GOSSIP_SENDER_MAIN, 6);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_axe_113:20:20:-15:0|t[Enchant: weapon]", GOSSIP_SENDER_MAIN, 1);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_axe_116:20:20:-15:0|t[Enchant: off-hand weapon]", GOSSIP_SENDER_MAIN, 13);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_axe_115:20:20:-15:0|t[Enchant: two-hand weapon]", GOSSIP_SENDER_MAIN, 2);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_shield_75:20:20:-15:0|t[Enchant: shield]", GOSSIP_SENDER_MAIN, 3);
 
                 if (player->HasSkill(SKILL_ENCHANTING) && player->GetSkillValue(SKILL_ENCHANTING) == 450)
                 {
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_jewelry_ring_83:20:20:-15:0|t[Enchant: ring]", GOSSIP_SENDER_MAIN, 12);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_jewelry_ring_83:20:20:-15:0|t[Enchant: ring]", GOSSIP_SENDER_MAIN, 12);
                 }
 
-                //AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|t[remove enchant from item]", GOSSIP_SENDER_MAIN, 14);
+                //AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|t[remove enchant from item]", GOSSIP_SENDER_MAIN, 14);
 
                 player->PlayerTalkClass->SendGossipMenu(100007, me->GetGUID());
                 return true;
@@ -761,23 +761,23 @@ public:
 
             case 1: // Enchant Weapon
 
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlade Ward", GOSSIP_SENDER_MAIN, 102);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlood Draining", GOSSIP_SENDER_MAIN, 103);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+26 agility", GOSSIP_SENDER_MAIN, 100);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+45 spirit", GOSSIP_SENDER_MAIN, 101);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBerserking", GOSSIP_SENDER_MAIN, 104);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 hit, +25 crit", GOSSIP_SENDER_MAIN, 105);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlack magic", GOSSIP_SENDER_MAIN, 106);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBattlemaster", GOSSIP_SENDER_MAIN, 107);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tIcebreaker", GOSSIP_SENDER_MAIN, 108);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tLifeward", GOSSIP_SENDER_MAIN, 109);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 stamina", GOSSIP_SENDER_MAIN, 110);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+65 attack power", GOSSIP_SENDER_MAIN, 111);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+63 spell power", GOSSIP_SENDER_MAIN, 112);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tMangoose", GOSSIP_SENDER_MAIN, 113);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tExecutor", GOSSIP_SENDER_MAIN, 114);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tIcy Chill", GOSSIP_SENDER_MAIN, 701);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlade Ward", GOSSIP_SENDER_MAIN, 102);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlood Draining", GOSSIP_SENDER_MAIN, 103);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+26 agility", GOSSIP_SENDER_MAIN, 100);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+45 spirit", GOSSIP_SENDER_MAIN, 101);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBerserking", GOSSIP_SENDER_MAIN, 104);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 hit, +25 crit", GOSSIP_SENDER_MAIN, 105);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlack magic", GOSSIP_SENDER_MAIN, 106);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBattlemaster", GOSSIP_SENDER_MAIN, 107);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tIcebreaker", GOSSIP_SENDER_MAIN, 108);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tLifeward", GOSSIP_SENDER_MAIN, 109);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 stamina", GOSSIP_SENDER_MAIN, 110);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+65 attack power", GOSSIP_SENDER_MAIN, 111);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+63 spell power", GOSSIP_SENDER_MAIN, 112);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tMangoose", GOSSIP_SENDER_MAIN, 113);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tExecutor", GOSSIP_SENDER_MAIN, 114);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tIcy Chill", GOSSIP_SENDER_MAIN, 701);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100002, me->GetGUID());
                 return true;
                 break;
@@ -792,14 +792,14 @@ public:
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_2HWEAPON)
                     {
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBerserking", GOSSIP_SENDER_MAIN, 104);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+81 spell power", GOSSIP_SENDER_MAIN, 115);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+35 agility", GOSSIP_SENDER_MAIN, 116);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+110 attack power", GOSSIP_SENDER_MAIN, 117);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tMangoose", GOSSIP_SENDER_MAIN, 113);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tExecutor", GOSSIP_SENDER_MAIN, 114);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tIcy Chill", GOSSIP_SENDER_MAIN, 701);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBerserking", GOSSIP_SENDER_MAIN, 104);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+81 spell power", GOSSIP_SENDER_MAIN, 115);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+35 agility", GOSSIP_SENDER_MAIN, 116);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+110 attack power", GOSSIP_SENDER_MAIN, 117);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tMangoose", GOSSIP_SENDER_MAIN, 113);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tExecutor", GOSSIP_SENDER_MAIN, 114);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tIcy Chill", GOSSIP_SENDER_MAIN, 701);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                         player->PlayerTalkClass->SendGossipMenu(100003, me->GetGUID());
                         return true;
                     }
@@ -821,13 +821,13 @@ public:
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_SHIELD)
                     {
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+20 defense", GOSSIP_SENDER_MAIN, 118);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 intellect", GOSSIP_SENDER_MAIN, 119);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+12 resilience", GOSSIP_SENDER_MAIN, 120);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tTitanium Plating", GOSSIP_SENDER_MAIN, 121);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+18 stamina", GOSSIP_SENDER_MAIN, 122);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+36 block", GOSSIP_SENDER_MAIN, 123);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+20 defense", GOSSIP_SENDER_MAIN, 118);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 intellect", GOSSIP_SENDER_MAIN, 119);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+12 resilience", GOSSIP_SENDER_MAIN, 120);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tTitanium Plating", GOSSIP_SENDER_MAIN, 121);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+18 stamina", GOSSIP_SENDER_MAIN, 122);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+36 block", GOSSIP_SENDER_MAIN, 123);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                         player->PlayerTalkClass->SendGossipMenu(100004, me->GetGUID());
                         return true;
                     }
@@ -839,98 +839,98 @@ public:
                 }
                 break;
             case 4: // Enchant Head
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 spell power + 10 mp5", GOSSIP_SENDER_MAIN, 124);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 spell power +20 crit rating", GOSSIP_SENDER_MAIN, 125);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+29 stamina +20 resilience", GOSSIP_SENDER_MAIN, 126);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 stamina + 25 resilience", GOSSIP_SENDER_MAIN, 127);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+37 stamina + 20 defense", GOSSIP_SENDER_MAIN, 128);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 attack power + 20 crit rating", GOSSIP_SENDER_MAIN, 129);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 attack power +20 resilience", GOSSIP_SENDER_MAIN, 130);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 arcana resistance +30 stamina", GOSSIP_SENDER_MAIN, 131);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 fire resistance +30 stamina", GOSSIP_SENDER_MAIN, 132);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 shadow resistance +30 stamina", GOSSIP_SENDER_MAIN, 133);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 ice resistance +30 stamina", GOSSIP_SENDER_MAIN, 134);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 nature resistance +30 stamina", GOSSIP_SENDER_MAIN, 135);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 spell power + 10 mp5", GOSSIP_SENDER_MAIN, 124);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 spell power +20 crit rating", GOSSIP_SENDER_MAIN, 125);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+29 stamina +20 resilience", GOSSIP_SENDER_MAIN, 126);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 stamina + 25 resilience", GOSSIP_SENDER_MAIN, 127);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+37 stamina + 20 defense", GOSSIP_SENDER_MAIN, 128);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 attack power + 20 crit rating", GOSSIP_SENDER_MAIN, 129);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 attack power +20 resilience", GOSSIP_SENDER_MAIN, 130);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 arcana resistance +30 stamina", GOSSIP_SENDER_MAIN, 131);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 fire resistance +30 stamina", GOSSIP_SENDER_MAIN, 132);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 shadow resistance +30 stamina", GOSSIP_SENDER_MAIN, 133);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 ice resistance +30 stamina", GOSSIP_SENDER_MAIN, 134);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 nature resistance +30 stamina", GOSSIP_SENDER_MAIN, 135);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100005, me->GetGUID());
                 return true;
                 break;
             case 5: // Enchant Shoulders
                 if (player->HasSkill(SKILL_INSCRIPTION) && player->GetSkillValue(SKILL_INSCRIPTION) == 450)
                 {
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+120 attack power + 15 crit effect rating [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 136);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 spell power +8 mp5 [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 137);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 spell power +15 crit effect rating [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 411);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+60 dodge + 15 defense [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 138);
-                    // AddGossipItemFor(player,7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 ? ????????????? ????? ??????? ? 30 ? ????????????", GOSSIP_SENDER_MAIN, 139);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+120 attack power + 15 crit effect rating [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 136);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 spell power +8 mp5 [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 137);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 spell power +15 crit effect rating [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 411);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+60 dodge + 15 defense [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 138);
+                    // AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 ? ????????????? ????? ??????? ? 30 ? ????????????", GOSSIP_SENDER_MAIN, 139);
                 }
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 attack power +15 crit rating", GOSSIP_SENDER_MAIN, 140);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+24 attack power +8 mp5", GOSSIP_SENDER_MAIN, 141);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 stamina +15 resilience", GOSSIP_SENDER_MAIN, 142);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+20 dodge +15 defense", GOSSIP_SENDER_MAIN, 143);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+24 spell power +15 crit rating", GOSSIP_SENDER_MAIN, 144);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+23 spell power +15 resilience", GOSSIP_SENDER_MAIN, 145);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 attack power + 15 resilience", GOSSIP_SENDER_MAIN, 146);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 attack power +15 crit rating", GOSSIP_SENDER_MAIN, 140);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+24 attack power +8 mp5", GOSSIP_SENDER_MAIN, 141);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 stamina +15 resilience", GOSSIP_SENDER_MAIN, 142);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+20 dodge +15 defense", GOSSIP_SENDER_MAIN, 143);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+24 spell power +15 crit rating", GOSSIP_SENDER_MAIN, 144);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+23 spell power +15 resilience", GOSSIP_SENDER_MAIN, 145);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 attack power + 15 resilience", GOSSIP_SENDER_MAIN, 146);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100006, me->GetGUID());
                 return true;
                 break;
             case 6: // Enchant Cloak
                 if (player->HasSkill(SKILL_TAILORING) && player->GetSkillValue(SKILL_TAILORING) == 450)
                 {
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tDarkglow Embroidery [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 149);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tLightweave Embroidery [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 150);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tSwordguard Embroidery [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 151);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tDarkglow Embroidery [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 149);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tLightweave Embroidery [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 150);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tSwordguard Embroidery [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 151);
                 }
                 if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) == 450)
                 {
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tSpringy Arachnoweave +27 spell power + parachut [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 350);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tFlexweave Underlay +23 agility + parachut [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 351);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tSpringy Arachnoweave +27 spell power + parachut [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 350);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tFlexweave Underlay +23 agility + parachut [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 351);
                 }
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+10 spirit 2% Reduced Threat", GOSSIP_SENDER_MAIN, 152);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+16 defense", GOSSIP_SENDER_MAIN, 153);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+35 penetration", GOSSIP_SENDER_MAIN, 154);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+225 armor", GOSSIP_SENDER_MAIN, 155);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+22 agility", GOSSIP_SENDER_MAIN, 156);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+23 haste", GOSSIP_SENDER_MAIN, 157);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tIncreased Stealth and +10 Agility", GOSSIP_SENDER_MAIN, 148);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+10 spirit 2% Reduced Threat", GOSSIP_SENDER_MAIN, 152);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+16 defense", GOSSIP_SENDER_MAIN, 153);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+35 penetration", GOSSIP_SENDER_MAIN, 154);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+225 armor", GOSSIP_SENDER_MAIN, 155);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+22 agility", GOSSIP_SENDER_MAIN, 156);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+23 haste", GOSSIP_SENDER_MAIN, 157);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tIncreased Stealth and +10 Agility", GOSSIP_SENDER_MAIN, 148);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100007, me->GetGUID());
                 return true;
                 break;
             case 7: //Enchant chest
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+10 all stats", GOSSIP_SENDER_MAIN, 158);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+275 health", GOSSIP_SENDER_MAIN, 159);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+10 mp5", GOSSIP_SENDER_MAIN, 160);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+20 resilience", GOSSIP_SENDER_MAIN, 161);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+22 defense", GOSSIP_SENDER_MAIN, 162);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+10 all stats", GOSSIP_SENDER_MAIN, 158);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+275 health", GOSSIP_SENDER_MAIN, 159);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+10 mp5", GOSSIP_SENDER_MAIN, 160);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+20 resilience", GOSSIP_SENDER_MAIN, 161);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+22 defense", GOSSIP_SENDER_MAIN, 162);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100008, me->GetGUID());
                 return true;
                 break;
             case 8: //Enchant Bracers
                 if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetSkillValue(SKILL_LEATHERWORKING) == 450)
                 {
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 arcan resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 170);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 fire resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 171);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 ice resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 172);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 nature resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 173);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 shadow resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 174);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+130 attack power [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 175);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+102 stamina [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 176);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+76 spell power [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 177);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 arcan resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 170);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 fire resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 171);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 ice resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 172);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 nature resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 173);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+70 shadow resistance [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 174);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+130 attack power [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 175);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+102 stamina [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 176);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+76 spell power [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 177);
                 }
                 if (player->HasSkill(SKILL_BLACKSMITHING) && player->GetSkillValue(SKILL_BLACKSMITHING) == 450)
                 {
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tAdd slot for socket [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 601);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tAdd slot for socket [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 601);
                 }
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 stamina", GOSSIP_SENDER_MAIN, 163);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 spell power", GOSSIP_SENDER_MAIN, 164);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 attack power", GOSSIP_SENDER_MAIN, 165);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+18 spirit", GOSSIP_SENDER_MAIN, 166);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+15 Expertise", GOSSIP_SENDER_MAIN, 167);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+16 intellect", GOSSIP_SENDER_MAIN, 169);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 stamina", GOSSIP_SENDER_MAIN, 163);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 spell power", GOSSIP_SENDER_MAIN, 164);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 attack power", GOSSIP_SENDER_MAIN, 165);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+18 spirit", GOSSIP_SENDER_MAIN, 166);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+15 Expertise", GOSSIP_SENDER_MAIN, 167);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+16 intellect", GOSSIP_SENDER_MAIN, 169);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100009, me->GetGUID());
                 return true;
                 break;
@@ -938,57 +938,57 @@ public:
                 if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) == 450)
                 {
 
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tHyperspeed Accelerators [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 222);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tHand-Mounted Pyro Rocket [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 223);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tHyperspeed Accelerators [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 222);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tHand-Mounted Pyro Rocket [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 223);
 
                 }
                 if (player->HasSkill(SKILL_BLACKSMITHING) && player->GetSkillValue(SKILL_BLACKSMITHING) == 450)
                 {
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tAdd slot for socket [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 600);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tAdd slot for socket [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 600);
                 }
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+16 crit rating", GOSSIP_SENDER_MAIN, 178);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+2% Threat and 10 Parry Rating", GOSSIP_SENDER_MAIN, 179);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+44 attack power", GOSSIP_SENDER_MAIN, 180);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+20 agility", GOSSIP_SENDER_MAIN, 181);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+20 hit", GOSSIP_SENDER_MAIN, 182);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+28 spell power", GOSSIP_SENDER_MAIN, 168);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+16 crit rating", GOSSIP_SENDER_MAIN, 178);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+2% Threat and 10 Parry Rating", GOSSIP_SENDER_MAIN, 179);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+44 attack power", GOSSIP_SENDER_MAIN, 180);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+20 agility", GOSSIP_SENDER_MAIN, 181);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+20 hit", GOSSIP_SENDER_MAIN, 182);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+28 spell power", GOSSIP_SENDER_MAIN, 168);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100010, me->GetGUID());
                 return true;
                 break;
             case 10: //Enchant legs
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 resilience + 28 stamina", GOSSIP_SENDER_MAIN, 184);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+55 stamina +22 agility", GOSSIP_SENDER_MAIN, 185);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+75 attack power +22 crit rating", GOSSIP_SENDER_MAIN, 186);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 spell power +20 spirit", GOSSIP_SENDER_MAIN, 187);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 spell power +30 stamina", GOSSIP_SENDER_MAIN, 188);
-                // AddGossipItemFor(player,7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+72 ? ???????????? ? +35 ? ????????", GOSSIP_SENDER_MAIN, 189);
-                // AddGossipItemFor(player,7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+100 ? ???? ????? ? +36 ? ???????? ???????????? ?????", GOSSIP_SENDER_MAIN, 190);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 resilience + 28 stamina", GOSSIP_SENDER_MAIN, 184);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+55 stamina +22 agility", GOSSIP_SENDER_MAIN, 185);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+75 attack power +22 crit rating", GOSSIP_SENDER_MAIN, 186);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 spell power +20 spirit", GOSSIP_SENDER_MAIN, 187);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 spell power +30 stamina", GOSSIP_SENDER_MAIN, 188);
+                // AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+72 ? ???????????? ? +35 ? ????????", GOSSIP_SENDER_MAIN, 189);
+                // AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+100 ? ???? ????? ? +36 ? ???????? ???????????? ?????", GOSSIP_SENDER_MAIN, 190);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100017, me->GetGUID());
                 return true;
                 break;
             case 11: //Enchant feet
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+32 attack power", GOSSIP_SENDER_MAIN, 191);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+15 Stamina and Minor Speed Increase", GOSSIP_SENDER_MAIN, 192);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+16 agility", GOSSIP_SENDER_MAIN, 193);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+18 spirit", GOSSIP_SENDER_MAIN, 194);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+7 health and mana each 5 sec", GOSSIP_SENDER_MAIN, 195);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+12 hit + 12 crit rating", GOSSIP_SENDER_MAIN, 196);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+22 stamina", GOSSIP_SENDER_MAIN, 197);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+32 attack power", GOSSIP_SENDER_MAIN, 191);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+15 Stamina and Minor Speed Increase", GOSSIP_SENDER_MAIN, 192);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+16 agility", GOSSIP_SENDER_MAIN, 193);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+18 spirit", GOSSIP_SENDER_MAIN, 194);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+7 health and mana each 5 sec", GOSSIP_SENDER_MAIN, 195);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+12 hit + 12 crit rating", GOSSIP_SENDER_MAIN, 196);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+22 stamina", GOSSIP_SENDER_MAIN, 197);
                 if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) == 450)
                 {
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tNitro boots [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 198);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tNitro boots [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 198);
                 }
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100012, me->GetGUID());
                 return true;
                 break;
             case 12: //Enchant rings
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 attack power [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 202);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+23 spell power [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 203);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 stamina [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 204);
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+40 attack power [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 202);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+23 spell power [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 203);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+30 stamina [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 204);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100013, me->GetGUID());
                 return true;
                 break;
@@ -1003,22 +1003,22 @@ public:
                     }
                     if (item->GetTemplate()->InventoryType == INVTYPE_WEAPON)
                     {
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlade Ward", GOSSIP_SENDER_MAIN, 205);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlood Draining", GOSSIP_SENDER_MAIN, 219);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+26 agility", GOSSIP_SENDER_MAIN, 206);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+45 spirit", GOSSIP_SENDER_MAIN, 207);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBerserking", GOSSIP_SENDER_MAIN, 208);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 hits +25 crit rating", GOSSIP_SENDER_MAIN, 209);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlack magic", GOSSIP_SENDER_MAIN, 210);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBattlemaster", GOSSIP_SENDER_MAIN, 211);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tIcebreaker Weapon", GOSSIP_SENDER_MAIN, 212);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tLifeward", GOSSIP_SENDER_MAIN, 213);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 stamina", GOSSIP_SENDER_MAIN, 214);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+65 attack power", GOSSIP_SENDER_MAIN, 215);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+63 spell power", GOSSIP_SENDER_MAIN, 216);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tMangoose", GOSSIP_SENDER_MAIN, 217);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tExecutor", GOSSIP_SENDER_MAIN, 218);
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlade Ward", GOSSIP_SENDER_MAIN, 205);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlood Draining", GOSSIP_SENDER_MAIN, 219);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+26 agility", GOSSIP_SENDER_MAIN, 206);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+45 spirit", GOSSIP_SENDER_MAIN, 207);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBerserking", GOSSIP_SENDER_MAIN, 208);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+25 hits +25 crit rating", GOSSIP_SENDER_MAIN, 209);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBlack magic", GOSSIP_SENDER_MAIN, 210);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tBattlemaster", GOSSIP_SENDER_MAIN, 211);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tIcebreaker Weapon", GOSSIP_SENDER_MAIN, 212);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tLifeward", GOSSIP_SENDER_MAIN, 213);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+50 stamina", GOSSIP_SENDER_MAIN, 214);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+65 attack power", GOSSIP_SENDER_MAIN, 215);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|t+63 spell power", GOSSIP_SENDER_MAIN, 216);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tMangoose", GOSSIP_SENDER_MAIN, 217);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tExecutor", GOSSIP_SENDER_MAIN, 218);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                         player->PlayerTalkClass->SendGossipMenu(100002, me->GetGUID());
                         return true;
                     }
@@ -1030,13 +1030,13 @@ public:
                 }
                 break;
             case 15: //Enchant poyas
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tAdd slot for socket", GOSSIP_SENDER_MAIN, 220);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tAdd slot for socket", GOSSIP_SENDER_MAIN, 220);
                 if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) == 450)
                 {
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tFrag Belt [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 221);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tElectromagnetic Pulse Generator [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 299);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tFrag Belt [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 221);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargepositive:20:20:-15:0|tElectromagnetic Pulse Generator [|cffD80000+|r]", GOSSIP_SENDER_MAIN, 299);
                 }
-                AddGossipItemFor(player, 7, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\Spell_chargenegative:20:20:-15:0|tBack", GOSSIP_SENDER_MAIN, 300);
                 player->PlayerTalkClass->SendGossipMenu(100513, me->GetGUID());
                 return true;
                 break;
@@ -2016,22 +2016,22 @@ public:
                 break;
             case 300: //<-Back menu
                 {
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_helmet_164:20:20:-15:0|t[Enchant: helm]", GOSSIP_SENDER_MAIN, 4);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_shoulder_126:20:20:-15:0|t[Enchant: shoulder]", GOSSIP_SENDER_MAIN, 5);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_chest_plate26:20:20:-15:0|t[Enchant: chest]", GOSSIP_SENDER_MAIN, 7);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_pants_plate_37:20:20:-15:0|t[Enchant: legs]", GOSSIP_SENDER_MAIN, 10);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_gauntlets_91:20:20:-15:0|t[Enchant: hands]", GOSSIP_SENDER_MAIN, 9);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_bracer_43:20:20:-15:0|t[Enchant: wrist]", GOSSIP_SENDER_MAIN, 8);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_belt_48c:20:20:-15:0|t[Enchant: waist]", GOSSIP_SENDER_MAIN, 15);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_boots_plate_13:20:20:-15:0|t[Enchant: feet]", GOSSIP_SENDER_MAIN, 11);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_misc_cape_18:20:20:-15:0|t[Enchant: cloak]", GOSSIP_SENDER_MAIN, 6);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_axe_113:20:20:-15:0|t[Enchant: weapon]", GOSSIP_SENDER_MAIN, 1);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_axe_116:20:20:-15:0|t[Enchant: off-hand weapon]", GOSSIP_SENDER_MAIN, 13);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_axe_115:20:20:-15:0|t[Enchant: two-hand weapon]", GOSSIP_SENDER_MAIN, 2);
-                    AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_shield_75:20:20:-15:0|t[Enchant: shield]", GOSSIP_SENDER_MAIN, 3);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_helmet_164:20:20:-15:0|t[Enchant: helm]", GOSSIP_SENDER_MAIN, 4);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_shoulder_126:20:20:-15:0|t[Enchant: shoulder]", GOSSIP_SENDER_MAIN, 5);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_chest_plate26:20:20:-15:0|t[Enchant: chest]", GOSSIP_SENDER_MAIN, 7);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_pants_plate_37:20:20:-15:0|t[Enchant: legs]", GOSSIP_SENDER_MAIN, 10);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_gauntlets_91:20:20:-15:0|t[Enchant: hands]", GOSSIP_SENDER_MAIN, 9);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_bracer_43:20:20:-15:0|t[Enchant: wrist]", GOSSIP_SENDER_MAIN, 8);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_belt_48c:20:20:-15:0|t[Enchant: waist]", GOSSIP_SENDER_MAIN, 15);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_boots_plate_13:20:20:-15:0|t[Enchant: feet]", GOSSIP_SENDER_MAIN, 11);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_misc_cape_18:20:20:-15:0|t[Enchant: cloak]", GOSSIP_SENDER_MAIN, 6);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_axe_113:20:20:-15:0|t[Enchant: weapon]", GOSSIP_SENDER_MAIN, 1);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_axe_116:20:20:-15:0|t[Enchant: off-hand weapon]", GOSSIP_SENDER_MAIN, 13);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_axe_115:20:20:-15:0|t[Enchant: two-hand weapon]", GOSSIP_SENDER_MAIN, 2);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_shield_75:20:20:-15:0|t[Enchant: shield]", GOSSIP_SENDER_MAIN, 3);
                     if (player->HasSkill(SKILL_ENCHANTING) && player->GetSkillValue(SKILL_ENCHANTING) == 450)
                     {
-                        AddGossipItemFor(player, 7, "|TInterface\\icons\\inv_jewelry_ring_83:20:20:-15:0|t[Enchant: ring]", GOSSIP_SENDER_MAIN, 12);
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\inv_jewelry_ring_83:20:20:-15:0|t[Enchant: ring]", GOSSIP_SENDER_MAIN, 12);
                     }
                     player->PlayerTalkClass->SendGossipMenu(100007, me->GetGUID());
                     return true;
@@ -2070,8 +2070,8 @@ public:
             ClearGossipMenuFor(player);
 
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_PROFESSION_TRAIN, GOSSIP_SENDER_MAIN, 4);
-            AddGossipItemFor(player, 4, GOSSIP_RIDING, GOSSIP_SENDER_MAIN, 5);
-            AddGossipItemFor(player, 4, GOSSIP_WEAPON, GOSSIP_SENDER_MAIN, 6);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GOSSIP_RIDING, GOSSIP_SENDER_MAIN, 5);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GOSSIP_WEAPON, GOSSIP_SENDER_MAIN, 6);
             SendGossipMenuFor(player, 68, me->GetGUID());
             return true;
         }

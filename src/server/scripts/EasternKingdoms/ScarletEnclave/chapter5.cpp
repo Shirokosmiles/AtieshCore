@@ -80,12 +80,12 @@ public:
             {
                 if (!LoD->IsActiveTime())
                     if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE)
-                        AddGossipItemFor(player, 0, "I am ready, Highlord. Let the siege of the Last Hope Chapel begin!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I am ready, Highlord. Let the siege of the Last Hope Chapel begin!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             }*/
 
             //TODO:remove it and finish QUEST
             if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE)
-                AddGossipItemFor(player, 0, "(UNDER DEVELOPMENT) QUEST: skip quest!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "(UNDER DEVELOPMENT) QUEST: skip quest!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
 

@@ -84,7 +84,7 @@ public:
                     if (ActionMenuID != 0)
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, OptionText, GOSSIP_SENDER_MAIN, ActionMenuID);
                     else
-                        AddGossipItemFor(player, 0, OptionText, GOSSIP_SENDER_MAIN, MenuID + index, "", ActionMenuID, true);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, OptionText, GOSSIP_SENDER_MAIN, MenuID + index, "", ActionMenuID, true);
                 }
             }
 
