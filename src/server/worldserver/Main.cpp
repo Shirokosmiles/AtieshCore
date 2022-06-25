@@ -56,6 +56,7 @@
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include <boost/asio/signal_set.hpp>
+#include <boost/dll/runtime_symbol_info.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/program_options.hpp>
 #include <csignal>
@@ -67,8 +68,6 @@ namespace fs = boost::filesystem;
 #ifndef _TRINITY_CORE_CONFIG
     #define _TRINITY_CORE_CONFIG  "worldserver.conf"
 #endif
-
-#define WORLD_SLEEP_CONST 1
 
 #ifdef _WIN32
 #include "ServiceWin32.h"
@@ -203,8 +202,8 @@ extern int main(int argc, char** argv)
         },
         []()
         {
-            FMT_LOG_INFO("server.worldserver", "Using configuration file {}.", sConfigMgr->GetFilename());
-            FMT_LOG_INFO("server.worldserver", "Using SSL version: {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            FMT_LOG_INFO("server.worldserver", "Using configuration file {}.", sConfigMgr->GetFilename().c_str());
+            FMT_LOG_INFO("server.worldserver", "Using SSL version: {} (library: {})", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
             FMT_LOG_INFO("server.worldserver", "Using Boost version: {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         }
     );
@@ -212,7 +211,7 @@ extern int main(int argc, char** argv)
     for (std::string const& key : overriddenKeys)
         FMT_LOG_INFO("server.worldserver", "Configuration field '{}' was overridden with environment variable.", key);
 
-    OpenSSLCrypto::threadsSetup();
+    OpenSSLCrypto::threadsSetup(boost::dll::program_location().remove_filename());
 
     std::shared_ptr<void> opensslHandle(nullptr, [](void*) { OpenSSLCrypto::threadsCleanup(); });
 
@@ -474,6 +473,7 @@ void ShutdownCLIThread(std::thread* cliThread)
 
 void WorldUpdateLoop()
 {
+    uint32 minUpdateDiff = uint32(sConfigMgr->GetIntDefault("MinWorldUpdateTime", 1));
     uint32 realCurrTime = 0;
     uint32 realPrevTime = getMSTime();
 
@@ -489,10 +489,10 @@ void WorldUpdateLoop()
         realCurrTime = getMSTime();
 
         uint32 diff = getMSTimeDiff(realPrevTime, realCurrTime);
-        if (!diff)
+        if (diff < minUpdateDiff)
         {
             // sleep until enough time passes that we can update all timers
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(Milliseconds(minUpdateDiff - diff));
             continue;
         }
 

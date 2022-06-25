@@ -55,7 +55,7 @@ void Metric::LoadFromConfigs()
 {
     bool previousValue = _enabled;
     _enabled = sConfigMgr->GetBoolDefault("Metric.Enable", false);
-    _updateInterval = sConfigMgr->GetIntDefault("Metric.Interval", 10);
+    _updateInterval = sConfigMgr->GetIntDefault("Metric.Interval", 1);
     if (_updateInterval < 1)
     {
         FMT_LOG_ERROR("metric", "'Metric.Interval' config set to {}, overriding to 1.", _updateInterval);

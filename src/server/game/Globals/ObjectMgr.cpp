@@ -322,7 +322,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
         if (locale == LOCALE_enUS)
             continue;
 
-        GossipMenuItemsLocale& data = _gossipMenuItemsLocaleStore[MAKE_PAIR32(menuId, optionId)];
+        GossipMenuItemsLocale& data = _gossipMenuItemsLocaleStore[std::make_pair(menuId, optionId)];
         AddLocaleString(fields[3].GetString(), locale, data.OptionText);
         AddLocaleString(fields[4].GetString(), locale, data.BoxText);
     } while (result->NextRow());
@@ -9647,7 +9647,7 @@ void ObjectMgr::LoadGossipMenuItems()
 
         gMenuItem.MenuID                = fields[0].GetUInt16();
         gMenuItem.OptionID              = fields[1].GetUInt16();
-        gMenuItem.OptionIcon            = fields[2].GetUInt32();
+        gMenuItem.OptionIcon            = GossipOptionIcon(fields[2].GetUInt32());
         gMenuItem.OptionText            = fields[3].GetString();
         gMenuItem.OptionBroadcastTextID = fields[4].GetUInt32();
         gMenuItem.OptionType            = fields[5].GetUInt8();
