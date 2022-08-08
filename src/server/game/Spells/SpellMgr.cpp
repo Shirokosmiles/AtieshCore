@@ -3103,12 +3103,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         {
             spellInfo->_GetEffect(EFFECT_1).TriggerSpell = 46737;
         });
-
-        // Lich Pet
-        ApplySpellFix({ 70050 }, [](SpellInfo* spellInfo)
-        {
-            spellInfo->_GetEffect(EFFECT_0).TriggerSpell = 70049;
-        });
     }
 
     // Allows those to crit
@@ -3176,6 +3170,16 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 42436 }, [](SpellInfo* spellInfo)
     {
         spellInfo->_GetEffect(EFFECT_0).TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+    });
+
+    // Warsong Gulch Anti-Stall Debuffs
+    ApplySpellFix({
+        46392, // Focused Assault
+        46393, // Brutal Assault
+    }, [](SpellInfo* spellInfo)
+    {
+        // due to discrepancies between ranks
+        spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
     });
 
     // Summon Skeletons
@@ -3405,14 +3409,17 @@ void SpellMgr::LoadSpellInfoCorrections()
         38762, // Force of Neltharaku
         51122, // Fierce Lightning Stike
         71848, // Toxic Wasteling Find Target
-        36146  // Chains of Naberius
+        36146, // Chains of Naberius
+        33711, // Murmur's Touch
+        38794  // Murmur's Touch
     }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
     });
 
     ApplySpellFix({
-        36384  // Skartax Purple Beam
+        36384, // Skartax Purple Beam
+        47731  // Critter
     }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 2;
@@ -3460,18 +3467,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     ApplySpellFix({
-        54835  // Curse of the Plaguebringer - Noth (H)
-    }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 8;
-    });
-
-    ApplySpellFix({
         40827, // Sinful Beam
         40859, // Sinister Beam
         40860, // Vile Beam
         40861, // Wicked Beam
-        54098  // Poison Bolt Volly - Faerlina (H)
+        54098, // Poison Bolt Volly - Faerlina (H)
+        54835  // Curse of the Plaguebringer - Noth (H)
     }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 10;
@@ -3520,13 +3521,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->_GetEffect(EFFECT_1).ApplyAuraName = SPELL_AURA_DUMMY;
         spellInfo->_GetEffect(EFFECT_1).MiscValue = 127;
         spellInfo->_GetEffect(EFFECT_1).TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ALLY);
-    });
-
-    // Murmur's Touch
-    ApplySpellFix({ 33711, 38794 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 1;
-        spellInfo->_GetEffect(EFFECT_0).TriggerSpell = 33760;
     });
 
     // Fingers of Frost

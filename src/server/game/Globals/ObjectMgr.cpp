@@ -4433,7 +4433,7 @@ void ObjectMgr::LoadPlayerInfo()
             auto& pClassInfo = _playerClassInfo[class_];
 
             // fatal error if no level 1 data
-            if (!pClassInfo->levelInfo || pClassInfo->levelInfo[0].basehealth == 0)
+            if (!pClassInfo || !pClassInfo->levelInfo || pClassInfo->levelInfo[0].basehealth == 0)
             {
                 FMT_LOG_ERROR("sql.sql", "Class {} Level 1 does not have health/mana data!", class_);
                 ABORT();

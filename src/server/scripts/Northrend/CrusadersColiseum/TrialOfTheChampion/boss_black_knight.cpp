@@ -30,11 +30,8 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "SpellAuraEffects.h"
+#include "SpellInfo.h"
 #include "SpellScript.h"
-#include "ObjectAccessor.h"
-#include "Map.h"
-#include "MotionMaster.h"
 #include "trial_of_the_champion.h"
 
 enum Yells
@@ -700,36 +697,47 @@ class spell_black_knight_army_of_the_dead : public SpellScriptLoader
         }
 };
 
-class spell_black_knight_ghoul_explode : public SpellScriptLoader
+// 67751 - Ghoul Explode
+class spell_black_knight_ghoul_explode : public SpellScript
 {
-    public:
-        spell_black_knight_ghoul_explode() : SpellScriptLoader("spell_black_knight_ghoul_explode") { }
+    PrepareSpellScript(spell_black_knight_ghoul_explode);
 
-        class spell_black_knight_ghoul_explode_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_black_knight_ghoul_explode_AuraScript);
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->GetEffect(EFFECT_0).CalcValue()) });
+    }
 
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                return ValidateSpellInfo({ SPELL_EXPLODE });
-            }
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetHitUnit(), uint32(GetEffectInfo(EFFECT_0).CalcValue()));
+    }
 
-            void CastExplode(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                // On Ghoul Explode aura apply, start casting Explode
-                GetTarget()->CastSpell(GetTarget(), SPELL_EXPLODE);
-            }
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_black_knight_ghoul_explode::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
 
-            void Register() override
-            {
-                AfterEffectApply += AuraEffectApplyFn(spell_black_knight_ghoul_explode_AuraScript::CastExplode, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
+// 67754 - Ghoul Explode
+// 67889 - Ghoul Explode
+class spell_black_knight_ghoul_explode_risen_ghoul : public SpellScript
+{
+    PrepareSpellScript(spell_black_knight_ghoul_explode_risen_ghoul);
 
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_black_knight_ghoul_explode_AuraScript();
-        }
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->GetEffect(EFFECT_1).CalcValue()) });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()));
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_black_knight_ghoul_explode_risen_ghoul::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
 };
 
 // Achievement id 3804 - I've Had Worse
@@ -756,6 +764,7 @@ void AddSC_boss_black_knight()
     new spell_black_knight_deaths_push();
     new spell_black_knight_obliterate();
     new spell_black_knight_army_of_the_dead();
-    new spell_black_knight_ghoul_explode();
+    RegisterSpellScript(spell_black_knight_ghoul_explode);
+    RegisterSpellScript(spell_black_knight_ghoul_explode_risen_ghoul);
     new achievement_ive_had_worse();
 }

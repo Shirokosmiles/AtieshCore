@@ -934,6 +934,64 @@ class spell_item_party_time : public AuraScript
     }
 };
 
+enum DireBrew
+{
+    MODEL_CLASS_CLOTH_MALE         = 25229,
+    MODEL_CLASS_CLOTH_FEMALE       = 25233,
+    MODEL_CLASS_LEATHER_MALE       = 25230,
+    MODEL_CLASS_LEATHER_FEMALE     = 25234,
+    MODEL_CLASS_MAIL_MALE          = 25231,
+    MODEL_CLASS_MAIL_FEMALE        = 25235,
+    MODEL_CLASS_PLATE_MALE         = 25232,
+    MODEL_CLASS_PLATE_FEMALE       = 25236
+};
+
+// 51010 - Dire Brew
+class spell_item_dire_brew : public AuraScript
+{
+    PrepareAuraScript(spell_item_dire_brew);
+
+    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+
+        uint32 model = 0;
+        uint8 gender = target->GetGender();
+
+        switch (target->GetClass())
+        {
+            case CLASS_PRIEST:
+            case CLASS_MAGE:
+            case CLASS_WARLOCK:
+                model = gender == GENDER_MALE ? MODEL_CLASS_CLOTH_MALE : MODEL_CLASS_CLOTH_FEMALE;
+                break;
+            case CLASS_ROGUE:
+            case CLASS_DRUID:
+                model = gender == GENDER_MALE ? MODEL_CLASS_LEATHER_MALE : MODEL_CLASS_LEATHER_FEMALE;
+                break;
+            case CLASS_HUNTER:
+            case CLASS_SHAMAN:
+                model = gender == GENDER_MALE ? MODEL_CLASS_MAIL_MALE : MODEL_CLASS_MAIL_FEMALE;
+                break;
+            case CLASS_WARRIOR:
+            case CLASS_PALADIN:
+            case CLASS_DEATH_KNIGHT:
+                model = gender == GENDER_MALE ? MODEL_CLASS_PLATE_MALE : MODEL_CLASS_PLATE_FEMALE;
+                break;
+            default:
+                break;
+        }
+
+        if (model)
+            target->SetDisplayId(model);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_item_dire_brew::AfterApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 enum DiscerningEyeBeastMisc
 {
     SPELL_DISCERNING_EYE_BEAST = 59914
@@ -1040,6 +1098,47 @@ class spell_item_fate_rune_of_unsurpassed_vigor : public AuraScript
     {
         OnEffectProc += AuraEffectProcFn(spell_item_fate_rune_of_unsurpassed_vigor::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
+};
+
+enum Feast
+{
+    TEXT_GREAT_FEAST        = 31843,
+    TEXT_FISH_FEAST         = 31844,
+    TEXT_GIGANTIC_FEAST     = 31846,
+    TEXT_SMALL_FEAST        = 31845,
+    TEXT_BOUNTIFUL_FEAST    = 35153
+};
+
+/* 57301 - Great Feast
+   57426 - Fish Feast
+   58465 - Gigantic Feast
+   58474 - Small Feast
+   66476 - Bountiful Feast */
+class spell_item_feast : public SpellScript
+{
+    PrepareSpellScript(spell_item_feast);
+
+public:
+    spell_item_feast(uint32 text) : SpellScript(), _text(text) { }
+
+private:
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return sObjectMgr->GetBroadcastText(_text);
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        caster->Unit::TextEmote(_text, caster, false);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_feast::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+
+    uint32 _text;
 };
 
 // http://www.wowhead.com/item=47499 Flask of the North
@@ -4261,10 +4360,16 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_desperate_defense);
     RegisterSpellScript(spell_item_deviate_fish);
     RegisterSpellScript(spell_item_party_time);
+    RegisterSpellScript(spell_item_dire_brew);
     RegisterSpellScript(spell_item_discerning_eye_beast_dummy);
     RegisterSpellScript(spell_item_echoes_of_light);
     RegisterSpellScript(spell_item_extract_gas);
     RegisterSpellScript(spell_item_fate_rune_of_unsurpassed_vigor);
+    RegisterSpellScriptWithArgs(spell_item_feast, "spell_item_great_feast", TEXT_GREAT_FEAST);
+    RegisterSpellScriptWithArgs(spell_item_feast, "spell_item_fish_feast", TEXT_FISH_FEAST);
+    RegisterSpellScriptWithArgs(spell_item_feast, "spell_item_gigantic_feast", TEXT_GIGANTIC_FEAST);
+    RegisterSpellScriptWithArgs(spell_item_feast, "spell_item_small_feast", TEXT_SMALL_FEAST);
+    RegisterSpellScriptWithArgs(spell_item_feast, "spell_item_bountiful_feast", TEXT_BOUNTIFUL_FEAST);
     RegisterSpellScript(spell_item_flask_of_the_north);
     RegisterSpellScript(spell_item_frozen_shadoweave);
     RegisterSpellScript(spell_item_gnomish_death_ray);
