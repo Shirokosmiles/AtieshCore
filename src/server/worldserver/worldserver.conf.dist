@@ -210,7 +210,13 @@ ProcessPriority = 0
 #        Default:     60 - (Enabled, Recommended 10+)
 #                      0 - (Disabled)
 
-MaxCoreStuckTime = 60
+MaxCoreStuckTime = 0
+
+#
+#    MinWorldUpdateTime
+#        Description: Minimum time (milliseconds) between world update ticks (for mostly idle servers).
+#        Default:     1 - (0.001 second)
+MinWorldUpdateTime = 1
 
 #
 ###################################################################################################
