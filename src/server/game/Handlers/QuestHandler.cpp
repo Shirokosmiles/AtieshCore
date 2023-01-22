@@ -35,6 +35,10 @@
 #include "World.h"
 #include "WorldPacket.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
 void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
@@ -97,6 +101,12 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
     creature->SetHomePosition(creature->GetPosition());
 
     _player->PlayerTalkClass->ClearMenus();
+
+#ifdef ELUNA
+    if (sEluna->OnGossipHello(_player, creature))
+        return;
+#endif
+
     if (creature->AI()->OnGossipHello(_player))
         return;
 
@@ -318,7 +328,11 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
                         }
 
                         _player->PlayerTalkClass->ClearMenus();
+#ifdef ELUNA
+                        sEluna->OnQuestReward(_player, questgiver, quest, reward);
+#endif
                         questgiver->AI()->OnQuestReward(_player, quest, reward);
+
                         break;
                     }
                     case TYPEID_GAMEOBJECT:
@@ -338,6 +352,9 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
                         }
 
                         _player->PlayerTalkClass->ClearMenus();
+#ifdef ELUNA
+                        sEluna->OnQuestReward(_player, questGiver, quest, reward);
+#endif
                         questGiver->AI()->OnQuestReward(_player, quest, reward);
                         break;
                     }
@@ -429,6 +446,10 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recvData)
             _player->RemoveTimedAchievement(ACHIEVEMENT_TIMED_TYPE_QUEST, questId);
 
             FMT_LOG_INFO("network", "Player {} abandoned quest {}", _player->GetGUID().ToString(), questId);
+
+#ifdef ELUNA
+            sEluna->OnQuestAbandon(_player, questId);
+#endif
 
             if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER)) // check if Quest Tracker is enabled
             {
