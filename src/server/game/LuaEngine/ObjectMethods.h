@@ -133,11 +133,7 @@ namespace LuaObject
      */
     int GetScale(lua_State* L, Object* obj)
     {
-#ifndef AZEROTHCORE
         Eluna::Push(L, obj->GetObjectScale());
-#else
-        Eluna::Push(L, obj->GetFloatValue(OBJECT_FIELD_SCALE_X));
-#endif
         return 1;
     }
 
@@ -186,11 +182,7 @@ namespace LuaObject
      */
     int GetGUIDLow(lua_State* L, Object* obj)
     {
-#if defined TRINITY || AZEROTHCORE
         Eluna::Push(L, obj->GetGUID().GetCounter());
-#else
-        Eluna::Push(L, obj->GetGUIDLow());
-#endif
         return 1;
     }
 
@@ -362,7 +354,6 @@ namespace LuaObject
     int SetScale(lua_State* L, Object* obj)
     {
         float size = Eluna::CHECKVAL<float>(L, 2);
-
         obj->SetObjectScale(size);
         return 0;
     }
@@ -391,7 +382,6 @@ namespace LuaObject
     {
         uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
         uint32 flag = Eluna::CHECKVAL<uint32>(L, 3);
-
         obj->RemoveFlag(index, flag);
         return 0;
     }
