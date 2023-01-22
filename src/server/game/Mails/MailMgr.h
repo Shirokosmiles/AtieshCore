@@ -108,9 +108,9 @@ public:
     time_t GetMailMgrExpiryTimer() { return _ExpTimer.GetExpiry().count(); }
 
     MailMap const& GetMailMap() const { return m_mails; }
+    Item* GetMItem(uint32 id);
 
 protected:
-
     // Mail section
     uint32 AddNewMail(
         uint8 messageType, uint8 stationery, uint16 mailTemplateId, ObjectGuid::LowType sender, ObjectGuid::LowType receiver,
@@ -120,8 +120,6 @@ protected:
 
     // Mail Item section
     void AddNewMailItem(uint32 mailID, Item* itemPointer, ObjectGuid::LowType itemGuidLow, ObjectGuid::LowType receiver, CharacterDatabaseTransaction& trans);
-
-    Item* GetMItem(uint32 id);
     void AddMItem(Item* it);
     bool RemoveMItem(uint32 id);
 

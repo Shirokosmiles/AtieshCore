@@ -722,7 +722,7 @@ void World::SetInitialWorldSettings()
 
 #ifdef ELUNA
     ///- Initialize Lua Engine
-    TC_LOG_INFO("server.loading", "Initialize Eluna Lua Engine...");
+    FMT_LOG_INFO("server.loading", "Initialize Eluna Lua Engine...");
     Eluna::Initialize();
 #endif
 
