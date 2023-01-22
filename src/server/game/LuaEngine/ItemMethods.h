@@ -23,7 +23,6 @@ namespace LuaItem
         return 1;
     }
 
-#if (!defined(TBC) && !defined(CLASSIC))
     /**
      * Returns 'true' if the [Item] is account bound, 'false' otherwise
      *
@@ -34,7 +33,6 @@ namespace LuaItem
         Eluna::Push(L, item->IsBoundAccountWide());
         return 1;
     }
-#endif
 
     /**
      * Returns 'true' if the [Item] is bound to a [Player] by an enchant, 'false' otehrwise
@@ -56,7 +54,6 @@ namespace LuaItem
     int IsNotBoundToPlayer(lua_State* L, Item* item)
     {
         Player* player = Eluna::CHECKOBJ<Player>(L, 2);
-
         Eluna::Push(L, item->IsBindedNotWith(player));
         return 1;
     }
@@ -83,7 +80,6 @@ namespace LuaItem
         return 1;
     }
 
-#ifndef CLASSIC
     /**
      * Returns 'true' if the [Item] is a currency token, 'false' otherwise
      *
@@ -94,7 +90,6 @@ namespace LuaItem
         Eluna::Push(L, item->IsCurrencyToken());
         return 1;
     }
-#endif
 
     /**
      * Returns 'true' if the [Item] is a not an empty bag, 'false' otherwise
@@ -125,12 +120,8 @@ namespace LuaItem
      */
     int CanBeTraded(lua_State* L, Item* item)
     {
-#if (defined(TBC) || defined(CLASSIC))
-        Eluna::Push(L, item->CanBeTraded());
-#else
         bool mail = Eluna::CHECKVAL<bool>(L, 2, false);
         Eluna::Push(L, item->CanBeTraded(mail));
-#endif
         return 1;
     }
 
@@ -176,11 +167,7 @@ namespace LuaItem
     int HasQuest(lua_State* L, Item* item)
     {
         uint32 quest = Eluna::CHECKVAL<uint32>(L, 2);
-#if defined TRINITY || AZEROTHCORE
         Eluna::Push(L, item->hasQuest(quest));
-#else
-        Eluna::Push(L, item->HasQuest(quest));
-#endif
         return 1;
     }
 
@@ -195,7 +182,6 @@ namespace LuaItem
         return 1;
     }
 
-#if defined(WOTLK)
     /**
      * Returns 'true' if the [Item] is a weapon vellum, 'false' otherwise
      *
@@ -217,7 +203,6 @@ namespace LuaItem
         Eluna::Push(L, item->IsArmorVellum());
         return 1;
     }
-#endif
 
     /**
      * Returns 'true' if the [Item] is a conjured consumable, 'false' otherwise
@@ -268,66 +253,29 @@ namespace LuaItem
         if (ItemLocale const* il = eObjectMgr->GetItemLocale(temp->ItemId))
             ObjectMgr::GetLocaleString(il->Name, static_cast<LocaleConstant>(locale), name);
 
-#ifndef CLASSIC
         if (int32 itemRandPropId = item->GetItemRandomPropertyId())
         {
-#if defined(CATA) || defined (MISTS)
-            char* suffix = NULL;
-#else
-#ifdef TRINITY
             std::string suffix;
-#else
-            char* const* suffix = NULL;
-#endif
-#endif
-            if (itemRandPropId < 0)
-            {
-                ItemRandomSuffixDBC const* itemRandEntry = sDBCStoresMgr->GetItemRandomSuffixDBC(item->GetItemRandomPropertyId());
-                if (itemRandEntry)
-#ifdef TRINITY
-                    suffix = itemRandEntry->Name[locale];
-#else
-                    suffix = itemRandEntry->nameSuffix;
-#endif
-            }
-            else
-            {
-                ItemRandomSuffixDBC const* itemRandEntry = sDBCStoresMgr->GetItemRandomSuffixDBC(item->GetItemRandomPropertyId());
-                if (itemRandEntry)
-#ifdef TRINITY
-                    suffix = itemRandEntry->Name[locale];
-#else
-                    suffix = itemRandEntry->nameSuffix;
-#endif
-            }
+            ItemRandomSuffixDBC const* itemRandEntry = sDBCStoresMgr->GetItemRandomSuffixDBC(item->GetItemRandomPropertyId());
+            if (itemRandEntry)
+                suffix = itemRandEntry->Name[locale];
             if (suffix.length() > 1)
             {
                 name += ' ';
-#if defined TRINITY
                 name += suffix[(name != temp->Name1) ? locale : uint8(DEFAULT_LOCALE)];
-#else
-                name += suffix[(name != temp->Name1) ? locale : uint8(DEFAULT_LOCALE)];
-#endif
             }
         }
-#endif
 
         std::ostringstream oss;
         oss << "|c" << std::hex << ItemQualityColors[temp->Quality] << std::dec <<
             "|Hitem:" << temp->ItemId << ":" <<
             item->GetEnchantmentId(PERM_ENCHANTMENT_SLOT) << ":" <<
-#ifndef CLASSIC
             item->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT) << ":" <<
             item->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2) << ":" <<
             item->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3) << ":" <<
             item->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT) << ":" <<
-#endif
             item->GetItemRandomPropertyId() << ":" << item->GetItemSuffixFactor() << ":" <<
-#if defined(TRINITY) || CMANGOS
             (uint32)item->GetOwner()->GetLevel() << "|h[" << name << "]|h|r";
-#else
-            (uint32)item->GetOwner()->getLevel() << "|h[" << name << "]|h|r";
-#endif
 
         Eluna::Push(L, oss.str());
         return 1;
@@ -335,11 +283,7 @@ namespace LuaItem
 
     int GetOwnerGUID(lua_State* L, Item* item)
     {
-#if defined TRINITY || AZEROTHCORE
         Eluna::Push(L, item->GetOwnerGUID());
-#else
-        Eluna::Push(L, item->GetOwnerGuid());
-#endif
         return 1;
     }
 
@@ -590,13 +534,11 @@ namespace LuaItem
         return 1;
     }
 
-#ifdef WOTLK
     int GetStatsCount(lua_State* L, Item* item)
     {
         Eluna::Push(L, item->GetTemplate()->StatsCount);
         return 1;
     }
-#endif
 
     /**
      * Returns the random property ID of this [Item]
@@ -609,13 +551,11 @@ namespace LuaItem
         return 1;
     }
 
-#ifndef CLASSIC
     int GetRandomSuffix(lua_State* L, Item* item)
     {
         Eluna::Push(L, item->GetTemplate()->RandomSuffix);
         return 1;
     }
-#endif
 
     /**
      * Returns the item set ID of this [Item]
@@ -650,11 +590,7 @@ namespace LuaItem
     int SetOwner(lua_State* L, Item* item)
     {
         Player* player = Eluna::CHECKOBJ<Player>(L, 2);
-#if defined TRINITY || AZEROTHCORE
         item->SetOwnerGUID(player->GET_GUID());
-#else
-        item->SetOwnerGuid(player->GET_GUID());
-#endif
         return 0;
     }
 
@@ -666,10 +602,8 @@ namespace LuaItem
     int SetBinding(lua_State* L, Item* item)
     {
         bool soulbound = Eluna::CHECKVAL<bool>(L, 2);
-
         item->SetBinding(soulbound);
         item->SetState(ITEM_CHANGED, item->GetOwner());
-
         return 0;
     }
 
@@ -756,12 +690,8 @@ namespace LuaItem
      */
     int SaveToDB(lua_State* /*L*/, Item* item)
     {
-#if defined TRINITY || defined AZEROTHCORE
         CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         item->SaveToDB(trans);
-#else
-        item->SaveToDB();
-#endif
         return 0;
     }
 };
