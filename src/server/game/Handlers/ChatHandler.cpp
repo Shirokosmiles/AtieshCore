@@ -267,7 +267,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     if (!msg.empty())
     {
         // Filter for message
-        if (!ObjectMgr::IsValidityChecks(sender, msg, addonmessage))
+        if (!ObjectMgr::IsValidityChecks(sender, msg, !addonmessage))
         {
             recvData.rfinish();
             return;
