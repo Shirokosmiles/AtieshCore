@@ -38,6 +38,84 @@
 
 using boost::asio::ip::tcp;
 
+enum eAuthCmd
+{
+    AUTH_LOGON_CHALLENGE = 0x00,
+    AUTH_LOGON_PROOF = 0x01,
+    AUTH_RECONNECT_CHALLENGE = 0x02,
+    AUTH_RECONNECT_PROOF = 0x03,
+    REALM_LIST = 0x10,
+    XFER_INITIATE = 0x30,
+    XFER_DATA = 0x31,
+    XFER_ACCEPT = 0x32,
+    XFER_RESUME = 0x33,
+    XFER_CANCEL = 0x34
+};
+
+#pragma pack(push, 1)
+
+typedef struct AUTH_LOGON_CHALLENGE_C
+{
+    uint8   cmd;
+    uint8   error;
+    uint16  size;
+    uint8   gamename[4];
+    uint8   version1;
+    uint8   version2;
+    uint8   version3;
+    uint16  build;
+    uint8   platform[4];
+    uint8   os[4];
+    uint8   country[4];
+    uint32  timezone_bias;
+    uint32  ip;
+    uint8   I_len;
+    uint8   I[1];
+} sAuthLogonChallenge_C;
+static_assert(sizeof(sAuthLogonChallenge_C) == (1 + 1 + 2 + 4 + 1 + 1 + 1 + 2 + 4 + 4 + 4 + 4 + 4 + 1 + 1));
+
+typedef struct AUTH_LOGON_PROOF_C
+{
+    uint8   cmd;
+    Trinity::Crypto::SRP6::EphemeralKey A;
+    Trinity::Crypto::SHA1::Digest clientM;
+    Trinity::Crypto::SHA1::Digest crc_hash;
+    uint8   number_of_keys;
+    uint8   securityFlags;
+} sAuthLogonProof_C;
+static_assert(sizeof(sAuthLogonProof_C) == (1 + 32 + 20 + 20 + 1 + 1));
+
+typedef struct AUTH_LOGON_PROOF_S
+{
+    uint8   cmd;
+    uint8   error;
+    Trinity::Crypto::SHA1::Digest M2;
+    uint32  AccountFlags;
+    uint32  SurveyId;
+    uint16  LoginFlags;
+} sAuthLogonProof_S;
+static_assert(sizeof(sAuthLogonProof_S) == (1 + 1 + 20 + 4 + 4 + 2));
+
+typedef struct AUTH_LOGON_PROOF_S_OLD
+{
+    uint8   cmd;
+    uint8   error;
+    Trinity::Crypto::SHA1::Digest M2;
+    uint32  unk2;
+} sAuthLogonProof_S_Old;
+static_assert(sizeof(sAuthLogonProof_S_Old) == (1 + 1 + 20 + 4));
+
+typedef struct AUTH_RECONNECT_PROOF_C
+{
+    uint8   cmd;
+    uint8   R1[16];
+    Trinity::Crypto::SHA1::Digest R2, R3;
+    uint8   number_of_keys;
+} sAuthReconnectProof_C;
+static_assert(sizeof(sAuthReconnectProof_C) == (1 + 16 + 20 + 20 + 1));
+
+#pragma pack(pop)
+
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
 #define MAX_ACCEPTED_CHALLENGE_SIZE (sizeof(AUTH_LOGON_CHALLENGE_C) + 16)
@@ -90,8 +168,7 @@ void AccountInfo::LoadResult(Field* fields)
     Utf8ToUpperOnlyLatin(Login);
 }
 
-AuthSession::AuthSession(tcp::socket&& socket) : Socket(std::move(socket)),
-_status(STATUS_CHALLENGE), _build(0), _expversion(0), _patcher(nullptr) { }
+AuthSession::AuthSession(tcp::socket&& socket) : Socket(std::move(socket)), _patcher(nullptr), _status(STATUS_CHALLENGE), _build(0), _expversion(0) { }
 
 AuthSession::~AuthSession()
 {
@@ -340,7 +417,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     );
 
     // Fill the response packet with the result
-    if (AuthHelper::IsAcceptedClientBuild(_build) || sPatcher->CanPatch(_build, _localizationName))
+    if (AuthHelper::IsAcceptedClientBuild(_build) || sPatcher->CanPatch(_build))
     {
         pkt << uint8(WOW_SUCCESS);
 
@@ -378,7 +455,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     }
     else
         pkt << uint8(WOW_FAIL_VERSION_INVALID);
-
+  
     SendPacket(pkt);
 }
 
@@ -391,19 +468,15 @@ bool AuthSession::HandleLogonProof()
     // Read the packet
     sAuthLogonProof_C *logonProof = reinterpret_cast<sAuthLogonProof_C*>(GetReadBuffer().GetReadPointer());
 
-    // Check if we have the appropriate patch on the disk    
-    if (sPatcher->CanPatch(_build, _localizationName))
-    {
-        FMT_LOG_INFO("server.authserver", "User has no valid version. Attempting patching...");
-        sPatcher->Patch(_build, this);
-        return true;
-    }
-
     // If the client has no valid version
     if (_expversion == NO_VALID_EXP_FLAG)
     {
-        // Check if we have the appropriate patch on the disk
-        FMT_LOG_DEBUG("network", "Client with invalid version, patching is not implemented");
+        FMT_LOG_INFO("patcher", "User has no valid version. Attempting patching...");
+        if (sPatcher->CanPatch(_build)) {
+            sPatcher->Patch(_build, this);
+            return true;
+        }
+        FMT_LOG_INFO("patcher", "Patching failed for user! Build: {}", _build);
         return false;
     }
 
@@ -771,6 +844,34 @@ void AuthSession::RealmListCallback(PreparedQueryResult result)
     _status = STATUS_AUTHED;
 }
 
+// Resume patch transfer
+bool AuthSession::HandleXferResume()
+{
+    FMT_LOG_DEBUG("server.authserver", "Entering _HandleXferResume");
+    return true;
+}
+
+// Cancel patch transfer
+bool AuthSession::HandleXferCancel()
+{
+    FMT_LOG_DEBUG("server.authserver", "Entering _HandleXferCancel");
+    if (_patcher)
+        _patcher->Stop();
+    return false;
+}
+
+// Accept patch transfer
+bool AuthSession::HandleXferAccept()
+{
+    FMT_LOG_INFO("patcher", "Entering _HandleXferAccept");
+    if (!_patcher) {
+        FMT_LOG_INFO("patcher", "No patcher for user!");
+        return false;
+    }
+    _patcher->Init();
+    return true;
+}
+
 bool AuthSession::VerifyVersion(uint8 const* a, int32 aLength, Trinity::Crypto::SHA1::Digest const& versionProof, bool isReconnect)
 {
     if (!sConfigMgr->GetBoolDefault("StrictVersionCheck", false))
@@ -804,35 +905,4 @@ bool AuthSession::VerifyVersion(uint8 const* a, int32 aLength, Trinity::Crypto::
     version.Finalize();
 
     return (versionProof == version.GetDigest());
-}
-
-// Resume patch transfer
-bool AuthSession::HandleXferResume()
-{
-    FMT_LOG_DEBUG("server.authserver", "Entering _HandleXferResume");
-    return true;
-}
-
-// Cancel patch transfer
-bool AuthSession::HandleXferCancel()
-{
-    FMT_LOG_DEBUG("server.authserver", "Entering _HandleXferCancel");
-    if (_patcher)
-        _patcher->Stop();
-    return false;
-}
-
-// Accept patch transfer
-bool AuthSession::HandleXferAccept()
-{
-    FMT_LOG_INFO("server.authserver", "Entering _HandleXferAccept");
-    if (!_patcher)
-    {
-        FMT_LOG_INFO("server.authserver", "No patcher for user!");
-        return false;
-    }
-    FMT_LOG_INFO("server.authserver", "TEST {}", uint8(_status));
-    
-    _patcher->Init();
-    return true;
 }

@@ -47,107 +47,27 @@ enum AuthStatus
     STATUS_CLOSED
 };
 
-enum eAuthCmd
-{
-    AUTH_LOGON_CHALLENGE = 0x00,
-    AUTH_LOGON_PROOF = 0x01,
-    AUTH_RECONNECT_CHALLENGE = 0x02,
-    AUTH_RECONNECT_PROOF = 0x03,
-    REALM_LIST = 0x10,
-    XFER_INITIATE = 0x30,
-    XFER_DATA = 0x31,
-    XFER_ACCEPT = 0x32,
-    XFER_RESUME = 0x33,
-    XFER_CANCEL = 0x34
-};
-
 #pragma pack(push, 1)
 
-typedef struct AUTH_LOGON_CHALLENGE_C
-{
-    uint8   cmd;
-    uint8   error;
-    uint16  size;
-    uint8   gamename[4];
-    uint8   version1;
-    uint8   version2;
-    uint8   version3;
-    uint16  build;
-    uint8   platform[4];
-    uint8   os[4];
-    uint8   country[4];
-    uint32  timezone_bias;
-    uint32  ip;
-    uint8   I_len;
-    uint8   I[1];
-} sAuthLogonChallenge_C;
-static_assert(sizeof(sAuthLogonChallenge_C) == (1 + 1 + 2 + 4 + 1 + 1 + 1 + 2 + 4 + 4 + 4 + 4 + 4 + 1 + 1));
-
-typedef struct AUTH_LOGON_PROOF_C
-{
-    uint8   cmd;
-    Trinity::Crypto::SRP6::EphemeralKey A;
-    Trinity::Crypto::SHA1::Digest clientM;
-    Trinity::Crypto::SHA1::Digest crc_hash;
-    uint8   number_of_keys;
-    uint8   securityFlags;
-} sAuthLogonProof_C;
-static_assert(sizeof(sAuthLogonProof_C) == (1 + 32 + 20 + 20 + 1 + 1));
-
-typedef struct AUTH_LOGON_PROOF_S
-{
-    uint8   cmd;
-    uint8   error;
-    Trinity::Crypto::SHA1::Digest M2;
-    uint32  AccountFlags;
-    uint32  SurveyId;
-    uint16  LoginFlags;
-} sAuthLogonProof_S;
-static_assert(sizeof(sAuthLogonProof_S) == (1 + 1 + 20 + 4 + 4 + 2));
-
-typedef struct AUTH_LOGON_PROOF_S_OLD
-{
-    uint8   cmd;
-    uint8   error;
-    Trinity::Crypto::SHA1::Digest M2;
-    uint32  unk2;
-} sAuthLogonProof_S_Old;
-static_assert(sizeof(sAuthLogonProof_S_Old) == (1 + 1 + 20 + 4));
-
-typedef struct AUTH_RECONNECT_PROOF_C
-{
-    uint8   cmd;
-    uint8   R1[16];
-    Trinity::Crypto::SHA1::Digest R2, R3;
-    uint8   number_of_keys;
-} sAuthReconnectProof_C;
-static_assert(sizeof(sAuthReconnectProof_C) == (1 + 16 + 20 + 20 + 1));
-
-typedef struct XFER_INIT_C
-{
+typedef struct XFER_INIT_C {
     uint8 cmd;
     uint8 nameLength;
     uint8 fileName[5];
     uint64 fileSize;
     uint8 MD5[MD5_DIGEST_LENGTH];
 } sXferInit_C;
-//static_assert(sizeof(sXferInit_C) == (1 + 1 + 1 + 32 + 1));
 
-typedef struct XFER_RESUME_C
-{
+typedef struct XFER_RESUME_C {
     uint8 cmd;
     uint64 pos;
 } sXferResume_C;;
-//static_assert(sizeof(sXferResume_C) == (1 + 32));
 
-typedef struct XFER_RESUME_S
-{
+typedef struct XFER_RESUME_S {
     uint8 cmd;
     uint64 pos;
 } sXferResume_S;
 
-struct TransferDataPacket
-{
+struct TransferDataPacket {
     uint8 cmd;
     uint16 chunk_size;
 };
@@ -183,6 +103,7 @@ public:
     bool Update() override;
 
     void SendPacket(ByteBuffer& packet);
+
     Patcher* _patcher;
 protected:
     void ReadHandler() override;
@@ -205,7 +126,7 @@ private:
     void RealmListCallback(PreparedQueryResult result);
 
     bool VerifyVersion(uint8 const* a, int32 aLength, Trinity::Crypto::SHA1::Digest const& versionProof, bool isReconnect);
-    
+
     Optional<Trinity::Crypto::SRP6> _srp6;
     SessionKey _sessionKey = {};
     std::array<uint8, 16> _reconnectProof = {};

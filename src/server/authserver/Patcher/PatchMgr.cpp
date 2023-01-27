@@ -21,6 +21,9 @@ PatchMgr::PatchMgr()
 
 PatchMgr::~PatchMgr()
 {
+    for (auto patchInfo : Patches)
+        delete patchInfo.second;
+    Patches.clear();
 }
 
 void PatchMgr::GetPatchMD5(std::ifstream& file, uint64 size, uint8 MD5[MD5_DIGEST_LENGTH])
@@ -60,44 +63,40 @@ void PatchMgr::LoadPatches()
     fs::path PatchDir(sConfigMgr->GetStringDefault("PatchDir", "./"));
     if (!fs::exists(PatchDir) || !fs::is_directory(PatchDir))
     {
-        FMT_LOG_INFO("server.authserver", "ERROR");
         Disable();
         return;
     }
 
     int count = 0;
     for (auto& file : boost::filesystem::directory_iterator(PatchDir))
-    {        
+    {
         std::string filename = file.path().stem().string();
         std::string extension = file.path().extension().string();
         if (algo::to_lower_copy(extension) != ".mpq" || !std::all_of(filename.begin(), filename.end(), ::isdigit))
             continue;
-
         PatchInfo* info = new PatchInfo;
         info->Build = boost::lexical_cast<uint16>(filename);
         info->Path = file.path().string();
         std::ifstream patch(info->Path, std::ios::binary);
         if (!patch.is_open())
             continue;
-
         info->Size = fs::file_size(file);
         GetPatchMD5(patch, info->Size, info->MD5);
         patch.close();
         ++count;
         Patches.insert({ info->Build, info });
-        FMT_LOG_INFO("server.authserver", "[PatchMgr] added patch {}{}", filename, extension);
     }
 
     if (count > 0)
     {
-        FMT_LOG_INFO("server.authserver", "[PatchMgr] Loaded {} patches.", count);
+        FMT_LOG_INFO("patcher", "[PatchMgr] Loaded {} patches.", count);
         Enable();
     }
     else
         Disable();
 }
 
-bool PatchMgr::CanPatch(uint16 Build, std::string /*Locale*/)
+bool PatchMgr::CanPatch(uint16 Build)
 {
     if (!IsEnabled())
         return false;
@@ -112,12 +111,12 @@ bool PatchMgr::Patch(uint16 Build, AuthSession* Session)
 {
     PatchInfo* Patch = Patches.find(Build)->second;
     ByteBuffer pkt;
-    pkt << uint8(AUTH_LOGON_PROOF);
+    pkt << uint8(0x01); // AUTH_LOGON_PROOF
     pkt << uint8(LOGIN_DOWNLOAD_FILE);
     Session->SendPacket(pkt);
 
     sXferInit_C Xfer;
-    Xfer.cmd = XFER_INITIATE;
+    Xfer.cmd = 0x30; // XFER_INITIATE
     Xfer.nameLength = 5;
     Xfer.fileName[0] = 'P';
     Xfer.fileName[1] = 'a';
@@ -129,6 +128,7 @@ bool PatchMgr::Patch(uint16 Build, AuthSession* Session)
     pkt.resize(sizeof(Xfer));
     memcpy(pkt.contents(), &Xfer, sizeof(Xfer));
     Session->SendPacket(pkt);
+
     Patcher* patcher = new Patcher(Session, Patch);
     Session->_patcher = patcher;
     return true;

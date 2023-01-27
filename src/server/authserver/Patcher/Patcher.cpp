@@ -1,11 +1,13 @@
 #include "AuthSession.h"
 #include "Patcher.h"
 #include "PatchMgr.h"
+#include <thread>
+#include <chrono>
 #include <fstream>
 
 #define CHUNK_SIZE 4096
 
-Patcher::Patcher(AuthSession* Session, PatchMgr::PatchInfo* Patch) : _stopped(false), _session(Session), _patch(Patch) { }
+Patcher::Patcher(AuthSession* Session, PatchMgr::PatchInfo* Patch) : _session(Session), _patch(Patch), _stopped(false) { }
 Patcher::~Patcher()
 {
     _session->_patcher = nullptr;
@@ -29,17 +31,16 @@ void Patcher::Init(uint64 start_pos)
         ByteBuffer pkt;
         char* bytes = new char[chunkSize];
         TransferDataPacket hdr;
-        hdr.cmd = XFER_DATA;
+        hdr.cmd = 0x31; // XFER_DATA
         hdr.chunk_size = chunkSize;
         file.read(bytes, chunkSize);
-        pkt.append(&hdr, 1);
+        pkt.append(&hdr, 1); 
         pkt.append(bytes, chunkSize);
 
         _session->SendPacket(pkt);
         delete[] bytes;
 
-        // we need it?
-        //Sleep(100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     file.close();
