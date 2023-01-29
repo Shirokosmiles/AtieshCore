@@ -93,11 +93,11 @@ INSERT INTO `npc_spellclick_spells` (`npc_entry`, `spell_id`, `cast_flags`, `use
 (@ARGENT_BATTLEWORG, 67830, 1, 0);
 
 DELETE FROM `creature_template_addon` WHERE `entry` IN (@ARGENT_WARHORSE_GC,@ARGENT_WARHORSE,@ARGENT_BATTLEWORG,@ARGENT_BATTLEWORG_GC);
-INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES
-(@ARGENT_WARHORSE_GC,   0, 0,   1, 0, '67870'),
-(@ARGENT_WARHORSE,      0, 0, 257, 0, '67865'),
-(@ARGENT_BATTLEWORG,    0, 0, 257, 0, '67865'),
-(@ARGENT_BATTLEWORG_GC, 0, 0,   1, 0, '67870');
+INSERT INTO `creature_template_addon` (`entry`, `mount`, `emote`, `auras`) VALUES
+(@ARGENT_WARHORSE_GC,   0, 0,'67870'),
+(@ARGENT_WARHORSE,      0, 0,'67865'),
+(@ARGENT_BATTLEWORG,    0, 0,'67865'),
+(@ARGENT_BATTLEWORG_GC, 0, 0,'67870');
 
 -- You should not be able to mount a vehicle if you don't have Argent Lance equipped
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=16 AND `SourceGroup`=0 AND `SourceEntry` IN (@ARGENT_BATTLEWORG,@ARGENT_WARHORSE);

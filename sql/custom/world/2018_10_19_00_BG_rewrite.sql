@@ -336,9 +336,9 @@ UPDATE `creature_template` SET `VehicleId`=435 WHERE `entry`=35431;
 UPDATE `creature_template` SET `VehicleId`=514 WHERE `entry`=35433;
 -- UPDATE `creature_template` SET `ScriptName`='npc_ioc_siege_engine' WHERE `entry` IN (34776,35069);
 DELETE FROM `creature_template_addon` WHERE `entry` IN (35431,35433);
-INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES
-(35431, 0, 0, 0, 1, 0, ''),
-(35433, 0, 0, 0, 1, 0, '');
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `emote`, `auras`) VALUES
+(35431, 0, 0, 0, ''),
+(35433, 0, 0, 0, '');
 DELETE FROM `vehicle_template_accessory` WHERE `entry` IN (35431,35433);
 INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer`)
 SELECT 35431, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer` FROM `vehicle_template_accessory` WHERE `entry`=34776;
