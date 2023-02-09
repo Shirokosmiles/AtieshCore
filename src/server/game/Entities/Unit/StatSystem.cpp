@@ -1123,6 +1123,8 @@ void Creature::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, 
     float totalValue       = GetFlatModifierValue(unitMod, TOTAL_VALUE);
     float totalPct         = addTotalPct ? GetPctModifierValue(unitMod, TOTAL_PCT) : 1.0f;
     float dmgMultiplier    = GetCreatureTemplate()->ModDamage; // = ModDamage * _GetDamageMod(rank);
+    if (!IsPet() && sWorld->isZoneforCreatureRates(GetZoneId()))
+        dmgMultiplier *= sWorld->getRate(RATE_CREATURE_IN_ZONE_DAMAGE);
 
     minDamage = ((weaponMinDamage + baseValue) * dmgMultiplier * basePct + totalValue) * totalPct;
     maxDamage = ((weaponMaxDamage + baseValue) * dmgMultiplier * basePct + totalValue) * totalPct;
@@ -1184,24 +1186,6 @@ bool Guardian::UpdateStats(Stats stat)
         if (owner->GetClass() == CLASS_WARLOCK && IsPet())
         {
             ownersBonus = CalculatePct(owner->GetStat(STAT_STAMINA), 75);
-            value += ownersBonus;
-        }
-        else
-        {
-            mod = 0.45f;
-            if (IsPet())
-            {
-                PetSpellMap::const_iterator itr = (ToPet()->m_spells.find(62758)); // Wild Hunt rank 1
-                if (itr == ToPet()->m_spells.end())
-                    itr = ToPet()->m_spells.find(62762);                            // Wild Hunt rank 2
-
-                if (itr != ToPet()->m_spells.end())                                 // If pet has Wild Hunt
-                {
-                    SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first); // Then get the SpellProto and add the dummy effect value
-                    AddPct(mod, spellInfo->GetEffect(EFFECT_0).CalcValue());
-                }
-            }
-            ownersBonus = float(owner->GetStat(stat)) * mod;
             value += ownersBonus;
         }
     }
@@ -1451,7 +1435,7 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
             int32 spellDmg = m_owner->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FIRE) - m_owner->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FIRE);
             if (spellDmg > 0)
                 bonusDamage = spellDmg * 0.4f;
-        }
+        }        
     }
 
     UnitMods unitMod = UNIT_MOD_DAMAGE_MAINHAND;
@@ -1505,6 +1489,13 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
                 break;
         }
     }
+
+    /*if (GetEntry() == 27893)
+    {        
+        float mindamage = m_owner->GetFloatValue(UNIT_FIELD_MINDAMAGE) / 2;
+        float maxdamage = m_owner->GetFloatValue(UNIT_FIELD_MAXDAMAGE) / 2;
+        FMT_LOG_ERROR("server", "PET WEAPON DANCINGS : min = {}, max = {}", mindamage, maxdamage);
+    }*/
 
     SetStatFloatValue(UNIT_FIELD_MINDAMAGE, mindamage);
     SetStatFloatValue(UNIT_FIELD_MAXDAMAGE, maxdamage);

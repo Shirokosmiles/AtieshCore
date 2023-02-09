@@ -20,7 +20,7 @@
 #include "CellImpl.h"
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "Log.h"
@@ -160,7 +160,7 @@ bool ChatHandler::_ParseCommands(std::string_view text)
         return false;
 
     // Send error message for GMs
-    PSendSysMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(text));
+    PSendSysMessage(LANG_CMD_INVALID, (text));
     SetSentErrorMessage(true);
     return true;
 }
@@ -551,7 +551,7 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
         case SPELL_LINK_TALENT:
         {
             // talent
-            TalentEntry const* talentEntry = sTalentStore.LookupEntry(id);
+            TalentDBC const* talentEntry = sDBCStoresMgr->GetTalentDBC(id);
             if (!talentEntry)
                 return 0;
 
@@ -568,7 +568,7 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
         {
             uint32 glyph_prop_id = param1_str ? atoul(param1_str) : 0;
 
-            GlyphPropertiesEntry const* glyphPropEntry = sGlyphPropertiesStore.LookupEntry(glyph_prop_id);
+            GlyphPropertiesDBC const* glyphPropEntry = sDBCStoresMgr->GetGlyphPropertiesDBC(glyph_prop_id);
             if (!glyphPropEntry)
                 return 0;
 
@@ -889,7 +889,7 @@ bool AddonChannelCommandHandler::ParseCommands(std::string_view str)
             }
             else
             {
-                PSendSysMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(cmd));
+                PSendSysMessage(LANG_CMD_INVALID, (cmd));
                 SendFailed();
             }
             return true;

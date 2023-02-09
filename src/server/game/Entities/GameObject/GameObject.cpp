@@ -20,6 +20,7 @@
 #include "CellImpl.h"
 #include "CreatureAISelector.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "GameObjectAI.h"
 #include "GameObjectModel.h"
 #include "GameTime.h"
@@ -140,6 +141,7 @@ GameObject::GameObject() : WorldObject(false), MapObject(),
 
     ResetLootMode(); // restore default loot mode
     m_stationaryPosition.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
+    ClearTempSummonsList();
 }
 
 GameObject::~GameObject()
@@ -196,8 +198,8 @@ void GameObject::RemoveFromOwner()
     }
 
     // This happens when a mage portal is despawned after the caster changes map (for example using the portal)
-    TC_LOG_DEBUG("misc", "Removed GameObject (%s Entry: %u SpellId: %u LinkedGO: %u) that just lost any reference to the owner (%s) GO list",
-        GetGUID().ToString().c_str(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), ownerGUID.ToString().c_str());
+    FMT_LOG_DEBUG("misc", "Removed GameObject ({} Entry: {} SpellId: {} LinkedGO: {}) that just lost any reference to the owner ({}) GO list",
+        GetGUID().ToString(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), ownerGUID.ToString());
     SetOwnerGUID(ObjectGuid::Empty);
 }
 
@@ -262,7 +264,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
     m_stationaryPosition.Relocate(pos);
     if (!IsPositionValid())
     {
-        TC_LOG_ERROR("misc", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, pos.GetPositionX(), pos.GetPositionY());
+        FMT_LOG_ERROR("misc", "Gameobject (GUID: {} Entry: {}) not created. Suggested coordinates isn't valid (X: {} Y: {})", guidlow, name_id, pos.GetPositionX(), pos.GetPositionY());
         return false;
     }
 
@@ -284,13 +286,13 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(name_id);
     if (!goinfo)
     {
-        TC_LOG_ERROR("sql.sql", "Gameobject (GUID: %u Entry: %u) not created: non-existing entry in `gameobject_template`. Map: %u (X: %f Y: %f Z: %f)", guidlow, name_id, map->GetId(), pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+        FMT_LOG_ERROR("sql.sql", "Gameobject (GUID: {} Entry: {}) not created: non-existing entry in `gameobject_template`. Map: {} (X: {} Y: {} Z: {})", guidlow, name_id, map->GetId(), pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
         return false;
     }
 
     if (goinfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT)
     {
-        TC_LOG_ERROR("sql.sql", "Gameobject (GUID: %u Entry: %u) not created: gameobject type GAMEOBJECT_TYPE_MO_TRANSPORT cannot be manually created.", guidlow, name_id);
+        FMT_LOG_ERROR("sql.sql", "Gameobject (GUID: {} Entry: {}) not created: gameobject type GAMEOBJECT_TYPE_MO_TRANSPORT cannot be manually created.", guidlow, name_id);
         return false;
     }
 
@@ -304,7 +306,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     if (goinfo->type >= MAX_GAMEOBJECT_TYPE)
     {
-        TC_LOG_ERROR("sql.sql", "Gameobject (GUID: %u Entry: %u) not created: non-existing GO type '%u' in `gameobject_template`. It will crash client if created.", guidlow, name_id, goinfo->type);
+        FMT_LOG_ERROR("sql.sql", "Gameobject (GUID: {} Entry: {}) not created: non-existing GO type '{}' in `gameobject_template`. It will crash client if created.", guidlow, name_id, goinfo->type);
         return false;
     }
 
@@ -426,7 +428,7 @@ void GameObject::Update(uint32 diff)
     if (AI())
         AI()->UpdateAI(diff);
     else if (!AIM_Initialize())
-        TC_LOG_ERROR("misc", "Could not initialize GameObjectAI");
+        FMT_LOG_ERROR("misc", "Could not initialize GameObjectAI");
 
     if (m_despawnDelay)
     {
@@ -487,7 +489,7 @@ void GameObject::Update(uint32 diff)
 
                             G3D::Vector3 src(GetPositionX(), GetPositionY(), GetPositionZ());
 
-                            TC_LOG_DEBUG("misc", "Src: %s Dest: %s", src.toString().c_str(), pos.toString().c_str());
+                            FMT_LOG_DEBUG("misc", "Src: {} Dest: {}", src.toString(), pos.toString());
 
                             GetMap()->GameObjectRelocation(this, pos.x, pos.y, pos.z, GetOrientation());
                         }
@@ -649,7 +651,7 @@ void GameObject::Update(uint32 diff)
                     Unit* target = nullptr;
 
                     /// @todo this hack with search required until GO casting not implemented
-                    if (GetOwner())
+                    if (GetOwner() && goInfo->trap.type != 0)
                     {
                         // Hunter trap: Search units which are unfriendly to the trap's owner
                         Trinity::NearestAttackableNoTotemUnitInObjectRangeCheck checker(this, radius);
@@ -659,11 +661,17 @@ void GameObject::Update(uint32 diff)
                     else
                     {
                         // Environmental trap: Any player
-                        Player* player = nullptr;
+                        std::vector<Player*> _players;
                         Trinity::AnyPlayerInObjectRangeCheck checker(this, radius);
-                        Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
+                        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, _players, checker);
                         Cell::VisitWorldObjects(this, searcher, radius);
-                        target = player;
+                        for (auto const& pointer : _players)
+                        {
+                            if (pointer->IsSpectator())
+                                continue;
+                            target = pointer;
+                        }
+                        _players.clear();
                     }
 
                     if (target)
@@ -974,7 +982,7 @@ void GameObject::SaveToDB()
     GameObjectData const* data = sObjectMgr->GetGameObjectData(m_spawnId);
     if (!data)
     {
-        TC_LOG_ERROR("misc", "GameObject::SaveToDB failed, cannot get gameobject data!");
+        FMT_LOG_ERROR("misc", "GameObject::SaveToDB failed, cannot get gameobject data!");
         return;
     }
 
@@ -1046,7 +1054,7 @@ bool GameObject::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap
 
     if (!data)
     {
-        TC_LOG_ERROR("sql.sql", "Gameobject (GUID: %u) not found in table `gameobject`, can't load. ", spawnId);
+        FMT_LOG_ERROR("sql.sql", "Gameobject (GUID: {}) not found in table `gameobject`, can't load. ", spawnId);
         return false;
     }
 
@@ -1090,7 +1098,7 @@ bool GameObject::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap
     {
         if (!m_respawnCompatibilityMode)
         {
-            TC_LOG_WARN("sql.sql", "GameObject %u (SpawnID %u) is not spawned by default, but tries to use a non-hack spawn system. This will not work. Defaulting to compatibility mode.", entry, spawnId);
+            FMT_LOG_WARN("sql.sql", "GameObject {} (SpawnID {}) is not spawned by default, but tries to use a non-hack spawn system. This will not work. Defaulting to compatibility mode.", entry, spawnId);
             m_respawnCompatibilityMode = true;
         }
 
@@ -1439,7 +1447,7 @@ void GameObject::ActivateObject(GameObjectActions action, WorldObject* spellCast
     switch (action)
     {
         case GameObjectActions::None:
-            TC_LOG_FATAL("spell", "Spell %d has action type NONE in effect %d", spellId, effectIndex);
+            FMT_LOG_FATAL("spell", "Spell {} has action type NONE in effect {}", spellId, effectIndex);
             break;
         case GameObjectActions::AnimateCustom0:
         case GameObjectActions::AnimateCustom1:
@@ -1511,7 +1519,7 @@ void GameObject::ActivateObject(GameObjectActions action, WorldObject* spellCast
                 artKitValue = templateAddon->artKits[artKitIndex];
 
             if (artKitValue == 0)
-                TC_LOG_ERROR("sql.sql", "GameObject %d hit by spell %d needs `artkit%d` in `gameobject_template_addon`", GetEntry(), spellId, artKitIndex);
+                FMT_LOG_ERROR("sql.sql", "GameObject {} hit by spell {} needs `artkit{}` in `gameobject_template_addon`", GetEntry(), spellId, artKitIndex);
             else
                 SetGoArtKit(artKitValue);
 
@@ -1521,7 +1529,7 @@ void GameObject::ActivateObject(GameObjectActions action, WorldObject* spellCast
             // No use cases, implementation unknown
             break;
         default:
-            TC_LOG_ERROR("spell", "Spell %d has unhandled action %d in effect %d", spellId, int32(action), effectIndex);
+            FMT_LOG_ERROR("spell", "Spell {} has unhandled action {} in effect {}", spellId, int32(action), effectIndex);
             break;
     }
 }
@@ -1595,6 +1603,10 @@ void GameObject::Use(Unit* user)
     {
         case GAMEOBJECT_TYPE_DOOR:                          //0
         case GAMEOBJECT_TYPE_BUTTON:                        //1
+            // ArenaSpectator
+            if (user && user->ToPlayer() && user->ToPlayer()->IsSpectator())
+                return;
+            // ArenaSpectator end
             //doors/buttons never really despawn, only reset to default state/flags
             UseDoorOrButton(0, false, user);
             return;
@@ -1612,6 +1624,21 @@ void GameObject::Use(Unit* user)
         case GAMEOBJECT_TYPE_TRAP:                          //6
         {
             GameObjectTemplate const* goInfo = GetGOInfo();
+
+            // ArenaSpectator
+            if (user && user->ToPlayer() && user->ToPlayer()->IsSpectator())
+                return;
+            // ArenaSpectator end
+
+            if (user->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (user->ToPlayer()->HasAuraType(SPELL_AURA_MOD_STEALTH) || user->ToPlayer()->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
+                {
+                    user->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
+                    user->RemoveAurasByType(SPELL_AURA_MOD_INVISIBILITY);
+                }
+            }
+
             if (goInfo->trap.spellId)
                 CastSpell(user, goInfo->trap.spellId);
 
@@ -1712,6 +1739,15 @@ void GameObject::Use(Unit* user)
 
             if (Player* player = user->ToPlayer())
             {
+                if (player->GetMap() != GetMap())
+                    break;
+
+                if (!player->GetMap()->IsDungeon() && player->GetAreaId() != GetAreaId())
+                    break;
+
+                if (!IsEmptyTempSummonsList())
+                    break;
+
                 if (info->goober.pageId)                    // show page...
                 {
                     WorldPacket data(SMSG_GAMEOBJECT_PAGETEXT, 8);
@@ -1726,7 +1762,7 @@ void GameObject::Use(Unit* user)
 
                 if (info->goober.eventId)
                 {
-                    TC_LOG_DEBUG("maps.script", "Goober ScriptStart id %u for GO entry %u (GUID %u).", info->goober.eventId, GetEntry(), GetSpawnId());
+                    FMT_LOG_DEBUG("maps.script", "Goober ScriptStart id {} for GO entry {} (GUID {}).", info->goober.eventId, GetEntry(), GetSpawnId());
                     GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
                     EventInform(info->goober.eventId, user);
                 }
@@ -1815,7 +1851,7 @@ void GameObject::Use(Unit* user)
 
                     //provide error, no fishable zone or area should be 0
                     if (!zone_skill)
-                        TC_LOG_ERROR("sql.sql", "Fishable areaId %u are not properly defined in `skill_fishing_base_level`.", subzone);
+                        FMT_LOG_ERROR("sql.sql", "Fishable areaId {} are not properly defined in `skill_fishing_base_level`.", subzone);
 
                     int32 skill = player->GetSkillValue(SKILL_FISHING);
 
@@ -1831,7 +1867,7 @@ void GameObject::Use(Unit* user)
 
                     int32 roll = irand(1, 100);
 
-                    TC_LOG_DEBUG("misc", "Fishing check (skill: %i zone min skill: %i chance %i roll: %i", skill, zone_skill, chance, roll);
+                    FMT_LOG_DEBUG("misc", "Fishing check (skill: {} zone min skill: {} chance {} roll: {}", skill, zone_skill, chance, roll);
 
                     player->UpdateFishingSkill();
 
@@ -2100,22 +2136,7 @@ void GameObject::Use(Unit* user)
                 // 179786 - Warsong Flag
                 // EotS:
                 // 184142 - Netherstorm Flag
-                GameObjectTemplate const* info = GetGOInfo();
-                if (info)
-                {
-                    switch (info->entry)
-                    {
-                        case 179785:                        // Silverwing Flag
-                        case 179786:                        // Warsong Flag
-                            if (bg->GetTypeID(true) == BATTLEGROUND_WS)
-                                bg->EventPlayerClickedOnFlag(player, this);
-                            break;
-                        case 184142:                        // Netherstorm Flag
-                            if (bg->GetTypeID(true) == BATTLEGROUND_EY)
-                                bg->EventPlayerClickedOnFlag(player, this);
-                            break;
-                    }
-                }
+                bg->EventPlayerClickedOnFlag(player, this);
                 //this cause to call return, all flags must be deleted here!!
                 spellId = 0;
                 Delete();
@@ -2144,8 +2165,8 @@ void GameObject::Use(Unit* user)
         }
         default:
             if (GetGoType() >= MAX_GAMEOBJECT_TYPE)
-                TC_LOG_ERROR("misc", "GameObject::Use(): unit (%s, name: %s) tries to use object (%s, name: %s) of unknown type (%u)",
-                    user->GetGUID().ToString().c_str(), user->GetName().c_str(), GetGUID().ToString().c_str(), GetGOInfo()->name.c_str(), GetGoType());
+                FMT_LOG_ERROR("misc", "GameObject::Use(): unit ({}, name: {}) tries to use object ({}, name: {}) of unknown type ({})",
+                    user->GetGUID().ToString(), user->GetName(), GetGUID().ToString(), GetGOInfo()->name, GetGoType());
             break;
     }
 
@@ -2155,9 +2176,9 @@ void GameObject::Use(Unit* user)
     if (!sSpellMgr->GetSpellInfo(spellId))
     {
         if (user->GetTypeId() != TYPEID_PLAYER || !sOutdoorPvPMgr->HandleCustomSpell(user->ToPlayer(), spellId, this))
-            TC_LOG_ERROR("misc", "WORLD: unknown spell id %u at use action for gameobject (Entry: %u GoType: %u)", spellId, GetEntry(), GetGoType());
+            FMT_LOG_ERROR("misc", "WORLD: unknown spell id {} at use action for gameobject (Entry: {} GoType: {})", spellId, GetEntry(), GetGoType());
         else
-            TC_LOG_DEBUG("outdoorpvp", "WORLD: %u non-dbc spell was handled by OutdoorPvP", spellId);
+            FMT_LOG_DEBUG("outdoorpvp", "WORLD: {} non-dbc spell was handled by OutdoorPvP", spellId);
         return;
     }
 
@@ -2180,7 +2201,7 @@ void GameObject::SendCustomAnim(uint32 anim)
 
 bool GameObject::IsInRange(float x, float y, float z, float radius) const
 {
-    GameObjectDisplayInfoEntry const* info = sGameObjectDisplayInfoStore.LookupEntry(m_goInfo->displayId);
+    GameObjectDisplayInfoDBC const* info = sDBCStoresMgr->GetGameObjectDisplayInfoDBC(m_goInfo->displayId);
     if (!info)
         return IsWithinDist3d(x, y, z, radius);
 
@@ -2373,7 +2394,7 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, WorldOb
             SetFlag(GO_FLAG_DAMAGED);
 
             uint32 modelId = m_goInfo->displayId;
-            if (DestructibleModelDataEntry const* modelData = sDestructibleModelDataStore.LookupEntry(m_goInfo->building.destructibleData))
+            if (DestructibleModelDataDBC const* modelData = sDBCStoresMgr->GetDestructibleModelDataDBC(m_goInfo->building.destructibleData))
                 if (modelData->State1Wmo)
                     modelId = modelData->State1Wmo;
             SetDisplayId(modelId);
@@ -2402,7 +2423,7 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, WorldOb
             SetFlag(GO_FLAG_DESTROYED);
 
             uint32 modelId = m_goInfo->displayId;
-            if (DestructibleModelDataEntry const* modelData = sDestructibleModelDataStore.LookupEntry(m_goInfo->building.destructibleData))
+            if (DestructibleModelDataDBC const* modelData = sDBCStoresMgr->GetDestructibleModelDataDBC(m_goInfo->building.destructibleData))
                 if (modelData->State2Wmo)
                     modelId = modelData->State2Wmo;
             SetDisplayId(modelId);
@@ -2421,7 +2442,7 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, WorldOb
             RemoveFlag(GO_FLAG_DAMAGED | GO_FLAG_DESTROYED);
 
             uint32 modelId = m_goInfo->displayId;
-            if (DestructibleModelDataEntry const* modelData = sDestructibleModelDataStore.LookupEntry(m_goInfo->building.destructibleData))
+            if (DestructibleModelDataDBC const* modelData = sDBCStoresMgr->GetDestructibleModelDataDBC(m_goInfo->building.destructibleData))
                 if (modelData->State3Wmo)
                     modelId = modelData->State3Wmo;
             SetDisplayId(modelId);
@@ -2773,10 +2794,7 @@ void GameObject::CreateModel()
 
 std::string GameObject::GetDebugInfo() const
 {
-    std::stringstream sstr;
-    sstr << WorldObject::GetDebugInfo() << "\n"
-        << "SpawnId: " << GetSpawnId() << " GoState: " << std::to_string(GetGoState()) << " ScriptId: " << GetScriptId() << " AIName: " << GetAIName();
-    return sstr.str();
+    return fmt::format("{}\nSpawnId: {} GoState: {} ScriptId: {} AIName: {}", WorldObject::GetDebugInfo(), GetSpawnId(), std::to_string(GetGoState()), GetScriptId(), GetAIName());
 }
 
 bool GameObject::IsAtInteractDistance(Player const* player, SpellInfo const* spell) const
@@ -2788,7 +2806,7 @@ bool GameObject::IsAtInteractDistance(Player const* player, SpellInfo const* spe
         if (GetGoType() == GAMEOBJECT_TYPE_SPELL_FOCUS)
             return maxRange * maxRange >= GetExactDistSq(player);
 
-        if (sGameObjectDisplayInfoStore.LookupEntry(GetGOInfo()->displayId))
+        if (sDBCStoresMgr->GetGameObjectDisplayInfoDBC(GetGOInfo()->displayId))
             return IsAtInteractDistance(*player, maxRange);
     }
 
@@ -2797,7 +2815,7 @@ bool GameObject::IsAtInteractDistance(Player const* player, SpellInfo const* spe
 
 bool GameObject::IsAtInteractDistance(Position const& pos, float radius) const
 {
-    if (GameObjectDisplayInfoEntry const* displayInfo = sGameObjectDisplayInfoStore.LookupEntry(GetGOInfo()->displayId))
+    if (GameObjectDisplayInfoDBC const* displayInfo = sDBCStoresMgr->GetGameObjectDisplayInfoDBC(GetGOInfo()->displayId))
     {
         float scale = GetObjectScale();
 
@@ -2833,7 +2851,7 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
     if (!lockId)
         return nullptr;
 
-    LockEntry const* lock = sLockStore.LookupEntry(lockId);
+    LockDBC const* lock = sDBCStoresMgr->GetLockDBC(lockId);
     if (!lock)
         return nullptr;
 

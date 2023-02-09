@@ -41,7 +41,7 @@ Bag::~Bag()
         {
             if (item->IsInWorld())
             {
-                TC_LOG_FATAL("entities.player.items", "Item %u (slot %u, bag slot %u) in bag %u (slot %u, bag slot %u, m_bagslot %u) is to be deleted but is still in world.",
+                FMT_LOG_FATAL("entities.player.items", "Item {} (slot {}, bag slot {}) in bag {} (slot {}, bag slot {}, m_bagslot {}) is to be deleted but is still in world.",
                     item->GetEntry(), (uint32)item->GetSlot(), (uint32)item->GetBagSlot(),
                     GetEntry(), (uint32)GetSlot(), (uint32)GetBagSlot(), (uint32)i);
                 item->RemoveFromWorld();
@@ -247,7 +247,5 @@ Item* Bag::GetItemByPos(uint8 slot) const
 
 std::string Bag::GetDebugInfo() const
 {
-    std::stringstream sstr;
-    sstr << Item::GetDebugInfo();
-    return sstr.str();
+    return Item::GetDebugInfo();
 }

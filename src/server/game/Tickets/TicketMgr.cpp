@@ -325,7 +325,7 @@ void TicketMgr::LoadTickets()
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 GM tickets. DB table `gm_ticket` is empty!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 GM tickets. DB table `gm_ticket` is empty!");
 
         return;
     }
@@ -352,7 +352,7 @@ void TicketMgr::LoadTickets()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u GM tickets in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} GM tickets in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 
 }
 
@@ -365,7 +365,7 @@ void TicketMgr::LoadSurveys()
     if (QueryResult result = CharacterDatabase.Query("SELECT MAX(surveyId) FROM gm_survey"))
         _lastSurveyId = (*result)[0].GetUInt32();
 
-    TC_LOG_INFO("server.loading", ">> Loaded GM Survey count from database in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded GM Survey count from database in {} ms", GetMSTimeDiffToNow(oldMSTime));
 
 }
 
@@ -424,7 +424,7 @@ void TicketMgr::ShowList(ChatHandler& handler, bool onlineOnly) const
     for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
         if (!itr->second->IsClosed() && !itr->second->IsCompleted())
             if (!onlineOnly || itr->second->GetPlayer())
-                handler.SendSysMessage(itr->second->FormatMessageString(handler).c_str());
+                handler.SendSysMessage(itr->second->FormatMessageString(handler));
 }
 
 void TicketMgr::ShowClosedList(ChatHandler& handler) const
@@ -432,7 +432,7 @@ void TicketMgr::ShowClosedList(ChatHandler& handler) const
     handler.SendSysMessage(LANG_COMMAND_TICKETSHOWCLOSEDLIST);
     for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
         if (itr->second->IsClosed())
-            handler.SendSysMessage(itr->second->FormatMessageString(handler).c_str());
+            handler.SendSysMessage(itr->second->FormatMessageString(handler));
 }
 
 void TicketMgr::ShowEscalatedList(ChatHandler& handler) const
@@ -440,7 +440,7 @@ void TicketMgr::ShowEscalatedList(ChatHandler& handler) const
     handler.SendSysMessage(LANG_COMMAND_TICKETSHOWESCALATEDLIST);
     for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
         if (!itr->second->IsClosed() && itr->second->GetEscalatedStatus() == TICKET_IN_ESCALATION_QUEUE)
-            handler.SendSysMessage(itr->second->FormatMessageString(handler).c_str());
+            handler.SendSysMessage(itr->second->FormatMessageString(handler));
 }
 
 void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const

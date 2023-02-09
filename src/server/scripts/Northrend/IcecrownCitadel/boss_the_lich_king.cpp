@@ -18,7 +18,7 @@
 #include "ScriptMgr.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GridNotifiersImpl.h"
 #include "icecrown_citadel.h"
 #include "InstanceScript.h"
@@ -2816,7 +2816,7 @@ class spell_the_lich_king_play_movie : public SpellScript
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
-        if (!sMovieStore.LookupEntry(MOVIE_FALL_OF_THE_LICH_KING))
+        if (!sDBCStoresMgr->GetMovieDBC(MOVIE_FALL_OF_THE_LICH_KING))
             return false;
         return true;
     }

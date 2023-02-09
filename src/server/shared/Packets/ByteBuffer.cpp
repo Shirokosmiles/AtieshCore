@@ -32,30 +32,18 @@ ByteBuffer::ByteBuffer(MessageBuffer&& buffer) : _rpos(0), _wpos(0), _storage(bu
 ByteBufferPositionException::ByteBufferPositionException(bool add, size_t pos,
                                                          size_t size, size_t valueSize)
 {
-    std::ostringstream ss;
-
-    ss << "Attempted to " << (add ? "put" : "get") << " value with size: "
-       << valueSize << " in ByteBuffer (pos: " << pos << " size: " << size
-       << ")";
-
-    message().assign(ss.str());
+    message().assign(fmt::format("Attempted to {} value with size: {} in ByteBuffer (pos: {} size: {})", add ? "put" : "get", valueSize, pos, size));
 }
 
 ByteBufferSourceException::ByteBufferSourceException(size_t pos, size_t size,
                                                      size_t valueSize)
 {
-    std::ostringstream ss;
-
-    ss << "Attempted to put a "
-       << (valueSize > 0 ? "NULL-pointer" : "zero-sized value")
-       << " in ByteBuffer (pos: " << pos << " size: " << size << ")";
-
-    message().assign(ss.str());
+    message().assign(fmt::format("Attempted to put a {} in ByteBuffer (pos: {} size: {})", (valueSize > 0 ? "NULL-pointer" : "zero-sized value"), pos, size));
 }
 
 ByteBufferInvalidValueException::ByteBufferInvalidValueException(char const* type, char const* value)
 {
-    message().assign(Trinity::StringFormat("Invalid %s value (%s) found in ByteBuffer", type, value));
+    message().assign(Trinity::StringFormat("Invalid {} value ({}) found in ByteBuffer", type, value));
 }
 
 ByteBuffer& ByteBuffer::operator>>(float& value)
@@ -106,6 +94,8 @@ uint32 ByteBuffer::ReadPackedTime()
 
 void ByteBuffer::append(uint8 const* src, size_t cnt)
 {
+    if (!cnt)
+        return;
     ASSERT(src, "Attempted to put a NULL-pointer in ByteBuffer (pos: " SZFMTD " size: " SZFMTD ")", _wpos, size());
     ASSERT(cnt, "Attempted to put a zero-sized value in ByteBuffer (pos: " SZFMTD " size: " SZFMTD ")", _wpos, size());
     ASSERT(size() < 10000000);
@@ -156,7 +146,7 @@ void ByteBuffer::print_storage() const
         o << read<uint8>(i) << " - ";
     o << " ";
 
-    TC_LOG_TRACE("network", "%s", o.str().c_str());
+    FMT_LOG_TRACE("network", "{}", o.str());
 }
 
 void ByteBuffer::textlike() const
@@ -173,7 +163,7 @@ void ByteBuffer::textlike() const
         o << buf;
     }
     o << " ";
-    TC_LOG_TRACE("network", "%s", o.str().c_str());
+    FMT_LOG_TRACE("network", "{}", o.str());
 }
 
 void ByteBuffer::hexlike() const
@@ -205,5 +195,5 @@ void ByteBuffer::hexlike() const
         o << buf;
     }
     o << " ";
-    TC_LOG_TRACE("network", "%s", o.str().c_str());
+    FMT_LOG_TRACE("network", "{}", o.str());
 }

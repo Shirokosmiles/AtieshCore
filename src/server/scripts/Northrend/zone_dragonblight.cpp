@@ -19,6 +19,7 @@
 #include "CombatAI.h"
 #include "CreatureAIImpl.h"
 #include "MotionMaster.h"
+#include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -238,7 +239,7 @@ struct npc_commander_eligor_dawnbringer : public ScriptedAI
 
         for (uint8 ii = 0; ii < 3; ++ii)
         {
-            std::list<Creature*> creatureList;
+            std::vector<Creature*> creatureList;
             GetCreatureListWithEntryInGrid(creatureList, me, AudienceMobs[ii], 15.0f);
             for (Creature* creature : creatureList)
             {
@@ -737,6 +738,328 @@ class spell_dragonblight_high_executor_branding_iron : public SpellScript
     }
 };
 
+Position const SkyCaptainCryOfLight1Point = { 3720.85f, -755.389f, 239.45f, 0.0f };
+Position const SkyCaptainCryOfLight2Point = { 3713.73f, -1289.81f, 155.37f, 0.0f };
+Position const SkyCaptainCryOfLight3Point = { 3828.08f, -1401.45f, 183.12f, 0.0f };
+
+enum SkyCaptainCryOfLight
+{
+    EVENT_FLY_AT_NPC              = 1,
+    EVENT_FLY_AT_2                = 2,
+    EVENT_FLY_AT_3                = 3,
+    EVENT_DROPPLAYER              = 4,
+    EVENT_RETURN_RESPAWN          = 5,
+
+    POINT_1              = 1,
+    POINT_2              = 2,
+    POINT_3              = 3
+};
+
+class npc_sky_captain_cryoflight : public CreatureScript
+{
+public: npc_sky_captain_cryoflight() : CreatureScript("npc_sky_captain_cryoflight") {}
+
+        struct npc_sky_captain_cryoflightAI : public ScriptedAI
+        {
+            npc_sky_captain_cryoflightAI(Creature* creature) : ScriptedAI(creature)
+            {
+                Initialize();
+            }
+
+            void Initialize()
+            {
+                _events.Reset();
+                _player = nullptr;
+            }
+
+            void PassengerBoarded(Unit* passenger, int8 /*seatId*/, bool apply) override
+            {
+                if (Player* player = passenger->ToPlayer())
+                {
+                    if (me->GetVehicleKit())
+                    {
+                        Unit* npcpassenger = me->GetVehicleKit()->GetPassenger(1);
+                        if (apply)
+                        {
+                            if (npcpassenger)
+                                if (Creature* creature = npcpassenger->ToCreature())
+                                    creature->AI()->Talk(0, player);
+                            //Talk(27272); // Hang on to your hat, $n! To Scalawag we go!
+                            _events.ScheduleEvent(EVENT_FLY_AT_NPC, 1s);
+                            _player = player;
+                        }
+                        else
+                        {
+                            if (npcpassenger)
+                                if (Creature* creature = npcpassenger->ToCreature())
+                                    creature->AI()->Talk(1, player);
+                            //Talk(26924); // This is your stop, pal. Safe landing!
+                            _events.ScheduleEvent(EVENT_RETURN_RESPAWN, 5s);
+                        }
+                    }
+                }
+            }
+
+            void MovementInform(uint32 movementType, uint32 pointId) override
+            {
+                if (movementType == POINT_MOTION_TYPE)
+                {
+                    if (pointId == POINT_3)
+                        _events.ScheduleEvent(EVENT_DROPPLAYER, 100ms);
+                    else if (pointId == POINT_1)
+                        _events.ScheduleEvent(EVENT_FLY_AT_2, 100ms);
+                    else if (pointId == POINT_2)
+                        _events.ScheduleEvent(EVENT_FLY_AT_3, 100ms);
+                }
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (!me || !me->IsAlive())
+                    return;
+
+                _events.Update(diff);
+
+                while (uint32 eventId = _events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                    case EVENT_DROPPLAYER:
+                    {
+                        if (_player)
+                        {
+                            _player->ExitVehicle();
+                            me->CastSpell(_player, 45472, true); //parachute
+                        }
+
+                        _events.ScheduleEvent(EVENT_FLY_AT_2, 100ms);
+                        break;
+                    }
+                    case EVENT_FLY_AT_NPC:
+                    {
+                        std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+                        {
+                            init.MoveTo(SkyCaptainCryOfLight1Point.GetPositionX(), SkyCaptainCryOfLight1Point.GetPositionY(), SkyCaptainCryOfLight1Point.GetPositionZ(), false);
+                            init.SetFly();
+                        };
+                        me->GetMotionMaster()->LaunchMoveSpline(std::move(initializer), POINT_1, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                        break;
+                    }
+                    case EVENT_FLY_AT_2:
+                    {
+                        std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+                        {
+                            init.MoveTo(SkyCaptainCryOfLight2Point.GetPositionX(), SkyCaptainCryOfLight2Point.GetPositionY(), SkyCaptainCryOfLight2Point.GetPositionZ(), false);
+                            init.SetFly();
+                        };
+                        me->GetMotionMaster()->LaunchMoveSpline(std::move(initializer), POINT_2, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                        break;
+                    }
+                    case EVENT_FLY_AT_3:
+                    {
+                        std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
+                        {
+                            init.MoveTo(SkyCaptainCryOfLight3Point.GetPositionX(), SkyCaptainCryOfLight3Point.GetPositionY(), SkyCaptainCryOfLight3Point.GetPositionZ(), false);
+                            init.SetFly();
+                        };
+                        me->GetMotionMaster()->LaunchMoveSpline(std::move(initializer), POINT_3, MOTION_PRIORITY_NORMAL, POINT_MOTION_TYPE);
+                        break;
+                    }
+                    case EVENT_RETURN_RESPAWN:
+                    {
+                        me->SetVisible(false);
+                        if (Unit* npcpassenger = me->GetVehicleKit()->GetPassenger(0))
+                            npcpassenger->SetVisible(false);
+                        me->Respawn(true);
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                }
+            }
+        private:
+            EventMap _events;
+            Player* _player;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return new npc_sky_captain_cryoflightAI(creature);
+        }
+};
+
+/*#####
+# npc_destructive_ward_kill, quest No Place to Run 12261
+#####*/
+
+enum DestructiveWard
+{
+    SPELL_SUMMON_SKELETON             = 48715,
+    SPELL_SUMMON_SMOLDERING_CONSTRUCT = 48718,
+    SPELL_DESTRUCTIVE_PULSE           = 48733,
+    SPELL_DESTRUCTIVE_BARRAGE         = 48734,
+    SPELL_POWERUP                     = 48735,
+
+    SPELL_KILL_REWARD                 = 52409,
+
+    EVENT_SUMMON_SKELETON               = 1,
+    EVENT_SUMMON_SKELETON_2             = 2,
+    EVENT_POWERUP_1                     = 3,
+    EVENT_POWERUP_2                     = 4,
+    EVENT_SUMMON_SMOLDERING_CONSTRUCT   = 5,
+    EVENT_SUMMON_SMOLDERING_CONSTRUCT_2 = 6,
+    EVENT_SUMMON_DOUBLE_SPAWN           = 7,
+    EVENT_SUMMON_LAST_SKELET            = 8,
+    EVENT_FINAL_POWERUP                 = 9,
+    EVENT_DESTRUCTIVE_BARRAGE           = 10,
+    EVENT_DESTRUCTIVE_BARRAGE_2         = 11,
+    EVENT_FDESPAWN                      = 12
+};
+
+class npc_destructive_ward_kill : public CreatureScript
+{
+public: npc_destructive_ward_kill() : CreatureScript("npc_destructive_ward_kill") {}
+
+    struct npc_destructive_ward_killAI : public ScriptedAI
+    {
+        npc_destructive_ward_killAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _events.Reset();
+            _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 2s, 3s);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!me || !me->IsAlive())
+                return;
+
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SUMMON_SKELETON:
+                    DoCastSelf(SPELL_SUMMON_SKELETON);
+                    _events.ScheduleEvent(EVENT_SUMMON_SKELETON_2, 15s);
+                    break;
+                case EVENT_SUMMON_SKELETON_2:
+                    DoCastSelf(SPELL_SUMMON_SKELETON);
+                    _events.ScheduleEvent(EVENT_POWERUP_1, 1s);
+                    break;
+                case EVENT_POWERUP_1:
+                    DoCastSelf(SPELL_POWERUP);
+                    Talk(0);
+                    DoCastSelf(SPELL_DESTRUCTIVE_PULSE);
+                    _events.ScheduleEvent(EVENT_SUMMON_SMOLDERING_CONSTRUCT, 15s);
+                    break;
+                case EVENT_SUMMON_SMOLDERING_CONSTRUCT:
+                    DoCastSelf(48718);
+                    _events.ScheduleEvent(EVENT_SUMMON_SMOLDERING_CONSTRUCT_2, 15s);
+                    break;
+                case EVENT_SUMMON_SMOLDERING_CONSTRUCT_2:
+                    DoCastSelf(48718);
+                    _events.ScheduleEvent(EVENT_POWERUP_2, 1s);
+                    break;
+                case EVENT_POWERUP_2:
+                    DoCastSelf(SPELL_POWERUP);
+                    Talk(0);
+                    DoCastSelf(SPELL_DESTRUCTIVE_PULSE);
+                    _events.ScheduleEvent(EVENT_SUMMON_DOUBLE_SPAWN, 1s);
+                    break;
+                case EVENT_SUMMON_DOUBLE_SPAWN:
+                    DoCastSelf(SPELL_SUMMON_SKELETON);
+                    DoCastSelf(SPELL_SUMMON_SMOLDERING_CONSTRUCT);
+                    _events.ScheduleEvent(EVENT_SUMMON_LAST_SKELET, 3s);
+                    break;
+                case EVENT_SUMMON_LAST_SKELET:
+                    DoCastSelf(SPELL_SUMMON_SKELETON);
+                    _events.ScheduleEvent(EVENT_FINAL_POWERUP, 2s);
+                    break;
+                case EVENT_FINAL_POWERUP:
+                    DoCastSelf(SPELL_POWERUP);
+                    Talk(1);
+                    DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
+                    _events.ScheduleEvent(EVENT_DESTRUCTIVE_BARRAGE, 1s);
+                    break;
+                case EVENT_DESTRUCTIVE_BARRAGE:
+                    DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
+                    _events.ScheduleEvent(EVENT_DESTRUCTIVE_BARRAGE_2, 1s);
+                    break;
+                case EVENT_DESTRUCTIVE_BARRAGE_2:
+                    DoCastSelf(SPELL_DESTRUCTIVE_BARRAGE);
+                    if (Unit* summoner = me->GetCharmerOrOwner())
+                        me->CastSpell(summoner, SPELL_KILL_REWARD);
+                    _events.ScheduleEvent(EVENT_FDESPAWN, 1s);
+                    break;
+                case EVENT_FDESPAWN:
+                    me->DespawnOrUnsummon();
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_destructive_ward_killAI(creature);
+    }
+};
+
+/*#####
+# npc_body_magehunter, quest Rifle the Bodies 12000
+#####*/
+
+enum magehunterbody
+{
+    SPELL_RIFLE_THE_BODIES           = 61832,
+    SPELL_RIFLE_THE_BODIES_LOOT      = 47096,
+    ITEM_MAIL_MOONREST_GARDENS_PLANS = 35783
+};
+
+class npc_body_magehunter : public CreatureScript
+{
+public: npc_body_magehunter() : CreatureScript("npc_body_magehunter") {}
+
+    struct npc_body_magehunterAI : public ScriptedAI
+    {
+        npc_body_magehunterAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override
+        {
+            if (!caster->ToPlayer())
+                return;
+
+            Player* player = caster->ToPlayer();
+
+            if (spellInfo->Id == SPELL_RIFLE_THE_BODIES)
+            {
+                player->CastSpell(player, SPELL_RIFLE_THE_BODIES_LOOT);
+                /*uint32 rand = urand(0, 10);
+                if (rand == 7)
+                    player->AddItem(ITEM_MAIL_MOONREST_GARDENS_PLANS, 1);*/
+            }
+
+            me->DespawnOrUnsummon();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_body_magehunterAI(creature);
+    }
+};
+
 /*######
 ## Quest 12260: The Perfect Dissemblance
 ######*/
@@ -985,6 +1308,11 @@ void AddSC_dragonblight()
     RegisterSpellScript(spell_dragonblight_moti_hourglass_cast_see_invis_on_master);
     RegisterSpellScript(spell_dragonblight_call_out_injured_soldier);
     RegisterSpellScript(spell_dragonblight_high_executor_branding_iron);
+
+    new npc_sky_captain_cryoflight();
+    new npc_destructive_ward_kill();
+    new npc_body_magehunter();
+
     RegisterSpellScript(spell_dragonblight_cancel_banshees_magic_mirror);
     RegisterSpellScript(spell_dragonblight_scarlet_raven_priest_image_master);
     RegisterSpellScript(spell_dragonblight_cancel_scarlet_raven_priest_image);

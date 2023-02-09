@@ -18,6 +18,7 @@
 #include "UnitAI.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
+#include "DBCStructure.h"
 #include "MotionMaster.h"
 #include "Player.h"
 #include "Spell.h"
@@ -60,7 +61,7 @@ void UnitAI::AttackStartCaster(Unit* victim, float dist)
 
 void UnitAI::DoMeleeAttackIfReady()
 {
-    if (me->HasUnitState(UNIT_STATE_CASTING))
+    if (me->HasUnitState(UNIT_STATE_CASTING) && !me->IsMovementPreventedByCasting())
         return;
 
     Unit* victim = me->GetVictim();
@@ -84,7 +85,7 @@ void UnitAI::DoMeleeAttackIfReady()
 
 bool UnitAI::DoSpellAttackIfReady(uint32 spell)
 {
-    if (me->HasUnitState(UNIT_STATE_CASTING) || !me->isAttackReady())
+    if (me->HasUnitState(UNIT_STATE_CASTING) || !me->isAttackReady() || me->IsJumping())
         return true;
 
     if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))

@@ -26,7 +26,7 @@
 #include "Pet.h"
 #include "Player.h"
 
-TempSummon::TempSummon(SummonPropertiesEntry const* properties, WorldObject* owner, bool isWorldObject) :
+TempSummon::TempSummon(SummonPropertiesDBC const* properties, WorldObject* owner, bool isWorldObject) :
 Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
 m_timer(0), m_lifetime(0), m_canFollowOwner(true), m_visibleBySummonerOnly(false)
 {
@@ -55,6 +55,8 @@ Creature* TempSummon::GetSummonerCreatureBase() const
 
 GameObject* TempSummon::GetSummonerGameObject() const
 {
+    if (m_summonerGOGUID)
+        return ObjectAccessor::GetGameObject(*this, m_summonerGOGUID);
     if (WorldObject* summoner = GetSummoner())
         return summoner->ToGameObject();
     return nullptr;
@@ -168,7 +170,7 @@ void TempSummon::Update(uint32 diff)
         }
         default:
             UnSummon();
-            TC_LOG_ERROR("entities.unit", "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
+            FMT_LOG_ERROR("entities.unit", "Temporary summoned creature (entry: {}) have unknown type {} of ", GetEntry(), m_type);
             break;
     }
 }
@@ -292,10 +294,38 @@ void TempSummon::RemoveFromWorld()
                 if (owner->m_SummonSlot[slot] == GetGUID())
                     owner->m_SummonSlot[slot].Clear();
 
+    if (m_summonerGOGUID)
+        if (GameObject* GO = GetSummonerGameObject())
+        {
+            GO->RemoveFromTempSummonsList(this);
+            //FMT_LOG_ERROR("server", "Unit TempSummon, summoned by GO {}, removed from world", GO->GetName());
+        }
     //if (GetOwnerGUID())
-    //    TC_LOG_ERROR("entities.unit", "Unit %u has owner guid when removed from world", GetEntry());
+    //    FMT_LOG_ERROR("entities.unit", "Unit {} has owner guid when removed from world", GetEntry());
 
     Creature::RemoveFromWorld();
+}
+
+void TempSummon::AddGOSummonerPointer(GameObject* GOsummoner)
+{
+    if (!GOsummoner)
+        return;
+
+    m_summonerGOGUID = GOsummoner->GetGUID();
+
+    GOsummoner->AddInTempSummonsList(this);
+}
+
+void TempSummon::Killed()
+{
+    if (m_summonerGOGUID)
+        if (GameObject* GO = GetSummonerGameObject())
+        {
+            GO->RemoveFromTempSummonsList(this);
+            //FMT_LOG_ERROR("server", "Unit TempSummon, summoned by GO {}, removed from world", GO->GetName());
+        }
+
+    m_summonerGOGUID = ObjectGuid::Empty;
 }
 
 std::string TempSummon::GetDebugInfo() const
@@ -308,7 +338,7 @@ std::string TempSummon::GetDebugInfo() const
     return sstr.str();
 }
 
-Minion::Minion(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject)
+Minion::Minion(SummonPropertiesDBC const* properties, Unit* owner, bool isWorldObject)
     : TempSummon(properties, owner, isWorldObject), m_owner(owner)
 {
     ASSERT(m_owner);
@@ -373,7 +403,7 @@ std::string Minion::GetDebugInfo() const
     return sstr.str();
 }
 
-Guardian::Guardian(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject) : Minion(properties, owner, isWorldObject)
+Guardian::Guardian(SummonPropertiesDBC const* properties, Unit* owner, bool isWorldObject) : Minion(properties, owner, isWorldObject)
 , m_bonusSpellDamage(0)
 {
     memset(m_statFromOwner, 0, sizeof(float)*MAX_STATS);
@@ -416,7 +446,7 @@ std::string Guardian::GetDebugInfo() const
     return sstr.str();
 }
 
-Puppet::Puppet(SummonPropertiesEntry const* properties, Unit* owner)
+Puppet::Puppet(SummonPropertiesDBC const* properties, Unit* owner)
     : Minion(properties, owner, false) //maybe true?
 {
     ASSERT(m_owner->GetTypeId() == TYPEID_PLAYER);

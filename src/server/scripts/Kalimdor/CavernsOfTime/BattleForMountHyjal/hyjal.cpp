@@ -104,7 +104,7 @@ class npc_jaina_proudmoore : public CreatureScript
                         break;
                     case GOSSIP_ACTION_INFO_DEF:
                         Debug = !Debug;
-                        TC_LOG_DEBUG("scripts", "HyjalAI - Debug mode has been toggled");
+                        FMT_LOG_DEBUG("scripts", "HyjalAI - Debug mode has been toggled");
                         break;
                 }
                 return true;
@@ -186,7 +186,7 @@ class npc_thrall : public CreatureScript
                         break;
                     case GOSSIP_ACTION_INFO_DEF:
                         Debug = !Debug;
-                        TC_LOG_DEBUG("scripts", "HyjalAI - Debug mode has been toggled");
+                        FMT_LOG_DEBUG("scripts", "HyjalAI - Debug mode has been toggled");
                         break;
                 }
                 return true;

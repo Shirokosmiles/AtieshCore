@@ -26,8 +26,8 @@
 #include "Timer.h"
 #include <map>
 
-class Battlefield;
 class Battleground;
+class SpecialEvent;
 class Creature;
 class InstanceSave;
 class Map;
@@ -37,7 +37,7 @@ class WorldObject;
 class WorldPacket;
 class WorldSession;
 
-struct MapEntry;
+struct MapDBC;
 
 #define MAXGROUPSIZE 5
 #define MAXRAIDSIZE 40
@@ -254,7 +254,8 @@ class TC_GAME_API Group
         void ConvertToRaid();
 
         void SetBattlegroundGroup(Battleground* bg);
-        void SetBattlefieldGroup(Battlefield* bf);
+        void SetBattlefieldGroup(bool toggle);
+        void SetSpecialEventGroup(SpecialEvent* bf);
         GroupJoinBattlegroundResult CanJoinBattlegroundQueue(Battleground const* bgOrTemplate, BattlegroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
 
         void ChangeMembersGroup(ObjectGuid guid, uint8 group);
@@ -325,7 +326,7 @@ class TC_GAME_API Group
         void UnbindInstance(uint32 mapid, uint8 difficulty, bool unload = false);
         InstanceGroupBind* GetBoundInstance(Player* player);
         InstanceGroupBind* GetBoundInstance(Map* aMap);
-        InstanceGroupBind* GetBoundInstance(MapEntry const* mapEntry);
+        InstanceGroupBind* GetBoundInstance(MapDBC const* mapEntry);
         InstanceGroupBind* GetBoundInstance(Difficulty difficulty, uint32 mapId);
         BoundInstancesMap& GetBoundInstances(Difficulty difficulty);
 
@@ -335,6 +336,7 @@ class TC_GAME_API Group
 
         // FG: evil hacks
         void BroadcastGroupUpdate(void);
+        void CalculateRolesAndAnnounce(int8& ppl, int8& lives, int8& tanks, int8 &healers, int8& damagers, uint32& gs);
 
     protected:
         bool _setMembersGroup(ObjectGuid guid, uint8 group);
@@ -356,7 +358,8 @@ class TC_GAME_API Group
         Difficulty          m_dungeonDifficulty;
         Difficulty          m_raidDifficulty;
         Battleground*       m_bgGroup;
-        Battlefield*        m_bfGroup;
+        bool                m_isBFGroup;
+        SpecialEvent*       m_seGroup;
         ObjectGuid          m_targetIcons[TARGETICONCOUNT];
         LootMethod          m_lootMethod;
         ItemQualities       m_lootThreshold;

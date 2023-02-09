@@ -17,7 +17,7 @@
 
 #include "Position.h"
 #include "ByteBuffer.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GridDefines.h"
 #include "Random.h"
 #include "World.h"
@@ -148,9 +148,7 @@ bool Position::HasInLine(Position const* pos, float objSize, float width) const
 
 std::string Position::ToString() const
 {
-    std::stringstream sstr;
-    sstr << "X: " << m_positionX << " Y: " << m_positionY << " Z: " << m_positionZ << " O: " << m_orientation;
-    return sstr.str();
+    return fmt::format("X: {} Y: {} Z: {} O: {}", m_positionX, m_positionY, m_positionZ, m_orientation);
 }
 
 float Position::NormalizeOrientation(float o)
@@ -224,7 +222,7 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::ConstStreamer<Position::Packed
 std::string WorldLocation::GetDebugInfo() const
 {
     std::stringstream sstr;
-    MapEntry const* mapEntry = sMapStore.LookupEntry(m_mapId);
+    MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(m_mapId);
     sstr << "MapID: " << m_mapId << " Map name: '" << (mapEntry ? mapEntry->MapName[sWorld->GetDefaultDbcLocale()] : "<not found>") <<"' " << Position::ToString();
     return sstr.str();
 }

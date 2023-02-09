@@ -26,7 +26,7 @@
 #include "Containers.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "LootMgr.h"
 #include "Map.h"
 #include "ObjectMgr.h"
@@ -790,6 +790,39 @@ class spell_item_defibrillate : public SpellScriptLoader
     private:
         uint8 _chance;
         uint32 _failSpell;
+};
+
+enum GoblinGumbo
+{
+    SPELL_GOBLIN_GUMBO_VISUAL = 42755
+};
+
+// 42760 - Goblin Gumbo
+class spell_item_goblin_gumbo : public AuraScript
+{
+    PrepareAuraScript(spell_item_goblin_gumbo);
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_GOBLIN_GUMBO_VISUAL });
+    }
+
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
+    {
+        amplitude = urandms(10, 45);
+    }
+
+    void Update(AuraEffect* effect)
+    {
+        effect->SetPeriodicTimer(urandms(10, 45));
+        if (Unit* owner = GetUnitOwner())
+            owner->CastSpell(owner, SPELL_GOBLIN_GUMBO_VISUAL, false);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_item_goblin_gumbo::CalcPeriodic, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_item_goblin_gumbo::Update, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
 };
 
 enum DesperateDefense
@@ -2237,13 +2270,16 @@ class spell_item_shadowmourne : public AuraScript
     {
         if (GetTarget()->HasAura(SPELL_SHADOWMOURNE_CHAOS_BANE_BUFF)) // cant collect shards while under effect of Chaos Bane buff
             return false;
+        if (GetTarget()->HasAuraType(SPELL_AURA_MOD_DISARM))          // cant collect shards while under disarm effect
+            return false;
         return eventInfo.GetProcTarget() && eventInfo.GetProcTarget()->IsAlive();
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_SHADOWMOURNE_SOUL_FRAGMENT, aurEff);
+        if (!GetTarget()->GetSpellHistory()->HasCooldown(SPELL_SHADOWMOURNE_SOUL_FRAGMENT))
+            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOWMOURNE_SOUL_FRAGMENT, aurEff);
 
         // this can't be handled in AuraScript of SoulFragments because we need to know victim
         if (Aura* soulFragments = GetTarget()->GetAura(SPELL_SHADOWMOURNE_SOUL_FRAGMENT))
@@ -2252,6 +2288,7 @@ class spell_item_shadowmourne : public AuraScript
             {
                 GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE, aurEff);
                 soulFragments->Remove();
+                GetTarget()->GetSpellHistory()->AddCooldown(SPELL_SHADOWMOURNE_SOUL_FRAGMENT, 0, std::chrono::seconds(20));
             }
         }
     }
@@ -2640,13 +2677,14 @@ class spell_item_gift_of_the_harvester : public SpellScript
 
     SpellCastResult CheckRequirement()
     {
-        std::list<Creature*> ghouls;
+        std::vector<Creature*> ghouls;
         GetCaster()->GetAllMinionsByEntry(ghouls, NPC_GHOUL);
         if (ghouls.size() >= MAX_GHOULS)
         {
             SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TOO_MANY_GHOULS);
             return SPELL_FAILED_CUSTOM_ERROR;
         }
+        ghouls.clear();
 
         return SPELL_CAST_OK;
     }
@@ -3117,7 +3155,7 @@ class spell_item_nitro_boosts : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         Unit* caster = GetCaster();
-        AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(caster->GetAreaId());
+        AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(caster->GetAreaId());
         bool success = true;
         if (areaEntry && areaEntry->IsFlyable() && !caster->GetMap()->IsDungeon())
             success = roll_chance_i(95); // nitro boosts can only fail in flying-enabled locations on 3.3.5
@@ -3557,8 +3595,8 @@ class spell_item_sunwell_neck : public SpellScriptLoader
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
                 return ValidateSpellInfo({ Aldors, Scryers }) &&
-                    sFactionStore.LookupEntry(FACTION_ALDOR) &&
-                    sFactionStore.LookupEntry(FACTION_SCRYERS);
+                    sDBCStoresMgr->GetFactionDBC(FACTION_ALDOR) &&
+                    sDBCStoresMgr->GetFactionDBC(FACTION_SCRYERS);
             }
 
             bool CheckProc(ProcEventInfo& eventInfo)
@@ -3604,7 +3642,7 @@ class spell_item_toy_train_set_pulse : public SpellScript
         if (Player* target = GetHitUnit()->ToPlayer())
         {
             target->HandleEmoteCommand(EMOTE_ONESHOT_TRAIN);
-            if (EmotesTextSoundEntry const* soundEntry = FindTextSoundEmoteFor(TEXT_EMOTE_TRAIN, target->GetRace(), target->GetNativeGender()))
+            if (EmotesTextSoundDBC const* soundEntry = sDBCStoresMgr->GetEmotesTextSoundDBCWithParam(TEXT_EMOTE_TRAIN, target->GetRace(), target->GetNativeGender()))
                 target->PlayDistanceSound(soundEntry->SoundID);
         }
     }
@@ -4318,6 +4356,7 @@ void AddSC_item_spell_scripts()
     new spell_item_defibrillate("spell_item_goblin_jumper_cables", 67, SPELL_GOBLIN_JUMPER_CABLES_FAIL);
     new spell_item_defibrillate("spell_item_goblin_jumper_cables_xl", 50, SPELL_GOBLIN_JUMPER_CABLES_XL_FAIL);
     new spell_item_defibrillate("spell_item_gnomish_army_knife", 33);
+    RegisterSpellScript(spell_item_goblin_gumbo);
     RegisterSpellScript(spell_item_desperate_defense);
     RegisterSpellScript(spell_item_deviate_fish);
     RegisterSpellScript(spell_item_party_time);

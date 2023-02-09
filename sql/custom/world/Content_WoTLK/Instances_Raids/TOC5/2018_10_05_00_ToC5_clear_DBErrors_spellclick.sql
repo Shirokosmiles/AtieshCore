@@ -1,0 +1,1 @@
+UPDATE creature_template SET npcflag = 0 WHERE entry IN (35644,36559);

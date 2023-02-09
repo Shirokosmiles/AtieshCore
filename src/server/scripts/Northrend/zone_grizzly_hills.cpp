@@ -888,9 +888,9 @@ class spell_warhead_detonate : public SpellScript
         player->KnockbackFrom(caster->GetPositionX(), caster->GetPositionY(), horizontalSpeed, verticalSpeed);
         caster->CastSpell(player, SPELL_PARACHUTE, true);
 
-        std::list<Creature*> explosionBunnys;
+        std::vector<Creature*> explosionBunnys;
         caster->GetCreatureListWithEntryInGrid(explosionBunnys, NPC_ALLIANCE_LUMBERBOAT_EXPLOSIONS, 90.0f);
-        for (std::list<Creature*>::const_iterator itr = explosionBunnys.begin(); itr != explosionBunnys.end(); ++itr)
+        for (std::vector<Creature*>::const_iterator itr = explosionBunnys.begin(); itr != explosionBunnys.end(); ++itr)
             (*itr)->CastSpell((*itr), SPELL_TORPEDO_EXPLOSION, true);
     }
 

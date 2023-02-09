@@ -402,9 +402,9 @@ class spell_q12620_the_lifewarden_wrath : public SpellScript
                 // Freya Dummy could be scripted with the following code
 
                 // Revive plants
-                std::list<Creature*> servants;
+                std::vector<Creature*> servants;
                 GetCaster()->GetCreatureListWithEntryInGrid(servants, NPC_SERVANT, 200.0f);
-                for (std::list<Creature*>::iterator itr = servants.begin(); itr != servants.end(); ++itr)
+                for (std::vector<Creature*>::iterator itr = servants.begin(); itr != servants.end(); ++itr)
                 {
                     // Couldn't find a spell that does this
                     if ((*itr)->isDead())
@@ -419,9 +419,9 @@ class spell_q12620_the_lifewarden_wrath : public SpellScript
                 }
 
                 // Kill nearby enemies
-                std::list<Creature*> saboteurs;
+                std::vector<Creature*> saboteurs;
                 caster->GetCreatureListWithEntryInGrid(saboteurs, NPC_SABOTEUR, 200.0f);
-                for (std::list<Creature*>::iterator itr = saboteurs.begin(); itr != saboteurs.end(); ++itr)
+                for (std::vector<Creature*>::iterator itr = saboteurs.begin(); itr != saboteurs.end(); ++itr)
                     if ((*itr)->IsAlive())
                         // Lifeforce has a cast duration, it should be cast at all saboteurs one by one
                         presence->CastSpell((*itr), SPELL_LIFEFORCE, false);
@@ -739,6 +739,41 @@ class spell_sholazar_song_of_cleansing : public SpellScript
 };
 
 /*######
+## Quest: A Mammoth Undertaking (12607)
+######*/
+enum Mammoth
+{
+    SPELL_RIDE_SHATTERTUSK_MAMMOTH = 51658,
+    SPELL_HAND_OVER_MAMMOTH = 51660
+};
+
+class npc_mammoth : public CreatureScript
+{
+public:
+    npc_mammoth() : CreatureScript("npc_mammoth") { }
+
+    struct npc_mammothAI : public ScriptedAI
+    {
+        npc_mammothAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_RIDE_SHATTERTUSK_MAMMOTH)
+            {
+                me->StopMoving();
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_mammothAI(creature);
+    }
+};
+
+/*######
 ## Quest 12741: Strength of the Tempest
 ######*/
 
@@ -809,6 +844,7 @@ void AddSC_sholazar_basin()
     RegisterSpellScript(spell_sholazar_take_sputum_sample);
     RegisterSpellScript(spell_sholazar_sputum_collected);
     RegisterSpellScript(spell_sholazar_song_of_cleansing);
+    new npc_mammoth();
     RegisterSpellScript(spell_sholazar_lightning_strike);
     RegisterSpellScript(spell_sholazar_flight_to_sholazar);
 }

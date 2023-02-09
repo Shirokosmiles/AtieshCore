@@ -23,8 +23,7 @@
 
 #include "ScriptMgr.h"
 #include "Containers.h"
-#include "CreatureAI.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Map.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -85,6 +84,7 @@ enum DeathKnightSpells
     SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1   = 49189,
     SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284,
     SPELL_DK_GHOUL_THRASH                       = 47480,
+    SPELL_DK_DANCING_RUNE_WEAPON                = 49028,
     SPELL_DK_GLYPH_OF_SCOURGE_STRIKE_SCRIPT     = 69961,
     SPELL_DK_BUTCHERY_RUNIC_POWER               = 50163,
     SPELL_DK_MARK_OF_BLOOD_HEAL                 = 61607,
@@ -2319,7 +2319,7 @@ public:
 
             //! HACK - StatSystem needs further develop to enable update on Puppet stats
             // Using same summon properties as Raise Dead 46585 (Guardian) - EffectMiscValueB = 829
-            SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(829);
+            SummonPropertiesDBC const* properties = sDBCStoresMgr->GetSummonPropertiesDBC(829);
 
             uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
@@ -2476,6 +2476,60 @@ class spell_dk_ghoul_thrash : public SpellScript
     void Register() override
     {
         OnEffectLaunchTarget += SpellEffectFn(spell_dk_ghoul_thrash::CalcDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
+class spell_dk_summon_gargoyle : public SpellScriptLoader
+{
+public:
+    spell_dk_summon_gargoyle() : SpellScriptLoader("spell_dk_summon_gargoyle") { }
+
+    class spell_dk_summon_gargoyle_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dk_summon_gargoyle_SpellScript);
+
+        bool Load() override
+        {
+            offset.m_positionX = frand(-5.0f, 5.0f);
+            offset.m_positionY = frand(-5.0f, 5.0f);
+            offset.m_positionZ = 20.0f;
+            return true;
+        }
+
+        void HandleHitTarget(SpellEffIndex /*effIndex*/)
+        {
+            WorldLocation summonPos = *GetExplTargetDest();
+            summonPos.RelocateOffset(offset);
+            SetExplTargetDest(summonPos);
+            GetHitDest()->Relocate(summonPos);
+        }
+
+        void HandleLaunchTarget(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* target = GetExplTargetUnit())
+            {
+                if (!GetCaster()->isInFront(target, 2.5f) && GetCaster()->IsWithinMeleeRange(target))
+                {
+                    float o = GetCaster()->GetOrientation();
+                    offset.m_positionX = (7 * cos(o)) + target->GetCombatReach();
+                    offset.m_positionY = (7 * sin(o)) + target->GetCombatReach();
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_dk_summon_gargoyle_SpellScript::HandleHitTarget, EFFECT_0, SPELL_EFFECT_SUMMON);
+            OnEffectLaunchTarget += SpellEffectFn(spell_dk_summon_gargoyle_SpellScript::HandleLaunchTarget, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+        }
+
+    private:
+        Position offset;
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_summon_gargoyle_SpellScript();
     }
 };
 
@@ -2652,7 +2706,7 @@ class spell_dk_dancing_rune_weapon : public AuraScript
         if (!caster)
             return;
 
-        std::list<Creature*> runeWeapons;
+        std::vector<Creature*> runeWeapons;
         caster->GetAllMinionsByEntry(runeWeapons, NPC_DK_DANCING_RUNE_WEAPON);
         for (Creature* temp : runeWeapons)
         {
@@ -2764,6 +2818,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_raise_ally_initial);
     new spell_dk_raise_ally();
     RegisterSpellScript(spell_dk_ghoul_thrash);
+    new spell_dk_summon_gargoyle();
     new spell_dk_blood_tap();
     RegisterSpellScript(spell_pet_dk_gargoyle_strike);
     RegisterSpellScript(spell_dk_dancing_rune_weapon);

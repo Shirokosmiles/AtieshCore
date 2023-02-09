@@ -224,6 +224,9 @@ struct boss_northrend_beastsAI : public BossAI
         switch (me->GetEntry())
         {
             case NPC_GORMOK:
+                me->GetMotionMaster()->MoveAlongSplineChain(POINT_INITIAL_MOVEMENT, SPLINE_INITIAL_MOVEMENT, false);
+                events.ScheduleEvent(EVENT_ENGAGE, 7s);
+                break;
             case NPC_DREADSCALE:
                 me->GetMotionMaster()->MoveAlongSplineChain(POINT_INITIAL_MOVEMENT, SPLINE_INITIAL_MOVEMENT, false);
                 break;
@@ -340,12 +343,6 @@ struct boss_gormok : public boss_northrend_beastsAI
     {
         if (apply && seatId == GORMOK_HAND_SEAT)
             who->CastSpell(who, SPELL_RISING_ANGER, true);
-    }
-
-    void MovementInform(uint32 type, uint32 pointId) override
-    {
-        if (type == SPLINE_CHAIN_MOTION_TYPE && pointId == POINT_INITIAL_MOVEMENT)
-            events.ScheduleEvent(EVENT_ENGAGE, 7s);
     }
 
     void ExecuteEvent(uint32 eventId) override
@@ -647,10 +644,10 @@ struct boss_jormungarAI : public boss_northrend_beastsAI
 {
     boss_jormungarAI(Creature* creature, uint32 bossId) : boss_northrend_beastsAI(creature, bossId)
     {
-        Initialize();
+        Initialize_jormungar();
     }
 
-    void Initialize()
+    void Initialize_jormungar()
     {
         otherWormEntry = 0;
         modelStationary = 0;
@@ -664,7 +661,7 @@ struct boss_jormungarAI : public boss_northrend_beastsAI
 
     void Reset() override
     {
-        Initialize();
+        Initialize_jormungar();
         boss_northrend_beastsAI::Reset();
     }
 
@@ -963,7 +960,7 @@ struct boss_icehowl : public boss_northrend_beastsAI
 
     void MovementInform(uint32 type, uint32 pointId) override
     {
-        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE && type != SPLINE_CHAIN_MOTION_TYPE)
+        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE && type != JUMP_MOTION_TYPE && type != SPLINE_CHAIN_MOTION_TYPE)
             return;
 
         switch (pointId)

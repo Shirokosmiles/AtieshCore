@@ -491,11 +491,12 @@ struct boss_kelthuzad : public BossAI
                         if (selected != _guardianCount)
                             std::swap(_guardianGroups[selected], _guardianGroups[_guardianCount]);
 
-                        std::list<TempSummon*> summoned;
+                        std::vector<TempSummon*> summoned;
                         // server-side spell 28454 is used on retail - no point replicating this in spell_dbc
                         me->SummonCreatureGroup(_guardianGroups[_guardianCount++], &summoned);
                         for (TempSummon* guardian : summoned)
                             guardian->AI()->DoAction(ACTION_JUST_SUMMONED);
+                        summoned.clear();
                         break;
                     }
                 }
@@ -536,13 +537,14 @@ struct boss_kelthuzad : public BossAI
 
                     for (uint8 group = SUMMON_GROUP_MINION_FIRST; group < SUMMON_GROUP_MINION_FIRST + nMinionGroups; ++group)
                     {
-                        std::list<TempSummon*> summoned;
+                        std::vector<TempSummon*> summoned;
                         me->SummonCreatureGroup(group, &summoned);
                         for (TempSummon* summon : summoned)
                         {
                             summon->SetReactState(REACT_PASSIVE);
                             summon->AI()->SetData(DATA_MINION_POCKET_ID, group);
                         }
+                        summoned.clear();
                     }
 
                     events.ScheduleEvent(EVENT_SKELETON, Seconds(5), 0, PHASE_ONE);
@@ -940,7 +942,7 @@ class at_kelthuzad_center : public AreaTriggerScript
 public:
     at_kelthuzad_center() : AreaTriggerScript("at_kelthuzad_center") { }
 
-    bool OnTrigger(Player* player, AreaTriggerEntry const* /*at*/) override
+    bool OnTrigger(Player* player, AreaTriggerDBC const* /*at*/) override
     {
         InstanceScript* instance = player->GetInstanceScript();
         if (!instance || instance->GetBossState(BOSS_KELTHUZAD) != NOT_STARTED)

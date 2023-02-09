@@ -19,7 +19,7 @@
 #include "Battleground.h"
 #include "Corpse.h"
 #include "Creature.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Item.h"
 #include "ItemTemplate.h"
 #include "Log.h"
@@ -326,7 +326,7 @@ std::array<SpellImplicitTargetInfo::StaticData, TOTAL_SPELL_TARGETS> SpellImplic
     {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_ENTRY,    TARGET_DIR_NONE},        // 110 TARGET_UNIT_CONE_ENTRY_110
 } };
 
-SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
+SpellEffectInfo::SpellEffectInfo(SpellDBC const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
 {
     _spellInfo = spellInfo;
     EffectIndex = SpellEffIndex(effIndex);
@@ -345,7 +345,7 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* 
     Mechanic = Mechanics(spellEntry->EffectMechanic[effIndex]);
     TargetA = SpellImplicitTargetInfo(spellEntry->EffectImplicitTargetA[effIndex]);
     TargetB = SpellImplicitTargetInfo(spellEntry->EffectImplicitTargetB[effIndex]);
-    RadiusEntry = spellEntry->EffectRadiusIndex[effIndex] ? sSpellRadiusStore.LookupEntry(spellEntry->EffectRadiusIndex[effIndex]) : nullptr;
+    RadiusEntry = spellEntry->EffectRadiusIndex[effIndex] ? sDBCStoresMgr->GetSpellRadiusDBC(spellEntry->EffectRadiusIndex[effIndex]) : nullptr;
     ChainTarget = spellEntry->EffectChainTargets[effIndex];
     ItemType = spellEntry->EffectItemType[effIndex];
     TriggerSpell = spellEntry->EffectTriggerSpell[effIndex];
@@ -494,8 +494,8 @@ int32 SpellEffectInfo::CalcValue(WorldObject const* caster /*= nullptr*/, int32 
 
             if (canEffectScale)
             {
-                GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(_spellInfo->SpellLevel - 1);
-                GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(casterUnit->GetLevel() - 1);
+                GtNPCManaCostScalerDBC const* spellScaler = sDBCStoresMgr->GetGtNPCManaCostScalerDBC(_spellInfo->SpellLevel - 1);
+                GtNPCManaCostScalerDBC const* casterScaler = sDBCStoresMgr->GetGtNPCManaCostScalerDBC(casterUnit->GetLevel() - 1);
                 if (spellScaler && casterScaler)
                     value *= casterScaler->Data / spellScaler->Data;
             }
@@ -765,10 +765,10 @@ std::array<SpellEffectInfo::StaticData, TOTAL_SPELL_EFFECTS> SpellEffectInfo::_d
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 164 SPELL_EFFECT_REMOVE_AURA
 } };
 
-SpellInfo::SpellInfo(SpellEntry const* spellEntry)
+SpellInfo::SpellInfo(SpellDBC const* spellEntry)
 {
     Id = spellEntry->ID;
-    CategoryEntry = spellEntry->Category ? sSpellCategoryStore.LookupEntry(spellEntry->Category) : nullptr;
+    CategoryEntry = spellEntry->Category ? sDBCStoresMgr->GetSpellCategoryDBC(spellEntry->Category) : nullptr;
     Dispel = spellEntry->DispelType;
     Mechanic = spellEntry->Mechanic;
     Attributes = spellEntry->Attributes;
@@ -794,7 +794,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     TargetAuraSpell = spellEntry->TargetAuraSpell;
     ExcludeCasterAuraSpell = spellEntry->ExcludeCasterAuraSpell;
     ExcludeTargetAuraSpell = spellEntry->ExcludeTargetAuraSpell;
-    CastTimeEntry = spellEntry->CastingTimeIndex ? sSpellCastTimesStore.LookupEntry(spellEntry->CastingTimeIndex) : nullptr;
+    CastTimeEntry = spellEntry->CastingTimeIndex ? sDBCStoresMgr->GetSpellCastTimesDBC(spellEntry->CastingTimeIndex) : nullptr;
     RecoveryTime = spellEntry->RecoveryTime;
     CategoryRecoveryTime = spellEntry->CategoryRecoveryTime;
     StartRecoveryCategory = spellEntry->StartRecoveryCategory;
@@ -808,7 +808,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     MaxLevel = spellEntry->MaxLevel;
     BaseLevel = spellEntry->BaseLevel;
     SpellLevel = spellEntry->SpellLevel;
-    DurationEntry = spellEntry->DurationIndex ? sSpellDurationStore.LookupEntry(spellEntry->DurationIndex) : nullptr;
+    DurationEntry = spellEntry->DurationIndex ? sDBCStoresMgr->GetSpellDurationDBC(spellEntry->DurationIndex) : nullptr;
     PowerType = static_cast<Powers>(spellEntry->PowerType);
     ManaCost = spellEntry->ManaCost;
     ManaCostPerlevel = spellEntry->ManaCostPerLevel;
@@ -816,7 +816,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     ManaPerSecondPerLevel = spellEntry->ManaPerSecondPerLevel;
     ManaCostPercentage = spellEntry->ManaCostPct;
     RuneCostID = spellEntry->RuneCostID;
-    RangeEntry = spellEntry->RangeIndex ? sSpellRangeStore.LookupEntry(spellEntry->RangeIndex) : nullptr;
+    RangeEntry = spellEntry->RangeIndex ? sDBCStoresMgr->GetSpellRangeDBC(spellEntry->RangeIndex) : nullptr;
     Speed = spellEntry->Speed;
     StackAmount = spellEntry->CumulativeAura;
     Totem = spellEntry->Totem;
@@ -830,8 +830,11 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     SpellIconID = spellEntry->SpellIconID;
     ActiveIconID = spellEntry->ActiveIconID;
     Priority = spellEntry->SpellPriority;
-    SpellName = spellEntry->Name;
-    Rank = spellEntry->NameSubtext;
+    for (uint8 i = 0; i < TOTAL_LOCALES; i++)
+    {
+        SpellName[i] = spellEntry->Name[i];
+        Rank[i] = spellEntry->NameSubtext[i];
+    }
     MaxTargetLevel = spellEntry->MaxTargetLevel;
     MaxAffectedTargets = spellEntry->MaxTargets;
     SpellFamilyName = spellEntry->SpellClassSet;
@@ -986,7 +989,7 @@ bool SpellInfo::IsAbilityLearnedWithProfession() const
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
-        SkillLineAbilityEntry const* pAbility = _spell_idx->second;
+        SkillLineAbilityDBC const* pAbility = _spell_idx->second;
         if (!pAbility || pAbility->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE)
             continue;
 
@@ -1072,6 +1075,30 @@ bool SpellInfo::IsSelfCast() const
         if (effect.Effect && effect.TargetA.GetTarget() != TARGET_UNIT_CASTER)
             return false;
     return true;
+}
+
+bool SpellInfo::IsVanish() const
+{
+    return HasAttribute(SPELL_ATTR2_UNK1)
+        && HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT)
+        && HasAttribute(SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE)
+        && HasAttribute(SPELL_ATTR0_DISABLED_WHILE_ACTIVE)
+        && HasAttribute(SPELL_ATTR1_NOT_BREAK_STEALTH);
+}
+
+bool SpellInfo::IsShadowMeld() const
+{
+    return HasAttribute(SPELL_ATTR0_ABILITY)
+        && HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT)
+        && HasAttribute(SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE)
+        && HasAttribute(SPELL_ATTR0_STOP_ATTACK_TARGET)
+        && HasAttribute(SPELL_ATTR1_UNK4)
+        && HasAttribute(SPELL_ATTR1_NO_THREAT)
+        && HasAttribute(SPELL_ATTR1_UNAUTOCASTABLE_BY_PET)
+        && HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS)
+        && HasAttribute(SPELL_ATTR2_NOT_NEED_SHAPESHIFT)
+        && HasAttribute(SPELL_ATTR2_DAMAGE_REDUCED_SHIELD)
+        && HasAttribute(SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED);
 }
 
 bool SpellInfo::IsPassive() const
@@ -1242,6 +1269,11 @@ bool SpellInfo::IsAutoRepeatRangedSpell() const
 bool SpellInfo::HasInitialAggro() const
 {
     return !(HasAttribute(SPELL_ATTR1_NO_THREAT) || HasAttribute(SPELL_ATTR3_NO_INITIAL_AGGRO));
+}
+
+bool SpellInfo::HasChargeEffect() const
+{
+    return HasAttribute(SPELL_ATTR7_HAS_CHARGE_EFFECT);
 }
 
 WeaponAttackType SpellInfo::GetAttackType() const
@@ -1424,7 +1456,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
 {
     // talents that learn spells can have stance requirements that need ignore
     // (this requirement only for client-side stance show in talent description)
-    if (GetTalentSpellCost(Id) > 0 && HasEffect(SPELL_EFFECT_LEARN_SPELL))
+    if (sDBCStoresMgr->GetTalentSpellCost(Id) > 0 && HasEffect(SPELL_EFFECT_LEARN_SPELL))
         return SPELL_CAST_OK;
 
     uint64 stanceMask = (form ? UI64LIT(1) << (form - 1) : 0);
@@ -1436,13 +1468,13 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         return SPELL_CAST_OK;
 
     bool actAsShifted = false;
-    SpellShapeshiftFormEntry const* shapeInfo = nullptr;
+    SpellShapeshiftFormDBC const* shapeInfo = nullptr;
     if (form > 0)
     {
-        shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
+        shapeInfo = sDBCStoresMgr->GetSpellShapeshiftFormDBC(form);
         if (!shapeInfo)
         {
-            TC_LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
+            FMT_LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift {}", form);
             return SPELL_CAST_OK;
         }
         actAsShifted = !(shapeInfo->Flags & 1);            // shapeshift acts as normal form for spells
@@ -1480,7 +1512,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     if (AreaGroupId > 0)
     {
         bool found = false;
-        AreaGroupEntry const* groupEntry = sAreaGroupStore.LookupEntry(AreaGroupId);
+        AreaGroupDBC const* groupEntry = sDBCStoresMgr->GetAreaGroupDBC(AreaGroupId);
         while (groupEntry)
         {
             for (uint8 i = 0; i < MAX_GROUP_AREA_IDS; ++i)
@@ -1489,7 +1521,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
             if (found || !groupEntry->NextAreaID)
                 break;
             // Try search in next group
-            groupEntry = sAreaGroupStore.LookupEntry(groupEntry->NextAreaID);
+            groupEntry = sDBCStoresMgr->GetAreaGroupDBC(groupEntry->NextAreaID);
         }
 
         if (!found)
@@ -1501,17 +1533,17 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     {
         if (strict)
         {
-            AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(area_id);
+            AreaTableDBC const* areaEntry = sDBCStoresMgr->GetAreaTableDBC(area_id);
             if (!areaEntry)
-                areaEntry = sAreaTableStore.LookupEntry(zone_id);
+                areaEntry = sDBCStoresMgr->GetAreaTableDBC(zone_id);
 
             if (!areaEntry || !areaEntry->IsFlyable() || !player->CanFlyInZone(map_id, zone_id, this))
                 return SPELL_FAILED_INCORRECT_AREA;
         }
         else
         {
-            uint32 const v_map = GetVirtualMapForMapAndZone(map_id, zone_id);
-            MapEntry const* mapEntry = sMapStore.LookupEntry(v_map);
+            uint32 const v_map = sDBCStoresMgr->GetVirtualMapForMapAndZone(map_id, zone_id);
+            MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(v_map);
             if (!mapEntry || mapEntry->Expansion() < 1 || !mapEntry->IsContinent())
                 return SPELL_FAILED_INCORRECT_AREA;
         }
@@ -1520,7 +1552,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     // raid instance limitation
     if (HasAttribute(SPELL_ATTR6_NOT_IN_RAID_INSTANCE))
     {
-        MapEntry const* mapEntry = sMapStore.LookupEntry(map_id);
+        MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(map_id);
         if (!mapEntry || mapEntry->IsRaid())
             return SPELL_FAILED_NOT_IN_RAID_INSTANCE;
     }
@@ -1552,7 +1584,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
         case 43681:                                         // Inactive
         case 44535:                                         // Spirit Heal (mana)
         {
-            MapEntry const* mapEntry = sMapStore.LookupEntry(map_id);
+            MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(map_id);
             if (!mapEntry)
                 return SPELL_FAILED_INCORRECT_AREA;
 
@@ -1563,7 +1595,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
             if (!player)
                 return SPELL_FAILED_REQUIRES_AREA;
 
-            MapEntry const* mapEntry = sMapStore.LookupEntry(map_id);
+            MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(map_id);
             if (!mapEntry)
                 return SPELL_FAILED_INCORRECT_AREA;
 
@@ -1578,7 +1610,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
         case 35774:                                         // Gold Team (Horde)
         case 35775:                                         // Green Team (Horde)
         {
-            MapEntry const* mapEntry = sMapStore.LookupEntry(map_id);
+            MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(map_id);
             if (!mapEntry)
                 return SPELL_FAILED_INCORRECT_AREA;
 
@@ -1589,7 +1621,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
             if (!player)
                 return SPELL_FAILED_REQUIRES_AREA;
 
-            MapEntry const* mapEntry = sMapStore.LookupEntry(map_id);
+            MapDBC const* mapEntry = sDBCStoresMgr->GetMapDBC(map_id);
             if (!mapEntry)
                 return SPELL_FAILED_INCORRECT_AREA;
 
@@ -1801,7 +1833,7 @@ SpellCastResult SpellInfo::CheckVehicle(Unit const* caster) const
         {
             if (effect.IsAura(SPELL_AURA_MOD_SHAPESHIFT))
             {
-                SpellShapeshiftFormEntry const* shapeShiftEntry = sSpellShapeshiftFormStore.LookupEntry(effect.MiscValue);
+                SpellShapeshiftFormDBC const* shapeShiftEntry = sDBCStoresMgr->GetSpellShapeshiftFormDBC(effect.MiscValue);
                 if (shapeShiftEntry && (shapeShiftEntry->Flags & 1) == 0)  // unk flag
                     checkMask |= VEHICLE_SEAT_FLAG_UNCONTROLLED;
                 break;
@@ -1814,7 +1846,7 @@ SpellCastResult SpellInfo::CheckVehicle(Unit const* caster) const
         if (!checkMask)
             checkMask = VEHICLE_SEAT_FLAG_CAN_ATTACK;
 
-        VehicleSeatEntry const* vehicleSeat = vehicle->GetSeatForPassenger(caster);
+        VehicleSeatDBC const* vehicleSeat = vehicle->GetSeatForPassenger(caster);
         if (!HasAttribute(SPELL_ATTR6_CASTABLE_WHILE_ON_VEHICLE) && !HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_MOUNTED)
             && (vehicleSeat->Flags & checkMask) != checkMask)
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
@@ -1827,7 +1859,7 @@ SpellCastResult SpellInfo::CheckVehicle(Unit const* caster) const
                 if (!effect.IsEffect(SPELL_EFFECT_SUMMON))
                     continue;
 
-                SummonPropertiesEntry const* props = sSummonPropertiesStore.LookupEntry(effect.MiscValueB);
+                SummonPropertiesDBC const* props = sDBCStoresMgr->GetSummonPropertiesDBC(effect.MiscValueB);
                 if (props && props->Control != SUMMON_CATEGORY_WILD)
                     return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
             }
@@ -2242,6 +2274,15 @@ void SpellInfo::_LoadSpellDiminishInfo()
                     return DIMINISHING_NONE;
                 // Screams of the Dead (King Ymiron)
                 else if (Id == 51750)
+                    return DIMINISHING_NONE;
+                // Triggered trample aura (ToC 5)
+                else if (Id == 67868)
+                    return DIMINISHING_NONE;
+                // The Black Knight's Death's Respite (ToC 5)
+                else if (Id == 67745)
+                    return DIMINISHING_NONE;
+                // The Black Knight's Death's Respite (Heroic ToC 5)
+                else if (Id == 68306)
                     return DIMINISHING_NONE;
                 // Crystallize (Keristrasza heroic)
                 else if (Id == 48179)
@@ -3179,7 +3220,7 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
         // Else drain all power
         if (PowerType < MAX_POWERS)
             return unitCaster->GetPower(PowerType);
-        TC_LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
+        FMT_LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '{}' in spell {}", PowerType, Id);
         return 0;
     }
 
@@ -3205,10 +3246,10 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
                 break;
             case POWER_RUNE:
             case POWER_RUNIC_POWER:
-                TC_LOG_DEBUG("spells", "CalculateManaCost: Not implemented yet!");
+                FMT_LOG_DEBUG("spells", "CalculateManaCost: Not implemented yet!");
                 break;
             default:
-                TC_LOG_ERROR("spells", "CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
+                FMT_LOG_ERROR("spells", "CalculateManaCost: Unknown power type '{}' in spell {}", PowerType, Id);
                 return 0;
         }
     }
@@ -3220,7 +3261,7 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
     if (HasAttribute(SPELL_ATTR4_SPELL_VS_EXTEND_COST))
     {
         uint32 speed = 0;
-        if (SpellShapeshiftFormEntry const* ss = sSpellShapeshiftFormStore.LookupEntry(unitCaster->GetShapeshiftForm()))
+        if (SpellShapeshiftFormDBC const* ss = sDBCStoresMgr->GetSpellShapeshiftFormDBC(unitCaster->GetShapeshiftForm()))
             speed = ss->CombatRoundTime;
         else
             speed = unitCaster->GetAttackTime(GetAttackType());
@@ -3236,8 +3277,8 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
     {
         if (HasAttribute(SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION))
         {
-            GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(SpellLevel - 1);
-            GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(unitCaster->GetLevel() - 1);
+            GtNPCManaCostScalerDBC const* spellScaler = sDBCStoresMgr->GetGtNPCManaCostScalerDBC(SpellLevel - 1);
+            GtNPCManaCostScalerDBC const* casterScaler = sDBCStoresMgr->GetGtNPCManaCostScalerDBC(unitCaster->GetLevel() - 1);
             if (spellScaler && casterScaler)
                 powerCost *= casterScaler->Data / spellScaler->Data;
         }
@@ -3416,7 +3457,12 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
         case SPELLFAMILY_GENERIC:
             switch (spellInfo->Id)
             {
+                case 29214: // Wrath of the Plaguebringer
+                case 34700: // Allergic Reaction
                 case 40268: // Spiritual Vengeance, Teron Gorefiend, Black Temple
+                case 41914: // Parasitic Shadowfiend (Illidan)
+                case 41917: // Parasitic Shadowfiend (Illidan)
+                case 54836: // Wrath of the Plaguebringer
                 case 61987: // Avenging Wrath Marker
                 case 61988: // Divine Shield exclude aura
                 case 64412: // Phase Punch, Algalon the Observer, Ulduar
@@ -3435,11 +3481,6 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
                 default:
                     break;
             }
-            break;
-        case SPELLFAMILY_ROGUE:
-            // Shadow of Death, Teron Gorefiend, Black Temple
-            if (spellInfo->Id == 40251)
-                return false;
             break;
         case SPELLFAMILY_MAGE:
             // Amplify Magic, Dampen Magic
@@ -3474,6 +3515,24 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
             // Starfall
             if (spellInfo->SpellFamilyFlags[2] == 0x00000100)
                 return false;
+            break;
+        case SPELLFAMILY_ROGUE:
+            switch (spellInfo->Id)
+            {
+                // Slice and Dice. Prevents breaking Stealth
+                case 5171:      // Slice and Dice (Rank 1)
+                case 6774:      // Slice and Dice (Rank 2)
+                // Envenom must be considered as a positive effect even though it deals damage
+                case 32645:     // Envenom (Rank 1)
+                case 32684:     // Envenom (Rank 2)
+                case 57992:     // Envenom (Rank 3)
+                case 57993:     // Envenom (Rank 4)
+                    return true;
+                case 40251:     // Shadow of Death, Teron Gorefiend, Black Temple
+                    return false;
+                default:
+                    break;
+            }
             break;
         case SPELLFAMILY_DEATHKNIGHT:
             if (spellInfo->SpellFamilyFlags[2] == 0x00000010) // Ebon Plague
@@ -3673,6 +3732,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
             case SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE:
             case SPELL_AURA_MOD_POWER_COST_SCHOOL:
             case SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT:
+            case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:
             case SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT:
                 if (bp > 0)
                     return false;
@@ -3768,6 +3828,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
             case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
             case SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS:
             case SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS:
+            case SPELL_AURA_PREVENTS_FLEEING:
                 return false;
             case SPELL_AURA_MECHANIC_IMMUNITY:
             {

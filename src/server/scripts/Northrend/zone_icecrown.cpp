@@ -847,6 +847,25 @@ class spell_icecrown_chum_the_water : public SpellScript
     }
 };
 
+class npc_frostbrood_Destroyer : public CreatureScript
+{
+public:
+    npc_frostbrood_Destroyer() : CreatureScript("npc_nrostbrood_Destroyer") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_frostbrood_DestroyerAI(creature);
+    }
+
+    struct npc_frostbrood_DestroyerAI : public ScriptedAI
+    {
+        npc_frostbrood_DestroyerAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetIgnoreEvade(true);
+        }
+    };
+};
+
 /*######
 ## Quest 13121: Through the Eye
 ######*/
@@ -947,6 +966,9 @@ void AddSC_icecrown()
     RegisterSpellScript(spell_icecrown_summon_tualiq_proxy);
     RegisterSpellScript(spell_icecrown_pound_drum);
     RegisterSpellScript(spell_icecrown_chum_the_water);
+
+    new npc_frostbrood_Destroyer();
+
     RegisterSpellScript(spell_icecrown_through_the_eye_the_eye_of_the_lk);
     RegisterSpellScript(spell_icecrown_through_the_eye_kill_credit_to_master);
     RegisterSpellScript(spell_icecrown_summon_freed_crusader);

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DBCStructure.h"
 #include "Totem.h"
 #include "Group.h"
 #include "Log.h"
@@ -25,7 +26,7 @@
 #include "SpellInfo.h"
 #include "TotemPackets.h"
 
-Totem::Totem(SummonPropertiesEntry const* properties, Unit* owner) : Minion(properties, owner, false)
+Totem::Totem(SummonPropertiesDBC const* properties, Unit* owner) : Minion(properties, owner, false)
 {
     m_unitTypeMask |= UNIT_MASK_TOTEM;
     m_duration = 0;
@@ -71,8 +72,8 @@ void Totem::InitStats(uint32 duration)
         if (uint32 totemDisplayId = sObjectMgr->GetModelForTotem(SummonSlot(slot), Races(owner->GetRace())))
             SetDisplayId(totemDisplayId);
         else
-            TC_LOG_DEBUG("misc", "Totem with entry %u, owned by player %s (%u %s %s) in slot %u, created by spell %u, does not have a specialized model. Set to default.",
-                         GetEntry(), owner->GetGUID().ToString().c_str(), owner->GetLevel(), EnumUtils::ToTitle(Races(owner->GetRace())), EnumUtils::ToTitle(Classes(owner->GetClass())), slot, GetUInt32Value(UNIT_CREATED_BY_SPELL));
+            FMT_LOG_DEBUG("misc", "Totem with entry {}, owned by player {} ({} {} {}) in slot {}, created by spell {}, does not have a specialized model. Set to default.",
+                         GetEntry(), owner->GetGUID().ToString(), owner->GetLevel(), EnumUtils::ToTitle(Races(owner->GetRace())), EnumUtils::ToTitle(Classes(owner->GetClass())), slot, GetUInt32Value(UNIT_CREATED_BY_SPELL));
     }
 
     Minion::InitStats(duration);
@@ -165,6 +166,10 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, SpellEffectInfo c
         spellInfo->IsPositive() && spellEffectInfo.TargetA.GetTarget() != TARGET_UNIT_CASTER &&
         spellEffectInfo.TargetA.GetCheckType() != TARGET_CHECK_ENTRY && spellInfo->Id != SENTRY_STONECLAW_SPELLID && spellInfo->Id != SENTRY_BIND_SIGHT_SPELLID)
         return true;
+
+    // Devouring plague with trigger
+    if (spellInfo->Id == 48300)
+        return false;
 
     switch (spellEffectInfo.ApplyAuraName)
     {

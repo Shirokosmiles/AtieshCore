@@ -219,7 +219,7 @@ class at_stratholme_inn_stairs_cot : public AreaTriggerScript
     public:
         at_stratholme_inn_stairs_cot() : AreaTriggerScript("at_stratholme_inn_stairs_cot") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
+        bool OnTrigger(Player* player, AreaTriggerDBC const* /*areaTrigger*/) override
         {
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (instance->GetData(DATA_INSTANCE_PROGRESS) <= CRATES_IN_PROGRESS)
@@ -362,8 +362,9 @@ class npc_chromie_start : public CreatureScript
                         break;
                     case GOSSIP_OFFSET_SKIP_1:
                         AdvanceDungeonFar();
-                        [[fallthrough]];
+                        break;
                     case GOSSIP_OFFSET_TELEPORT:
+                        AdvanceDungeonFar();
                         CloseGossipMenuFor(player);
                         me->CastSpell(player, SPELL_TELEPORT_PLAYER);
                         break;
@@ -383,12 +384,12 @@ class npc_chromie_start : public CreatureScript
                         for (uint32 state = 1; state <= COMPLETE; state = state << 1)
                         {
                             if (GetStableStateFor(COSProgressStates(state)) == state)
-                                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, Trinity::StringFormat("Set instance progress to 0x%05X", state).c_str(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + GOSSIP_OFFSET_GM_INITIAL + state);
+                                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, Trinity::StringFormat("Set instance progress to 0x%05X", state), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + GOSSIP_OFFSET_GM_INITIAL + state);
                         }
                         for (uint32 state = 1; state <= COMPLETE; state = state << 1)
                         {
                             if (GetStableStateFor(COSProgressStates(state)) != state)
-                                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, Trinity::StringFormat("Force state to 0x%05X (UNSTABLE)", state).c_str(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + GOSSIP_OFFSET_GM_INITIAL + state);
+                                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, Trinity::StringFormat("Force state to 0x%05X (UNSTABLE)", state), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + GOSSIP_OFFSET_GM_INITIAL + state);
                         }
                         SendGossipMenuFor(player, GOSSIP_TEXT_SKIP_1, me->GetGUID());
                         break;

@@ -25,6 +25,7 @@
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
+#include "Transport.h"
 #include "Spell.h"
 #include "SpellHistory.h"
 #include "SpellInfo.h"
@@ -76,7 +77,7 @@ void PetAI::UpdateAI(uint32 diff)
 
         if (NeedToStop())
         {
-            TC_LOG_TRACE("scripts.ai.petai", "PetAI::UpdateAI: AI stopped attacking %s", me->GetGUID().ToString().c_str());
+            FMT_LOG_TRACE("scripts.ai.petai", "PetAI::UpdateAI: AI stopped attacking {}", me->GetGUID().ToString());
             StopAttack();
             return;
         }
@@ -221,12 +222,6 @@ void PetAI::UpdateAI(uint32 diff)
         for (std::pair<Unit*, Spell*> const& unitspellpair : targetSpellStore)
             delete unitspellpair.second;
     }
-
-    // Update speed as needed to prevent dropping too far behind and despawning
-    me->UpdateSpeed(MOVE_RUN);
-    me->UpdateSpeed(MOVE_WALK);
-    me->UpdateSpeed(MOVE_FLIGHT);
-
 }
 
 void PetAI::KilledUnit(Unit* victim)
@@ -368,7 +363,7 @@ void PetAI::HandleReturnMovement()
 
     if (!me->GetCharmInfo())
     {
-        TC_LOG_WARN("scripts.ai.petai", "me->GetCharmInfo() is NULL in PetAI::HandleReturnMovement(). Debug info: %s", GetDebugInfo().c_str());
+        FMT_LOG_WARN("scripts.ai.petai", "me->GetCharmInfo() is NULL in PetAI::HandleReturnMovement(). Debug info: {}", GetDebugInfo());
         return;
     }
 
@@ -376,17 +371,20 @@ void PetAI::HandleReturnMovement()
     {
         if (!me->GetCharmInfo()->IsAtStay() && !me->GetCharmInfo()->IsReturning())
         {
-            // Return to previous position where stay was clicked
-            float x, y, z;
+            if (me->GetCharmInfo()->HasStayPosition())
+            {
+                // Return to previous position where stay was clicked
+                float x, y, z;
 
-            me->GetCharmInfo()->GetStayPosition(x, y, z);
-            ClearCharmInfoFlags();
-            me->GetCharmInfo()->SetIsReturning(true);
+                me->GetCharmInfo()->GetStayPosition(x, y, z);
+                ClearCharmInfoFlags();
+                me->GetCharmInfo()->SetIsReturning(true);
 
-            if (me->HasUnitState(UNIT_STATE_CHASE))
-                me->GetMotionMaster()->Remove(CHASE_MOTION_TYPE);
+                if (me->HasUnitState(UNIT_STATE_CHASE))
+                    me->GetMotionMaster()->Remove(CHASE_MOTION_TYPE);
 
-            me->GetMotionMaster()->MovePoint(me->GetGUID().GetCounter(), x, y, z);
+                me->GetMotionMaster()->MovePoint(me->GetGUID().GetCounter(), x, y, z);
+            }
         }
     }
     else // COMMAND_FOLLOW
@@ -399,6 +397,27 @@ void PetAI::HandleReturnMovement()
             if (me->HasUnitState(UNIT_STATE_CHASE))
                 me->GetMotionMaster()->Remove(CHASE_MOTION_TYPE);
 
+            if (Unit* owner = me->GetOwner())
+            {
+                if (Transport* transportowner = owner->GetTransport())
+                {
+                    if (me->GetTransport())
+                    {
+                        if (me->GetTransport()->GetGUID() != transportowner->GetGUID())
+                            me->GetTransport()->RemovePassenger(me);
+
+                        if (!transportowner->isPassenger(me))
+                            transportowner->AddPassenger(me);
+                    }
+                    else
+                    {
+                        if (!transportowner->isPassenger(me))
+                            transportowner->AddPassenger(me);
+                    }
+                }
+                else if (me->GetTransport())
+                    me->GetTransport()->RemovePassenger(me);
+            }
             me->GetMotionMaster()->MoveFollow(me->GetCharmerOrOwner(), PET_FOLLOW_DIST, me->GetFollowAngle());
         }
     }
@@ -425,6 +444,25 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
             if (me->HasUnitState(UNIT_STATE_FOLLOW))
                 me->GetMotionMaster()->Remove(FOLLOW_MOTION_TYPE);
+
+            if (Transport* transporttarget = target->GetTransport())
+            {
+                if (me->GetTransport())
+                {
+                    if (me->GetTransport()->GetGUID() != transporttarget->GetGUID())
+                        me->GetTransport()->RemovePassenger(me);
+
+                    if (!transporttarget->isPassenger(me))
+                        transporttarget->AddPassenger(me);
+                }
+                else
+                {
+                    if (!transporttarget->isPassenger(me))
+                        transporttarget->AddPassenger(me);
+                }
+            }
+            else if (me->GetTransport())
+                me->GetTransport()->RemovePassenger(me);
 
             // Pets with ranged attacks should not care about the chase angle at all.
             float chaseDistance = me->GetPetChaseDistance();
@@ -498,7 +536,7 @@ bool PetAI::CanAttack(Unit* target)
 
     if (!me->GetCharmInfo())
     {
-        TC_LOG_WARN("scripts.ai.petai", "me->GetCharmInfo() is NULL in PetAI::CanAttack(). Debug info: %s", GetDebugInfo().c_str());
+        FMT_LOG_WARN("scripts.ai.petai", "me->GetCharmInfo() is NULL in PetAI::CanAttack(). Debug info: {}", GetDebugInfo());
         return false;
     }
 

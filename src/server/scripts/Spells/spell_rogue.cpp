@@ -23,7 +23,7 @@
 
 #include "ScriptMgr.h"
 #include "Containers.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Item.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -136,6 +136,8 @@ class spell_rog_cheat_death : public AuraScript
         // hp lower than 10% - absorb everything
         else
             absorbAmount = dmgInfo.GetDamage();
+
+        target->CastSpell(target, 45182); // cheat death aura
     }
 
     void Register() override
@@ -238,7 +240,7 @@ class spell_rog_deadly_poison : public SpellScript
             // item combat enchantments
             for (uint8 slot = 0; slot < MAX_ENCHANTMENT_SLOT; ++slot)
             {
-                SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(item->GetEnchantmentId(EnchantmentSlot(slot)));
+                SpellItemEnchantmentDBC const* enchant = sDBCStoresMgr->GetSpellItemEnchantmentDBC(item->GetEnchantmentId(EnchantmentSlot(slot)));
                 if (!enchant)
                     continue;
 
@@ -250,7 +252,7 @@ class spell_rog_deadly_poison : public SpellScript
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(enchant->EffectArg[s]);
                     if (!spellInfo)
                     {
-                        TC_LOG_ERROR("spells", "Player::CastItemCombatSpell Enchant %i, player (Name: %s, %s) cast unknown spell %i", enchant->ID, player->GetName().c_str(), player->GetGUID().ToString().c_str(), enchant->EffectArg[s]);
+                        FMT_LOG_ERROR("spells", "Player::CastItemCombatSpell Enchant {}, player (Name: {}, {}) cast unknown spell {}", enchant->ID, player->GetName(), player->GetGUID().ToString(), enchant->EffectArg[s]);
                         continue;
                     }
 
@@ -963,6 +965,7 @@ class spell_rog_vanish : public AuraScript
             unitTarget->GetSpellHistory()->ResetCooldown(SPELL_ROGUE_STEALTH);
 
         unitTarget->CastSpell(nullptr, SPELL_ROGUE_STEALTH, true);
+        unitTarget->GetCombatManager().EndAllPvPCombat(true); // remove refs from rogue at victim, and if no others target, victim should break combat
     }
 
     void Register() override

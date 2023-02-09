@@ -25,7 +25,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
@@ -101,6 +101,43 @@ public:
         return true;
     }
 
+    static bool HandleGameObjectArtKitCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* id = strtok((char*)args, " ");
+        char* artkid = strtok(nullptr, " ");
+
+        if (!id)
+            return false;
+
+        if (!artkid)
+            return false;
+
+        ObjectGuid::LowType guidLow = atoul(id);
+        if (!guidLow)
+            return false;
+
+        uint32 artID = atoi(artkid);
+        if (!artkid)
+            return false;
+
+        GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
+        if (!object)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, guidLow);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        // Activate
+        object->SetGoArtKit(artID);
+        handler->PSendSysMessage("GameObject has activated artkid : {}", artID);
+
+        return true;
+    }
+
     //spawn go
     static bool HandleGameObjectAddCommand(ChatHandler* handler, GameObjectEntry objectId, Optional<int32> spawnTimeSecs)
     {
@@ -115,10 +152,10 @@ public:
             return false;
         }
 
-        if (objectInfo->displayId && !sGameObjectDisplayInfoStore.LookupEntry(objectInfo->displayId))
+        if (objectInfo->displayId && !sDBCStoresMgr->GetGameObjectDisplayInfoDBC(objectInfo->displayId))
         {
             // report to DB errors log as in loading case
-            TC_LOG_ERROR("sql.sql", "Gameobject (Entry %u GoType: %u) have invalid displayId (%u), not spawned.", *objectId, objectInfo->type, objectInfo->displayId);
+            FMT_LOG_ERROR("sql.sql", "Gameobject (Entry {} GoType: {}) have invalid displayId ({}), not spawned.", *objectId, objectInfo->type, objectInfo->displayId);
             handler->PSendSysMessage(LANG_GAMEOBJECT_HAVE_INVALID_DATA, objectId);
             handler->SetSentErrorMessage(true);
             return false;
@@ -159,7 +196,7 @@ public:
         /// @todo is it really necessary to add both the real and DB table guid here ?
         sObjectMgr->AddGameobjectToGrid(guidLow, sObjectMgr->GetGameObjectData(guidLow));
 
-        handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, objectId, objectInfo->name.c_str(), guidLow, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, objectId, objectInfo->name, guidLow, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
         return true;
     }
 
@@ -280,7 +317,7 @@ public:
 
         GameObject* target = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
 
-        handler->PSendSysMessage(LANG_GAMEOBJECT_DETAIL, guidLow, objectInfo->name.c_str(), guidLow, id, x, y, z, mapId, o, phase);
+        handler->PSendSysMessage(LANG_GAMEOBJECT_DETAIL, guidLow, objectInfo->name, guidLow, id, x, y, z, mapId, o, phase);
 
         if (target)
         {
@@ -291,7 +328,7 @@ public:
             std::string curRespawnDelayStr = secsToTimeString(curRespawnDelay, TimeFormat::ShortText);
             std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), TimeFormat::ShortText);
 
-            handler->PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, defRespawnDelayStr.c_str(), curRespawnDelayStr.c_str());
+            handler->PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, defRespawnDelayStr, curRespawnDelayStr);
         }
         return true;
     }
@@ -363,7 +400,7 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, object->GetSpawnId(), object->GetGOInfo()->name.c_str(), object->GetSpawnId());
+        handler->PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, object->GetSpawnId(), object->GetGOInfo()->name, object->GetSpawnId());
         return true;
     }
 
@@ -420,7 +457,7 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_MOVEOBJMESSAGE, object->GetSpawnId(), object->GetGOInfo()->name.c_str(), object->GetSpawnId());
+        handler->PSendSysMessage(LANG_COMMAND_MOVEOBJMESSAGE, object->GetSpawnId(), object->GetGOInfo()->name, object->GetSpawnId());
         return true;
     }
 
@@ -485,7 +522,7 @@ public:
                 if (!gameObjectInfo)
                     continue;
 
-                handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gameObjectInfo->name.c_str(), x, y, z, mapId, "", "");
+                handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gameObjectInfo->name, x, y, z, mapId, "", "");
 
                 ++count;
             } while (result->NextRow());
@@ -501,6 +538,7 @@ public:
         uint32 entry = 0;
         uint32 type = 0;
         uint32 displayId = 0;
+        uint32 phasemask = 0;
         std::string name;
         uint32 lootId = 0;
 
@@ -545,13 +583,15 @@ public:
         // If we have a real object, send some info about it
         if (thisGO)
         {
-            handler->PSendSysMessage(LANG_SPAWNINFO_GUIDINFO, thisGO->GetGUID().ToString().c_str());
+            phasemask = thisGO->GetPhaseMask();
+            handler->PSendSysMessage(LANG_GOINFO_PHASEMASK, phasemask);
+            handler->PSendSysMessage(LANG_SPAWNINFO_GUIDINFO, thisGO->GetGUID().ToString());
             handler->PSendSysMessage(LANG_SPAWNINFO_COMPATIBILITY_MODE, thisGO->GetRespawnCompatibilityMode());
 
             if (thisGO->GetGameObjectData() && thisGO->GetGameObjectData()->spawnGroupData->groupId)
             {
                 SpawnGroupTemplateData const* groupData = thisGO->GetGameObjectData()->spawnGroupData;
-                handler->PSendSysMessage(LANG_SPAWNINFO_GROUP_ID, groupData->name.c_str(), groupData->groupId, groupData->flags, thisGO->GetMap()->IsSpawnGroupActive(groupData->groupId));
+                handler->PSendSysMessage(LANG_SPAWNINFO_GROUP_ID, groupData->name, groupData->groupId, groupData->flags, thisGO->GetMap()->IsSpawnGroupActive(groupData->groupId));
             }
 
             GameObjectOverride const* goOverride = sObjectMgr->GetGameObjectOverride(spawnId);
@@ -573,13 +613,13 @@ public:
         handler->PSendSysMessage(LANG_GOINFO_TYPE, type);
         handler->PSendSysMessage(LANG_GOINFO_LOOTID, lootId);
         handler->PSendSysMessage(LANG_GOINFO_DISPLAYID, displayId);
-        handler->PSendSysMessage(LANG_GOINFO_NAME, name.c_str());
+        handler->PSendSysMessage(LANG_GOINFO_NAME, name);
         handler->PSendSysMessage(LANG_GOINFO_SIZE, gameObjectInfo->size);
-        handler->PSendSysMessage(LANG_OBJECTINFO_AIINFO, gameObjectInfo->AIName.c_str(), sObjectMgr->GetScriptName(gameObjectInfo->ScriptId).c_str());
+        handler->PSendSysMessage(LANG_OBJECTINFO_AIINFO, gameObjectInfo->AIName, sObjectMgr->GetScriptName(gameObjectInfo->ScriptId));
         if (GameObjectAI const* ai = thisGO ? thisGO->AI() : nullptr)
-            handler->PSendSysMessage(LANG_OBJECTINFO_AITYPE, GetTypeName(*ai).c_str());
+            handler->PSendSysMessage(LANG_OBJECTINFO_AITYPE, GetTypeName(*ai));
 
-        if (GameObjectDisplayInfoEntry const* modelInfo = sGameObjectDisplayInfoStore.LookupEntry(displayId))
+        if (GameObjectDisplayInfoDBC const* modelInfo = sDBCStoresMgr->GetGameObjectDisplayInfoDBC(displayId))
             handler->PSendSysMessage(LANG_GOINFO_MODEL, modelInfo->GeoBoxMax.X, modelInfo->GeoBoxMax.Y, modelInfo->GeoBoxMax.Z, modelInfo->GeoBoxMin.X, modelInfo->GeoBoxMin.Y, modelInfo->GeoBoxMin.Z);
 
         return true;
@@ -636,7 +676,7 @@ public:
             default:
                 break;
         }
-        handler->PSendSysMessage("Set gobject type %d state %u", objectType, *objectState);
+        handler->PSendSysMessage("Set gobject type {} state {}", objectType, *objectState);
         return true;
     }
 };

@@ -188,7 +188,7 @@ class instance_zulaman : public InstanceMapScript
                 }
                 else
                 {
-                    TC_LOG_ERROR("scripts", "Zul'aman: corrupted save data.");
+                    FMT_LOG_ERROR("scripts", "Zul'aman: corrupted save data.");
                     return;
                 }
 

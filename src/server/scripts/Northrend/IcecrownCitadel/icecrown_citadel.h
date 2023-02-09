@@ -25,7 +25,7 @@
 #define ICCScriptName "instance_icecrown_citadel"
 #define DataHeader "IC"
 
-uint32 const EncounterCount = 13;
+uint32 const EncounterCount = 14;
 
 // Shared spells used by more than one script
 enum ICSharedSpells
@@ -121,7 +121,9 @@ enum ICDataTypes
     DATA_BLOOD_PRINCE_COUNCIL_INTRO    = 43,
     DATA_SINDRAGOSA_INTRO              = 44,
     DATA_FACTION_BUFF                  = 45, // used by conditions
-    DATA_NERUBAR_BROODKEEPER_EVENT     = 46
+    DATA_NERUBAR_BROODKEEPER_EVENT     = 46,
+    DATA_PUTRICIDE_TRAP                = 47,
+    DATA_SINDRAGOSA_GAUNTLET           = 48 
 };
 
 enum ICCreaturesIds
@@ -242,6 +244,7 @@ enum ICCreaturesIds
     NPC_TEAR_GAS_TARGET_STALKER                 = 38317,
     NPC_MUTATED_ABOMINATION_10                  = 37672,
     NPC_MUTATED_ABOMINATION_25                  = 38285,
+    NPC_PUTRICIDE_TRAP                          = 38879,
 
     // Blood Prince Council
     NPC_PRINCE_KELESETH                         = 37972,
@@ -301,6 +304,14 @@ enum ICCreaturesIds
     NPC_NIGHTMARE_PORTAL_PRE_EFFECT             = 38429,
     NPC_DREAM_PORTAL                            = 37945,
     NPC_NIGHTMARE_PORTAL                        = 38430,
+
+    // Sindragosa Gauntlet
+    NPC_SINDRAGOSA_GAUNTLET                     = 37503,
+    NPC_NERUBAR_CHAMPION                        = 37501,
+    NPC_NERUBAR_WEBWEAVER                       = 37502,
+    NPC_NERUBAR_BROODLING                       = 37232,
+    NPC_FROSTWARDEN_SORCERESS                   = 37229,
+    NPC_FROSTWARDEN_WARRIOR                     = 37228,
 
     // Sindragosa
     NPC_SINDRAGOSA                              = 36853,
@@ -511,7 +522,10 @@ enum ICSharedActions
 
     // The Lich King
     ACTION_RESTORE_LIGHT        = -72262,
-    ACTION_FROSTMOURNE_INTRO    = -36823
+    ACTION_FROSTMOURNE_INTRO    = -36823,
+
+    // Profession prepare
+    ACTION_COMBAT_PREPARE       = -366781
 };
 
 enum ICWeekliesICC

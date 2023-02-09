@@ -1,5 +1,7 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
+ * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -75,7 +77,6 @@ enum WorldTimers
     WUPDATE_EVENTS,
     WUPDATE_CLEANDB,
     WUPDATE_AUTOBROADCAST,
-    WUPDATE_MAILBOXQUEUE,
     WUPDATE_DELETECHARS,
     WUPDATE_AHBOT,
     WUPDATE_PINGDB,
@@ -178,6 +179,61 @@ enum WorldBoolConfigs
     CONFIG_RESPAWN_DYNAMIC_ESCORTNPC,
     CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
     CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE,
+    // AT Section
+    CONFIG_GUILD_MULTIPLE_GUILD_MASTERS,
+    CONFIG_VMAP_ENABLE_LOS,
+    CONFIG_VMAP_ENABLE_HEIGHT_CALCULATION,
+    CONFIG_ENABLE_SINFO_LOGIN,
+    CONFIG_CHECK_M2_LOS,
+    CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED,
+    CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED,
+    CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED,
+    CONFIG_ANTICHEAT_FLYHACK_ENABLED,
+    CONFIG_ANTICHEAT_SPEEDHACK_ENABLED,
+    CONFIG_ANTICHEAT_IGNORE_CONTROL_MOVEMENT_ENABLED,
+    CONFIG_ASH_KICK_ENABLED,
+    CONFIG_AFH_KICK_ENABLED,
+    CONFIG_FAKEJUMPER_KICK_ENABLED,
+    CONFIG_FAKEFLYINGMODE_KICK_ENABLED,
+    CONFIG_ANTICHEAT_NOFALLINGDMG_KICK_ENABLED,
+    CROSSFACTION_SYSTEM_BATTLEGROUNDS,
+    CONFIG_LOOT_GUILD_ENABLED,
+    CONFIG_FIRST_LOGIN_ACC_BONUS,
+    CONFIG_ALLOWED_LFG_CHANNEL,
+    CONFIG_VIP_DEBUFF,
+    CONFIG_VIP_BANK,
+    CONFIG_VIP_MAIL,
+    CONFIG_VIP_REPAIR,
+    CONFIG_VIP_RESET_TALENTS,
+    CONFIG_VIP_TAXI,
+    CONFIG_VIP_HOME,
+    CONFIG_VIP_CHANGE_RACE,
+    CONFIG_VIP_CUSTOMIZE,
+    CONFIG_VIP_CAPITAL,
+    CONFIG_VIP_APPEAR,
+    CONFIG_VIP_ITEM_HELPER,
+    CONFIG_RAID_INFO,
+    CONFIG_PVP_REWARD,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP,
+    CONFIG_ALLOW_OSX_CONNECT,
+    CONFIG_ANTISPAM_ENABLED,
+    CONFIG_CHATRESTRICTSYMBOLS_ENABLED,
+    CONFIG_CREATECHAR_BONUS_BAGS,
+    CONFIG_CREATECHAR_BONUS_STARTPACK,
+    CONFIG_DUEL_IN_SPECIAL_PHASE,
+    CONFIG_GSYSTEM_LEVEL_ENABLED,
+    CONFIG_GSYSTEM_GUILDWARS_ENABLED,
+    CONFIG_GSYSTEM_GUILDWARS_BETWEEN_TWO_FACTION_ENABLED,
+    CONFIG_GSYSTEM_IN_WHO_LIST,
+    CONFIG_GSYSTEM_IN_QUERY_OPCODE,
+    CONFIG_GSYSTEM_IN_GUILDENEMY_LIST,
+    CONFIG_VAS_AUTOBALANCE,
+    CONFIG_DALARAN_GAME_EVENTS_INSTANT_RETURN,
+    CONFIG_DALARAN_GAME_EVENTS_SQUAD_ENABLED,
+    CONFIG_PLAYER_AUTO_LEARN_ENABLED,
+    CONFIG_PLAYER_UNIVERSAL_LANGUAGE,
+    CONFIG_EXTERNAL_MAIL_ENABLE,
+    // END AT custom
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -203,6 +259,10 @@ enum WorldFloatConfigs
     CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER,
     CONFIG_RESPAWN_DYNAMICRATE_CREATURE,
     CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT,
+    CONFIG_VISIBILITY_DISTANCE_CONTINENTS,
+    CONFIG_VISIBILITY_DISTANCE_INSTANCES,
+    CONFIG_VISIBILITY_DISTANCE_BG,
+    CONFIG_VISIBILITY_DISTANCE_ARENAS,
     FLOAT_CONFIG_VALUE_COUNT
 };
 
@@ -216,6 +276,7 @@ enum WorldIntConfigs
     CONFIG_INTERVAL_DISCONNECT_TOLERANCE,
     CONFIG_PORT_WORLD,
     CONFIG_SOCKET_TIMEOUTTIME,
+    CONFIG_SOCKET_TIMEOUTTIME_ACTIVE,
     CONFIG_SESSION_ADD_DELAY,
     CONFIG_GAME_TYPE,
     CONFIG_REALM_ZONE,
@@ -228,8 +289,8 @@ enum WorldIntConfigs
     CONFIG_CHARACTER_CREATING_DISABLED,
     CONFIG_CHARACTER_CREATING_DISABLED_RACEMASK,
     CONFIG_CHARACTER_CREATING_DISABLED_CLASSMASK,
-    CONFIG_CHARACTERS_PER_ACCOUNT,
     CONFIG_CHARACTERS_PER_REALM,
+    CONFIG_CHARACTERS_PER_ACCOUNT,
     CONFIG_DEATH_KNIGHTS_PER_REALM,
     CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_DEATH_KNIGHT,
     CONFIG_SKIP_CINEMATICS,
@@ -237,6 +298,7 @@ enum WorldIntConfigs
     CONFIG_MIN_DUALSPEC_LEVEL,
     CONFIG_START_PLAYER_LEVEL,
     CONFIG_START_DEATH_KNIGHT_PLAYER_LEVEL,
+    CONFIG_START_GM_LEVEL,
     CONFIG_START_PLAYER_MONEY,
     CONFIG_MAX_HONOR_POINTS,
     CONFIG_START_HONOR_POINTS,
@@ -255,17 +317,15 @@ enum WorldIntConfigs
     CONFIG_MIN_DISCOVERED_SCALED_XP_RATIO,
     CONFIG_GM_LOGIN_STATE,
     CONFIG_GM_VISIBLE_STATE,
-    CONFIG_GM_ACCEPT_TICKETS,
     CONFIG_GM_CHAT,
     CONFIG_GM_WHISPERING_TO,
     CONFIG_GM_FREEZE_DURATION,
     CONFIG_GM_LEVEL_IN_GM_LIST,
     CONFIG_GM_LEVEL_IN_WHO_LIST,
-    CONFIG_START_GM_LEVEL,
     CONFIG_FORCE_SHUTDOWN_THRESHOLD,
     CONFIG_GROUP_VISIBILITY,
     CONFIG_MAIL_DELIVERY_DELAY,
-    CONFIG_CLEAN_OLD_MAIL_TIME,
+    CONFIG_CLEAN_OLD_MAIL_TIME, // UNUSED IN AT
     CONFIG_UPTIME_UPDATE,
     CONFIG_SKILL_CHANCE_ORANGE,
     CONFIG_SKILL_CHANCE_YELLOW,
@@ -307,7 +367,6 @@ enum WorldIntConfigs
     CONFIG_CORPSE_DECAY_RAREELITE,
     CONFIG_CORPSE_DECAY_WORLDBOSS,
     CONFIG_DEATH_SICKNESS_LEVEL,
-    CONFIG_INSTANT_LOGOUT,
     CONFIG_DISABLE_BREATHING,
     CONFIG_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
@@ -327,8 +386,6 @@ enum WorldIntConfigs
     CONFIG_PVP_TOKEN_MAP_TYPE,
     CONFIG_PVP_TOKEN_ID,
     CONFIG_PVP_TOKEN_COUNT,
-    CONFIG_ENABLE_SINFO_LOGIN,
-    CONFIG_PLAYER_ALLOW_COMMANDS,
     CONFIG_NUMTHREADS,
     CONFIG_LOGDB_CLEARINTERVAL,
     CONFIG_LOGDB_CLEARTIME,
@@ -365,7 +422,7 @@ enum WorldIntConfigs
     CONFIG_WINTERGRASP_PLR_MIN_LVL,
     CONFIG_WINTERGRASP_BATTLETIME,
     CONFIG_WINTERGRASP_NOBATTLETIME,
-    CONFIG_WINTERGRASP_RESTART_AFTER_CRASH,
+    CONFIG_WINTERGRASP_RESTART_AFTER_CRASH, //UNUSED
     CONFIG_PACKET_SPOOF_POLICY,
     CONFIG_PACKET_SPOOF_BANMODE,
     CONFIG_PACKET_SPOOF_BANDURATION,
@@ -397,8 +454,38 @@ enum WorldIntConfigs
     CONFIG_RESPAWN_DYNAMICMINIMUM_CREATURE,
     CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT,
     CONFIG_RESPAWN_GUIDWARNING_FREQUENCY,
-    CONFIG_SOCKET_TIMEOUTTIME_ACTIVE,
+    CONFIG_VISIBILITY_NOTIFY_PERIOD_ONCONTINENTS,
+    CONFIG_VISIBILITY_NOTIFY_PERIOD_ININSTANCES,
+    CONFIG_VISIBILITY_NOTIFY_PERIOD_INBG,
+    CONFIG_VISIBILITY_NOTIFY_PERIOD_INARENAS,
+    CONFIG_MAX_PLAYERS_ON_REALM,
     CONFIG_PENDING_MOVE_CHANGES_TIMEOUT,
+    // AT Section
+    CONFIG_VANISH_VISION_TIMER,
+    CONFIG_VANISH_CC_BREAK_TIMER,
+    CONFIG_ANTICHEAT_FLYHACK_TIMER,
+    CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS,
+    CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS,
+    CONFIG_PVP_REWARD_MAXCAP,
+    CONFIG_PVP_REWARD_CAP_FOR_WIN,
+    CONFIG_PVP_REWARD_CAP_FOR_LOSE,
+    CONFIG_ANTISPAM_MAIL_TIMER,
+    CONFIG_ANTISPAM_MAIL_COUNT,
+    CONFIG_ANTISPAM_MAIL_COUNT_CONTROLLER,
+    CONFIG_CREATECHAR_BONUS_BAGS_ID,
+    CONFIG_GSYSTEM_GW_MIN_PLAYERS,
+    CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_START,
+    CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_END,
+    CONFIG_GSYSTEM_ARENA_EXP,
+    CONFIG_GSYSTEM_BG_EXP,
+    CONFIG_GSYSTEM_LFG_EXP,
+    CONFIG_GSYSTEM_GW_KILL_EXP,
+    CONFIG_GSYSTEM_GW_WINNER_EXP,
+    CONFIG_GSYSTEM_GW_LOSER_EXP,
+    CONFIG_GSYSTEM_LVL_FOR_BANK,
+    CONFIG_GSYSTEM_LVL_FOR_REPAIR,
+    CONFIG_DALARAN_GAME_EVENTS_MIN_PLAYERS,
+    // END AT custom
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -470,6 +557,16 @@ enum Rates
     RATE_XP_BOOST,
     RATE_MONEY_QUEST,
     RATE_MONEY_MAX_LEVEL_QUEST,
+    // AT Section
+    RATE_VIP_XP_KILL,
+    RATE_VIP_XP_QUEST,
+    RATE_VIP_HONOR,
+    RATE_VIP_REPUTATION,
+    RATE_GSYSTEM_BONUS_EXP,
+    RATE_CREATURE_IN_ZONE_DAMAGE,
+    RATE_CREATURE_IN_ZONE_SPELLDAMAGE,
+    RATE_CREATURE_IN_ZONE_HEALTH,
+    // END AT custom
     MAX_RATES
 };
 
@@ -657,7 +754,11 @@ class TC_GAME_API World
         void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);
         bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);
         void SendZoneText(uint32 zone, const char *text, WorldSession* self = nullptr, uint32 team = 0);
+        bool SendAutoBroadcastMessage(WorldPacket* packet, WorldSession* self = nullptr);
+        void SendAutoBroadcastText(const char *text, WorldSession* self = nullptr);
 
+        /// Reset PVP Reward Cap for Online Characters
+        void ResetPVPRewardWeeklyCap();
         /// Are we in the middle of a shutdown?
         bool IsShuttingDown() const { return m_ShutdownTimer > 0; }
         uint32 GetShutDownTimeLeft() const { return m_ShutdownTimer; }
@@ -672,15 +773,32 @@ class TC_GAME_API World
 
         void UpdateSessions(uint32 diff);
         /// Set a server rate (see #Rates)
-        void setRate(Rates rate, float value) { rate_values[rate]=value; }
+        bool setRate(Rates rate, float const& value)
+        {
+            bool result = false;
+            if (rate < MAX_RATES)
+            {
+                rate_values[rate] = value;
+                result = true;
+            }
+
+            return result;
+        }
+
         /// Get a server rate (see #Rates)
         float getRate(Rates rate) const { return rate_values[rate]; }
 
         /// Set a server configuration element (see #WorldConfigs)
-        void setBoolConfig(WorldBoolConfigs index, bool value)
+        bool setBoolConfig(WorldBoolConfigs index, bool const& value)
         {
+            bool result = false;
             if (index < BOOL_CONFIG_VALUE_COUNT)
+            {
                 m_bool_configs[index] = value;
+                result = true;
+            }
+
+            return result;
         }
 
         /// Get a server configuration element (see #WorldConfigs)
@@ -690,10 +808,16 @@ class TC_GAME_API World
         }
 
         /// Set a server configuration element (see #WorldConfigs)
-        void setFloatConfig(WorldFloatConfigs index, float value)
+        bool setFloatConfig(WorldFloatConfigs index, float const& value)
         {
+            bool result = false;
             if (index < FLOAT_CONFIG_VALUE_COUNT)
+            {
                 m_float_configs[index] = value;
+                result = true;
+            }
+
+            return result;
         }
 
         /// Get a server configuration element (see #WorldConfigs)
@@ -703,10 +827,16 @@ class TC_GAME_API World
         }
 
         /// Set a server configuration element (see #WorldConfigs)
-        void setIntConfig(WorldIntConfigs index, uint32 value)
+        bool setIntConfig(WorldIntConfigs index, uint32 const& value)
         {
+            bool result = false;
             if (index < INT_CONFIG_VALUE_COUNT)
+            {
                 m_int_configs[index] = value;
+                result = true;
+            }
+
+            return result;
         }
 
         /// Get a server configuration element (see #WorldConfigs)
@@ -771,6 +901,15 @@ class TC_GAME_API World
         bool IsGuidWarning() { return _guidWarn; }
         bool IsGuidAlert() { return _guidAlert; }
 
+        void SetACMapExcludes(const std::string& mapIdExcludes);
+        bool isAreaDisabledForAC(uint32 areaid) const { return excludeACMapsId.count(areaid); }
+
+        void SetBankBagsIdMap(const std::string& bankBagsId);
+        bool isBankBagsID(uint32 id) const { return mapbankBagsId.count(id); }
+
+        void SetCreatureRatesInZone(const std::string& zoneList);
+        bool isZoneforCreatureRates(uint32 zoneId) const { return creatureRatesInZoneId.count(zoneId); }
+
     protected:
         void _UpdateGameTime();
 
@@ -803,8 +942,6 @@ class TC_GAME_API World
         bool m_isClosed;
 
         IntervalTimer m_timers[WUPDATE_COUNT];
-        time_t mail_timer;
-        time_t mail_timer_expires;
 
         SessionMap m_sessions;
         typedef std::unordered_map<uint32, time_t> DisconnectMap;
@@ -820,6 +957,7 @@ class TC_GAME_API World
         uint32 m_int_configs[INT_CONFIG_VALUE_COUNT];
         bool m_bool_configs[BOOL_CONFIG_VALUE_COUNT];
         float m_float_configs[FLOAT_CONFIG_VALUE_COUNT];
+
         typedef std::map<uint32, uint64> WorldStatesMap;
         WorldStatesMap m_worldstates;
         uint32 m_playerLimit;
@@ -884,6 +1022,9 @@ class TC_GAME_API World
         bool _guidAlert;
         uint32 _warnDiff;
         time_t _warnShutdownTime;
+        std::unordered_set<uint32> excludeACMapsId;
+        std::unordered_set<uint32> mapbankBagsId;
+        std::unordered_set<uint32> creatureRatesInZoneId;
 
     friend class debug_commandscript;
 };

@@ -880,11 +880,10 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (!killer)
-                return;
-
-            switch (killer->GetTypeId())
+            if (killer)
             {
+                switch (killer->GetTypeId())
+                {
                 case TYPEID_UNIT:
                     if (Unit* owner = killer->GetOwner())
                         if (Player* player = owner->ToPlayer())
@@ -896,6 +895,7 @@ public:
                     break;
                 default:
                     break;
+                }
             }
 
             if (Creature* LordIllidan = (ObjectAccessor::GetCreature(*me, LordIllidanGUID)))

@@ -33,7 +33,7 @@ else()
 
     # Create a revision-string that we can use
     execute_process(
-      COMMAND "${GIT_EXECUTABLE}" rev-parse --short=12 HEAD
+      COMMAND "${GIT_EXECUTABLE}" rev-list --count HEAD
       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
       OUTPUT_VARIABLE rev_hash
       OUTPUT_STRIP_TRAILING_WHITESPACE

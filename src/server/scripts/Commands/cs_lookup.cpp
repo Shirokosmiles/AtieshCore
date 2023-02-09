@@ -26,7 +26,7 @@ EndScriptData */
 #include "AccountMgr.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameEventMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -106,10 +106,10 @@ public:
         wstrToLower(wNamePart);
 
         // Search in AreaTable.dbc
-        for (uint32 i = 0; i < sAreaTableStore.GetNumRows(); ++i)
+        AreaTableDBCMap const& areaMap = sDBCStoresMgr->GetAreaTableDBCMap();
+        for (const auto& atID : areaMap)
         {
-            AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(i);
-            if (areaEntry)
+            if (AreaTableDBC const* areaEntry = &atID.second)
             {
                 uint8 locale = handler->GetSessionDbcLocale();
                 std::string name = areaEntry->AreaName[locale];
@@ -142,13 +142,13 @@ public:
                     }
 
                     // send area in "id - [name]" format
-                    std::ostringstream ss;
+                    std::string ss;
                     if (handler->GetSession())
-                        ss << areaEntry->ID << " - |cffffffff|Harea:" << areaEntry->ID << "|h[" << name << ' ' << localeNames[locale]<< "]|h|r";
+                        ss = fmt::format("{} - |cffffffff|Harea:{}|h[{} {}]|h|r", areaEntry->ID, areaEntry->ID, name, localeNames[locale]);
                     else
-                        ss << areaEntry->ID << " - " << name << ' ' << localeNames[locale];
+                        ss = fmt::format("{} - {} {}", areaEntry->ID, name, localeNames[locale]);
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    handler->SendSysMessage(ss);
 
                     if (!found)
                         found = true;
@@ -200,9 +200,9 @@ public:
                         }
 
                         if (handler->GetSession())
-                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
+                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name);
                         else
-                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
+                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name);
 
                         if (!found)
                             found = true;
@@ -225,9 +225,9 @@ public:
                 }
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
+                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name);
                 else
-                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
+                    handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name);
 
                 if (!found)
                     found = true;
@@ -280,9 +280,9 @@ public:
                 char const* active = activeEvents.find(id) != activeEvents.end() ? handler->GetTrinityString(LANG_ACTIVE) : "";
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description.c_str(), active);
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description, active);
                 else
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.description.c_str(), active);
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.description, active);
 
                 if (!found)
                     found = true;
@@ -316,10 +316,10 @@ public:
         uint32 count = 0;
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-        for (uint32 id = 0; id < sFactionStore.GetNumRows(); ++id)
+        FactionDBCMap const& factionMap = sDBCStoresMgr->GetFactionDBCMap();
+        for (FactionDBCMap::const_iterator itr = factionMap.begin(); itr != factionMap.end(); ++itr)
         {
-            FactionEntry const* factionEntry = sFactionStore.LookupEntry(id);
-            if (factionEntry)
+            if (FactionDBC const* factionEntry = &itr->second)
             {
                 FactionState const* factionState = target ? target->GetReputationMgr().GetState(factionEntry) : nullptr;
 
@@ -357,9 +357,9 @@ public:
                     // or              "id - [faction] [no reputation]" format
                     std::ostringstream ss;
                     if (handler->GetSession())
-                        ss << id << " - |cffffffff|Hfaction:" << id << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
+                        ss << factionEntry->ID << " - |cffffffff|Hfaction:" << factionEntry->ID << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
                     else
-                        ss << id << " - " << name << ' ' << localeNames[locale];
+                        ss << factionEntry->ID << " - " << name << ' ' << localeNames[locale];
 
                     if (factionState) // and then target != NULL also
                     {
@@ -384,7 +384,7 @@ public:
                     else
                         ss << handler->GetTrinityString(LANG_FACTION_NOREPUTATION);
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    handler->SendSysMessage(ss.str());
 
                     if (!found)
                         found = true;
@@ -435,9 +435,9 @@ public:
                         }
 
                         if (handler->GetSession())
-                            handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplatePair.first, itemTemplatePair.first, name.c_str());
+                            handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplatePair.first, itemTemplatePair.first, name);
                         else
-                            handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplatePair.first, name.c_str());
+                            handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplatePair.first, name);
 
                         if (!found)
                             found = true;
@@ -460,9 +460,9 @@ public:
                 }
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplatePair.first, itemTemplatePair.first, name.c_str());
+                    handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplatePair.first, itemTemplatePair.first, name);
                 else
-                    handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplatePair.first, name.c_str());
+                    handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemTemplatePair.first, name);
 
                 if (!found)
                     found = true;
@@ -493,9 +493,9 @@ public:
             }
 
             if (handler->GetSession())
-                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, id, id, name.c_str());
+                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, id, id, name);
             else
-                handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, id, name.c_str());
+                handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, id, name);
         }
         else
             handler->SendSysMessage(LANG_COMMAND_NOITEMFOUND);
@@ -522,10 +522,10 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in ItemSet.dbc
-        for (uint32 id = 0; id < sItemSetStore.GetNumRows(); id++)
+        ItemSetDBCMap const& entryMap = sDBCStoresMgr->GetItemSetMap();
+        for (const auto& indexID : entryMap)
         {
-            ItemSetEntry const* set = sItemSetStore.LookupEntry(id);
-            if (set)
+            if (ItemSetDBC const* set = &indexID.second)
             {
                 uint8 locale = handler->GetSessionDbcLocale();
                 std::string name = set->Name[locale];
@@ -559,15 +559,16 @@ public:
 
                     // send item set in "id - [namedlink locale]" format
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CHAT, id, id, name.c_str(), localeNames[locale]);
+                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CHAT, set->ID, set->ID, name, localeNames[locale]);
                     else
-                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CONSOLE, id, name.c_str(), localeNames[locale]);
+                        handler->PSendSysMessage(LANG_ITEMSET_LIST_CONSOLE, set->ID, name, localeNames[locale]);
 
                     if (!found)
                         found = true;
                 }
             }
         }
+
         if (!found)
             handler->SendSysMessage(LANG_COMMAND_NOITEMSETFOUND);
 
@@ -610,9 +611,9 @@ public:
                         }
 
                         if (handler->GetSession())
-                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplatePair.first, gameObjectTemplatePair.first, name.c_str());
+                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplatePair.first, gameObjectTemplatePair.first, name);
                         else
-                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplatePair.first, name.c_str());
+                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplatePair.first, name);
 
                         if (!found)
                             found = true;
@@ -635,9 +636,9 @@ public:
                 }
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplatePair.first, gameObjectTemplatePair.first, name.c_str());
+                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, gameObjectTemplatePair.first, gameObjectTemplatePair.first, name);
                 else
-                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplatePair.first, name.c_str());
+                    handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, gameObjectTemplatePair.first, name);
 
                 if (!found)
                     found = true;
@@ -710,9 +711,9 @@ public:
                         }
 
                         if (handler->GetSession())
-                            handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, questTemplatePair.first, questTemplatePair.first, questTemplatePair.second.GetQuestLevel(), title.c_str(), statusStr);
+                            handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, questTemplatePair.first, questTemplatePair.first, questTemplatePair.second.GetQuestLevel(), title, statusStr);
                         else
-                            handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, questTemplatePair.first, title.c_str(), statusStr);
+                            handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, questTemplatePair.first, title, statusStr);
 
                         if (!found)
                             found = true;
@@ -755,9 +756,9 @@ public:
                 }
 
                 if (handler->GetSession())
-                    handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, questTemplatePair.first, questTemplatePair.first, questTemplatePair.second.GetQuestLevel(), title.c_str(), statusStr);
+                    handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, questTemplatePair.first, questTemplatePair.first, questTemplatePair.second.GetQuestLevel(), title, statusStr);
                 else
-                    handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, questTemplatePair.first, title.c_str(), statusStr);
+                    handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, questTemplatePair.first, title, statusStr);
 
                 if (!found)
                     found = true;
@@ -810,9 +811,9 @@ public:
             }
 
             if (handler->GetSession())
-                handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, id, id, quest->GetQuestLevel(), title.c_str(), statusStr);
+                handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, id, id, quest->GetQuestLevel(), title, statusStr);
             else
-                handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, id, title.c_str(), statusStr);
+                handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, id, title, statusStr);
         }
         else
             handler->SendSysMessage(LANG_COMMAND_NOQUESTFOUND);
@@ -842,10 +843,10 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in SkillLine.dbc
-        for (uint32 id = 0; id < sSkillLineStore.GetNumRows(); id++)
+        SkillLineDBCMap const& skilllinemap = sDBCStoresMgr->GetSkillLineDBCMap();
+        for (SkillLineDBCMap::const_iterator itr = skilllinemap.begin(); itr != skilllinemap.end(); ++itr)
         {
-            SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(id);
-            if (skillInfo)
+            if (SkillLineDBC const* skillInfo = &itr->second)
             {
                 uint8 locale = handler->GetSessionDbcLocale();
                 std::string name = skillInfo->DisplayName[locale];
@@ -879,13 +880,13 @@ public:
 
                     char valStr[50] = "";
                     char const* knownStr = "";
-                    if (target && target->HasSkill(id))
+                    if (target && target->HasSkill(skillInfo->ID))
                     {
                         knownStr = handler->GetTrinityString(LANG_KNOWN);
-                        uint32 curValue = target->GetPureSkillValue(id);
-                        uint32 maxValue  = target->GetPureMaxSkillValue(id);
-                        uint32 permValue = target->GetSkillPermBonusValue(id);
-                        uint32 tempValue = target->GetSkillTempBonusValue(id);
+                        uint32 curValue = target->GetPureSkillValue(skillInfo->ID);
+                        uint32 maxValue = target->GetPureMaxSkillValue(skillInfo->ID);
+                        uint32 permValue = target->GetSkillPermBonusValue(skillInfo->ID);
+                        uint32 tempValue = target->GetSkillTempBonusValue(skillInfo->ID);
 
                         char const* valFormat = handler->GetTrinityString(LANG_SKILL_VALUES);
                         snprintf(valStr, 50, valFormat, curValue, maxValue, permValue, tempValue);
@@ -893,15 +894,16 @@ public:
 
                     // send skill in "id - [namedlink locale]" format
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_SKILL_LIST_CHAT, id, id, name.c_str(), localeNames[locale], knownStr, valStr);
+                        handler->PSendSysMessage(LANG_SKILL_LIST_CHAT, skillInfo->ID, skillInfo->ID, name, localeNames[locale], knownStr, valStr);
                     else
-                        handler->PSendSysMessage(LANG_SKILL_LIST_CONSOLE, id, name.c_str(), localeNames[locale], knownStr, valStr);
+                        handler->PSendSysMessage(LANG_SKILL_LIST_CONSOLE, skillInfo->ID, name, localeNames[locale], knownStr, valStr);
 
                     if (!found)
                         found = true;
                 }
             }
         }
+
         if (!found)
             handler->SendSysMessage(LANG_COMMAND_NOSKILLFOUND);
 
@@ -972,7 +974,7 @@ public:
 
                     SpellInfo const* learnSpellInfo = sSpellMgr->GetSpellInfo(spellEffectInfo.TriggerSpell);
 
-                    uint32 talentCost = GetTalentSpellCost(id);
+                    uint32 talentCost = sDBCStoresMgr->GetTalentSpellCost(id);
 
                     bool talent = (talentCost > 0);
                     bool passive = spellInfo->IsPassive();
@@ -1009,7 +1011,7 @@ public:
                     if (active)
                         ss << handler->GetTrinityString(LANG_ACTIVE);
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    handler->SendSysMessage(ss.str());
 
                     if (!found)
                         found = true;
@@ -1049,7 +1051,7 @@ public:
 
             SpellInfo const* learnSpellInfo = sSpellMgr->GetSpellInfo(spellEffectInfo.TriggerSpell);
 
-            uint32 talentCost = GetTalentSpellCost(id);
+            uint32 talentCost = sDBCStoresMgr->GetTalentSpellCost(id);
 
             bool talent = (talentCost > 0);
             bool passive = spellInfo->IsPassive();
@@ -1086,7 +1088,7 @@ public:
             if (active)
                 ss << handler->GetTrinityString(LANG_ACTIVE);
 
-            handler->SendSysMessage(ss.str().c_str());
+            handler->SendSysMessage(ss.str());
         }
         else
             handler->SendSysMessage(LANG_COMMAND_NOSPELLFOUND);
@@ -1113,10 +1115,10 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in TaxiNodes.dbc
-        for (uint32 id = 0; id < sTaxiNodesStore.GetNumRows(); id++)
+        TaxiNodesDBCMap const& tnMap = sDBCStoresMgr->GetTaxiNodesDBCMap();
+        for (const auto& tnID : tnMap)
         {
-            TaxiNodesEntry const* nodeEntry = sTaxiNodesStore.LookupEntry(id);
-            if (nodeEntry)
+            if (TaxiNodesDBC const* nodeEntry = &tnID.second)
             {
                 uint8 locale = handler->GetSessionDbcLocale();
                 std::string name = nodeEntry->Name[locale];
@@ -1150,10 +1152,10 @@ public:
 
                     // send taxinode in "id - [name] (Map:m X:x Y:y Z:z)" format
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CHAT, id, id, name.c_str(), localeNames[locale],
+                        handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CHAT, nodeEntry->ID, nodeEntry->ID, name, localeNames[locale],
                             nodeEntry->ContinentID, nodeEntry->Pos.X, nodeEntry->Pos.Y, nodeEntry->Pos.Z);
                     else
-                        handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CONSOLE, id, name.c_str(), localeNames[locale],
+                        handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CONSOLE, nodeEntry->ID, name, localeNames[locale],
                             nodeEntry->ContinentID, nodeEntry->Pos.X, nodeEntry->Pos.Y, nodeEntry->Pos.Z);
 
                     if (!found)
@@ -1218,7 +1220,7 @@ public:
         if (reply.str().empty())
             handler->SendSysMessage(LANG_COMMAND_TELE_NOLOCATION);
         else
-            handler->PSendSysMessage(LANG_COMMAND_TELE_LOCATION, reply.str().c_str());
+            handler->PSendSysMessage(LANG_COMMAND_TELE_LOCATION, reply.str());
 
         if (limitReached)
             handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
@@ -1250,14 +1252,18 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in CharTitles.dbc
-        for (uint32 id = 0; id < sCharTitlesStore.GetNumRows(); id++)
+        CharTitlesDBCMap const& entryMap = sDBCStoresMgr->GetCharTitlesDBCMap();
+        for (const auto& skaID : entryMap)
         {
-            CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
-            if (titleInfo)
+            if (CharTitlesDBC const* titleInfo = &skaID.second)
             {
-                /// @todo: implement female support
                 uint8 locale = handler->GetSessionDbcLocale();
-                std::string name = titleInfo->Name[locale];
+                std::string name = "";
+                if (target)
+                    name = target->GetGender() > 0 ? titleInfo->Name1[locale] : titleInfo->Name[locale];
+                else
+                    name = titleInfo->Name[locale];
+
                 if (name.empty())
                     continue;
 
@@ -1297,14 +1303,15 @@ public:
 
                     // send title in "id (idx:idx) - [namedlink locale]" format
                     if (handler->GetSession())
-                        handler->PSendSysMessage(LANG_TITLE_LIST_CHAT, id, titleInfo->MaskID, id, titleNameStr, localeNames[locale], knownStr, activeStr);
+                        handler->PSendSysMessage(LANG_TITLE_LIST_CHAT, titleInfo->ID, titleInfo->MaskID, titleInfo->ID, titleNameStr, localeNames[locale], knownStr, activeStr);
                     else
-                        handler->PSendSysMessage(LANG_TITLE_LIST_CONSOLE, id, titleInfo->MaskID, titleNameStr, localeNames[locale], knownStr, activeStr);
+                        handler->PSendSysMessage(LANG_TITLE_LIST_CONSOLE, titleInfo->ID, titleInfo->MaskID, titleNameStr, localeNames[locale], knownStr, activeStr);
 
                     ++counter;
                 }
             }
         }
+
         if (counter == 0)  // if counter == 0 then we found nth
             handler->SendSysMessage(LANG_COMMAND_NOTITLEFOUND);
 
@@ -1329,9 +1336,10 @@ public:
         uint8 locale = handler->GetSession() ? handler->GetSession()->GetSessionDbcLocale() : sWorld->GetDefaultDbcLocale();
 
         // search in Map.dbc
-        for (uint32 id = 0; id < sMapStore.GetNumRows(); id++)
+        MapDBCMap const& mapMap = sDBCStoresMgr->GetMapDBCMap();
+        for (MapDBCMap::const_iterator itr = mapMap.begin(); itr != mapMap.end(); ++itr)
         {
-            if (MapEntry const* mapInfo = sMapStore.LookupEntry(id))
+            if (MapDBC const* mapInfo = &itr->second)
             {
                 std::string name = mapInfo->MapName[locale];
                 if (name.empty())
@@ -1346,28 +1354,28 @@ public:
                     }
 
                     std::ostringstream ss;
-                    ss << id << " - [" << name << ']';
+                    ss << mapInfo->ID << " - [" << name << ']';
 
                     if (mapInfo->IsContinent())
                         ss << handler->GetTrinityString(LANG_CONTINENT);
 
                     switch (mapInfo->InstanceType)
                     {
-                        case MAP_INSTANCE:
-                            ss << handler->GetTrinityString(LANG_INSTANCE);
-                            break;
-                        case MAP_RAID:
-                            ss << handler->GetTrinityString(LANG_RAID);
-                            break;
-                        case MAP_BATTLEGROUND:
-                            ss << handler->GetTrinityString(LANG_BATTLEGROUND);
-                            break;
-                        case MAP_ARENA:
-                            ss << handler->GetTrinityString(LANG_ARENA);
-                            break;
+                    case MAP_INSTANCE:
+                        ss << handler->GetTrinityString(LANG_INSTANCE);
+                        break;
+                    case MAP_RAID:
+                        ss << handler->GetTrinityString(LANG_RAID);
+                        break;
+                    case MAP_BATTLEGROUND:
+                        ss << handler->GetTrinityString(LANG_BATTLEGROUND);
+                        break;
+                    case MAP_ARENA:
+                        ss << handler->GetTrinityString(LANG_ARENA);
+                        break;
                     }
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    handler->SendSysMessage(ss.str());
 
                     ++counter;
                 }
@@ -1387,7 +1395,7 @@ public:
 
         uint32 id = atoi((char*)args);
 
-        if (MapEntry const* mapInfo = sMapStore.LookupEntry(id))
+        if (MapDBC const* mapInfo = sDBCStoresMgr->GetMapDBC(id))
         {
             uint8 locale = handler->GetSession() ? handler->GetSession()->GetSessionDbcLocale() : sWorld->GetDefaultDbcLocale();
             std::string name = mapInfo->MapName[locale];
@@ -1419,7 +1427,7 @@ public:
                 break;
             }
 
-            handler->SendSysMessage(ss.str().c_str());
+            handler->SendSysMessage(ss.str());
         }
         else
             handler->SendSysMessage(LANG_COMMAND_NOMAPFOUND);
@@ -1524,7 +1532,7 @@ public:
 
             if (result2)
             {
-                handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName.c_str(), accountId);
+                handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName, accountId);
 
                 do
                 {
@@ -1533,7 +1541,7 @@ public:
                     std::string name        = characterFields[1].GetString();
                     uint8 online = characterFields[2].GetUInt8();
 
-                    handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name.c_str(), guid, online ? handler->GetTrinityString(LANG_ONLINE) : "");
+                    handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name, guid, online ? handler->GetTrinityString(LANG_ONLINE) : "");
                     ++counter;
                 }
                 while (result2->NextRow() && (limit == -1 || counter < limit));

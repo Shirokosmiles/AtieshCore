@@ -64,6 +64,9 @@ struct TC_GAME_API EscortAI : public ScriptedAI
         void SetActiveAttacker(bool enable) { _activeAttacker = enable; }
         ObjectGuid GetEventStarterGUID() const { return _playerGUID; }
 
+        void AddEscortState(uint32 escortState) { _escortState |= escortState; }
+        void RemoveEscortState(uint32 escortState) { _escortState &= ~escortState; }
+
     protected:
         Player* GetPlayerForEscort();
 
@@ -71,9 +74,6 @@ struct TC_GAME_API EscortAI : public ScriptedAI
         bool AssistPlayerInCombatAgainst(Unit* who);
         bool IsPlayerOrGroupInRange();
         void FillPointMovementListForCreature();
-
-        void AddEscortState(uint32 escortState) { _escortState |= escortState; }
-        void RemoveEscortState(uint32 escortState) { _escortState &= ~escortState; }
 
         ObjectGuid _playerGUID;
         Milliseconds _pauseTimer;

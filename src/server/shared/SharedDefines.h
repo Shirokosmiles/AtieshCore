@@ -22,6 +22,7 @@
 #include "Define.h"
 #include "EnumFlag.h"
 #include "SmartEnum.h"
+#include <map>
 
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
 constexpr float Z_OFFSET_FIND_HEIGHT = 1.5f;
@@ -77,6 +78,42 @@ enum Gender
     GENDER_MALE                        = 0,
     GENDER_FEMALE                      = 1,
     GENDER_NONE                        = 2
+};
+
+enum eRanks
+{
+    /* Alliance */
+    PRIVATE              = 1,
+    CORPORAL             = 2,
+    SERGEANT             = 3,
+    MASTER_SERGEANT      = 4,
+    SERGEANT_MAJOR       = 5,
+    KNIGHT               = 6,
+    KNIGHT_LIEUTENANT    = 7,
+    KNIGHT_CAPTAIN       = 8,
+    KNIGHT_CHAMPION      = 9,
+    LIEUTENANT_COMMANDER = 10,
+    COMMANDER            = 11,
+    MARSHAL              = 12,
+    FIELD_MARSHAL        = 13,
+    GRAND_MARSHAL        = 14,
+    OF_THE_ALLIANCE      = 126,
+  /* Horde */
+    SCOUT                = 15,
+    GRUNT                = 16,
+    SERGEANT_H           = 17,
+    SENIOR_SERGEANT      = 18,
+    FIRST_SERGEANT       = 19,
+    STONE_GUARD          = 20,
+    BLOOD_GUARD          = 21,
+    LEGIONNAIRE          = 22,
+    CENTURION            = 23,
+    CHAMPION             = 24,
+    LIEUTENANT_GENERAL   = 25,
+    GENERAL              = 26,
+    WARLORD              = 27,
+    HIGH_WARLORD         = 28,
+    OF_THE_HORDE         = 127
 };
 
 // Race value is index in ChrRaces.dbc
@@ -3492,12 +3529,12 @@ enum BanReturn
 
 enum PvPTeamId
 {
-    PVP_TEAM_HORDE       = 0, // Battleground: Horde,    Arena: Green
-    PVP_TEAM_ALLIANCE    = 1, // Battleground: Alliance, Arena: Gold
-    PVP_TEAM_NEUTRAL     = 2  // Battleground: Neutral,  Arena: None
+    PVP_TEAM_HORDE    = 0, // Battleground/Battlefield: Horde,    Arena: Green
+    PVP_TEAM_ALLIANCE = 1, // Battleground/Battlefield: Alliance, Arena: Gold
+    PVP_TEAM_NEUTRAL  = 2  // Battleground/Battlefield: Neutral,  Arena: None
 };
 
-uint8 constexpr PVP_TEAMS_COUNT = 2;
+static uint8 constexpr PVP_TEAMS_COUNT = 2;
 
 // indexes of BattlemasterList.dbc
 enum BattlegroundTypeId : uint32
@@ -3518,13 +3555,7 @@ enum BattlegroundTypeId : uint32
     BATTLEGROUND_RB             = 32  // Random Battleground
 };
 
-#define MAX_BATTLEGROUND_TYPE_ID 33
-
-enum BattlefieldBattleId : uint8
-{
-    BATTLEFIELD_BATTLEID_WINTERGRASP = 1, // Wintergrasp battle
-    BATTLEFIELD_BATTLEID_MAX = 2
-};
+static uint32 constexpr MAX_BATTLEGROUND_TYPE_ID = 33;
 
 enum MailResponseType
 {
@@ -3802,6 +3833,26 @@ enum LineOfSightChecks
     LINEOFSIGHT_ALL_CHECKS      = (LINEOFSIGHT_CHECK_VMAP | LINEOFSIGHT_CHECK_GOBJECT)
 };
 
+enum SpectatorPrefix
+{
+    SPECTATOR_PREFIX_PLAYER,
+    SPECTATOR_PREFIX_STATUS,
+    SPECTATOR_PREFIX_MAXHP,
+    SPECTATOR_PREFIX_CURHP,
+    SPECTATOR_PREFIX_MAXPOWER,
+    SPECTATOR_PREFIX_CURPOWER,
+    SPECTATOR_PREFIX_POWERTYPE,
+    SPECTATOR_PREFIX_TARGET,
+    SPECTATOR_PREFIX_CLASS,
+    SPECTATOR_PREFIX_TEAM,
+    SPECTATOR_PREFIX_SPELL,
+    SPECTATOR_PREFIX_AURA,
+    SPECTATOR_PREFIX_RESET,
+    SPECTATOR_PREFIX_CANCEL_SPELL,
+    SPECTATOR_PREFIX_AURA_REMOVE,
+    SPECTATOR_PREFIX_COUNT      // must be at the end of list
+};
+
 enum ServerProcessTypes
 {
     SERVER_PROCESS_AUTHSERVER = 0,
@@ -3827,11 +3878,18 @@ enum class MountResult : uint32
 
 enum AreaId : uint32
 {
+    // ZoneID = non areaid
     AREA_WINTERGRASP                = 4197,
-    AREA_THE_SUNKEN_RING            = 4538,
-    AREA_THE_BROKEN_TEMPLATE        = 4539,
+    // keep fortress
     AREA_WINTERGRASP_FORTRESS       = 4575,
+
+    // sunken ring
+    AREA_THE_SUNKEN_RING            = 4538,
+
+    // chilled quagmire and broken template
+    AREA_THE_BROKEN_TEMPLATE        = 4539,
     AREA_THE_CHILLED_QUAGMIRE       = 4589,
+
     AREA_WESTPARK_WORKSHOP          = 4611,
     AREA_EASTPARK_WORKSHOP          = 4612,
 };

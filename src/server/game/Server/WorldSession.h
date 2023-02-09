@@ -31,6 +31,8 @@
 #include "Packet.h"
 #include "SharedDefines.h"
 #include <string>
+#include "World.h"
+
 #include <map>
 #include <memory>
 #include <unordered_map>
@@ -51,7 +53,7 @@ class Warden;
 class WorldPacket;
 class WorldSocket;
 struct AddonInfo;
-struct AreaTableEntry;
+struct AreaTableDBC;
 struct AuctionEntry;
 struct DeclinedName;
 struct ItemTemplate;
@@ -80,6 +82,20 @@ class RBACData;
 
 namespace WorldPackets
 {
+    namespace Battlefield
+    {
+        class BattlefieldMgrEntryInviteResponse;
+        class BattlefieldMgrQueueInviteResponse;
+        class BattlefieldMgrExitRequest;
+    }
+
+    namespace Battleground
+    {
+        class AreaSpiritHealerQuery;
+        class AreaSpiritHealerQueue;
+        class HearthAndResurrect;
+    }
+
     namespace Bank
     {
         class AutoBankItem;
@@ -101,12 +117,14 @@ namespace WorldPackets
     {
         class EmoteClient;
     }
+
     namespace Combat
     {
         class AttackSwing;
         class AttackStop;
         class SetSheathed;
     }
+
     namespace Guild
     {
         class QueryGuildInfo;
@@ -152,15 +170,14 @@ namespace WorldPackets
 
     namespace Mail
     {
-        class MailCreateTextItem;
-        class MailDelete;
-        class MailGetList;
+        class SendMailClient;
         class MailMarkAsRead;
-        class MailQueryNextMailTime;
+        class MailDelete;
         class MailReturnToSender;
         class MailTakeItem;
         class MailTakeMoney;
-        class SendMail;
+        class MailGetList;
+        class MailCreateTextItem;
     }
 
     namespace Misc
@@ -199,10 +216,12 @@ namespace WorldPackets
         class QueryItemSingle;
         class QuestPOIQuery;
     }
+
     namespace Quest
     {
         class QueryQuestInfo;
     }
+
     namespace Spells
     {
         class CancelCast;
@@ -265,8 +284,8 @@ enum BarberShopResult
 enum BFLeaveReason
 {
     BF_LEAVE_REASON_CLOSE     = 0x00000001,
-    //BF_LEAVE_REASON_UNK1      = 0x00000002, (not used)
-    //BF_LEAVE_REASON_UNK2      = 0x00000004, (not used)
+    //BF_LEAVE_REASON_UNK1      = 0x00000002,
+    //BF_LEAVE_REASON_UNK2      = 0x00000004,
     BF_LEAVE_REASON_EXITED    = 0x00000008,
     BF_LEAVE_REASON_LOW_LEVEL = 0x00000010
 };
@@ -445,6 +464,9 @@ class TC_GAME_API WorldSession
         std::string const& GetPlayerName() const;
         std::string GetPlayerInfo() const;
 
+        uint32 GetCurrentVendor() const { return m_currentVendorEntry; }
+        void SetCurrentVendor(uint32 vendorEntry) { m_currentVendorEntry = vendorEntry; }
+
         ObjectGuid::LowType GetGUIDLow() const;
         void SetSecurity(AccountTypes security) { _security = security; }
         std::string const& GetRemoteAddress() const { return m_Address; }
@@ -493,7 +515,7 @@ class TC_GAME_API WorldSession
         void SendNameQueryOpcode(ObjectGuid guid);
 
         void SendTrainerList(Creature* npc);
-        void SendListInventory(ObjectGuid guid);
+        void SendListInventory(ObjectGuid guid, uint32 vendorEntry = 0);
         void SendShowBank(ObjectGuid guid);
         bool CanOpenMailBox(ObjectGuid guid);
         void SendShowMailBox(ObjectGuid guid);
@@ -585,6 +607,29 @@ class TC_GAME_API WorldSession
         // Recruit-A-Friend Handling
         uint32 GetRecruiterId() const { return recruiterId; }
         bool IsARecruiter() const { return isRecruiter; }
+
+        // Antispam Functions
+        void UpdateAntispamTimer(uint32 diff)
+        {
+            if (m_uiAntispamMailSentTimer <= diff)
+            {
+                m_uiAntispamMailSentTimer = sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_TIMER);
+                m_uiAntispamMailSentCount = 0;
+            }
+            else
+                m_uiAntispamMailSentTimer -= diff;
+        }
+
+        bool UpdateAntispamCount()
+        {
+            if (!sWorld->getBoolConfig(CONFIG_ANTISPAM_ENABLED))
+                return true;
+
+            m_uiAntispamMailSentCount++;
+            if (m_uiAntispamMailSentCount > sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_COUNT))
+                return false;
+            return true;
+        }
 
         // Time Synchronisation
         void ResetTimeSync();
@@ -838,7 +883,7 @@ class TC_GAME_API WorldSession
         void HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyBankSlot);
 
         void HandleGetMailList(WorldPackets::Mail::MailGetList& getList);
-        void HandleSendMail(WorldPackets::Mail::SendMail& sendMail);
+        void HandleSendMail(WorldPackets::Mail::SendMailClient& sendMail);
         void HandleMailTakeMoney(WorldPackets::Mail::MailTakeMoney& takeMoney);
         void HandleMailTakeItem(WorldPackets::Mail::MailTakeItem& takeItem);
         void HandleMailMarkAsRead(WorldPackets::Mail::MailMarkAsRead& markAsRead);
@@ -846,7 +891,7 @@ class TC_GAME_API WorldSession
         void HandleMailDelete(WorldPackets::Mail::MailDelete& mailDelete);
         void HandleItemTextQuery(WorldPacket& recvData);
         void HandleMailCreateTextItem(WorldPackets::Mail::MailCreateTextItem& createTextItem);
-        void HandleQueryNextMailTime(WorldPackets::Mail::MailQueryNextMailTime& queryNextMailTime);
+        void HandleQueryNextMailTime(WorldPacket& recvData);
 
         void HandleSplitItemOpcode(WorldPacket& recvPacket);
         void HandleSwapInvItemOpcode(WorldPacket& recvPacket);
@@ -964,7 +1009,7 @@ class TC_GAME_API WorldSession
         void HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestroyed);
         void HandleDismissCritter(WorldPackets::Pet::DismissCritter& dismissCritter);
 
-        //Battleground
+        // Battleground
         void HandleBattlemasterHelloOpcode(WorldPacket& recvData);
         void HandleBattlemasterJoinOpcode(WorldPacket& recvData);
         void HandleBattlegroundPlayerPositionsOpcode(WorldPacket& recvData);
@@ -974,16 +1019,20 @@ class TC_GAME_API WorldSession
         void HandleBattlefieldLeaveOpcode(WorldPacket& recvData);
         void HandleBattlemasterJoinArena(WorldPacket& recvData);
         void HandleReportPvPAFK(WorldPacket& recvData);
+        void HandleAreaSpiritHealerQueryOpcode(WorldPackets::Battleground::AreaSpiritHealerQuery& areaSpiritHealerQuery);
+        void HandleAreaSpiritHealerQueueOpcode(WorldPackets::Battleground::AreaSpiritHealerQueue& areaSpiritHealerQueue);
+        void HandleHearthAndResurrect(WorldPackets::Battleground::HearthAndResurrect& hearthAndResurrect);
 
         // Battlefield
-        void SendBfInvitePlayerToWar(uint32 battleId, uint32 zoneId, uint32 time);
-        void SendBfInvitePlayerToQueue(uint32 battleId);
-        void SendBfQueueInviteResponse(uint32 battleId, uint32 zoneId, bool canQueue = true, bool full = false);
-        void SendBfEntered(uint32 battleId);
-        void SendBfLeaveMessage(uint32 battleId, BFLeaveReason reason = BF_LEAVE_REASON_EXITED);
-        void HandleBfQueueInviteResponse(WorldPacket& recvData);
-        void HandleBfEntryInviteResponse(WorldPacket& recvData);
-        void HandleBfQueueExitRequest(WorldPacket& recvData);
+        void SendBattlefieldInvitePlayerToWar(uint32 battleId, uint32 zoneId, uint32 time);
+        void SendBattlefieldInvitePlayerToQueue(uint32 battleId);
+        void SendBattlefieldQueueInviteResponse(uint32 battleId, uint32 zoneId, bool canQueue = true, bool full = false);
+        void SendBattlefieldEntered(uint32 battleId);
+        void SendBattlefieldLeaveMessage(uint32 battleId, BFLeaveReason reason = BF_LEAVE_REASON_EXITED);
+        void SendBattlefieldEjectPending(uint32 battleId, bool remove);
+        void HandleBattlefieldEntryInviteResponse(WorldPackets::Battlefield::BattlefieldMgrEntryInviteResponse& entryInviteResponse);
+        void HandleBattlefieldQueueInviteResponse(WorldPackets::Battlefield::BattlefieldMgrQueueInviteResponse& queueInviteResponse);
+        void HandleBattlefieldExitRequest(WorldPackets::Battlefield::BattlefieldMgrExitRequest& exitRequest);
 
         void HandleWardenDataOpcode(WorldPacket& recvData);
         void HandleWorldTeleportOpcode(WorldPackets::Misc::WorldTeleport& worldTeleport);
@@ -997,7 +1046,6 @@ class TC_GAME_API WorldSession
         void HandleTimeSyncResponse(WorldPacket& recvData);
         void HandleWhoIsOpcode(WorldPacket& recvData);
         void HandleResetInstancesOpcode(WorldPacket& recvData);
-        void HandleHearthAndResurrect(WorldPacket& recvData);
         void HandleInstanceLockResponse(WorldPacket& recvPacket);
 
         // Looking for Dungeon/Raid
@@ -1040,8 +1088,6 @@ class TC_GAME_API WorldSession
         void HandleArenaTeamDisbandOpcode(WorldPacket& recvData);
         void HandleArenaTeamLeaderOpcode(WorldPacket& recvData);
 
-        void HandleAreaSpiritHealerQueryOpcode(WorldPacket& recvData);
-        void HandleAreaSpiritHealerQueueOpcode(WorldPacket& recvData);
         void HandleSelfResOpcode(WorldPacket& recvData);
         void HandleComplainOpcode(WorldPacket& recvData);
         void HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& packet);
@@ -1191,6 +1237,7 @@ class TC_GAME_API WorldSession
         uint32 _accountId;
         std::string _accountName;
         uint8 m_expansion;
+        uint32 m_Hoffset;
 
         // Warden
         std::unique_ptr<Warden> _warden;                                    // Remains NULL if Warden system is not enabled by config
@@ -1234,6 +1281,7 @@ class TC_GAME_API WorldSession
         rbac::RBACData* _RBACData;
         uint32 expireTime;
         bool forceExit;
+        uint32 m_currentVendorEntry = 0;
         ObjectGuid m_currentBankerGUID;
 
         boost::circular_buffer<std::pair<int64, uint32>> _timeSyncClockDeltaQueue; // first member: clockDelta. Second member: latency of the packet exchange that was used to compute that clockDelta.
@@ -1247,6 +1295,15 @@ class TC_GAME_API WorldSession
         // Packets cooldown
         time_t _calendarEventCreationCooldown;
         GameClient* _gameClient;
+
+        // custom ATiesh features
+        uint32 m_uiAntispamMailSentCount;
+        uint32 m_uiAntispamMailSentTimer;
+        time_t timerGsSpam;
+        time_t timerWhoOpcode;
+        time_t timerMessageChannelOpcode;
+        uint32 countWhoOpcode;
+        uint32 countMessageChannelOpcode;
 
         WorldSession(WorldSession const& right) = delete;
         WorldSession& operator=(WorldSession const& right) = delete;

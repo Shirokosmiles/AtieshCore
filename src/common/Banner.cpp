@@ -19,10 +19,11 @@
 #include "GitRevision.h"
 #include "StringFormat.h"
 
-void Trinity::Banner::Show(char const* applicationName, void(*log)(char const* text), void(*logExtraInfo)())
+void Trinity::Banner::Show(std::string_view applicationName, void(*log)(std::string_view text), void(*logExtraInfo)())
 {
-    log(Trinity::StringFormat("%s (%s)", GitRevision::GetFullVersion(), applicationName).c_str());
+    log(Trinity::StringFormat("{} ({})", GitRevision::GetFullVersion(), applicationName));
     log("<Ctrl-C> to stop.\n");
+    /*
     log(" ______                       __");
     log("/\\__  _\\       __          __/\\ \\__");
     log("\\/_/\\ \\/ _ __ /\\_\\    ___ /\\_\\ \\, _\\  __  __");
@@ -32,6 +33,14 @@ void Trinity::Banner::Show(char const* applicationName, void(*log)(char const* t
     log("      \\/_/\\/_/   \\/_/\\/_/\\/_/\\/_/\\/__/ `/___/> \\");
     log("                                 C O R E  /\\___/");
     log("http://TrinityCore.org                    \\/__/\n");
+    */
+
+    log("████─███─███─███─███─█──█─────████─████─████─███");
+    log("█──█──█───█──█───█───█──█─────█──█─█──█─█──█─█");
+    log("████──█───█──███─███─████─███─█────█──█─████─███");
+    log("█──█──█───█──█─────█─█──█─────█──█─█──█─█─█──█");
+    log("█──█──█──███─███─███─█──█─────████─████─█─█──███");
+    log("\n");
 
     if (logExtraInfo)
         logExtraInfo();

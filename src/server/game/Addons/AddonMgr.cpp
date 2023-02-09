@@ -18,7 +18,7 @@
 #include "AddonMgr.h"
 #include "CryptoHash.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "Timer.h"
 
@@ -59,17 +59,17 @@ void LoadFromDB()
         }
         while (result->NextRow());
 
-        TC_LOG_INFO("server.loading", ">> Loaded %u known addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        FMT_LOG_INFO("server.loading", ">> Loaded {} known addons in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     }
     else
-        TC_LOG_INFO("server.loading", ">> Loaded 0 known addons. DB table `addons` is empty!");
+        FMT_LOG_INFO("server.loading", ">> Loaded 0 known addons. DB table `addons` is empty!");
 
     oldMSTime = getMSTime();
     result = CharacterDatabase.Query("SELECT id, name, version, UNIX_TIMESTAMP(timestamp) FROM banned_addons ORDER BY timestamp");
     if (result)
     {
         uint32 count = 0;
-        uint32 dbcMaxBannedAddon = sBannedAddOnsStore.GetNumRows();
+        uint32 dbcMaxBannedAddon = sDBCStoresMgr->GetBannedAddOnsNumRow();
 
         do
         {
@@ -91,7 +91,7 @@ void LoadFromDB()
         }
         while (result->NextRow());
 
-        TC_LOG_INFO("server.loading", ">> Loaded %u banned addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        FMT_LOG_INFO("server.loading", ">> Loaded {} banned addons in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     }
 }
 

@@ -19,7 +19,7 @@
 #include "AreaBoundary.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "InstanceScript.h"
@@ -190,9 +190,9 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* source, uint32 soundId)
     if (!source)
         return;
 
-    if (!sSoundEntriesStore.LookupEntry(soundId))
+    if (!sDBCStoresMgr->GetSoundEntriesDBC(soundId))
     {
-        TC_LOG_ERROR("scripts.ai", "ScriptedAI::DoPlaySoundToSet: Invalid soundId %u used in DoPlaySoundToSet (Source: %s)", soundId, source->GetGUID().ToString().c_str());
+        FMT_LOG_ERROR("scripts.ai", "ScriptedAI::DoPlaySoundToSet: Invalid soundId {} used in DoPlaySoundToSet (Source: {})", soundId, source->GetGUID().ToString());
         return;
     }
 
@@ -262,7 +262,7 @@ void ScriptedAI::ForceCombatStop(Creature* who, bool reset /*= true*/)
 
 void ScriptedAI::ForceCombatStopForCreatureEntry(uint32 entry, float maxSearchRange /*= 250.0f*/, bool samePhase /*= true*/, bool reset /*= true*/)
 {
-    TC_LOG_DEBUG("scripts.ai", "ScriptedAI::ForceCombatStopForCreatureEntry: called on '%s'. Debug info: %s", me->GetGUID().ToString().c_str(), me->GetDebugInfo().c_str());
+    FMT_LOG_DEBUG("scripts.ai", "ScriptedAI::ForceCombatStopForCreatureEntry: called on '{}'. Debug info: {}", me->GetGUID().ToString(), me->GetDebugInfo());
 
     std::list<Creature*> creatures;
     Trinity::AllCreaturesOfEntryInRange check(me, entry, maxSearchRange);
@@ -395,8 +395,8 @@ void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o
     if (Player* player = unit->ToPlayer())
         player->TeleportTo(unit->GetMapId(), x, y, z, o, TELE_TO_NOT_LEAVE_COMBAT);
     else
-        TC_LOG_ERROR("scripts.ai", "ScriptedAI::DoTeleportPlayer: Creature %s Tried to teleport non-player unit (%s) to x: %f y:%f z: %f o: %f. Aborted.",
-            me->GetGUID().ToString().c_str(), unit->GetGUID().ToString().c_str(), x, y, z, o);
+        FMT_LOG_ERROR("scripts.ai", "ScriptedAI::DoTeleportPlayer: Creature {} Tried to teleport non-player unit ({}) to x: {} y:{} z: {} o: {}. Aborted.",
+            me->GetGUID().ToString(), unit->GetGUID().ToString(), x, y, z, o);
 }
 
 void ScriptedAI::DoTeleportAll(float x, float y, float z, float o)
@@ -431,24 +431,24 @@ Unit* ScriptedAI::DoSelectBelowHpPctFriendlyWithEntry(uint32 entry, float range,
     return unit;
 }
 
-std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
+std::vector<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
 {
-    std::list<Creature*> list;
+    std::vector<Creature*> vector;
     Trinity::FriendlyCCedInRange u_check(me, range);
-    Trinity::CreatureListSearcher<Trinity::FriendlyCCedInRange> searcher(me, list, u_check);
+    Trinity::CreatureListSearcher<Trinity::FriendlyCCedInRange> searcher(me, vector, u_check);
     Cell::VisitAllObjects(me, searcher, range);
 
-    return list;
+    return vector;
 }
 
-std::list<Creature*> ScriptedAI::DoFindFriendlyMissingBuff(float range, uint32 uiSpellid)
+std::vector<Creature*> ScriptedAI::DoFindFriendlyMissingBuff(float range, uint32 uiSpellid)
 {
-    std::list<Creature*> list;
+    std::vector<Creature*> vector;
     Trinity::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
-    Trinity::CreatureListSearcher<Trinity::FriendlyMissingBuffInRange> searcher(me, list, u_check);
+    Trinity::CreatureListSearcher<Trinity::FriendlyMissingBuffInRange> searcher(me, vector, u_check);
     Cell::VisitAllObjects(me, searcher, range);
 
-    return list;
+    return vector;
 }
 
 Player* ScriptedAI::GetPlayerAtMinimumRange(float minimumRange)
@@ -508,6 +508,7 @@ void BossAI::_Reset()
     scheduler.CancelAll();
     if (instance && instance->GetBossState(_bossId) != DONE)
         instance->SetBossState(_bossId, NOT_STARTED);
+    me->ResetCombatTime();
 }
 
 void BossAI::_JustDied()
@@ -536,7 +537,7 @@ void BossAI::_JustEngagedWith(Unit* who)
         }
         instance->SetBossState(_bossId, IN_PROGRESS);
     }
-
+    me->StartCombatTime();
     me->SetCombatPulseDelay(5);
     me->setActive(true);
     DoZoneInCombat();
@@ -597,7 +598,7 @@ void BossAI::_DespawnAtEvade(Seconds delayToRespawn /*= 30s*/, Creature* who /*=
 {
     if (delayToRespawn < 2s)
     {
-        TC_LOG_ERROR("scripts.ai", "BossAI::_DespawnAtEvade: called with delay of " UI64FMTD " seconds, defaulting to 2 (me: %s)", delayToRespawn.count(), me->GetGUID().ToString().c_str());
+        FMT_LOG_ERROR("scripts.ai", "BossAI::_DespawnAtEvade: called with delay of %ld seconds, defaulting to 2 (me: {})", delayToRespawn.count(), me->GetGUID().ToString());
         delayToRespawn = 2s;
     }
 
@@ -606,7 +607,7 @@ void BossAI::_DespawnAtEvade(Seconds delayToRespawn /*= 30s*/, Creature* who /*=
 
     if (TempSummon* whoSummon = who->ToTempSummon())
     {
-        TC_LOG_WARN("scripts.ai", "BossAI::_DespawnAtEvade: called on a temporary summon (who: %s)", who->GetGUID().ToString().c_str());
+        FMT_LOG_WARN("scripts.ai", "BossAI::_DespawnAtEvade: called on a temporary summon (who: {})", who->GetGUID().ToString());
         whoSummon->UnSummon();
         return;
     }

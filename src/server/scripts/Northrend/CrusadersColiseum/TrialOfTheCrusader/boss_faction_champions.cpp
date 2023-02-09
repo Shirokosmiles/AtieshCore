@@ -656,12 +656,13 @@ struct boss_faction_championsAI : public BossAI
 
     Creature* SelectRandomFriendlyMissingBuff(uint32 spell)
     {
-        std::list<Creature*> lst = DoFindFriendlyMissingBuff(40.0f, spell);
-        std::list<Creature*>::const_iterator itr = lst.begin();
+        std::vector<Creature*> lst = DoFindFriendlyMissingBuff(40.0f, spell);
         if (lst.empty())
             return nullptr;
-        advance(itr, rand32() % lst.size());
-        return (*itr);
+
+        uint32 randomIndex = rand() % lst.size();
+        Creature* pointer = lst[randomIndex];
+        return pointer;
     }
 
     Unit* SelectEnemyCaster(bool /*casting*/)

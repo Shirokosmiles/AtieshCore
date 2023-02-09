@@ -835,6 +835,82 @@ class spell_zuldrak_cocooned_on_quest : public SpellScript
     }
 };
 
+enum rabbit
+{
+    SPELL_CREATE_ZULDRAK_RAT_COVER = 50926,
+    SPELL_CREATE_LOOT_RAT = 50927
+};
+
+class npc_body_rabbit : public CreatureScript
+{
+public: npc_body_rabbit() : CreatureScript("npc_body_rabbit") {}
+
+      struct npc_body_rabbitAI : public ScriptedAI
+      {
+          npc_body_rabbitAI(Creature* creature) : ScriptedAI(creature) {}
+
+          void SpellHit(WorldObject* target, SpellInfo const* spellInfo) override
+          {
+              if (!target->ToPlayer())
+                  return;
+
+              if (Player* player = target->ToPlayer())
+              {
+                  if (spellInfo->Id == SPELL_CREATE_ZULDRAK_RAT_COVER)
+                      player->CastSpell(player, SPELL_CREATE_LOOT_RAT);
+              }
+
+              me->DespawnOrUnsummon();
+          }
+      };
+
+      CreatureAI* GetAI(Creature* creature) const override
+      {
+          return new npc_body_rabbitAI(creature);
+      }
+};
+
+enum bigbasilisk
+{
+    SPELL_CLICK_BASILISK = 50918,
+    SPELL_CREATE_LOOT_BASILISK = 50919,
+    SPELL_COSMETIC_SLEEP_ZZZ = 55474
+};
+
+class npc_body_basilisk : public CreatureScript
+{
+public: npc_body_basilisk() : CreatureScript("npc_body_basilisk") {}
+
+      struct npc_body_basiliskAI : public ScriptedAI
+      {
+          npc_body_basiliskAI(Creature* creature) : ScriptedAI(creature) {}
+
+          void Reset() override
+          {
+              DoCastSelf(SPELL_COSMETIC_SLEEP_ZZZ);
+          }
+
+          void SpellHit(WorldObject* target, SpellInfo const* spellInfo) override
+          {
+              if (!target->ToPlayer())
+                  return;
+
+              if (Player* player = target->ToPlayer())
+              {
+                  if (spellInfo->Id == SPELL_CLICK_BASILISK)
+                      player->CastSpell(player, SPELL_CREATE_LOOT_BASILISK);
+              }
+
+              me->DespawnOrUnsummon();
+          }
+      };
+
+      CreatureAI* GetAI(Creature* creature) const override
+      {
+          return new npc_body_basiliskAI(creature);
+      }
+};
+
 /*######
 ## Quest 12676: Sabotage
 ######*/
@@ -923,6 +999,11 @@ void AddSC_zuldrak()
     RegisterSpellScript(spell_zuldrak_drop_disguise);
     RegisterSpellScript(spell_zuldrak_cocooned_not_on_quest);
     RegisterSpellScript(spell_zuldrak_cocooned_on_quest);
+
+    new npc_body_rabbit();
+    new npc_body_basilisk();
+
     RegisterSpellScript(spell_zuldrak_scourgewagon_explosion);
     RegisterSpellScript(spell_zuldrak_chains_of_the_scourge);
+
 }

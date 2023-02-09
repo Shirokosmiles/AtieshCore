@@ -67,13 +67,13 @@ class TC_GAME_API ChatHandler
         template<typename... Args>
         void PSendSysMessage(char const* fmt, Args&&... args)
         {
-            SendSysMessage(Trinity::StringFormat(fmt, std::forward<Args>(args)...).c_str());
+            SendSysMessage(Trinity::StringFormat(fmt, std::forward<Args>(args)...));
         }
 
         template<typename... Args>
         void PSendSysMessage(uint32 entry, Args&&... args)
         {
-            SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...).c_str());
+            SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...));
         }
 
         template<typename... Args>
@@ -108,6 +108,7 @@ class TC_GAME_API ChatHandler
 
         char* extractKeyFromLink(char* text, char const* linkType, char** something1 = nullptr);
         char* extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = nullptr);
+        uint32 extractKeyFromAllTypeLinks(char* text);
         char* extractQuotedArg(char* args);
         uint32 extractSpellIdFromLink(char* text);
         ObjectGuid::LowType extractLowGuidFromLink(char* text, HighGuid& guidHigh);

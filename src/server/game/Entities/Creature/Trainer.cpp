@@ -39,7 +39,7 @@ namespace Trainer
         float reputationDiscount = player->GetReputationPriceDiscount(npc);
 
         WorldPackets::NPC::TrainerList trainerList;
-        trainerList.TrainerGUID = npc->GetGUID();
+        trainerList.TrainerGUID = npc ? npc->GetGUID() : ObjectGuid::Empty;
         trainerList.TrainerType = AsUnderlyingType(_type);
         trainerList.Greeting = GetGreeting(locale);
         trainerList.Spells.reserve(_spells.size());
@@ -105,8 +105,16 @@ namespace Trainer
 
         player->ModifyMoney(-moneyCost);
 
-        npc->SendPlaySpellVisual(179);
-        npc->SendPlaySpellImpact(player->GetGUID(), 362);
+        if (npc)
+        {
+            npc->SendPlaySpellVisual(179);
+            npc->SendPlaySpellImpact(player->GetGUID(), 362);
+        }
+        else
+        {
+            player->SendPlaySpellVisual(179);
+            player->SendPlaySpellImpact(player->GetGUID(), 362);
+        }
 
         // learn explicitly or cast explicitly
         if (trainerSpell->IsCastable())
@@ -233,7 +241,7 @@ namespace Trainer
     void Trainer::SendTeachFailure(Creature const* npc, Player const* player, uint32 spellId, FailReason reason) const
     {
         WorldPackets::NPC::TrainerBuyFailed trainerBuyFailed;
-        trainerBuyFailed.TrainerGUID = npc->GetGUID();
+        trainerBuyFailed.TrainerGUID = npc ? npc->GetGUID() : ObjectGuid::Empty;
         trainerBuyFailed.SpellID = spellId;
         trainerBuyFailed.TrainerFailedReason = AsUnderlyingType(reason);
         player->SendDirectMessage(trainerBuyFailed.Write());
@@ -242,7 +250,7 @@ namespace Trainer
     void Trainer::SendTeachSucceeded(Creature const* npc, Player const* player, uint32 spellId) const
     {
         WorldPackets::NPC::TrainerBuySucceeded trainerBuySucceeded;
-        trainerBuySucceeded.TrainerGUID = npc->GetGUID();
+        trainerBuySucceeded.TrainerGUID = npc ? npc->GetGUID() : ObjectGuid::Empty;
         trainerBuySucceeded.SpellID = spellId;
         player->SendDirectMessage(trainerBuySucceeded.Write());
     }

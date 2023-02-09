@@ -1,5 +1,7 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
+ * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -45,14 +47,14 @@ class Map;
 enum GossipOptionIcon : uint8;
 struct AccessRequirement;
 struct DeclinedName;
-struct DungeonEncounterEntry;
-struct FactionEntry;
+struct DungeonEncounterDBC;
+struct FactionDBC;
 struct PlayerClassInfo;
 struct PlayerClassLevelInfo;
 struct PlayerInfo;
 struct PlayerLevelInfo;
-struct SkillRaceClassInfoEntry;
-struct WorldSafeLocsEntry;
+struct SkillRaceClassInfoDBC;
+struct WorldSafeLocsDBC;
 
 struct PageText
 {
@@ -172,6 +174,38 @@ struct GameTele
 };
 
 typedef std::unordered_map<uint32, GameTele> GameTeleContainer;
+
+// AT-features section
+struct GuildSpellAuras
+{
+    uint32 spellauraId;
+    uint32 reqlevel;
+};
+
+typedef std::unordered_map<uint32, GuildSpellAuras> GuildSpellAurasContainer;
+
+struct PlayerAutoLearn
+{
+    uint32 spellId;
+    uint8 reqlevel;
+    uint8 reqclass;
+    uint8 reqrace;
+};
+
+typedef std::unordered_map<uint32, PlayerAutoLearn> PlayerAutoLearnContainer;
+
+struct ItemPresent
+{
+    ItemPresent(uint32 entry, uint32 itemId, uint32 count) :
+        ItemPresentSlot(entry), ItemId(itemId), Count(count) { }
+    uint32 ItemPresentSlot;
+    uint32 ItemId;
+    uint32 Count;
+};
+
+typedef std::vector<ItemPresent> ItemPresentList;
+typedef std::map<uint32, ItemPresentList> ItemPresentContainer;
+// END AT section
 
 enum ScriptsType
 {
@@ -699,6 +733,7 @@ struct PlayerInfo
     PlayerCreateInfoItems item;
     PlayerCreateInfoSpells customSpells;
     PlayerCreateInfoSpells castSpells;
+    PlayerCreateInfoSpells learnSpells;
     PlayerCreateInfoActions action;
     PlayerCreateInfoSkills skills;
 
@@ -729,7 +764,7 @@ struct MailLevelReward
     uint32 senderEntry;
 };
 
-typedef std::list<MailLevelReward> MailLevelRewardList;
+typedef std::vector<MailLevelReward> MailLevelRewardList;
 typedef std::unordered_map<uint8, MailLevelRewardList> MailLevelRewardContainer;
 
 // We assume the rate is in general the same for all three types below, but chose to keep three for scalability and customization
@@ -878,12 +913,13 @@ enum SkillRangeType
     SKILL_RANGE_NONE                                        // 0..0 always
 };
 
-SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
+SkillRangeType GetSkillRangeType(SkillRaceClassInfoDBC const* rcEntry);
 
 #define MAX_PLAYER_NAME          12                         // max allowed by client name length
 #define MAX_INTERNAL_PLAYER_NAME 15                         // max server internal player name length (> MAX_PLAYER_NAME for support declined names)
 #define MAX_PET_NAME             12                         // max allowed by client name length
 #define MAX_CHARTER_NAME         24                         // max allowed by client name length
+#define MAX_CHANNEL_NAME         99                         // max allowed by client name length
 
 TC_GAME_API bool normalizePlayerName(std::string& name);
 #define SPAWNGROUP_MAP_UNSET            0xFFFFFFFF
@@ -906,10 +942,10 @@ enum EncounterCreditType : uint8
 
 struct DungeonEncounter
 {
-    DungeonEncounter(DungeonEncounterEntry const* _dbcEntry, EncounterCreditType _creditType, uint32 _creditEntry, uint32 _lastEncounterDungeon)
+    DungeonEncounter(DungeonEncounterDBC const* _dbcEntry, EncounterCreditType _creditType, uint32 _creditEntry, uint32 _lastEncounterDungeon)
         : dbcEntry(_dbcEntry), creditType(_creditType), creditEntry(_creditEntry), lastEncounterDungeon(_lastEncounterDungeon) { }
 
-    DungeonEncounterEntry const* dbcEntry;
+    DungeonEncounterDBC const* dbcEntry;
     EncounterCreditType creditType;
     uint32 creditEntry;
     uint32 lastEncounterDungeon;
@@ -1063,8 +1099,8 @@ class TC_GAME_API ObjectMgr
         GossipText const* GetGossipText(uint32 Text_ID) const;
         QuestGreeting const* GetQuestGreeting(ObjectGuid guid) const;
 
-        WorldSafeLocsEntry const* GetDefaultGraveyard(uint32 team) const;
-        WorldSafeLocsEntry const* GetClosestGraveyard(float x, float y, float z, uint32 MapId, uint32 team) const;
+        WorldSafeLocsDBC const* GetDefaultGraveyard(uint32 team) const;
+        WorldSafeLocsDBC const* GetClosestGraveyard(float x, float y, float z, uint32 MapId, uint32 team) const;
         bool AddGraveyardLink(uint32 id, uint32 zoneId, uint32 team, bool persist = true);
         void RemoveGraveyardLink(uint32 id, uint32 zoneId, uint32 team, bool persist = false);
         void LoadGraveyardZones();
@@ -1095,7 +1131,7 @@ class TC_GAME_API ObjectMgr
             return nullptr;
         }
 
-        int32 GetBaseReputationOf(FactionEntry const* factionEntry, uint8 race, uint8 playerClass) const;
+        int32 GetBaseReputationOf(FactionDBC const* factionEntry, uint8 race, uint8 playerClass) const;
 
         RepSpilloverTemplate const* GetRepSpilloverTemplate(uint32 factionId) const
         {
@@ -1118,6 +1154,7 @@ class TC_GAME_API ObjectMgr
 
         VehicleTemplate const* GetVehicleTemplate(Vehicle* veh) const;
         VehicleAccessoryList const* GetVehicleAccessoryList(Vehicle* veh) const;
+        ItemPresentList const* GetItemPresentList(uint32 presentId) const;
 
         DungeonEncounterList const* GetDungeonEncounterList(uint32 mapId, Difficulty difficulty) const;
 
@@ -1227,6 +1264,9 @@ class TC_GAME_API ObjectMgr
         void LoadNPCSpellClickSpells();
 
         void LoadGameTele();
+        void LoadGuildSpellAuras();
+
+        void LoadPlayerAutoLearnSpells();
 
         void LoadGossipMenu();
         void LoadGossipMenuItems();
@@ -1234,6 +1274,7 @@ class TC_GAME_API ObjectMgr
         void LoadVendors();
         void LoadTrainers();
         void LoadCreatureDefaultTrainers();
+        void LoadItemPresents();
 
         void InitializeQueriesData(QueryDataGroup mask);
 
@@ -1246,8 +1287,6 @@ class TC_GAME_API ObjectMgr
             FishingBaseSkillContainer::const_iterator itr = _fishingBaseForAreaStore.find(entry);
             return itr != _fishingBaseForAreaStore.end() ? itr->second : 0;
         }
-
-        void ReturnOrDeleteOldMails(bool serverUp);
 
         CreatureBaseStats const* GetCreatureBaseStats(uint8 level, uint8 unitClass);
 
@@ -1262,7 +1301,6 @@ class TC_GAME_API ObjectMgr
 
         uint32 GenerateAuctionID();
         uint64 GenerateEquipmentSetGuid();
-        uint32 GenerateMailID();
         uint32 GeneratePetNumber();
         ObjectGuid::LowType GenerateCreatureSpawnId();
         ObjectGuid::LowType GenerateGameObjectSpawnId();
@@ -1472,7 +1510,9 @@ class TC_GAME_API ObjectMgr
         static ResponseCodes CheckPlayerName(std::string_view name, LocaleConstant locale, bool create = false);
         static PetNameInvalidReason CheckPetName(std::string_view name, LocaleConstant locale);
         static bool IsValidCharterName(std::string_view name);
-
+        static bool IsValidChannelName(std::string_view name);
+        static bool IsValidChannelText(std::string_view name);
+        static bool IsValidityChecks(Player* player, std::string& name, bool withNasty = false);
         static bool CheckDeclinedNames(const std::wstring& w_ownname, DeclinedName const& names);
 
         GameTele const* GetGameTele(uint32 id) const
@@ -1486,6 +1526,21 @@ class TC_GAME_API ObjectMgr
         GameTeleContainer const& GetGameTeleMap() const { return _gameTeleStore; }
         bool AddGameTele(GameTele& data);
         bool DeleteGameTele(std::string_view name);
+
+        //Guild Spell Auras
+        GuildSpellAuras const* GetGuildSpellAura(uint32 spellId) const
+        {
+            GuildSpellAurasContainer::const_iterator itr = _guildSpellAurasStore.find(spellId);
+            if (itr == _guildSpellAurasStore.end()) return nullptr;
+            return &itr->second;
+        }
+        GuildSpellAuras const* GetGuildSpellAurasbyLevel(uint32 guildLevel) const;
+        GuildSpellAurasContainer const& GetGuildSpellAurasMap() const { return _guildSpellAurasStore; }
+        //Guild Spell Auras end
+
+        //Player Auto Learn start
+        PlayerAutoLearnContainer const& GetPlayerAutoLearnMap() const { return _playerAutoLearnStore; }
+        //Player Auto Learn end
 
         Trainer::Trainer const* GetTrainer(uint32 creatureId) const;
         std::vector<Trainer::Trainer const*> const& GetClassTrainers(uint8 classId) const { return _classTrainers.at(classId); }
@@ -1577,7 +1632,6 @@ class TC_GAME_API ObjectMgr
         // first free id for selected id type
         uint32 _auctionId;
         uint64 _equipmentSetGuid;
-        std::atomic<uint32> _mailId;
         std::atomic<uint32> _hiPetNumber;
 
         ObjectGuid::LowType _creatureSpawnId;
@@ -1634,6 +1688,8 @@ class TC_GAME_API ObjectMgr
         ReservedNamesContainer _reservedNamesStore;
 
         GameTeleContainer _gameTeleStore;
+        GuildSpellAurasContainer _guildSpellAurasStore;
+        PlayerAutoLearnContainer _playerAutoLearnStore;
 
         ScriptNameContainer _scriptNamesStore;
 
@@ -1644,6 +1700,8 @@ class TC_GAME_API ObjectMgr
         std::unordered_map<uint32, VehicleTemplate> _vehicleTemplateStore;
         VehicleAccessoryContainer _vehicleTemplateAccessoryStore;
         VehicleAccessoryContainer _vehicleAccessoryStore;
+
+        ItemPresentContainer _itemPresentStore;
 
         LocaleConstant DBCLocaleIndex;
 

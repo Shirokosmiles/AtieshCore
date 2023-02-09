@@ -260,7 +260,6 @@ struct boss_valithria_dreamwalker : public ScriptedAI
     boss_valithria_dreamwalker(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()), _portalCount(RAID_MODE<uint32>(3, 8, 3, 8))
     {
         Initialize();
-        _spawnHealth = me->GetHealth();
     }
 
     void Initialize()
@@ -274,10 +273,6 @@ struct boss_valithria_dreamwalker : public ScriptedAI
 
     void InitializeAI() override
     {
-        if (CreatureData const* data = sObjectMgr->GetCreatureData(me->GetSpawnId()))
-            if (data->curhealth)
-                _spawnHealth = data->curhealth;
-
         ScriptedAI::InitializeAI();
     }
 
@@ -294,6 +289,9 @@ struct boss_valithria_dreamwalker : public ScriptedAI
         me->ApplySpellImmune(0, IMMUNITY_ID, 56131, true);
         _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
         Initialize();
+        _spawnHealth = me->GetMaxHealth();
+        uint32 health = CalculatePct(_spawnHealth, 50.f);
+        me->SetHealth(health);
     }
 
     void AttackStart(Unit* /*target*/) override
@@ -1106,7 +1104,7 @@ class spell_dreamwalker_summon_suppresser : public AuraScript
         if (!caster || !caster->IsAIEnabled())
             return;
 
-        std::list<Creature*> summoners;
+        std::vector<Creature*> summoners;
         GetCreatureListWithEntryInGrid(summoners, caster, NPC_WORLD_TRIGGER, 90.0f);
         if (summoners.empty())
             return;
@@ -1114,6 +1112,7 @@ class spell_dreamwalker_summon_suppresser : public AuraScript
         uint8 suppresserNumber = caster->GetAI()->GetData(DATA_SUPPRESSERS_COUNT);
         for (uint8 i = 0; i < suppresserNumber; ++i)
             caster->CastSpell(Trinity::Containers::SelectRandomContainerElement(summoners), SPELL_SUMMON_SUPPRESSER, true);
+        summoners.clear();
     }
 
     void Register() override

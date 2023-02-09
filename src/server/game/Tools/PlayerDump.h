@@ -37,12 +37,6 @@ enum DumpTableType
 
     DTT_INVENTORY,      //    -> item guids collection      // character_inventory
 
-    DTT_MAIL,           //    -> mail ids collection        // mail
-                        //    -> item_text
-
-    DTT_MAIL_ITEM,      // <- mail ids                      // mail_items
-                        //    -> item guids collection
-
     DTT_ITEM,           // <- item guids                    // item_instance
                         //    -> item_text
 
@@ -88,7 +82,6 @@ class TC_GAME_API PlayerDumpWriter : public PlayerDump
         void PopulateGuids(ObjectGuid::LowType guid);
 
         std::set<ObjectGuid::LowType> _pets;
-        std::set<ObjectGuid::LowType> _mails;
         std::set<ObjectGuid::LowType> _items;
 
         std::set<uint64> _itemSets;

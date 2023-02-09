@@ -33,6 +33,8 @@
 #include "Util.h"
 #include <boost/lexical_cast.hpp>
 #include <openssl/crypto.h>
+#include <openssl/md5.h>
+#include "PatchMgr.h"
 
 using boost::asio::ip::tcp;
 
@@ -120,6 +122,9 @@ std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B,
 
 #define AUTH_LOGON_CHALLENGE_INITIAL_SIZE 4
 #define REALM_LIST_PACKET_SIZE 5
+#define XFER_ACCEPT_SIZE 1
+#define XFER_RESUME_SIZE 9
+#define XFER_CANCEL_SIZE 1
 
 std::unordered_map<uint8, AuthHandler> AuthSession::InitHandlers()
 {
@@ -130,6 +135,9 @@ std::unordered_map<uint8, AuthHandler> AuthSession::InitHandlers()
     handlers[AUTH_RECONNECT_CHALLENGE] = { STATUS_CHALLENGE, AUTH_LOGON_CHALLENGE_INITIAL_SIZE, &AuthSession::HandleReconnectChallenge };
     handlers[AUTH_RECONNECT_PROOF]     = { STATUS_RECONNECT_PROOF, sizeof(AUTH_RECONNECT_PROOF_C),    &AuthSession::HandleReconnectProof };
     handlers[REALM_LIST]               = { STATUS_AUTHED,    REALM_LIST_PACKET_SIZE,            &AuthSession::HandleRealmList };
+    handlers[XFER_ACCEPT]              = { STATUS_CLOSED,    XFER_ACCEPT_SIZE,                  &AuthSession::HandleXferAccept };
+    handlers[XFER_RESUME]              = { STATUS_CLOSED,    XFER_RESUME_SIZE,                  &AuthSession::HandleXferResume };
+    handlers[XFER_CANCEL]              = { STATUS_CLOSED,    XFER_CANCEL_SIZE,                  &AuthSession::HandleXferCancel };
 
     return handlers;
 }
@@ -161,12 +169,18 @@ void AccountInfo::LoadResult(Field* fields)
 }
 
 AuthSession::AuthSession(tcp::socket&& socket) : Socket(std::move(socket)),
-_status(STATUS_CHALLENGE), _build(0), _expversion(0) { }
+_patcher(nullptr), _status(STATUS_CHALLENGE), _build(0), _expversion(0) { }
+
+AuthSession::~AuthSession()
+{
+    if (_patcher)
+        delete _patcher;
+}
 
 void AuthSession::Start()
 {
     std::string ip_address = GetRemoteIpAddress().to_string();
-    TC_LOG_TRACE("session", "Accepted connection from %s", ip_address.c_str());
+    FMT_LOG_TRACE("session", "Accepted connection from {}", ip_address);
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_INFO);
     stmt->setString(0, ip_address);
@@ -204,7 +218,7 @@ void AuthSession::CheckIpCallback(PreparedQueryResult result)
             pkt << uint8(0x00);
             pkt << uint8(WOW_FAIL_BANNED);
             SendPacket(pkt);
-            TC_LOG_DEBUG("session", "[AuthSession::CheckIpCallback] Banned ip '%s:%d' tries to login!", GetRemoteIpAddress().to_string().c_str(), GetRemotePort());
+            FMT_LOG_DEBUG("session", "[AuthSession::CheckIpCallback] Banned ip '{}:{}' tries to login!", GetRemoteIpAddress().to_string(), GetRemotePort());
             return;
         }
     }
@@ -236,7 +250,7 @@ void AuthSession::ReadHandler()
         if (packet.GetActiveSize() < size)
             break;
 
-        if (cmd == AUTH_LOGON_CHALLENGE || cmd == AUTH_RECONNECT_CHALLENGE)
+        if (cmd == AUTH_LOGON_CHALLENGE || cmd == AUTH_RECONNECT_CHALLENGE || cmd == REALM_LIST)
         {
             sAuthLogonChallenge_C* challenge = reinterpret_cast<sAuthLogonChallenge_C*>(packet.GetReadPointer());
             size += challenge->size;
@@ -284,7 +298,7 @@ bool AuthSession::HandleLogonChallenge()
         return false;
 
     std::string login((char const*)challenge->I, challenge->I_len);
-    TC_LOG_DEBUG("server.authserver", "[AuthChallenge] '%s'", login.c_str());
+    FMT_LOG_DEBUG("server.authserver", "[AuthChallenge] '{}'", login);
 
     _build = challenge->build;
     _expversion = uint8(AuthHelper::IsPostBCAcceptedClientBuild(_build) ? POST_BC_EXP_FLAG : (AuthHelper::IsPreBCAcceptedClientBuild(_build) ? PRE_BC_EXP_FLAG : NO_VALID_EXP_FLAG));
@@ -331,7 +345,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     // If the IP is 'locked', check that the player comes indeed from the correct IP address
     if (_accountInfo.IsLockedToIP)
     {
-        TC_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is locked to IP - '%s' is logging in from '%s'", _accountInfo.Login.c_str(), _accountInfo.LastIP.c_str(), ipAddress.c_str());
+        FMT_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is locked to IP - '{}' is logging in from '{}'", _accountInfo.Login, _accountInfo.LastIP, ipAddress);
         if (_accountInfo.LastIP != ipAddress)
         {
             pkt << uint8(WOW_FAIL_LOCKED_ENFORCED);
@@ -344,12 +358,12 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
         if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(ipAddress))
             _ipCountry = location->CountryCode;
 
-        TC_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is not locked to ip", _accountInfo.Login.c_str());
+        FMT_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is not locked to ip", _accountInfo.Login);
         if (_accountInfo.LockCountry.empty() || _accountInfo.LockCountry == "00")
-            TC_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is not locked to country", _accountInfo.Login.c_str());
+            FMT_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is not locked to country", _accountInfo.Login);
         else if (!_ipCountry.empty())
         {
-            TC_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is locked to country: '%s' Player country is '%s'", _accountInfo.Login.c_str(), _accountInfo.LockCountry.c_str(), _ipCountry.c_str());
+            FMT_LOG_DEBUG("server.authserver", "[AuthChallenge] Account '{}' is locked to country: '{}' Player country is '{}'", _accountInfo.Login, _accountInfo.LockCountry, _ipCountry);
             if (_ipCountry != _accountInfo.LockCountry)
             {
                 pkt << uint8(WOW_FAIL_UNLOCKABLE_LOCK);
@@ -366,14 +380,14 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
         {
             pkt << uint8(WOW_FAIL_BANNED);
             SendPacket(pkt);
-            TC_LOG_INFO("server.authserver.banned", "'%s:%d' [AuthChallenge] Banned account %s tried to login!", ipAddress.c_str(), port, _accountInfo.Login.c_str());
+            FMT_LOG_INFO("server.authserver.banned", "'{}:{}' [AuthChallenge] Banned account {} tried to login!", ipAddress, port, _accountInfo.Login);
             return;
         }
         else
         {
             pkt << uint8(WOW_FAIL_SUSPENDED);
             SendPacket(pkt);
-            TC_LOG_INFO("server.authserver.banned", "'%s:%d' [AuthChallenge] Temporarily banned account %s tried to login!", ipAddress.c_str(), port, _accountInfo.Login.c_str());
+            FMT_LOG_INFO("server.authserver.banned", "'{}:{}' [AuthChallenge] Temporarily banned account {} tried to login!", ipAddress, port, _accountInfo.Login);
             return;
         }
     }
@@ -390,7 +404,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
             if (!success)
             {
                 pkt << uint8(WOW_FAIL_DB_BUSY);
-                TC_LOG_ERROR("server.authserver", "[AuthChallenge] Account '%s' has invalid ciphertext for TOTP token key stored", _accountInfo.Login.c_str());
+                FMT_LOG_ERROR("server.authserver", "[AuthChallenge] Account '{}' has invalid ciphertext for TOTP token key stored", _accountInfo.Login);
                 SendPacket(pkt);
                 return;
             }
@@ -404,7 +418,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     );
 
     // Fill the response packet with the result
-    if (AuthHelper::IsAcceptedClientBuild(_build))
+    if (AuthHelper::IsAcceptedClientBuild(_build) || sPatcher->CanPatch(_build))
     {
         pkt << uint8(WOW_SUCCESS);
 
@@ -435,8 +449,8 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
         if (securityFlags & 0x04)               // Security token input
             pkt << uint8(1);
 
-        TC_LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] account %s is using '%s' locale (%u)",
-            ipAddress.c_str(), port, _accountInfo.Login.c_str(), _localizationName.c_str(), GetLocaleByName(_localizationName));
+        FMT_LOG_DEBUG("server.authserver", "'{}:{}' [AuthChallenge] account {} is using '{}' locale ({})",
+            ipAddress, port, _accountInfo.Login, _localizationName, GetLocaleByName(_localizationName));
 
         _status = STATUS_LOGON_PROOF;
     }
@@ -449,7 +463,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
 // Logon Proof command handler
 bool AuthSession::HandleLogonProof()
 {
-    TC_LOG_DEBUG("server.authserver", "Entering _HandleLogonProof");
+    FMT_LOG_DEBUG("server.authserver", "Entering _HandleLogonProof");
     _status = STATUS_CLOSED;
 
     // Read the packet
@@ -458,8 +472,12 @@ bool AuthSession::HandleLogonProof()
     // If the client has no valid version
     if (_expversion == NO_VALID_EXP_FLAG)
     {
-        // Check if we have the appropriate patch on the disk
-        TC_LOG_DEBUG("network", "Client with invalid version, patching is not implemented");
+        FMT_LOG_INFO("patcher", "User has no valid version. Attempting patching...");
+        if (sPatcher->CanPatch(_build)) {
+            sPatcher->Patch(_build, this);
+            return true;
+        }
+        FMT_LOG_INFO("patcher", "Patching failed for user! Build: {}", _build);
         return false;
     }
 
@@ -502,7 +520,7 @@ bool AuthSession::HandleLogonProof()
             return true;
         }
 
-        TC_LOG_DEBUG("server.authserver", "'%s:%d' User '%s' successfully authenticated", GetRemoteIpAddress().to_string().c_str(), GetRemotePort(), _accountInfo.Login.c_str());
+        FMT_LOG_DEBUG("server.authserver", "'{}:{}' User '{}' successfully authenticated", GetRemoteIpAddress().to_string(), GetRemotePort(), _accountInfo.Login);
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
@@ -556,8 +574,8 @@ bool AuthSession::HandleLogonProof()
         packet << uint16(0);    // LoginFlags, 1 has account message
         SendPacket(packet);
 
-        TC_LOG_INFO("server.authserver.hack", "'%s:%d' [AuthChallenge] account %s tried to login with invalid password!",
-            GetRemoteIpAddress().to_string().c_str(), GetRemotePort(), _accountInfo.Login.c_str());
+        FMT_LOG_INFO("server.authserver.hack", "'{}:{}' [AuthChallenge] account {} tried to login with invalid password!",
+            GetRemoteIpAddress().to_string(), GetRemotePort(), _accountInfo.Login);
 
         uint32 MaxWrongPassCount = sConfigMgr->GetIntDefault("WrongPass.MaxCount", 0);
 
@@ -591,8 +609,8 @@ bool AuthSession::HandleLogonProof()
                     stmt->setUInt32(1, WrongPassBanTime);
                     LoginDatabase.Execute(stmt);
 
-                    TC_LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times",
-                        GetRemoteIpAddress().to_string().c_str(), GetRemotePort(), _accountInfo.Login.c_str(), WrongPassBanTime, _accountInfo.FailedLogins);
+                    FMT_LOG_DEBUG("server.authserver", "'{}:{}' [AuthChallenge] account {} got banned for '{}' seconds because it failed to authenticate '{}' times",
+                        GetRemoteIpAddress().to_string(), GetRemotePort(), _accountInfo.Login, WrongPassBanTime, _accountInfo.FailedLogins);
                 }
                 else
                 {
@@ -601,8 +619,8 @@ bool AuthSession::HandleLogonProof()
                     stmt->setUInt32(1, WrongPassBanTime);
                     LoginDatabase.Execute(stmt);
 
-                    TC_LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] IP got banned for '%u' seconds because account %s failed to authenticate '%u' times",
-                        GetRemoteIpAddress().to_string().c_str(), GetRemotePort(), WrongPassBanTime, _accountInfo.Login.c_str(), _accountInfo.FailedLogins);
+                    FMT_LOG_DEBUG("server.authserver", "'{}:{}' [AuthChallenge] IP got banned for '{}' seconds because account {} failed to authenticate '{}' times",
+                        GetRemoteIpAddress().to_string(), GetRemotePort(), WrongPassBanTime, _accountInfo.Login, _accountInfo.FailedLogins);
                 }
             }
         }
@@ -620,7 +638,7 @@ bool AuthSession::HandleReconnectChallenge()
         return false;
 
     std::string login((char const*)challenge->I, challenge->I_len);
-    TC_LOG_DEBUG("server.authserver", "[ReconnectChallenge] '%s'", login.c_str());
+    FMT_LOG_DEBUG("server.authserver", "[ReconnectChallenge] '{}'", login);
 
     _build = challenge->build;
     _expversion = uint8(AuthHelper::IsPostBCAcceptedClientBuild(_build) ? POST_BC_EXP_FLAG : (AuthHelper::IsPreBCAcceptedClientBuild(_build) ? PRE_BC_EXP_FLAG : NO_VALID_EXP_FLAG));
@@ -672,7 +690,7 @@ void AuthSession::ReconnectChallengeCallback(PreparedQueryResult result)
 
 bool AuthSession::HandleReconnectProof()
 {
-    TC_LOG_DEBUG("server.authserver", "Entering _HandleReconnectProof");
+    FMT_LOG_DEBUG("server.authserver", "Entering _HandleReconnectProof");
     _status = STATUS_CLOSED;
 
     sAuthReconnectProof_C *reconnectProof = reinterpret_cast<sAuthReconnectProof_C*>(GetReadBuffer().GetReadPointer());
@@ -709,15 +727,15 @@ bool AuthSession::HandleReconnectProof()
     }
     else
     {
-        TC_LOG_ERROR("server.authserver.hack", "'%s:%d' [ERROR] user %s tried to login, but session is invalid.", GetRemoteIpAddress().to_string().c_str(),
-            GetRemotePort(), _accountInfo.Login.c_str());
+        FMT_LOG_ERROR("server.authserver.hack", "'{}:{}' [ERROR] user {} tried to login, but session is invalid.", GetRemoteIpAddress().to_string(),
+            GetRemotePort(), _accountInfo.Login);
         return false;
     }
 }
 
 bool AuthSession::HandleRealmList()
 {
-    TC_LOG_DEBUG("server.authserver", "Entering _HandleRealmList");
+    FMT_LOG_DEBUG("server.authserver", "Entering _HandleRealmList");
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REALM_CHARACTER_COUNTS);
     stmt->setUInt32(0, _accountInfo.Id);
@@ -825,6 +843,34 @@ void AuthSession::RealmListCallback(PreparedQueryResult result)
     SendPacket(hdr);
 
     _status = STATUS_AUTHED;
+}
+
+// Resume patch transfer
+bool AuthSession::HandleXferResume()
+{
+    FMT_LOG_DEBUG("server.authserver", "Entering _HandleXferResume");
+    return true;
+}
+
+// Cancel patch transfer
+bool AuthSession::HandleXferCancel()
+{
+    FMT_LOG_DEBUG("server.authserver", "Entering _HandleXferCancel");
+    if (_patcher)
+        _patcher->Stop();
+    return false;
+}
+
+// Accept patch transfer
+bool AuthSession::HandleXferAccept()
+{
+    FMT_LOG_INFO("patcher", "Entering _HandleXferAccept");
+    if (!_patcher) {
+        FMT_LOG_INFO("patcher", "No patcher for user!");
+        return false;
+    }
+    _patcher->Init();
+    return true;
 }
 
 bool AuthSession::VerifyVersion(uint8 const* a, int32 aLength, Trinity::Crypto::SHA1::Digest const& versionProof, bool isReconnect)

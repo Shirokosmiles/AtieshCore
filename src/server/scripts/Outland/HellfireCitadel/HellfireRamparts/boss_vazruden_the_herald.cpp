@@ -495,11 +495,11 @@ class npc_hellfire_sentry : public CreatureScript
 
             void JustDied(Unit* killer) override
             {
-                if (!killer)
-                    return;
-
-                if (Creature* herald = me->FindNearestCreature(NPC_VAZRUDEN_HERALD, 150))
-                    ENSURE_AI(boss_vazruden_the_herald::boss_vazruden_the_heraldAI, herald->AI())->SentryDownBy(killer);
+                if (killer)
+                {
+                    if (Creature* herald = me->FindNearestCreature(NPC_VAZRUDEN_HERALD, 150))
+                        ENSURE_AI(boss_vazruden_the_herald::boss_vazruden_the_heraldAI, herald->AI())->SentryDownBy(killer);
+                }
             }
 
             void UpdateAI(uint32 diff) override

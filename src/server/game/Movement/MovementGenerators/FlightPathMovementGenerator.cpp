@@ -16,7 +16,7 @@
  */
 
 #include "FlightPathMovementGenerator.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "MapManager.h"
 #include "MovementDefines.h"
@@ -51,7 +51,7 @@ MovementGeneratorType FlightPathMovementGenerator::GetMovementGeneratorType() co
 
 bool FlightPathMovementGenerator::GetResetPosition(Unit* /*owner*/, float& x, float& y, float& z)
 {
-    TaxiPathNodeEntry const* node = _path[_currentNode];
+    TaxiPathNodeDBC const* node = _path[_currentNode];
     x = node->Loc.X;
     y = node->Loc.Y;
     z = node->Loc.Z;
@@ -79,7 +79,7 @@ void FlightPathMovementGenerator::DoReset(Player* owner)
 
     if (currentNodeId == end)
     {
-        TC_LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::DoReset: trying to start a flypath from the end point. %s", owner->GetDebugInfo().c_str());
+        FMT_LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::DoReset: trying to start a flypath from the end point. {}", owner->GetDebugInfo());
         return;
     }
 
@@ -166,9 +166,9 @@ void FlightPathMovementGenerator::DoFinalize(Player* owner, bool active, bool/* 
         owner->StopMoving();
 
         // When the player reaches the last flight point, teleport to destination taxi node location
-        if (TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(taxiNodeId))
+        if (TaxiNodesDBC const* node = sDBCStoresMgr->GetTaxiNodesDBC(taxiNodeId))
         {
-            owner->SetFallInformation(0, node->Pos.Z);
+            owner->ResetFallingData(node->Pos.Z);
             owner->TeleportTo(node->ContinentID, node->Pos.X, node->Pos.Y, node->Pos.Z, owner->GetOrientation());
         }
     }
@@ -191,7 +191,7 @@ uint32 FlightPathMovementGenerator::GetPathAtMapEnd() const
     return _path.size();
 }
 
-bool IsNodeIncludedInShortenedPath(TaxiPathNodeEntry const* p1, TaxiPathNodeEntry const* p2)
+bool IsNodeIncludedInShortenedPath(TaxiPathNodeDBC const* p1, TaxiPathNodeDBC const* p2)
 {
     return p1->ContinentID != p2->ContinentID || std::pow(p1->Loc.X - p2->Loc.X, 2) + std::pow(p1->Loc.Y - p2->Loc.Y, 2) > SKIP_SPLINE_POINT_DISTANCE_SQ;
 }
@@ -205,14 +205,14 @@ void FlightPathMovementGenerator::LoadPath(Player* owner)
     {
         uint32 path, cost;
         sObjectMgr->GetTaxiPath(taxi[src], taxi[dst], path, cost);
-        if (path >= sTaxiPathNodesByPath.size())
+        if (path >= sDBCStoresMgr->GetTaxiPathNodesByPath().size())
             return;
 
-        TaxiPathNodeList const& nodes = sTaxiPathNodesByPath[path];
+        TaxiPathNodeList const& nodes = sDBCStoresMgr->GetTaxiPathNodesByPath()[path];
         if (!nodes.empty())
         {
-            TaxiPathNodeEntry const* start = nodes[0];
-            TaxiPathNodeEntry const* end = nodes[nodes.size() - 1];
+            TaxiPathNodeDBC const* start = nodes[0];
+            TaxiPathNodeDBC const* end = nodes[nodes.size() - 1];
             bool passedPreviousSegmentProximityCheck = false;
             for (uint32 i = 0; i < nodes.size(); ++i)
             {
@@ -253,13 +253,13 @@ void FlightPathMovementGenerator::SetCurrentNodeAfterTeleport()
     }
 }
 
-void FlightPathMovementGenerator::DoEventIfAny(Player* owner, TaxiPathNodeEntry const* node, bool departure)
+void FlightPathMovementGenerator::DoEventIfAny(Player* owner, TaxiPathNodeDBC const* node, bool departure)
 {
     ASSERT(node, "%s", owner->GetDebugInfo().c_str());
 
     if (uint32 eventid = departure ? node->DepartureEventID : node->ArrivalEventID)
     {
-        TC_LOG_DEBUG("maps.script", "FlightPathMovementGenerator::DoEventIfAny: taxi %s event %u of node %u of path %u for player %s", departure ? "departure" : "arrival", eventid, node->NodeIndex, node->PathID, owner->GetName().c_str());
+        FMT_LOG_DEBUG("maps.script", "FlightPathMovementGenerator::DoEventIfAny: taxi {} event {} of node {} of path {} for player {}", departure ? "departure" : "arrival", eventid, node->NodeIndex, node->PathID, owner->GetName());
         owner->GetMap()->ScriptsStart(sEventScripts, eventid, owner, owner);
     }
 }
@@ -289,11 +289,11 @@ void FlightPathMovementGenerator::PreloadEndGrid()
     // Load the grid
     if (endMap)
     {
-        TC_LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::PreloadEndGrid: preloading grid (%f, %f) for map %u at node index %u/%u", _endGridX, _endGridY, _endMapId, _preloadTargetNode, uint32(_path.size() - 1));
+        FMT_LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::PreloadEndGrid: preloading grid ({}, {}) for map {} at node index {}/{}", _endGridX, _endGridY, _endMapId, _preloadTargetNode, uint32(_path.size() - 1));
         endMap->LoadGrid(_endGridX, _endGridY);
     }
     else
-        TC_LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::PreloadEndGrid: unable to determine map to preload flightmaster grid");
+        FMT_LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::PreloadEndGrid: unable to determine map to preload flightmaster grid");
 }
 
 uint32 FlightPathMovementGenerator::GetPathId(size_t index) const

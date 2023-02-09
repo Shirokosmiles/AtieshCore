@@ -19,7 +19,8 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Common.h"
-#include "DBCStores.h"
+#include "Creature.h"
+#include "DBCStoresMgr.h"
 #include "GameObjectAI.h"
 #include "Log.h"
 #include "MapManager.h"
@@ -42,6 +43,13 @@ Transport::Transport() : GameObject(),
 
 Transport::~Transport()
 {
+    while (!_passengers.empty())
+    {
+        WorldObject* obj = *_passengers.begin();
+        RemovePassenger(obj);
+    }
+
+    _passengers.clear(); // forced clear passengers list, for safe delete
     ASSERT(_passengers.empty());
     UnloadStaticPassengers();
 }
@@ -52,7 +60,7 @@ bool Transport::Create(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, 
 
     if (!IsPositionValid())
     {
-        TC_LOG_ERROR("entities.transport", "Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        FMT_LOG_ERROR("entities.transport", "Transport (GUID: {}) not created. Suggested coordinates isn't valid (X: {} Y: {})",
             guidlow, x, y);
         return false;
     }
@@ -62,7 +70,7 @@ bool Transport::Create(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, 
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
-        TC_LOG_ERROR("sql.sql", "Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
+        FMT_LOG_ERROR("sql.sql", "Transport not created: entry in `gameobject_template` not found, guidlow: {} map: {}  (X: {} Y: {} Z: {}) ang: {}", guidlow, mapid, x, y, z, ang);
         return false;
     }
 
@@ -72,7 +80,7 @@ bool Transport::Create(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, 
     TransportTemplate const* tInfo = sTransportMgr->GetTransportTemplate(entry);
     if (!tInfo)
     {
-        TC_LOG_ERROR("sql.sql", "Transport %u (name: %s) will not be created, missing `transport_template` entry.", entry, goinfo->name.c_str());
+        FMT_LOG_ERROR("sql.sql", "Transport {} (name: {}) will not be created, missing `transport_template` entry.", entry, goinfo->name);
         return false;
     }
 
@@ -125,7 +133,7 @@ void Transport::Update(uint32 diff)
     if (AI())
         AI()->UpdateAI(diff);
     else if (!AIM_Initialize())
-        TC_LOG_ERROR("entities.transport", "Could not initialize GameObjectAI for Transport");
+        FMT_LOG_ERROR("entities.transport", "Could not initialize GameObjectAI for Transport");
 
     if (GetKeyFrames().size() <= 1)
         return;
@@ -185,7 +193,7 @@ void Transport::Update(uint32 diff)
 
         sScriptMgr->OnRelocate(this, _currentFrame->Node->NodeIndex, _currentFrame->Node->ContinentID, _currentFrame->Node->Loc.X, _currentFrame->Node->Loc.Y, _currentFrame->Node->Loc.Z);
 
-        TC_LOG_DEBUG("entities.transport", "Transport %u (%s) moved to node %u %u %f %f %f", GetEntry(), GetName().c_str(), _currentFrame->Node->NodeIndex, _currentFrame->Node->ContinentID, _currentFrame->Node->Loc.X, _currentFrame->Node->Loc.Y, _currentFrame->Node->Loc.Z);
+        FMT_LOG_DEBUG("entities.transport", "Transport {} ({}) moved to node {} {} {} {} {}", GetEntry(), GetName(), _currentFrame->Node->NodeIndex, _currentFrame->Node->ContinentID, _currentFrame->Node->Loc.X, _currentFrame->Node->Loc.Y, _currentFrame->Node->Loc.Z);
 
         // Departure event
         if (_currentFrame->IsTeleportFrame())
@@ -246,7 +254,7 @@ void Transport::DelayedUpdate(uint32 /*diff*/)
     DelayedTeleportTransport();
 }
 
-void Transport::AddPassenger(WorldObject* passenger)
+void Transport::AddPassenger(WorldObject* passenger, bool skiprelocate)
 {
     if (!IsInWorld())
         return;
@@ -256,10 +264,45 @@ void Transport::AddPassenger(WorldObject* passenger)
         passenger->SetTransport(this);
         passenger->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         passenger->m_movementInfo.transport.guid = GetGUID();
-        TC_LOG_DEBUG("entities.transport", "Object %s boarded transport %s.", passenger->GetName().c_str(), GetName().c_str());
+        FMT_LOG_DEBUG("entities.transport", "Object {} boarded transport {}.", passenger->GetName(), GetName());
 
         if (Player* plr = passenger->ToPlayer())
+        {
+            plr->SetSkipOnePacketForASH(true);
             sScriptMgr->OnAddPassenger(this, plr);
+        }
+
+        if (Creature* crt = passenger->ToCreature()) // reg pet or totem on transport
+        {
+            if (crt->IsTotem() || crt->IsPet())
+            {
+                if (Unit* owner = crt->GetOwner())
+                {
+                    float x, y, z, o;
+                    owner->m_movementInfo.transport.pos.GetPosition(x, y, z, o);
+                    crt->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+                    CalculatePassengerPosition(x, y, z, &o);
+                    crt->SetHomePosition(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + 1.0f, owner->GetOrientation());
+                    crt->SetTransportHomePosition(x, y, z, o);
+
+                    if (!skiprelocate)
+                    {
+                        if (crt->IsPet())
+                        {
+                            if (crt->GetVictim())
+                                GetMap()->CreatureRelocation(crt, crt->GetVictim()->GetPositionX(), crt->GetVictim()->GetPositionY(), crt->GetVictim()->GetPositionZ() + crt->GetVictim()->GetCollisionHeight(), crt->GetVictim()->GetOrientation());
+                            else
+                                GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + owner->GetCollisionHeight(), owner->GetOrientation());
+                        }
+                        else if (crt->IsTotem())
+                            GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);
+                    }
+
+                }
+
+                sScriptMgr->OnAddPassengerPetOrTotem(this, crt);
+            }
+        }
     }
 }
 
@@ -283,17 +326,58 @@ void Transport::RemovePassenger(WorldObject* passenger)
 
     if (erased || _staticPassengers.erase(passenger)) // static passenger can remove itself in case of grid unload
     {
-        passenger->SetTransport(nullptr);
-        passenger->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-        passenger->m_movementInfo.transport.Reset();
-        TC_LOG_DEBUG("entities.transport", "Object %s removed from transport %s.", passenger->GetName().c_str(), GetName().c_str());
-
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(this, plr);
-            plr->SetFallInformation(0, plr->GetPositionZ());
+            plr->ResetFallingData(plr->GetPositionZ());
         }
+
+        if (Creature* crt = passenger->ToCreature())
+        {
+            if (crt->IsPet())
+            {
+                if (Unit* owner = crt->GetOwner())
+                {
+                    if (crt->GetVictim())
+                        GetMap()->CreatureRelocation(crt, crt->GetVictim()->GetPositionX(), crt->GetVictim()->GetPositionY(), crt->GetVictim()->GetPositionZ() + crt->GetVictim()->GetCollisionHeight(), crt->GetVictim()->GetOrientation());
+                    else
+                        GetMap()->CreatureRelocation(crt, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ() + owner->GetCollisionHeight(), owner->GetOrientation());
+                }
+
+                sScriptMgr->OnRemovePassengerPetOrTotem(this, crt);
+            }
+            else if (crt->IsTotem())
+            {
+                if (crt->GetOwner())
+                {
+                    float x, y, z, o;
+                    crt->m_movementInfo.transport.pos.GetPosition(x, y, z, o);
+                    crt->SetTransportHomePosition(x, y, z, o);
+
+                    CalculatePassengerPosition(x, y, z, &o);
+                    crt->SetHomePosition(x, y, z, o);
+
+                    GetMap()->CreatureRelocation(crt, crt->GetPositionX(), crt->GetPositionY(), crt->GetPositionZ() + 1.0f, crt->GetOrientation(), false);
+                }
+
+                sScriptMgr->OnRemovePassengerPetOrTotem(this, crt);
+            }
+        }
+
+        passenger->SetTransport(nullptr);
+        passenger->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+        passenger->m_movementInfo.transport.Reset();
+        FMT_LOG_DEBUG("entities.transport", "Object {} removed from transport {}.", passenger->GetName(), GetName());
     }
+}
+
+bool Transport::isPassenger(WorldObject* passenger)
+{
+    for (PassengerSet::iterator itr = _passengers.begin(); itr != _passengers.end(); ++itr)
+        if (passenger == (*itr))
+            return true;
+
+    return false;
 }
 
 Creature* Transport::CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData const* data)
@@ -328,7 +412,7 @@ Creature* Transport::CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData c
 
     if (!creature->IsPositionValid())
     {
-        TC_LOG_ERROR("entities.transport", "Creature %s not created. Suggested coordinates aren't valid (X: %f Y: %f)", creature->GetGUID().ToString().c_str(), creature->GetPositionX(), creature->GetPositionY());
+        FMT_LOG_ERROR("entities.transport", "Creature {} not created. Suggested coordinates aren't valid (X: {} Y: {})", creature->GetGUID().ToString(), creature->GetPositionX(), creature->GetPositionY());
         delete creature;
         return nullptr;
     }
@@ -372,7 +456,7 @@ GameObject* Transport::CreateGOPassenger(ObjectGuid::LowType guid, GameObjectDat
 
     if (!go->IsPositionValid())
     {
-        TC_LOG_ERROR("entities.transport", "GameObject %s not created. Suggested coordinates aren't valid (X: %f Y: %f)", go->GetGUID().ToString().c_str(), go->GetPositionX(), go->GetPositionY());
+        FMT_LOG_ERROR("entities.transport", "GameObject {} not created. Suggested coordinates aren't valid (X: {} Y: {})", go->GetGUID().ToString(), go->GetPositionX(), go->GetPositionY());
         delete go;
         return nullptr;
     }
@@ -387,7 +471,7 @@ GameObject* Transport::CreateGOPassenger(ObjectGuid::LowType guid, GameObjectDat
     return go;
 }
 
-TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSummonType summonType, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, Unit* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
+TempSummon* Transport::SummonPassenger(uint32 entry, Position const& pos, TempSummonType summonType, SummonPropertiesDBC const* properties /*= nullptr*/, uint32 duration /*= 0*/, Unit* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
 {
     Map* map = FindMap();
     if (!map)
@@ -694,6 +778,7 @@ void Transport::UpdatePassengerPositions(PassengerSet& passengers)
     for (PassengerSet::iterator itr = passengers.begin(); itr != passengers.end(); ++itr)
     {
         WorldObject* passenger = *itr;
+
         // transport teleported but passenger not yet (can happen for players)
         if (passenger->GetMap() != GetMap())
             continue;
@@ -725,7 +810,7 @@ void Transport::UpdatePassengerPositions(PassengerSet& passengers)
                 if (passenger->IsInWorld() && !passenger->ToPlayer()->IsBeingTeleported())
                 {
                     GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
-                    passenger->ToPlayer()->SetFallInformation(0, passenger->GetPositionZ());
+                    passenger->ToPlayer()->ResetFallingData(passenger->GetPositionZ());
                 }
                 break;
             case TYPEID_GAMEOBJECT:
@@ -749,7 +834,7 @@ void Transport::DoEventIfAny(KeyFrame const& node, bool departure)
 {
     if (uint32 eventid = departure ? node.Node->DepartureEventID : node.Node->ArrivalEventID)
     {
-        TC_LOG_DEBUG("maps.script", "Taxi %s event %u of node %u of %s path", departure ? "departure" : "arrival", eventid, node.Node->NodeIndex, GetName().c_str());
+        FMT_LOG_DEBUG("maps.script", "Taxi {} event {} of node {} of {} path", departure ? "departure" : "arrival", eventid, node.Node->NodeIndex, GetName());
         GetMap()->ScriptsStart(sEventScripts, eventid, this, this);
         EventInform(eventid);
     }

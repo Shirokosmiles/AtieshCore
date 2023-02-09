@@ -97,7 +97,7 @@ class at_ring_of_law : public AreaTriggerScript
 public:
     at_ring_of_law() : AreaTriggerScript("at_ring_of_law") { }
 
-    bool OnTrigger(Player* player, AreaTriggerEntry const* /*at*/) override
+    bool OnTrigger(Player* player, AreaTriggerDBC const* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
@@ -228,7 +228,7 @@ public:
                 case 5:
                     instance->UpdateEncounterStateForKilledCreature(NPC_GRIMSTONE, me);
                     instance->SetData(TYPE_RING_OF_LAW, DONE);
-                    TC_LOG_DEBUG("scripts", "npc_grimstone: event reached end and set complete.");
+                    FMT_LOG_DEBUG("scripts", "npc_grimstone: event reached end and set complete.");
                     break;
             }
         }

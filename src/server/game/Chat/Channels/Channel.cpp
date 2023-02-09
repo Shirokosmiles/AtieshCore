@@ -20,7 +20,7 @@
 #include "ChannelAppenders.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -33,7 +33,7 @@
 #include "StringConvert.h"
 #include "World.h"
 
-Channel::Channel(uint32 channelId, uint32 team /*= 0*/, AreaTableEntry const* zoneEntry /*= nullptr*/) :
+Channel::Channel(uint32 channelId, uint32 team /*= 0*/, AreaTableDBC const* zoneEntry /*= nullptr*/) :
     _isDirty(false),
     _nextActivityUpdateTime(0),
     _announceEnabled(false),                                        // no join/leave announces
@@ -47,7 +47,8 @@ Channel::Channel(uint32 channelId, uint32 team /*= 0*/, AreaTableEntry const* zo
     _channelPassword(),
     _zoneEntry(zoneEntry)
 {
-    ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId);
+    ChatChannelsDBC const* channelEntry = sDBCStoresMgr->GetChatChannelsDBC(channelId);
+    ASSERT_NOTNULL(channelEntry);
     if (channelEntry->Flags & CHANNEL_DBC_FLAG_TRADE)              // for trade channel
         _channelFlags |= CHANNEL_FLAG_TRADE;
 
@@ -80,22 +81,24 @@ Channel::Channel(std::string const& name, uint32 team /*= 0*/, std::string const
         if (!banned)
             continue;
 
-        TC_LOG_DEBUG("chat.system", "Channel(%s) loaded player %s into bannedStore", name.c_str(), banned.ToString().c_str());
+        FMT_LOG_DEBUG("chat.system", "Channel({}) loaded player {} into bannedStore", name, banned.ToString());
         _bannedStore.insert(banned);
     }
 }
 
-void Channel::GetChannelName(std::string& channelName, uint32 channelId, LocaleConstant locale, AreaTableEntry const* zoneEntry)
+void Channel::GetChannelName(std::string& channelName, uint32 channelId, LocaleConstant locale, AreaTableDBC const* zoneEntry)
 {
     if (channelId)
     {
-        ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId);
+        ChatChannelsDBC const* channelEntry = sDBCStoresMgr->GetChatChannelsDBC(channelId);
+        if (!channelEntry)
+            return;
         if (!(channelEntry->Flags & CHANNEL_DBC_FLAG_GLOBAL))
         {
             if (channelEntry->Flags & CHANNEL_DBC_FLAG_CITY_ONLY)
-                channelName = Trinity::StringFormat(channelEntry->Name[locale], sObjectMgr->GetTrinityString(LANG_CHANNEL_CITY, locale));
+                channelName = Trinity::StringSPRINTF(channelEntry->Name[locale], sObjectMgr->GetTrinityString(LANG_CHANNEL_CITY, locale));
             else
-                channelName = Trinity::StringFormat(channelEntry->Name[locale], ASSERT_NOTNULL(zoneEntry)->AreaName[locale]);
+                channelName = Trinity::StringSPRINTF(channelEntry->Name[locale], ASSERT_NOTNULL(zoneEntry)->AreaName[locale]);
         }
         else
             channelName = channelEntry->Name[locale];
@@ -602,8 +605,8 @@ void Channel::List(Player const* player) const
     }
 
     std::string channelName = GetName(player->GetSession()->GetSessionDbcLocale());
-    TC_LOG_DEBUG("chat.system", "SMSG_CHANNEL_LIST %s Channel: %s",
-        player->GetSession()->GetPlayerInfo().c_str(), channelName.c_str());
+    FMT_LOG_DEBUG("chat.system", "SMSG_CHANNEL_LIST {} Channel: {}",
+        player->GetSession()->GetPlayerInfo(), channelName);
 
     WorldPacket data(SMSG_CHANNEL_LIST, 1 + (channelName.size() + 1) + 1 + 4 + _playersStore.size() * (8 + 1));
     data << uint8(1);                                   // channel type?
@@ -680,10 +683,6 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
 {
     if (what.empty())
         return;
-
-    // TODO: Add proper RBAC check
-    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
-        lang = LANG_UNIVERSAL;
 
     if (!IsOn(guid))
     {

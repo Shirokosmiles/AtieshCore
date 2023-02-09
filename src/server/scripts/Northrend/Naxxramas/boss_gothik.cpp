@@ -437,7 +437,7 @@ struct boss_gothik : public BossAI
                 {
                     if (RAID_MODE(waves10,waves25).size() <= _waveCount) // bounds check
                     {
-                        TC_LOG_INFO("scripts", "GothikAI: Wave count %d is out of range for difficulty %d.", _waveCount, static_cast<uint32>(GetDifficulty()));
+                        FMT_LOG_INFO("scripts", "GothikAI: Wave count {} is out of range for difficulty {}.", _waveCount, static_cast<uint32>(GetDifficulty()));
                         break;
                     }
 
@@ -733,7 +733,7 @@ struct npc_gothik_minion_spectralrider : public npc_gothik_minion_baseAI
             _frenzyTimer = 0;
         else
         { // target priority: knight > other rider > horse > gothik
-            std::list<Creature*> potentialTargets = DoFindFriendlyMissingBuff(30.0, SPELLHELPER_UNHOLY_FRENZY);
+            std::vector<Creature*> potentialTargets = DoFindFriendlyMissingBuff(30.0, SPELLHELPER_UNHOLY_FRENZY);
             Creature *knightTarget = nullptr, *riderTarget = nullptr, *horseTarget = nullptr, *gothikTarget = nullptr;
             for (Creature* pTarget : potentialTargets)
             {

@@ -137,55 +137,36 @@ class TC_COMMON_API Log
         } \
         catch (std::exception& e) \
         { \
-            sLog->outMessage("server", LOG_LEVEL_ERROR, "Wrong format occurred (%s) at %s:%u.", \
+            sLog->outMessage("server", LOG_LEVEL_ERROR, "Wrong format occurred ({}) at {}:{}.", \
                 e.what(), __FILE__, __LINE__); \
         } \
     }
 
-#ifdef PERFORMANCE_PROFILING
-#define TC_LOG_MESSAGE_BODY(filterType__, level__, ...) ((void)0)
-#elif TRINITY_PLATFORM != TRINITY_PLATFORM_WINDOWS
-void check_args(char const*, ...) ATTR_PRINTF(1, 2);
-void check_args(std::string const&, ...);
-
 // This will catch format errors on build time
-#define TC_LOG_MESSAGE_BODY(filterType__, level__, ...)                 \
+#define FMT_LOG_MESSAGE_BODY(filterType__, level__, ...)                 \
         do {                                                            \
             if (sLog->ShouldLog(filterType__, level__))                 \
             {                                                           \
-                if (false)                                              \
-                    check_args(__VA_ARGS__);                            \
-                                                                        \
                 LOG_EXCEPTION_FREE(filterType__, level__, __VA_ARGS__); \
             }                                                           \
         } while (0)
-#else
-#define TC_LOG_MESSAGE_BODY(filterType__, level__, ...)                 \
-        __pragma(warning(push))                                         \
-        __pragma(warning(disable:4127))                                 \
-        do {                                                            \
-            if (sLog->ShouldLog(filterType__, level__))                 \
-                LOG_EXCEPTION_FREE(filterType__, level__, __VA_ARGS__); \
-        } while (0)                                                     \
-        __pragma(warning(pop))
-#endif
 
-#define TC_LOG_TRACE(filterType__, ...) \
-    TC_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_TRACE, __VA_ARGS__)
+#define FMT_LOG_TRACE(filterType__, ...) \
+    FMT_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_TRACE, __VA_ARGS__)
 
-#define TC_LOG_DEBUG(filterType__, ...) \
-    TC_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_DEBUG, __VA_ARGS__)
+#define FMT_LOG_DEBUG(filterType__, ...) \
+    FMT_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_DEBUG, __VA_ARGS__)
 
-#define TC_LOG_INFO(filterType__, ...)  \
-    TC_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_INFO, __VA_ARGS__)
+#define FMT_LOG_INFO(filterType__, ...)  \
+    FMT_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_INFO, __VA_ARGS__)
 
-#define TC_LOG_WARN(filterType__, ...)  \
-    TC_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_WARN, __VA_ARGS__)
+#define FMT_LOG_WARN(filterType__, ...)  \
+    FMT_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_WARN, __VA_ARGS__)
 
-#define TC_LOG_ERROR(filterType__, ...) \
-    TC_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_ERROR, __VA_ARGS__)
+#define FMT_LOG_ERROR(filterType__, ...) \
+    FMT_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_ERROR, __VA_ARGS__)
 
-#define TC_LOG_FATAL(filterType__, ...) \
-    TC_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_FATAL, __VA_ARGS__)
+#define FMT_LOG_FATAL(filterType__, ...) \
+    FMT_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_FATAL, __VA_ARGS__)
 
 #endif

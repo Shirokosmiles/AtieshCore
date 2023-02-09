@@ -572,30 +572,28 @@ public:
         void CompleteQuest()
         {
             float radius = 50.0f;
-            std::list<Player*> players;
+            std::vector<Player*> _players;
             Trinity::AnyPlayerInObjectRangeCheck checker(me, radius);
-            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, _players, checker);
             Cell::VisitWorldObjects(me, searcher, radius);
-
-            for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                if ((*itr)->GetQuestStatus(QUEST_TREES_COMPANY) == QUEST_STATUS_INCOMPLETE && (*itr)->HasAura(SPELL_TREE_DISGUISE))
-                    (*itr)->KilledMonsterCredit(NPC_SPARK);
+            for (auto const& pointer : _players)
+            {
+                if (pointer->GetQuestStatus(QUEST_TREES_COMPANY) == QUEST_STATUS_INCOMPLETE && pointer->HasAura(SPELL_TREE_DISGUISE))
+                    pointer->KilledMonsterCredit(NPC_SPARK);
+            }
+            _players.clear();
         }
 
         void DespawnNagaFlag(bool despawn)
         {
-            std::list<GameObject*> FlagList;
-            me->GetGameObjectListWithEntryInGrid(FlagList, GO_NAGA_FLAG, 100.0f);
-
-            if (!FlagList.empty())
+            std::vector<GameObject*> _flagList;
+            me->GetGameObjectListWithEntryInGrid(_flagList, GO_NAGA_FLAG, 100.0f);
+            for (auto const& pointer : _flagList)
             {
-                for (std::list<GameObject*>::const_iterator itr = FlagList.begin(); itr != FlagList.end(); ++itr)
-                {
-                    if (despawn)
-                        (*itr)->SetLootState(GO_JUST_DEACTIVATED);
-                    else
-                        (*itr)->Respawn();
-                }
+                if (despawn)
+                    pointer->SetLootState(GO_JUST_DEACTIVATED);
+                else
+                    pointer->Respawn();
             }
         }
 

@@ -95,9 +95,10 @@ struct boss_sulfuron : public BossAI
                     break;
                 case EVENT_INSPIRE:
                 {
-                    std::list<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
+                    std::vector<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
                     if (!healers.empty())
                         DoCast(Trinity::Containers::SelectRandomContainerElement(healers), SPELL_INSPIRE);
+                    healers.clear();
 
                     DoCast(me, SPELL_INSPIRE);
                     events.ScheduleEvent(EVENT_INSPIRE, 20s, 26s);

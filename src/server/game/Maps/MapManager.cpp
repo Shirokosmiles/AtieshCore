@@ -18,6 +18,7 @@
 #include "MapManager.h"
 #include "InstanceSaveMgr.h"
 #include "DatabaseEnv.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Transport.h"
@@ -73,7 +74,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
     {
         std::lock_guard<std::mutex> lock(_mapsLock);
 
-        MapEntry const* entry = sMapStore.LookupEntry(id);
+        MapDBC const* entry = sDBCStoresMgr->GetMapDBC(id);
         ASSERT(entry);
 
         if (entry->Instanceable())
@@ -124,7 +125,7 @@ Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
 
 Map::EnterState MapManager::PlayerCannotEnter(uint32 mapid, Player* player, bool loginCheck)
 {
-    MapEntry const* entry = sMapStore.LookupEntry(mapid);
+    MapDBC const* entry = sDBCStoresMgr->GetMapDBC(mapid);
     if (!entry)
         return Map::CANNOT_ENTER_NO_ENTRY;
 
@@ -138,7 +139,7 @@ Map::EnterState MapManager::PlayerCannotEnter(uint32 mapid, Player* player, bool
     Difficulty targetDifficulty, requestedDifficulty;
     targetDifficulty = requestedDifficulty = player->GetDifficulty(entry->IsRaid());
     // Get the highest available difficulty if current setting is higher than the instance allows
-    MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(entry->ID, targetDifficulty);
+    MapDifficultyDBC const* mapDiff = sDBCStoresMgr->GetDownscaledMapDifficultyData(entry->ID, targetDifficulty);
     if (!mapDiff)
         return Map::CANNOT_ENTER_DIFFICULTY_UNAVAILABLE;
 
@@ -150,12 +151,17 @@ Map::EnterState MapManager::PlayerCannotEnter(uint32 mapid, Player* player, bool
     if (!player->Satisfy(sObjectMgr->GetAccessRequirement(mapid, targetDifficulty), mapid, true))
         return Map::CANNOT_ENTER_UNSPECIFIED_REASON;
 
-    char const* mapName = entry->MapName[player->GetSession()->GetSessionDbcLocale()];
+    char const* mapName = entry->MapName[player->GetSession()->GetSessionDbcLocale()].c_str();
 
     Group* group = player->GetGroup();
     if (entry->IsRaid()) // can only enter in a raid group
+    {
+        if (mapid == 580 && player->CanEnterInInstanceOrRaidCustom())
+            return Map::CAN_ENTER;
+
         if ((!group || !group->isRaidGroup()) && !sWorld->getBoolConfig(CONFIG_INSTANCE_IGNORE_RAID))
             return Map::CANNOT_ENTER_NOT_IN_RAID;
+    }
 
     if (!player->IsAlive())
     {
@@ -175,10 +181,10 @@ Map::EnterState MapManager::PlayerCannotEnter(uint32 mapid, Player* player, bool
             if (!corpseMap)
                 return Map::CANNOT_ENTER_CORPSE_IN_DIFFERENT_INSTANCE;
 
-            TC_LOG_DEBUG("maps", "MAP: Player '%s' has corpse in instance '%s' and can enter.", player->GetName().c_str(), mapName);
+            FMT_LOG_DEBUG("maps", "MAP: Player '{}' has corpse in instance '{}' and can enter.", player->GetName(), mapName);
         }
         else
-            TC_LOG_DEBUG("maps", "Map::CanPlayerEnter - player '%s' is dead but does not have a corpse!", player->GetName().c_str());
+            FMT_LOG_DEBUG("maps", "Map::CanPlayerEnter - player '{}' is dead but does not have a corpse!", player->GetName());
     }
 
     //Get instance where player's group is bound & its map
@@ -243,7 +249,7 @@ bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
 
 bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
 {
-    MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
+    MapDBC const* mEntry = sDBCStoresMgr->GetMapDBC(mapid);
 
     if (startUp)
         return mEntry ? true : false;
@@ -331,7 +337,7 @@ uint32 MapManager::GenerateInstanceId()
 {
     if (_nextInstanceId == 0xFFFFFFFF)
     {
-        TC_LOG_ERROR("maps", "Instance ID overflow!! Can't continue, shutting down server. ");
+        FMT_LOG_ERROR("maps", "Instance ID overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
         return _nextInstanceId;
     }

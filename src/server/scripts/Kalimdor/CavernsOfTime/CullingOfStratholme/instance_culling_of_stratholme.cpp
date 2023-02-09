@@ -311,7 +311,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                 if (!infiniteGuardianTime)
                     timediff = -1;
 
-                TC_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::ReadSaveDataMore: Loaded with state %u and guardian timeout at %zu minutes %zu seconds from now", (uint32)loadState, timediff / MINUTE, timediff % MINUTE);
+                FMT_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::ReadSaveDataMore: Loaded with state {} and guardian timeout at %zu minutes %zu seconds from now", (uint32)loadState, timediff / MINUTE, timediff % MINUTE);
             }
 
             void SetData(uint32 type, uint32 data) override
@@ -525,7 +525,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                             break;
                         }
                         case EVENT_RESPAWN_ARTHAS:
-                            TC_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::Update: Spawning new Arthas for instance...");
+                            FMT_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::Update: Spawning new Arthas for instance...");
                             instance->SummonCreature(NPC_ARTHAS, GetArthasSnapbackFor(_currentState));
                             events.CancelEvent(EVENT_RESPAWN_ARTHAS); // make sure we don't have two scheduled
                             break;
@@ -617,7 +617,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                         _plagueCrates.push_back(creature->GetGUID());
                         break;
                     case NPC_ARTHAS:
-                        TC_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::OnCreatureCreate: Arthas spawned at %s", creature->GetPosition().ToString().c_str());
+                        FMT_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::OnCreatureCreate: Arthas spawned at {}", creature->GetPosition().ToString());
                         _arthasGUID = creature->GetGUID();
                         creature->setActive(true);
                         break;
@@ -655,7 +655,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
 
             void SetInstanceProgress(COSProgressStates state, bool force)
             {
-                TC_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::SetInstanceProgress: Instance progress is now 0x%X", (uint32)state);
+                FMT_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::SetInstanceProgress: Instance progress is now 0x{:X}", (uint32)state);
                 _currentState = state;
 
                 /* Spawn group management */
@@ -796,7 +796,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
 
             void SetWorldState(COSWorldStates state, uint32 value, bool immediate = true)
             {
-                TC_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::SetWorldState: %u %u", uint32(state), value);
+                FMT_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::SetWorldState: {} {}", uint32(state), value);
                 _currentWorldStates[state] = value;
                 if (immediate)
                     PropagateWorldStateUpdate();
@@ -804,13 +804,13 @@ class instance_culling_of_stratholme : public InstanceMapScript
 
             void PropagateWorldStateUpdate()
             {
-                TC_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::PropagateWorldStateUpdate: Propagate world states");
+                FMT_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::PropagateWorldStateUpdate: Propagate world states");
                 for (WorldStateMap::const_iterator it = _currentWorldStates.begin(); it != _currentWorldStates.end(); ++it)
                 {
                     uint32& sent = _sentWorldStates[it->first];
                     if (sent != it->second)
                     {
-                        TC_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::PropagateWorldStateUpdate: Sending world state %u (%u)", it->first, it->second);
+                        FMT_LOG_DEBUG("scripts.cos", "instance_culling_of_stratholme::PropagateWorldStateUpdate: Sending world state {} ({})", it->first, it->second);
                         DoUpdateWorldState(it->first, it->second);
                         sent = it->second;
                     }

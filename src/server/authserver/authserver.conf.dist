@@ -255,7 +255,7 @@ TOTPMasterSecret =
 #        Default:     0  - (All Disabled)
 #                     1  - (All Enabled)
 
-Updates.EnableDatabases = 0
+Updates.EnableDatabases = 1
 
 #
 #    Updates.AutoSetup
@@ -394,6 +394,17 @@ Appender.Auth=2,2,0,Auth.log,w
 #
 
 Logger.root=3,Console Auth
+
+#
+###################################################################################################
+###################################################################################################
+#
+#
+#    PatchDir
+#        Description: folder for custom .mpq patches
+#        Default:     "./Patches"
+
+PatchDir = "./Patches"
 
 #
 ###################################################################################################

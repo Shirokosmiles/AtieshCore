@@ -18,8 +18,10 @@
 #include "ScriptMgr.h"
 #include "AreaBoundary.h"
 #include "Creature.h"
+#include "Group.h"
 #include "forge_of_souls.h"
 #include "InstanceScript.h"
+#include "ObjectAccessor.h"
 #include "Map.h"
 #include "Player.h"
 
@@ -42,17 +44,33 @@ class instance_forge_of_souls : public InstanceMapScript
                 SetBossNumber(EncounterCount);
                 LoadBossBoundaries(boundaries);
 
-                teamInInstance = 0;
+                teamInInstance = map->ToInstanceMap()->GetTeamInInstance();
             }
 
             void OnPlayerEnter(Player* player) override
             {
-                if (!teamInInstance)
-                    teamInInstance = player->GetTeam();
+                if (Group* group = player->GetGroup())
+                {
+                    Player* gleader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
+                    if (gleader)
+                        teamInInstance = gleader->GetCFSTeam();
+                    else
+                        teamInInstance = player->GetCFSTeam();
+                }
+                else
+                    teamInInstance = player->GetCFSTeam();
             }
 
             void OnCreatureCreate(Creature* creature) override
             {
+                if (!teamInInstance)
+                {
+                    Map::PlayerList const& players = instance->GetPlayers();
+                    if (!players.isEmpty())
+                        if (Player* player = players.begin()->GetSource())
+                            teamInInstance = player->GetCFSTeam();
+                }
+
                 switch (creature->GetEntry())
                 {
                     case NPC_BRONJAHM:
@@ -61,30 +79,18 @@ class instance_forge_of_souls : public InstanceMapScript
                     case NPC_DEVOURER:
                         devourerOfSouls = creature->GetGUID();
                         break;
-                }
-            }
-
-            uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
-            {
-                if (!teamInInstance)
-                {
-                    Map::PlayerList const& players = instance->GetPlayers();
-                    if (!players.isEmpty())
-                        if (Player* player = players.begin()->GetSource())
-                            teamInInstance = player->GetTeam();
-                }
-
-                uint32 entry = data->id;
-                switch (entry)
-                {
                     case NPC_SYLVANAS_PART1:
-                        return teamInInstance == ALLIANCE ? NPC_JAINA_PART1 : NPC_SYLVANAS_PART1;
+                        if (teamInInstance == ALLIANCE)
+                            creature->UpdateEntry(NPC_JAINA_PART1);
+                        break;
                     case NPC_LORALEN:
-                        return teamInInstance == ALLIANCE ? NPC_ELANDRA : NPC_LORALEN;
+                        if (teamInInstance == ALLIANCE)
+                            creature->UpdateEntry(NPC_ELANDRA);
+                        break;
                     case NPC_KALIRA:
-                        return teamInInstance == ALLIANCE ? NPC_KORELN : NPC_KALIRA;
-                    default:
-                        return entry;
+                        if (teamInInstance == ALLIANCE)
+                            creature->UpdateEntry(NPC_KORELN);
+                        break;
                 }
             }
 

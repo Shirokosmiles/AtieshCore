@@ -36,7 +36,12 @@ enum MageSpells
     SPELL_MAGE_CLONE_ME                 = 45204,
     SPELL_MAGE_MASTERS_THREAT_LIST      = 58838,
     SPELL_MAGE_FROST_BOLT               = 59638,
-    SPELL_MAGE_FIRE_BLAST               = 59637
+    SPELL_MAGE_FIRE_BLAST               = 59637,
+
+    SPELL_FROSTSHIELD                   = 43008,
+    SPELL_FIRESHIELD                    = 43046,
+    SPELL_ICEBLOCK                      = 65802,
+    SPELL_NOVA                          = 42917
 };
 
 enum MirrorImageTimers

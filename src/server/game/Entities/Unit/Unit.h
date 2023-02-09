@@ -62,9 +62,9 @@ enum InventorySlot
 };
 
 struct AbstractFollower;
-struct FactionTemplateEntry;
+struct FactionTemplateDBC;
 struct LiquidData;
-struct LiquidTypeEntry;
+struct LiquidTypeDBC;
 struct SpellValue;
 
 class Aura;
@@ -262,6 +262,8 @@ enum UnitState : uint32
     UNIT_STATE_SIGHTLESS           = UNIT_STATE_LOST_CONTROL | UNIT_STATE_EVADE,
     UNIT_STATE_CANNOT_TURN         = UNIT_STATE_LOST_CONTROL | UNIT_STATE_ROTATING | UNIT_STATE_FOCUSING,
     UNIT_STATE_NOT_MOVE            = UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DIED | UNIT_STATE_DISTRACTED,
+
+    UNIT_STATE_IGNORE_ANTISPEEDHACK = UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED | UNIT_STATE_CHARGING | UNIT_STATE_DISTRACTED | UNIT_STATE_POSSESSED | UNIT_STATE_JUMPING,
 
     UNIT_STATE_ALL_ERASABLE        = UNIT_STATE_ALL_STATE_SUPPORTED & ~(UNIT_STATE_IGNORE_PATHFINDING),
     UNIT_STATE_ALL_STATE           = 0xffffffff
@@ -484,6 +486,7 @@ class TC_GAME_API HealInfo
         HealInfo(Unit* healer, Unit* target, uint32 heal, SpellInfo const* spellInfo, SpellSchoolMask schoolMask);
 
         void AbsorbHeal(uint32 amount);
+        void SetHeal(uint32 amount) { _heal = amount; }
         void SetEffectiveHeal(uint32 amount) { _effectiveHeal = amount; }
 
         Unit* GetHealer() const { return _healer; }
@@ -715,6 +718,8 @@ struct TC_GAME_API CharmInfo
         void SetIsReturning(bool val);
         bool IsReturning();
         void SaveStayPosition();
+        void RemoveStayPosition();
+        bool HasStayPosition();
         void GetStayPosition(float &x, float &y, float &z);
 
     private:
@@ -868,6 +873,7 @@ class TC_GAME_API Unit : public WorldObject
         void CombatStopWithPets(bool includingCast = false);
         void StopAttackFaction(uint32 faction_id);
         Unit* SelectNearbyTarget(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
+        Unit* SelectNearbyNoTotemTarget(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
         void SendMeleeAttackStop(Unit* victim = nullptr);
         void SendMeleeAttackStart(Unit* victim);
 
@@ -887,13 +893,20 @@ class TC_GAME_API Unit : public WorldObject
 
         uint8 GetLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
         uint8 GetLevelForTarget(WorldObject const* /*target*/) const override { return GetLevel(); }
+
         void SetLevel(uint8 lvl, bool sendUpdate = true);
-        uint8 GetRace() const { return GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_RACE); }
         void SetRace(uint8 race) { SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_RACE, race); }
-        uint32 GetRaceMask() const { return 1 << (GetRace() - 1); }
+        void SetClass(uint8 unitClass) { SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS, unitClass); }
+
+        uint8 GetRace(bool forceoriginal = false) const;
         uint8 GetClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS); }
-        void SetClass(uint8 classId) { SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS, classId); }
-        uint32 GetClassMask() const { return 1 << (GetClass() - 1); }
+
+        uint32 GetRaceMask() const { return 1 << (GetRace() - 1); }
+        uint32 GetClassMask() const { return 1 << (GetClass()-1); }
+
+        uint8 getCFSRace() { return GetRace(true); }
+        uint32 getCFSRaceMask() const { return 1 << (GetRace(true) - 1); }
+
         Gender GetGender() const { return Gender(GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER)); }
         void SetGender(Gender gender) { SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, gender); }
         virtual Gender GetNativeGender() const { return GetGender(); }
@@ -970,6 +983,9 @@ class TC_GAME_API Unit : public WorldObject
         // faction template id
         uint32 GetFaction() const override { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
         void SetFaction(uint32 faction) override { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction); }
+        // GSystem
+        uint32 GetGuildWarFaction() const;
+        void UpdateFactionForSelfAndControllList();
 
         bool IsInPartyWith(Unit const* unit) const;
         bool IsInRaidWith(Unit const* unit) const;
@@ -1017,7 +1033,7 @@ class TC_GAME_API Unit : public WorldObject
         uint32 GetMaxSkillValueForLevel(Unit const* target = nullptr) const { return (target ? GetLevelForTarget(target) : GetLevel()) * 5; }
         static void DealDamageMods(Unit const* victim, uint32& damage, uint32* absorb);
         static uint32 DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* spellProto = nullptr, bool durabilityLoss = true);
-        static void Kill(Unit* attacker, Unit* victim, bool durabilityLoss = true);
+        static void Kill(Unit* attacker, Unit* victim, bool durabilityLoss = true, bool skipreward = false);
         void KillSelf(bool durabilityLoss = true) { Unit::Kill(this, this, durabilityLoss); }
         static void DealHeal(HealInfo& healInfo);
 
@@ -1080,6 +1096,7 @@ class TC_GAME_API Unit : public WorldObject
         int32 GetMechanicResistChance(SpellInfo const* spellInfo) const;
         bool CanUseAttackType(uint8 attacktype) const;
 
+        virtual float GetShieldBlockValuePctMod() const = 0;
         virtual uint32 GetShieldBlockValue() const = 0;
         uint32 GetShieldBlockValue(uint32 soft_cap, uint32 hard_cap) const;
         uint32 GetDefenseSkillValue(Unit const* target = nullptr) const;
@@ -1165,6 +1182,8 @@ class TC_GAME_API Unit : public WorldObject
         bool IsFeared()  const { return HasAuraType(SPELL_AURA_MOD_FEAR); }
         bool IsRooted() const { return HasAuraType(SPELL_AURA_MOD_ROOT); }
         bool IsPolymorphed() const;
+        bool IsDazed() const;
+
         bool IsFrozen() const { return HasAuraState(AURA_STATE_FROZEN); }
 
         bool isTargetableForAttack(bool checkFakeDeath = true) const;
@@ -1186,6 +1205,7 @@ class TC_GAME_API Unit : public WorldObject
         void SendPlaySpellImpact(ObjectGuid guid, uint32 id) const;
 
         void DeMorph();
+        void RaidInfoByMe(Unit* victim);
 
         void SendAttackStateUpdate(CalcDamageInfo* damageInfo);
         void SendAttackStateUpdate(uint32 HitInfo, Unit* target, uint8 SwingType, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, uint32 Resist, VictimState TargetState, uint32 BlockedAmount);
@@ -1234,6 +1254,7 @@ class TC_GAME_API Unit : public WorldObject
         bool isDying() const { return (m_deathState == JUST_DIED); }
         bool isDead() const { return (m_deathState == DEAD || m_deathState == CORPSE); }
         bool IsGhouled() const;
+        bool UnderCheatDeath() const { return HasAura(45182 /*Cheat Death aura -90% dmg*/); }
         DeathState getDeathState() const { return m_deathState; }
         virtual void setDeathState(DeathState s);           // overwrited in Creature/Player/Pet
 
@@ -1263,8 +1284,15 @@ class TC_GAME_API Unit : public WorldObject
         Minion* GetFirstMinion() const;
         Unit* GetCharmerOrOwner() const { return IsCharmed() ? GetCharmer() : GetOwner(); }
 
+        Unit* GetCharmerController() const;
+        Unit* GetCharmerControlledByThis() const;
+        void SetCharmerController(Unit* charmer);
+        void SetCharmerControlled(Unit* charmer);
+        void RemoveCharmerController();
+        void RemoveCharmerControlled();
+
         void SetMinion(Minion *minion, bool apply);
-        void GetAllMinionsByEntry(std::list<Creature*>& Minions, uint32 entry);
+        void GetAllMinionsByEntry(std::vector<Creature*>& Minions, uint32 entry);
         void RemoveAllMinionsByEntry(uint32 entry);
         void SetCharm(Unit* target, bool apply);
         Unit* GetNextRandomRaidMemberOrPet(float radius);
@@ -1305,6 +1333,7 @@ class TC_GAME_API Unit : public WorldObject
         void AddPlayerToVision(Player* player);
         void RemovePlayerFromVision(Player* player);
         bool HasSharedVision() const { return !m_sharedVision.empty(); }
+        void RemoveSharedVisionPlayers();
         void RemoveBindSightAuras();
         void RemoveCharmAuras();
 
@@ -1410,6 +1439,7 @@ class TC_GAME_API Unit : public WorldObject
         bool HasAuraTypeWithTriggerSpell(AuraType auratype, uint32 triggerSpell) const;
         bool HasNegativeAuraWithInterruptFlag(uint32 flag, ObjectGuid guid = ObjectGuid::Empty) const;
         bool HasAuraWithMechanic(uint32 mechanicMask) const;
+        bool HasAuraFaireFire() const;
         bool HasStrongerAuraWithDR(SpellInfo const* auraSpellInfo, Unit* caster, bool triggered) const;
 
         AuraEffect* IsScriptOverriden(SpellInfo const* spell, int32 script) const;
@@ -1547,6 +1577,7 @@ class TC_GAME_API Unit : public WorldObject
         void SetRangedAttackPowerMultiplier(float attackPowerMult) { SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, attackPowerMult); }
         virtual void UpdateDamagePhysical(WeaponAttackType attType);
         float GetTotalAttackPowerValue(WeaponAttackType attType) const;
+        float GetModsAttackPowerValue(WeaponAttackType attType) const;
         float GetWeaponDamageRange(WeaponAttackType attType, WeaponDamageRange type, uint8 damageIndex = 0) const;
         void SetBaseWeaponDamage(WeaponAttackType attType, WeaponDamageRange damageRange, float value, uint8 damageIndex = 0) { m_weaponDamage[attType][damageRange][damageIndex] = value; }
         virtual void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex) const = 0;
@@ -1605,6 +1636,7 @@ class TC_GAME_API Unit : public WorldObject
         uint32 BuildAuraStateUpdateForTarget(Unit const* target) const;
         bool HasAuraState(AuraStateType flag, SpellInfo const* spellProto = nullptr, Unit const* Caster = nullptr) const;
         void UnsummonAllTotems();
+        void UpdPhaseForAllTotemsAndPetAndTraps();
         bool IsMagnet() const;
         Unit* GetMeleeHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo = nullptr);
 
@@ -1755,9 +1787,15 @@ class TC_GAME_API Unit : public WorldObject
 
         bool isMoving() const   { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING); }
         bool isTurning() const  { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_TURNING); }
+        bool isSwimming() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SWIMMING); }
         virtual bool CanFly() const = 0;
         bool IsFlying() const   { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); }
         bool IsFalling() const;
+        bool IsJumping() const { return _isJumping; }
+        void SetIsJumping(bool jump) { _isJumping = jump; }
+        bool IsCharging() const { return _isCharging; }
+        void SetIsCharging(bool jump) { _isCharging = jump; }
+
         virtual bool CanEnterWater() const = 0;
         virtual bool CanSwim() const;
 
@@ -1826,6 +1864,8 @@ class TC_GAME_API Unit : public WorldObject
 
         std::string GetDebugInfo() const override;
 
+        void SetNeedToDismountAfterRoots() { needtodismount = true; }
+        void UpdateSplinePosition();
     protected:
         explicit Unit (bool isWorldObject);
 
@@ -1895,7 +1935,7 @@ class TC_GAME_API Unit : public WorldObject
         Vehicle* m_vehicleKit;
 
         uint32 m_unitTypeMask;
-        LiquidTypeEntry const* _lastLiquid;
+        LiquidTypeDBC const* _lastLiquid;
 
         bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
         bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
@@ -1915,7 +1955,6 @@ class TC_GAME_API Unit : public WorldObject
     private:
 
         void UpdateSplineMovement(uint32 t_diff);
-        void UpdateSplinePosition();
         void InterruptMovementBasedAuras();
         void CheckPendingMovementAcks();
 
@@ -1972,6 +2011,14 @@ class TC_GAME_API Unit : public WorldObject
         bool _isWalkingBeforeCharm;     ///< Are we walking before we were charmed?
 
         SpellHistory* _spellHistory;
+
+        // custom ATiesh features
+        ObjectGuid CharmerGUID_controller;
+        ObjectGuid CharmerGUID_controlled;
+
+        bool _isJumping;
+        bool _isCharging;
+        bool needtodismount;
 
         PositionUpdateInfo _positionUpdateInfo;
 

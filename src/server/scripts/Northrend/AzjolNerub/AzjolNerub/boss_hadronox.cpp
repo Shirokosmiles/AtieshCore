@@ -179,7 +179,7 @@ struct boss_hadronox : public BossAI
 
     void SummonCrusherPack(SummonGroups group)
     {
-        std::list<TempSummon*> summoned;
+        std::vector<TempSummon*> summoned;
         me->SummonCreatureGroup(group, &summoned);
         for (TempSummon* summon : summoned)
         {
@@ -353,9 +353,9 @@ struct boss_hadronox : public BossAI
     }
 
     // Safeguard to prevent Hadronox dying to NPCs
-    void DamageTaken(Unit* who, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
     {
-        if ((!who || !who->IsControlledByPlayer()) && me->HealthBelowPct(70))
+        if ((!attacker || !attacker->IsControlledByPlayer()) && me->HealthBelowPct(70))
         {
             if (me->HealthBelowPctDamaged(5, damage))
                 damage = 0;
@@ -514,7 +514,7 @@ struct npc_anub_ar_crusher : public npc_hadronox_crusherPackAI
         Talk(CRUSHER_SAY_AGGRO);
     }
 
-    void DamageTaken(Unit* /*source*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+    void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
     {
         if (_hadFrenzy || !me->HealthBelowPctDamaged(25, damage))
             return;

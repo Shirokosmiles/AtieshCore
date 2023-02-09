@@ -1,0 +1,1 @@
+UPDATE `creature_template` SET `ScriptName`='npc_nrostbrood_Destroyer' WHERE (`entry`='30575');

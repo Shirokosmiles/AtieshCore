@@ -120,7 +120,24 @@ void LoginDatabaseConnection::DoPrepareStatements()
 
     PrepareStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET, "SELECT totp_secret FROM account WHERE id = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET, "UPDATE account SET totp_secret = ? WHERE id = ?", CONNECTION_ASYNC);
-}
+
+    PrepareStatement(LOGIN_INS_GM_CHAR_ITEM_ADD, "INSERT INTO account_gm_log_item (guid, player, account, item, item_guid, count, position, target, realmId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_INS_GM_CHAR_LOG, "INSERT INTO account_gm_log (player, account, command, position, selected, realmId) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+
+    // VIP system
+    PrepareStatement(LOGIN_SET_ACCOUNT_PREMIUM, "INSERT INTO account_premium (id, setdate, unsetdate, active) VALUES (?, unix_timestamp(NOW()), ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_DEL_ACCOUNT_PREMIUM, "DELETE FROM account_premium WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_UPD_ACCOUNT_PREMIUM, "UPDATE account_premium SET setdate = unix_timestamp(NOW()), unsetdate = ? WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_GET_ACCOUNT_PREMIUM_STATUS_BY_ID, "SELECT 1 FROM account_premium WHERE id = ? AND active = 1", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_GET_ACCOUNT_PREMIUM_UNSETDATE_BY_ID, "SELECT unsetdate FROM account_premium WHERE id = ?", CONNECTION_SYNCH);
+    // VIP coins
+    PrepareStatement(LOGIN_UPD_ACCOUNT_COINS, "UPDATE account SET coins = ? WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_GET_ACCOUNT_COINS_BY_ID, "SELECT coins FROM account WHERE id = ?", CONNECTION_SYNCH);
+    // Anticheat system
+    PrepareStatement(LOGIN_INS_ACCOUNT_ANTICHEAT, "INSERT INTO anticheat_logs (account, player, description, position, realmId) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    // Warden log system
+    PrepareStatement(LOGIN_INS_ACCOUNT_WARDEN, "INSERT INTO warden_log (`check`, `action`, `account`, `guid`, `map`, `position_x`, `position_y`, `position_z`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+ }
 
 LoginDatabaseConnection::LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
 {
@@ -133,3 +150,4 @@ LoginDatabaseConnection::LoginDatabaseConnection(ProducerConsumerQueue<SQLOperat
 LoginDatabaseConnection::~LoginDatabaseConnection()
 {
 }
+

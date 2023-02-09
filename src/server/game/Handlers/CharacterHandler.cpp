@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "WorldSession.h"
+#include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
+#include "Battleground.h"
 #include "CalendarMgr.h"
 #include "CharacterCache.h"
 #include "CharacterPackets.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameObject.h"
 #include "GameTime.h"
 #include "GitRevision.h"
@@ -52,6 +53,7 @@
 #include "SystemPackets.h"
 #include "QueryHolder.h"
 #include "World.h"
+#include "WorldSession.h"
 
 class LoginQueryHolder : public CharacterDatabaseQueryHolder
 {
@@ -124,14 +126,6 @@ bool LoginQueryHolder::Initialize()
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS);
     stmt->setUInt32(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_ACTIONS, stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL);
-    stmt->setUInt32(0, lowGuid);
-    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAILS, stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
-    stmt->setUInt32(0, lowGuid);
-    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAIL_ITEMS, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_SOCIALLIST);
     stmt->setUInt32(0, lowGuid);
@@ -233,7 +227,7 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
         do
         {
             ObjectGuid guid(HighGuid::Player, (*result)[0].GetUInt32());
-            TC_LOG_INFO("network", "Loading %s from account %u.", guid.ToString().c_str(), GetAccountId());
+            FMT_LOG_INFO("network", "Loading {} from account {}.", guid.ToString(), GetAccountId());
             if (Player::BuildEnumData(result, &data))
             {
                 // Do not allow banned characters to log in
@@ -311,18 +305,18 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         }
     }
 
-    ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(createInfo->Class);
+    ChrClassesDBC const* classEntry = sDBCStoresMgr->GetChrClassesDBC(createInfo->Class);
     if (!classEntry)
     {
-        TC_LOG_ERROR("network", "Class (%u) not found in DBC while creating new char for account (ID: %u): wrong DBC files or cheater?", createInfo->Class, GetAccountId());
+        FMT_LOG_ERROR("network", "Class ({}) not found in DBC while creating new char for account (ID: {}): wrong DBC files or cheater?", createInfo->Class, GetAccountId());
         SendCharCreate(CHAR_CREATE_FAILED);
         return;
     }
 
-    ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(createInfo->Race);
+    ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(createInfo->Race);
     if (!raceEntry)
     {
-        TC_LOG_ERROR("network", "Race (%u) not found in DBC while creating new char for account (ID: %u): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
+        FMT_LOG_ERROR("network", "Race ({}) not found in DBC while creating new char for account (ID: {}): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
         SendCharCreate(CHAR_CREATE_FAILED);
         return;
     }
@@ -330,7 +324,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     // prevent character creating Expansion race without Expansion account
     if (raceEntry->RequiredExpansion > Expansion())
     {
-        TC_LOG_ERROR("entities.player.cheat", "Expansion %u account:[%d] tried to Create character with expansion %u race (%u)", Expansion(), GetAccountId(), raceEntry->RequiredExpansion, createInfo->Race);
+        FMT_LOG_ERROR("entities.player.cheat", "Expansion {} account:[{}] tried to Create character with expansion {} race ({})", Expansion(), GetAccountId(), raceEntry->RequiredExpansion, createInfo->Race);
         SendCharCreate(CHAR_CREATE_EXPANSION);
         return;
     }
@@ -338,7 +332,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     // prevent character creating Expansion class without Expansion account
     if (classEntry->RequiredExpansion > Expansion())
     {
-        TC_LOG_ERROR("entities.player.cheat", "Expansion %u account:[%d] tried to Create character with expansion %u class (%u)", Expansion(), GetAccountId(), classEntry->RequiredExpansion, createInfo->Class);
+        FMT_LOG_ERROR("entities.player.cheat", "Expansion {} account:[{}] tried to Create character with expansion {} class ({})", Expansion(), GetAccountId(), classEntry->RequiredExpansion, createInfo->Class);
         SendCharCreate(CHAR_CREATE_EXPANSION_CLASS);
         return;
     }
@@ -347,7 +341,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     {
         if (raceEntry->Alliance == CHRRACES_ALLIANCE_TYPE_NOT_PLAYABLE || raceEntry->HasFlag(CHRRACES_FLAGS_NOT_PLAYABLE))
         {
-            TC_LOG_ERROR("network", "Race (%u) was not playable but requested while creating new char for account (ID: %u): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
+            FMT_LOG_ERROR("network", "Race ({}) was not playable but requested while creating new char for account (ID: {}): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
             SendCharCreate(CHAR_CREATE_DISABLED);
             return;
         }
@@ -373,7 +367,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     // prevent character creating with invalid name
     if (!normalizePlayerName(createInfo->Name))
     {
-        TC_LOG_ERROR("entities.player.cheat", "Account:[%d] but tried to Create character with empty [name] ", GetAccountId());
+        FMT_LOG_ERROR("entities.player.cheat", "Account:[{}] but tried to Create character with empty [name] ", GetAccountId());
         SendCharCreate(CHAR_NAME_NO_NAME);
         return;
     }
@@ -588,6 +582,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             CharacterDatabaseTransaction characterTransaction = CharacterDatabase.BeginTransaction();
             LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
+            if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS))
+            {
+                uint32 charCount = AccountMgr::GetCharactersCount(GetAccountId());
+
+                if (charCount <= sWorld->getIntConfig(CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS))
+                    newChar->SetAtLoginFlag(AT_LOGIN_START_MONEY);  // First login with bonus
+            }
                                                                   // Player created, save it now
             newChar->SaveToDB(characterTransaction, true);
             createInfo->CharCount += 1;
@@ -604,7 +605,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             {
                 if (success)
                 {
-                    TC_LOG_INFO("entities.player.character", "Account: %u (IP: %s) Create Character: %s %s", GetAccountId(), GetRemoteAddress().c_str(), newChar->GetName().c_str(), newChar->GetGUID().ToString().c_str());
+                    FMT_LOG_INFO("entities.player.character", "Account: {} (IP: {}) Create Character: {} {}", GetAccountId(), GetRemoteAddress(), newChar->GetName(), newChar->GetGUID().ToString());
                     sScriptMgr->OnPlayerCreate(newChar.get());
                     sCharacterCache->AddCharacterCacheEntry(newChar->GetGUID(), GetAccountId(), newChar->GetName(), newChar->GetNativeGender(), newChar->GetRace(), newChar->GetClass(), newChar->GetLevel());
 
@@ -680,7 +681,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
         return;
     }
 
-    TC_LOG_INFO("entities.player.character", "Account: %d, IP: %s deleted character: %s, %s, Level: %u", accountId, GetRemoteAddress().c_str(), name.c_str(), guid.ToString().c_str(), level);
+    FMT_LOG_INFO("entities.player.character", "Account: {}, IP: {} deleted character: {}, {}, Level: {}", accountId, GetRemoteAddress(), name, guid.ToString(), level);
 
     // To prevent hook failure, place hook before removing reference from DB
     sScriptMgr->OnPlayerDelete(guid, initAccountId); // To prevent race conditioning, but as it also makes sense, we hand the accountId over for successful delete.
@@ -703,7 +704,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 {
     if (PlayerLoading() || GetPlayer() != nullptr)
     {
-        TC_LOG_ERROR("network", "Player tries to login again, AccountId = %d", GetAccountId());
+        FMT_LOG_ERROR("network", "Player tries to login again, AccountId = {}", GetAccountId());
         KickPlayer("WorldSession::HandlePlayerLoginOpcode Another client logging in");
         return;
     }
@@ -715,7 +716,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
     if (!IsLegitCharacterForAccount(playerGuid))
     {
-        TC_LOG_ERROR("network", "Account (%u) can't login with that character (%s).", GetAccountId(), playerGuid.ToString().c_str());
+        FMT_LOG_ERROR("network", "Account ({}) can't login with that character ({}).", GetAccountId(), playerGuid.ToString());
         KickPlayer("WorldSession::HandlePlayerLoginOpcode Trying to login with a character of another account");
         return;
     }
@@ -770,7 +771,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         SendPacket(Motd::GetMotdPacket());
 
         // send server info
-        if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
+        if (sWorld->getBoolConfig(CONFIG_ENABLE_SINFO_LOGIN))
             chH.PSendSysMessage(GitRevision::GetFullVersion());
     }
 
@@ -794,7 +795,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         else
         {
             // remove wrong guild data
-            TC_LOG_ERROR("network", "Player %s %s marked as member of not existing guild (id: %u), removing guild membership for player.", pCurrChar->GetName().c_str(), pCurrChar->GetGUID().ToString().c_str(), pCurrChar->GetGuildId());
+            FMT_LOG_ERROR("network", "Player {} {} marked as member of not existing guild (id: {}), removing guild membership for player.", pCurrChar->GetName(), pCurrChar->GetGUID().ToString(), pCurrChar->GetGuildId());
             pCurrChar->SetInGuild(0);
         }
     }
@@ -811,16 +812,16 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     {
         pCurrChar->setCinematic(1);
 
-        if (ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(pCurrChar->GetClass()))
+        if (ChrClassesDBC const* cEntry = sDBCStoresMgr->GetChrClassesDBC(pCurrChar->GetClass()))
         {
             if (cEntry->CinematicSequenceID)
                 pCurrChar->SendCinematicStart(cEntry->CinematicSequenceID);
-            else if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->GetRace()))
+            else if (ChrRacesDBC const* rEntry = sDBCStoresMgr->GetChrRacesDBC(pCurrChar->GetRace()))
                 pCurrChar->SendCinematicStart(rEntry->CinematicSequenceID);
 
             // send new char string if not empty
             if (!sWorld->GetNewCharString().empty())
-                chH.PSendSysMessage("%s", sWorld->GetNewCharString().c_str());
+                chH.PSendSysMessage("{}", sWorld->GetNewCharString());
         }
     }
 
@@ -834,7 +835,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     }
 
     ObjectAccessor::AddObject(pCurrChar);
-    //TC_LOG_DEBUG("Player %s added to Map.", pCurrChar->GetName().c_str());
+    //FMT_LOG_DEBUG("Player {} added to Map.", pCurrChar->GetName());
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
 
@@ -920,65 +921,94 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         if (sWorld->getBoolConfig(CONFIG_START_ALL_REP))
         {
             ReputationMgr& repMgr = pCurrChar->GetReputationMgr();
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 942), 42999, false); // Cenarion Expedition
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 935), 42999, false); // The Sha'tar
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 936), 42999, false); // Shattrath City
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1011), 42999, false); // Lower City
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 970), 42999, false); // Sporeggar
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 967), 42999, false); // The Violet Eye
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 989), 42999, false); // Keepers of Time
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 932), 42999, false); // The Aldor
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 934), 42999, false); // The Scryers
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1038), 42999, false); // Ogri'la
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1077), 42999, false); // Shattered Sun Offensive
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1106), 42999, false); // Argent Crusade
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1104), 42999, false); // Frenzyheart Tribe
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1090), 42999, false); // Kirin Tor
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1098), 42999, false); // Knights of the Ebon Blade
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1156), 42999, false); // The Ashen Verdict
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1073), 42999, false); // The Kalu'ak
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1105), 42999, false); // The Oracles
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1119), 42999, false); // The Sons of Hodir
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1091), 42999, false); // The Wyrmrest Accord
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 942), 42999, false); // Cenarion Expedition
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 935), 42999, false); // The Sha'tar
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 936), 42999, false); // Shattrath City
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1011), 42999, false); // Lower City
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 970), 42999, false); // Sporeggar
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 967), 42999, false); // The Violet Eye
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 989), 42999, false); // Keepers of Time
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 932), 42999, false); // The Aldor
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 934), 42999, false); // The Scryers
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1038), 42999, false); // Ogri'la
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1077), 42999, false); // Shattered Sun Offensive
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1106), 42999, false); // Argent Crusade
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1104), 42999, false); // Frenzyheart Tribe
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1090), 42999, false); // Kirin Tor
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1098), 42999, false); // Knights of the Ebon Blade
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1156), 42999, false); // The Ashen Verdict
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1073), 42999, false); // The Kalu'ak
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1105), 42999, false); // The Oracles
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1119), 42999, false); // The Sons of Hodir
+            repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1091), 42999, false); // The Wyrmrest Accord
 
             // Factions depending on team, like cities and some more stuff
-            switch (pCurrChar->GetTeam())
+            switch (pCurrChar->GetCFSTeam())
             {
                 case ALLIANCE:
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  72), 42999, false); // Stormwind
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  47), 42999, false); // Ironforge
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  69), 42999, false); // Darnassus
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 930), 42999, false); // Exodar
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 730), 42999, false); // Stormpike Guard
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 978), 42999, false); // Kurenai
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  54), 42999, false); // Gnomeregan Exiles
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 946), 42999, false); // Honor Hold
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1037), 42999, false); // Alliance Vanguard
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1068), 42999, false); // Explorers' League
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1126), 42999, false); // The Frostborn
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1094), 42999, false); // The Silver Covenant
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1050), 42999, false); // Valiance Expedition
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  72), 42999, false); // Stormwind
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  47), 42999, false); // Ironforge
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  69), 42999, false); // Darnassus
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 930), 42999, false); // Exodar
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 730), 42999, false); // Stormpike Guard
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 978), 42999, false); // Kurenai
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  54), 42999, false); // Gnomeregan Exiles
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 946), 42999, false); // Honor Hold
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1037), 42999, false); // Alliance Vanguard
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1068), 42999, false); // Explorers' League
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1126), 42999, false); // The Frostborn
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1094), 42999, false); // The Silver Covenant
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1050), 42999, false); // Valiance Expedition
                     break;
                 case HORDE:
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  76), 42999, false); // Orgrimmar
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  68), 42999, false); // Undercity
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(  81), 42999, false); // Thunder Bluff
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 911), 42999, false); // Silvermoon City
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 729), 42999, false); // Frostwolf Clan
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 941), 42999, false); // The Mag'har
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 530), 42999, false); // Darkspear Trolls
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry( 947), 42999, false); // Thrallmar
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1052), 42999, false); // Horde Expedition
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1067), 42999, false); // The Hand of Vengeance
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1124), 42999, false); // The Sunreavers
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1064), 42999, false); // The Taunka
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1085), 42999, false); // Warsong Offensive
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  76), 42999, false); // Orgrimmar
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  68), 42999, false); // Undercity
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(  81), 42999, false); // Thunder Bluff
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 911), 42999, false); // Silvermoon City
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 729), 42999, false); // Frostwolf Clan
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 941), 42999, false); // The Mag'har
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 530), 42999, false); // Darkspear Trolls
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC( 947), 42999, false); // Thrallmar
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1052), 42999, false); // Horde Expedition
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1067), 42999, false); // The Hand of Vengeance
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1124), 42999, false); // The Sunreavers
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1064), 42999, false); // The Taunka
+                    repMgr.SetOneFactionReputation(sDBCStoresMgr->GetFactionDBC(1085), 42999, false); // Warsong Offensive
                     break;
                 default:
                     break;
             }
             repMgr.SendState(nullptr);
         }
+
+        if (sWorld->getBoolConfig(CONFIG_CREATECHAR_BONUS_BAGS)) // if enabled plr will take a bonus
+        {
+            // here will script for adding bags
+            uint32 bagsid = sWorld->getIntConfig(CONFIG_CREATECHAR_BONUS_BAGS_ID);
+            pCurrChar->StoreNewItemInBestSlots(bagsid, 4);
+        }
+
+        if (sWorld->getBoolConfig(CONFIG_CREATECHAR_BONUS_STARTPACK)) // if enabled plr will take a bonus
+            pCurrChar->SetCanReceiveStartPack(1);
+    }
+
+    uint32 coins = AccountMgr::GetCoins(GetAccountId());
+    pCurrChar->SetCoins(coins);
+
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_START_MONEY)) // moved from firstLogin - now we can set this Flag (512) from DB - characters.at_login
+    {
+        if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS)) // if enabled plr will take a bonus
+        {
+            // here will script for adding money or something more
+            uint32 moneybonus = sWorld->getIntConfig(CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS);
+
+            // send bonus announce
+            chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus / GOLD, (moneybonus%GOLD) / SILVER, moneybonus%SILVER);
+
+            pCurrChar->ModifyMoney(moneybonus);
+        }
+
+        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_START_MONEY);
     }
 
     // show time before shutdown if shutdown planned.
@@ -991,9 +1021,35 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     if (pCurrChar->IsGameMaster())
         SendNotification(LANG_GM_ON);
 
+    bool vip = AccountMgr::GetVipStatus(GetAccountId());
+    if (vip)
+    {
+        time_t unsetdate = AccountMgr::GetVIPunsetDate(GetAccountId());
+        if (GameTime::GetGameTime() > unsetdate)
+        {
+            vip = false;
+            AccountMgr::RemoveVipStatus(GetAccountId());
+            ChatHandler(pCurrChar->GetSession()).PSendSysMessage(pCurrChar->GetSession()->GetTrinityString(LANG_PLAYER_VIP_TIME_EXPIRED));
+        }
+        else
+            pCurrChar->SetPremiumUnsetdate(unsetdate);
+    }
+    pCurrChar->SetPremiumStatus(vip);
+
+    if (sWorld->getBoolConfig(CONFIG_VIP_ITEM_HELPER))
+    {
+        if (!pCurrChar->HasItemCount(973))
+            pCurrChar->AddItem(973, 1);
+    }
+    else
+    {
+        if (pCurrChar->HasItemCount(973))
+            pCurrChar->DestroyItemCount(973, 1, true);
+    }
+
     std::string IP_str = GetRemoteAddress();
-    TC_LOG_INFO("entities.player.character", "Account: %d (IP: %s) Login Character:[%s] %s Level: %d, XP: %u/%u (%u left)",
-        GetAccountId(), IP_str.c_str(), pCurrChar->GetName().c_str(), pCurrChar->GetGUID().ToString().c_str(), pCurrChar->GetLevel(),
+    FMT_LOG_INFO("entities.player.character", "Account: {} (IP: {}) Login Character:[{}] {} Level: {}, XP: {}/{} ({} left)",
+        GetAccountId(), IP_str, pCurrChar->GetName(), pCurrChar->GetGUID().ToString(), pCurrChar->GetLevel(),
         _player->GetXP(), _player->GetXPForNextLevel(), std::max(0, (int32)_player->GetXPForNextLevel() - (int32)_player->GetXP()));
 
     if (!pCurrChar->IsStandState() && !pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
@@ -1014,6 +1070,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
 
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
+
+    if (pCurrChar->GetTeam() != pCurrChar->GetCFSTeam())
+        pCurrChar->FitPlayerInTeam(pCurrChar->GetBattleground() && !pCurrChar->GetBattleground()->isArena() ? true : false, pCurrChar->GetBattleground());
 }
 
 void WorldSession::SendFeatureSystemStatus()
@@ -1026,7 +1085,7 @@ void WorldSession::SendFeatureSystemStatus()
 
 void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: Received CMSG_SET_FACTION_ATWAR");
+    FMT_LOG_DEBUG("network", "WORLD: Received CMSG_SET_FACTION_ATWAR");
 
     uint32 repListID;
     uint8  flag;
@@ -1040,7 +1099,7 @@ void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 //I think this function is never used :/ I dunno, but i guess this opcode not exists
 void WorldSession::HandleSetFactionCheat(WorldPacket& /*recvData*/)
 {
-    TC_LOG_ERROR("network", "WORLD SESSION: HandleSetFactionCheat, not expected call, please report.");
+    FMT_LOG_ERROR("network", "WORLD SESSION: HandleSetFactionCheat, not expected call, please report.");
     GetPlayer()->GetReputationMgr().SendState(nullptr);
 }
 
@@ -1074,7 +1133,7 @@ void WorldSession::HandleTutorialReset(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: Received CMSG_SET_WATCHED_FACTION");
+    FMT_LOG_DEBUG("network", "WORLD: Received CMSG_SET_WATCHED_FACTION");
     uint32 fact;
     recvData >> fact;
     GetPlayer()->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fact);
@@ -1082,7 +1141,7 @@ void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: Received CMSG_SET_FACTION_INACTIVE");
+    FMT_LOG_DEBUG("network", "WORLD: Received CMSG_SET_FACTION_INACTIVE");
     uint32 replistid;
     uint8 inactive;
     recvData >> replistid >> inactive;
@@ -1186,7 +1245,7 @@ void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo>
 
     CharacterDatabase.Execute(stmt);
 
-    TC_LOG_INFO("entities.player.character", "Account: %d (IP: %s) Character:[%s] (%s) Changed name to: %s", GetAccountId(), GetRemoteAddress().c_str(), oldName.c_str(), renameInfo->Guid.ToString().c_str(), renameInfo->Name.c_str());
+    FMT_LOG_INFO("entities.player.character", "Account: {} (IP: {}) Character:[{}] ({}) Changed name to: {}", GetAccountId(), GetRemoteAddress(), oldName, renameInfo->Guid.ToString(), renameInfo->Name);
 
     SendCharRename(RESPONSE_SUCCESS, renameInfo.get());
 
@@ -1271,22 +1330,22 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
 
 void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "CMSG_ALTER_APPEARANCE");
+    FMT_LOG_DEBUG("network", "CMSG_ALTER_APPEARANCE");
 
     uint32 Hair, Color, FacialHair, SkinColor;
     recvData >> Hair >> Color >> FacialHair >> SkinColor;
 
-    BarberShopStyleEntry const* bs_hair = sBarberShopStyleStore.LookupEntry(Hair);
+    BarberShopStyleDBC const* bs_hair = sDBCStoresMgr->GetBarberShopStyleDBC(Hair);
 
     if (!bs_hair || bs_hair->Type != 0 || bs_hair->Race != _player->GetRace() || bs_hair->Sex != _player->GetNativeGender())
         return;
 
-    BarberShopStyleEntry const* bs_facialHair = sBarberShopStyleStore.LookupEntry(FacialHair);
+    BarberShopStyleDBC const* bs_facialHair = sDBCStoresMgr->GetBarberShopStyleDBC(FacialHair);
 
     if (!bs_facialHair || bs_facialHair->Type != 2 || bs_facialHair->Race != _player->GetRace() || bs_facialHair->Sex != _player->GetNativeGender())
         return;
 
-    BarberShopStyleEntry const* bs_skinColor = sBarberShopStyleStore.LookupEntry(SkinColor);
+    BarberShopStyleDBC const* bs_skinColor = sDBCStoresMgr->GetBarberShopStyleDBC(SkinColor);
 
     if (bs_skinColor && (bs_skinColor->Type != 3 || bs_skinColor->Race != _player->GetRace() || bs_skinColor->Sex != _player->GetNativeGender()))
         return;
@@ -1343,13 +1402,13 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
 
     if (slot >= MAX_GLYPH_SLOT_INDEX)
     {
-        TC_LOG_DEBUG("network", "Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH %u", slot);
+        FMT_LOG_DEBUG("network", "Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH {}", slot);
         return;
     }
 
     if (uint32 glyph = _player->GetGlyph(slot))
     {
-        if (GlyphPropertiesEntry const* gp = sGlyphPropertiesStore.LookupEntry(glyph))
+        if (GlyphPropertiesDBC const* gp = sDBCStoresMgr->GetGlyphPropertiesDBC(glyph))
         {
             _player->RemoveAurasDueToSpell(gp->SpellID);
             _player->SetGlyph(slot, 0);
@@ -1365,8 +1424,8 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     recvData >> customizeInfo->Guid;
     if (!IsLegitCharacterForAccount(customizeInfo->Guid))
     {
-        TC_LOG_ERROR("entities.player.cheat", "Account %u, IP: %s tried to customise %s, but it does not belong to their account!",
-            GetAccountId(), GetRemoteAddress().c_str(), customizeInfo->Guid.ToString().c_str());
+        FMT_LOG_ERROR("entities.player.cheat", "Account {}, IP: {} tried to customise {}, but it does not belong to their account!",
+            GetAccountId(), GetRemoteAddress(), customizeInfo->Guid.ToString());
         recvData.rfinish();
         KickPlayer("WorldSession::HandleCharCustomize Trying to customise character of another account");
         return;
@@ -1483,13 +1542,13 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
 
     SendCharCustomize(RESPONSE_SUCCESS, customizeInfo.get());
 
-    TC_LOG_INFO("entities.player.character", "Account: %d (IP: %s), Character[%s] (%s) Customized to: %s",
-        GetAccountId(), GetRemoteAddress().c_str(), oldName.c_str(), customizeInfo->Guid.ToString().c_str(), customizeInfo->Name.c_str());
+    FMT_LOG_INFO("entities.player.character", "Account: {} (IP: {}), Character[{}] ({}) Customized to: {}",
+        GetAccountId(), GetRemoteAddress(), oldName, customizeInfo->Guid.ToString(), customizeInfo->Name);
 }
 
 void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_SAVE");
+    FMT_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_SAVE");
 
     uint64 setGuid;
     recvData.readPackGUID(setGuid);
@@ -1541,7 +1600,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
 
 void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_DELETE");
+    FMT_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_DELETE");
 
     uint64 setGuid;
     recvData.readPackGUID(setGuid);
@@ -1551,7 +1610,7 @@ void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
 
 void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_USE");
+    FMT_LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_USE");
 
     for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
@@ -1561,7 +1620,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
         uint8 srcbag, srcslot;
         recvData >> srcbag >> srcslot;
 
-        TC_LOG_DEBUG("entities.player.items", "%s: srcbag %u, srcslot %u", itemGuid.ToString().c_str(), srcbag, srcslot);
+        FMT_LOG_DEBUG("entities.player.items", "{}: srcbag {}, srcslot {}", itemGuid.ToString(), srcbag, srcslot);
 
         // check if item slot is set to "ignored" (raw value == 1), must not be unequipped then
         if (itemGuid.GetRawValue() == 1)
@@ -1618,8 +1677,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 
     if (!IsLegitCharacterForAccount(factionChangeInfo->Guid))
     {
-        TC_LOG_ERROR("entities.player.cheat", "Account %u, IP: %s tried to factionchange character %s, but it does not belong to their account!",
-            GetAccountId(), GetRemoteAddress().c_str(), factionChangeInfo->Guid.ToString().c_str());
+        FMT_LOG_ERROR("entities.player.cheat", "Account {}, IP: {} tried to factionchange character {}, but it does not belong to their account!",
+            GetAccountId(), GetRemoteAddress(), factionChangeInfo->Guid.ToString());
         recvData.rfinish();
         KickPlayer("WorldSession::HandleCharFactionOrRaceChange Trying to change faction of character of another account");
         return;
@@ -1854,10 +1913,10 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                 if (numFullTaximasks > 11)
                     numFullTaximasks = 11;
 
-                TaxiMask const& factionMask = newTeam == HORDE ? sHordeTaxiNodesMask : sAllianceTaxiNodesMask;
+                TaxiMask const& factionMask = newTeam == HORDE ? sDBCStoresMgr->GetHordeTaxiNodesMask() : sDBCStoresMgr->GetAllianceTaxiNodesMask();
                 for (uint8 i = 0; i < numFullTaximasks; ++i)
                 {
-                    uint8 deathKnightExtraNode = (playerClass == CLASS_DEATH_KNIGHT) ? sDeathKnightTaxiNodesMask[i] : 0;
+                    uint8 deathKnightExtraNode = (playerClass == CLASS_DEATH_KNIGHT) ? sDBCStoresMgr->GetDeathKnightTaxiNodesMask()[i] : 0;
                     taximaskstream << uint32(factionMask[i] | deathKnightExtraNode) << ' ';
                 }
 
@@ -2033,13 +2092,13 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                 {
                     fields = reputationResult->Fetch();
                     int32 oldDBRep = fields[0].GetInt32();
-                    FactionEntry const* factionEntry = sFactionStore.LookupEntry(oldReputation);
+                    FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(oldReputation);
 
                     // old base reputation
                     int32 oldBaseRep = sObjectMgr->GetBaseReputationOf(factionEntry, oldRace, playerClass);
 
                     // new base reputation
-                    int32 newBaseRep = sObjectMgr->GetBaseReputationOf(sFactionStore.LookupEntry(newReputation), factionChangeInfo->Race, playerClass);
+                    int32 newBaseRep = sObjectMgr->GetBaseReputationOf(sDBCStoresMgr->GetFactionDBC(newReputation), factionChangeInfo->Race, playerClass);
 
                     // final reputation shouldnt change
                     int32 FinalRep = oldDBRep + oldBaseRep;
@@ -2075,8 +2134,8 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                         knownTitles[index] = *thisMask;
                     else
                     {
-                        TC_LOG_WARN("entities.player", "%s has invalid title data '%s' at index %u - skipped, this may result in titles being lost",
-                            GetPlayerInfo().c_str(), (index < tokens.size()) ? std::string(tokens[index]).c_str() : "<none>", index);
+                        FMT_LOG_WARN("entities.player", "{} has invalid title data '{}' at index {} - skipped, this may result in titles being lost",
+                            GetPlayerInfo(), (index < tokens.size()) ? std::string(tokens[index]) : "<none>", index);
                         knownTitles[index] = 0;
                     }
                 }
@@ -2086,8 +2145,10 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                     uint32 title_alliance = it->first;
                     uint32 title_horde = it->second;
 
-                    CharTitlesEntry const* atitleInfo = sCharTitlesStore.AssertEntry(title_alliance);
-                    CharTitlesEntry const* htitleInfo = sCharTitlesStore.AssertEntry(title_horde);
+                    CharTitlesDBC const* atitleInfo = sDBCStoresMgr->GetCharTitlesDBC(title_alliance);
+                    ASSERT_NOTNULL(atitleInfo);
+                    CharTitlesDBC const* htitleInfo = sDBCStoresMgr->GetCharTitlesDBC(title_horde);
+                    ASSERT_NOTNULL(htitleInfo);
                     // new team
                     if (newTeam == ALLIANCE)
                     {
@@ -2136,7 +2197,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
     CharacterDatabase.CommitTransaction(trans);
 
-    TC_LOG_DEBUG("entities.player", "%s (IP: %s) changed race from %u to %u", GetPlayerInfo().c_str(), GetRemoteAddress().c_str(), oldRace, factionChangeInfo->Race);
+    FMT_LOG_DEBUG("entities.player", "{} (IP: {}) changed race from {} to {}", GetPlayerInfo(), GetRemoteAddress(), oldRace, factionChangeInfo->Race);
 
     SendCharFactionChange(RESPONSE_SUCCESS, factionChangeInfo.get());
 }
@@ -2225,11 +2286,11 @@ void WorldSession::HandleOpeningCinematic(WorldPackets::Misc::OpeningCinematic& 
     if (_player->GetUInt32Value(PLAYER_XP))
         return;
 
-    if (ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(_player->GetClass()))
+    if (ChrClassesDBC const* classEntry = sDBCStoresMgr->GetChrClassesDBC(_player->GetClass()))
     {
         if (classEntry->CinematicSequenceID)
             _player->SendCinematicStart(classEntry->CinematicSequenceID);
-        else if (ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(_player->GetRace()))
+        else if (ChrRacesDBC const* raceEntry = sDBCStoresMgr->GetChrRacesDBC(_player->GetRace()))
             _player->SendCinematicStart(raceEntry->CinematicSequenceID);
     }
 }

@@ -748,6 +748,34 @@ enum RBACPermissions
     // IF YOU ADD NEW PERMISSIONS, ADD THEM IN MASTER BRANCH AS WELL!
     //
     // custom permissions 1000+
+    RBAC_PERM_COMMAND_VIP                                    = 1100,
+    RBAC_PERM_COMMAND_VIP_DEBUFF                             = 1101,
+    RBAC_PERM_COMMAND_VIP_BANK                               = 1102,
+    RBAC_PERM_COMMAND_VIP_MAIL                               = 1103,
+    RBAC_PERM_COMMAND_VIP_REPAIR                             = 1104,
+    RBAC_PERM_COMMAND_VIP_RESETTALENTS                       = 1105,
+    RBAC_PERM_COMMAND_VIP_TAXI                               = 1106,
+    RBAC_PERM_COMMAND_VIP_HOME                               = 1107,
+    RBAC_PERM_COMMAND_VIP_CAPITAL                            = 1108,
+    RBAC_PERM_COMMAND_VIP_CHANGERACE                         = 1109,
+    RBAC_PERM_COMMAND_VIP_CUSTOMIZE                          = 1110,
+    RBAC_PERM_COMMAND_VIP_ARPPEAR                            = 1111,
+    RBAC_PERM_COMMAND_VIP_SET                                = 1112,
+    RBAC_PERM_COMMAND_VIP_REMOVE                             = 1113,
+    RBAC_PERM_COMMAND_ADDCOIN                                = 1114,
+
+    // arena spectator
+    RBAC_PERM_COMMAND_SPECTATE                               = 1015,
+    RBAC_PERM_COMMAND_SPECTATE_PLAYER                        = 1016,
+    RBAC_PERM_COMMAND_SPECTATE_VIEW                          = 1017,
+    RBAC_PERM_COMMAND_SPECTATE_RESET                         = 1018,
+    RBAC_PERM_COMMAND_SPECTATE_LEAVE                         = 1019,
+
+    // GuildProgress
+    RBAC_PERM_GSYSTEM_COMMANDS                               = 1020,
+
+    // Reload Promo
+    RBAC_PERM_RELOAD_PROMO_CODE_TABLE                        = 1022,
     RBAC_PERM_MAX
 };
 
@@ -858,7 +886,7 @@ class TC_GAME_API RBACData
          * // previously defined "RBACData* rbac" with proper initialization
          * uint32 permissionId = 2;
          * if (rbac->GrantRole(permissionId) == RBAC_IN_DENIED_LIST)
-         *     TC_LOG_DEBUG("entities.player", "Failed to grant permission %u, already denied", permissionId);
+         *     FMT_LOG_DEBUG("entities.player", "Failed to grant permission {}, already denied", permissionId);
          * @endcode
          */
         RBACCommandResult GrantPermission(uint32 permissionId, int32 realmId = 0);
@@ -882,7 +910,7 @@ class TC_GAME_API RBACData
          * // previously defined "RBACData* rbac" with proper initialization
          * uint32 permissionId = 2;
          * if (rbac->DenyRole(permissionId) == RBAC_ID_DOES_NOT_EXISTS)
-         *     TC_LOG_DEBUG("entities.player", "Role Id %u does not exists", permissionId);
+         *     FMT_LOG_DEBUG("entities.player", "Role Id {} does not exists", permissionId);
          * @endcode
          */
         RBACCommandResult DenyPermission(uint32 permissionId, int32 realmId = 0);
@@ -907,7 +935,7 @@ class TC_GAME_API RBACData
          * // previously defined "RBACData* rbac" with proper initialization
          * uint32 permissionId = 2;
          * if (rbac->RevokeRole(permissionId) == RBAC_OK)
-         *     TC_LOG_DEBUG("entities.player", "Permission %u succesfully removed", permissionId);
+         *     FMT_LOG_DEBUG("entities.player", "Permission {} succesfully removed", permissionId);
          * @endcode
          */
         RBACCommandResult RevokePermission(uint32 permissionId, int32 realmId = 0);

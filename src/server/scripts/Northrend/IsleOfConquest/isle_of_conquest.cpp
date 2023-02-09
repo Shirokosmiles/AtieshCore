@@ -16,17 +16,33 @@
  */
 
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "PassiveAI.h"
 #include "BattlegroundIC.h"
 #include "GameObject.h"
 #include "Map.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
-#include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "SpellInfo.h"
-#include "SpellScript.h"
 #include "Vehicle.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "SpellInfo.h"
+#include "TaskScheduler.h"
+#include "Transport.h"
+#include "WorldSession.h"
+
+uint32 const siegeEngineSize = 7;
+Position const siegeEnginePath[siegeEngineSize] = // sniff
+{
+    { 773.6412f, -882.243f, 17.14940f },
+    { 773.1412f, -879.993f, 16.89940f },
+    { 772.6412f, -877.243f, 16.89940f },
+    { 771.3912f, -870.243f, 16.89940f },
+    { 770.6412f, -866.243f, 15.39940f },
+    { 769.3912f, -859.243f, 12.89940f },
+    { 772.6020f, -852.394f, 12.48976f }
+};
 
 // TO-DO: This should be done with SmartAI, but yet it does not correctly support vehicles's AIs.
 //        Even adding ReactState Passive we still have issues using SmartAI.
@@ -65,6 +81,14 @@ struct npc_four_car_garage : public NullCreatureAI
         }
     }
 };
+
+enum SiegeEngine
+{
+    ACTION_EXIT_WORKSHOP = 1,
+
+    POINT_WORKSHOP_EXIT  = 1
+};
+
 
 enum Events
 {
@@ -170,9 +194,7 @@ class spell_ioc_parachute_ic : public AuraScript
 class StartLaunchEvent : public BasicEvent
 {
     public:
-        StartLaunchEvent(Position const& pos, ObjectGuid::LowType lowGuid) : _pos(pos), _lowGuid(lowGuid)
-        {
-        }
+        StartLaunchEvent(Position const& pos, ObjectGuid::LowType lowGuid) : _pos(pos), _lowGuid(lowGuid) { }
 
         bool Execute(uint64 /*time*/, uint32 /*diff*/) override
         {

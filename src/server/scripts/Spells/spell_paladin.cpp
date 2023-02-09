@@ -42,6 +42,7 @@ enum PaladinSpells
     SPELL_PALADIN_HOLY_SHOCK_R1_DAMAGE           = 25912,
     SPELL_PALADIN_HOLY_SHOCK_R1_HEALING          = 25914,
     SPELL_PALADIN_ILLUMINATION_ENERGIZE          = 20272,
+    SPELL_PALADIN_SEALS_OF_THE_PURE_R1           = 20224,
 
     SPELL_PALADIN_BLESSING_OF_LOWER_CITY_DRUID   = 37878,
     SPELL_PALADIN_BLESSING_OF_LOWER_CITY_PALADIN = 37879,
@@ -1675,95 +1676,106 @@ class spell_pal_seal_of_righteousness : public AuraScript
 template <uint32 DoTSpellId, uint32 DamageSpellId>
 class spell_pal_seal_of_vengeance : public SpellScriptLoader
 {
-    public:
-        spell_pal_seal_of_vengeance(char const* ScriptName) : SpellScriptLoader(ScriptName) { }
+public:
+    spell_pal_seal_of_vengeance(char const* ScriptName) : SpellScriptLoader(ScriptName) { }
 
-        template <uint32 DoTSpell, uint32 DamageSpell>
-        class spell_pal_seal_of_vengeance_AuraScript : public AuraScript
+    template <uint32 DoTSpell, uint32 DamageSpell>
+    class spell_pal_seal_of_vengeance_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_seal_of_vengeance_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            PrepareAuraScript(spell_pal_seal_of_vengeance_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                return ValidateSpellInfo(
+            return ValidateSpellInfo(
                 {
                     DoTSpell,
                     DamageSpell
                 });
-            }
-
-            /*
-            When an auto-attack lands (does not dodge/parry/miss) that can proc a seal the of the following things happen independently of each other (see 2 roll system).
-
-            1) A "hidden strike" which uses melee combat mechanics occurs. If it lands it refreshes/stacks SoV DoT. Only white swings can trigger a refresh or stack. (This hidden strike mechanic can also proc things like berserking..)
-            2) A weapon damage based proc will occur if you used a special (CS/DS/judge) or if you have a 5 stack (from auto attacks). This attack can not be avoided.
-
-            Remember #2 happens regardless of #1 landing, it just requires the initial attack (autos, cs, etc) to land.
-
-            Stack Number    % of Weapon Damage  % with SotP
-            0               0%                  0%
-            1               6.6%                7.6%
-            2               13.2%               15.2%
-            3               19.8%               22.8%
-            4               26.4%               30.4%
-            5               33%                 38%
-            */
-
-            void HandleApplyDoT(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-            {
-                PreventDefaultAction();
-
-                if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_MELEE_AUTO_ATTACK))
-                {
-                    // Patch 3.2.0 Notes: Only auto-attacks and Hammer of the Righteous can place the debuff on the paladin's current target(s).
-                    SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-                    if (!spellInfo || spellInfo->SpellIconID != PALADIN_ICON_ID_HAMMER_OF_THE_RIGHTEOUS)
-                        return;
-                }
-
-                // don't cast triggered, spell already has SPELL_ATTR4_CAN_CAST_WHILE_CASTING attr
-                eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), DoTSpell, CastSpellExtraArgs(TRIGGERED_DONT_RESET_PERIODIC_TIMER).SetTriggeringAura(aurEff));
-            }
-
-            void HandleSeal(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-            {
-                PreventDefaultAction();
-
-                Unit* caster = eventInfo.GetActor();
-                Unit* target = eventInfo.GetProcTarget();
-
-                // get current aura on target, if any
-                AuraEffect const* sealDot = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PALADIN, 0x00000000, 0x00000800, 0x00000000, caster->GetGUID());
-                if (!sealDot)
-                    return;
-
-                uint8 const stacks = sealDot->GetBase()->GetStackAmount();
-                uint8 const maxStacks = sealDot->GetSpellInfo()->StackAmount;
-
-                if (stacks < maxStacks && !(eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS))
-                    return;
-
-                SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(DamageSpell);
-                int32 amount = spellInfo->GetEffect(EFFECT_0).CalcValue();
-                amount *= stacks;
-                amount /= maxStacks;
-
-                CastSpellExtraArgs args(aurEff);
-                args.AddSpellBP0(amount);
-                caster->CastSpell(target, DamageSpell, args);
-            }
-
-            void Register() override
-            {
-                OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_AuraScript::HandleApplyDoT, EFFECT_0, SPELL_AURA_DUMMY);
-                OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_AuraScript::HandleSeal, EFFECT_0, SPELL_AURA_DUMMY);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_pal_seal_of_vengeance_AuraScript<DoTSpellId, DamageSpellId>();
         }
+
+        /*
+        When an auto-attack lands (does not dodge/parry/miss) that can proc a seal the of the following things happen independently of each other (see 2 roll system).
+
+        1) A "hidden strike" which uses melee combat mechanics occurs. If it lands it refreshes/stacks SoV DoT. Only white swings can trigger a refresh or stack. (This hidden strike mechanic can also proc things like berserking..)
+        2) A weapon damage based proc will occur if you used a special (CS/DS/judge) or if you have a 5 stack (from auto attacks). This attack can not be avoided.
+
+        Remember #2 happens regardless of #1 landing, it just requires the initial attack (autos, cs, etc) to land.
+
+        Stack Number    % of Weapon Damage  % with SotP
+        0               0%                  0%
+        1               6.6%                7.6%
+        2               13.2%               15.2%
+        3               19.8%               22.8%
+        4               26.4%               30.4%
+        5               33%                 38%
+        */
+
+        void HandleApplyDoT(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_MELEE_AUTO_ATTACK))
+            {
+                // Patch 3.2.0 Notes: Only auto-attacks and Hammer of the Righteous can place the debuff on the paladin's current target(s).
+                SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+                if (!spellInfo || spellInfo->SpellIconID != PALADIN_ICON_ID_HAMMER_OF_THE_RIGHTEOUS)
+                    return;
+            }
+
+            CastSpellExtraArgs args(aurEff);
+            args.SetTriggeringAura(aurEff);
+            args.SetTriggerFlags(TRIGGERED_DONT_RESET_PERIODIC_TIMER);
+            if (AuraEffect const* talentAurEff = eventInfo.GetActor()->GetAuraEffectOfRankedSpell(SPELL_PALADIN_SEALS_OF_THE_PURE_R1, EFFECT_1))
+                args.AddSpellMod(SPELLVALUE_BASE_POINT0, talentAurEff->GetAmount());
+
+            // don't cast triggered, spell already has SPELL_ATTR4_CAN_CAST_WHILE_CASTING attr
+            eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), DoTSpell, args);
+        }
+
+        void HandleSeal(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* caster = eventInfo.GetActor();
+            Unit* target = eventInfo.GetProcTarget();
+
+            // get current aura on target, if any
+            AuraEffect const* sealDot = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PALADIN, 0x00000000, 0x00000800, 0x00000000, caster->GetGUID());
+            if (!sealDot)
+                return;
+
+            uint8 const stacks = sealDot->GetBase()->GetStackAmount();
+            uint8 const maxStacks = sealDot->GetSpellInfo()->StackAmount;
+
+            if (stacks < maxStacks && !(eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS))
+                return;
+
+            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(DamageSpell);
+            int32 amount = spellInfo->GetEffect(EFFECT_0).CalcValue();
+            amount *= stacks;
+            amount /= maxStacks;
+
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(amount);
+
+            if (AuraEffect const* talentAurEff = caster->GetAuraEffectOfRankedSpell(SPELL_PALADIN_SEALS_OF_THE_PURE_R1, EFFECT_0))
+                AddPct(amount, talentAurEff->GetAmount());
+
+            if (amount)
+                caster->CastSpell(target, DamageSpell, args);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_AuraScript::HandleApplyDoT, EFFECT_0, SPELL_AURA_DUMMY);
+            OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_AuraScript::HandleSeal, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pal_seal_of_vengeance_AuraScript<DoTSpellId, DamageSpellId>();
+    }
 };
 
 // 20375 - Seal of Command

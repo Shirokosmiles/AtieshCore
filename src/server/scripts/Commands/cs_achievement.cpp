@@ -45,7 +45,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleAchievementAddCommand(ChatHandler* handler, AchievementEntry const* achievementEntry)
+    static bool HandleAchievementAddCommand(ChatHandler* handler, char const* args)
     {
         Player* target = handler->getSelectedPlayer();
         if (!target)
@@ -54,7 +54,21 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-        target->CompletedAchievement(achievementEntry);
+
+        if (!*args)
+            return false;
+
+        uint32 achievementId = atoi((char*)args);
+        if (!achievementId)
+        {
+            if (char* id = handler->extractKeyFromLink((char*)args, "Hachievement"))
+                achievementId = atoi(id);
+            if (!achievementId)
+                return false;
+        }
+
+        if (AchievementDBC const* ach = sAchievementMgr->GetAchievement(achievementId))
+            target->CompletedAchievement(ach);
 
         return true;
     }

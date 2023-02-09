@@ -150,7 +150,7 @@ struct boss_jedoga_shadowseeker : public BossAI
         events.SetPhase(PHASE_INTRO);
         me->SetReactState(REACT_PASSIVE);
 
-        std::list<TempSummon*> summoned;
+        std::vector<TempSummon*> summoned;
         me->SummonCreatureGroup(SUMMON_GROUP_INITIATES, &summoned);
         for (TempSummon* value : summoned)
             _initiateGUIDS.insert(value->GetGUID());

@@ -23,6 +23,7 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptedEscortAI.h"
+
 #include "SpellScript.h"
 
 /*######
@@ -202,10 +203,13 @@ public:
             {
                 Group* group = me->GetLootRecipientGroup();
 
-                if (killer->GetGUID() == legoso->GetGUID() ||
-                    (group && group->IsMember(killer->GetGUID())) ||
-                    killer->GetGUID().GetCounter() == legoso->AI()->GetData(DATA_EVENT_STARTER_GUID))
-                    legoso->AI()->DoAction(ACTION_LEGOSO_SIRONAS_KILLED);
+                if (killer)
+                {
+                    if (killer->GetGUID() == legoso->GetGUID() ||
+                        (group && group->IsMember(killer->GetGUID())) ||
+                        killer->GetGUID().GetCounter() == legoso->AI()->GetData(DATA_EVENT_STARTER_GUID))
+                        legoso->AI()->DoAction(ACTION_LEGOSO_SIRONAS_KILLED);
+                }
             }
         }
 

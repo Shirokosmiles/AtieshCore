@@ -1,5 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,7 +25,8 @@
 enum BG_WS_TimerOrScore
 {
     BG_WS_MAX_TEAM_SCORE    = 3,
-    BG_WS_FLAG_RESPAWN_TIME = 23000,
+    BG_WS_FLAG_RESPAWN_TIME = 23, // seconds!
+
     BG_WS_FLAG_DROP_TIME    = 10000,
     BG_WS_SPELL_FORCE_TIME  = 600000,
     BG_WS_SPELL_BRUTAL_TIME = 900000
@@ -234,7 +236,7 @@ class BattlegroundWS : public Battleground
         bool SetupBattleground() override;
         void Reset() override;
         void EndBattleground(uint32 winner) override;
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player) override;
+        WorldSafeLocsDBC const* GetClosestGraveyard(Player* player) override;
 
         void UpdateFlagState(uint32 team, uint32 value);
         void SetLastFlagCapture(uint32 team)                { _lastFlagCaptureTeam = team; }

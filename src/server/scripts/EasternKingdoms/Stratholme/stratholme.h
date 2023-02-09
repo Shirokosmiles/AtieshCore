@@ -22,6 +22,7 @@
 
 #define StratholmeScriptName "instance_stratholme"
 #define DataHeader "STR"
+#define RegisterStratholmeCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetStratholmeAI)
 
 enum STRDataTypes
 {

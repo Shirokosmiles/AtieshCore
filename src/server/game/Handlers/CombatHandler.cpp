@@ -49,7 +49,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPackets::Combat::AttackSwing& pa
     //! in other places as well.
     if (Vehicle* vehicle = _player->GetVehicle())
     {
-        VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(_player);
+        VehicleSeatDBC const* seat = vehicle->GetSeatForPassenger(_player);
         ASSERT(seat);
         if (!(seat->Flags & VEHICLE_SEAT_FLAG_CAN_ATTACK))
         {
@@ -70,7 +70,7 @@ void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& pa
 {
     if (packet.CurrentSheathState >= MAX_SHEATH_STATE)
     {
-        TC_LOG_ERROR("network", "Unknown sheath state %u ??", packet.CurrentSheathState);
+        FMT_LOG_ERROR("network", "Unknown sheath state {} ??", packet.CurrentSheathState);
         return;
     }
 

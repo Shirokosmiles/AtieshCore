@@ -1,5 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2016-2019 AtieshCore <https://at-wow.org/>
+ * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameObject.h"
+#include "GameObjectAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
@@ -22,6 +25,79 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "TemporarySummon.h"
+
+/*######
+## npc_queldelar_sunwell_plateau
+######*/
+
+class npc_sunwell_warder : public CreatureScript
+{
+public:
+    npc_sunwell_warder() : CreatureScript("npc_sunwell_warder") { }
+
+    struct npc_sunwell_warderAI : public ScriptedAI
+    {
+        npc_sunwell_warderAI(Creature* creature) : ScriptedAI(creature) { }
+
+        bool OnGossipHello(Player* player) override
+        {
+            player->PrepareGossipMenu(me, 0);
+            if (player->HasItemCount(49879, 1) || player->HasItemCount(49889, 1))
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Take me to the Sunwell", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->SendPreparedGossip(me);
+            return true;
+        }
+
+        bool OnGossipSelect(Player* player, uint32 /*uiSender*/, uint32 gossipListId) override
+        {
+            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
+            player->PlayerTalkClass->ClearMenus();
+            switch (action)
+            {
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                CloseGossipMenuFor(player);
+                player->SetCanEnterInInstanceOrRaidCustom(true);
+                player->TeleportTo(580, 1728.5f, 709.219f, 71.1905f, 2.78676f);
+                player->SetPhaseMask(2048, true);
+                break;
+            default:
+                return false; // nothing defined -> trinity core handling
+            }
+            return true; // no default handling -> prevent trinity core handling
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_sunwell_warderAI(creature);
+    }
+};
+
+class go_dalaran_portal_sunwell : public GameObjectScript
+{
+public:
+    go_dalaran_portal_sunwell() : GameObjectScript("go_dalaran_portal_sunwell") {}
+
+    struct go_dalaran_portal_sunwellAI : public GameObjectAI
+    {
+        go_dalaran_portal_sunwellAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool OnGossipHello(Player* player) override
+        {
+            player->PrepareGossipMenu(me, 0);
+            player->SetCanEnterInInstanceOrRaidCustom(false);
+            player->TeleportTo(571, 5804.149902f, 624.770996f, 647.767029f, 1.640000f);
+            player->SetPhaseMask(player->GetNormalPhase(), true);
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_dalaran_portal_sunwellAI(go);
+    }
+};
 
 enum ThalorienDawnseekerTexts
 {
@@ -416,5 +492,9 @@ private:
 
 void AddSC_isle_of_queldanas()
 {
+    new go_dalaran_portal_sunwell();
+    new npc_sunwell_warder();
+    //new npc_queldelar_sunwell_plateau();
+    //new item_tainted_queldelar();
     RegisterCreatureAI(npc_thalorien_dawnseeker);
 }

@@ -20,7 +20,7 @@
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "ItemEnchantmentMgr.h"
 #include "Log.h"
@@ -44,11 +44,11 @@ void AddItemsSetItem(Player* player, Item* item)
     ItemTemplate const* proto = item->GetTemplate();
     uint32 setid = proto->ItemSet;
 
-    ItemSetEntry const* set = sItemSetStore.LookupEntry(setid);
+    ItemSetDBC const* set = sDBCStoresMgr->GetItemSetDBC(setid);
 
     if (!set)
     {
-        TC_LOG_ERROR("sql.sql", "Item set %u for item (id %u) not found, mods not applied.", setid, proto->ItemId);
+        FMT_LOG_ERROR("sql.sql", "Item set {} for item (id {}) not found, mods not applied.", setid, proto->ItemId);
         return;
     }
 
@@ -108,7 +108,7 @@ void AddItemsSetItem(Player* player, Item* item)
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(set->SetSpellID[x]);
                 if (!spellInfo)
                 {
-                    TC_LOG_ERROR("entities.player.items", "WORLD: unknown spell id %u in items set %u effects", set->SetSpellID[x], setid);
+                    FMT_LOG_ERROR("entities.player.items", "WORLD: unknown spell id {} in items set {} effects", set->SetSpellID[x], setid);
                     break;
                 }
 
@@ -125,11 +125,11 @@ void RemoveItemsSetItem(Player*player, ItemTemplate const* proto)
 {
     uint32 setid = proto->ItemSet;
 
-    ItemSetEntry const* set = sItemSetStore.LookupEntry(setid);
+    ItemSetDBC const* set = sDBCStoresMgr->GetItemSetDBC(setid);
 
     if (!set)
     {
-        TC_LOG_ERROR("sql.sql", "Item set #%u for item #%u not found, mods not removed.", setid, proto->ItemId);
+        FMT_LOG_ERROR("sql.sql", "Item set #{} for item #{} not found, mods not removed.", setid, proto->ItemId);
         return;
     }
 
@@ -308,7 +308,7 @@ void Item::UpdateDuration(Player* owner, uint32 diff)
     if (!GetUInt32Value(ITEM_FIELD_DURATION))
         return;
 
-    TC_LOG_DEBUG("entities.player.items", "Item::UpdateDuration Item (Entry: %u Duration %u Diff %u)", GetEntry(), GetUInt32Value(ITEM_FIELD_DURATION), diff);
+    FMT_LOG_DEBUG("entities.player.items", "Item::UpdateDuration Item (Entry: {} Duration {} Diff {})", GetEntry(), GetUInt32Value(ITEM_FIELD_DURATION), diff);
 
     if (GetUInt32Value(ITEM_FIELD_DURATION) <= diff)
     {
@@ -424,7 +424,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
     ItemTemplate const* proto = GetTemplate();
     if (!proto)
     {
-        TC_LOG_ERROR("entities.item", "Invalid entry %u for item %s. Refusing to load.", GetEntry(), GetGUID().ToString().c_str());
+        FMT_LOG_ERROR("entities.item", "Invalid entry {} for item {}. Refusing to load.", GetEntry(), GetGUID().ToString());
         return false;
     }
 
@@ -454,7 +454,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
             if (Optional<int32> charges = Trinity::StringTo<int32>(tokens[i]))
                 SetSpellCharges(i, *charges);
             else
-                TC_LOG_ERROR("entities.item", "Invalid charge info '%s' for item %s, charge data not loaded.", std::string(tokens[i]).c_str(), GetGUID().ToString().c_str());
+                FMT_LOG_ERROR("entities.item", "Invalid charge info '{}' for item {}, charge data not loaded.", std::string(tokens[i]), GetGUID().ToString());
         }
     }
 
@@ -467,7 +467,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
     }
 
     if (!_LoadIntoDataField(fields[6].GetString(), ITEM_FIELD_ENCHANTMENT_1_1, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET))
-        TC_LOG_WARN("entities.item", "Invalid enchantment data '%s' for item %s. Forcing partial load.", fields[6].GetString().c_str(), GetGUID().ToString().c_str());
+        FMT_LOG_WARN("entities.item", "Invalid enchantment data '{}' for item {}. Forcing partial load.", fields[6].GetString(), GetGUID().ToString());
 
     SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[7].GetInt16());
     // recalculate suffix factor
@@ -596,7 +596,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
 
     if (randomPropId > 0)
     {
-        ItemRandomPropertiesEntry const* item_rand = sItemRandomPropertiesStore.LookupEntry(randomPropId);
+        ItemRandomPropertiesDBC const* item_rand = sDBCStoresMgr->GetItemRandomPropertiesDBC(randomPropId);
         if (item_rand)
         {
             if (GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) != int32(item_rand->ID))
@@ -610,7 +610,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
     }
     else
     {
-        ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(-randomPropId);
+        ItemRandomSuffixDBC const* item_rand = sDBCStoresMgr->GetItemRandomSuffixDBC(-randomPropId);
         if (item_rand)
         {
             if (GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) != -int32(item_rand->ID) ||
@@ -675,8 +675,8 @@ void AddItemToUpdateQueueOf(Item* item, Player* player)
 
     if (player->GetGUID() != item->GetOwnerGUID())
     {
-        TC_LOG_DEBUG("entities.player.items", "AddItemToUpdateQueueOf - Owner's guid (%s) and player's guid (%s) don't match!",
-            item->GetOwnerGUID().ToString().c_str(), player->GetGUID().ToString().c_str());
+        FMT_LOG_DEBUG("entities.player.items", "AddItemToUpdateQueueOf - Owner's guid ({}) and player's guid ({}) don't match!",
+            item->GetOwnerGUID().ToString(), player->GetGUID().ToString());
         return;
     }
 
@@ -696,8 +696,8 @@ void RemoveItemFromUpdateQueueOf(Item* item, Player* player)
 
     if (player->GetGUID() != item->GetOwnerGUID())
     {
-        TC_LOG_DEBUG("entities.player.items", "RemoveItemFromUpdateQueueOf - Owner's guid (%s) and player's guid (%s) don't match!",
-            item->GetOwnerGUID().ToString().c_str(), player->GetGUID().ToString().c_str());
+        FMT_LOG_DEBUG("entities.player.items", "RemoveItemFromUpdateQueueOf - Owner's guid ({}) and player's guid ({}) don't match!",
+            item->GetOwnerGUID().ToString(), player->GetGUID().ToString());
         return;
     }
 
@@ -758,12 +758,12 @@ uint32 Item::CalculateDurabilityRepairCost(float discount) const
 
     ItemTemplate const* itemTemplate = GetTemplate();
 
-    DurabilityCostsEntry const* durabilityCost = sDurabilityCostsStore.LookupEntry(itemTemplate->ItemLevel);
+    DurabilityCostsDBC const* durabilityCost = sDBCStoresMgr->GetDurabilityCostsDBC(itemTemplate->ItemLevel);
     if (!durabilityCost)
         return 0;
 
     uint32 durabilityQualityEntryId = (itemTemplate->Quality + 1) * 2;
-    DurabilityQualityEntry const* durabilityQualityEntry = sDurabilityQualityStore.LookupEntry(durabilityQualityEntryId);
+    DurabilityQualityDBC const* durabilityQualityEntry = sDBCStoresMgr->GetDurabilityQualityDBC(durabilityQualityEntryId);
     if (!durabilityQualityEntry)
         return 0;
 
@@ -795,7 +795,7 @@ bool Item::HasEnchantRequiredSkill(Player const* player) const
     // Check all enchants for required skill
     for (uint32 enchant_slot = PERM_ENCHANTMENT_SLOT; enchant_slot < MAX_ENCHANTMENT_SLOT; ++enchant_slot)
         if (uint32 enchant_id = GetEnchantmentId(EnchantmentSlot(enchant_slot)))
-            if (SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id))
+            if (SpellItemEnchantmentDBC const* enchantEntry = sDBCStoresMgr->GetSpellItemEnchantmentDBC(enchant_id))
                 if (enchantEntry->RequiredSkillID && player->GetSkillValue(enchantEntry->RequiredSkillID) < enchantEntry->RequiredSkillRank)
                     return false;
 
@@ -809,7 +809,7 @@ uint32 Item::GetEnchantRequiredLevel() const
     // Check all enchants for required level
     for (uint32 enchant_slot = PERM_ENCHANTMENT_SLOT; enchant_slot < MAX_ENCHANTMENT_SLOT; ++enchant_slot)
         if (uint32 enchant_id = GetEnchantmentId(EnchantmentSlot(enchant_slot)))
-            if (SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id))
+            if (SpellItemEnchantmentDBC const* enchantEntry = sDBCStoresMgr->GetSpellItemEnchantmentDBC(enchant_id))
                 if (enchantEntry->MinLevel > level)
                     level = enchantEntry->MinLevel;
 
@@ -821,7 +821,7 @@ bool Item::IsBoundByEnchant() const
     // Check all enchants for soulbound
     for (uint32 enchant_slot = PERM_ENCHANTMENT_SLOT; enchant_slot < MAX_ENCHANTMENT_SLOT; ++enchant_slot)
         if (uint32 enchant_id = GetEnchantmentId(EnchantmentSlot(enchant_slot)))
-            if (SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id))
+            if (SpellItemEnchantmentDBC const* enchantEntry = sDBCStoresMgr->GetSpellItemEnchantmentDBC(enchant_id))
                 if (enchantEntry->Flags & ENCHANTMENT_CAN_SOULBOUND)
                     return true;
     return false;
@@ -944,7 +944,7 @@ bool Item::GemsFitSockets() const
         if (!enchant_id) // no gems on this socket
             return false;
 
-        SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+        SpellItemEnchantmentDBC const* enchantEntry = sDBCStoresMgr->GetSpellItemEnchantmentDBC(enchant_id);
         if (!enchantEntry) // invalid gem id on this socket
             return false;
 
@@ -956,7 +956,7 @@ bool Item::GemsFitSockets() const
             ItemTemplate const* gemProto = sObjectMgr->GetItemTemplate(gemid);
             if (gemProto)
             {
-                GemPropertiesEntry const* gemProperty = sGemPropertiesStore.LookupEntry(gemProto->GemProperties);
+                GemPropertiesDBC const* gemProperty = sDBCStoresMgr->GetGemPropertiesDBC(gemProto->GemProperties);
                 if (gemProperty)
                     GemColor = gemProperty->Type;
             }
@@ -977,7 +977,7 @@ uint8 Item::GetGemCountWithID(uint32 GemID) const
         if (!enchant_id)
             continue;
 
-        SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+        SpellItemEnchantmentDBC const* enchantEntry = sDBCStoresMgr->GetSpellItemEnchantmentDBC(enchant_id);
         if (!enchantEntry)
             continue;
 
@@ -996,7 +996,7 @@ uint8 Item::GetGemCountWithLimitCategory(uint32 limitCategory) const
         if (!enchant_id)
             continue;
 
-        SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+        SpellItemEnchantmentDBC const* enchantEntry = sDBCStoresMgr->GetSpellItemEnchantmentDBC(enchant_id);
         if (!enchantEntry)
             continue;
 

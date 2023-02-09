@@ -347,7 +347,7 @@ struct npc_time_rift : public ScriptedAI
         uint32 entry = 0;
 
         entry = PortalWaves[mWaveId].PortalMob[mRiftWaveCount];
-        TC_LOG_DEBUG("scripts", "npc_time_rift: summoning wave Creature (Wave %u, Entry %u).", mRiftWaveCount, entry);
+        FMT_LOG_DEBUG("scripts", "npc_time_rift: summoning wave Creature (Wave {}, Entry {}).", mRiftWaveCount, entry);
 
         ++mRiftWaveCount;
 
@@ -369,7 +369,7 @@ struct npc_time_rift : public ScriptedAI
         if (me->IsNonMeleeSpellCast(false))
             return;
 
-        TC_LOG_DEBUG("scripts", "npc_time_rift: not casting anylonger, i need to die.");
+        FMT_LOG_DEBUG("scripts", "npc_time_rift: not casting anylonger, i need to die.");
         me->setDeathState(JUST_DIED);
 
         if (instance->GetData(TYPE_RIFT) == IN_PROGRESS)

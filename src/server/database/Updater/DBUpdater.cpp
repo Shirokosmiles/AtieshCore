@@ -50,8 +50,8 @@ bool DBUpdaterUtil::CheckExecutable()
             return true;
         }
 
-        TC_LOG_FATAL("sql.updates", "Didn't find any executable MySQL binary at \'%s\' or in path, correct the path in the *.conf (\"MySQLExecutable\").",
-            absolute(exe).generic_string().c_str());
+        FMT_LOG_FATAL("sql.updates", "Didn't find any executable MySQL binary at \'{}\' or in path, correct the path in the *.conf (\"MySQLExecutable\").",
+            absolute(exe).generic_string());
 
         return false;
     }
@@ -150,6 +150,33 @@ bool DBUpdater<CharacterDatabaseConnection>::IsEnabled(uint32 const updateMask)
     return (updateMask & DatabaseLoader::DATABASE_CHARACTER) ? true : false;
 }
 
+// DBC Database
+template<>
+std::string DBUpdater<DBCDatabaseConnection>::GetConfigEntry()
+{
+    return "Updates.DBC";
+}
+
+template<>
+std::string DBUpdater<DBCDatabaseConnection>::GetTableName()
+{
+    return "DBC";
+}
+
+template<>
+std::string DBUpdater<DBCDatabaseConnection>::GetBaseFile()
+{
+    return BuiltInConfig::GetSourceDirectory() +
+        "/sql/base/dbc_database.sql";
+}
+
+template<>
+bool DBUpdater<DBCDatabaseConnection>::IsEnabled(uint32 const updateMask)
+{
+    // This way silences warnings under msvc
+    return (updateMask & DatabaseLoader::DATABASE_DBC) ? true : false;
+}
+
 // All
 template<class T>
 BaseLocation DBUpdater<T>::GetBaseLocationType()
@@ -160,15 +187,15 @@ BaseLocation DBUpdater<T>::GetBaseLocationType()
 template<class T>
 bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
-    TC_LOG_INFO("sql.updates", "Database \"%s\" does not exist, do you want to create it? [yes (default) / no]: ",
-        pool.GetConnectionInfo()->database.c_str());
+    FMT_LOG_INFO("sql.updates", "Database \"{}\" does not exist, do you want to create it? [yes (default) / no]: ",
+        pool.GetConnectionInfo()->database);
 
     std::string answer;
     std::getline(std::cin, answer);
     if (!answer.empty() && !(answer.substr(0, 1) == "y"))
         return false;
 
-    TC_LOG_INFO("sql.updates", "Creating database \"%s\"...", pool.GetConnectionInfo()->database.c_str());
+    FMT_LOG_INFO("sql.updates", "Creating database \"{}\"...", pool.GetConnectionInfo()->database);
 
     // Path of temp file
     static Path const temp("create_table.sql");
@@ -177,7 +204,7 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     std::ofstream file(temp.generic_string());
     if (!file.is_open())
     {
-        TC_LOG_FATAL("sql.updates", "Failed to create temporary query file \"%s\"!", temp.generic_string().c_str());
+        FMT_LOG_FATAL("sql.updates", "Failed to create temporary query file \"{}\"!", temp.generic_string());
         return false;
     }
 
@@ -192,12 +219,12 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     }
     catch (UpdateException&)
     {
-        TC_LOG_FATAL("sql.updates", "Failed to create database %s! Does the user (named in *.conf) have `CREATE`, `ALTER`, `DROP`, `INSERT` and `DELETE` privileges on the MySQL server?", pool.GetConnectionInfo()->database.c_str());
+        FMT_LOG_FATAL("sql.updates", "Failed to create database {}! Does the user (named in *.conf) have `CREATE`, `ALTER`, `DROP`, `INSERT` and `DELETE` privileges on the MySQL server?", pool.GetConnectionInfo()->database);
         boost::filesystem::remove(temp);
         return false;
     }
 
-    TC_LOG_INFO("sql.updates", "Done.");
+    FMT_LOG_INFO("sql.updates", "Done.");
     boost::filesystem::remove(temp);
     return true;
 }
@@ -208,13 +235,13 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
 
-    TC_LOG_INFO("sql.updates", "Updating %s database...", DBUpdater<T>::GetTableName().c_str());
+    FMT_LOG_INFO("sql.updates", "Updating {} database...", DBUpdater<T>::GetTableName());
 
     Path const sourceDirectory(BuiltInConfig::GetSourceDirectory());
 
     if (!is_directory(sourceDirectory))
     {
-        TC_LOG_ERROR("sql.updates", "DBUpdater: The given source directory %s does not exist, change the path to the directory where your sql directory exists (for example c:\\source\\trinitycore). Shutting down.", sourceDirectory.generic_string().c_str());
+        FMT_LOG_ERROR("sql.updates", "DBUpdater: The given source directory {} does not exist, change the path to the directory where your sql directory exists (for example c:\\source\\trinitycore). Shutting down.", sourceDirectory.generic_string());
         return false;
     }
 
@@ -236,13 +263,13 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    std::string const info = Trinity::StringFormat("Containing " SZFMTD " new and " SZFMTD " archived updates.",
+    std::string const info = Trinity::StringFormat("Containing {} new and {} archived updates.",
         result.recent, result.archived);
 
     if (!result.updated)
-        TC_LOG_INFO("sql.updates", ">> %s database is up-to-date! %s", DBUpdater<T>::GetTableName().c_str(), info.c_str());
+        FMT_LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", DBUpdater<T>::GetTableName(), info);
     else
-        TC_LOG_INFO("sql.updates", ">> Applied " SZFMTD " %s. %s", result.updated, result.updated == 1 ? "query" : "queries", info.c_str());
+        FMT_LOG_INFO("sql.updates", ">> Applied {} {}. {}", result.updated, result.updated == 1 ? "query" : "queries", info);
 
     return true;
 }
@@ -259,12 +286,12 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
 
-    TC_LOG_INFO("sql.updates", "Database %s is empty, auto populating it...", DBUpdater<T>::GetTableName().c_str());
+    FMT_LOG_INFO("sql.updates", "Database {} is empty, auto populating it...", DBUpdater<T>::GetTableName());
 
     std::string const p = DBUpdater<T>::GetBaseFile();
     if (p.empty())
     {
-        TC_LOG_INFO("sql.updates", ">> No base file provided, skipped!");
+        FMT_LOG_INFO("sql.updates", ">> No base file provided, skipped!");
         return true;
     }
 
@@ -275,8 +302,8 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
         {
             case LOCATION_REPOSITORY:
             {
-                TC_LOG_ERROR("sql.updates", ">> Base file \"%s\" is missing. Try fixing it by cloning the source again.",
-                    base.generic_string().c_str());
+                FMT_LOG_ERROR("sql.updates", ">> Base file \"{}\" is missing. Try fixing it by cloning the source again.",
+                    base.generic_string());
 
                 break;
             }
@@ -284,8 +311,8 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
             {
                 std::string const filename = base.filename().generic_string();
                 std::string const workdir = boost::filesystem::current_path().generic_string();
-                TC_LOG_ERROR("sql.updates", ">> File \"%s\" is missing, download it from \"https://github.com/TrinityCore/TrinityCore/releases\"" \
-                    " uncompress it and place the file \"%s\" in the directory \"%s\".", filename.c_str(), filename.c_str(), workdir.c_str());
+                FMT_LOG_ERROR("sql.updates", ">> File \"{}\" is missing, download it from \"https://github.com/TrinityCore/TrinityCore/releases\"" \
+                    " uncompress it and place the file \"{}\" in the directory \"{}\".", filename, filename, workdir);
                 break;
             }
         }
@@ -293,7 +320,7 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
     }
 
     // Update database
-    TC_LOG_INFO("sql.updates", ">> Applying \'%s\'...", base.generic_string().c_str());
+    FMT_LOG_INFO("sql.updates", ">> Applying \'{}\'...", base.generic_string());
     try
     {
         ApplyFile(pool, base);
@@ -303,7 +330,7 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    TC_LOG_INFO("sql.updates", ">> Done!");
+    FMT_LOG_INFO("sql.updates", ">> Done!");
     return true;
 }
 
@@ -384,7 +411,7 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
 
     // Execute sql file
     args.emplace_back("-e");
-    args.emplace_back(Trinity::StringFormat("BEGIN; SOURCE %s; COMMIT;", path.generic_string().c_str()));
+    args.emplace_back(Trinity::StringFormat("BEGIN; SOURCE {}; COMMIT;", path.generic_string()));
 
     // Database
     if (!database.empty())
@@ -396,12 +423,12 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
 
     if (ret != EXIT_SUCCESS)
     {
-        TC_LOG_FATAL("sql.updates", "Applying of file \'%s\' to database \'%s\' failed!" \
+        FMT_LOG_FATAL("sql.updates", "Applying of file \'{}\' to database \'{}\' failed!" \
             " If you are a user, please pull the latest revision from the repository. "
             "Also make sure you have not applied any of the databases with your sql client. "
             "You cannot use auto-update system and import sql files from TrinityCore repository with your sql client. "
             "If you are a developer, please fix your sql query.",
-            path.generic_string().c_str(), pool.GetConnectionInfo()->database.c_str());
+            path.generic_string(), pool.GetConnectionInfo()->database);
 
         throw UpdateException("update failed");
     }
@@ -410,3 +437,4 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
 template class TC_DATABASE_API DBUpdater<LoginDatabaseConnection>;
 template class TC_DATABASE_API DBUpdater<WorldDatabaseConnection>;
 template class TC_DATABASE_API DBUpdater<CharacterDatabaseConnection>;
+template class TC_DATABASE_API DBUpdater<DBCDatabaseConnection>;

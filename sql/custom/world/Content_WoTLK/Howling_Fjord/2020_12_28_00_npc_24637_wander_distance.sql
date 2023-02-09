@@ -1,0 +1,1 @@
+UPDATE `creature` SET `wander_distance`=45 WHERE `id`='24637' AND `MovementType`=1;

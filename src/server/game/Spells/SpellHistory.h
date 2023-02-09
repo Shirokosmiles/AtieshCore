@@ -31,7 +31,7 @@ class Spell;
 class SpellInfo;
 class Unit;
 class WorldPacket;
-struct SpellCategoryEntry;
+struct SpellCategoryDBC;
 
 /// Spell cooldown flags sent in SMSG_SPELL_COOLDOWN
 enum SpellCooldownFlags

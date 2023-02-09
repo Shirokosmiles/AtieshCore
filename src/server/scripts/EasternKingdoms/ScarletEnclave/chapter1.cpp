@@ -193,7 +193,7 @@ public:
                         anchorGUID = anchor->GetGUID();
                     }
                     else
-                        TC_LOG_ERROR("scripts", "npc_unworthy_initiateAI: unable to find anchor!");
+                        FMT_LOG_ERROR("scripts", "npc_unworthy_initiateAI: unable to find anchor!");
 
                     float dist = 99.0f;
                     GameObject* prison = nullptr;
@@ -213,7 +213,7 @@ public:
                     if (prison)
                         prison->ResetDoorOrButton();
                     else
-                        TC_LOG_ERROR("scripts", "npc_unworthy_initiateAI: unable to find prison!");
+                        FMT_LOG_ERROR("scripts", "npc_unworthy_initiateAI: unable to find prison!");
                 }
                 break;
             case PHASE_TO_EQUIP:
@@ -224,7 +224,7 @@ public:
                     else
                     {
                         me->GetMotionMaster()->MovePoint(1, anchorX, anchorY, me->GetPositionZ());
-                        //TC_LOG_DEBUG("scripts", "npc_unworthy_initiateAI: move to %f %f %f", anchorX, anchorY, me->GetPositionZ());
+                        //FMT_LOG_DEBUG("scripts", "npc_unworthy_initiateAI: move to {} {} {}", anchorX, anchorY, me->GetPositionZ());
                         phase = PHASE_EQUIPING;
                         wait_timer = 0;
                     }
@@ -928,11 +928,14 @@ public:
             if (!deathcharger || !killer)
                 return;
 
-            if (killer->GetTypeId() == TYPEID_PLAYER && deathcharger->GetTypeId() == TYPEID_UNIT && deathcharger->IsVehicle())
+            if (killer && killer->GetTypeId() == TYPEID_PLAYER && deathcharger->GetTypeId() == TYPEID_UNIT && deathcharger->IsVehicle())
             {
                 deathcharger->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
                 deathcharger->RemoveUnitFlag(UNIT_FLAG_UNINTERACTIBLE);
                 deathcharger->SetFaction(FACTION_SCARLET_CRUSADE_2);
+                deathcharger->StopMoving();
+                deathcharger->GetMotionMaster()->Clear();
+                deathcharger->GetMotionMaster()->MoveIdle();
             }
         }
     };
@@ -1010,7 +1013,7 @@ struct npc_scarlet_ghoul : public ScriptedAI
 
     void FindMinions(Unit* owner)
     {
-        std::list<Creature*> MinionList;
+        std::vector<Creature*> MinionList;
         owner->GetAllMinionsByEntry(MinionList, NPC_GHOULS);
 
         if (!MinionList.empty())
@@ -1026,6 +1029,7 @@ struct npc_scarlet_ghoul : public ScriptedAI
                 }
             }
         }
+        MinionList.clear();
     }
 
     void UpdateAI(uint32 /*diff*/) override

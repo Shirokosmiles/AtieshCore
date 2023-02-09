@@ -210,10 +210,11 @@ class spell_pet_gen_lich_pet_aura : public AuraScript
 
         Unit* owner = GetUnitOwner();
 
-        std::list<Creature*> minionList;
+        std::vector<Creature*> minionList;
         owner->GetAllMinionsByEntry(minionList, NPC_LICH_PET);
         for (Creature* minion : minionList)
             owner->CastSpell(minion, SPELL_LICH_PET_AURA_ONKILL, true);
+        minionList.clear();
     }
 
     void Register() override

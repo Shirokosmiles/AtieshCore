@@ -98,6 +98,7 @@ DoorData const doorData[] =
     { GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_03,  DATA_VALITHRIA_DREAMWALKER, DOOR_TYPE_SPAWN_HOLE },
     { GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_04,  DATA_VALITHRIA_DREAMWALKER, DOOR_TYPE_SPAWN_HOLE },
     { GO_SINDRAGOSA_ENTRANCE_DOOR,            DATA_SINDRAGOSA,            DOOR_TYPE_ROOM },
+    { GO_SINDRAGOSA_ENTRANCE_DOOR,            DATA_SINDRAGOSA_GAUNTLET,   DOOR_TYPE_PASSAGE },
     { GO_SINDRAGOSA_SHORTCUT_ENTRANCE_DOOR,   DATA_SINDRAGOSA,            DOOR_TYPE_PASSAGE },
     { GO_SINDRAGOSA_SHORTCUT_EXIT_DOOR,       DATA_SINDRAGOSA,            DOOR_TYPE_PASSAGE },
     { GO_ICE_WALL,                            DATA_SINDRAGOSA,            DOOR_TYPE_ROOM },
@@ -151,6 +152,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                 UpperSpireTeleporterActiveState = NOT_STARTED;
                 BloodQuickeningState = NOT_STARTED;
                 BloodQuickeningMinutes = 0;
+                PutricideTrapEventState = NOT_STARTED;
                 BloodPrinceIntro = 1;
                 SindragosaIntro = 1;
                 IsBonedEligible = true;
@@ -325,6 +327,9 @@ class instance_icecrown_citadel : public InstanceMapScript
                         // Remove corpse as soon as it dies (and respawn 10 seconds later)
                         creature->SetCorpseDelay(0);
                         creature->SetReactState(REACT_PASSIVE);
+                        break;
+                    case NPC_SINDRAGOSA_GAUNTLET:
+                        SindragosaGauntletGUID = creature->GetGUID();
                         break;
                     default:
                         break;
@@ -503,13 +508,18 @@ class instance_icecrown_citadel : public InstanceMapScript
             {
                 switch (go->GetEntry())
                 {
+                    case GO_ORANGE_PLAGUE_MONSTER_ENTRANCE:
+                        PutricideNormalGateGUIDs[0] = go->GetGUID();
+                        AddDoor(go, true);
+                        break;
+                    case GO_GREEN_PLAGUE_MONSTER_ENTRANCE:
+                        PutricideNormalGateGUIDs[1] = go->GetGUID();
+                        AddDoor(go, true);
+                        break;
                     case GO_DOODAD_ICECROWN_ICEWALL02:
                     case GO_ICEWALL:
                     case GO_LORD_MARROWGAR_S_ENTRANCE:
                     case GO_ORATORY_OF_THE_DAMNED_ENTRANCE:
-                    case GO_ORANGE_PLAGUE_MONSTER_ENTRANCE:
-                    case GO_GREEN_PLAGUE_MONSTER_ENTRANCE:
-                    case GO_SCIENTIST_ENTRANCE:
                     case GO_CRIMSON_HALL_DOOR:
                     case GO_BLOOD_ELF_COUNCIL_DOOR:
                     case GO_BLOOD_ELF_COUNCIL_DOOR_RIGHT:
@@ -629,6 +639,11 @@ class instance_icecrown_citadel : public InstanceMapScript
                         else if (GetBossState(DATA_ROTFACE) == DONE)
                             HandleGameObject(PutricideGateGUIDs[1], false, go);
                         break;
+                    case GO_SCIENTIST_ENTRANCE:
+                        PutricideDoorGUID = go->GetGUID();
+                        if (GetData(DATA_PUTRICIDE_TRAP) == DONE)
+                            HandleGameObject(PutricideDoorGUID, false, go);
+                        break;
                     case GO_DOODAD_ICECROWN_ORANGETUBES02:
                         PutricidePipeGUIDs[0] = go->GetGUID();
                         if (GetBossState(DATA_FESTERGUT) == DONE)
@@ -731,6 +746,8 @@ class instance_icecrown_citadel : public InstanceMapScript
             {
                 switch (type)
                 {
+                    case DATA_PUTRICIDE_TRAP:
+                        return PutricideTrapEventState;
                     case DATA_SINDRAGOSA_FROSTWYRMS:
                         return FrostwyrmGUIDs.size();
                     case DATA_SPINESTALKER:
@@ -778,6 +795,10 @@ class instance_icecrown_citadel : public InstanceMapScript
                         return DeathbringerSaurfangEventGUID;
                     case GO_SAURFANG_S_DOOR:
                         return DeathbringerSaurfangDoorGUID;
+                    case GO_ORANGE_PLAGUE_MONSTER_ENTRANCE: //festergut
+                        return PutricideNormalGateGUIDs[0];
+                    case GO_GREEN_PLAGUE_MONSTER_ENTRANCE:
+                        return PutricideNormalGateGUIDs[1];
                     case DATA_FESTERGUT:
                         return FestergutGUID;
                     case DATA_ROTFACE:
@@ -827,6 +848,8 @@ class instance_icecrown_citadel : public InstanceMapScript
                         return ArthasPlatformGUID;
                     case DATA_TERENAS_MENETHIL:
                         return TerenasMenethilGUID;
+                    case NPC_SINDRAGOSA_GAUNTLET:
+                        return SindragosaGauntletGUID;
                     default:
                         break;
                 }
@@ -1124,6 +1147,27 @@ class instance_icecrown_citadel : public InstanceMapScript
                         if (!IsFactionBuffActive)
                             DoRemoveAurasDueToSpellOnPlayers(TeamInInstance == ALLIANCE ? SPELL_STRENGHT_OF_WRYNN : SPELL_HELLSCREAMS_WARSONG, true, true);
                         break;
+                    case DATA_PUTRICIDE_TRAP:
+                    {
+                        PutricideTrapEventState = data;
+                        if (data == DONE)
+                        {
+                            if (GameObject* go = instance->GetGameObject(PutricideDoorGUID))
+                                go->SetGoState(GO_STATE_DESTROYED);
+                            HandleGameObject(PutricideCollisionGUID, true);
+                            if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[0]))
+                                go->SetGoState(GO_STATE_DESTROYED);
+                            if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[1]))
+                                go->SetGoState(GO_STATE_DESTROYED);
+                        }
+                        else if (data == IN_PROGRESS)
+                        {
+                            HandleGameObject(PutricideCollisionGUID, false);
+                            HandleGameObject(PutricideGateGUIDs[0], false);
+                            HandleGameObject(PutricideGateGUIDs[1], false);
+                        }
+                        break;
+                    }
                     case DATA_NERUBAR_BROODKEEPER_EVENT:
                     {
                         uint8 group = (data == AT_NERUBAR_BROODKEEPER) ? 0 : 1;
@@ -1506,6 +1550,7 @@ class instance_icecrown_citadel : public InstanceMapScript
             ObjectGuid FrostwingSigilGUID;
             ObjectGuid PutricidePipeGUIDs[2];
             ObjectGuid PutricideGateGUIDs[2];
+            ObjectGuid PutricideNormalGateGUIDs[2];
             ObjectGuid PutricideCollisionGUID;
             ObjectGuid FestergutGUID;
             ObjectGuid RotfaceGUID;
@@ -1536,6 +1581,8 @@ class instance_icecrown_citadel : public InstanceMapScript
             ObjectGuid FrozenBolvarGUID;
             ObjectGuid PillarsChainedGUID;
             ObjectGuid PillarsUnchainedGUID;
+            ObjectGuid PutricideDoorGUID;
+            ObjectGuid SindragosaGauntletGUID;
             Team TeamInInstance;
             uint32 ColdflameJetsState;
             uint32 UpperSpireTeleporterActiveState;
@@ -1545,6 +1592,7 @@ class instance_icecrown_citadel : public InstanceMapScript
             uint32 BloodQuickeningState;
             uint32 HeroicAttempts;
             uint16 BloodQuickeningMinutes;
+            uint32 PutricideTrapEventState;
             uint8 BloodPrinceIntro;
             uint8 SindragosaIntro;
             bool IsBonedEligible;

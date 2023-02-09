@@ -19,7 +19,7 @@
 #include "AchievementMgr.h"
 #include "CharacterDatabaseCleaner.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "Log.h"
 #include "SpellMgr.h"
 #include "World.h"
@@ -30,7 +30,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     if (!sWorld->getBoolConfig(CONFIG_CLEAN_CHARACTER_DB))
         return;
 
-    TC_LOG_INFO("misc", "Cleaning character database...");
+    FMT_LOG_INFO("misc", "Cleaning character database...");
 
     uint32 oldMSTime = getMSTime();
 
@@ -64,7 +64,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
 
     sWorld->SetCleaningFlags(flags);
 
-    TC_LOG_INFO("server.loading", ">> Cleaned character database in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Cleaned character database in {} ms", GetMSTimeDiffToNow(oldMSTime));
 }
 
 void CharacterDatabaseCleaner::CheckUnique(char const* column, char const* table, bool (*check)(uint32))
@@ -72,7 +72,7 @@ void CharacterDatabaseCleaner::CheckUnique(char const* column, char const* table
     QueryResult result = CharacterDatabase.PQuery("SELECT DISTINCT %s FROM %s", column, table);
     if (!result)
     {
-        TC_LOG_INFO("misc", "Table %s is empty.", table);
+        FMT_LOG_INFO("misc", "Table {} is empty.", table);
         return;
     }
 
@@ -118,7 +118,7 @@ void CharacterDatabaseCleaner::CleanCharacterAchievementProgress()
 
 bool CharacterDatabaseCleaner::SkillCheck(uint32 skill)
 {
-    return sSkillLineStore.LookupEntry(skill) != nullptr;
+    return sDBCStoresMgr->GetSkillLineDBC(skill) != nullptr;
 }
 
 void CharacterDatabaseCleaner::CleanCharacterSkills()
@@ -128,7 +128,7 @@ void CharacterDatabaseCleaner::CleanCharacterSkills()
 
 bool CharacterDatabaseCleaner::SpellCheck(uint32 spell_id)
 {
-    return sSpellMgr->GetSpellInfo(spell_id) && !GetTalentSpellPos(spell_id);
+    return sSpellMgr->GetSpellInfo(spell_id) && !sDBCStoresMgr->GetTalentSpellPos(spell_id);
 }
 
 void CharacterDatabaseCleaner::CleanCharacterSpell()
@@ -138,11 +138,11 @@ void CharacterDatabaseCleaner::CleanCharacterSpell()
 
 bool CharacterDatabaseCleaner::TalentCheck(uint32 talent_id)
 {
-    TalentEntry const* talentInfo = sTalentStore.LookupEntry(talent_id);
+    TalentDBC const* talentInfo = sDBCStoresMgr->GetTalentDBC(talent_id);
     if (!talentInfo)
         return false;
 
-    return sTalentTabStore.LookupEntry(talentInfo->TabID) != nullptr;
+    return sDBCStoresMgr->GetTalentTabDBC(talentInfo->TabID) != nullptr;
 }
 
 void CharacterDatabaseCleaner::CleanCharacterTalent()

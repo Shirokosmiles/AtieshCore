@@ -15,14 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameObject.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
-#include "GameObject.h"
+#include "ScriptedEscortAI.h"
+#include "SpellScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
 
 enum BloodyBreakoutTexts
 {
@@ -414,7 +416,7 @@ public:
                 } else uiStage_timer -= diff;
             }
 
-            if (!UpdateVictim())
+            if (!UpdateVictim() || !me->GetVictim())
                 return;
 
             DoMeleeAttackIfReady();

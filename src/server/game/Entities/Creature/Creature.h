@@ -23,6 +23,7 @@
 #include "CreatureData.h"
 #include "DatabaseEnvFwd.h"
 #include "Duration.h"
+#include "GameTime.h"
 #include "Loot.h"
 #include "GridObject.h"
 #include "MapObject.h"
@@ -161,6 +162,11 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool SetFeatherFall(bool enable, bool packetOnly = false) override;
         bool SetHover(bool enable, bool packetOnly = false, bool updateAnimTier = true) override;
 
+        float GetShieldBlockValuePctMod() const override
+        {
+            return 1.0f;
+        }
+
         uint32 GetShieldBlockValue() const override;
 
         SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType /*attackType*/ = BASE_ATTACK, uint8 /*damageIndex*/ = 0) const override { return m_meleeDamageSchoolMask; }
@@ -185,7 +191,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         uint8 GetCurrentEquipmentId() const { return m_equipmentId; }
         void SetCurrentEquipmentId(uint8 id) { m_equipmentId = id; }
 
-        float GetSpellDamageMod(int32 Rank) const;
+        float GetSpellDamageMod(int32 Rank, uint32 ZoneId) const;
 
         VendorItemData const* GetVendorItems() const;
         uint32 GetVendorItemCurrentCount(VendorItem const* vItem);
@@ -277,6 +283,14 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
                 m_combatPulseTime = delay;
         }
 
+        uint32 GetMasterCallDelay() const { return m_masterCallDelay; }
+        void SetMasterCallDelay(uint32 delay) // (secs) interval at which the creature will going at owner for free him from roots
+        {
+            m_masterCallDelay = delay;
+            if (m_masterCallTime == 0 || m_masterCallTime > delay)
+                m_masterCallTime = delay;
+        }
+
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
         ObjectGuid::LowType lootingGroupLowGUID;                         // used to find group which is looting corpse
 
@@ -293,6 +307,12 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         void SetCannotReachTarget(bool cannotReach);
         bool CanNotReachTarget() const { return m_cannotReachTarget; }
+
+        void SetIgnoreEvade(bool setcaster = false)
+        {
+            m_isIgnoreEvade = setcaster;
+        }
+        bool isCreatureIgnoreEvade() const { return m_isIgnoreEvade; }     // will not evaded for some special NPC like ballista for DK zone
 
         void SetHomePosition(float x, float y, float z, float o) { m_homePosition.Relocate(x, y, z, o); }
         void SetHomePosition(Position const& pos) { m_homePosition.Relocate(pos); }
@@ -352,6 +372,10 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         // Part of Evade mechanics
         time_t GetLastDamagedTime() const { return _lastDamagedTime; }
         void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
+        // Part of Raid Info
+        void StartCombatTime() { m_startEngageTime = GameTime::GetGameTime(); }
+        void ResetCombatTime() { m_startEngageTime = 0; }
+        uint32 GetCombatTime() { return uint32(GameTime::GetGameTime() - m_startEngageTime); }
 
         CreatureTextRepeatIds GetTextRepeatGroup(uint8 textGroup);
         void SetTextRepeatId(uint8 textGroup, uint8 id);
@@ -381,7 +405,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         // vendor items
         VendorItemCounts m_vendorItemCounts;
 
-        static float _GetHealthMod(int32 Rank);
+        static float _GetHealthMod(int32 Rank, uint32 ZoneId);
 
         ObjectGuid m_lootRecipient;
         uint32 m_lootRecipientGroup;
@@ -456,8 +480,13 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         // Regenerate health
         bool _regenerateHealth; // Set on creation
         bool _regenerateHealthLock; // Dynamically set
-
         bool _isMissingCanSwimFlagOutOfCombat;
+
+        // custom ATiesh features
+        uint32 m_masterCallTime;
+        uint32 m_masterCallDelay;
+        bool m_isIgnoreEvade;
+        time_t m_startEngageTime;
 };
 
 class TC_GAME_API AssistDelayEvent : public BasicEvent

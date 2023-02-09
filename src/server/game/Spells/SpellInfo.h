@@ -36,12 +36,13 @@ class Unit;
 struct Condition;
 struct SpellChainNode;
 struct SpellTargetPosition;
-struct SpellDurationEntry;
+struct SpellDurationDBC;
 struct SpellModifier;
-struct SpellRangeEntry;
-struct SpellRadiusEntry;
-struct SpellEntry;
-struct SpellCastTimesEntry;
+struct SpellRangeDBC;
+struct SpellRadiusDBC;
+struct SpellDBC;
+struct SpellCastTimesDBC;
+struct SpellCategoryDBC;
 
 enum SpellTargetSelectionCategories
 {
@@ -226,7 +227,7 @@ public:
     Mechanics Mechanic;
     SpellImplicitTargetInfo TargetA;
     SpellImplicitTargetInfo TargetB;
-    SpellRadiusEntry const* RadiusEntry;
+    SpellRadiusDBC const* RadiusEntry;
     uint32    ChainTarget;
     uint32    ItemType;
     uint32    TriggerSpell;
@@ -237,7 +238,7 @@ public:
                         RealPointsPerLevel(0), BasePoints(0), PointsPerComboPoint(0), ValueMultiplier(0), DamageMultiplier(0),
                         BonusMultiplier(0), MiscValue(0), MiscValueB(0), Mechanic(MECHANIC_NONE), RadiusEntry(nullptr), ChainTarget(0),
                         ItemType(0), TriggerSpell(0), ImplicitTargetConditions(nullptr) {}
-    SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex);
+    SpellEffectInfo(SpellDBC const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex);
 
     bool IsEffect() const;
     bool IsEffect(SpellEffects effectName) const;
@@ -296,7 +297,7 @@ class TC_GAME_API SpellInfo
 
     public:
         uint32 Id;
-        SpellCategoryEntry const* CategoryEntry;
+        SpellCategoryDBC const* CategoryEntry;
         uint32 Dispel;
         uint32 Mechanic;
         uint32 Attributes;
@@ -322,7 +323,7 @@ class TC_GAME_API SpellInfo
         uint32 TargetAuraSpell;
         uint32 ExcludeCasterAuraSpell;
         uint32 ExcludeTargetAuraSpell;
-        SpellCastTimesEntry const* CastTimeEntry;
+        SpellCastTimesDBC const* CastTimeEntry;
         uint32 RecoveryTime;
         uint32 CategoryRecoveryTime;
         uint32 StartRecoveryCategory;
@@ -336,7 +337,7 @@ class TC_GAME_API SpellInfo
         uint32 MaxLevel;
         uint32 BaseLevel;
         uint32 SpellLevel;
-        SpellDurationEntry const* DurationEntry;
+        SpellDurationDBC const* DurationEntry;
         Powers PowerType;
         uint32 ManaCost;
         uint32 ManaCostPerlevel;
@@ -344,7 +345,7 @@ class TC_GAME_API SpellInfo
         uint32 ManaPerSecondPerLevel;
         uint32 ManaCostPercentage;
         uint32 RuneCostID;
-        SpellRangeEntry const* RangeEntry;
+        SpellRangeDBC const* RangeEntry;
         float  Speed;
         uint32 StackAmount;
         std::array<uint32, 2> Totem;
@@ -358,8 +359,8 @@ class TC_GAME_API SpellInfo
         uint32 SpellIconID;
         uint32 ActiveIconID;
         uint32 Priority;
-        std::array<char const*, 16> SpellName;
-        std::array<char const*, 16> Rank;
+        std::string SpellName[TOTAL_LOCALES];
+        std::string Rank[TOTAL_LOCALES];
         uint32 MaxTargetLevel;
         uint32 MaxAffectedTargets;
         uint32 SpellFamilyName;
@@ -372,7 +373,7 @@ class TC_GAME_API SpellInfo
         uint32 ExplicitTargetMask;
         SpellChainNode const* ChainEntry;
 
-        SpellInfo(SpellEntry const* spellEntry);
+        SpellInfo(SpellDBC const* spellEntry);
         ~SpellInfo();
 
         uint32 GetCategory() const;
@@ -406,6 +407,9 @@ class TC_GAME_API SpellInfo
         bool NeedsToBeTriggeredByCaster(SpellInfo const* triggeringSpell) const;
         bool IsSelfCast() const;
 
+        bool IsVanish() const; // 11327 || 11329 || 26888 vanish ranks
+        bool IsShadowMeld() const;
+        bool IsVanishOrShadowMeld() const { return IsVanish() || IsShadowMeld(); }
         bool IsPassive() const;
         bool IsAutocastable() const;
         bool IsStackableWithRanks() const;
@@ -428,6 +432,7 @@ class TC_GAME_API SpellInfo
         bool IsRangedWeaponSpell() const;
         bool IsAutoRepeatRangedSpell() const;
         bool HasInitialAggro() const;
+        bool HasChargeEffect() const;
 
         WeaponAttackType GetAttackType() const;
 

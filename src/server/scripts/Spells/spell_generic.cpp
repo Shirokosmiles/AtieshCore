@@ -25,7 +25,7 @@
 #include "ScriptMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
-#include "DBCStores.h"
+#include "DBCStoresMgr.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -43,6 +43,8 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "WintergraspMgr.h"
+#include "Transmogrification.h"
 
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
@@ -254,7 +256,7 @@ class spell_gen_arena_drink : public AuraScript
     {
         if (!spellInfo->GetEffect(EFFECT_0).IsAura(SPELL_AURA_MOD_POWER_REGEN))
         {
-            TC_LOG_ERROR("spells", "Aura %d structure has been changed - first aura is no longer SPELL_AURA_MOD_POWER_REGEN", GetId());
+            FMT_LOG_ERROR("spells", "Aura {} structure has been changed - first aura is no longer SPELL_AURA_MOD_POWER_REGEN", GetId());
             return false;
         }
 
@@ -925,7 +927,12 @@ class spell_gen_clone_weapon_aura : public AuraScript
                 if (Player* player = caster->ToPlayer())
                 {
                     if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
-                        target->SetVirtualItem(0, mainItem->GetEntry());
+                    {
+                        if (uint32 entry = sTransmogrification->GetFakeEntry(mainItem))
+                            target->SetVirtualItem(0, entry);
+                        else
+                            target->SetVirtualItem(0, mainItem->GetEntry());
+                    }
                 }
                 else
                     target->SetVirtualItem(0, caster->GetVirtualItemId(0));
@@ -939,7 +946,12 @@ class spell_gen_clone_weapon_aura : public AuraScript
                 if (Player* player = caster->ToPlayer())
                 {
                     if (Item* offItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
-                        target->SetVirtualItem(1, offItem->GetEntry());
+                    {
+                        if (uint32 entry = sTransmogrification->GetFakeEntry(offItem))
+                            target->SetVirtualItem(1, entry);
+                        else
+                            target->SetVirtualItem(1, offItem->GetEntry());
+                    }
                 }
                 else
                     target->SetVirtualItem(1, caster->GetVirtualItemId(1));
@@ -952,7 +964,12 @@ class spell_gen_clone_weapon_aura : public AuraScript
                 if (Player* player = caster->ToPlayer())
                 {
                     if (Item* rangedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
-                        target->SetVirtualItem(2, rangedItem->GetEntry());
+                    {
+                        if (uint32 entry = sTransmogrification->GetFakeEntry(rangedItem))
+                            target->SetVirtualItem(2, entry);
+                        else
+                            target->SetVirtualItem(2, rangedItem->GetEntry());
+                    }
                 }
                 else
                     target->SetVirtualItem(2, caster->GetVirtualItemId(2));
@@ -1516,7 +1533,7 @@ class spell_ethereal_pet_aura : public AuraScript
     {
         PreventDefaultAction();
 
-        std::list<Creature*> minionList;
+        std::vector<Creature*> minionList;
         GetUnitOwner()->GetAllMinionsByEntry(minionList, NPC_ETHEREAL_SOUL_TRADER);
         for (Creature* minion : minionList)
         {
@@ -1526,6 +1543,7 @@ class spell_ethereal_pet_aura : public AuraScript
                 minion->CastSpell(eventInfo.GetProcTarget(), SPELL_STEAL_ESSENCE_VISUAL);
             }
         }
+        minionList.clear();
     }
 
     void Register() override
@@ -2238,7 +2256,10 @@ private:
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(_mount150);
             uint32 zoneid, areaid;
             target->GetZoneAndAreaId(zoneid, areaid);
-            bool const canFly = spellInfo && (spellInfo->CheckLocation(target->GetMapId(), zoneid, areaid, target) == SPELL_CAST_OK);
+            bool canFly = spellInfo && (spellInfo->CheckLocation(target->GetMapId(), zoneid, areaid, target) == SPELL_CAST_OK);
+            // check battlefield
+            if (target->GetZoneId() == AREA_WINTERGRASP && sWintergraspMgr->IsWarTime())
+                canFly = false;
 
             uint32 mount = 0;
             switch (target->GetBaseSkillValue(SKILL_RIDING))
@@ -2439,6 +2460,44 @@ class spell_gen_mounted_charge : public SpellScript
         if (spell->GetEffect(EFFECT_0).Effect == SPELL_EFFECT_CHARGE)
             OnEffectHitTarget += SpellEffectFn(spell_gen_mounted_charge::HandleChargeEffect, EFFECT_0, SPELL_EFFECT_CHARGE);
     }
+};
+
+class spell_gen_select_target_count : public SpellScriptLoader
+{
+public:
+    spell_gen_select_target_count(const char* name, Targets effTarget, uint8 count) : SpellScriptLoader(name), _effTarget(effTarget), _count(count) { }
+
+    class spell_gen_select_target_count_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_select_target_count_SpellScript);
+
+    public:
+        spell_gen_select_target_count_SpellScript(Targets effTarget, uint8 count) : _effTarget(effTarget), _count(count) { }
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove(GetCaster());
+            Trinity::Containers::RandomResize(targets, _count);
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_select_target_count_SpellScript::FilterTargets, EFFECT_ALL, _effTarget);
+        }
+
+    private:
+        Targets _effTarget;
+        uint8 _count;
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_select_target_count_SpellScript(_effTarget, _count);
+    }
+
+private:
+    Targets _effTarget;
+    uint8 _count;
 };
 
 enum MossCoveredFeet
@@ -2680,7 +2739,7 @@ class spell_gen_oracle_wolvar_reputation : public SpellScript
         uint32 factionId = GetEffectInfo().CalcValue();
         int32  repChange = GetEffectInfo(EFFECT_1).CalcValue();
 
-        FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
+        FactionDBC const* factionEntry = sDBCStoresMgr->GetFactionDBC(factionId);
         if (!factionEntry)
             return;
 
@@ -4215,7 +4274,7 @@ class spell_gen_mixology_bonus : public AuraScript
                     SetBonusValueForEffect(EFFECT_0, 5, aurEff);
                     break;
                 default:
-                    TC_LOG_ERROR("spells", "SpellId %u couldn't be processed in spell_gen_mixology_bonus", GetId());
+                    FMT_LOG_ERROR("spells", "SpellId {} couldn't be processed in spell_gen_mixology_bonus", GetId());
                     break;
             }
             amount += bonus;
@@ -4280,6 +4339,35 @@ class spell_gen_clear_debuffs : public SpellScript
     }
 };
 
+class spell_gen_shadowmeld : public SpellScript
+{
+    PrepareSpellScript(spell_gen_shadowmeld);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetCaster())
+        {
+            target->AttackStop();
+
+            //target->getHostileRefManager().UpdateVisibility(); - old? unused?
+
+            Unit::AttackerSet const& attackers = target->getAttackers();
+            for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
+            {
+                if (!(*itr)->CanSeeOrDetect(target))
+                    (*(itr++))->AttackStop();
+                else
+                    ++itr;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_shadowmeld::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+    }
+};
+
 enum PonySpells
 {
     ACHIEV_PONY_UP              = 3736,
@@ -4314,6 +4402,24 @@ class spell_gen_pony_mount_check : public AuraScript
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_pony_mount_check::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+class spell_10101_knock_back : public SpellScript
+{
+    PrepareSpellScript(spell_10101_knock_back);
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player *player = GetHitUnit()->ToPlayer())
+        {
+            ThreatManager &tm = GetCaster()->GetThreatManager();
+            if (tm.GetThreat(player))
+                tm.ModifyThreatByPercent(player, -50);
+        }
+    }
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_10101_knock_back::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -4595,6 +4701,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_consumption);
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_default_count_pct_from_max_hp");
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_50pct_count_pct_from_max_hp", 50);
+    RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_100pct_count_pct_from_max_hp", 100);
     RegisterSpellScript(spell_gen_create_lance);
     RegisterSpellScriptWithArgs(spell_gen_dalaran_disguise, "spell_gen_sunreaver_disguise");
     RegisterSpellScriptWithArgs(spell_gen_dalaran_disguise, "spell_gen_silver_covenant_disguise");
@@ -4702,6 +4809,8 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_mixology_bonus);
     RegisterSpellScript(spell_gen_landmine_knockback_achievement);
     RegisterSpellScript(spell_gen_clear_debuffs);
+    RegisterSpellScript(spell_gen_shadowmeld);
+    RegisterSpellScript(spell_10101_knock_back);
     RegisterSpellScript(spell_gen_pony_mount_check);
     RegisterSpellScript(spell_corrupting_plague_aura);
     RegisterSpellScript(spell_stasis_field_aura);

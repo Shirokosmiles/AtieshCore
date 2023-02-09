@@ -15,6 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptLoader.h"
+#include "World.h"
+
 // This is where scripts' loading functions should be declared:
 void AddSC_account_commandscript();
 void AddSC_achievement_commandscript();
@@ -52,7 +55,9 @@ void AddSC_reload_commandscript();
 void AddSC_reset_commandscript();
 void AddSC_send_commandscript();
 void AddSC_server_commandscript();
+void AddSC_specialevent_commandscript();
 void AddSC_tele_commandscript();
+void AddSC_vip_commandscript();
 void AddSC_ticket_commandscript();
 void AddSC_titles_commandscript();
 void AddSC_wp_commandscript();
@@ -97,7 +102,9 @@ void AddCommandsScripts()
     AddSC_reset_commandscript();
     AddSC_send_commandscript();
     AddSC_server_commandscript();
+    AddSC_specialevent_commandscript();
     AddSC_tele_commandscript();
+    AddSC_vip_commandscript();
     AddSC_ticket_commandscript();
     AddSC_titles_commandscript();
     AddSC_wp_commandscript();
