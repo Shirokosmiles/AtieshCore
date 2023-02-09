@@ -8801,8 +8801,9 @@ bool ObjectMgr::IsValidityChecks(Player* player, std::string& msg, bool withNast
             {
                 if (player)
                 {
-                    FMT_LOG_ERROR("network", "Player {} (GUID: {}) sent a message containing invalid character {} - blocked", player->GetName(),
+                    FMT_LOG_ERROR("network", "[IsValidityChecks::isNasty] Player {} ({}) sent a message containing invalid character {} - blocked", player->GetName(),
                         player->GetGUID().ToString(), uint8(c));
+                    FMT_LOG_ERROR("network", "[IsValidityChecks::isNasty] invalid character {} - blocked", unsigned char(c));
                 }
                 return false;
             }

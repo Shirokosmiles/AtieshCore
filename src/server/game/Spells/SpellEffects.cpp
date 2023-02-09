@@ -45,6 +45,9 @@
 #include "Pet.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 #include "ScriptMgr.h"
 #include "SkillExtraItems.h"
 #include "SharedDefines.h"
@@ -707,6 +710,14 @@ void Spell::EffectDummy()
     // normal DB scripted effect
     FMT_LOG_DEBUG("spells", "Spell ScriptStart spellid {} in EffectDummy({})", m_spellInfo->Id, uint32(effectInfo->EffectIndex));
     m_caster->GetMap()->ScriptsStart(sSpellScripts, uint32(m_spellInfo->Id | (effectInfo->EffectIndex << 24)), m_caster, unitTarget);
+#ifdef ELUNA
+    if (gameObjTarget)
+        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effectInfo->EffectIndex, gameObjTarget);
+    else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
+        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effectInfo->EffectIndex, unitTarget->ToCreature());
+    else if (itemTarget)
+        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effectInfo->EffectIndex, itemTarget);
+#endif
 }
 
 void Spell::EffectTriggerSpell()
@@ -1723,6 +1734,12 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype)
         }
 
         player->PlayerTalkClass->ClearMenus();
+#ifdef ELUNA
+        if (sEluna->OnGossipHello(player, gameObjTarget))
+            return;
+        if (sEluna->OnGameObjectUse(player, gameObjTarget))
+            return;
+#endif
         if (gameObjTarget->AI()->OnGossipHello(player))
             return;
 

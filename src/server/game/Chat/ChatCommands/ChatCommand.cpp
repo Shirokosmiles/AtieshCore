@@ -26,6 +26,9 @@
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 #include "WorldSession.h"
 #include "World.h"
 
@@ -315,11 +318,20 @@ namespace Trinity::Impl::ChatCommands
         }
         else if (!handler.HasSentErrorMessage())
         { /* invocation failed, we should show usage */
+#ifdef ELUNA
+            if (!sEluna->OnCommand(handler.IsConsole() ? NULL : handler.GetSession()->GetPlayer(), std::string(cmdStr).c_str()))
+                return true;
+#endif
             cmd->SendCommandHelp(handler);
             handler.SetSentErrorMessage(true);
         }
         return true;
     }
+
+#ifdef ELUNA
+    if (!sEluna->OnCommand(handler.IsConsole() ? NULL : handler.GetSession()->GetPlayer(), std::string(cmdStr).c_str()))
+        return true;
+#endif
 
     return false;
 }

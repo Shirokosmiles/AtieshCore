@@ -55,6 +55,10 @@
 #include "World.h"
 #include "WorldSession.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
 class LoginQueryHolder : public CharacterDatabaseQueryHolder
 {
     private:

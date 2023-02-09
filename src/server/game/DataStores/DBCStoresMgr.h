@@ -1165,6 +1165,10 @@ public:
             return &itr->second;
         return nullptr;
     }
+    void AddTaxiNodesDBC(uint32 id, TaxiNodesDBC entry)
+    {
+        _taxiNodesMap[id] = entry;
+    }
 
     TaxiPathDBC const* GetTaxiPathDBC(uint32 ID)
     {
@@ -1172,6 +1176,10 @@ public:
         if (itr != _taxiPathMap.end())
             return &itr->second;
         return nullptr;
+    }
+    void AddTaxiPathDBC(uint32 id, TaxiPathDBC entry)
+    {
+        _taxiPathMap[id] = entry;
     }
 
     TaxiPathNodeDBC const* GetTaxiPathNodeDBC(uint32 ID)
@@ -1397,7 +1405,16 @@ public:
     TaxiMask const GetDeathKnightTaxiNodesMask() { return _DeathKnightTaxiNodesMask; }
 
     TaxiPathSetBySource const& GetTaxiPathSetBySource() { return _taxiPathSetBySource; }
+    void AddTaxiPathSetBySource(uint32 startNode, uint32 index, uint32 pathId, uint32 price)
+    {
+        _taxiPathSetBySource[startNode][index] = TaxiPathBySourceAndDestination(pathId, price);
+    }
     TaxiPathNodesByPath const& GetTaxiPathNodesByPath() { return _taxiPathNodesByPath; }
+    void ResizeTaxiPathNodesByPath(uint32 size) { _taxiPathNodesByPath.resize(size); }
+    void AddTaxiPathNodesByPath(uint32 id, uint32 index, TaxiPathNodeDBC entry)
+    {
+        _taxiPathNodesByPath[id][index++] = new TaxiPathNodeDBC(entry);
+    }
 
     void Handle_SpellDifficultyInSpellMgr();
 
