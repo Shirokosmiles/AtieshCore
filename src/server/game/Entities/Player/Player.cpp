@@ -7783,8 +7783,10 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, bool appl
             if (extraDPS)
             {
                 float average = extraDPS * proto->Delay / 1000.0f;
-                minDamage = 0.7f * average;
-                maxDamage = 1.3f * average;
+                float mod = ssv->isTwoHand(proto->ScalingStatValue) ? 0.2f : 0.3f;
+
+                minDamage = (1.0f - mod) * average;
+                maxDamage = (1.0f + mod) * average;
             }
         }
 
@@ -22383,9 +22385,9 @@ bool Player::HaveAtClient(Object const* u) const
     return u == this || m_clientGUIDs.find(u->GetGUID()) != m_clientGUIDs.end();
 }
 
-bool Player::IsNeverVisible() const
+bool Player::IsNeverVisible(bool allowServersideObjects) const
 {
-    if (Unit::IsNeverVisible())
+    if (Unit::IsNeverVisible(allowServersideObjects))
         return true;
 
     if (GetSession()->PlayerLogout() || GetSession()->PlayerLoading())
@@ -22854,7 +22856,6 @@ void Player::SendInitialPacketsAfterAddToMap()
         SendDirectMessage(&setCompoundState);
     }
 
-    SendAurasForTarget(this);
     SendEnchantmentDurations();                             // must be after add to map
     SendItemDurations();                                    // must be after add to map
     SendQuestGiverStatusMultiple();
@@ -23275,9 +23276,9 @@ void Player::LearnSkillRewardedSpells(uint32 skillId, uint32 skillValue)
     }
 }
 
-void Player::SendAurasForTarget(Unit* target) const
+void Player::SendAurasForTarget(Unit* target, bool force /*= false*/) const
 {
-    if (!target || target->GetVisibleAuras().empty())                  // speedup things
+    if (!target || (!force && target->GetVisibleAuras().empty()))                  // speedup things
         return;
 
     WorldPacket data(SMSG_AURA_UPDATE_ALL);

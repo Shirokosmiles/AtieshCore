@@ -2022,7 +2022,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SendBGWeekendWorldStates() const;
         void SendBattlefieldWorldStates() const;
 
-        void SendAurasForTarget(Unit* target) const;
+        void SendAurasForTarget(Unit* target, bool force = false) const;
 
         PlayerMenu* PlayerTalkClass;
         std::vector<ItemSetEffect*> ItemSetEff;
@@ -2157,7 +2157,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         bool HaveAtClient(Object const* u) const;
 
-        bool IsNeverVisible() const override;
+        bool IsNeverVisible(bool allowServersideObjects = false) const override;
 
         bool IsVisibleGloballyFor(Player const* player) const;
 

@@ -1014,7 +1014,7 @@ void World::SetInitialWorldSettings()
     FMT_LOG_INFO("server.loading", "Loading SpellArea Data...");                // must be after quest load
     sSpellMgr->LoadSpellAreas();
 
-    FMT_LOG_INFO("server.loading", "Loading AreaTrigger definitions...");
+    FMT_LOG_INFO("server.loading", "Loading Area Trigger Teleports definitions...");
     sObjectMgr->LoadAreaTriggerTeleports();
 
     FMT_LOG_INFO("server.loading", "Loading Access Requirements...");
