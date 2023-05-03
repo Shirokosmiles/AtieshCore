@@ -1,5 +1,5 @@
-DELETE FROM `custom_world_config` WHERE `Type` = 'bool' AND `IDInTypeGroup` between 0 and 52;
-INSERT INTO `custom_world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+DELETE FROM `world_custom_config` WHERE `Type` = 'bool' AND `IDInTypeGroup` between 0 and 52;
+INSERT INTO `world_custom_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
 -- AT configs
 ('Guild.AllowMultipleGuildMaster', 'bool', 0, '0', NULL, 'Allow more than one guild master. Additional Guild Masters must be set using the \".guild rank\" command.'),
 ('vmap.enableLOS', 'bool', 1, '1', NULL, 'VMmap support for line of sight and height calculation.'),

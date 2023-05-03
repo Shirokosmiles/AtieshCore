@@ -1,5 +1,5 @@
-DELETE FROM `custom_world_config` WHERE `Type` = 'rate' AND `IDInTypeGroup` between 0 and 7;
-INSERT INTO `custom_world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
+DELETE FROM `world_custom_config` WHERE `Type` = 'rate' AND `IDInTypeGroup` between 0 and 7;
+INSERT INTO `world_custom_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
 -- AT configs
 ('Rate.XP.Kill.Premium', 'rate', 0, '1', NULL, 'Individual rate for vip player'),
 ('Rate.XP.Quest.Premium', 'rate', 1, '1', NULL, 'Individual rate for vip player'),
