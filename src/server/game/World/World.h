@@ -922,7 +922,7 @@ class TC_GAME_API World
         /// Get a server configuration element (see #WorldConfigs)
         uint32 customGetIntConfig(CustomWorldIntConfigs index) const
         {
-            return index < INT_CONFIG_VALUE_COUNT ? custom_int_configs[index] : 0;
+            return index < CUSTOM_INT_CONFIG_VALUE_COUNT ? custom_int_configs[index] : 0;
         }
 
         void setWorldState(uint32 index, uint64 value);
