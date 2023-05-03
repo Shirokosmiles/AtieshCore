@@ -583,11 +583,11 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             CharacterDatabaseTransaction characterTransaction = CharacterDatabase.BeginTransaction();
             LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
-            if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS))
+            if (sWorld->customGetBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS))
             {
                 uint32 charCount = AccountMgr::GetCharactersCount(GetAccountId());
 
-                if (charCount <= sWorld->getIntConfig(CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS))
+                if (charCount <= sWorld->customGetIntConfig(CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS))
                     newChar->SetAtLoginFlag(AT_LOGIN_START_MONEY);  // First login with bonus
             }
                                                                   // Player created, save it now
@@ -772,7 +772,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         SendPacket(Motd::GetMotdPacket());
 
         // send server info
-        if (sWorld->getBoolConfig(CONFIG_ENABLE_SINFO_LOGIN))
+        if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
             chH.PSendSysMessage(GitRevision::GetFullVersion());
     }
 
@@ -982,14 +982,14 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             repMgr.SendState(nullptr);
         }
 
-        if (sWorld->getBoolConfig(CONFIG_CREATECHAR_BONUS_BAGS)) // if enabled plr will take a bonus
+        if (sWorld->customGetBoolConfig(CONFIG_CREATECHAR_BONUS_BAGS)) // if enabled plr will take a bonus
         {
             // here will script for adding bags
-            uint32 bagsid = sWorld->getIntConfig(CONFIG_CREATECHAR_BONUS_BAGS_ID);
+            uint32 bagsid = sWorld->customGetIntConfig(CONFIG_CREATECHAR_BONUS_BAGS_ID);
             pCurrChar->StoreNewItemInBestSlots(bagsid, 4);
         }
 
-        if (sWorld->getBoolConfig(CONFIG_CREATECHAR_BONUS_STARTPACK)) // if enabled plr will take a bonus
+        if (sWorld->customGetBoolConfig(CONFIG_CREATECHAR_BONUS_STARTPACK)) // if enabled plr will take a bonus
             pCurrChar->SetCanReceiveStartPack(1);
     }
 
@@ -998,10 +998,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_START_MONEY)) // moved from firstLogin - now we can set this Flag (512) from DB - characters.at_login
     {
-        if (sWorld->getBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS)) // if enabled plr will take a bonus
+        if (sWorld->customGetBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS)) // if enabled plr will take a bonus
         {
             // here will script for adding money or something more
-            uint32 moneybonus = sWorld->getIntConfig(CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS);
+            uint32 moneybonus = sWorld->customGetIntConfig(CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS);
 
             // send bonus announce
             chH.PSendSysMessage(LANG_FIRST_LOGIN_ACC_MONEY_BONUS_ANNOUNCE, pCurrChar->GetName(), moneybonus / GOLD, (moneybonus%GOLD) / SILVER, moneybonus%SILVER);
@@ -1037,7 +1037,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     }
     pCurrChar->SetPremiumStatus(vip);
 
-    if (sWorld->getBoolConfig(CONFIG_VIP_ITEM_HELPER))
+    if (sWorld->customGetBoolConfig(CONFIG_VIP_ITEM_HELPER))
     {
         if (!pCurrChar->HasItemCount(973))
             pCurrChar->AddItem(973, 1);

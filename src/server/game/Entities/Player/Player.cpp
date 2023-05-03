@@ -317,8 +317,8 @@ Player::Player(WorldSession* session): Unit(true)
 
     /////////////////// AntiCheat System /////////////////////
     m_flyhackTimer = 0;
-    if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FLYHACK_ENABLED))
-        m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
+    if (sWorld->customGetBoolConfig(CONFIG_ANTICHEAT_FLYHACK_ENABLED))
+        m_flyhackTimer = sWorld->customGetIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
     m_reloadModelsDisplayTimer = 0;
     m_mountTimer = 0;
     m_rootUpdTimer = 0;
@@ -1352,10 +1352,10 @@ void Player::Update(uint32 p_time)
     {
         if (p_time >= m_flyhackTimer)
         {
-            if (!CheckOnFlyHack() && sWorld->getBoolConfig(CONFIG_AFH_KICK_ENABLED))
+            if (!CheckOnFlyHack() && sWorld->customGetBoolConfig(CONFIG_AFH_KICK_ENABLED))
                 GetSession()->KickPlayer("AFH kicked by flyhackTimer");
 
-            m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
+            m_flyhackTimer = sWorld->customGetIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
         }
         else
             m_flyhackTimer -= p_time;
@@ -5135,7 +5135,7 @@ void Player::RepopAtGraveyard()
 
 bool Player::CanJoinConstantChannelInZone(ChatChannelsDBC const* channel, AreaTableDBC const* zone) const
 {
-    if (sWorld->getBoolConfig(CONFIG_ALLOWED_LFG_CHANNEL) && channel->Flags & CHANNEL_DBC_FLAG_LFG)
+    if (sWorld->customGetBoolConfig(CONFIG_ALLOWED_LFG_CHANNEL) && channel->Flags & CHANNEL_DBC_FLAG_LFG)
         return true;
 
     if (channel->Flags & CHANNEL_DBC_FLAG_ZONE_DEP && zone->Flags & AREA_FLAG_ARENA_INSTANCE)
@@ -6982,7 +6982,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
         AddPct(honor_f, GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HONOR_GAIN_PCT));
     }
 
-    honor_f *= IsPremium() ? sWorld->getRate(RATE_VIP_HONOR) : sWorld->getRate(RATE_HONOR);
+    honor_f *= IsPremium() ? sWorld->customGetRate(RATE_VIP_HONOR) : sWorld->getRate(RATE_HONOR);
     // Back to int now
     honor = int32(honor_f);
     // honor - for show honor points in log
@@ -14305,7 +14305,7 @@ void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, 
     else
         SendDirectMessage(&data);
 
-    if (sWorld->getBoolConfig(CONFIG_LOOT_GUILD_ENABLED) && GetSession() && GetGuild())
+    if (sWorld->customGetBoolConfig(CONFIG_LOOT_GUILD_ENABLED) && GetSession() && GetGuild())
     {
         ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(item->GetEntry());
         if (itemProto && itemProto->Quality >= ITEM_QUALITY_EPIC)
@@ -15386,7 +15386,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     bool rewarded = IsQuestRewarded(quest_id) && !quest->IsDFQuest();
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = rewarded ? 0 : uint32(quest->GetXPReward(this)*(IsPremium() ? sWorld->getRate(RATE_VIP_XP_QUEST) : sWorld->getRate(RATE_XP_QUEST)));
+    uint32 XP = rewarded ? 0 : uint32(quest->GetXPReward(this)*(IsPremium() ? sWorld->customGetRate(RATE_VIP_XP_QUEST) : sWorld->getRate(RATE_XP_QUEST)));
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     XP *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
@@ -17476,7 +17476,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES, fields[70].GetUInt8());
 
     m_pvpcap = fields[72].GetUInt32();
-    if (m_pvpcap >= sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP))
+    if (m_pvpcap >= sWorld->customGetIntConfig(CONFIG_PVP_REWARD_MAXCAP))
         m_pvpcapReceived = true;
 
     m_receivedStartPack = fields[73].GetUInt32();

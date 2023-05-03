@@ -1598,7 +1598,7 @@ float Creature::_GetHealthMod(int32 Rank, uint32 ZoneId)
     }
 
     if (sWorld->isZoneforCreatureRates(ZoneId))
-        result *= sWorld->getRate(RATE_CREATURE_IN_ZONE_HEALTH);
+        result *= sWorld->customGetRate(RATE_CREATURE_IN_ZONE_HEALTH);
     return result;
 }
 
@@ -1652,7 +1652,7 @@ float Creature::GetSpellDamageMod(int32 Rank, uint32 ZoneId) const
             break;
     }
     if (sWorld->isZoneforCreatureRates(ZoneId))
-        result *= sWorld->getRate(RATE_CREATURE_IN_ZONE_SPELLDAMAGE);
+        result *= sWorld->customGetRate(RATE_CREATURE_IN_ZONE_SPELLDAMAGE);
     return result;
 }
 

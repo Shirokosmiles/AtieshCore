@@ -495,7 +495,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
-    if ((account.OS != "Win" && account.OS != "OSX") || (account.OS == "OSX" && !sWorld->getBoolConfig(CONFIG_ALLOW_OSX_CONNECT)))
+    if ((account.OS != "Win" && account.OS != "OSX") || (account.OS == "OSX" && !sWorld->customGetBoolConfig(CONFIG_ALLOW_OSX_CONNECT)))
     {
         SendAuthResponseError(AUTH_REJECT);
         FMT_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client {} attempted to log in using invalid client OS ({}).", address, account.OS);

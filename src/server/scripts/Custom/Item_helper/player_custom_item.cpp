@@ -110,14 +110,14 @@ public:
 
         // bonus system
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(GTS(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 1);
-        if (sWorld->getBoolConfig(CONFIG_PVP_REWARD))
+        if (sWorld->customGetBoolConfig(CONFIG_PVP_REWARD))
         {
             std::string flag = GTS(LANG_ITEM_PVP_CAP_ALIANCE);
             if (player->GetCFSTeam() == HORDE)
                 flag = GTS(LANG_ITEM_PVP_CAP_HORDE);
 
             uint32 pvpcap = player->GetPVPCapPoints();
-            uint32 maxcap = sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP);
+            uint32 maxcap = sWorld->customGetIntConfig(CONFIG_PVP_REWARD_MAXCAP);
             flag += getString(" ", pvpcap).c_str();
             flag += getString(" / ", maxcap).c_str();
             // pvp weekly bonus cap
@@ -284,14 +284,14 @@ public:
 
                         // bonus system
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(GTS(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 1);
-                        if (sWorld->getBoolConfig(CONFIG_PVP_REWARD))
+                        if (sWorld->customGetBoolConfig(CONFIG_PVP_REWARD))
                         {
                             std::string flag = GTS(LANG_ITEM_PVP_CAP_ALIANCE);
                             if (player->GetCFSTeam() == HORDE)
                                 flag = GTS(LANG_ITEM_PVP_CAP_HORDE);
 
                             uint32 pvpcap = player->GetPVPCapPoints();
-                            uint32 maxcap = sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP);
+                            uint32 maxcap = sWorld->customGetIntConfig(CONFIG_PVP_REWARD_MAXCAP);
                             flag += getString(" ", pvpcap).c_str();
                             flag += getString(" / ", maxcap).c_str();
                             // pvp weekly bonus cap
@@ -1111,10 +1111,10 @@ public:
                     case 11:  // VIP rates info
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GTS(LANG_ITEM_RATES), GOSSIP_SENDER_MAIN, 3);
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(XP, uint32(player->IsPremium() ? sWorld->getRate(RATE_VIP_XP_KILL) : sWorld->getRate(RATE_XP_KILL))).c_str(), GOSSIP_SENDER_MAIN, 3);
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(XP_quest, uint32(player->IsPremium() ? sWorld->getRate(RATE_VIP_XP_QUEST) : sWorld->getRate(RATE_XP_QUEST))).c_str(), GOSSIP_SENDER_MAIN, 3);
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(rep, uint32(player->IsPremium() ? sWorld->getRate(RATE_VIP_REPUTATION) : sWorld->getRate(RATE_REPUTATION_GAIN))).c_str(), GOSSIP_SENDER_MAIN, 3);
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(honor, uint32(player->IsPremium() ? sWorld->getRate(RATE_VIP_HONOR) : sWorld->getRate(RATE_HONOR))).c_str(), GOSSIP_SENDER_MAIN, 3);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(XP, uint32(player->IsPremium() ? sWorld->customGetRate(RATE_VIP_XP_KILL) : sWorld->getRate(RATE_XP_KILL))).c_str(), GOSSIP_SENDER_MAIN, 3);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(XP_quest, uint32(player->IsPremium() ? sWorld->customGetRate(RATE_VIP_XP_QUEST) : sWorld->getRate(RATE_XP_QUEST))).c_str(), GOSSIP_SENDER_MAIN, 3);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(rep, uint32(player->IsPremium() ? sWorld->customGetRate(RATE_VIP_REPUTATION) : sWorld->getRate(RATE_REPUTATION_GAIN))).c_str(), GOSSIP_SENDER_MAIN, 3);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(honor, uint32(player->IsPremium() ? sWorld->customGetRate(RATE_VIP_HONOR) : sWorld->getRate(RATE_HONOR))).c_str(), GOSSIP_SENDER_MAIN, 3);
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(gold, uint32(sWorld->getRate(RATE_DROP_MONEY))).c_str(), GOSSIP_SENDER_MAIN, 3);
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GTS(LANG_ITEM_CLOSE), GOSSIP_SENDER_MAIN, 3);
                         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
@@ -1131,27 +1131,27 @@ public:
                     case 13: // Vip info
                     {
                         ChatHandler(player->GetSession()).PSendSysMessage("|cff006699The next VIP commands are available for you:");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_DEBUFF))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_DEBUFF))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip debuff|r - Drop debuff Deserter and Resurrection Sickness");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_BANK))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_BANK))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip bank|r - Open bank window");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_MAIL))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_MAIL))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip mail|r - Open mail box");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_REPAIR))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_REPAIR))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip repair|r - Repair without costs");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_RESET_TALENTS))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_RESET_TALENTS))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip resettalents|r - Reset talents");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_TAXI))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_TAXI))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip taxi|r - Open taxi window");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_HOME))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_HOME))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip home|r - Teleport at Home position (Hearthstone)");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_CAPITAL))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_CAPITAL))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip capital|r - Teleport at your main city");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_CHANGE_RACE))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_CHANGE_RACE))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip changerace|r - Change Race");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_CUSTOMIZE))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_CUSTOMIZE))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip customize|r - Customize character");
-                        if (sWorld->getBoolConfig(CONFIG_VIP_APPEAR))
+                        if (sWorld->customGetBoolConfig(CONFIG_VIP_APPEAR))
                             ChatHandler(player->GetSession()).PSendSysMessage("|cff006699 .vip app|r - Teleport at your mate in Group");
                         player->PlayerTalkClass->SendCloseGossip();
                         break;

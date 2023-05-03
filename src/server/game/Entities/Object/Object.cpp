@@ -3433,7 +3433,7 @@ void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
 
 bool WorldObject::InSamePhase(uint32 phasemask) const
 {
-    if (sWorld->getBoolConfig(CONFIG_DUEL_IN_SPECIAL_PHASE))
+    if (sWorld->customGetBoolConfig(CONFIG_DUEL_IN_SPECIAL_PHASE))
     {
         if (phasemask == uint32(PHASEMASK_DUEL))
             return true;

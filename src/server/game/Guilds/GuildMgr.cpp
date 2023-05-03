@@ -65,7 +65,7 @@ std::string GuildMgr::GetGuildEnemy(ObjectGuid::LowType guildId) const
     {
         if (itr->second.attackerGuildId == guildId)
         {
-            if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
+            if (sWorld->customGetBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
                 str = fmt::format("{}\n|cFFF00000", GetGuildNameByIdWithLvl(itr->second.defenderGuildId));
             else
                 str = fmt::format("{}\n|cFFF00000", GetGuildNameById(itr->second.defenderGuildId));
@@ -73,7 +73,7 @@ std::string GuildMgr::GetGuildEnemy(ObjectGuid::LowType guildId) const
 
         if (itr->second.defenderGuildId == guildId)
         {
-            if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
+            if (sWorld->customGetBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
                 str = fmt::format("{}\n|cFFF00000", GetGuildNameByIdWithLvl(itr->second.attackerGuildId));
             else
                 str = fmt::format("{}\n|cFFF00000", GetGuildNameById(itr->second.attackerGuildId));
@@ -167,7 +167,7 @@ bool GuildMgr::StartNewWar(GuildWars& data)
 
     std::string attackerName;
     std::string defenderName;
-    if (sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
+    if (sWorld->customGetBoolConfig(CONFIG_GSYSTEM_IN_GUILDENEMY_LIST))
     {
         attackerName = GetGuildNameByIdWithLvl(data.attackerGuildId);
         defenderName = GetGuildNameByIdWithLvl(data.defenderGuildId);
@@ -274,8 +274,8 @@ void GuildMgr::StopWarBetween(ObjectGuid::LowType firstguildId, ObjectGuid::LowT
     looserGuild->UpdateGuildRating(loserMatchmakerChange, false);
     winnerGuild->UpdateGuildRating(winnerMatchmakerChange, true);
 
-    uint32 receivedWinnerExp = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_WINNER_EXP);
-    uint32 receivedLoserExp = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_LOSER_EXP);
+    uint32 receivedWinnerExp = sWorld->customGetIntConfig(CONFIG_GSYSTEM_GW_WINNER_EXP);
+    uint32 receivedLoserExp = sWorld->customGetIntConfig(CONFIG_GSYSTEM_GW_LOSER_EXP);
     winnerGuild->AddGuildExp(receivedWinnerExp, nullptr, true);
     looserGuild->AddGuildExp(receivedLoserExp, nullptr, true);
 

@@ -613,7 +613,7 @@ class TC_GAME_API WorldSession
         {
             if (m_uiAntispamMailSentTimer <= diff)
             {
-                m_uiAntispamMailSentTimer = sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_TIMER);
+                m_uiAntispamMailSentTimer = sWorld->customGetIntConfig(CONFIG_ANTISPAM_MAIL_TIMER);
                 m_uiAntispamMailSentCount = 0;
             }
             else
@@ -622,11 +622,11 @@ class TC_GAME_API WorldSession
 
         bool UpdateAntispamCount()
         {
-            if (!sWorld->getBoolConfig(CONFIG_ANTISPAM_ENABLED))
+            if (!sWorld->customGetBoolConfig(CONFIG_ANTISPAM_ENABLED))
                 return true;
 
             m_uiAntispamMailSentCount++;
-            if (m_uiAntispamMailSentCount > sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_COUNT))
+            if (m_uiAntispamMailSentCount > sWorld->customGetIntConfig(CONFIG_ANTISPAM_MAIL_COUNT))
                 return false;
             return true;
         }

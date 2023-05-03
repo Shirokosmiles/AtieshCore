@@ -1,4 +1,4 @@
-DELETE FROM `world_config` WHERE `Type` = 'float' AND `IDInTypeGroup` between 0 and 23;
+DELETE FROM `world_config` WHERE `Type` = 'float' AND `IDInTypeGroup` between 0 and 19;
 INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`, `CustomValue`, `Description`) VALUES 
 ('MaxGroupXPDistance', 'float', 0, '74', NULL, 'Max distance to creature for group member to get experience at creature death.'),
 ('MaxRecruitAFriendBonusDistance', 'float', 1, '100', NULL, 'Max distance between character and and group to gain the Recruit-A-Friend XP multiplier.'),
@@ -19,8 +19,4 @@ INSERT INTO `world_config`(`OptionName`, `Type`, `IDInTypeGroup`, `DefaultValue`
 ('Arena.ArenaLoseRatingModifier', 'float', 16, '24', NULL, 'Modifier of rating subtraction for loser team (increasing this value will subtract more rating) #Default:     24'),
 ('Arena.ArenaMatchmakerRatingModifier', 'float', 17, '24', NULL, 'Modifier of matchmaker rating'),
 ('Respawn.DynamicRateCreature', 'float', 18, '10', NULL, 'The rate at which the respawn time is adjusted for high player counts in a zone (for creatures). Up to this number of players, the respawn rate is unchanged. At double this number in players, you get twice as many respawns, at three times this number, three times the respawns, and so forth. #Default: 10'),
-('Respawn.DynamicRateGameObject', 'float', 19, '10', NULL, 'The rate at which the respawn time is adjusted for high player counts in a zone (for gameobjects). Up to this number of players, the respawn rate is unchanged. At double this number in players, you get twice as many respawns, at three times this number, three times the respawns, and so forth. #Default: 10'),
-('Visibility.Distance.Continents', 'float', 20, '100', NULL, 'Visibility on continents on retail ~100 yards.'),
-('Visibility.Distance.Instances', 'float', 21, '170', NULL, 'For instances default ~170.'),
-('Visibility.Distance.BG', 'float', 22, '533', NULL, 'Max limited by grid size: 533.33333'),
-('Visibility.Distance.Arenas', 'float', 23, '533', NULL, 'Max limited by grid size: 533.33333');
+('Respawn.DynamicRateGameObject', 'float', 19, '10', NULL, 'The rate at which the respawn time is adjusted for high player counts in a zone (for gameobjects). Up to this number of players, the respawn rate is unchanged. At double this number in players, you get twice as many respawns, at three times this number, three times the respawns, and so forth. #Default: 10');

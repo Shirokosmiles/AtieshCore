@@ -171,7 +171,7 @@ void DalaranGEvent::Update(uint32 diff)
                 }
                 case PREPARE_PHASE_0:
                 {
-                    if (GetCountPlayerInEvent() < sWorld->getIntConfig(CONFIG_DALARAN_GAME_EVENTS_MIN_PLAYERS))
+                    if (GetCountPlayerInEvent() < sWorld->customGetIntConfig(CONFIG_DALARAN_GAME_EVENTS_MIN_PLAYERS))
                     {
                         sWorld->SendWorldText(LANG_DALARAN_CRATER_NOT_ENOGH_MIN_PLAYERS);
                         m_playersDataStore.clear();
@@ -243,7 +243,7 @@ void DalaranGEvent::RemovePlayer(ObjectGuid playerGUID)
     {
         if (IsActiveDalaranEvent())
         {
-            if (sWorld->getBoolConfig(CONFIG_DALARAN_GAME_EVENTS_INSTANT_RETURN))
+            if (sWorld->customGetBoolConfig(CONFIG_DALARAN_GAME_EVENTS_INSTANT_RETURN))
                 RemovePlayerFromFight(player);
             else
                 RemovePlayerFromQueue(player);
@@ -335,7 +335,7 @@ void DalaranGEvent::TeleportAllPlayersInZone()
             {
                 if (player->GetGroup()->isRaidGroup())
                     player->GetGroup()->RemoveMember(itr->first);
-                else if (!sWorld->getBoolConfig(CONFIG_DALARAN_GAME_EVENTS_SQUAD_ENABLED))
+                else if (!sWorld->customGetBoolConfig(CONFIG_DALARAN_GAME_EVENTS_SQUAD_ENABLED))
                     player->GetGroup()->RemoveMember(itr->first);
             }
 

@@ -97,6 +97,7 @@
 #include "WintergraspMgr.h"
 #include "WhoListStorage.h"
 #include "WorldConfigMgr.h"
+#include "CustomWorldConfigMgr.h"
 #include "WorldSession.h"
 
 #include <boost/asio/ip/address.hpp>
@@ -156,6 +157,11 @@ World::World()
     memset(m_bool_configs, 0, sizeof(m_bool_configs));
     memset(m_float_configs, 0, sizeof(m_float_configs));
 
+    memset(custom_rate_values, 0, sizeof(custom_rate_values));
+    memset(custom_int_configs, 0, sizeof(custom_int_configs));
+    memset(custom_bool_configs, 0, sizeof(custom_bool_configs));
+    memset(custom_float_configs, 0, sizeof(custom_float_configs));
+
     _guidWarn = false;
     _guidAlert = false;
     _warnDiff = 0;
@@ -198,6 +204,15 @@ World::~World()
         m_bool_configs[i] = 0;
     for (uint32 i = 0; i < FLOAT_CONFIG_VALUE_COUNT; i++)
         m_float_configs[i] = 0;
+
+    for (uint32 i = 0; i < CUSTOM_MAX_RATES; i++)
+        custom_rate_values[i] = 0;
+    for (uint32 i = 0; i < CUSTOM_INT_CONFIG_VALUE_COUNT; i++)
+        custom_int_configs[i] = 0;
+    for (uint32 i = 0; i < CUSTOM_BOOL_CONFIG_VALUE_COUNT; i++)
+        custom_bool_configs[i] = 0;
+    for (uint32 i = 0; i < CUSTOM_FLOAT_CONFIG_VALUE_COUNT; i++)
+        custom_float_configs[i] = 0;
 
     VMAP::VMapFactory::clear();
     MMAP::MMapFactory::clear();
@@ -599,14 +614,60 @@ void World::LoadConfigSettings(bool reload)
     sWorldConfig->Load();
     sWorldConfig->RecheckAndFixDependancy();
 
+    sCustomWorldConfig->Load();
+
     //###               FLOAT configs:
     ///-visibility on continents
-    m_MaxVisibleDistanceOnContinents = m_float_configs[CONFIG_VISIBILITY_DISTANCE_CONTINENTS];
+    m_MaxVisibleDistanceOnContinents = sConfigMgr->GetFloatDefault("Visibility.Distance.Continents", DEFAULT_VISIBILITY_DISTANCE);
+    if (m_MaxVisibleDistanceOnContinents < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
+    {
+        FMT_LOG_ERROR("server.loading", "Visibility.Distance.Continents can't be less max aggro radius %f", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
+        m_MaxVisibleDistanceOnContinents = 45 * sWorld->getRate(RATE_CREATURE_AGGRO);
+    }
+    else if (m_MaxVisibleDistanceOnContinents > MAX_VISIBILITY_DISTANCE)
+    {
+        FMT_LOG_ERROR("server.loading", "Visibility.Distance.Continents can't be greater %f", MAX_VISIBILITY_DISTANCE);
+        m_MaxVisibleDistanceOnContinents = MAX_VISIBILITY_DISTANCE;
+    }
+
     ///-visibility in instances
-    m_MaxVisibleDistanceInInstances = m_float_configs[CONFIG_VISIBILITY_DISTANCE_INSTANCES];
+    m_MaxVisibleDistanceInInstances = sConfigMgr->GetFloatDefault("Visibility.Distance.Instances", DEFAULT_VISIBILITY_INSTANCE);
+    if (m_MaxVisibleDistanceInInstances < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
+    {
+        FMT_LOG_ERROR("server.loading", "Visibility.Distance.Instances can't be less max aggro radius %f", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
+        m_MaxVisibleDistanceInInstances = 45 * sWorld->getRate(RATE_CREATURE_AGGRO);
+    }
+    else if (m_MaxVisibleDistanceInInstances > MAX_VISIBILITY_DISTANCE)
+    {
+        FMT_LOG_ERROR("server.loading", "Visibility.Distance.Instances can't be greater %f", MAX_VISIBILITY_DISTANCE);
+        m_MaxVisibleDistanceInInstances = MAX_VISIBILITY_DISTANCE;
+    }
+
     ///-visibility in BG/Arenas
-    m_MaxVisibleDistanceInBG = m_float_configs[CONFIG_VISIBILITY_DISTANCE_BG];
-    m_MaxVisibleDistanceInArenas = m_float_configs[CONFIG_VISIBILITY_DISTANCE_ARENAS];
+    m_MaxVisibleDistanceInBG = sConfigMgr->GetFloatDefault("Visibility.Distance.BG", DEFAULT_VISIBILITY_BGARENAS);
+    if (m_MaxVisibleDistanceInBG < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
+    {
+        FMT_LOG_ERROR("server.loading", "Visibility.Distance.BG can't be less max aggro radius %f", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
+        m_MaxVisibleDistanceInBG = 45 * sWorld->getRate(RATE_CREATURE_AGGRO);
+    }
+    else if (m_MaxVisibleDistanceInBG > MAX_VISIBILITY_DISTANCE)
+    {
+        FMT_LOG_ERROR("server.loading", "Visibility.Distance.BG can't be greater %f", MAX_VISIBILITY_DISTANCE);
+        m_MaxVisibleDistanceInBG = MAX_VISIBILITY_DISTANCE;
+    }
+
+    m_MaxVisibleDistanceInArenas = sConfigMgr->GetFloatDefault("Visibility.Distance.Arenas", DEFAULT_VISIBILITY_BGARENAS);
+    if (m_MaxVisibleDistanceInArenas < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
+    {
+        FMT_LOG_ERROR("server.loading", "Visibility.Distance.Arenas can't be less max aggro radius %f", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
+        m_MaxVisibleDistanceInArenas = 45 * sWorld->getRate(RATE_CREATURE_AGGRO);
+    }
+    else if (m_MaxVisibleDistanceInArenas > MAX_VISIBILITY_DISTANCE)
+    {
+        FMT_LOG_ERROR("server.loading", "Visibility.Distance.Arenas can't be greater %f", MAX_VISIBILITY_DISTANCE);
+        m_MaxVisibleDistanceInArenas = MAX_VISIBILITY_DISTANCE;
+    }
+
     ///- Read all rates from the config file
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
         playerBaseMoveSpeed[i] = baseMoveSpeed[i] * rate_values[RATE_MOVESPEED];
@@ -614,11 +675,12 @@ void World::LoadConfigSettings(bool reload)
 
     //###               INT configs:
     ///- Read the player limit and the Message of the day from the config file
-    SetPlayerAmountLimit(m_int_configs[CONFIG_MAX_PLAYERS_ON_REALM]);
-    m_visibility_notify_periodOnContinents = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_ONCONTINENTS];
-    m_visibility_notify_periodInInstances = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_ININSTANCES];
-    m_visibility_notify_periodInBG = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_INBG];
-    m_visibility_notify_periodInArenas = m_int_configs[CONFIG_VISIBILITY_NOTIFY_PERIOD_INARENAS];
+    SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
+    m_visibility_notify_periodOnContinents = sConfigMgr->GetIntDefault("Visibility.Notify.Period.OnContinents", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
+    m_visibility_notify_periodInInstances = sConfigMgr->GetIntDefault("Visibility.Notify.Period.InInstances", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
+    m_visibility_notify_periodInBG = sConfigMgr->GetIntDefault("Visibility.Notify.Period.InBG", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
+    m_visibility_notify_periodInArenas = sConfigMgr->GetIntDefault("Visibility.Notify.Period.InArenas", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
+
     FMT_LOG_INFO("server.loading", "Will clear `logs` table of entries older than {} seconds every {} minutes.", m_int_configs[CONFIG_LOGDB_CLEARTIME], m_int_configs[CONFIG_LOGDB_CLEARINTERVAL]);
     FMT_LOG_INFO("server.loading", "Client cache version set to: {}", m_int_configs[CONFIG_CLIENTCACHE_VERSION]);
     //###      End

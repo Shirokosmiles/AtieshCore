@@ -13977,7 +13977,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player const* t
             // FG: pretend that OTHER players in own group are friendly ("blue")
             else if (index == UNIT_FIELD_BYTES_2 || index == UNIT_FIELD_FACTIONTEMPLATE)
             {
-                bool ConfigAccessGroups = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) || sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP);
+                bool ConfigAccessGroups = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) || sWorld->customGetBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP);
                 bool inGuildWar = false;
                 bool fromDiffFaction = false;
                 if (ToPlayer() && target->ToPlayer())
@@ -14252,7 +14252,7 @@ float Unit::GetCollisionHeight() const
 
 void Unit::RaidInfoByMe(Unit* victim)
 {
-    if (!sWorld->getBoolConfig(CONFIG_RAID_INFO))
+    if (!sWorld->customGetBoolConfig(CONFIG_RAID_INFO))
         return;
 
     if (!victim)

@@ -1986,7 +1986,7 @@ public:
             handler->PSendSysMessage("Specialization : {}", _spec);
             handler->PSendSysMessage("Auction Lots Count : {}", target->GetAuctionLotsCount());
             std::string _pvpweeklycap = target->IsWeeklyPVPCapComplete() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
-            handler->PSendSysMessage("Weekly Bonus PVP Cap completed : {} ( {} / {} )", _pvpweeklycap, target->GetPVPCapPoints(), sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP));
+            handler->PSendSysMessage("Weekly Bonus PVP Cap completed : {} ( {} / {} )", _pvpweeklycap, target->GetPVPCapPoints(), sWorld->customGetIntConfig(CONFIG_PVP_REWARD_MAXCAP));
 
             std::string _canreceivestartpack = target->CanReceiveStartPack() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
             handler->PSendSysMessage("Player can receive start-pack items : {}", _canreceivestartpack);

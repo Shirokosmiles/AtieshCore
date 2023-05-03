@@ -823,7 +823,7 @@ void ArenaTeam::MemberLost(Player* player, uint32 againstMatchmakerRating, int32
             // update the unit fields
             player->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_GAMES_WEEK,  itr->WeekGames);
             player->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_GAMES_SEASON,  itr->SeasonGames);
-            player->RewardPVPCapPoints(sWorld->getIntConfig(CONFIG_PVP_REWARD_CAP_FOR_LOSE));
+            player->RewardPVPCapPoints(sWorld->customGetIntConfig(CONFIG_PVP_REWARD_CAP_FOR_LOSE));
             return;
         }
     }
@@ -875,7 +875,7 @@ void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 
             // update unit fields
             player->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_GAMES_WEEK, itr->WeekGames);
             player->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_GAMES_SEASON, itr->SeasonGames);
-            player->RewardPVPCapPoints(sWorld->getIntConfig(CONFIG_PVP_REWARD_CAP_FOR_WIN));
+            player->RewardPVPCapPoints(sWorld->customGetIntConfig(CONFIG_PVP_REWARD_CAP_FOR_WIN));
             return;
         }
     }

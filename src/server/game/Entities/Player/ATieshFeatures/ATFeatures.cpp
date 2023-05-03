@@ -38,8 +38,8 @@
  // Vanish System
 void Player::SetVanishTimer()
 {
-    m_vanishTimer = sWorld->getIntConfig(CONFIG_VANISH_VISION_TIMER);
-    m_breakblevanishTimer = sWorld->getIntConfig(CONFIG_VANISH_CC_BREAK_TIMER);
+    m_vanishTimer = sWorld->customGetIntConfig(CONFIG_VANISH_VISION_TIMER);
+    m_breakblevanishTimer = sWorld->customGetIntConfig(CONFIG_VANISH_CC_BREAK_TIMER);
     m_visiblevanish = true;
     m_breakablevanish = true;
 }
@@ -273,10 +273,10 @@ bool Player::IsTankTalentSpec() const
 // PVP Weekly Bonus Cap reward
 void Player::SetPVPCapPoints(uint32 cap, bool weeklyupdate)
 {
-    if (!sWorld->getBoolConfig(CONFIG_PVP_REWARD))
+    if (!sWorld->customGetBoolConfig(CONFIG_PVP_REWARD))
         return;
 
-    uint32 maxcap = sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP);
+    uint32 maxcap = sWorld->customGetIntConfig(CONFIG_PVP_REWARD_MAXCAP);
     if (cap > maxcap)
         cap = maxcap;
 
@@ -302,13 +302,13 @@ void Player::SetPVPCapPoints(uint32 cap, bool weeklyupdate)
 
 void Player::RewardPVPCapPoints(uint32 reward)
 {
-    if (!sWorld->getBoolConfig(CONFIG_PVP_REWARD))
+    if (!sWorld->customGetBoolConfig(CONFIG_PVP_REWARD))
         return;
 
     if (m_pvpcapReceived)
         return;
 
-    uint32 maxcap = sWorld->getIntConfig(CONFIG_PVP_REWARD_MAXCAP);
+    uint32 maxcap = sWorld->customGetIntConfig(CONFIG_PVP_REWARD_MAXCAP);
     m_pvpcap += reward;
 
     if (m_pvpcap >= maxcap)
@@ -786,7 +786,7 @@ void Player::UpdGuildQuery(Guild* guild)
 
 bool Player::IsInGuildWarWith(Player const* p) const
 {
-    if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
+    if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
         return false;
 
     if (!GetGuild())
@@ -817,7 +817,7 @@ bool Player::IsFromDiffFactionGuildWarWith(Player const* p) const
 
 void Player::LearnSpellFromAutoLearnSpells(uint8 level)
 {
-    if (!sWorld->getBoolConfig(CONFIG_PLAYER_AUTO_LEARN_ENABLED))
+    if (!sWorld->customGetBoolConfig(CONFIG_PLAYER_AUTO_LEARN_ENABLED))
         return;
 
     uint8 classid = GetClass();
@@ -1113,7 +1113,7 @@ bool Guild::CanStartGuildWarByGuildRights(WorldSession* session)
 
 bool Guild::CanStartGuildWarByCount(WorldSession* session, std::string& msg, bool defendGuild)
 {
-    uint32 minCount = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_MIN_PLAYERS);
+    uint32 minCount = sWorld->customGetIntConfig(CONFIG_GSYSTEM_GW_MIN_PLAYERS);
     uint32 gcount = GetMemberCount();
     if (gcount < minCount)
     {
@@ -1132,7 +1132,7 @@ bool Guild::CanStartGuildWarByTimer(WorldSession* session, std::string& msg)
 
     if (dateLastWarStart)
     {
-        time_t deltaStart = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_START);
+        time_t deltaStart = sWorld->customGetIntConfig(CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_START);
         time_t timeOfPossible = dateLastWarStart + deltaStart;
         if (timeOfPossible > now)
         {
@@ -1143,7 +1143,7 @@ bool Guild::CanStartGuildWarByTimer(WorldSession* session, std::string& msg)
 
     if (dateLastWarEnd)
     {
-        time_t deltaEnd = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_END);
+        time_t deltaEnd = sWorld->customGetIntConfig(CONFIG_GSYSTEM_GW_MIN_DELTA_FROM_PREV_END);
         time_t timeOfPossible = dateLastWarEnd + deltaEnd;
         if (timeOfPossible > now)
         {

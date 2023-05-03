@@ -3741,7 +3741,7 @@ void Spell::EffectDuel()
 
     Map* map = caster->GetMap();
     uint32 duelflagphasemask = caster->GetPhaseMask();
-    if (sWorld->getBoolConfig(CONFIG_DUEL_IN_SPECIAL_PHASE))
+    if (sWorld->customGetBoolConfig(CONFIG_DUEL_IN_SPECIAL_PHASE))
     {
         if (caster->GetZoneId() != 4197)    // on Wintergrasp only in base phase
             duelflagphasemask = uint32(PHASEMASK_DUEL);

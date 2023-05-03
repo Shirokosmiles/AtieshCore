@@ -165,9 +165,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 lang = LANG_UNIVERSAL;
             else
             {
-                if (!sWorld->getBoolConfig(CONFIG_PLAYER_UNIVERSAL_LANGUAGE))
+                if (!sWorld->customGetBoolConfig(CONFIG_PLAYER_UNIVERSAL_LANGUAGE))
                 {
-                    bool lfgininstance = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP) && sender->isUsingLfg() && sender->inRandomLfgDungeon();
+                    bool lfgininstance = sWorld->customGetBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_LFG_GROUP) && sender->isUsingLfg() && sender->inRandomLfgDungeon();
                     switch (type)
                     {
                         case CHAT_MSG_SAY:
@@ -269,7 +269,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
         }
 
-        if (sWorld->getBoolConfig(CONFIG_CHATRESTRICTSYMBOLS_ENABLED))
+        if (sWorld->customGetBoolConfig(CONFIG_CHATRESTRICTSYMBOLS_ENABLED))
         {
             // Filter for message
             if (!ObjectMgr::IsValidChannelText(msg))
@@ -386,7 +386,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
-            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground)
+            if (sWorld->customGetBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground)
                 sender->SendBattleGroundChat(type, msg);
             else
                 sender->Say(msg, Language(lang));
@@ -409,7 +409,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
-            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground)
+            if (sWorld->customGetBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground)
                 sender->SendBattleGroundChat(type, msg);
             else
                 sender->TextEmote(msg);
@@ -431,7 +431,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
-            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground)
+            if (sWorld->customGetBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && senderinbattleground)
                 sender->SendBattleGroundChat(type, msg);
             else
                 sender->Yell(msg, Language(lang));
@@ -452,7 +452,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 bool cantalk = receiverinbattleground && senderinbattleground && receiver->GetTeam() == sender->GetTeam();
                 if (!receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
                 {
-                    if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && receiver && cantalk)
+                    if (sWorld->customGetBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && receiver && cantalk)
                         lang = LANG_UNIVERSAL;
                     else
                     {
@@ -615,7 +615,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
-            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && lang != LANG_ADDON)
+            if (sWorld->customGetBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && lang != LANG_ADDON)
                 lang = LANG_UNIVERSAL;
 
             sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
@@ -634,7 +634,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
             }
 
-            if (sWorld->getBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && lang != LANG_ADDON)
+            if (sWorld->customGetBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && lang != LANG_ADDON)
                 lang = LANG_UNIVERSAL;
 
             sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);

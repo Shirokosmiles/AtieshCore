@@ -349,7 +349,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             FMT_LOG_INFO("anticheat", "MovementHandler::NoFallingDamage by Account id : {}, Player {}", plrMover->GetSession()->GetAccountId(), plrMover->GetName());
             sWorld->SendGMText(LANG_GM_ANNOUNCE_NOFALLINGDMG, plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
             AccountMgr::RecordAntiCheatLog(plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str(), plrMover->GetDescriptionACForLogs(9), plrMover->GetPositionACForLogs(), int32(realm.Id.Realm));
-            if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_NOFALLINGDMG_KICK_ENABLED))
+            if (sWorld->customGetBoolConfig(CONFIG_ANTICHEAT_NOFALLINGDMG_KICK_ENABLED))
             {
                 plrMover->GetSession()->KickPlayer("Kicked by anticheat::NoFallingDamage");
                 recvData.rfinish();                     // prevent warnings spam
@@ -513,7 +513,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                 FMT_LOG_INFO("anticheat", "MovementHandler::DOUBLE_JUMP by Account id : {}, Player {}", plrMover->GetSession()->GetAccountId(), plrMover->GetName());
                 sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, plrMover->GetName().c_str());
                 AccountMgr::RecordAntiCheatLog(plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str(), plrMover->GetDescriptionACForLogs(6), plrMover->GetPositionACForLogs(), int32(realm.Id.Realm));
-                if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED))
+                if (sWorld->customGetBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED))
                 {
                     plrMover->GetSession()->KickPlayer("Kicked by anticheat::DOUBLE_JUMP");
                     return;
@@ -524,7 +524,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (plrMover && !sWorld->isAreaDisabledForAC(plrMover->GetAreaId()))
     {
-        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED) && plrMover && !movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
+        if (sWorld->customGetBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED) && plrMover && !movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
         {
             if (!plrMover->IsJumpingbyOpcode() && !plrMover->UnderACKmount() && !plrMover->IsFlying())
             {
@@ -532,7 +532,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                 FMT_LOG_INFO("anticheat", "MovementHandler::Fake_Jumper by Account id : {}, Player {}", plrMover->GetSession()->GetAccountId(), plrMover->GetName());
                 sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FAKE, plrMover->GetName().c_str());
                 AccountMgr::RecordAntiCheatLog(plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str(), plrMover->GetDescriptionACForLogs(7), plrMover->GetPositionACForLogs(), int32(realm.Id.Realm));
-                if (sWorld->getBoolConfig(CONFIG_FAKEJUMPER_KICK_ENABLED))
+                if (sWorld->customGetBoolConfig(CONFIG_FAKEJUMPER_KICK_ENABLED))
                 {
                     plrMover->GetSession()->KickPlayer("Kicked by anticheat::Fake_Jumper");
                     return;
@@ -540,12 +540,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             }
         }
 
-        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED) && plrMover && !movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !plrMover->IsCanFlybyServer() && !plrMover->UnderACKmount() && movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY) && !plrMover->IsInWater())
+        if (sWorld->customGetBoolConfig(CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED) && plrMover && !movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !plrMover->IsCanFlybyServer() && !plrMover->UnderACKmount() && movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY) && !plrMover->IsInWater())
         {
             FMT_LOG_INFO("anticheat", "MovementHandler::Fake_flying mode (using MOVEMENTFLAG_FLYING flag doesn't restricted) by Account id : {}, Player {}", plrMover->GetSession()->GetAccountId(), plrMover->GetName());
             sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FLYING, plrMover->GetName().c_str());
             AccountMgr::RecordAntiCheatLog(plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str(), plrMover->GetDescriptionACForLogs(8), plrMover->GetPositionACForLogs(), int32(realm.Id.Realm));
-            if (sWorld->getBoolConfig(CONFIG_FAKEFLYINGMODE_KICK_ENABLED))
+            if (sWorld->customGetBoolConfig(CONFIG_FAKEFLYINGMODE_KICK_ENABLED))
             {
                 plrMover->GetSession()->KickPlayer("Kicked by anticheat::Fake_flying mode");
                 return;
@@ -554,7 +554,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     /* start SpeedHack Detection */
-    if (plrMover && !plrMover->CheckMovementInfo(movementInfo, jumpopcode) && sWorld->getBoolConfig(CONFIG_ASH_KICK_ENABLED))
+    if (plrMover && !plrMover->CheckMovementInfo(movementInfo, jumpopcode) && sWorld->customGetBoolConfig(CONFIG_ASH_KICK_ENABLED))
     {
         plrMover->GetSession()->KickPlayer("Kicked by anticheat::ASH");
         return;

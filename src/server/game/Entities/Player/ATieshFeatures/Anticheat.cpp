@@ -156,7 +156,7 @@ bool Player::CheckOnFlyHack()
 
 bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 {
-    if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_SPEEDHACK_ENABLED))
+    if (!sWorld->customGetBoolConfig(CONFIG_ANTICHEAT_SPEEDHACK_ENABLED))
         return true;
 
     if (sWorld->isAreaDisabledForAC(GetAreaId()))
@@ -211,7 +211,7 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         else
             GetPosition(x, y, z);
 
-        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_IGNORE_CONTROL_MOVEMENT_ENABLED))
+        if (sWorld->customGetBoolConfig(CONFIG_ANTICHEAT_IGNORE_CONTROL_MOVEMENT_ENABLED))
         {
             if (HasUnitState(UNIT_STATE_ROOT) && !UnderACKRootUpd())
             {

@@ -139,49 +139,6 @@ void WorldConfig::RecheckAndFixDependancy()
                 }
                 break;
             }
-            case WorldFloatConfigs::CONFIG_VISIBILITY_DISTANCE_CONTINENTS:
-            {
-                if (value < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
-                {
-                    FMT_LOG_ERROR("config", "Visibility.Distance.Continents can't be less max aggro radius {}", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
-                    sWorld->setFloatConfig(WorldFloatConfigs(i), 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
-                }
-                else if (value > MAX_VISIBILITY_DISTANCE)
-                {
-                    FMT_LOG_ERROR("server.loading", "Visibility.Distance.Continents can't be greater {}", MAX_VISIBILITY_DISTANCE);
-                    sWorld->setFloatConfig(WorldFloatConfigs(i), MAX_VISIBILITY_DISTANCE);
-                }
-                break;
-            }
-            case WorldFloatConfigs::CONFIG_VISIBILITY_DISTANCE_INSTANCES:
-            {
-                if (value < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
-                {
-                    FMT_LOG_ERROR("server.loading", "Visibility.Distance.Instances can't be less max aggro radius {}", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
-                    sWorld->setFloatConfig(WorldFloatConfigs(i), 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
-                }
-                else if (value > MAX_VISIBILITY_DISTANCE)
-                {
-                    FMT_LOG_ERROR("server.loading", "Visibility.Distance.Instances can't be greater {}", MAX_VISIBILITY_DISTANCE);
-                    sWorld->setFloatConfig(WorldFloatConfigs(i), MAX_VISIBILITY_DISTANCE);
-                }
-                break;
-            }
-            case WorldFloatConfigs::CONFIG_VISIBILITY_DISTANCE_BG:
-            case WorldFloatConfigs::CONFIG_VISIBILITY_DISTANCE_ARENAS:
-            {
-                if (value < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
-                {
-                    FMT_LOG_ERROR("server.loading", "Visibility.Distance.BGArenas can't be less max aggro radius {}", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
-                    sWorld->setFloatConfig(WorldFloatConfigs(i), 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
-                }
-                else if (value > MAX_VISIBILITY_DISTANCE)
-                {
-                    FMT_LOG_ERROR("server.loading", "Visibility.Distance.BGArenas can't be greater {}", MAX_VISIBILITY_DISTANCE);
-                    sWorld->setFloatConfig(WorldFloatConfigs(i), MAX_VISIBILITY_DISTANCE);
-                }
-                break;
-            }
             default:
                 break;
         }
@@ -689,16 +646,6 @@ void WorldConfig::RecheckAndFixDependancy()
                 if (value && !vmap)
                 {
                     FMT_LOG_ERROR("config", "CheckGameObjectLoS enabled, but DetectPosCollision disabled. CheckGameObjectLoS disabled");
-                    sWorld->setBoolConfig(WorldBoolConfigs(i), 0);
-                }
-                break;
-            }
-            case WorldBoolConfigs::CONFIG_CHECK_M2_LOS:
-            {
-                bool vmap = sWorld->getBoolConfig(CONFIG_DETECT_POS_COLLISION);
-                if (value && !vmap)
-                {
-                    FMT_LOG_ERROR("config", "CheckM2ObjectLoS enabled, but DetectPosCollision disabled. CheckGameObjectLoS disabled");
                     sWorld->setBoolConfig(WorldBoolConfigs(i), 0);
                 }
                 break;

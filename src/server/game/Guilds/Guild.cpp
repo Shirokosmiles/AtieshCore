@@ -1309,7 +1309,7 @@ void Guild::HandleQuery(WorldSession* session)
 
     response.Info.GuildName = m_name;
 
-    if (sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED) && sWorld->getBoolConfig(CONFIG_GSYSTEM_IN_QUERY_OPCODE))
+    if (sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED) && sWorld->customGetBoolConfig(CONFIG_GSYSTEM_IN_QUERY_OPCODE))
         response.Info.GuildName = PrepareGuildNameByIdWithLvl(session, m_name, m_guildLevel);
 
     session->SendPacket(response.Write());
@@ -2143,7 +2143,7 @@ bool Guild::Validate()
         _SetLeaderGUID(*pLeader);
 
     // Check config if multiple guildmasters are allowed
-    if (!sWorld->getBoolConfig(CONFIG_GUILD_MULTIPLE_GUILD_MASTERS))
+    if (!sWorld->customGetBoolConfig(CONFIG_GUILD_MULTIPLE_GUILD_MASTERS))
         for (auto& [guid, member] : m_members)
             if ((member.GetRankId() == GR_GUILDMASTER) && !member.IsSamePlayer(m_leaderGuid))
                 member.ChangeRank(trans, GR_OFFICER);

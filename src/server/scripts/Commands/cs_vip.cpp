@@ -235,27 +235,27 @@ public:
             handler->PSendSysMessage(LANG_PLAYER_VIP_TIME_EXIST, (secsToTimeString(player->GetPremiumUnsetdate() - GameTime::GetGameTime(), TimeFormat::ShortText)));
 
         handler->PSendSysMessage("The next VIP commands are available for you:");
-        if (sWorld->getBoolConfig(CONFIG_VIP_DEBUFF))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_DEBUFF))
             handler->PSendSysMessage(" .vip debuff");
-        if (sWorld->getBoolConfig(CONFIG_VIP_BANK))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_BANK))
             handler->PSendSysMessage(" .vip bank");
-        if (sWorld->getBoolConfig(CONFIG_VIP_MAIL))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_MAIL))
             handler->PSendSysMessage(" .vip mail");
-        if (sWorld->getBoolConfig(CONFIG_VIP_REPAIR))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_REPAIR))
             handler->PSendSysMessage(" .vip repair");
-        if (sWorld->getBoolConfig(CONFIG_VIP_RESET_TALENTS))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_RESET_TALENTS))
             handler->PSendSysMessage(" .vip resettalents");
-        if (sWorld->getBoolConfig(CONFIG_VIP_TAXI))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_TAXI))
             handler->PSendSysMessage(" .vip taxi");
-        if (sWorld->getBoolConfig(CONFIG_VIP_HOME))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_HOME))
             handler->PSendSysMessage(" .vip home");
-        if (sWorld->getBoolConfig(CONFIG_VIP_CAPITAL))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_CAPITAL))
             handler->PSendSysMessage(" .vip capital");
-        if (sWorld->getBoolConfig(CONFIG_VIP_CHANGE_RACE))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_CHANGE_RACE))
             handler->PSendSysMessage(" .vip changerace");
-        if (sWorld->getBoolConfig(CONFIG_VIP_CUSTOMIZE))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_CUSTOMIZE))
             handler->PSendSysMessage(" .vip customize");
-        if (sWorld->getBoolConfig(CONFIG_VIP_APPEAR))
+        if (sWorld->customGetBoolConfig(CONFIG_VIP_APPEAR))
             handler->PSendSysMessage(" .vip app");
 
         if (handler->HasPermission(rbac::RBAC_PERM_COMMAND_VIP_SET))
@@ -277,7 +277,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_DEBUFF))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_DEBUFF))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);
@@ -335,7 +335,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_BANK))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_BANK))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);
@@ -392,7 +392,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_MAIL))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_MAIL))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);
@@ -449,7 +449,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_REPAIR))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_REPAIR))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);
@@ -507,7 +507,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_RESET_TALENTS))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_RESET_TALENTS))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);
@@ -566,7 +566,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_TAXI))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_TAXI))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);
@@ -626,7 +626,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_HOME))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_HOME))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);
@@ -684,7 +684,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_CHANGE_RACE))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_CHANGE_RACE))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);
@@ -743,7 +743,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_CUSTOMIZE))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_CUSTOMIZE))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);
@@ -801,7 +801,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_CAPITAL))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_CAPITAL))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);
@@ -861,7 +861,7 @@ public:
             return false;
         }
 
-        if (!sWorld->getBoolConfig(CONFIG_VIP_APPEAR))
+        if (!sWorld->customGetBoolConfig(CONFIG_VIP_APPEAR))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);

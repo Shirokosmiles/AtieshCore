@@ -913,7 +913,7 @@ MailResponseResult MailMgr::HandleMailReturnToSender(uint32 mailID)
         {
             if (Player* receiver = ObjectAccessor::FindPlayerByLowGUID(itr->second.sender))
             {
-                if (GetMailBoxSize(itr->second.sender) + receiver->GetAuctionLotsCount() > sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_COUNT_CONTROLLER))
+                if (GetMailBoxSize(itr->second.sender) + receiver->GetAuctionLotsCount() > sWorld->customGetIntConfig(CONFIG_ANTISPAM_MAIL_COUNT_CONTROLLER))
                     return MAIL_ERR_RECIPIENT_CAP_REACHED;
             }
         }

@@ -36,13 +36,13 @@ public:
 
     void OnGiveXP(Player* player, uint32& amount, Unit* /*victim*/) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             return;
 
         if (Guild* guildtarget = player->GetGuild())
         {
             if (guildtarget->GetGuildLevel() >= 1)
-                amount *= sWorld->getRate(RATE_GSYSTEM_BONUS_EXP);
+                amount *= sWorld->customGetRate(RATE_GSYSTEM_BONUS_EXP);
         }
     }
 
@@ -50,10 +50,10 @@ public:
     {
         if (Guild* guildtarget = player->GetGuild())
         {
-            if (sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+            if (sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
                 player->AddGuildAurasForPlr(guildtarget->GetGuildLevel());
 
-            if (sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
+            if (sWorld->customGetBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
             {
                 if (sGuildMgr->GuildHasWarState(guildtarget->GetId()))
                 {
@@ -67,7 +67,7 @@ public:
 
     void OnLogout(Player* player) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             return;
 
         if (player->GetGuild())
@@ -92,10 +92,10 @@ public:
 
     void OnAddMember(Guild* guild, Player* player, uint8& /*plRank*/) override
     {
-        if (sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             player->AddGuildAurasForPlr(guild->GetGuildLevel());
 
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
             return;
 
         if (sGuildMgr->GuildHasWarState(guild->GetId()))
@@ -109,10 +109,10 @@ public:
 
     void OnRemoveMember(Guild* guild, Player* player, bool /*isDisbanding*/, bool /*isKicked*/) override
     {
-        if (sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             player->RemoveGuildAurasForPlr();
 
-        if (sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
+        if (sWorld->customGetBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
         {
             if (sGuildMgr->GuildHasWarState(guild->GetId()))
                 sGuildMgr->UpdateWarFlagForAllEnemiesAndThis(guild->GetId());
@@ -121,7 +121,7 @@ public:
 
     void OnLevelUp(Guild* guild, Player* player, uint32 receivedLevel) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             return;
 
         std::string name = "";
@@ -134,7 +134,7 @@ public:
 
     void OnLevelDown(Guild* guild, Player* player, uint32 newLevel, uint32 lost) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             return;
 
         std::string name = "";
@@ -147,7 +147,7 @@ public:
 
     void OnExpReceived(Guild* guild, Player* player, uint32 receivedExp) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             return;
 
         std::string name = "";
@@ -158,7 +158,7 @@ public:
 
     void OnRatingReceived(Guild* guild, Player* player, uint32 receivedRating) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             return;
 
         std::string name = "";
@@ -169,37 +169,37 @@ public:
 
     void OnArenaWon(Guild* guild, Player* player) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             return;
 
-        uint32 receivedExp = sWorld->getIntConfig(CONFIG_GSYSTEM_ARENA_EXP);
+        uint32 receivedExp = sWorld->customGetIntConfig(CONFIG_GSYSTEM_ARENA_EXP);
         guild->AddGuildExp(receivedExp, player);
     }
 
     void OnBattlegroundWon(Guild* guild, Player* player) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             return;
 
-        uint32 receivedExp = sWorld->getIntConfig(CONFIG_GSYSTEM_BG_EXP);
+        uint32 receivedExp = sWorld->customGetIntConfig(CONFIG_GSYSTEM_BG_EXP);
         guild->AddGuildExp(receivedExp, player);
     }
 
     void OnLFGComplete(Guild* guild, Player* player) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
             return;
 
-        uint32 receivedExp = sWorld->getIntConfig(CONFIG_GSYSTEM_LFG_EXP);
+        uint32 receivedExp = sWorld->customGetIntConfig(CONFIG_GSYSTEM_LFG_EXP);
         guild->AddGuildExp(receivedExp, player);
     }
 
     void OnKillGuildEnemyEvent(Guild* guild, Player* killer) override
     {
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED) || !sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED) || !sWorld->customGetBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
             return;
 
-        uint32 receivedExp = sWorld->getIntConfig(CONFIG_GSYSTEM_GW_KILL_EXP);
+        uint32 receivedExp = sWorld->customGetIntConfig(CONFIG_GSYSTEM_GW_KILL_EXP);
         guild->AddGuildExp(receivedExp, killer);
     }
 };
@@ -257,7 +257,7 @@ public:
         if (!guild)
             return false;
 
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
             handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
@@ -279,7 +279,7 @@ public:
         if (!targetGuild)
             return false;
 
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
             handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
@@ -308,7 +308,7 @@ public:
         if (!targetGuild)
             return false;
 
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
             handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
@@ -334,7 +334,7 @@ public:
         if (!targetGuild)
             return false;
 
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
             handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
@@ -363,13 +363,13 @@ public:
         if (!targetGuild)
             return false;
 
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
             handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
         }
 
-        uint32 needlvl = sWorld->getIntConfig(CONFIG_GSYSTEM_LVL_FOR_REPAIR);
+        uint32 needlvl = sWorld->customGetIntConfig(CONFIG_GSYSTEM_LVL_FOR_REPAIR);
 
         if (targetGuild->GetGuildLevel() < needlvl)
         {
@@ -392,13 +392,13 @@ public:
         if (!targetGuild)
             return false;
 
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LEVEL_ENABLED))
         {
             handler->PSendSysMessage(LANG_GSYSTEM_GUILD_DISABLED);
             return true;
         }
 
-        uint32 needlvl = sWorld->getIntConfig(CONFIG_GSYSTEM_LVL_FOR_BANK);
+        uint32 needlvl = sWorld->customGetIntConfig(CONFIG_GSYSTEM_LVL_FOR_BANK);
 
         if (targetGuild->GetGuildLevel() < needlvl)
         {
@@ -455,7 +455,7 @@ public:
         if (!targetGuild)
             return false;
 
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
         {
             handler->PSendSysMessage(LANG_GSYSTEM_GUILD_WARS_DISABLED);
             return true;
@@ -492,7 +492,7 @@ public:
         if (!targetGuild)
             return false;
 
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
         {
             handler->PSendSysMessage(LANG_GSYSTEM_GUILD_WARS_DISABLED);
             return true;
@@ -506,7 +506,7 @@ public:
 
         if (ownGuild->GetGuildFaction() != targetGuild->GetGuildFaction())
         {
-            if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_BETWEEN_TWO_FACTION_ENABLED))
+            if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_GUILDWARS_BETWEEN_TWO_FACTION_ENABLED))
             {
                 handler->PSendSysMessage(LANG_GSYSTEM_GW_REQ_ONEFACTION);
                 return true;
@@ -564,7 +564,7 @@ public:
         if (!guildStr)
             return false;
 
-        if (!sWorld->getBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
+        if (!sWorld->customGetBoolConfig(CONFIG_GSYSTEM_GUILDWARS_ENABLED))
         {
             handler->PSendSysMessage(LANG_GSYSTEM_GUILD_WARS_DISABLED);
             return true;
