@@ -273,7 +273,7 @@ bool Player::IsTankTalentSpec() const
 // PVP Weekly Bonus Cap reward
 void Player::SetPVPCapPoints(uint32 cap, bool weeklyupdate)
 {
-    if (!sWorld->customGetBoolConfig(CONFIG_PVP_REWARD))
+    if (!sWorld->customGetBoolConfig(CONFIG_PLAYER_PVPCAP_REWARD_ENABLED))
         return;
 
     uint32 maxcap = sWorld->customGetIntConfig(CONFIG_PVP_REWARD_MAXCAP);
@@ -302,7 +302,7 @@ void Player::SetPVPCapPoints(uint32 cap, bool weeklyupdate)
 
 void Player::RewardPVPCapPoints(uint32 reward)
 {
-    if (!sWorld->customGetBoolConfig(CONFIG_PVP_REWARD))
+    if (!sWorld->customGetBoolConfig(CONFIG_PLAYER_PVPCAP_REWARD_ENABLED))
         return;
 
     if (m_pvpcapReceived)

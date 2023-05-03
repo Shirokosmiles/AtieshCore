@@ -622,7 +622,7 @@ class TC_GAME_API WorldSession
 
         bool UpdateAntispamCount()
         {
-            if (!sWorld->customGetBoolConfig(CONFIG_ANTISPAM_ENABLED))
+            if (!sWorld->customGetBoolConfig(CONFIG_MAIL_ANTISPAM_ENABLED))
                 return true;
 
             m_uiAntispamMailSentCount++;

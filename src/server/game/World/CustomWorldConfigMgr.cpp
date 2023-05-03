@@ -108,7 +108,7 @@ void CustomWorldConfig::Load()
 
     } while (result->NextRow());
 
-    FMT_LOG_INFO("server.loading", ">> Loaded {} game config option in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} CustomWorldConfigs option in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void CustomWorldConfig::AddBoolOption(uint32 IDinTypeGroup, bool const& value)

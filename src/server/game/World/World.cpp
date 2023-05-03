@@ -705,8 +705,8 @@ void World::LoadConfigSettings(bool reload)
 
     //###               BOOL configs:
     bool enableIndoor = m_bool_configs[CONFIG_VMAP_INDOOR_CHECK];
-    bool enableLOS = m_bool_configs[CONFIG_VMAP_ENABLE_LOS];
-    bool enableHeight = m_bool_configs[CONFIG_VMAP_ENABLE_HEIGHT_CALCULATION];
+    bool enableLOS = custom_bool_configs[CONFIG_VMAP_ENABLE_LOS];
+    bool enableHeight = custom_bool_configs[CONFIG_VMAP_ENABLE_HEIGHT_CALCULATION];
     if (!enableHeight)
         FMT_LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
 

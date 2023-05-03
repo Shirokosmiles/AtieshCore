@@ -108,7 +108,7 @@ void WorldConfig::Load()
 
     } while (result->NextRow());
 
-    FMT_LOG_INFO("server.loading", ">> Loaded {} game config option in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    FMT_LOG_INFO("server.loading", ">> Loaded {} WorldConfigs in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void WorldConfig::RecheckAndFixDependancy()

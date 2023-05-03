@@ -159,7 +159,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
     if (ginfo->Team == HORDE)
         index++;
 
-    if (sWorld->customGetBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS) && ArenaType == 0)
+    if (sWorld->customGetBoolConfig(CONFIG_CROSSFACTION_ENABLED) && ArenaType == 0)
         index = BG_QUEUE_CROSSFACTION;
 
     FMT_LOG_DEBUG("bg.battleground", "Adding Group to BattlegroundQueue bgTypeId : {}, bracket_id : {}, index : {}", BgTypeId, bracketId, index);
@@ -206,7 +206,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
         {
             if (Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(ginfo->BgTypeId))
             {
-                if (sWorld->customGetBoolConfig(CROSSFACTION_SYSTEM_BATTLEGROUNDS))
+                if (sWorld->customGetBoolConfig(CONFIG_CROSSFACTION_ENABLED))
                 {
                     char const* bgName = bg->GetName().c_str();
                     uint32 MinPlayers = bg->GetMinPlayersPerTeam() * 2;

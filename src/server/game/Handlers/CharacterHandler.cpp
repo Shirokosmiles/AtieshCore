@@ -583,7 +583,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             CharacterDatabaseTransaction characterTransaction = CharacterDatabase.BeginTransaction();
             LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
-            if (sWorld->customGetBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS))
+            if (sWorld->customGetBoolConfig(CONFIG_PLAYER_FIRST_LOGIN_ACC_BONUS_ENABLED))
             {
                 uint32 charCount = AccountMgr::GetCharactersCount(GetAccountId());
 
@@ -982,14 +982,14 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             repMgr.SendState(nullptr);
         }
 
-        if (sWorld->customGetBoolConfig(CONFIG_CREATECHAR_BONUS_BAGS)) // if enabled plr will take a bonus
+        if (sWorld->customGetBoolConfig(CONFIG_PLAYER_BONUS_BAGS_ENABLED)) // if enabled plr will take a bonus
         {
             // here will script for adding bags
             uint32 bagsid = sWorld->customGetIntConfig(CONFIG_CREATECHAR_BONUS_BAGS_ID);
             pCurrChar->StoreNewItemInBestSlots(bagsid, 4);
         }
 
-        if (sWorld->customGetBoolConfig(CONFIG_CREATECHAR_BONUS_STARTPACK)) // if enabled plr will take a bonus
+        if (sWorld->customGetBoolConfig(CONFIG_PLAYER_BONUS_STARTPACK_ENABLED)) // if enabled plr will take a bonus
             pCurrChar->SetCanReceiveStartPack(1);
     }
 
@@ -998,7 +998,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_START_MONEY)) // moved from firstLogin - now we can set this Flag (512) from DB - characters.at_login
     {
-        if (sWorld->customGetBoolConfig(CONFIG_FIRST_LOGIN_ACC_BONUS)) // if enabled plr will take a bonus
+        if (sWorld->customGetBoolConfig(CONFIG_PLAYER_FIRST_LOGIN_ACC_BONUS_ENABLED)) // if enabled plr will take a bonus
         {
             // here will script for adding money or something more
             uint32 moneybonus = sWorld->customGetIntConfig(CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS);

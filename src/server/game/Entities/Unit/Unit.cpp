@@ -14252,7 +14252,7 @@ float Unit::GetCollisionHeight() const
 
 void Unit::RaidInfoByMe(Unit* victim)
 {
-    if (!sWorld->customGetBoolConfig(CONFIG_RAID_INFO))
+    if (!sWorld->customGetBoolConfig(CONFIG_RAID_INFO_ENABLED))
         return;
 
     if (!victim)

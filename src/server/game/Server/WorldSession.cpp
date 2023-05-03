@@ -295,7 +295,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         m_Socket->CloseSocket();
 
     /// Antispam Timer update
-    if (sWorld->customGetBoolConfig(CONFIG_ANTISPAM_ENABLED))
+    if (sWorld->customGetBoolConfig(CONFIG_MAIL_ANTISPAM_ENABLED))
         UpdateAntispamTimer(diff);
 
     ///- Retrieve packets from the receive queue and call the appropriate handlers

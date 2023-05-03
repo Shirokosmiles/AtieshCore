@@ -110,7 +110,7 @@ public:
 
         // bonus system
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(GTS(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 1);
-        if (sWorld->customGetBoolConfig(CONFIG_PVP_REWARD))
+        if (sWorld->customGetBoolConfig(CONFIG_PLAYER_PVPCAP_REWARD_ENABLED))
         {
             std::string flag = GTS(LANG_ITEM_PVP_CAP_ALIANCE);
             if (player->GetCFSTeam() == HORDE)
@@ -284,7 +284,7 @@ public:
 
                         // bonus system
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, getString(GTS(LANG_ITEM_CURRENT_COINS), player->GetCoins()).c_str(), GOSSIP_SENDER_MAIN, 1);
-                        if (sWorld->customGetBoolConfig(CONFIG_PVP_REWARD))
+                        if (sWorld->customGetBoolConfig(CONFIG_PLAYER_PVPCAP_REWARD_ENABLED))
                         {
                             std::string flag = GTS(LANG_ITEM_PVP_CAP_ALIANCE);
                             if (player->GetCFSTeam() == HORDE)

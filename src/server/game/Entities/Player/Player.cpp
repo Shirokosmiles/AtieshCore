@@ -5135,7 +5135,7 @@ void Player::RepopAtGraveyard()
 
 bool Player::CanJoinConstantChannelInZone(ChatChannelsDBC const* channel, AreaTableDBC const* zone) const
 {
-    if (sWorld->customGetBoolConfig(CONFIG_ALLOWED_LFG_CHANNEL) && channel->Flags & CHANNEL_DBC_FLAG_LFG)
+    if (sWorld->customGetBoolConfig(CONFIG_ALLOW_LFG_CHANNEL_EVERYWHERE) && channel->Flags & CHANNEL_DBC_FLAG_LFG)
         return true;
 
     if (channel->Flags & CHANNEL_DBC_FLAG_ZONE_DEP && zone->Flags & AREA_FLAG_ARENA_INSTANCE)
@@ -14305,7 +14305,7 @@ void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, 
     else
         SendDirectMessage(&data);
 
-    if (sWorld->customGetBoolConfig(CONFIG_LOOT_GUILD_ENABLED) && GetSession() && GetGuild())
+    if (sWorld->customGetBoolConfig(CONFIG_GSYSTEM_LOOT_ENABLED) && GetSession() && GetGuild())
     {
         ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(item->GetEntry());
         if (itemProto && itemProto->Quality >= ITEM_QUALITY_EPIC)
