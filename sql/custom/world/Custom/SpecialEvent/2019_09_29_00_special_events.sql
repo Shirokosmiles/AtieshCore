@@ -19,5 +19,5 @@ CREATE TABLE `special_events` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 INSERT INTO `special_events`(`TypeId`, `ScriptName`, `isEnabled`, `isActiveStatus`, `isRepeatable`, `cooldownTimer`, `durationTimer`, `comment`) VALUES 
-(1, 'dalaran_crater', 1, 0, 1, 45, 7, 'Dalaran Crater PVP Event'),
-(2, 'the_light_of_dawn', 1, 0, 0, 60, 40, 'The Light of Dawn Event - Quest');
+(1, 'dalaran_crater', 0, 0, 1, 45, 7, 'Dalaran Crater PVP Event'),
+(2, 'the_light_of_dawn', 0, 0, 0, 60, 40, 'The Light of Dawn Event - Quest');
