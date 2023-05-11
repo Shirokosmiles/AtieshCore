@@ -97,7 +97,6 @@
 #include "WintergraspMgr.h"
 #include "WhoListStorage.h"
 #include "WorldConfigMgr.h"
-#include "CustomWorldConfigMgr.h"
 #include "WorldSession.h"
 
 #include <boost/asio/ip/address.hpp>
@@ -612,9 +611,8 @@ void World::LoadConfigSettings(bool reload)
 
     // STAGE 2 - Load all others from DB
     sWorldConfig->Load();
+    sWorldConfig->LoadCustom();
     sWorldConfig->RecheckAndFixDependancy();
-
-    sCustomWorldConfig->Load();
 
     //###               FLOAT configs:
     ///-visibility on continents

@@ -37,17 +37,24 @@ public:
     static WorldConfig* instance();
 
     void Load();
+    void LoadCustom();
 
     void RecheckAndFixDependancy();
 
 private:
     // Add config options
     void AddOption(WorldConfigType type, uint32 IDinTypeGroup, std::string const& defaultValue, std::string const& value);
+    void AddCustomOption(WorldConfigType type, uint32 IDinTypeGroup, std::string const& defaultValue, std::string const& value);
 
     void AddBoolOption(uint32 IDinTypeGroup, bool const& value);
     void AddIntOption(uint32 IDinTypeGroup, uint32 const& value);
     void AddFloatOption(uint32 IDinTypeGroup, float const& value);
     void AddRateOption(uint32 IDinTypeGroup, float const& value);
+
+    void CustomAddBoolOption(uint32 IDinTypeGroup, bool const& value);
+    void CustomAddIntOption(uint32 IDinTypeGroup, uint32 const& value);
+    void CustomAddFloatOption(uint32 IDinTypeGroup, float const& value);
+    void CustomAddRateOption(uint32 IDinTypeGroup, float const& value);
 };
 
 #define sWorldConfig WorldConfig::instance()
