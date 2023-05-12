@@ -369,8 +369,8 @@ void DBCStoresMgr::_Load_Achievement()
     uint32 oldMSTime = getMSTime();
 
     _achievementMap.clear();
-    //                                                0      1         2               3           4                    5                6                7                8                9                10               11           12       13      14         15                16
-    QueryResult result = DBCDatabase.Query("SELECT ID, Faction, Instance_Id, Title_Lang_enUS, Title_Lang_koKR, Title_Lang_frFR, Title_Lang_deDE, Title_Lang_zhCN, Title_Lang_zhTW, Title_Lang_esES, Title_Lang_esMX, Title_Lang_ruRU, Category, Points, Flags, Minimum_Criteria, Shares_Criteria FROM dbc_achievement");
+    //                                                0      1         2               3           4                    5                6                7                8                9                10               11             12               13               14               15                16             17            18       19     20        21                22
+    QueryResult result = DBCDatabase.Query("SELECT ID, Faction, Instance_Id, Title_Lang_enUS, Title_Lang_enGB, Title_Lang_koKR, Title_Lang_frFR, Title_Lang_deDE, Title_Lang_enCN, Title_Lang_zhCN, Title_Lang_enTW, Title_Lang_zhTW, Title_Lang_esES, Title_Lang_esMX, Title_Lang_ruRU, Title_Lang_ptPT, Title_Lang_ptBR, Title_Lang_itIT, Category, Points, Flags, Minimum_Criteria, Shares_Criteria FROM dbc_achievement");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievements. DB table `dbc_achievement` is empty.");
@@ -397,11 +397,11 @@ void DBCStoresMgr::_Load_Achievement()
             ach.Title[i] = name;
         }
 
-        ach.Category        = fields[12].GetUInt32();
-        ach.Points          = fields[13].GetUInt32();
-        ach.Flags           = fields[14].GetUInt32();
-        ach.MinimumCriteria = fields[15].GetUInt32();
-        ach.SharesCriteria  = fields[16].GetUInt32();
+        ach.Category        = fields[18].GetUInt32();
+        ach.Points          = fields[19].GetUInt32();
+        ach.Flags           = fields[20].GetUInt32();
+        ach.MinimumCriteria = fields[21].GetUInt32();
+        ach.SharesCriteria  = fields[22].GetUInt32();
 
         _achievementMap[id] = ach;
 
@@ -418,8 +418,8 @@ void DBCStoresMgr::_Load_AchievementCriteria()
     uint32 oldMSTime = getMSTime();
 
     _achievementCriteriaMap.clear();
-    //                                                0          1        2         3       4           5           6            7            8                9                10                      11                   12                      13                       14                   15                       16                  17                    18            19           20                21
-    QueryResult result = DBCDatabase.Query("SELECT ID, Achievement_Id, Type, Asset_Id, Quantity, Start_Event, Start_Asset, Fail_Event, Fail_Asset, Description_Lang_enUS, Description_Lang_koKR, Description_Lang_frFR, Description_Lang_deDE, Description_Lang_zhCN, Description_Lang_zhTW, Description_Lang_esES, Description_Lang_esMX, Description_Lang_ruRU, Flags, Timer_Start_Event, Timer_Asset_Id, Timer_Time FROM dbc_achievement_criteria");
+    //                                                0          1        2         3       4           5           6            7            8                9                10                      11                   12                      13                       14                   15                       16                  17                        18                      19                  20                       21                     22                       23             24         25              26              27
+    QueryResult result = DBCDatabase.Query("SELECT ID, Achievement_Id, Type, Asset_Id, Quantity, Start_Event, Start_Asset, Fail_Event, Fail_Asset, Description_Lang_enUS, Description_Lang_enGB, Description_Lang_koKR, Description_Lang_frFR, Description_Lang_deDE, Description_Lang_enCN, Description_Lang_zhCN, Description_Lang_enTW, Description_Lang_zhTW, Description_Lang_esES, Description_Lang_esMX, Description_Lang_ruRU, Description_Lang_ptPT, Description_Lang_ptBR, Description_Lang_itIT,  Flags, Timer_Start_Event, Timer_Asset_Id, Timer_Time FROM dbc_achievement_criteria");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_achievement_criteria. DB table `dbc_achievement_criteria` is empty.");
@@ -454,10 +454,10 @@ void DBCStoresMgr::_Load_AchievementCriteria()
             achc.name[i] = name;
         }
 
-        achc.Flags      = fields[18].GetUInt32();
-        achc.StartEvent = fields[19].GetUInt32();
-        achc.StartAsset = fields[20].GetUInt32();
-        achc.StartTimer = fields[21].GetUInt32();
+        achc.Flags      = fields[24].GetUInt32();
+        achc.StartEvent = fields[25].GetUInt32();
+        achc.StartAsset = fields[26].GetUInt32();
+        achc.StartTimer = fields[27].GetUInt32();
 
         _achievementCriteriaMap[id] = achc;
 
@@ -474,8 +474,8 @@ void DBCStoresMgr::_Load_AreaTable()
     uint32 oldMSTime = getMSTime();
 
     _areaTableMap.clear();
-    //                                                0       1            2           3       4           5                  6                  7                    8                   9                   10                  11                  12                  13                14                   15                16               17               18              19
-    QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, ParentAreaID, AreaBit, Flags, ExplorationLevel, AreaName_Lang_enUS, AreaName_Lang_koKR, AreaName_Lang_frFR, AreaName_Lang_deDE, AreaName_Lang_zhCN, AreaName_Lang_zhTW, AreaName_Lang_esES, AreaName_Lang_esMX, AreaName_Lang_ruRU, FactionGroupMask, LiquidTypeID_1, LiquidTypeID_2, LiquidTypeID_3, LiquidTypeID_4 FROM dbc_areatable");
+    //                                             0       1            2           3       4           5                  6                  7                    8                   9                   10                  11                  12                  13                14                   15                16                  17                    18                 19                 20                 21               22              23              24              25
+    QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, ParentAreaID, AreaBit, Flags, ExplorationLevel, AreaName_Lang_enUS, AreaName_Lang_enGB, AreaName_Lang_koKR, AreaName_Lang_frFR, AreaName_Lang_deDE, AreaName_Lang_enCN, AreaName_Lang_zhCN, AreaName_Lang_enTW, AreaName_Lang_zhTW, AreaName_Lang_esES, AreaName_Lang_esMX, AreaName_Lang_ruRU, AreaName_Lang_ptPT, AreaName_Lang_ptBR, AreaName_Lang_itIT, FactionGroupMask, LiquidTypeID_1, LiquidTypeID_2, LiquidTypeID_3, LiquidTypeID_4 FROM dbc_areatable");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_areatable. DB table `dbc_areatable` is empty.");
@@ -499,11 +499,11 @@ void DBCStoresMgr::_Load_AreaTable()
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
             at.AreaName[i] = fields[6 + i].GetString();
 
-        at.FactionGroupMask = fields[15].GetUInt32();
-        at.LiquidTypeID[0]  = fields[16].GetUInt32();
-        at.LiquidTypeID[1]  = fields[17].GetUInt32();
-        at.LiquidTypeID[2]  = fields[18].GetUInt32();
-        at.LiquidTypeID[3]  = fields[19].GetUInt32();
+        at.FactionGroupMask = fields[21].GetUInt32();
+        at.LiquidTypeID[0]  = fields[22].GetUInt32();
+        at.LiquidTypeID[1]  = fields[23].GetUInt32();
+        at.LiquidTypeID[2]  = fields[24].GetUInt32();
+        at.LiquidTypeID[3]  = fields[25].GetUInt32();
 
         _areaTableMap[id] = at;
 
@@ -786,8 +786,8 @@ void DBCStoresMgr::_Load_BattlemasterList()
     uint32 oldMSTime = getMSTime();
 
     _battlemasterListMap.clear();
-    //                                                0     1        2        3        4        5        6        7       8             9           10              11              12              13              14              15              16              17              18              19              20
-    QueryResult result = DBCDatabase.Query("SELECT ID, MapID_1, MapID_2, MapID_3, MapID_4, MapID_5, MapID_6, MapID_7, MapID_8, InstanceType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MaxGroupSize, HolidayWorldState FROM dbc_battlemasterlist");
+    //                                                0     1        2        3        4        5        6        7       8             9           10              11              12              13              14              15              16              17              18              19              20            21                22            23               24            25             26
+    QueryResult result = DBCDatabase.Query("SELECT ID, MapID_1, MapID_2, MapID_3, MapID_4, MapID_5, MapID_6, MapID_7, MapID_8, InstanceType, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT, MaxGroupSize, HolidayWorldState FROM dbc_battlemasterlist");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_battlemasterlist. DB table `dbc_battlemasterlist` is empty.");
@@ -811,8 +811,8 @@ void DBCStoresMgr::_Load_BattlemasterList()
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
             bl.Name[i] = fields[10 + i].GetString();
 
-        bl.MaxGroupSize      = fields[19].GetUInt32();
-        bl.HolidayWorldState = fields[20].GetUInt32();
+        bl.MaxGroupSize      = fields[25].GetUInt32();
+        bl.HolidayWorldState = fields[26].GetUInt32();
 
         _battlemasterListMap[id] = bl;
 
@@ -940,8 +940,8 @@ void DBCStoresMgr::_Load_CharTitles()
     uint32 oldMSTime = getMSTime();
 
     _charTitlesMap.clear();
-    //                                                0        1               2               3               4               5               6               7               8               9               10              11              12                13                14              15              16              17                  18           19
-    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name1_Lang_enUS, Name1_Lang_koKR, Name1_Lang_frFR, Name1_Lang_deDE, Name1_Lang_zhCN, Name1_Lang_zhTW, Name1_Lang_esES, Name1_Lang_esMX, Name1_Lang_ruRU, Mask_ID FROM dbc_chartitles");
+    //                                             0        1               2               3               4               5               6               7               8               9               10              11              12                13                14              15              16              17              18                 19            20                21               22              23                 24              25              26              27               28                29               30            31
+    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT, Name1_Lang_enUS, Name1_Lang_enGB, Name1_Lang_koKR, Name1_Lang_frFR, Name1_Lang_deDE, Name1_Lang_enCN, Name1_Lang_zhCN, Name1_Lang_enTW, Name1_Lang_zhTW, Name1_Lang_esES, Name1_Lang_esMX, Name1_Lang_ruRU, Name1_Lang_ptPT, Name1_Lang_ptBR, Name1_Lang_itIT, Mask_ID FROM dbc_chartitles");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_chartitles. DB table `dbc_chartitles` is empty.");
@@ -961,9 +961,9 @@ void DBCStoresMgr::_Load_CharTitles()
             ct.Name[i] = fields[1 + i].GetString();
 
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-            ct.Name1[i] = fields[10 + i].GetString();
+            ct.Name1[i] = fields[16 + i].GetString();
 
-        ct.MaskID = fields[19].GetUInt32();
+        ct.MaskID = fields[31].GetUInt32();
 
         _charTitlesMap[id] = ct;
 
@@ -980,8 +980,8 @@ void DBCStoresMgr::_Load_ChatChannels()
     uint32 oldMSTime = getMSTime();
 
     _chatChannelsMap.clear();
-    //                                                0    1             2           3               4               5               6               7               8               9               10
-    QueryResult result = DBCDatabase.Query("SELECT ID, Flags, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_chatchannels");
+    //                                                0    1             2           3               4               5               6               7               8               9               10             11               12              13             14              15              16
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT FROM dbc_chatchannels");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_chatchannels. DB table `dbc_chatchannels` is empty.");
@@ -1016,8 +1016,8 @@ void DBCStoresMgr::_Load_ChrClasses()
     uint32 oldMSTime = getMSTime();
 
     _chrClassesMap.clear();
-    //                                                0       1              2               3               4               5               6               7               8               9               10              11              12                   13
-    QueryResult result = DBCDatabase.Query("SELECT ID, DisplayPower, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, SpellClassSet, CinematicSequenceID, Required_Expansion FROM dbc_chrclasses");
+    //                                                0       1              2               3               4               5               6               7               8               9               10              11              12            13             14              15               16            17              18                   19
+    QueryResult result = DBCDatabase.Query("SELECT ID, DisplayPower, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT, SpellClassSet, CinematicSequenceID, Required_Expansion FROM dbc_chrclasses");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrclasses. DB table `dbc_chrclasses` is empty.");
@@ -1037,9 +1037,9 @@ void DBCStoresMgr::_Load_ChrClasses()
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
             cc.Name[i] = fields[2 + i].GetString();
 
-        cc.SpellClassSet       = fields[11].GetUInt32();
-        cc.CinematicSequenceID = fields[12].GetUInt32();
-        cc.RequiredExpansion   = fields[13].GetUInt32();
+        cc.SpellClassSet       = fields[17].GetUInt32();
+        cc.CinematicSequenceID = fields[18].GetUInt32();
+        cc.RequiredExpansion   = fields[19].GetUInt32();
 
         _chrClassesMap[id] = cc;
 
@@ -1056,8 +1056,8 @@ void DBCStoresMgr::_Load_ChrRaces()
     uint32 oldMSTime = getMSTime();
 
     _chrRacesMap.clear();
-    //                                                0    1         2          3                4               5            6               7                     8               9            10           11              12              13              14               15              16              17               18              19
-    QueryResult result = DBCDatabase.Query("SELECT ID, Flags, FactionID, MaleDisplayId, FemaleDisplayId, BaseLanguage, CreatureType, ResSicknessSpellID, CinematicSequenceID, Alliance, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Required_Expansion FROM dbc_chrraces");
+    //                                                0    1         2          3                4               5            6               7                     8               9            10           11              12              13              14               15              16              17               18              19            20            21               22                23            24               25
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags, FactionID, MaleDisplayId, FemaleDisplayId, BaseLanguage, CreatureType, ResSicknessSpellID, CinematicSequenceID, Alliance, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT, Required_Expansion FROM dbc_chrraces");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_chrraces. DB table `dbc_chrraces` is empty.");
@@ -1085,7 +1085,7 @@ void DBCStoresMgr::_Load_ChrRaces()
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
             cr.Name[i] = fields[10 + i].GetString();
 
-        cr.RequiredExpansion   = fields[19].GetUInt32();
+        cr.RequiredExpansion   = fields[25].GetUInt32();
 
         _chrRacesMap[id] = cr;
 
@@ -1244,8 +1244,8 @@ void DBCStoresMgr::_Load_CreatureFamily()
     uint32 oldMSTime = getMSTime();
 
     _creatureFamilyMap.clear();
-    //                                                0       1          2            3            4            5            6            7             8               9               10              11              12              13              14              15              16              17
-    QueryResult result = DBCDatabase.Query("SELECT ID, MinScale, MinScaleLevel, MaxScale, MaxScaleLevel, SkillLine_1, SkillLine_2, PetFoodMask, PetTalentType, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_creaturefamily");
+    //                                                0       1          2            3            4            5            6            7             8               9               10              11              12              13              14              15              16              17            18              19              20            21              22                23
+    QueryResult result = DBCDatabase.Query("SELECT ID, MinScale, MinScaleLevel, MaxScale, MaxScaleLevel, SkillLine_1, SkillLine_2, PetFoodMask, PetTalentType, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT FROM dbc_creaturefamily");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_creaturefamily. DB table `dbc_creaturefamily` is empty.");
@@ -1389,8 +1389,8 @@ void DBCStoresMgr::_Load_CurrencyCategory()
     uint32 oldMSTime = getMSTime();
 
     _currencyCategoryMap.clear();
-    //                                                0    1           2               3               4               5               6               7               8               9               10
-    QueryResult result = DBCDatabase.Query("SELECT ID, Flags,  Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_currencycategory");
+    //                                                0    1           2               3               4               5               6               7               8               9               10          11               12               13             14               15              16
+    QueryResult result = DBCDatabase.Query("SELECT ID, Flags,  Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT FROM dbc_currencycategory");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_currencycategory. DB table `dbc_currencycategory` is empty.");
@@ -1494,8 +1494,8 @@ void DBCStoresMgr::_Load_DungeonEncounter()
     uint32 oldMSTime = getMSTime();
 
     _dungeonEncounterMap.clear();
-    //                                                0     1       2        3          4               5               6               7               8               9               10               11               12
-    QueryResult result = DBCDatabase.Query("SELECT ID, MapID, Difficulty, Bit, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_dungeonencounter");
+    //                                                0     1       2      3          4               5               6               7               8               9               10               11               12          13               14               15            16              17              18
+    QueryResult result = DBCDatabase.Query("SELECT ID, MapID, Difficulty, Bit, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT FROM dbc_dungeonencounter");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_dungeonencounter. DB table `dbc_dungeonencounter` is empty.");
@@ -1705,8 +1705,8 @@ void DBCStoresMgr::_Load_Faction()
     uint32 oldMSTime = getMSTime();
 
     _factionMap.clear();
-    //                                                0          1                  2                    3                    4                     5                       6                       7                     8                     9                   10                  11                12               13               14                    15                16                17                18                  19                  20                  21               22                  23               24              25             26             27                28               29           30                31
-    QueryResult result = DBCDatabase.Query("SELECT ID, ReputationIndex, ReputationRaceMask_1, ReputationRaceMask_2, ReputationRaceMask_3, ReputationRaceMask_4, ReputationClassMask_1, ReputationClassMask_2, ReputationClassMask_3, ReputationClassMask_4, ReputationBase_1, ReputationBase_2, ReputationBase_3, ReputationBase_4, ReputationFlags_1, ReputationFlags_2, ReputationFlags_3, ReputationFlags_4, ParentFactionID, ParentFactionMod_1, ParentFactionMod_2, ParentFactionCap_1, ParentFactionCap_2, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_faction");
+    //                                                0          1                  2                    3                    4                     5                       6                       7                     8                     9                   10                  11                12               13               14                    15                16                17                18                  19                  20                  21               22                  23               24              25             26             27                28               29           30                31            32            33              34             35               36              37
+    QueryResult result = DBCDatabase.Query("SELECT ID, ReputationIndex, ReputationRaceMask_1, ReputationRaceMask_2, ReputationRaceMask_3, ReputationRaceMask_4, ReputationClassMask_1, ReputationClassMask_2, ReputationClassMask_3, ReputationClassMask_4, ReputationBase_1, ReputationBase_2, ReputationBase_3, ReputationBase_4, ReputationFlags_1, ReputationFlags_2, ReputationFlags_3, ReputationFlags_4, ParentFactionID, ParentFactionMod_1, ParentFactionMod_2, ParentFactionCap_1, ParentFactionCap_2, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT FROM dbc_faction");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_faction. DB table `dbc_faction` is empty.");
@@ -2608,8 +2608,8 @@ void DBCStoresMgr::_Load_ItemRandomProperties()
     uint32 oldMSTime = getMSTime();
 
     _itemRandomPropertiesMap.clear();
-    //                                                0       1              2              3                4              5               6               7               8               9               10              11              12
-    QueryResult result = DBCDatabase.Query("SELECT ID, Enchantment_1, Enchantment_2, Enchantment_3, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU FROM dbc_itemrandomproperties");
+    //                                                0       1              2              3                4              5               6               7               8               9               10              11              12            13              14              15             16               17             18
+    QueryResult result = DBCDatabase.Query("SELECT ID, Enchantment_1, Enchantment_2, Enchantment_3, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT FROM dbc_itemrandomproperties");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemrandomproperties. DB table `dbc_itemrandomproperties` is empty.");
@@ -2645,8 +2645,8 @@ void DBCStoresMgr::_Load_ItemRandomSuffix()
     uint32 oldMSTime = getMSTime();
 
     _itemRandomSuffixMap.clear();
-    //                                                0          1              2              3                4              5               6               7               8               9                10           11             12              13              14                15
-    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Enchantment_1, Enchantment_2, Enchantment_3, AllocationPct_1, AllocationPct_2, AllocationPct_3 FROM dbc_itemrandomsuffix");
+    //                                             0          1              2              3                4              5               6               7               8               9                10           11             12              13              14                15               16            17              18              19              20               21
+    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT, Enchantment_1, Enchantment_2, Enchantment_3, AllocationPct_1, AllocationPct_2, AllocationPct_3 FROM dbc_itemrandomsuffix");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemrandomsuffix. DB table `dbc_itemrandomsuffix` is empty.");
@@ -2665,10 +2665,10 @@ void DBCStoresMgr::_Load_ItemRandomSuffix()
             irs.Name[i] = fields[1 + i].GetString();
 
         for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; i++)
-            irs.Enchantment[i] = fields[10 + i].GetUInt32();
+            irs.Enchantment[i] = fields[16 + i].GetUInt32();
 
         for (uint8 i = 0; i < MAX_ITEM_ENCHANTMENT_EFFECTS; i++)
-            irs.AllocationPct[i] = fields[13 + i].GetUInt32();
+            irs.AllocationPct[i] = fields[19 + i].GetUInt32();
 
         _itemRandomSuffixMap[id] = irs;
 
@@ -2695,8 +2695,8 @@ void DBCStoresMgr::_Load_ItemSet()
     uint32 oldMSTime = getMSTime();
 
     _itemSetMap.clear();
-    //                                                0          1              2              3                4              5               6               7               8               9            10        11        12        13        14        15        16        17        18        19           20             21             22             23          24            25           26            27             28             29             30                31              32              33              34              35              36              37
-    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, SetSpellID_1, SetSpellID_2, SetSpellID_3, SetSpellID_4, SetSpellID_5, SetSpellID_6, SetSpellID_7, SetSpellID_8, SetThreshold_1, SetThreshold_2, SetThreshold_3, SetThreshold_4, SetThreshold_5, SetThreshold_6, SetThreshold_7, SetThreshold_8, RequiredSkill, RequiredSkillRank FROM dbc_itemset");
+    //                                             0          1              2              3                4              5               6               7               8               9                10              11              12              13              14             15           16        17        18        19        20        21        22         23        24         25          26           27             28             29            30          31             32           33              34              35              36              37              38               39            40              41              42                 43
+    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT, ItemID_1, ItemID_2, ItemID_3, ItemID_4, ItemID_5, ItemID_6, ItemID_7, ItemID_8, ItemID_9, ItemID_10, SetSpellID_1, SetSpellID_2, SetSpellID_3, SetSpellID_4, SetSpellID_5, SetSpellID_6, SetSpellID_7, SetSpellID_8, SetThreshold_1, SetThreshold_2, SetThreshold_3, SetThreshold_4, SetThreshold_5, SetThreshold_6, SetThreshold_7, SetThreshold_8, RequiredSkill, RequiredSkillRank FROM dbc_itemset");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_itemset. DB table `dbc_itemset` is empty.");
@@ -2715,16 +2715,16 @@ void DBCStoresMgr::_Load_ItemSet()
             is.Name[i] = fields[1 + i].GetString();
 
         for (uint8 i = 0; i < MAX_ITEM_SET_ITEMS; i++)
-            is.ItemID[i] = fields[10 + i].GetUInt32();
+            is.ItemID[i] = fields[16 + i].GetUInt32();
 
         for (uint8 i = 0; i < MAX_ITEM_SET_SPELLS; i++)
-            is.SetSpellID[i] = fields[20 + i].GetUInt32();
+            is.SetSpellID[i] = fields[26 + i].GetUInt32();
 
         for (uint8 i = 0; i < MAX_ITEM_SET_SPELLS; i++)
-            is.SetThreshold[i] = fields[28 + i].GetUInt32();
+            is.SetThreshold[i] = fields[34 + i].GetUInt32();
 
-        is.RequiredSkill     = fields[36].GetUInt32();
-        is.RequiredSkillRank = fields[37].GetUInt32();
+        is.RequiredSkill     = fields[42].GetUInt32();
+        is.RequiredSkillRank = fields[43].GetUInt32();
 
         _itemSetMap[id] = is;
 
@@ -2741,8 +2741,8 @@ void DBCStoresMgr::_Load_LFGDungeons()
     uint32 oldMSTime = getMSTime();
 
     _lfgDungeonMap.clear();
-    //                                                0          1              2              3                4              5               6               7               8               9            10        11          12             13                 14          15        16        17     18        19           20
-    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, MinLevel, MaxLevel, Target_Level, Target_Level_Min, Target_Level_Max, MapID, Difficulty, Flags, TypeID, ExpansionLevel, Group_Id FROM dbc_lfgdungeons");
+    //                                             0          1              2              3                4              5               6               7               8               9              10                11                12             13             14            15            16         17          18              19             20              21      22        23       24        25           26
+    QueryResult result = DBCDatabase.Query("SELECT ID, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT, MinLevel, MaxLevel, Target_Level, Target_Level_Min, Target_Level_Max, MapID, Difficulty, Flags, TypeID, ExpansionLevel, Group_Id FROM dbc_lfgdungeons");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_lfgdungeons. DB table `dbc_lfgdungeons` is empty.");
@@ -2760,17 +2760,17 @@ void DBCStoresMgr::_Load_LFGDungeons()
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
             ld.Name[i] = fields[1 + i].GetString();
 
-        ld.MinLevel       = fields[10].GetUInt32();
-        ld.MaxLevel       = fields[11].GetUInt32();
-        ld.TargetLevel    = fields[12].GetUInt32();
-        ld.TargetLevelMin = fields[13].GetUInt32();
-        ld.TargetLevelMax = fields[14].GetUInt32();
-        ld.MapID          = fields[15].GetInt32();
-        ld.Difficulty     = fields[16].GetUInt32();
-        ld.Flags          = fields[17].GetUInt32();
-        ld.TypeID         = fields[18].GetUInt32();
-        ld.ExpansionLevel = fields[19].GetUInt32();
-        ld.GroupID        = fields[20].GetUInt32();
+        ld.MinLevel       = fields[16].GetUInt32();
+        ld.MaxLevel       = fields[17].GetUInt32();
+        ld.TargetLevel    = fields[18].GetUInt32();
+        ld.TargetLevelMin = fields[19].GetUInt32();
+        ld.TargetLevelMax = fields[20].GetUInt32();
+        ld.MapID          = fields[21].GetInt32();
+        ld.Difficulty     = fields[22].GetUInt32();
+        ld.Flags          = fields[23].GetUInt32();
+        ld.TypeID         = fields[24].GetUInt32();
+        ld.ExpansionLevel = fields[25].GetUInt32();
+        ld.GroupID        = fields[26].GetUInt32();
 
         _lfgDungeonMap[id] = ld;
 
@@ -2897,8 +2897,8 @@ void DBCStoresMgr::_Load_MailTemplate()
     uint32 oldMSTime = getMSTime();
 
     _mailTemplateMap.clear();
-    //                                                0         1               2               3               4               5               6               7               8               9
-    QueryResult result = DBCDatabase.Query("SELECT ID, Body_Lang_enUS, Body_Lang_koKR, Body_Lang_frFR, Body_Lang_deDE, Body_Lang_zhCN, Body_Lang_zhTW, Body_Lang_esES, Body_Lang_esMX, Body_Lang_ruRU FROM dbc_mailtemplate");
+    //                                             0         1               2               3               4               5               6               7               8               9              10               11             12                13               14            15
+    QueryResult result = DBCDatabase.Query("SELECT ID, Body_Lang_enUS, Body_Lang_enGB, Body_Lang_koKR, Body_Lang_frFR, Body_Lang_deDE, Body_Lang_enCN, Body_Lang_zhCN, Body_Lang_enTW, Body_Lang_zhTW, Body_Lang_esES, Body_Lang_esMX, Body_Lang_ruRU, Body_Lang_ptPT, Body_Lang_ptBR, Body_Lang_itIT FROM dbc_mailtemplate");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_mailtemplate. DB table `dbc_mailtemplate` is empty.");
@@ -2931,8 +2931,8 @@ void DBCStoresMgr::_Load_Map()
     uint32 oldMSTime = getMSTime();
 
     _mapMap.clear();
-    //                                                0         1         2            3                  4               5                   6                   7                  8                  9                10                    11             12           13              14          15       16         17          18           19
-    QueryResult result = DBCDatabase.Query("SELECT ID, InstanceType, Flags, MapName_Lang_enUS, MapName_Lang_koKR, MapName_Lang_frFR, MapName_Lang_deDE, MapName_Lang_zhCN, MapName_Lang_zhTW, MapName_Lang_esES, MapName_Lang_esMX, MapName_Lang_ruRU, AreaTableID, LoadingScreenID, CorpseMapID, CorpseX, CorpseY, ExpansionID, RaidOffset, MaxPlayers FROM dbc_map");
+    //                                             0         1         2            3                  4               5                   6                   7                  8                  9                10                    11                12                13                    14             15                  16                   17             18           19                20       21         22         23           24         25
+    QueryResult result = DBCDatabase.Query("SELECT ID, InstanceType, Flags, MapName_Lang_enUS, MapName_Lang_enGB, MapName_Lang_koKR, MapName_Lang_frFR, MapName_Lang_deDE, MapName_Lang_enCN, MapName_Lang_zhCN, MapName_Lang_enTW, MapName_Lang_zhTW, MapName_Lang_esES, MapName_Lang_esMX, MapName_Lang_ruRU, MapName_Lang_ptPT, MapName_Lang_ptBR, MapName_Lang_itIT, AreaTableID, LoadingScreenID, CorpseMapID, CorpseX, CorpseY, ExpansionID, RaidOffset, MaxPlayers FROM dbc_map");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_map. DB table `dbc_map` is empty.");
@@ -2952,14 +2952,14 @@ void DBCStoresMgr::_Load_Map()
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
             m.MapName[i] = fields[3 + i].GetString();
 
-        m.AreaTableID     = fields[12].GetUInt32();
-        m.LoadingScreenID = fields[13].GetUInt32();
-        m.CorpseMapID     = fields[14].GetInt32();
-        m.Corpse.X        = fields[15].GetFloat();
-        m.Corpse.Y        = fields[16].GetFloat();
-        m.ExpansionID     = fields[17].GetUInt32();
-        m.RaidOffset      = fields[18].GetUInt32();
-        m.MaxPlayers      = fields[19].GetUInt32();
+        m.AreaTableID     = fields[18].GetUInt32();
+        m.LoadingScreenID = fields[19].GetUInt32();
+        m.CorpseMapID     = fields[20].GetInt32();
+        m.Corpse.X        = fields[21].GetFloat();
+        m.Corpse.Y        = fields[22].GetFloat();
+        m.ExpansionID     = fields[23].GetUInt32();
+        m.RaidOffset      = fields[24].GetUInt32();
+        m.MaxPlayers      = fields[25].GetUInt32();
 
         _mapMap[id] = m;
 
@@ -2976,8 +2976,8 @@ void DBCStoresMgr::_Load_MapDifficulty()
     uint32 oldMSTime = getMSTime();
 
     _mapDifficultyMap.clear();
-    //                                                0    1        2                3                  4                  5                   6                   7                 8                  9                  10               11              12          13
-    QueryResult result = DBCDatabase.Query("SELECT ID, MapID, Difficulty,  Message_Lang_enUS, Message_Lang_koKR, Message_Lang_frFR, Message_Lang_deDE, Message_Lang_zhCN, Message_Lang_zhTW, Message_Lang_esES, Message_Lang_esMX, Message_Lang_ruRU, RaidDuration, MaxPlayers FROM dbc_mapdifficulty");
+    //                                                0    1        2                3                  4                  5                   6                   7                 8                  9                  10               11              12                    13              14                 15                   16                17             18            19
+    QueryResult result = DBCDatabase.Query("SELECT ID, MapID, Difficulty,  Message_Lang_enUS, Message_Lang_enGB, Message_Lang_koKR, Message_Lang_frFR, Message_Lang_deDE, Message_Lang_enCN, Message_Lang_zhCN, Message_Lang_enTW, Message_Lang_zhTW, Message_Lang_esES, Message_Lang_esMX, Message_Lang_ruRU, Message_Lang_ptPT, Message_Lang_ptBR, Message_Lang_itIT, RaidDuration, MaxPlayers FROM dbc_mapdifficulty");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_mapdifficulty. DB table `dbc_mapdifficulty` is empty.");
@@ -2997,8 +2997,8 @@ void DBCStoresMgr::_Load_MapDifficulty()
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
             md.Message[i] = fields[3 + i].GetString();
 
-        md.RaidDuration = fields[12].GetUInt32();
-        md.MaxPlayers   = fields[13].GetUInt32();
+        md.RaidDuration = fields[18].GetUInt32();
+        md.MaxPlayers   = fields[19].GetUInt32();
 
         _mapDifficultyMap[id] = md;
 
@@ -3456,8 +3456,8 @@ void DBCStoresMgr::_Load_SkillLine()
     uint32 oldMSTime = getMSTime();
 
     _skillLineMap.clear();
-    //                                                0       1                    2                    3                       4                     5                     6                       7                   8                       9                         10            11          12
-    QueryResult result = DBCDatabase.Query("SELECT ID, CategoryID, DisplayName_Lang_enUS, DisplayName_Lang_koKR, DisplayName_Lang_frFR, DisplayName_Lang_deDE, DisplayName_Lang_zhCN, DisplayName_Lang_zhTW, DisplayName_Lang_esES, DisplayName_Lang_esMX, DisplayName_Lang_ruRU, SpellIconID, CanLink FROM dbc_skillline");
+    //                                             0       1                    2                    3                       4                     5                     6                       7                   8                       9                         10                   11                        12               13                          14                  15                      16               17          18
+    QueryResult result = DBCDatabase.Query("SELECT ID, CategoryID, DisplayName_Lang_enUS, DisplayName_Lang_enGB, DisplayName_Lang_koKR, DisplayName_Lang_frFR, DisplayName_Lang_deDE, DisplayName_Lang_enCN, DisplayName_Lang_zhCN, DisplayName_Lang_enTW, DisplayName_Lang_zhTW, DisplayName_Lang_esES, DisplayName_Lang_esMX, DisplayName_Lang_ruRU, DisplayName_Lang_ptPT, DisplayName_Lang_ptBR, DisplayName_Lang_itIT,  SpellIconID, CanLink FROM dbc_skillline");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_skillline. DB table `dbc_skillline` is empty.");
@@ -3475,8 +3475,8 @@ void DBCStoresMgr::_Load_SkillLine()
         sl.CategoryID = fields[1].GetInt32();
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
             sl.DisplayName[i] = fields[2 + i].GetString();
-        sl.SpellIconID = fields[11].GetUInt32();
-        sl.CanLink     = fields[12].GetUInt32();        
+        sl.SpellIconID = fields[17].GetUInt32();
+        sl.CanLink     = fields[18].GetUInt32();        
 
         _skillLineMap[id] = sl;
 
@@ -3775,37 +3775,37 @@ void DBCStoresMgr::_Load_Spell()
         "ActiveIconID, "// 134                   133
         "SpellPriority, "// 135                   134
         "Name_Lang_enUS, "// 136                   135
-        //"Name_Lang_enGB, "// 137
+        "Name_Lang_enGB, "// 137
         "Name_Lang_koKR, "// 138                   136
         "Name_Lang_frFR, "// 139                   137
         "Name_Lang_deDE, "// 140                   138
-        //"Name_Lang_enCN, "// 141
+        "Name_Lang_enCN, "// 141
         "Name_Lang_zhCN, "// 142                   139
-        //"Name_Lang_enTW, "// 143
+        "Name_Lang_enTW, "// 143
         "Name_Lang_zhTW, "// 144                   140
         "Name_Lang_esES, "// 145                   141
         "Name_Lang_esMX, "// 146                   142
         "Name_Lang_ruRU, "// 147                   143
-        //"Name_Lang_ptPT, "// 148
-        //"Name_Lang_ptBR, "// 149
-        //"Name_Lang_itIT, "// 150
+        "Name_Lang_ptPT, "// 148
+        "Name_Lang_ptBR, "// 149
+        "Name_Lang_itIT, "// 150
         //"Name_Lang_Unk, "// 151
         //"Name_Lang_Mask, "// 152
         "NameSubtext_Lang_enUS, "// 153                   144
-        //"NameSubtext_Lang_enGB, "// 154
+        "NameSubtext_Lang_enGB, "// 154
         "NameSubtext_Lang_koKR, "// 155                   145
         "NameSubtext_Lang_frFR, "// 156                   146
         "NameSubtext_Lang_deDE, "// 157                   147
-        //"NameSubtext_Lang_enCN, "// 158
+        "NameSubtext_Lang_enCN, "// 158
         "NameSubtext_Lang_zhCN, "// 159                   148
-        //"NameSubtext_Lang_enTW, "// 160
+        "NameSubtext_Lang_enTW, "// 160
         "NameSubtext_Lang_zhTW, "// 161                   149
         "NameSubtext_Lang_esES, "// 162                   150
         "NameSubtext_Lang_esMX, "// 163                   151
         "NameSubtext_Lang_ruRU, "// 164                   152
-        //"NameSubtext_Lang_ptPT, "// 165
-        //"NameSubtext_Lang_ptBR, "// 166
-        //"NameSubtext_Lang_itIT, "// 167
+        "NameSubtext_Lang_ptPT, "// 165
+        "NameSubtext_Lang_ptBR, "// 166
+        "NameSubtext_Lang_itIT, "// 167
         //"NameSubtext_Lang_Unk, "// 168
         /*"NameSubtext_Lang_Mask, "// 169
         "Description_Lang_enUS, "// 170
@@ -4022,39 +4022,39 @@ void DBCStoresMgr::_Load_Spell()
 
         //uint32 Name_lang_mask; (UNUSED)
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
-            s.NameSubtext[i] = fields[144 + i].GetString();
+            s.NameSubtext[i] = fields[150 + i].GetString();
 
         //uint32 NameSubtext_lang_mask; (UNUSED)
         //std::array<char const*, 16> Description; (UNUSED)
         //uint32 Description_lang_mask; (UNUSED)
         //std::array<char const*, 16> AuraDescription; (UNUSED)
         //uint32 AuraDescription_lang_mask; (UNUSED)
-        s.ManaCostPct           = fields[153].GetUInt32();
-        s.StartRecoveryCategory = fields[154].GetUInt32();
-        s.StartRecoveryTime     = fields[155].GetUInt32();
-        s.MaxTargetLevel        = fields[156].GetUInt32();
-        s.SpellClassSet         = fields[157].GetUInt32();
-        s.SpellClassMask.Set(fields[158].GetUInt32(), fields[159].GetUInt32(), fields[160].GetUInt32());
-        s.MaxTargets            = fields[161].GetUInt32();
-        s.DefenseType           = fields[162].GetUInt32();
-        s.PreventionType        = fields[163].GetUInt32();
+        s.ManaCostPct           = fields[165].GetUInt32();
+        s.StartRecoveryCategory = fields[166].GetUInt32();
+        s.StartRecoveryTime     = fields[167].GetUInt32();
+        s.MaxTargetLevel        = fields[168].GetUInt32();
+        s.SpellClassSet         = fields[169].GetUInt32();
+        s.SpellClassMask.Set(fields[170].GetUInt32(), fields[171].GetUInt32(), fields[172].GetUInt32());
+        s.MaxTargets            = fields[173].GetUInt32();
+        s.DefenseType           = fields[174].GetUInt32();
+        s.PreventionType        = fields[175].GetUInt32();
         //uint32 StanceBarOrder; (UNUSED)
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
-            s.EffectChainAmplitude[i] = fields[164 + i].GetFloat();
+            s.EffectChainAmplitude[i] = fields[176 + i].GetFloat();
 
         //uint32 MinFactionID; (UNUSED)
         //uint32 MinReputation; (UNUSED)
         //uint32 RequiredAuraVision; (UNUSED)
         for (uint8 i = 0; i < 2; i++)
-            s.RequiredTotemCategoryID[i] = fields[167].GetUInt32();
+            s.RequiredTotemCategoryID[i] = fields[179].GetUInt32();
 
-        s.RequiredAreasID = fields[169].GetUInt32();
-        s.SchoolMask      = fields[170].GetUInt32();
-        s.RuneCostID      = fields[171].GetUInt32();
+        s.RequiredAreasID = fields[181].GetUInt32();
+        s.SchoolMask      = fields[182].GetUInt32();
+        s.RuneCostID      = fields[183].GetUInt32();
         //uint32 SpellMissileID; (UNUSED)
         //uint32 PowerDisplayID; (UNUSED)
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
-            s.EffectBonusCoefficient[i] = fields[172 + i].GetFloat();
+            s.EffectBonusCoefficient[i] = fields[184 + i].GetFloat();
 
         //uint32 DescriptionVariablesID; (UNUSED)
         //uint32 Difficulty; (UNUSED)
@@ -4143,8 +4143,8 @@ void DBCStoresMgr::_Load_SpellItemEnchantment()
     uint32 oldMSTime = getMSTime();
 
     _spellItemEnchantmentMap.clear();
-    //                                                0    1           2        3           4                   5                   6               7           8              9            10              11              12              13              14              15              16              17              18             19       20        21            22          23                  24            25
-    QueryResult result = DBCDatabase.Query("SELECT ID, Effect_1, Effect_2, Effect_3, EffectPointsMin_1, EffectPointsMin_2, EffectPointsMin_3, EffectArg_1, EffectArg_2, EffectArg_3, Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, ItemVisual, Flags, Src_ItemID, Condition_Id, RequiredSkillID, RequiredSkillRank, MinLevel FROM dbc_spellitemenchantment");
+    //                                                0    1           2        3           4                   5                   6               7           8              9            10              11              12              13              14              15              16              17              18             19                20              21             22               23          24             25        26        27        28               29                30             31
+    QueryResult result = DBCDatabase.Query("SELECT ID, Effect_1, Effect_2, Effect_3, EffectPointsMin_1, EffectPointsMin_2, EffectPointsMin_3, EffectArg_1, EffectArg_2, EffectArg_3, Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT, ItemVisual, Flags, Src_ItemID, Condition_Id, RequiredSkillID, RequiredSkillRank, MinLevel FROM dbc_spellitemenchantment");
     if (!result)
     {
         FMT_LOG_INFO("server.loading", ">> Loaded 0 DBC_spellitemenchantment. DB table `dbc_spellitemenchantment` is empty.");
@@ -4168,13 +4168,13 @@ void DBCStoresMgr::_Load_SpellItemEnchantment()
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
             sie.Name[i] = fields[10 + i].GetString();
 
-        sie.ItemVisual        = fields[19].GetUInt32();
-        sie.Flags             = fields[20].GetUInt32();
-        sie.SrcItemID         = fields[21].GetUInt32();
-        sie.ConditionID       = fields[22].GetUInt32();
-        sie.RequiredSkillID   = fields[23].GetUInt32();
-        sie.RequiredSkillRank = fields[24].GetUInt32();
-        sie.MinLevel          = fields[25].GetUInt32();
+        sie.ItemVisual        = fields[25].GetUInt32();
+        sie.Flags             = fields[26].GetUInt32();
+        sie.SrcItemID         = fields[27].GetUInt32();
+        sie.ConditionID       = fields[28].GetUInt32();
+        sie.RequiredSkillID   = fields[29].GetUInt32();
+        sie.RequiredSkillRank = fields[30].GetUInt32();
+        sie.MinLevel          = fields[31].GetUInt32();
 
         _spellItemEnchantmentMap[id] = sie;
 
@@ -4679,11 +4679,11 @@ void DBCStoresMgr::_Load_TaxiNodes()
     uint32 oldMSTime = getMSTime();
 
     _taxiNodesMap.clear();
-    //                                                0    1          2  3  4
+    //                                             0     1          2  3  4
     QueryResult result = DBCDatabase.Query("SELECT ID, ContinentID, X, Y, Z, "
-    //          5               6               7               8               9               10              11              12          13
-        "Name_Lang_enUS, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_zhCN, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, "
-    //          14                  15
+    //          5               6               7               8               9               10              11              12          13                14              15              16              17              18              19
+        "Name_Lang_enUS, Name_Lang_enGB, Name_Lang_koKR, Name_Lang_frFR, Name_Lang_deDE, Name_Lang_enCN, Name_Lang_zhCN, Name_Lang_enTW, Name_Lang_zhTW, Name_Lang_esES, Name_Lang_esMX, Name_Lang_ruRU, Name_Lang_ptPT, Name_Lang_ptBR, Name_Lang_itIT,"
+    //          20                  21
         "MountCreatureID_1, MountCreatureID_2 FROM dbc_taxinodes");
     if (!result)
     {
@@ -4706,7 +4706,7 @@ void DBCStoresMgr::_Load_TaxiNodes()
         for (uint8 i = 0; i < TOTAL_LOCALES; i++)
             tn.Name[i] = fields[5 + i].GetString();
         for (uint8 i = 0; i < 2; i++)
-            tn.MountCreatureID[i] = fields[14 + i].GetUInt32();
+            tn.MountCreatureID[i] = fields[20 + i].GetUInt32();
 
         _taxiNodesMap[id] = tn;
 
