@@ -147,7 +147,7 @@ public:
         if (player->IsPremium())
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GTS(LANG_ITEM_VIP_MENU), GOSSIP_SENDER_MAIN, 10);
 
-        if (player->CanReceiveStartPack())
+        if (player->CanReceiveStartPack() && player->GetLevel() == DEFAULT_MAX_LEVEL)
         {
             // Start pack
             switch (player->GetClass())
